@@ -52,28 +52,32 @@ forward by one step.
   an outside-the-tool concern.
 - **Closed problem set.** No user-extensible vocabulary, no plug-in
   primitives, no compiled foreign callables embedded in the tree.
-- **No notebook-driven workflow.** The notebook in `notebooks/` is a
-  validation harness, not the intended interface. The intended interface
+- **No notebook-driven workflow.** The notebook in `../notebooks/` is a
+  validation and tour harness, not the intended interface. The intended
+  interface
   is the CLI.
 
 ## Repository layout
 
 ```
-compose-physics/
-├── algebra/                 closed-form IR, vocabulary, solver
-│   ├── expression-trees.lisp
-│   ├── problem.lisp
-│   ├── vocabulary/
-│   └── solve/
-├── emission/                tree → chunked C kernels + dispatch + Makefile
-├── persistence/             canonical sexp, content-hashing, registry writer
-│   ├── sexp/
-│   └── registry/
-├── compose_physics/         Python CLI (argparse + rich)
-│   └── cli/
-├── notebooks/               three-mass / four-spring validation harness
-├── compose-physics.asd
-└── packages.lisp
+n-Op/
+├── compose-physics/         this project (managed via _darcs)
+│   ├── algebra/             closed-form IR, vocabulary, solver
+│   │   ├── expression-trees.lisp
+│   │   ├── problem.lisp
+│   │   ├── vocabulary/
+│   │   └── solve/
+│   ├── emission/            tree → chunked C kernels + dispatch + Makefile
+│   ├── persistence/         canonical sexp, content-hashing, registry writer
+│   │   ├── sexp/
+│   │   └── registry/
+│   ├── compose_physics/     Python CLI (argparse + rich)
+│   │   └── cli/
+│   ├── compose-physics.asd
+│   └── packages.lisp
+└── notebooks/               validation + tour notebooks (sibling to compose-physics)
+    ├── three-mass-four-spring.lisp
+    └── three-mass-four-spring.ipynb
 ```
 
 ## Requirements
@@ -85,8 +89,8 @@ compose-physics/
 
 ## Usage
 
-Author a problem in Lisp (see `notebooks/three-mass-four-spring.lisp` for a
-reference) and register it:
+Author a problem in Lisp (see `../notebooks/three-mass-four-spring.lisp`
+for a reference) and register it:
 
 ```sh
 python -m compose_physics register path/to/problem.lisp \
@@ -111,6 +115,16 @@ production but breaks bit-identity comparisons against the Lisp-side
 funcall path because of FP reassociation. For any test that requires
 Lisp-vs-C bit identity, register the problem with
 `-O2 -fPIC -fno-fast-math -fno-associative-math`.
+
+## Validation and tour
+
+[`../notebooks/three-mass-four-spring.ipynb`](../notebooks/three-mass-four-spring.ipynb)
+exercises the entire surface of the tool against a 3-mass / 4-spring 1D
+chain — IR construction, vocabulary, simplifier, solver (success and
+failure modes), canonical sexp + content hashing, serialize/deserialize
+round-trip, emitted C inspection, CLI registration, ctypes binding, and
+the four numerical invariants (eigenmodes, residual at zero, Lisp-vs-C
+bit identity, energy conservation).
 
 ## Status
 

@@ -1,0 +1,505 @@
+# Group B — Electronic, Magnetic, Optical
+
+Deep mathematical research for the n-Op `/physics` library. Scope: the three
+regimes whose primary degrees of freedom are the **electrons** (with spin) and
+their coupling to the **electromagnetic field**. The shared substrate is
+quantum mechanical: Hilbert spaces, density matrices, effective single-particle
+operators with state-dependent closures.
+
+The three regimes are instances of a single underlying structure: an effective
+one-body theory built on top of the (possibly Pauli-spinor) one-body density
+matrix $\hat\gamma(r, r'; t)$, with a state-dependent Hamiltonian $\hat H[\hat\gamma]$
+and a closure functional injecting the many-body physics.
+
+Notation:
+
+- $\hat\gamma(r, r')$ — one-body reduced density matrix (1RDM). In spin-DFT,
+  promoted to a 2×2 Pauli-spinor matrix $\hat\gamma_{\alpha\beta}(r, r')$.
+- $\rho(r) = \mathrm{tr}_\sigma\, \hat\gamma(r, r)$ — charge density.
+- $\mathbf m(r) = \mathrm{tr}_\sigma\,[\boldsymbol\sigma\, \hat\gamma(r, r)]$ —
+  magnetization vector field.
+- $\psi_{n\mathbf k}(r)$ — Bloch orbitals indexed by band $n$ and crystal
+  momentum $\mathbf k$; occupations $f_{n\mathbf k}$.
+- $\mathbf A(r, t), \mathbf E(r, t), \mathbf B(r, t)$ — EM vector potential and
+  derived fields.
+- $\chi(r, r', \omega)$ — density-density response.
+- $\hat L(t, t')$ — two-particle electron-hole propagator (Bethe–Salpeter).
+
+---
+
+## Regime 1 — Electronic
+
+### E.1 Mathematical formalism
+
+**Static ground state** (Hohenberg–Kohn / Kohn–Sham). The Hohenberg–Kohn
+theorems establish that the ground-state energy is a unique functional of
+the density $\rho(r)$. Kohn–Sham reduces this to an effective single-particle
+problem:
+
+$$
+E_{\rm KS}[\rho;\mathbf R,\mathbf h] = T_s[\{\psi_i\}] + \int v_{\rm ext}(\mathbf r;\mathbf R)\,\rho(\mathbf r)\,d\mathbf r + \tfrac12\!\int\!\!\int\!\frac{\rho(\mathbf r)\rho(\mathbf r')}{|\mathbf r-\mathbf r'|}\,d\mathbf r\,d\mathbf r' + E_{xc}[\rho] + V_{II},
+$$
+
+with the Kohn–Sham one-electron Hamiltonian
+
+$$
+\hat H_{\rm KS} = -\frac{\hbar^2}{2m}\nabla^2 + v_{\rm eff}(\mathbf r), \qquad v_{\rm eff} = v_{\rm ext} + v_H + v_{xc},
+$$
+
+and the self-consistency loop
+
+$$
+\hat H_{\rm KS}[\rho]\,\psi_i = \varepsilon_i \psi_i, \qquad \rho(\mathbf r) = \sum_i f_i |\psi_i(\mathbf r)|^2.
+$$
+
+**Time-dependent generalization** (TDKS): by the Runge–Gross theorem the
+time-dependent density determines the external potential up to a gauge, so a
+formally exact single-particle reduction exists:
+
+$$
+i\hbar\,\partial_t \psi_j(\mathbf r, t) = \hat H_{\rm KS}[\rho(t); t]\,\psi_j(\mathbf r, t).
+$$
+
+Equivalently in density-matrix form (Liouville–von Neumann):
+
+$$
+i\hbar\,\partial_t \hat\gamma = [\hat H_{\rm KS}, \hat\gamma].
+$$
+
+Note crucially that $\hat H_{\rm KS}$ depends on the state through
+$\rho(t) = \hat\gamma(r, r)$ — the equation is nonlinear in $\hat\gamma$.
+The variational principle underlying TDKS is van Leeuwen's
+Keldysh-contour-resolved action; this resolves the so-called "causality
+paradox" of naively defined TDDFT actions.
+
+### E.2 State at instant $t$
+
+**Independent (state):** the set of occupied Kohn–Sham orbitals
+$\{\psi_{n\mathbf k}(r)\}$ indexed by band and Bloch momentum, with
+occupations $\{f_{n\mathbf k}\}$ constrained by Fermi–Dirac. Equivalently,
+the one-body density matrix
+
+$$
+\hat\gamma(r, r') = \sum_{n\mathbf k} f_{n\mathbf k}\, \psi_{n\mathbf k}(r)\, \psi^*_{n\mathbf k}(r').
+$$
+
+**Derived (not state):** $\rho(r) = \hat\gamma(r, r)$; total energy
+$E[\rho]$; eigenvalues $\varepsilon_{n\mathbf k}$; Fermi level $E_F$; band
+structure.
+
+Dimensions: each $\psi_{n\mathbf k}$ lives in
+$L^2(\Omega_{\rm cell}) \otimes \mathbf k\text{-mesh}$. After discretization
+on a plane-wave basis of size $N_G$ and a $\mathbf k$-mesh of size $N_k$ with
+$N_b$ bands, the orbital data is $N_G \times N_k \times N_b$ complex numbers.
+
+### E.3 Dynamics
+
+- **Ground-state SCF**: not a time dynamics — a *fixed-point iteration* on
+  the loop $\rho \to v_{\rm eff}[\rho] \to \hat H_{\rm KS} \to \{\psi_i\} \to \rho$.
+  Convergence is via Pulay / Anderson / Broyden density mixing.
+- **TDKS**: the Liouville–von Neumann form above; integrated by Crank–Nicolson,
+  Magnus, or split-operator schemes for real-time TDDFT.
+- **Imaginary-time**: a gradient flow on the energy functional toward the ground
+  state, used as an alternative to SCF.
+
+### E.4 Conservation / constraints
+
+- **Orthonormality** $\langle \psi_i | \psi_j \rangle = \delta_{ij}$:
+  preserved exactly by unitary evolution (TDKS) and enforced by Gram-Schmidt
+  in iterative methods.
+- **Particle number** $\int \rho\, d\mathbf r = N$: conserved.
+- **Idempotency** at $T = 0$: $\hat\gamma^2 = \hat\gamma$ (integer
+  occupations).
+- **Causality** of response kernels (see Optical).
+- **Hermiticity** of $\hat H_{\rm KS}$ and $\hat\gamma$ at all times.
+- **Gauge invariance** in the time-dependent setting (residual after the
+  Runge–Gross fixing).
+
+### E.5 Standard observables
+
+| Observable | Reads from | Operation |
+|---|---|---|
+| Band structure $\varepsilon_n(\mathbf k)$ | $\hat H_{\rm KS}$ | diagonalize along BZ path |
+| Density of states $g(E)$ | $\{\varepsilon_{n\mathbf k}\}$ | $\sum_{n\mathbf k} \delta(E - \varepsilon_{n\mathbf k})$ |
+| Band gap $E_g$ | bands | $\min_{\mathbf k} \varepsilon_{c,\mathbf k} - \max_{\mathbf k} \varepsilon_{v,\mathbf k}$ |
+| Charge density $\rho(\mathbf r)$ | $\hat\gamma$ | diagonal trace |
+| Total energy $E$ | $\rho$ | $E_{\rm KS}[\rho]$ |
+| Forces $\mathbf F_I$ | $E_{\rm KS}$ | Hellmann–Feynman ($-\partial E/\partial \mathbf R_I$) |
+| Fermi level $E_F$ | $g(E)$, $N$ | $\int^{E_F} g \, dE = N$ |
+
+### E.6 Couplings to other regimes
+
+- **Structural**: Hellmann–Feynman forces $\mathbf F_I = -\partial E/\partial \mathbf R_I$.
+  Electronic structure determines forces; forces drive ion dynamics.
+- **Thermal / phonon**: electron–phonon coupling
+  $g_{nm,\nu}(\mathbf k, \mathbf q) = \langle \psi_{n,\mathbf k+\mathbf q} | \partial V/\partial u_{\mathbf q,\nu} | \psi_{m,\mathbf k} \rangle / \sqrt{2 M \omega_{\mathbf q\nu}}$.
+  Drives phonon-limited resistivity, superconductivity, Allen–Heine–Cardona
+  temperature renormalization of band gap.
+- **Transport**: Boltzmann transport equation reads $\varepsilon_n(\mathbf k)$
+  and group velocities $\mathbf v_n(\mathbf k) = \hbar^{-1} \nabla_{\mathbf k}\varepsilon_n(\mathbf k)$.
+- **Thermodynamic**: free-energy contribution
+  $F_{\rm el}[\rho; T] = E[\rho] - T S_{\rm el}$ with $S_{\rm el}$ from
+  Fermi–Dirac entropy of the electronic spectrum.
+- **Chemical**: charge-transfer integrals from molecular orbital overlaps;
+  Marcus reorganization energies.
+- **Optical / magnetic**: shared substrate $\hat\gamma$ (see those regimes).
+
+### E.7 Numerical methods
+
+Plane-wave DFT with norm-conserving or PAW pseudopotentials; LCAO bases
+(atomic orbitals); real-space grids; Green's-function methods (GW, BSE);
+tight-binding from Wannier interpolation. Sparsity: plane waves dense in
+$\mathbf G$; LCAO sparse in $\mathbf r$; tight-binding sparse in $\mathbf R$
+(Wannier-localized).
+
+---
+
+## Regime 2 — Magnetic
+
+### M.1 Mathematical formalism
+
+Two layered descriptions are standard, both reducible to a Pauli-spinor
+density matrix.
+
+**Microscopic (spin-DFT).** The KS Hamiltonian becomes a $2\times 2$
+Pauli-spinor operator:
+
+$$
+\hat H_{\rm KS} = \Big[-\frac{\hbar^2}{2m}\nabla^2 + v_{\rm eff}(\mathbf r)\Big]\,\mathbb 1 + \mu_B\,\boldsymbol\sigma \cdot \mathbf B_{\rm eff}(\mathbf r),
+$$
+
+with $\mathbf B_{\rm eff}(\mathbf r) = \mathbf B_{\rm ext}(\mathbf r) + \mathbf B_{xc}[\mathbf m](\mathbf r)$
+and the vector magnetization $\mathbf m(\mathbf r) = \mathrm{tr}_\sigma[\boldsymbol\sigma\,\hat\gamma(\mathbf r, \mathbf r)]$.
+This is the Vignale–Rasolt extension of DFT to the spin-current case.
+
+**Atomistic (effective spin model).** Project to localized spins:
+
+$$
+\hat H_{\rm spin} = -\sum_{i<j} J_{ij}\, \mathbf S_i \cdot \mathbf S_j - \sum_i K_i (\mathbf S_i \cdot \hat{\mathbf e}_i)^2 - \mu_s \sum_i \mathbf S_i \cdot \mathbf B_{\rm ext},
+$$
+
+with $|\mathbf S_i| = 1$ unit vectors, exchange constants $J_{ij}$, and
+single-ion anisotropy $K_i$.
+
+### M.2 State at instant $t$
+
+**Microscopic — independent:** Pauli-spinor KS orbitals
+$\{\psi_{n\mathbf k}(\mathbf r) = (\psi^\uparrow_{n\mathbf k}, \psi^\downarrow_{n\mathbf k})^\top\}$;
+equivalently the $2 \times 2$ density matrix $\hat\gamma_{\alpha\beta}(\mathbf r, \mathbf r')$.
+
+**Microscopic — derived:** $\rho(\mathbf r) = \mathrm{tr}_\sigma\,\hat\gamma(\mathbf r, \mathbf r)$;
+$\mathbf m(\mathbf r) = \mathrm{tr}_\sigma[\boldsymbol\sigma\,\hat\gamma]$;
+atomic magnetic moments $\boldsymbol\mu_I = \int_{\Omega_I} \mathbf m\, d\mathbf r$ over Wigner–Seitz spheres.
+
+**Atomistic — independent:** spin unit vectors $\{\mathbf S_i \in S^2\}$, one per atom.
+
+**Atomistic — derived:** total magnetization $\mathbf M = (1/N)\sum_i \mathbf S_i$;
+magnetic susceptibility; magnon dispersion (from spin-wave linearization).
+
+### M.3 Dynamics
+
+**Microscopic (TDKS-Pauli):**
+
+$$
+i\hbar\,\partial_t \psi_{j,\alpha}(\mathbf r, t) = \sum_\beta [\hat H_{\rm KS}]_{\alpha\beta}\, \psi_{j,\beta}(\mathbf r, t),
+$$
+
+equivalent to spin-Liouville $i\hbar\,\partial_t \hat\gamma = [\hat H_{\rm KS}, \hat\gamma]$.
+The local magnetization obeys
+
+$$
+\partial_t \mathbf m(\mathbf r, t) = \gamma\,\mathbf m(\mathbf r, t) \times \mathbf B_{xc}(\mathbf r, t) + \text{(non-local xc torque)},
+$$
+
+with $\mathbf B_{xc}$ generally non-parallel to $\mathbf m$ (transverse component drives precession).
+
+**Atomistic (Landau–Lifshitz–Gilbert):**
+
+$$
+\frac{d \mathbf S_i}{dt} = -\gamma \mathbf S_i \times \mathbf H_i^{\rm eff} + \alpha\, \mathbf S_i \times \frac{d \mathbf S_i}{dt},
+$$
+
+with $\mathbf H_i^{\rm eff} = -(1/\mu_s)\,\partial H_{\rm spin}/\partial \mathbf S_i$
+and Gilbert damping $\alpha$. The explicit (Landau–Lifshitz) form is
+
+$$
+\frac{d \mathbf S_i}{dt} = -\gamma'\, \mathbf S_i \times \mathbf H_i^{\rm eff} - \lambda\, \mathbf S_i \times (\mathbf S_i \times \mathbf H_i^{\rm eff}),
+$$
+
+with $\gamma' = \gamma/(1+\alpha^2)$ and $\lambda = \gamma \alpha/(1+\alpha^2)$.
+
+### M.4 Conservation / constraints
+
+- **Atomistic** $|\mathbf S_i| = 1$ preserved exactly by LLG (precession +
+  damping both lie in the tangent plane).
+- **Microscopic** spinor orthonormality $\langle \psi_i | \psi_j \rangle = \delta_{ij}$
+  preserved by unitary TDKS evolution.
+- **Total spin** $\mathbf M = \int \mathbf m\, d\mathbf r$ conserved in
+  absence of spin–orbit coupling; with SOC, only total $\mathbf J = \mathbf L + \mathbf S$ conserved.
+- **Time-reversal** symmetry: $\mathbf m(\mathbf r) \mapsto -\mathbf m(\mathbf r)$
+  under $t \mapsto -t$. Broken in ferromagnetic equilibrium.
+
+### M.5 Standard observables
+
+| Observable | Reads from | Operation |
+|---|---|---|
+| Magnetic moments $\boldsymbol\mu_I$ | $\hat\gamma$ | Wigner–Seitz integral of $\mathbf m$ |
+| Spin density $\mathbf m(\mathbf r)$ | $\hat\gamma$ | $\mathrm{tr}_\sigma[\boldsymbol\sigma\,\hat\gamma(\mathbf r,\mathbf r)]$ |
+| Exchange constants $J_{ij}$ | $\hat\gamma$ via Liechtenstein formula | $J_{ij} = (1/2\pi)\,\mathrm{Im}\int dE\,\mathrm{Tr}[\Delta_i G_{ij} \Delta_j G_{ji}]$ |
+| Magnon dispersion $\omega_{\mathbf q}$ | $\{J_{ij}\}$ via spin-wave linearization | eigenvalues of magnon matrix |
+| Curie / Néel temperature | $\{J_{ij}\}$ | mean-field or MC on Heisenberg model |
+
+### M.6 Couplings
+
+- **Electronic**: $\mathbf m(\mathbf r)$ is a state field of the electronic KS theory.
+- **Structural**: magneto-elastic coupling $H_{\rm me} = -B \sum_{ij} \mathbf S_i \cdot \boldsymbol\epsilon_{ij} \cdot \mathbf S_j$;
+  spin–lattice relaxation; magnetostriction.
+- **Thermal**: spin contribution to heat capacity from magnon DOS; magnon–phonon scattering.
+- **Transport**: spin transport, spin-Hall conductivity, anomalous Hall.
+- **Chemical**: spin-selective adsorption, magnetochemistry.
+
+### M.7 Numerical methods
+
+Spinor plane-wave DFT (VASP nspin=4, Quantum ESPRESSO); KKR Green's-function
+methods for $J_{ij}$ via Liechtenstein; atomistic LLG codes (Vampire, Spirit);
+spin-wave theory linearization for magnon spectra.
+
+---
+
+## Regime 3 — Optical
+
+### O.1 Mathematical formalism
+
+Three distinct regimes of optical response, all reducible to operators on
+the same $\hat\gamma$ substrate.
+
+**Linear response.** The frequency-resolved density-density response
+
+$$
+\chi(\mathbf r, \mathbf r', \omega) = \frac{\delta \rho(\mathbf r, \omega)}{\delta v_{\rm ext}(\mathbf r', \omega)},
+$$
+
+gives the dielectric function via $\varepsilon^{-1}(\mathbf r,\mathbf r',\omega) = \delta(\mathbf r-\mathbf r') + \int v(\mathbf r-\mathbf r'')\,\chi(\mathbf r'',\mathbf r',\omega)\,d\mathbf r''$.
+In TDDFT, $\chi$ obeys a Dyson equation
+
+$$
+\chi = \chi_0 + \chi_0\,(v + f_{xc})\,\chi,
+$$
+
+with KS susceptibility $\chi_0$ and xc kernel $f_{xc} = \delta v_{xc}/\delta \rho$.
+
+**Beyond independent-particle (excitonic).** The Bethe–Salpeter equation
+for the four-point particle-hole propagator:
+
+$$
+L = L_0 + L_0\,K\,L,
+$$
+
+with kernel $K = -i v + i W$ (screened-exchange minus bare-exchange).
+Required to capture excitonic bound states absent from RPA / TDDFT.
+
+**Real-time / strong-field.** Either real-time TDDFT propagation, or the
+semiconductor Bloch equations (SBE) for microscopic polarization
+$p_{\mathbf k}(t)$ and occupations $n_{\mathbf k}^{e/h}(t)$:
+
+$$
+i\hbar\,\partial_t p_{\mathbf k} = (\varepsilon_e + \varepsilon_h - i\gamma)\,p_{\mathbf k} + (n_{\mathbf k}^e + n_{\mathbf k}^h - 1)\,\Omega_{\mathbf k}(t) + \dots
+$$
+$$
+\partial_t n_{\mathbf k}^{e/h} = -2\,\mathrm{Im}[\Omega^*_{\mathbf k} p_{\mathbf k}],
+$$
+
+with Rabi frequency $\Omega_{\mathbf k} = \mathbf d_{\mathbf k} \cdot \mathbf E(t) + \sum_{\mathbf k'} V_{\mathbf k\mathbf k'}\,p_{\mathbf k'}$.
+Coupled to Maxwell:
+
+$$
+(\partial_t^2 + c^2 \nabla \times \nabla \times)\,\mathbf E = -\partial_t^2 \mathbf P, \qquad \mathbf P = \sum_{\mathbf k} \mathbf d_{\mathbf k}\,p_{\mathbf k}.
+$$
+
+### O.2 State at instant $t$
+
+**Linear response:** state is the equilibrium KS state plus a perturbative
+$\delta\rho(\mathbf r, \omega)$ — perturbatively *derived* from the KS state
+plus the external $v_{\rm ext}$.
+
+**Real-time TDDFT:** same INDEPENDENT state as Electronic (TDKS orbitals)
+plus the EM field $\mathbf A(\mathbf r, t)$ (with $\mathbf E = -\partial_t \mathbf A - \nabla\phi$,
+$\mathbf B = \nabla\times\mathbf A$).
+
+**SBE:** INDEPENDENT are $\{p_{\mathbf k}(t)\}$ (complex) and
+$\{n_{\mathbf k}^{e,h}(t)\}$ (real), plus the macroscopic $\mathbf E(\mathbf r, t)$.
+DERIVED: $\mathbf P(\mathbf r, t)$, $\varepsilon(\omega)$, $\alpha(\omega)$, $n(\omega)$.
+
+### O.3 Dynamics
+
+TDKS as in the Electronic regime; or the SBE / Maxwell–Bloch coupled
+system; or linear-response Dyson update for $\chi$. Causal structure
+$\chi(t < 0) = 0$ is enforced at the dynamics level.
+
+### O.4 Conservation / constraints
+
+- **Causality** ($\chi$ retarded, $\chi(t<0)=0$) and the resulting
+  **Kramers–Kronig relations**:
+
+  $$
+  \mathrm{Re}\,\varepsilon(\omega) = 1 + \frac{2}{\pi}\,P\int_0^\infty\!d\omega'\,\frac{\omega'\,\mathrm{Im}\,\varepsilon(\omega')}{{\omega'}^2 - \omega^2}.
+  $$
+
+- **f-sum rule** (Thomas–Reiche–Kuhn):
+
+  $$
+  \frac{2}{\pi}\int_0^\infty \omega\,\mathrm{Im}\,\varepsilon(\omega)\,d\omega = \omega_p^2 = \frac{4\pi n_e e^2}{m}.
+  $$
+
+- **Gauge invariance** under $\mathbf A \to \mathbf A + \nabla\chi$,
+  $\phi \to \phi - \partial_t \chi$.
+- **Charge conservation** $\partial_t \rho + \nabla\cdot\mathbf J = 0$.
+
+### O.5 Standard observables
+
+| Observable | Reads from | Operation |
+|---|---|---|
+| Dielectric function $\varepsilon_{\alpha\beta}(\omega)$ | polarization-polarization $\chi^{PP}$ | $\delta_{\alpha\beta} + 4\pi\chi^{PP}_{\alpha\beta}$ |
+| Absorption $\alpha(\omega)$ | $\varepsilon(\omega)$ | $(\omega/c)\cdot 2\,\mathrm{Im}\sqrt{\varepsilon(\omega)} = (\omega/c)\,\mathrm{Im}\,\varepsilon / n(\omega)$ |
+| Refractive index $n(\omega)$ | $\varepsilon(\omega)$ | $\mathrm{Re}\sqrt{\varepsilon(\omega)}$ |
+| Dielectric tensor (anisotropic) | $\chi^{PP}_{\alpha\beta}$ | tensor diagonalization |
+| Optical conductivity $\sigma(\omega)$ | $\chi^{JJ}_{\alpha\beta}$ (current-current) | $\sigma = -i\omega\chi^{JJ}/(4\pi)$ |
+| Photoluminescence (steady state) | $\alpha(\omega)$, population factor | Van Roosbroeck–Shockley |
+| Optical matrix elements | $\hat\gamma$, momentum operator | $\langle \psi_c | \hat p | \psi_v\rangle$ (or Berry connection) |
+
+### O.6 Couplings
+
+- **Electronic**: shared substrate $\hat\gamma$ — optical observables are
+  functionals of the electronic state.
+- **Structural**: IR / Raman activity via Born effective charges
+  $Z^*_{I,\alpha\beta} = \Omega\,\partial P_\alpha/\partial u_{I\beta}$;
+  phonon-assisted indirect transitions.
+- **Thermal**: temperature dependence of band gap and absorption
+  broadening (Allen–Heine–Cardona).
+- **Transport**: $\sigma_{\rm DC} = \lim_{\omega \to 0} \mathrm{Re}\,\sigma(\omega)$
+  is Kubo–Greenwood; the optical regime IS the dynamical-response form of
+  transport.
+- **Chemical**: photochemistry, photo-induced electron transfer.
+
+### O.7 Numerical methods
+
+Real-time TDDFT (Octopus, Yambo); linear-response TDDFT (Sternheimer /
+Casida); $GW$ for quasi-particle corrections; BSE on top of GW for
+excitonic absorption; Wannier interpolation for fine $\mathbf k$-meshes
+on optical matrix elements.
+
+---
+
+## Cross-regime synthesis
+
+### B.1 Shared substrate
+
+All three regimes are anchored on a single underlying object: the one-body
+density matrix $\hat\gamma$, in some regimes augmented to $2\times 2$
+Pauli-spinor form $\hat\gamma_{\alpha\beta}$, and in some regimes evolved in
+time. Concretely:
+
+- **Electronic ground state** — $\hat\gamma$ static, scalar, idempotent.
+- **Electronic time evolution** — $\hat\gamma(t)$, scalar, obeys
+  Liouville–von Neumann with $\hat H_{\rm KS}[\hat\gamma]$.
+- **Magnetic** — $\hat\gamma(t)$ is $2 \times 2$ Pauli-spinor; magnetization
+  $\mathbf m(\mathbf r) = \mathrm{tr}_\sigma[\boldsymbol\sigma\,\hat\gamma(\mathbf r,\mathbf r)]$.
+- **Optical (TDDFT)** — $\hat\gamma(t)$ coupled to external $\mathbf A(\mathbf r, t)$
+  via minimal coupling $\hat p \to \hat p - (e/c)\mathbf A$; observables
+  via response $\chi = -i\,\langle [\hat\rho(t), \hat\rho(0)]\rangle\,\theta(t)$.
+- **Optical (BSE)** — the two-particle propagator $L$ built from products of
+  $\hat\gamma$ and its time-ordered Green's function $G$.
+
+### B.2 Variational backbone
+
+All three regimes sit on a variational principle:
+
+- **Static**: Hohenberg–Kohn / Kohn–Sham minimization of $E[\rho]$
+  (or $E[\rho, \mathbf m]$ for spin-DFT).
+- **Time-dependent**: Runge–Gross theorem; van Leeuwen action on the
+  Keldysh contour; Dirac–Frenkel variational principle for TDKS orbitals.
+- **LLG**: derivable from a Poisson-bracket structure on the spin manifold
+  $(S^2)^N$ with Rayleigh dissipation added; equivalent for small angles
+  to gradient descent on $H_{\rm Heisenberg}$.
+
+### B.3 Effective single-particle structure
+
+Each regime, after KS reduction, is structured as a one-body problem with
+operator $\hat H[\hat\gamma]$, state-dependent Hamiltonian, and a closure
+functional that injects all the many-body physics:
+
+| Regime | Closure functional |
+|---|---|
+| Electronic | $v_{xc}$ |
+| Magnetic | $\mathbf B_{xc}$, non-collinear xc functional |
+| Optical | $f_{xc}$ (TDDFT kernel), BSE kernel $K$ |
+
+This is the strongest mathematical commonality: each regime is
+
+$$
+\text{(state-dependent linear operator on one-body sector)} + \text{(closure functional)}.
+$$
+
+### B.4 Deepest common canonical
+
+A fully relativistic many-body Hamiltonian on Pauli-spinor density matrix
+
+$$
+\hat H = \boldsymbol\alpha \cdot (\hat{\mathbf p} - (e/c)\mathbf A) + \beta m c^2 + V + \text{spin-orbit} + \hat V_{ee},
+$$
+
+reduced to a non-relativistic four-current $j^\mu(\mathbf r, t) = (\rho, \mathbf J)$
+and magnetization $\mathbf m(\mathbf r, t)$, gives a **current-spin-density
+functional** $E[\rho, \mathbf J, \mathbf m]$ (Vignale–Rasolt + spin extension).
+All three regimes are then instances of **TDCSDFT** (time-dependent
+current-spin-DFT) with different pieces of $(\rho, \mathbf J, \mathbf m)$ held
+fixed or perturbed:
+
+- Electronic = $\rho$ only, static or weakly driven;
+- Magnetic = $\mathbf m$ evolving under $H_{xc}$ + $\mathbf B_{xc}$;
+- Optical = $\mathbf J$ driven by $\mathbf A(\mathbf r, t)$.
+
+### B.5 Irreducibly different
+
+- **Tensor rank of the order parameter.** Electronic is rank-0 (scalar $\rho$);
+  magnetic adds rank-1 axial $\mathbf m$; optical adds rank-1 polar $\mathbf A$
+  and a coupled current $\mathbf J$. These transform differently under spatial
+  inversion ($\mathbf m$ axial, $\mathbf J$ polar) and time reversal ($\rho$
+  even, $\mathbf m$ odd, $\mathbf J$ odd, $\mathbf A$ odd).
+
+- **Time structure.** Electronic ground state is a fixed point. Magnetic
+  ground state likewise. Optical absorption is fundamentally a frequency-
+  domain object on a causal kernel — its very existence depends on temporal
+  non-locality. Pure TD dynamics of $\hat\gamma$ does not distinguish them;
+  the distinction emerges in which observable is read.
+
+- **Locality of the closure.** Local KS works surprisingly well for
+  electronic (LDA / GGA). Magnetic needs non-collinear / transverse-gradient
+  functionals. Optical needs long-range $f_{xc}(\mathbf r - \mathbf r') \sim
+  1/|\mathbf r - \mathbf r'|$ to capture excitonic binding — LDA fails
+  qualitatively.
+
+### B.6 Practical synthesis for n-Op
+
+The independent state for this group can be unified as a single Pauli-spinor
+density matrix $\hat\gamma(\mathbf r, \mathbf r'; t)$ (or equivalently
+$\{\psi_{n\mathbf k, \alpha}(\mathbf r, t)\}$ with occupations $\{f_{n\mathbf k}\}$)
+plus the external EM field $\mathbf A(\mathbf r, t)$ when driving. Every
+observable in the three lists in `properties.md` is a derived functional of
+this object. The conservations / sum rules — orthonormality, particle number,
+$|\mathbf S_i| = 1$ (atomistic), f-sum, Kramers–Kronig, gauge invariance —
+are residuals computable from the state without additional DOFs. This is the
+structure n-Op's PINO loss can be anchored on.
+
+---
+
+## Sources verified during research
+
+- TDKS / Runge–Gross / van Leeuwen action (Wikipedia, arXiv reviews).
+- Vignale–Rasolt spin-current DFT.
+- Pauli-spinor noncollinear KS with `B_xc` (arXiv, VASP / QE documentation).
+- Landau–Lifshitz–Gilbert canonical forms (Wikipedia, atomistic-LLG references).
+- Bethe–Salpeter four-point propagator; f-sum / Kramers–Kronig relations
+  (textbook references).
+- Semiconductor Bloch / Maxwell–Bloch equations (textbook references).
+- Wannier-function Berry-connection formulation of optical matrix elements.

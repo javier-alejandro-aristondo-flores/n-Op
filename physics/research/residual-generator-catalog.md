@@ -1,0 +1,551 @@
+# Stream S6 — Cheap-Residual Catalog & Residual-Generator Factory Specification
+
+## Preface
+
+This document synthesizes Phase-1 outputs (S1–S5) into a single executable substrate for Stream S7's architecture amendment. The deliverable is operational: every entry is typed, tiered, and tagged so that a residual-generator factory can mechanically instantiate it from the /physics vocabulary. Physics names are paired with computer-science contracts throughout; no string formulas appear in signatures.
+
+Diamond is the anchor substrate. Where streams disagree, this document binds the resolution.
+
+---
+
+## 1. Catalog Table (Deduplicated, Tiered, Tagged)
+
+### 1.1 Legend
+
+**Bundles** (reconciled to a coherent set of 11, see §4):
+- B1 `electronic-structure` (bands, gap, DOS, masses)
+- B2 `phonon` (ω_λ(q), DOS_ph, group velocities)
+- B3 `transport` (μ, σ, κ_e, κ_L, S, v_sat)
+- B4 `defect-resolved` (formation energies, charge-transition levels, configurational occupations)
+- B5 `surface-resolved` (γ(termination,μ_env), terminations, reconstructions)
+- B6 `interface-resolved` (band alignment, Schottky barriers, MIGS, interface-bond counts, stacking)
+- B7 `mechanics` (C_ij, B, ρ, sound velocities, fracture surrogates)
+- B8 `thermodynamics` (μ_i(T,P), G(T,P), phase stability)
+- B9 `non-equilibrium-operating` (T_op, T_e, T_L, j(r), E(r), avalanche, leakage)
+- B10 `structural-validity` (BVS, radius ratios, Born stability, GSF/twin)
+- B11 `degradation` (electromigration MTTF, fatigue, carbide growth, MB critical thickness)
+
+**Cost tiers** (reconciled to T0–T3 with optional T2-MLIP sub-classifier, see §4):
+- T0 = per-step (closed-form, ≤ O(1) per sample; in inner-loop loss)
+- T1 = per-batch (vectorizable kernel, O(N_atom) or O(N_q))
+- T2 = per-epoch (MLIP-bridge or surrogate-mediated; includes T2-MLIP)
+- T3 = on-demand (faithful DFT/MD/NEGF call, rare)
+
+**Differentiability tags** (S5's 5-tier):
+- D0 closed-form analytical gradient
+- D1 autodiff-native through model graph
+- D2 adjoint-required (custom backward)
+- D3 finite-difference fallback only
+- D4 non-differentiable (relaxation required: Gumbel-Softmax, signed-continuous surrogate, straight-through estimator)
+
+**Path**: `cheap` = goes into per-step loss; `faithful` = compared against DFT/experiment battery.
+
+### 1.2 Catalog
+
+| # | Name | Signature `(in) → out` | Bundle | Tier | Diff | Path | Source | Depends on |
+|---|------|------------------------|--------|------|------|------|--------|-----------|
+| 1 | bandgap-direct | `(BandStruct) → Scalar` | B1 | T0 | D1 | cheap | S1 | bands |
+| 2 | bandgap-indirect | `(BandStruct, k-grid) → Scalar` | B1 | T0 | D1 | cheap | S1 | bands |
+| 3 | effective-mass-tensor | `(BandStruct, k0) → Tensor[3,3]` | B1 | T0 | D1 | cheap | S1 | bands |
+| 4 | DOS-tetrahedron | `(BandStruct, k-mesh) → ε↦Scalar` | B1 | T1 | D2 | cheap | S1 | bands |
+| 5 | fermi-level-charge-neutral | `(DOS, T, dopants) → Scalar` | B1/B4 | T1 | D2 | cheap | S1+S3 | DOS, defect-populations |
+| 6 | quasi-particle-shift-G0W0-surrogate | `(bands, screening) → bands'` | B1 | T2 | D2 | faithful | S1 | bands |
+| 7 | acoustic-sum-rule | `(D(q→0)) → ‖residual‖` | B2 | T0 | D1 | cheap | S1+S2 | dyn-matrix |
+| 8 | dynamical-matrix-hermiticity | `(D(q)) → ‖D - D†‖` | B2 | T0 | D1 | cheap | S2 | dyn-matrix |
+| 9 | phonon-dispersion | `(D(q)) → ω_λ(q)` | B2 | T1 | D2 | cheap | S1 | dyn-matrix |
+| 10 | phonon-DOS | `(ω_λ(q), q-mesh) → ε↦Scalar` | B2 | T1 | D2 | cheap | S1 | phonon-disp |
+| 11 | phonon-group-velocity | `(ω_λ(q)) → ∂ω/∂q` | B2 | T1 | D1 | cheap | S1 | phonon-disp |
+| 12 | grueneisen-mode | `(ω_λ(q,V)) → γ_λ` | B2 | T2 | D3 | cheap | S1 | phonon-disp |
+| 13 | SCPH-self-consistent-phonons | `(D(q), T) → ω_renorm` | B2 | T2 | D2 | faithful | S1 | phonon-disp, T |
+| 14 | drude-conductivity | `(μ, n, e) → σ` | B3 | T0 | D1 | cheap | S1 | μ, n |
+| 15 | matthiessen-mobility | `(μ_imp, μ_ph, μ_grain) → μ` | B3 | T0 | D1 | cheap | S4 | μ-channels |
+| 16 | caughey-thomas-mobility | `(μ0, E, v_sat, β) → μ(E)` | B3/B9 | T0 | D1 | cheap | S4 | μ0, v_sat, E |
+| 17 | v-sat-POP-limit | `(ω_LO, m*, ε∞, ε0) → v_sat` | B3 | T0 | D1 | cheap | S4 | ω_LO, m* |
+| 18 | v-sat-intervalley | `(Δ_valley, m*_valleys) → v_sat` | B3 | T0 | D1 | cheap | S4 | bands |
+| 19 | hall-mobility-from-σ | `(σ_xx, σ_xy, B) → μ_H` | B3 | T0 | D1 | cheap | S1 | σ |
+| 20 | mobility-impurity-phonon | `(N_imp, T, m*) → μ_imp, μ_ph` | B3 | T0 | D1 | cheap | S4 | N_imp, T |
+| 21 | frohlich-coupling | `(ω_LO, ε∞, ε0, m*) → α_F` | B2/B3 | T0 | D1 | cheap | S4 | ω_LO, dielectric |
+| 22 | frohlich-scattering-rate | `(α_F, T, ε_k) → τ⁻¹` | B3 | T1 | D1 | cheap | S4 | α_F, bands |
+| 23 | seebeck-mott | `(σ(ε), E_F, T) → S` | B3 | T1 | D2 | cheap | S1 | σ, E_F |
+| 24 | wiedemann-franz-electronic-kappa | `(σ, T) → κ_e` | B3 | T0 | D1 | cheap | S1 | σ |
+| 25 | callaway-lattice-kappa | `(ω_λ(q), τ_λ) → κ_L` | B3/B2 | T2 | D2 | cheap | S1 | phonon-disp, τ |
+| 26 | phonon-poiseuille-length | `(τ_N, v_g) → L_Pois` | B3 | T0 | D1 | cheap | S4 | τ_N, v_g |
+| 27 | second-sound-speed | `(v_g_LA, T, τ_R/τ_N) → c_ss` | B3 | T0 | D1 | cheap | S4 | v_g, τ ratios |
+| 28 | acoustic-mismatch-TBR | `(ρ_1,v_1,ρ_2,v_2) → R_K` | B6 | T0 | D1 | cheap | S4 | mechanics ×2 |
+| 29 | diffuse-mismatch-TBR | `(DOS_ph_1, DOS_ph_2) → R_K` | B6 | T1 | D2 | cheap | S4 | phonon-DOS ×2 |
+| 30 | defect-formation-energy-zhang-northrup | `(E_def, E_host, μ_i, q, E_F) → E_form` | B4 | T0 | D1 | cheap | S1+S2+S3 | E_def, μ_i, E_F |
+| 31 | makov-payne-correction | `(q, ε, L_cell) → ΔE_MP` | B4 | T0 | D0 | cheap | S3 | q, ε |
+| 32 | freysoldt-correction | `(q, ε, V_q-V_0, L) → ΔE_FNV` | B4 | T0 | D0 | cheap | S1+S2+S3 | q, ε, potential |
+| 33 | lany-zunger-correction | `(q, ε, L, ξ) → ΔE_LZ` | B4 | T0 | D0 | cheap | S3 | q, ε |
+| 34 | charge-transition-level | `(E_form(q1), E_form(q2)) → ε(q1/q2)` | B4 | T0 | D1 | cheap | S1+S3 | E_form |
+| 35 | defect-boltzmann-population | `(E_form, T, μ_i) → c_def` | B4 | T0 | D1 | cheap | S2+S3 | E_form, T |
+| 36 | self-consistent-charge-balance | `(c_def(E_F), n(E_F), p(E_F)) → E_F*` | B4/B1 | T1 | D2 | cheap | S3 | populations, n,p |
+| 37 | defect-configurational-entropy | `(c_def, sites) → S_conf` | B4 | T0 | D1 | cheap | S3 | populations |
+| 38 | SRH-recombination | `(n, p, τ_n, τ_p, n_i) → R_SRH` | B4/B9 | T0 | D1 | cheap | S3 | n, p, τ |
+| 39 | auger-recombination | `(n, p, C_n, C_p) → R_Aug` | B4/B9 | T0 | D1 | cheap | S3 | n, p |
+| 40 | multiphonon-emission-capture | `(ΔE, ω_LO, S_HR, T) → C_p` | B4 | T2 | D2 | faithful | S1+S3 | ΔE, ω_LO, Huang-Rhys |
+| 41 | huang-rhys-factor | `(Q_def, ω_λ) → S_HR` | B4/B2 | T2 | D2 | faithful | S1 | Q_def, phonons |
+| 42 | mass-action-defect-complex | `(c_A, c_B, K_eq(T)) → c_AB` | B4 | T0 | D1 | cheap | S2 | populations, K_eq |
+| 43 | debye-screening-defect-defect | `(c_def, T, ε) → λ_D` | B4 | T0 | D1 | cheap | S3 | c_def, T, ε |
+| 44 | surface-grand-potential-γ | `(E_slab, μ_env, area) → γ(term,μ)` | B5 | T1 | D2 | cheap | S2+S3 | slab energy, μ_env |
+| 45 | wulff-shape | `(γ(hkl)) → polyhedron` | B5 | T1 | D3 | faithful | S1 | γ |
+| 46 | termination-stability-window | `(γ(term, μ_H,μ_O)) → phase-diagram` | B5 | T1 | D2 | cheap | S3 | γ family |
+| 47 | schottky-mott-alignment | `(W_m, χ_s) → φ_B` | B6 | T0 | D1 | cheap | S2+S3 | work-fn, affinity |
+| 48 | MIGS-corrected-barrier | `(W_m, χ_s, S, φ_CNL) → φ_B_eff` | B6 | T0 | D1 | cheap | S3 | Schottky-Mott, S, φ_CNL |
+| 49 | image-force-barrier-lowering | `(E, ε) → Δφ_IF` | B6/B9 | T0 | D0 | cheap | S4 | E_field |
+| 50 | interface-bond-counting | `(slab_pair, cutoff) → bond-vec` | B6 | T1 | D1 | cheap | S2 | slabs |
+| 51 | interface-stacking-energy | `(slab_A, slab_B, registry) → E_stack` | B6 | T1 | D1 | cheap | S2 | slabs, registry |
+| 52 | vegard-correction | `(a_A, a_B, x) → a_alloy` | B6/B10 | T0 | D0 | cheap | S2 | lattice consts |
+| 53 | hume-rothery-mismatch | `(r_A, r_B, χ_A, χ_B, valence) → score` | B6/B10 | T0 | D0 | cheap | S2 | radii, χ |
+| 54 | matthews-blakeslee-critical-thickness | `(a_film, a_sub, ν, b) → h_c` | B6/B11 | T0 | D0 | cheap | S3 | lattice, elastic |
+| 55 | bond-valence-sum | `(R_I, R0, b) → BVS_atom` | B10 | T0 | D1 | cheap | S2 | R_I, R0-table |
+| 56 | pauling-radius-ratio | `(r_cation, r_anion) → ratio + class` | B10 | T0 | D0 | cheap | S2 | radii |
+| 57 | born-stability-criteria | `(C_ij) → bool-vec + slack` | B10/B7 | T0 | D1 | cheap | S2 | elastic |
+| 58 | generalized-stacking-fault-energy | `(slab, shift) → γ_GSF` | B10 | T1 | D1 | cheap | S2 | slab |
+| 59 | twin-boundary-energy | `(slab_twin, slab_bulk) → γ_TB` | B10 | T1 | D1 | cheap | S2 | slabs |
+| 60 | elastic-constants-Cij | `(stress(strain)) → C_ij` | B7 | T1 | D1 | cheap | S1 | h, strain |
+| 61 | bulk-modulus | `(C_ij) → B` | B7 | T0 | D1 | cheap | S1 | C_ij |
+| 62 | sound-velocity-isotropic | `(C_ij, ρ) → v_L, v_T` | B7 | T0 | D1 | cheap | S1 | C_ij, ρ |
+| 63 | deformation-potential-gap-shift | `(E_g(ε), ε) → Ξ` | B7/B1 | T1 | D1 | cheap | S4 | bands, strain |
+| 64 | piezoresistance-coeff | `(σ(ε), ε) → π_ij` | B7/B3 | T1 | D1 | cheap | S4 | σ, strain |
+| 65 | gibbs-free-energy-phase | `(E_0, ω(q), T, P) → G(T,P)` | B8 | T1 | D2 | cheap | S1 | E_0, phonons |
+| 66 | chemical-potential-ref-table | `(species, T, P) → μ_i` | B8 | T0 | D0 | cheap | S2+S3 | ref-cache lookup |
+| 67 | phase-diagram-convex-hull | `(G_phases(μ,T)) → hull` | B8 | T1 | D3 | faithful | S1 | G |
+| 68 | clausius-clapeyron-boundary | `(ΔH, ΔV) → dP/dT` | B8 | T0 | D1 | cheap | S1 | thermo |
+| 69 | maxwell-relation-residual | `(∂μ_i/∂T, ∂S/∂N_i) → ‖Δ‖` | B8 | T0 | D1 | cheap | S5 | thermo derivatives |
+| 70 | self-heating-T_op | `(P_diss, R_th, T_amb) → T_op` | B9 | T0 | D1 | cheap | S1 | dissipation, R_th |
+| 71 | coupled-em-thermal-pde-residual | `(j, E, T_L, σ(T), κ(T)) → ‖PDE‖` | B9 | T1 | D2 | cheap | S4 | σ, κ, field |
+| 72 | hot-carrier-temperature-balance | `(j·E, τ_E, T_L) → T_e` | B9 | T0 | D1 | cheap | S4 | j, E, τ_E |
+| 73 | tau-energy-POP-acoustic | `(α_F, v_s, ρ, Ξ, T) → τ_E` | B9 | T0 | D1 | cheap | S4 | α_F, mech |
+| 74 | chynoweth-impact-ionization | `(α0, β/E) → α(E)` | B9 | T0 | D1 | cheap | S4 | E_field |
+| 75 | avalanche-multiplication | `(α(E), L) → M` | B9 | T1 | D2 | cheap | S4 | α(E) |
+| 76 | kane-zener-tunneling-rate | `(E_g, m*, E) → Γ_KZ` | B9 | T0 | D1 | cheap | S4 | E_g, m*, E |
+| 77 | fowler-nordheim-current | `(φ_B, E, m*) → J_FN` | B6/B9 | T0 | D1 | cheap | S4 | φ_B, E |
+| 78 | richardson-dushman-thermionic | `(φ_B, T, A*) → J_TE` | B6/B9 | T0 | D1 | cheap | S4 | φ_B, T |
+| 79 | padovani-stratton-TFE | `(φ_B, N_d, T, m*) → J_TFE` | B6/B9 | T0 | D1 | cheap | S4 | φ_B, N_d, T |
+| 80 | NEGF-transmission | `(H_device, Σ_L, Σ_R, E) → T(E)` | B6/B9 | T3 | D2 | faithful | S1+S4 | H, self-energies |
+| 81 | carbide-growth-parabolic | `(D_0, E_a, T, t) → x²(t)` | B11/B6 | T0 | D1 | cheap | S2+S3 | D_0, E_a, T |
+| 82 | black-electromigration-MTTF | `(j, E_a, T, n) → MTTF` | B11 | T0 | D1 | cheap | S3 | j, T |
+| 83 | coffin-manson-fatigue | `(Δε_p, c) → N_f` | B11 | T0 | D1 | cheap | S3 | thermal cycling |
+| 84 | cluster-expansion-energy | `(ECI, σ-config) → E_CE` | B4/B8 | T1 | D4 | cheap | S2 | ECI cache, config |
+| 85 | structure-uniqueness-CSP | `(structure, set) → bool + d` | B10 | T1 | D3 | cheap | S2 | structure set |
+| 86 | bi-slab-grand-potential | `(slab_A, slab_B, μ_env) → Ω` | B5/B6 | T1 | D2 | cheap | S2 | slabs, μ |
+| 87 | reference-phase-energy-cache | `(phase-id) → E_ref` | B8 | T3 | D0 | faithful | S2+S3 | DFT battery |
+| 88 | F-equals-minus-grad-E | (architectural — autodiff, NOT residualized) | — | — | — | — | S5 | (rejected per S5) |
+| 89 | equivariance | (architectural — by construction, NOT residualized) | — | — | — | — | S5 | (rejected per S5) |
+
+**Final count: 87 residual entries + 2 explicitly-rejected architectural constraints = 89 catalog rows.** Net of ~100 raw proposals across S1–S4, this represents ~13% dedup compression (Schottky-Mott unified across S2+S3, Freysoldt unified across S1+S2+S3, carbide-growth unified across S2+S3, defect-formation unified across S1+S2+S3, reference-phase-cache unified with defect-reference-battery — see §4).
+
+---
+
+## 2. Dependency DAG
+
+### 2.1 Centrality hubs (from S1 coupling matrix, refined)
+
+Seven hubs persist after cross-stream refinement:
+
+```
+                    ┌──────────┐
+                    │  T_op    │  ← meta-observable; everything T-dependent depends on this
+                    └────┬─────┘
+                         │ feeds T into:
+        ┌────────────────┼─────────────────┐
+        ▼                ▼                 ▼
+   E_F (charge-     μ(T) mobility      γ(T) surface
+    neutral)         channels           free energies
+        │                │                 │
+        ▼                ▼                 ▼
+   defect-pops     σ, κ_e, v_sat    termination/μ_env
+```
+
+### 2.2 Layered DAG (compute order)
+
+**Layer 0 — primitives, no dependencies:**
+`bands, dyn-matrix, h (relaxed positions), C_ij, ρ, reference-phase-cache, ECI-cache, μ_env table`
+
+**Layer 1 — direct cheap derivatives of Layer 0:**
+- From bands: gap (#1,#2), effective-mass (#3), Frohlich-α (#21 if dielectric)
+- From dyn-matrix: ASR (#7), Hermiticity (#8), dispersion (#9), v_g (#11)
+- From C_ij: B (#61), v_L/v_T (#62), Born-stability (#57)
+- From h: BVS (#55), radius-ratio (#56), Vegard (#52), Hume-Rothery (#53)
+- From slab+μ_env: γ (#44), bi-slab-Ω (#86)
+
+**Layer 2 — depends on Layer 1:**
+- DOS (#4) ← bands; phonon-DOS (#10) ← dispersion
+- Freysoldt/MP/LZ (#31,#32,#33) ← E_def_supercell + ε
+- E_form (#30) ← E_def + μ_i (#66 from ref-cache) + corrections
+- Charge-transition-levels (#34) ← E_form
+- Schottky-Mott (#47) ← W_m + χ_s ← bands + slabs
+- AMM/DMM TBR (#28,#29) ← v_L,v_T or phonon-DOS
+
+**Layer 3 — depends on T_op (the meta-observable):**
+
+This layer is the critical one. **T_op must be predicted/converged before these residuals fire.** S5's RAD sampling and S5's GradNorm balancing must respect this ordering.
+
+- Defect populations c_def(T) (#35) ← E_form + T
+- Self-consistent E_F (#5,#36) ← DOS + c_def(T) + n(T) + p(T)  *(fixed-point iteration)*
+- σ(T), μ(T) (#14,#15,#16,#20,#22) ← bands + scattering + T
+- κ_L(T) (#25) ← dispersion + τ(T)
+- v_sat(T) (#17,#18) (weak T-dep through ω_LO occupation)
+- γ(T, μ_env) (#44) — T enters via vibrational F
+- G(T,P) (#65) ← E_0 + phonons + T
+
+**Layer 4 — depends on Layer 3 (operating-condition observables):**
+- Caughey-Thomas μ(E,T) (#16) ← μ_0(T) + E
+- Hot-carrier T_e (#72) ← j·E + τ_E(T_L)
+- Chynoweth α(E,T) (#74) ← E + bands(T via gap shift)
+- Avalanche M (#75) ← α(E) × L
+- FN/TE/TFE leakage (#77,#78,#79) ← φ_B + T + E
+- Image-force lowering (#49) ← E_field
+- SRH/Auger (#38,#39) ← n,p,T
+
+**Layer 5 — coupled-field PDE residual:**
+- Coupled EM-thermal PDE (#71) ← σ(T), κ(T), J, V, T_L — closes the self-heating loop with T_op (#70)
+- Self-heating T_op (#70) ← ∫(j·E) + R_th — **completes the cycle back to Layer 3**
+
+**Layer 6 — degradation / time-integrated:**
+- Carbide growth (#81) ← T(t) history
+- Black MTTF (#82) ← j, T history
+- Coffin-Manson (#83) ← Δε_p cycling
+- Matthews-Blakeslee (#54) ← lattice + elastic (static, but read at design time)
+
+### 2.3 Cycle resolution
+
+The Layer 3 ↔ Layer 5 cycle (T_op → σ,κ → T_op) is closed by **fixed-point iteration during training**: T_op is a predicted node in the PINO graph, the PDE residual (#71) is evaluated with predicted (σ,κ), and the self-heating residual (#70) closes the loop. The two together act like a residual-of-a-residual, but both are evaluated in the same forward pass — no nested optimization required.
+
+The E_F ↔ c_def cycle (Layer 3 self-consistency, #5+#36) **is** a nested fixed point. Resolution: implement as an **implicit-layer (deep-equilibrium-style)** node with custom backward — this is a D2 entry whose adjoint is the implicit-function-theorem Jacobian solve.
+
+---
+
+## 3. Residual-Generator Factory Specification
+
+### 3.1 Core types
+
+```
+type ObservableId   = Symbol                        ; e.g., 'bandgap-direct
+type BundleId       = Symbol                        ; one of B1..B11
+type CostTier       = T0 | T1 | T2 | T3
+type DiffTag        = D0 | D1 | D2 | D3 | D4
+type Path           = Cheap | Faithful
+type Source         = Model | DFT-Battery | Experiment-Battery | MLIP
+
+record InputContract  {
+  state-slots    : List<Symbol>     ; subset of unified-state-vector slots
+  env-slots      : List<Symbol>     ; subset of Environment record
+  cache-handles  : List<CacheRef>   ; ref-phase-cache, ECI-cache, μ-table, ...
+  coverage-mask  : BitField         ; per-sample applicability
+}
+
+record OutputContract {
+  shape          : TensorShape      ; scalar | vector | field
+  units          : UnitSpec
+  expected-range : Interval | None
+  symmetry       : SymmetryGroup    ; for sanity checks
+}
+
+record ResidualGenerator {
+  id                : ObservableId
+  bundle            : BundleId
+  cost-tier         : CostTier
+  diff-tag          : DiffTag
+  path              : Path
+  source            : Source                 ; what we compare against
+  input             : InputContract
+  output            : OutputContract
+  forward           : (StateBatch, Env, Cache) → OutputTensor
+  loss              : (pred, target, σ, mask) → Scalar    ; Huber for D1/D2 experimental, MSE for cheap
+  backward?         : Option<AdjointFn>      ; required iff diff-tag = D2
+  relaxation?       : Option<RelaxationSpec> ; required iff diff-tag = D4
+  fd-step?          : Option<Scalar>         ; required iff diff-tag = D3
+  depends-on        : List<ObservableId>     ; from DAG §2
+  layer             : Integer 0..6           ; from §2.2
+  weight-policy     : WeightPolicy           ; GradNormGroup | NTKInit | Fixed
+  sampling-policy   : SamplingPolicy         ; UniformBatch | RADAdaptive | PerEpoch | OnDemand
+}
+```
+
+### 3.2 Factory function
+
+```
+make-residual-generator(
+  observable     : ObservableId,
+  path           : Path,
+  distance       : DistanceSpec,           ; L2 | Huber(δ) | KL | EarthMover
+  weight-policy  : WeightPolicy
+) → ResidualGenerator
+```
+
+Behavior:
+
+1. Look up `observable` in /physics registry; retrieve its `formula-record`, `signature`, `bundle`, `tier-hint`, `diff-hint`.
+2. Resolve `InputContract` by walking the formula's typed dependencies down to state-vector slots and cache handles.
+3. Pick `forward` from the registered closed-form / kernel / surrogate implementation associated with the formula.
+4. If `diff-tag = D2`: require an `AdjointFn` be registered alongside the formula; error if missing (this is the gate that S7 must implement).
+5. If `diff-tag = D4`: require a `RelaxationSpec` (e.g., Gumbel-Softmax for discrete config, signed-continuous-Heaviside for hull membership).
+6. Assign `sampling-policy` from `cost-tier`: T0→UniformBatch, T1→RADAdaptive, T2→PerEpoch, T3→OnDemand.
+7. Set `layer` from DAG.
+8. Return the record.
+
+### 3.3 Training-loop consumption
+
+```
+record PinoTrainStep {
+  generators        : List<ResidualGenerator>      ; the catalog (or a curriculum subset)
+  ordering          : List<List<ObservableId>>     ; layer-grouped from §2.2
+  source-weights    : Map<Source, Scalar>          ; GradNorm outer (4 families per S5)
+  generator-weights : Map<ObservableId, Scalar>    ; NTK-init fixed inner
+  curriculum-phase  : Warmup | Refine | Calibrate | Polish
+}
+
+procedure step(batch, model, train-step):
+  state, env = model.forward(batch.input)
+  caches     = train-step.caches
+  losses     = Map()
+  for layer-group in train-step.ordering:
+      for gen in layer-group ∩ active(curriculum-phase, gen):
+          if not coverage-mask-allows(batch, gen): continue
+          pred   = gen.forward(state, env, caches)
+          target = resolve-target(batch, gen.source)        ; cheap target = model itself + algebraic constraint
+          σ      = batch.uncertainty[gen.id] or 1.0
+          mask   = batch.mask[gen.id]
+          ℓ      = gen.loss(pred, target, σ, mask)
+          losses[gen.id] = ℓ
+          ; If gen.layer requires updating state (e.g., self-consistent E_F):
+          state = maybe-update-state(state, gen, pred)
+  total = combine(losses,
+                  train-step.source-weights,
+                  train-step.generator-weights)
+  total.backward()         ; D1 entries autodiff; D2 invoke registered adjoints; D3 use FD; D4 use relaxation
+```
+
+### 3.4 How tags interact with sampling/scheduling
+
+| Tier | Sampling | When evaluated |
+|------|----------|----------------|
+| T0 | UniformBatch | Every gradient step, every sample |
+| T1 | RAD-Adaptive | Every step but on a subsampled mesh/k-grid biased toward high-residual regions |
+| T2 | PerEpoch | Refresh MLIP-surrogate residual every N steps; otherwise use cached output |
+| T3 | OnDemand | Triggered by curriculum (Refine/Calibrate); compared against pre-computed DFT battery |
+
+| Diff tag | Backward path |
+|----------|---------------|
+| D0 | Analytical gradient registered with forward |
+| D1 | Autodiff through forward |
+| D2 | Registered adjoint (implicit-function-theorem for fixed points; vector-Jacobian product for ODE/PDE solves) |
+| D3 | Central finite-difference on inputs; **flagged for low gradient quality** — only used outside RAD-critical paths |
+| D4 | Relaxation applied at forward time (e.g., Gumbel-Softmax temperature τ from curriculum schedule) |
+
+### 3.5 Multi-source loss integration
+
+Per S5, four source families (cheap-algebraic, DFT-battery, MLIP-bridge, experiment-battery) get GradNorm outer balancing. Concretely:
+
+```
+source-of(gen) ∈ {Model-internal (cheap), DFT-Battery, MLIP, Experiment}
+GradNorm rebalances across these 4 family weights each K steps.
+Within each family, generator-weights are NTK-init at warmup, then frozen.
+```
+
+Cheap-path residuals (#1–#5, #7–#11, #14–#22, etc.) have `source = Model-internal` — the "target" is the algebraic identity the model must satisfy. Faithful-path entries (#6, #13, #40, #41, #45, #67, #80, #87) have `source = DFT-Battery` or external. Experiment entries use Huber loss with per-observable σ.
+
+### 3.6 Three /physics exports realized via the factory
+
+- `Generate(observable) → ResidualGenerator` — primary factory call
+- `Validate(state, env, observables) → Map<ObservableId, Scalar>` — inference-time, fires the same generators in eval mode
+- `Import(external-formula) → register and return generator` — for active learning / S7's extensibility hook
+
+---
+
+## 4. Reconciliation Decisions
+
+### 4.1 Cost tiers: T0–T4 (S2) vs T0–T3 (S1/S3/S4/S5)
+
+**Resolution: keep T0–T3, treat T2 as a polymorphic tier with a sub-classifier `T2.kind ∈ {MLIP-bridge, Surrogate, PerEpoch-cached}`.**
+
+Rationale: S2's T4 was carved out specifically to name the MLIP active-learning bridge, but operationally MLIP-bridge residuals share the same sampling cadence (per-epoch refresh) as other surrogate residuals. A 5-tier system inflates the type system without buying scheduling discrimination. The MLIP-specific behavior is in the *source* tag (`source = MLIP`), not the cost tier.
+
+### 4.2 Coupled-EM-thermal-PDE: sub-residual of eom-violation, vs new top-level category
+
+**Resolution: sub-residual under eom-violation, NOT a new top-level category.** Entry #71 is tagged with `bundle = B9 (non-equilibrium-operating)` and inherits the eom-violation category.
+
+Rationale: making it top-level would force the residual taxonomy to track PDE-vs-algebraic at the schema level, which crosscuts every bundle and breaks the bundle-as-cohesive-physical-domain abstraction. The PDE-ness is fully captured by `cost-tier = T1` (vectorized over the device mesh) and `diff-tag = D2` (adjoint solve through the PDE). S7 does not need a new top-level category; it needs to ensure the adjoint-registration mechanism (§3.1 `backward?`) handles PDE adjoints.
+
+### 4.3 Reference-phase-cache (S2) vs Defect-reference-battery (S3+S5)
+
+**Resolution: unify under one mechanism — `ReferenceCache` — with two namespaced sub-caches: `ref-cache.phases` and `ref-cache.defects`. Single type, single lifecycle, single invalidation policy.**
+
+Rationale: both are immutable lookup substrates produced offline from a fixed DFT corpus. They share storage backend, versioning, and the same `Cache` slot in `InputContract` (§3.1). Keeping them distinct doubles the bookkeeping with no benefit. The namespace distinction preserves the semantic separation S3 wanted.
+
+Catalog impact: entries #66 and #87 both reference `ReferenceCache` with different keyspaces.
+
+### 4.4 Bundle proliferation
+
+**Resolution: 11 bundles (B1–B11) as listed in §1.1.**
+
+Deduplication map:
+- S2 `structural-validity` ✓ kept as B10
+- S2 `band-alignment` → merged into B6 `interface-resolved` (band-alignment IS the interface band relationship)
+- S2 `defect-population-spectrum` → merged into B4 `defect-resolved`
+- S2 `interface-stack` ≡ S3 `interface-resolved` → unified as B6 `interface-resolved`
+- S3 `defect-resolved` ✓ kept as B4
+- S3 `surface-resolved` ✓ kept as B5
+- S4 `field-resolved` + S4 `hot-carrier-resolved` → merged into B9 `non-equilibrium-operating` (these are facets of the same operating-condition bundle; the field-and-hot-carrier observables are tagged by sub-property within B9, not by separate bundle)
+- New: B11 `degradation` introduced to host time-integrated lifetime residuals (#81–#83) that don't fit cleanly in operating-condition (B9 is per-step; B11 is per-mission-profile).
+
+Rationale: bundles are *physical-domain cohesion units* for the unified state vector, not residual-category bins. Over-splitting fragments the state vector and the curriculum. 11 is the minimum that preserves S1's 8 + the three genuinely-new domains (validity, surface vs interface separation, degradation).
+
+### 4.5 Honest gap: PDE adjoint registration
+
+S5 specified the factory abstractly. Concrete decision for S7: the `AdjointFn` slot in `ResidualGenerator` MUST be filled at registration time for D2 entries; the factory **errors at registration**, not at training time. This pushes the "do we have a working adjoint?" question to design phase.
+
+---
+
+## 5. Honest Gaps
+
+Residuals proposed across Phase-1 that cannot currently be made cheap+differentiable. Each is paired with a recommended S7 disposition.
+
+| Residual | Why hard | Current tag | Proposed disposition for S7 |
+|---|---|---|---|
+| Multiphonon-emission-capture (#40) | Huang-Rhys factor computation is autodiff-hostile (involves displacement-vector projections onto phonon modes that change identity under structural perturbation) | T2/D2 faithful | **Accept as faithful-only.** Train a small surrogate net f(ΔE, ω_LO, Z_def, T) → C_p from DFT battery; use surrogate at training time, DFT at validation. |
+| Huang-Rhys factor (#41) | Same — mode-projection discontinuities | T2/D2 faithful | **Same surrogate strategy.** |
+| 4-phonon scattering | No closed-form adjoint; full calculation is O(N_q⁴) | (deferred; not catalogued) | **Out of scope for v1.** Mark in /physics registry as known-gap. Use 3-phonon κ_L (#25) and absorb 4-phonon contribution into a learned correction factor at high-T (>1500K). |
+| NEGF transmission (#80) | Self-energy adjoint is expensive (matrix inverse per energy point); coverage limited to small devices | T3/D2 faithful | **Faithful-only, on-demand.** Build NEGF battery at design-time; use Padovani-Stratton (#79) and Fowler-Nordheim (#77) as cheap proxies during training. |
+| SCPH/SSCHA (#13) | Self-consistent loop with structural updates — adjoint requires nested IFT | T2/D2 faithful | **Periodic refresh, treat as fixed target between refreshes.** S7 should schedule SCPH refresh at curriculum phase boundaries (S5's Refine→Calibrate). |
+| Cluster-expansion config energy (#84) | Configuration σ is discrete | T1/D4 | **Gumbel-Softmax relaxation** with temperature scheduled by curriculum (high τ at Warmup, anneal to 0.1 by Polish). |
+| Wulff shape (#45) | Combinatorial face selection from γ(hkl) family | T1/D3 faithful | **Faithful-only.** Used as scalar shape-metric (anisotropy ratio) in calibration phase, not in cheap loss. |
+| Phase-diagram convex hull (#67) | argmin over phases | T1/D3 faithful | **Signed-continuous surrogate**: log-sum-exp soft-min of G(phase) with temperature → 0; D3-FD only used to validate the surrogate, not in the loss. |
+| Flexoelectricity, magneto-thermal coupling, non-Markovian deep defects, polaron-self-trapping | S1 flagged as out-of-scope | not catalogued | **Remain out-of-scope.** S7 should document in /physics as `known-omissions` with citations. |
+| Structure-uniqueness CSP (#85) | Distance metric on structures is non-smooth | T1/D3 cheap | **Surrogate via SOAP-descriptor distance** (D1 over the descriptor); leave hard equality as D3 validation only. |
+
+**Strategic gap recommendation:** The four D2 faithful entries (#6, #13, #40, #41) together demand that S7 commit to a **surrogate-net infrastructure** as a first-class part of the architecture. Without it, ~5% of the catalog is non-functional in training. S5 implied this with "MLIP-bridge"; S6 makes it explicit: surrogate-net-bridge is needed for non-MLIP quantities too.
+
+---
+
+## 6. Worked Example: Diamond–W Schottky Contact at 500°C
+
+### 6.1 Scenario setup
+
+- **Substrate**: B-doped diamond (acceptor N_A = 10²⁰ cm⁻³, partially activated)
+- **Contact metal**: tungsten (W), with potential WC interlayer
+- **Operating condition**: T_amb = 300K, P_diss = 5 W/mm, R_th = 40 K·mm/W → T_op ≈ 500°C (773K)
+- **Bias**: V_DS = 100 V across 1 μm channel → E ≈ 10⁶ V/cm in depletion region
+- **Mission profile**: 10⁴ thermal cycles, 10⁵ hours steady-state
+
+### 6.2 Residual firing order, with tier/diff/cost
+
+**Compile time (once, before training step):**
+- `make-residual-generator('bond-valence-sum, Cheap, L2, NTKInit)` → checks diamond C-C BVS and W-C BVS at interface  *(T0/D1)*
+- `make-residual-generator('hume-rothery-mismatch, Cheap, L2, Fixed)` → W vs C radius and χ  *(T0/D0)*
+- `make-residual-generator('born-stability-criteria, Cheap, L2, NTKInit)` → diamond + W + WC stability *(T0/D1)*
+- `make-residual-generator('matthews-blakeslee-critical-thickness, Cheap, L2, Fixed)` → WC layer h_c *(T0/D0)*
+
+These instantiate at registration; the factory verifies all `AdjointFn` slots are filled (only D2 entries — none of the above are D2, so registration succeeds).
+
+**Per-step training (one PINO forward pass on this sample):**
+
+*Layer 0 — primitives:*
+1. Model emits `bands_diamond`, `bands_W`, `dyn-matrix_diamond`, `h_diamond`, `h_W`, `h_interface_slab`, `C_ij_diamond`, `ρ_diamond,W`. Cost: model forward only.
+
+*Layer 1 — cheap algebraic, all T0/D1:*
+2. `bandgap-direct(bands_diamond)` → 5.47 eV target  [#1]
+3. `acoustic-sum-rule(dyn-matrix_diamond)` → 0  [#7]
+4. `dynamical-matrix-hermiticity` → 0  [#8]
+5. `bulk-modulus(C_ij)` → 442 GPa target  [#61]
+6. `born-stability-criteria(C_ij_diamond)` → all True  [#57]
+7. `bond-valence-sum(h_interface_slab)` → C-C valence ≈ 4, W-C valence ≈ 4  [#55]
+
+*Layer 2 — depends on Layer 1:*
+8. `schottky-mott-alignment(W_W=4.55 eV, χ_diamond=−0.1 eV)` → φ_B^SM ≈ 4.65 eV  [#47, T0/D1]
+9. `MIGS-corrected-barrier(W_W, χ_d, S_diamond≈0.85, φ_CNL_diamond≈4.0)` → φ_B^eff ≈ 4.5 eV  [#48, T0/D1]
+10. `interface-bond-counting(slab_W-diamond)` → W-C bonds per unit area  [#50, T1/D1]
+11. `surface-grand-potential-γ(diamond, μ_H_environment)` for H-terminated and bare → termination preference  [#44, T1/D2]
+12. `defect-formation-energy-zhang-northrup(B_C, μ_B, q=−1, E_F)` plus Freysoldt correction → E_form(B⁻) ≈ 0.37 eV  [#30+#32, T0/D1]
+13. `charge-transition-level(E_form(B⁰), E_form(B⁻))` → ε(0/−) at E_v + 0.37 eV  [#34, T0/D1]
+14. `acoustic-mismatch-TBR(diamond, W)` → R_K ≈ 1×10⁻⁹ m²K/W  [#28, T0/D1]
+
+*Layer 3 — fires AFTER T_op predicted (T = 773 K):*
+15. `defect-boltzmann-population(E_form, T=773K, μ_B)` → activated [B⁻] fraction ≈ exp(−(E_F−E_v−0.37)/kT) — at 773K, kT≈0.067 eV so activation jumps from ~10⁻⁴ at RT to ~10⁻¹ at 500°C  [#35, T0/D1]
+16. `self-consistent-charge-balance(c_def(E_F,T), n(E_F,T), p(E_F,T))` → E_F* via IFT-backed fixed point  [#36, T1/D2]
+17. `mobility-impurity-phonon(N_imp, T=773K, m*_h)` → μ_h(773K) ≈ 300 cm²/Vs (down from 2000 at RT)  [#20, T0/D1]
+18. `matthiessen-mobility(μ_imp, μ_ph)` → μ_total  [#15, T0/D1]
+19. `callaway-lattice-kappa(ω_λ, τ_λ(T=773K))` → κ_L(773K) ≈ 800 W/m·K (down from 2200 at RT)  [#25, T2/D2 — uses cached τ surrogate]
+20. `chemical-potential-ref-table('W,T=773K,P=1atm)` → μ_W(773K)  [#66, T0/D0]
+21. `gibbs-free-energy-phase(diamond, T=773K, P=1atm)` and same for WC, graphite, W₂C → confirms WC is downhill from W+C at 773K  [#65, T1/D2]
+
+*Layer 4 — operating-condition observables:*
+22. `caughey-thomas-mobility(μ_total(773K), E=10⁶ V/cm, v_sat, β)` → effective μ(E,T) under bias  [#16, T0/D1]
+23. `v-sat-POP-limit(ω_LO_diamond=165 meV, m*_h, ε∞, ε0)` → v_sat ≈ 1.5×10⁷ cm/s  [#17, T0/D1]
+24. `image-force-barrier-lowering(E=10⁶, ε_diamond)` → Δφ ≈ 0.06 eV  [#49, T0/D0]
+25. `richardson-dushman-thermionic(φ_B^eff − Δφ, T=773K, A*)` → J_TE leakage  [#78, T0/D1]
+26. `padovani-stratton-TFE(φ_B, N_A=10²⁰, T=773K, m*_h)` → J_TFE (dominates at this T and doping)  [#79, T0/D1]
+27. `fowler-nordheim-current(φ_B, E=10⁶, m*_h)` → J_FN (subdominant at 773K but rising)  [#77, T0/D1]
+28. `chynoweth-impact-ionization(α0_diamond, β/E)` → α at 10⁶ V/cm  [#74, T0/D1]
+29. `avalanche-multiplication(α, L_depl)` → M (should be <2 for safe operation)  [#75, T1/D2]
+30. `hot-carrier-temperature-balance(j·E, τ_E(773K), T_L=773K)` → T_e ≈ 1100K (hot carriers significantly above lattice)  [#72, T0/D1]
+31. `frohlich-scattering-rate(α_F=0.06 diamond, T=773K, ε_k=T_e·k_B)` → τ_F⁻¹  [#22, T1/D1]
+32. `deformation-potential-gap-shift(E_g, ε_thermal_mismatch_strain)` → ΔE_g ≈ −0.02 eV under thermal stress  [#63, T1/D1]
+
+*Layer 5 — coupled EM-thermal closure:*
+33. `coupled-em-thermal-pde-residual(j, E, T_L, σ(T_L), κ(T_L))` → PDE residual L2 norm over device mesh  [#71, T1/D2 — adjoint solves backward through the PDE]
+34. `self-heating-T_op(∫j·E, R_th=40K·mm/W, T_amb=300K)` → T_op ≈ 773K — **closes loop with step 15**  [#70, T0/D1]
+
+*Layer 6 — degradation, fires per-mission-profile not per-step:*
+35. `carbide-growth-parabolic(D_0_WC, E_a≈2.4 eV, T=773K, t=10⁵h)` → x² ≈ 5 nm² growth — **viable: WC layer stable on this timescale**  [#81, T0/D1]
+36. `black-electromigration-MTTF(j, E_a, T=773K, n=2)` → MTTF estimate  [#82, T0/D1]
+37. `coffin-manson-fatigue(Δε_p from thermal cycling 300↔773K, c)` → N_f cycles to failure  [#83, T0/D1]
+
+### 6.3 Cost accounting for this sample
+
+- **T0 entries fired**: 24 — all in inner loop, total cost ~ model-forward × O(1)
+- **T1 entries fired**: 9 — vectorized kernels, total cost ~ model-forward × O(N_atom + N_q + N_mesh)
+- **T2 entries fired**: 2 — surrogate-mediated (κ_L surrogate, Huang-Rhys not needed here), refreshed per-epoch
+- **T3 entries fired**: 0 — no faithful DFT call needed at training step (battery comparison happens only at calibration phase)
+
+**Key physics demonstration (S3's worked example): at T=773K, the B acceptor activation rises ~10³× vs RT.** The catalog catches this because entry #35 fires AT the operating temperature predicted by entries #70+#71. The cycle T_op → c_def → σ → P_diss → T_op is closed by Layer 3 ↔ Layer 5 fixed point. **Without the residual-generator factory enforcing layer ordering, this dependency would be silently violated** — the loss would compute c_def at RT while predicting performance at 500°C.
+
+### 6.4 Honest failure modes the catalog catches for this scenario
+
+- If model predicts φ_B^SM but #48 disagrees by >0.3 eV → MIGS-correction violation → flagged
+- If self-consistent E_F (#36) doesn't converge → IFT solve fails → sample dropped from batch, logged
+- If avalanche M (#75) > 10 → device is in breakdown; coverage-mask flags as out-of-operating-envelope
+- If carbide growth (#81) > 100 nm at mission lifetime → interface integrity violated; mission-profile fails
+- If T_op (#70) ≠ assumed T in #35 → fixed-point divergence → curriculum should not yet train on this sample (Warmup phase only)
+
+---
+
+## 7. Summary Recommendations for S7
+
+Concrete architecture amendments S7 should incorporate, in priority order:
+
+1. **Adopt the 87-entry catalog (§1) as the canonical /physics residual registry.** Bind bundle taxonomy to 11 bundles (§4.4). Treat the two architectural rejections (#88 F=−∇E, #89 equivariance) as positive design constraints, NOT residual entries.
+
+2. **Implement the ResidualGenerator record type and the make-residual-generator factory exactly as specified in §3.** The factory is the missing architectural piece S5 named; S6 has now typed it. Make registration-time adjoint validation a hard gate (§4.5).
+
+3. **Adopt T0–T3 cost tiers with T2 sub-classifier** (§4.1). Reject S2's T0–T4 expansion.
+
+4. **Bind layer ordering (§2.2) into the training loop.** Layer 3 residuals MUST fire after T_op is predicted; the Layer-3 ↔ Layer-5 cycle is closed by fixed-point iteration in the same forward pass, not by nested optimization.
+
+5. **Unify ref-phase-cache and defect-reference-battery into a single `ReferenceCache` substrate** with namespaces (§4.3). One lifecycle, one versioning, two keyspaces.
+
+6. **Commit to a surrogate-net-bridge infrastructure as a first-class architecture component** (§5 strategic recommendation). Required for entries #6, #13, #40, #41 to be trainable; complements (does not replace) the MLIP bridge.
+
+7. **Implement implicit-layer / deep-equilibrium support** for entry #36 (self-consistent charge balance) and any future fixed-point residuals. This is the IFT-adjoint mechanism that #36's D2 tag requires.
+
+8. **Implement PDE-adjoint support** for entries #71, #75, and similar Layer-5 entries. Wire it through the same `backward?` slot in `ResidualGenerator`.
+
+9. **Implement relaxations for D4 entries.** Currently only #84 (cluster-expansion config) is D4; the Gumbel-Softmax temperature should be tied to S5's curriculum scheduler.
+
+10. **Treat the 4-phonon, NEGF, multiphonon-capture, SCPH gaps (§5 table) as documented known-omissions** rather than silently incomplete. Mark in /physics with explicit `known-gap` annotation so users see them at registry inspection time.
+
+11. **Wire S5's multi-source GradNorm to the four `source` tags** (Model-internal, DFT-Battery, MLIP, Experiment) — these are now first-class slots on `ResidualGenerator` (§3.1, §3.5).
+
+12. **Wire S5's RAD-adaptive sampling to T1 entries only** (§3.4). T0 = uniform; T2 = per-epoch; T3 = on-demand. Do not over-engineer RAD for T0.
+
+13. **Diamond-W-Schottky-500°C scenario (§6) becomes the canonical integration test** for S7's amendment. If the 37-step firing sequence executes correctly with the right layer-ordering and closes the T_op self-heating cycle, the architecture works.
+
+14. **The Environment record needs `temperature_gradient` field** (S4's minor extension) — adopt directly. No other changes to the unified state vector are needed (S4 confirmed).
+
+15. **The response-interface needs a `causal?:Boolean` slot** (S4's minor extension) for non-causal nonlinear responses — adopt directly.
+
+16. **Honest scope envelope:** the 12 limits from S1 (flexoelectricity, magneto-thermal, non-Markovian deep defects, polaron localization, etc.) plus the 4 architecture-level gaps from §5 (4-phonon, NEGF, multiphonon-capture full, SCPH full) constitute v1's documented frontier. S7 should publish this as the explicit scope statement.
+
+The catalog is now executable. The factory is now typed. The DAG is now layered. The cycles are now closed. S7 has the substrate it needs.

@@ -1,0 +1,620 @@
+# Stream S3: Defects, Doping, Surfaces, and Interfaces for UWBG-Semiconductor PINO
+
+Survey of defect, doping, surface, and interface physics for diamond-centric UWBG semiconductors under harsh-environment (≥500°C, vibration, high-j) conditions. Read-only research; formulas typed in `/physics` registry style with two-tier (cheap/faithful) parameterizations.
+
+---
+
+## Part A — Native defects in UWBG hosts
+
+### A.1 Inventory by host
+
+| Host | Dominant native defects | Notable complexes | Notes |
+|---|---|---|---|
+| Diamond (C) | V_C (mono-vacancy GR1), C_i (split-⟨100⟩), divacancy V₂ | NV, NVN (H3), N₃V (N3), N₂ (A-aggregate), platelets | V_C migration barrier ≈ 2.3 eV; very stable at RT, mobile >700°C |
+| c-BN | V_B, V_N, B_i, N_i, antisites B_N, N_B | V_B–O complexes | V_N is shallow donor-like; antisites mid-gap |
+| AlN | V_Al (triple acceptor), V_N (donor), O_N, Al_i | V_Al–O complex (UV absorber), V_Al–nC_N | V_Al formation energy ~6–8 eV in n-type, dominant compensator |
+| GaN | V_Ga (acceptor), V_N (donor), N_i, Ga_i, antisites | V_Ga–O_N, V_Ga–H_n (n=1..4) | V_Ga–3H neutral at most E_F; H passivates |
+| β-Ga₂O₃ | V_O (three inequivalent sites I/II/III), V_Ga (two sites), Ga_i, split V_Ga–Ga_i–V_Ga | V_O–H, V_Ga–nH | V_O deep, NOT the shallow donor (was historically misattributed) |
+| AlGaN | inherits V_III, V_N, plus alloy disorder; cation-site preference for Al/Ga | Al_Ga, Ga_Al as native disorder | composition-dependent E_form |
+
+### A.2 Typed signatures
+
+```
+defect_inventory : Host → List[DefectSpecies]
+  where DefectSpecies = { name : Symbol
+                        , site : LatticeSite
+                        , charge_states : List[Int]
+                        , spin : Half ∪ Int }
+
+E_form : (DefectSpecies, charge q, E_F, μ_env, T, P) → Energy
+ε(q/q') : (DefectSpecies) → List[(q, q', E_level_in_gap)]  -- charge transition levels
+E_migr  : (DefectSpecies, Path) → Energy                     -- NEB barrier
+S_form  : (DefectSpecies, charge q, T) → Entropy             -- vibrational+electronic
+[D]_eq  : (DefectSpecies, charge q, T, E_F, μ_env) → Concentration
+```
+
+### A.3 Equilibrium concentration
+
+**Cheap path**: dilute Boltzmann
+```
+[D]^q_cheap(T) = N_site · g_q · exp(-E_form^q / kT)
+```
+
+**Faithful path**: include vibrational entropy + temperature-dependent E_F from charge balance
+```
+[D]^q_faith(T) = N_site · g_q · exp(S_form^q / k) · exp(-(E_form^q(E_F(T), μ(T))) / kT)
+```
+with E_F(T) solved self-consistently from
+∑_D ∑_q q·[D]^q + p(E_F, T) − n(E_F, T) + ∑_dopant q_d · [Dopant^q_d] = 0.
+
+### A.4 Worked example: V_C in diamond at 500°C (T = 773 K)
+
+E_form(V_C^0, intrinsic) ≈ 7.2 eV (HSE06). kT = 0.0666 eV. N_site = 1.76e23 cm⁻³.
+
+[V_C] ≈ 1.76e23 · exp(−108) ≈ vanishing (~1e−24 cm⁻³). **At thermal equilibrium V_C is negligible**; harsh-environment generation comes from non-equilibrium sources: ion-cascade displacement (turbine ingestion), interface-driven generation (carbide-front advance, Part G), and frozen-in concentrations from synthesis. The PINO should treat [V_C] as a state variable Z_I evolving by generation–annihilation kinetics, not an equilibrium quantity.
+
+### A.5 Migration barriers (NEB-class, faithful)
+
+| Defect | E_migr (eV) | Onset T at ν₀=1e13, τ=1 yr |
+|---|---|---|
+| V_C^0 in diamond | 2.3 | ~870 K (≈600°C) |
+| V_C^− in diamond | 2.8 | ~1050 K |
+| C_i (di-interstitial) | 1.6–1.7 | ~580 K |
+| V_N in GaN | 2.6 | ~970 K |
+| V_Ga in GaN | 1.9 | ~700 K |
+| V_O in β-Ga₂O₃ | 1.9–2.4 (site-dependent) | 700–890 K |
+| V_Al in AlN | 3.4 | ~1280 K |
+
+**Direct relevance**: at the 500°C target, V_C in diamond is on the verge of mobility — this is the regime where defects start clustering into platelets (Part G).
+
+---
+
+## Part B — Dopant chemistry
+
+### B.1 Per-host dopant table
+
+| Host | Donors (E_d) | Acceptors (E_a) | Compensators | Notes |
+|---|---|---|---|---|
+| Diamond | N (1.7 eV, deep, useless for conduction), P (0.57 eV, marginal n-type), Sb (~0.4 eV, low solubility), Li_i (donor predicted, kinetically hard) | B (0.37 eV; only viable acceptor) | self-comp: B+V_C; N+V_C → NV | NV/SiV are color centers, sensors not dopants |
+| c-BN | Si_B (donor, ~0.24 eV), S_N | Be_B (~0.15 eV), Mg_B | self-comp by V_B/V_N | best ambipolar UWBG candidate |
+| AlN | Si_Al (~0.25 eV, becomes DX-like at high Al) | Mg_Al (~0.5 eV, very deep), Be_Al | V_Al (triple acceptor) kills n-type | doping crisis worsens with x_Al in AlGaN |
+| GaN | Si_Ga (~0.02 eV, shallow), O_N | Mg_Ga (~0.17 eV, requires H-removal anneal) | V_Ga–nH; Mg–H | Mg activation = the GaN doping story |
+| β-Ga₂O₃ | Si, Sn, Ge (all shallow, ~0.03 eV) | Mg, Fe (deep, semi-insulating only); no shallow acceptor known | self-trapped holes (intrinsic compensation) | **no p-type Ga₂O₃** — fundamental limit |
+| AlGaN (high Al) | Si: DX onset at x_Al ≳ 0.8 | Mg: E_a rises linearly with x_Al | V_III increases with x_Al | AlGaN doping bottleneck for UV/power |
+
+### B.2 Why diamond doping is hard
+
+Five compounding obstacles, each worth a typed term:
+
+1. **Small lattice constant** (a = 3.567 Å) → tiny substitutional cavity → most dopants prefer interstitial sites where they're deep donors or kinetically frozen.
+2. **High cohesive energy** (~7.4 eV/atom) → small formation-energy window before competing phases (graphite, dopant precipitates) win.
+3. **No native shallow donor**: P at 0.57 eV gives <0.1% activation at RT; usable only at high T (favorable for harsh-env!).
+4. **Self-compensation**: substitutional B^− pairs with V_C^+ to form B–V; N^+_s pairs with V_C^− to form NV^0.
+5. **Surface depletion**: H-termination's NEA strips electrons; O-termination depletes holes. Bulk doping efficacy depends on surface boundary condition.
+
+### B.3 Typed signatures
+
+```
+dopant_activation : (Host, Dopant, site, T) → fraction_ionized
+solubility_limit  : (Host, Dopant, μ_env, T) → Concentration
+self_compensation : (Host, Dopant_pair) → BindingEnergy
+DX_transition     : (Host, Dopant, x_alloy) → E_DX_onset
+```
+
+**Cheap path** (single-donor model):
+```
+n(T) = (1/2) · [-N_C·g_d + √(N_C²·g_d² + 4·N_C·N_D·g_d·exp(-E_d/kT))]   with g_d = 2
+```
+**Faithful path**: multi-level charge-balance with all defects from Part A, T-dependent μ (Part C), and finite κ via Freysoldt.
+
+### B.4 Worked example: P-doped diamond at 500°C
+
+E_d = 0.57 eV, T = 773 K, kT = 0.0666 eV, N_D = 1e19 cm⁻³, N_C(773 K) ≈ 4e19 cm⁻³.
+exp(−E_d/kT) ≈ exp(−8.56) ≈ 1.9e−4. Activation fraction ≈ √(N_D/N_C) · √(exp(−E_d/kT)) ≈ 0.5 · 0.014 ≈ ~0.7%.
+n ≈ 7e16 cm⁻³ at 500°C — usable. Same dopant at RT gives ~3e13 cm⁻³ — useless. **Harsh-environment T turns marginal dopants into viable ones**; this is a real PINO-relevant inversion.
+
+---
+
+## Part C — Charged-defect machinery
+
+### C.1 Zhang–Northrup formation energy
+
+```
+E_form[D^q] = E_tot[D^q] − E_tot[host] − ∑_i n_i · μ_i + q·(E_VBM + E_F) + E_corr[q, L]
+```
+Types:
+```
+E_form : (DefectConfig, charge q, μ_env : List[(species, μ)],
+          E_F : Real, supercell_size L : Length, corr_scheme : Tag) → Energy
+```
+- μ_i bounded by stability triangle (e.g., μ_C ∈ [μ_C(diamond) − ΔH_f(competing phase), μ_C(diamond)])
+- E_F sweeps [0, E_g]
+- E_corr handles spurious supercell electrostatics.
+
+### C.2 Makov–Payne (cheap path)
+
+Leading multipole correction for charged supercell with compensating jellium:
+```
+E_MP(q, L) = (q² · α_M) / (2 · ε · L) + (2π · q · Q_r) / (3 · ε · L³) + O(L⁻⁵)
+sign convention: ADDED to E_tot[D^q] to recover dilute limit
+```
+Type:
+```
+E_MP : (charge q, supercell_L, α_Madelung, ε_static, Q_r : QuadrupoleMoment?) → Energy
+```
+**Status in /physics**: cheap-tier correction; α_M precomputed per Bravais lattice (diamond fcc → α_M ≈ 1.418).
+
+### C.3 Freysoldt (faithful path)
+
+Splits the correction into **point-charge lattice term** + **potential alignment**:
+```
+E_F = E_lat(q, ε, L) − q·ΔV_q/0     -- ΔV_q/0 = ⟨V_defect⟩ − ⟨V_pristine⟩ far from defect
+E_lat(q, ε, L) = (q²·α_M)/(2·ε·L) · [1 − f_shape(L, σ_model)]
+```
+Type:
+```
+E_Frey : (q, L, ε_∞, ε_0, model_charge_profile, V_diff_planar_avg : Array1D) → Energy
+ΔV_alignment : (V_defect : ScalarField3D, V_host : ScalarField3D, r_sample : Region) → Energy
+```
+Returns both the energy correction AND the alignment scalar (an alignment-residual observable for the PINO).
+
+### C.4 Lany–Zunger
+
+Empirical scaling of M-P for screening + image-charge interactions:
+```
+E_LZ(q, L) = (1 − c_sh) · (q²·α_M)/(2·ε·L),   c_sh ≈ 0.36 for cubic
+```
+Cheaper than Freysoldt, better than bare M-P for cubic hosts.
+
+### C.5 Defect–defect interaction & configurational entropy
+
+At [D] ≳ 1e19 cm⁻³, dilute-Boltzmann breaks. Add pairwise screened-Coulomb term:
+```
+E_dd(q_i, q_j, r_ij, ε) = (q_i·q_j·e²) / (4π·ε·r_ij) · exp(−r_ij/λ_D)
+λ_D = √(ε·kT / (e²·∑_q q²·[D^q]))    -- Debye screening length, self-consistent
+```
+Configurational entropy on N_site sublattice:
+```
+S_conf = k·[N_site·ln(N_site) − [D]·ln([D]) − (N_site − [D])·ln(N_site − [D])]
+       ≈ −k·[D]·(ln([D]/N_site) − 1)   in dilute limit
+```
+
+### C.6 Two-tier ladder for charged defects
+
+| Tier | Formation energy | Correction | Cost |
+|---|---|---|---|
+| cheap | DFT-GGA E_tot, M-P only | E_MP | 1× |
+| mid | DFT-HSE E_tot, Lany–Zunger | E_LZ | ~30× |
+| faithful | DFT-HSE + GW band edges, Freysoldt with planar-avg alignment | E_Frey + ΔV | ~300× |
+
+PINO surrogate trained on cheap, residual-corrected against mid, anchor-validated against faithful.
+
+---
+
+## Part D — Recombination and trapping
+
+### D.1 Shockley–Read–Hall
+
+```
+R_SRH = (n·p − n_i²) / (τ_p·(n + n_1) + τ_n·(p + p_1))
+n_1 = N_C · exp(−(E_C − E_T)/kT),   p_1 = N_V · exp(−(E_T − E_V)/kT)
+τ_n = 1/(σ_n · v_th · N_T),   τ_p = 1/(σ_p · v_th · N_T)
+v_th(T) = √(3kT/m*)
+```
+Type:
+```
+R_SRH : (n, p, T, traps : List[Trap]) → Rate
+Trap = { level E_T, σ_n(T), σ_p(T), concentration N_T, degeneracy g_T }
+```
+
+### D.2 Auger
+
+```
+R_Aug = (C_n · n + C_p · p) · (n·p − n_i²)
+C_n, C_p : T-dependent, ~1e−30 cm⁶/s for wide-gap (much smaller than narrow-gap)
+```
+Relevant in diamond power devices at high injection.
+
+### D.3 Multiphonon emission (deep-level non-radiative)
+
+Huang–Rhys formalism for capture at deep trap:
+```
+σ_capture(T) = σ_0 · exp(−E_b / kT)
+E_b = (S − ΔE/ℏω)² · ℏω / (4S)     -- effective barrier from Marcus-style crossing
+S = Huang–Rhys factor (dimensionless lattice coupling)
+ℏω = effective phonon energy
+```
+Type:
+```
+σ_MPE : (Trap, T, S : HuangRhys, ω_phonon, ΔE : energy_release) → CrossSection
+```
+**Cheap path**: temperature-independent σ_0 from device data.
+**Faithful path**: compute S and ω from DFT phonon mode at defect; Marcus crossing for barrier.
+
+### D.4 Capture cross sections
+
+Three regimes:
+- Coulomb-attractive (trap charge opposite carrier): σ ~ 1e−14 cm², σ ∝ T^−2
+- Neutral: σ ~ 1e−15 cm², weak T-dependence
+- Coulomb-repulsive: σ ~ 1e−18 cm² · exp(−E_C/kT), strongly T-activated
+
+```
+σ_capture_type : (Trap_charge_relative_to_carrier) → {Attractive | Neutral | Repulsive}
+σ : (type, T, Z_eff) → CrossSection
+```
+
+### D.5 Diamond-specific recombination centers at 500°C
+
+NV^0/NV^− has thermal activation ~1.7 eV → becomes a dominant SRH center at T > 600 K. The N concentration (in CVD diamond, 1e17–1e19 cm⁻³) sets τ_n via NV trap density. Boron-doped diamond at 500°C with [N]=1e18 cm⁻³ gives τ_n ≈ 10–100 ns (rough estimate, σ_n ~ 1e−15 cm², v_th ≈ 4e7 cm/s at 773 K).
+
+---
+
+## Part E — Surfaces and surface defects
+
+### E.1 Diamond surface reconstructions
+
+| Facet | Termination | Reconstruction | Surface energy γ (J/m²) | Electron affinity χ |
+|---|---|---|---|---|
+| (100) | clean | 2×1 (dimer rows) | 5.9 | +0.5 eV |
+| (100) | H | 1×1:H (mono-H) or 2×1:H (di-H unstable) | 3.4 | **−1.3 eV (NEA)** |
+| (100) | O (ether) | 1×1:O | 4.5 | +1.7 eV (PEA) |
+| (100) | O (ketone) | 1×1:O | — | +2.6 eV (strongly PEA) |
+| (100) | OH | 1×1:OH | 4.0 | +0.4 eV |
+| (110) | clean | 1×1 (no reconstruction) | 6.3 | +0.7 eV |
+| (110) | H | 1×1:H | 3.8 | −0.8 eV (NEA) |
+| (111) | clean | 2×1 (π-bonded chains) | 6.5 | +0.4 eV |
+| (111) | H | 1×1:H | 3.0 | **−1.27 eV (NEA, most-studied)** |
+| (111) | O | 1×1 or 2×1:O | 5.0 | +1.7 eV (PEA) |
+
+### E.2 Surface energy as function of termination (μ-dependent)
+
+```
+γ(Termination T, μ_H, μ_O, μ_C) = (1/A) · [E_slab − ∑_i N_i · μ_i]
+```
+Type:
+```
+γ_surf : (Facet, Termination_pattern, μ_env : ChemPotentialEnv, T) → Energy/Area
+```
+Cheap path: tabulated γ for canonical terminations.
+Faithful path: DFT slab with explicit μ_H(T, p_H2) = ½·g_H2(T, p) and μ_O(T, p_O2) = ½·g_O2(T, p).
+
+### E.3 Dangling-bond states
+
+Bare diamond surfaces have unsaturated sp³ → in-gap states near E_F. Reconstructions (π-bonded chains on (111), dimers on (100)) push these toward band edges but leave residual states near mid-gap. These act as Fermi-level pinning sites for unpassivated contacts.
+
+```
+ρ_DOS_surface(E) : (Facet, Termination) → DOS_in_gap
+```
+
+### E.4 NEA/PEA mechanism for diamond
+
+```
+χ_surface = χ_bulk + ΔV_surf_dipole
+ΔV_surf_dipole = (μ_dipole · n_dipole) / (ε_0 · ε_r_surface)
+```
+H-termination: C^δ−–H^δ+ dipole pointing out → reduces χ by ~1.8 eV → NEA.
+O-termination: C^δ+–O^δ− dipole pointing in → increases χ by ~1.5 eV → PEA.
+**Reliability concern**: H desorbs at ~700–900°C → NEA contacts degrade at harsh-env T. O-termination is thermally more stable. This is a measurable PINO observable: χ(T, t) under operating conditions.
+
+### E.5 Companion-UWBG surface terminations (one-liners)
+
+- **c-BN**: (110) cleavage face, B-rich vs N-rich (100), H/F passivation common
+- **AlN**: (0001) Al-polar vs (000-1) N-polar, polarity governs polarization charge
+- **GaN**: same Al/N polarity story; Ga-polar (0001) is the engineered surface
+- **β-Ga₂O₃**: (-201), (010), (100) all distinct; (010) is the cleavage plane
+- **AlGaN**: inherits GaN polarity, with composition-dependent surface segregation
+
+---
+
+## Part F — Metal–semiconductor interfaces
+
+### F.1 Schottky–Mott (cheap path)
+
+```
+φ_B^n = φ_M − χ_S        -- n-type barrier
+φ_B^p = E_g + χ_S − φ_M   -- p-type barrier
+φ_B^n + φ_B^p = E_g
+```
+Type:
+```
+φ_B_SM : (φ_M : eV, χ_S : eV) → eV
+```
+**Applies when**: no MIGS, no interface dipole, no Fermi-pinning. Almost never true; useful as zeroth-order estimate.
+
+### F.2 Bardeen limit
+
+```
+φ_B → E_g − φ_CNL   -- independent of φ_M
+```
+Holds when interface-state density D_it is so large (>1e14 cm⁻²·eV⁻¹) that the Fermi level pins regardless of metal.
+
+### F.3 MIGS / Cowley–Sze (faithful path)
+
+```
+φ_B = S · (φ_M − χ_S) + (1 − S) · (E_g − φ_CNL)
+S = 1 / (1 + (e²·D_it·δ) / (ε_i·ε_0))
+```
+S = slope parameter (S=1 → S-M; S=0 → Bardeen).
+φ_CNL = charge neutrality level of MIGS continuum.
+δ = interface-layer thickness; ε_i = interface permittivity.
+
+Type:
+```
+φ_B_MIGS : (φ_M, χ_S, E_g, φ_CNL, D_it, δ, ε_i) → eV
+S_param  : (D_it, δ, ε_i) → DimensionlessFraction
+```
+
+### F.4 Diamond/metal barrier values (from literature)
+
+| Metal | φ_M (eV) | φ_B^p on H-diamond (eV) | φ_B^p on O-diamond (eV) | Carbide-forming? | T_max for stability |
+|---|---|---|---|---|---|
+| W | 4.55 | ~0.8 | ~1.5 | yes (WC at ~600°C) | ~600°C (carbide-limited) |
+| Mo | 4.6 | ~0.8 | ~1.6 | yes (Mo₂C at ~500°C) | ~500°C |
+| Pt | 5.65 | ~1.4 | ~2.0 | **no** | >800°C (best harsh-env metal) |
+| Au | 5.1 | ~1.0 | ~1.8 | no | limited by Au mobility (~400°C) |
+| Ti | 4.33 | ~0.5 | ~1.2 | yes (TiC at ~400°C) | ~400°C (used as adhesion layer) |
+| Ni | 5.15 | ~1.0 | ~1.8 | yes (Ni₃C metastable; mainly graphitizes diamond at ~600°C) | ~500°C |
+| Al | 4.28 | ~0.5 | ~1.1 | yes (Al₄C₃ at ~600°C) | electromigration-limited |
+| Ta | 4.25 | ~0.5 | ~1.2 | yes (TaC) | ~700°C if barrier-protected |
+| TiN | 4.5 | — | ~1.4 | inert (acts as diffusion barrier) | >800°C |
+| WSi₂ | 4.7 | — | — | yes/silicide-bound | >700°C |
+
+S parameter for diamond ≈ 0.7–0.8 (relatively un-pinned compared to GaAs/Si); MIGS correction is real but small.
+
+### F.5 Carbide formation kinetics
+
+Parabolic growth law:
+```
+x_carbide(t, T) = √(2 · k_carb(T) · t)
+k_carb(T) = k_0 · exp(−E_carb / kT)
+```
+| Metal | E_carb (eV) | k_0 (cm²/s) | x_carbide after 1000 h at 500°C |
+|---|---|---|---|
+| Ti | 1.4 | ~1e−5 | ~600 nm (severe) |
+| W | 2.4 | ~1e−4 | ~3 nm (acceptable) |
+| Mo | 2.1 | ~3e−5 | ~15 nm (marginal) |
+| Pt | — | — | 0 (no carbide) |
+
+### F.6 Thermal stability ranking (≥500°C harsh-env contacts)
+
+Best → worst:
+1. **Pt** (no carbide, high φ_M, expensive)
+2. **TiN diffusion barrier + Pt/Au cap** (engineered stack)
+3. **W with TiN barrier** (carbide self-limits at thin oxide)
+4. **WSi₂** (already silicide, stable)
+5. **Mo** (carbide growth aggressive at 500°C)
+6. **Ti, Al, Ni** (degrade quickly; only as adhesion or sacrificial)
+
+---
+
+## Part G — High-T degradation pathways
+
+All Arrhenius-form: `rate = ν₀ · exp(−E_a / kT)`. Types:
+```
+rate_thermal_proc : (ProcessTag, T, prefactor ν₀, activation E_a, state x) → Rate
+```
+
+### G.1 Vacancy generation
+
+```
+d[V]/dt = G(T) − [V]·(annihilation_rate)
+G(T) = ν₀_V · exp(−E_form^V / kT) · N_site
+```
+For diamond V_C: G(773 K) negligible (E_form 7.2 eV). **Dominant generation in harsh env: irradiation/impact + interface-induced.** Add term:
+```
+G_total = G_thermal + G_carbide_front + G_ion_flux
+```
+
+### G.2 Dopant diffusion
+
+```
+D(T) = D_0 · exp(−E_diff / kT)
+profile evolution: ∂C/∂t = ∇·(D ∇C) − ∇·(μ_drift · C · E)
+```
+| Dopant in diamond | E_diff (eV) | D at 500°C (cm²/s) | profile shift in 1000 h |
+|---|---|---|---|
+| B substitutional | 4.5 | ~1e−24 | <1 nm (stable) |
+| N substitutional | 5.0 | ~1e−26 | negligible |
+| H interstitial | 1.7 | ~1e−13 | ~1 mm (catastrophic for passivation) |
+| Li interstitial | 1.0 | ~1e−10 | runaway |
+
+**H diffusion is the silent killer**: passivating H redistributes, exposing dangling bonds, changing χ at surfaces, breaking p-type GaN that was H-compensation activated.
+
+### G.3 Defect clustering (N platelets in diamond)
+
+```
+d[platelet]/dt = k_nuc · [N_s]² − k_dis · [platelet]
+k_nuc(T) = ν_0 · exp(−E_nuc / kT),   E_nuc ≈ 3.5 eV (N₂A formation barrier)
+```
+At [N] = 1e19 cm⁻³ and 500°C, half-life for N_s → N₂A aggregation ≈ years; at 1000°C, hours. Platelets pin dislocations and act as charged scatterers.
+
+### G.4 Carbide growth (see F.5)
+Already covered. Treat thickness x_carbide as an interface state variable in the PINO.
+
+### G.5 Electromigration
+
+Black's equation:
+```
+MTTF = (A / j^n) · exp(E_EM / kT),   n ≈ 2, E_EM ≈ 0.7–1.0 eV for Al, ~1.2 eV for Cu, ~1.5 eV for refractories
+```
+Type:
+```
+MTTF_EM : (j : CurrentDensity, T, metal : MetalProperties) → Time
+```
+For 500°C operation at j=1e6 A/cm², refractory metals give MTTF ~10³–10⁴ h; Al fails in hours.
+
+### G.6 Thermomechanical fatigue (CTE mismatch)
+
+```
+ε_thermal(T) = (α_metal − α_diamond) · ΔT
+N_cycles_to_failure : Coffin–Manson  N_f = C · (Δε_pl)^−β,   β ≈ 2 for ductile, β ≈ 4 for brittle interfaces
+```
+| Metal | α (1e−6/K) | Δα vs diamond (α_dia ≈ 1.0 at RT, 5 at 500°C) | Notes |
+|---|---|---|---|
+| W | 4.5 | small | best match |
+| Mo | 4.8 | small | |
+| Pt | 8.8 | moderate | |
+| Au | 14.2 | large | delam-prone |
+| Al | 23.1 | huge | not usable |
+
+### G.7 Vibration-induced defect generation
+
+```
+dN_dis/dt = κ_vib · (σ_stress / σ_yield)^m · f_vibration
+```
+With m≈4–6 (high stress exponent), σ_stress driven by mode amplitude × elastic modulus. For turbine vibration spectra (broadband 100 Hz–10 kHz), couples to acoustic phonons; the relevant kinetics for the PINO is dislocation multiplication and vacancy generation at moving dislocations:
+```
+G_V_from_dis = ξ · ρ_dis · v_dis · b   (vacancy generation per jog motion)
+```
+
+---
+
+## Part H — Heterostructure interface stability
+
+### H.1 Lattice mismatch & strain
+
+```
+ε_mismatch = (a_substrate − a_film) / a_film
+σ_film = (E / (1−ν)) · ε_mismatch   -- biaxial elastic, valid below critical thickness
+```
+
+| Heterostructure | a_substrate (Å) | mismatch with diamond a=3.567 | comment |
+|---|---|---|---|
+| diamond/SiC (3C) | 4.36 | −18% | huge; needs nucleation tricks |
+| diamond/Si | 5.43 | −34% | extreme; only via buffer layers |
+| diamond/Ir(100) | 3.84 | −7% | best epitaxy substrate; bias-enhanced nucleation |
+| diamond/Pt(111) | 3.92 | −9% | viable |
+| diamond/c-BN | 3.615 | −1.3% | nearly lattice-matched, ideal but c-BN substrates rare |
+
+### H.2 Critical thickness (Matthews–Blakeslee)
+
+```
+h_c = (b / (2π·|ε|)) · ((1 − ν·cos²θ) / ((1+ν)·cosλ)) · (ln(h_c/b) + 1)
+```
+Type:
+```
+h_critical : (mismatch ε, Burgers b, ν : Poisson, glide_geometry (θ, λ)) → Length
+```
+For diamond/Ir at 7% mismatch: h_c ≈ 1 nm — well below useful film thickness, so diamond films on Ir relax through misfit dislocation networks immediately.
+
+### H.3 Misfit dislocation density
+
+```
+ρ_misfit(h) = (ε − ε_relax(h)) / b   for h > h_c
+ε_relax(h) ≈ ε · (1 − h_c/h)
+```
+
+### H.4 Interface chemistry
+
+- **diamond/SiC**: stable; thin amorphous-C transition layer ~1–2 nm; no carbide reaction (SiC already carbide).
+- **diamond/Si**: SiC layer forms at growth T (~800°C), 5–20 nm thick; provides nucleation but is a thermal-expansion mismatch site.
+- **diamond/Ir**: no carbide; pure mechanical interface; basis of "single-crystal diamond on Ir" route.
+- **diamond/Pt**: no carbide; metallic adhesion via d-band hybridization; weak but clean.
+
+### H.5 Thermal-cycle stability
+
+```
+strain_accumulated(N_cycles) ≈ N · |α_dia − α_sub| · ΔT
+delamination_threshold: G_interface > G_critical(strain)
+```
+Diamond/SiC and diamond/Ir survive >1000 cycles to 500°C; diamond/Si fails by SiC interlayer cracking within ~100 cycles at ΔT=500 K.
+
+---
+
+## Part I — Bridge to /physics registry
+
+### I.1 Existing-registry slots
+
+| Existing formula | Reused here |
+|---|---|
+| Van Roosbroeck–Shockley radiative | direct reuse for D.3 (radiative branch) |
+| Boltzmann statistics | A.3 equilibrium [D]^q |
+| Drift–diffusion currents | G.2 dopant-profile evolution |
+| GENERIC bracket {·,·} for energy | C.1 Zhang–Northrup is an energy-functional definition; lives in entropy/energy potentials |
+| Arrhenius kinetic template | G.1–G.7 all instantiate this |
+
+### I.2 New formulas to add
+
+1. **Zhang–Northrup defect formation energy** (Part C.1)
+2. **Makov–Payne supercell correction** (cheap, C.2)
+3. **Freysoldt correction with potential alignment** (faithful, C.3)
+4. **Lany–Zunger correction** (mid, C.4)
+5. **SRH recombination** (D.1)
+6. **Auger recombination** (D.2)
+7. **Multiphonon emission capture** (D.3)
+8. **Surface free energy γ(termination, μ_env)** (E.2)
+9. **Schottky–Mott barrier** (cheap, F.1)
+10. **MIGS-corrected barrier with slope S** (faithful, F.3)
+11. **Carbide growth parabolic law** (F.5, G.4)
+12. **Black's electromigration MTTF** (G.5)
+13. **Coffin–Manson thermomechanical fatigue** (G.6)
+14. **Matthews–Blakeslee critical thickness** (H.2)
+15. **Charge-balance master equation** (closure for E_F(T))
+16. **Self-consistent Debye screening for defect-defect** (C.5)
+17. **Defect configurational entropy** (C.5)
+
+That fits a target of ~17 new formulas. With the 24 already in registry, **41 total** — recommend splitting `defects-and-interfaces` into a sub-registry.
+
+### I.3 Observable bundles
+
+Existing bundles likely cover scalars, atom-indexed, T-resolved. **New bundle needed**:
+
+- **Interface-resolved bundle**: indexed by (material_A, material_B, termination, T). Holds φ_B, ΔV_alignment, γ, ε_mismatch, ρ_misfit, x_carbide, MTTF. Distinct geometry/topology vs bulk.
+- **Defect-resolved bundle**: indexed by (host, defect_species, charge q). Holds E_form, ε(q/q'), E_migr, S_form, [D]^q(T, E_F).
+- **Surface-resolved bundle**: indexed by (host, facet, termination). Holds γ, χ, ρ_DOS_in_gap, dipole moment.
+
+### I.4 Residual categories
+
+| Category | New residuals from S3 |
+|---|---|
+| **positivity** | [D]^q ≥ 0, [carrier] ≥ 0, σ_capture ≥ 0, γ ≥ 0, MTTF > 0 |
+| **conservation** | charge balance Σq·[D^q]+p−n+q_d·[Dop]=0; mass balance in carbide growth (C_diamond loss = C_carbide gain) |
+| **algebraic-identities** | S–M sum rule φ_B^n + φ_B^p = E_g; MIGS reduces to S–M at S=1; Matthews–Blakeslee ε_relax monotone in h |
+| **reference-battery** (proposed new) | predicted E_form, ε(q/q'), and φ_B vs known DFT/experimental anchors (NV, NV⁻, B in diamond, V_O in Ga₂O₃, Pt/H-diamond) |
+| **thermodynamic-consistency** (proposed new) | dγ/dμ = −Γ (Gibbs adsorption); dE_form/dE_F = q (charge–Fermi-level Maxwell relation); d[D]/dT consistent with S_form via Clausius–Clapeyron analog |
+
+### I.5 Methods / templates
+
+| Existing template | Used for |
+|---|---|
+| **AlgebraicOf** | C.1 Z–N, F.1 S–M, F.3 MIGS, C.5 entropy, E.2 γ |
+| **SpectralAggregateOf** | D.1 SRH rate (sum over traps), MIGS continuum integral for φ_CNL |
+| **KineticEvolutionOf** | G.1–G.7 Arrhenius processes; G.2 diffusion PDE; F.5 carbide growth |
+| **PathStationaryOf** | A.5 NEB barriers; B.3 DX-transition reaction coordinate; D.3 Huang–Rhys crossing |
+
+**New template needed**:
+- **InterfaceEquilibriumOf**: solves for interface state (φ_B, dipole, alignment) given two bulk states + termination/orientation tag. Output couples to MIGS, S–M, ΔV_alignment as different parameterizations.
+- **SelfConsistentChargeBalanceOf**: closure operator that takes a defect/dopant list + T + μ_env and returns (E_F, {[D^q]}, n, p) consistent. Fixed-point on E_F.
+
+### I.6 Two-tier classification of Part-G processes (concrete table)
+
+| Process | Cheap (in PINO state x) | Faithful (residual-checked) |
+|---|---|---|
+| Vacancy generation | Arrhenius G(T) with tabulated E_form | E_form from Z–N at current E_F(T), Freysoldt-corrected |
+| Carbide growth | parabolic with metal-specific k_0, E_carb | reaction-diffusion: μ_C profile, interface flux, with Freysoldt-corrected interface energy |
+| Electromigration | Black's MTTF | atomistic effective valence Z*; current-driven force, T-gradient term |
+| CTE fatigue | Coffin–Manson with tabulated β | full thermomechanical FE in elastic state h of GENERIC |
+| Dopant diffusion | constant D(T) | charge-state-resolved D^q(T) with self-consistent E_F |
+| Schottky barrier | S–M with tabulated φ_M, χ_S | MIGS with φ_CNL from band-structure integral |
+
+### I.7 Diamond-anchor priority list (Phase-2 implementation order)
+
+1. Z–N formation energy + Freysoldt (foundational; everything else depends on E_F-resolved E_form)
+2. Self-consistent charge balance template (closure)
+3. NV/NVN/N₂A defect-resolved bundle for diamond (anchors via well-measured ZPLs and charge levels)
+4. SRH with NV as trap (immediate observable for device-level training data)
+5. Schottky-Mott + MIGS for Pt/H-diamond and Pt/O-diamond (the two thermally-stable diamond contact references)
+6. Carbide-growth kinetics for W, Mo, Ti (the three relevant carbide-forming refractories)
+7. Surface energy γ(termination) with μ_H, μ_O parameterization (closes the surface-termination state variable)
+8. Coffin–Manson + Black's law (reliability-residual inputs for the harsh-env training set)
+
+---
+
+## Cross-stream coordination notes
+
+- **Charge balance closure** (I.5 SelfConsistentChargeBalanceOf) is the natural meeting point with any thermodynamics/carrier-stat stream — recommend a shared canonical implementation.
+- The **interface-resolved bundle** is novel; if another stream (transport? device-physics?) is also producing interface observables (e.g., contact resistance, tunneling), bundle structure should be co-designed.
+- **Reference-battery residuals** (predicted vs known) are a strong candidate for a new universal residual category — useful beyond defects (e.g., for cohesive energies, lattice constants, band gaps). Recommend a cross-stream RFC.
+- **H diffusion** (G.2) couples Part-S3 surface termination to Part-G long-time bulk evolution AND to dopant activation (Mg–H in GaN) — this is a three-way coupling that needs one stream to own it; flagging as cross-cutting.
+
+End of Stream S3 report.

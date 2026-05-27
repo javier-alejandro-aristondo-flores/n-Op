@@ -1,0 +1,90 @@
+#,Name,Signature `(in) → out`,Bundle,Tier,Diff,Path,Source,Depends on
+1,bandgap-direct,`(BandStruct) → Scalar`,B1,T0,D1,cheap,S1,bands
+2,bandgap-indirect,"`(BandStruct, k-grid) → Scalar`",B1,T0,D1,cheap,S1,bands
+3,effective-mass-tensor,"`(BandStruct, k0) → Tensor[3,3]`",B1,T0,D1,cheap,S1,bands
+4,DOS-tetrahedron,"`(BandStruct, k-mesh) → ε↦Scalar`",B1,T1,D2,cheap,S1,bands
+5,fermi-level-charge-neutral,"`(DOS, T, dopants) → Scalar`",B1/B4,T1,D2,cheap,S1+S3,"DOS, defect-populations"
+6,quasi-particle-shift-G0W0-surrogate,"`(bands, screening) → bands'`",B1,T2,D2,faithful,S1,bands
+7,acoustic-sum-rule,`(D(q→0)) → ‖residual‖`,B2,T0,D1,cheap,S1+S2,dyn-matrix
+8,dynamical-matrix-hermiticity,`(D(q)) → ‖D - D†‖`,B2,T0,D1,cheap,S2,dyn-matrix
+9,phonon-dispersion,`(D(q)) → ω_λ(q)`,B2,T1,D2,cheap,S1,dyn-matrix
+10,phonon-DOS,"`(ω_λ(q), q-mesh) → ε↦Scalar`",B2,T1,D2,cheap,S1,phonon-disp
+11,phonon-group-velocity,`(ω_λ(q)) → ∂ω/∂q`,B2,T1,D1,cheap,S1,phonon-disp
+12,grueneisen-mode,"`(ω_λ(q,V)) → γ_λ`",B2,T2,D3,cheap,S1,phonon-disp
+13,SCPH-self-consistent-phonons,"`(D(q), T) → ω_renorm`",B2,T2,D2,faithful,S1,"phonon-disp, T"
+14,drude-conductivity,"`(μ, n, e) → σ`",B3,T0,D1,cheap,S1,"μ, n"
+15,matthiessen-mobility,"`(μ_imp, μ_ph, μ_grain) → μ`",B3,T0,D1,cheap,S4,μ-channels
+16,caughey-thomas-mobility,"`(μ0, E, v_sat, β) → μ(E)`",B3/B9,T0,D1,cheap,S4,"μ0, v_sat, E"
+17,v-sat-POP-limit,"`(ω_LO, m*, ε∞, ε0) → v_sat`",B3,T0,D1,cheap,S4,"ω_LO, m*"
+18,v-sat-intervalley,"`(Δ_valley, m*_valleys) → v_sat`",B3,T0,D1,cheap,S4,bands
+19,hall-mobility-from-σ,"`(σ_xx, σ_xy, B) → μ_H`",B3,T0,D1,cheap,S1,σ
+20,mobility-impurity-phonon,"`(N_imp, T, m*) → μ_imp, μ_ph`",B3,T0,D1,cheap,S4,"N_imp, T"
+21,frohlich-coupling,"`(ω_LO, ε∞, ε0, m*) → α_F`",B2/B3,T0,D1,cheap,S4,"ω_LO, dielectric"
+22,frohlich-scattering-rate,"`(α_F, T, ε_k) → τ⁻¹`",B3,T1,D1,cheap,S4,"α_F, bands"
+23,seebeck-mott,"`(σ(ε), E_F, T) → S`",B3,T1,D2,cheap,S1,"σ, E_F"
+24,wiedemann-franz-electronic-kappa,"`(σ, T) → κ_e`",B3,T0,D1,cheap,S1,σ
+25,callaway-lattice-kappa,"`(ω_λ(q), τ_λ) → κ_L`",B3/B2,T2,D2,cheap,S1,"phonon-disp, τ"
+26,phonon-poiseuille-length,"`(τ_N, v_g) → L_Pois`",B3,T0,D1,cheap,S4,"τ_N, v_g"
+27,second-sound-speed,"`(v_g_LA, T, τ_R/τ_N) → c_ss`",B3,T0,D1,cheap,S4,"v_g, τ ratios"
+28,acoustic-mismatch-TBR,"`(ρ_1,v_1,ρ_2,v_2) → R_K`",B6,T0,D1,cheap,S4,mechanics ×2
+29,diffuse-mismatch-TBR,"`(DOS_ph_1, DOS_ph_2) → R_K`",B6,T1,D2,cheap,S4,phonon-DOS ×2
+30,defect-formation-energy-zhang-northrup,"`(E_def, E_host, μ_i, q, E_F) → E_form`",B4,T0,D1,cheap,S1+S2+S3,"E_def, μ_i, E_F"
+31,makov-payne-correction,"`(q, ε, L_cell) → ΔE_MP`",B4,T0,D0,cheap,S3,"q, ε"
+32,freysoldt-correction,"`(q, ε, V_q-V_0, L) → ΔE_FNV`",B4,T0,D0,cheap,S1+S2+S3,"q, ε, potential"
+33,lany-zunger-correction,"`(q, ε, L, ξ) → ΔE_LZ`",B4,T0,D0,cheap,S3,"q, ε"
+34,charge-transition-level,"`(E_form(q1), E_form(q2)) → ε(q1/q2)`",B4,T0,D1,cheap,S1+S3,E_form
+35,defect-boltzmann-population,"`(E_form, T, μ_i) → c_def`",B4,T0,D1,cheap,S2+S3,"E_form, T"
+36,self-consistent-charge-balance,"`(c_def(E_F), n(E_F), p(E_F)) → E_F*`",B4/B1,T1,D2,cheap,S3,"populations, n,p"
+37,defect-configurational-entropy,"`(c_def, sites) → S_conf`",B4,T0,D1,cheap,S3,populations
+38,SRH-recombination,"`(n, p, τ_n, τ_p, n_i) → R_SRH`",B4/B9,T0,D1,cheap,S3,"n, p, τ"
+39,auger-recombination,"`(n, p, C_n, C_p) → R_Aug`",B4/B9,T0,D1,cheap,S3,"n, p"
+40,multiphonon-emission-capture,"`(ΔE, ω_LO, S_HR, T) → C_p`",B4,T2,D2,faithful,S1+S3,"ΔE, ω_LO, Huang-Rhys"
+41,huang-rhys-factor,"`(Q_def, ω_λ) → S_HR`",B4/B2,T2,D2,faithful,S1,"Q_def, phonons"
+42,mass-action-defect-complex,"`(c_A, c_B, K_eq(T)) → c_AB`",B4,T0,D1,cheap,S2,"populations, K_eq"
+43,debye-screening-defect-defect,"`(c_def, T, ε) → λ_D`",B4,T0,D1,cheap,S3,"c_def, T, ε"
+44,surface-grand-potential-γ,"`(E_slab, μ_env, area) → γ(term,μ)`",B5,T1,D2,cheap,S2+S3,"slab energy, μ_env"
+45,wulff-shape,`(γ(hkl)) → polyhedron`,B5,T1,D3,faithful,S1,γ
+46,termination-stability-window,"`(γ(term, μ_H,μ_O)) → phase-diagram`",B5,T1,D2,cheap,S3,γ family
+47,schottky-mott-alignment,"`(W_m, χ_s) → φ_B`",B6,T0,D1,cheap,S2+S3,"work-fn, affinity"
+48,MIGS-corrected-barrier,"`(W_m, χ_s, S, φ_CNL) → φ_B_eff`",B6,T0,D1,cheap,S3,"Schottky-Mott, S, φ_CNL"
+49,image-force-barrier-lowering,"`(E, ε) → Δφ_IF`",B6/B9,T0,D0,cheap,S4,E_field
+50,interface-bond-counting,"`(slab_pair, cutoff) → bond-vec`",B6,T1,D1,cheap,S2,slabs
+51,interface-stacking-energy,"`(slab_A, slab_B, registry) → E_stack`",B6,T1,D1,cheap,S2,"slabs, registry"
+52,vegard-correction,"`(a_A, a_B, x) → a_alloy`",B6/B10,T0,D0,cheap,S2,lattice consts
+53,hume-rothery-mismatch,"`(r_A, r_B, χ_A, χ_B, valence) → score`",B6/B10,T0,D0,cheap,S2,"radii, χ"
+54,matthews-blakeslee-critical-thickness,"`(a_film, a_sub, ν, b) → h_c`",B6/B11,T0,D0,cheap,S3,"lattice, elastic"
+55,bond-valence-sum,"`(R_I, R0, b) → BVS_atom`",B10,T0,D1,cheap,S2,"R_I, R0-table"
+56,pauling-radius-ratio,"`(r_cation, r_anion) → ratio + class`",B10,T0,D0,cheap,S2,radii
+57,born-stability-criteria,`(C_ij) → bool-vec + slack`,B10/B7,T0,D1,cheap,S2,elastic
+58,generalized-stacking-fault-energy,"`(slab, shift) → γ_GSF`",B10,T1,D1,cheap,S2,slab
+59,twin-boundary-energy,"`(slab_twin, slab_bulk) → γ_TB`",B10,T1,D1,cheap,S2,slabs
+60,elastic-constants-Cij,`(stress(strain)) → C_ij`,B7,T1,D1,cheap,S1,"h, strain"
+61,bulk-modulus,`(C_ij) → B`,B7,T0,D1,cheap,S1,C_ij
+62,sound-velocity-isotropic,"`(C_ij, ρ) → v_L, v_T`",B7,T0,D1,cheap,S1,"C_ij, ρ"
+63,deformation-potential-gap-shift,"`(E_g(ε), ε) → Ξ`",B7/B1,T1,D1,cheap,S4,"bands, strain"
+64,piezoresistance-coeff,"`(σ(ε), ε) → π_ij`",B7/B3,T1,D1,cheap,S4,"σ, strain"
+65,gibbs-free-energy-phase,"`(E_0, ω(q), T, P) → G(T,P)`",B8,T1,D2,cheap,S1,"E_0, phonons"
+66,chemical-potential-ref-table,"`(species, T, P) → μ_i`",B8,T0,D0,cheap,S2+S3,ref-cache lookup
+67,phase-diagram-convex-hull,"`(G_phases(μ,T)) → hull`",B8,T1,D3,faithful,S1,G
+68,clausius-clapeyron-boundary,"`(ΔH, ΔV) → dP/dT`",B8,T0,D1,cheap,S1,thermo
+69,maxwell-relation-residual,"`(∂μ_i/∂T, ∂S/∂N_i) → ‖Δ‖`",B8,T0,D1,cheap,S5,thermo derivatives
+70,self-heating-T_op,"`(P_diss, R_th, T_amb) → T_op`",B9,T0,D1,cheap,S1,"dissipation, R_th"
+71,coupled-em-thermal-pde-residual,"`(j, E, T_L, σ(T), κ(T)) → ‖PDE‖`",B9,T1,D2,cheap,S4,"σ, κ, field"
+72,hot-carrier-temperature-balance,"`(j·E, τ_E, T_L) → T_e`",B9,T0,D1,cheap,S4,"j, E, τ_E"
+73,tau-energy-POP-acoustic,"`(α_F, v_s, ρ, Ξ, T) → τ_E`",B9,T0,D1,cheap,S4,"α_F, mech"
+74,chynoweth-impact-ionization,"`(α0, β/E) → α(E)`",B9,T0,D1,cheap,S4,E_field
+75,avalanche-multiplication,"`(α(E), L) → M`",B9,T1,D2,cheap,S4,α(E)
+76,kane-zener-tunneling-rate,"`(E_g, m*, E) → Γ_KZ`",B9,T0,D1,cheap,S4,"E_g, m*, E"
+77,fowler-nordheim-current,"`(φ_B, E, m*) → J_FN`",B6/B9,T0,D1,cheap,S4,"φ_B, E"
+78,richardson-dushman-thermionic,"`(φ_B, T, A*) → J_TE`",B6/B9,T0,D1,cheap,S4,"φ_B, T"
+79,padovani-stratton-TFE,"`(φ_B, N_d, T, m*) → J_TFE`",B6/B9,T0,D1,cheap,S4,"φ_B, N_d, T"
+80,NEGF-transmission,"`(H_device, Σ_L, Σ_R, E) → T(E)`",B6/B9,T3,D2,faithful,S1+S4,"H, self-energies"
+81,carbide-growth-parabolic,"`(D_0, E_a, T, t) → x²(t)`",B11/B6,T0,D1,cheap,S2+S3,"D_0, E_a, T"
+82,black-electromigration-MTTF,"`(j, E_a, T, n) → MTTF`",B11,T0,D1,cheap,S3,"j, T"
+83,coffin-manson-fatigue,"`(Δε_p, c) → N_f`",B11,T0,D1,cheap,S3,thermal cycling
+84,cluster-expansion-energy,"`(ECI, σ-config) → E_CE`",B4/B8,T1,D4,cheap,S2,"ECI cache, config"
+85,structure-uniqueness-CSP,"`(structure, set) → bool + d`",B10,T1,D3,cheap,S2,structure set
+86,bi-slab-grand-potential,"`(slab_A, slab_B, μ_env) → Ω`",B5/B6,T1,D2,cheap,S2,"slabs, μ"
+87,reference-phase-energy-cache,`(phase-id) → E_ref`,B8,T3,D0,faithful,S2+S3,DFT battery
+88,F-equals-minus-grad-E,"(architectural — autodiff, NOT residualized)",—,—,—,—,S5,(rejected per S5)
+89,equivariance,"(architectural — by construction, NOT residualized)",—,—,—,—,S5,(rejected per S5)

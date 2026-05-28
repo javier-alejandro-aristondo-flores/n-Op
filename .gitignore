@@ -2,3 +2,4 @@ _darcs/
 __pycache__/
 .ipynb_checkpoints/
 *.fasl
+.claude/

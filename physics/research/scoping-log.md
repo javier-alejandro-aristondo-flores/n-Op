@@ -1804,13 +1804,13 @@ End of plan. Ready for ExitPlanMode → execute the file migration + amendment a
 
 Dispatched lit-review orchestrator (opus, max effort). Returned a full synthesis. User-approved actions applied to canonical docs:
 
-- **Topology task #9: CLOSED.** Resolution = topology integrated as the *navigational atlas* over composition space (not deferred). `SymmetryAdaptedHamiltonianOf` template added; X_BS via SNF and bulk-edge correspondence rules from Khalaf-Po-Vishwanath-Watanabe added as Layer 1.25 primitives. See `IMPLEMENTATION-PLAN.md` §28.
+- **Topology task #9: CLOSED.** Resolution = symmetry-indicator classification integrated as the *navigational atlas* over composition space (not deferred). `SymmetryAdaptedHamiltonianOf` template added; X_BS computed in polynomial time via Smith Normal Form on the orbit-representation matrix; bulk-boundary correspondence implemented as a lookup table indexed on `(classification_generator, boundary_orientation) → boundary_mode_count`. Added as Layer 1.25 primitives. See `IMPLEMENTATION-PLAN.md` §28.
 
 - **γ̂ pullback / bundle: REJECTED for V1.** User critique: "if we have a single canonical form for the lattice, why do we need a pullback?" The orchestrator's "pullback of the bundle-shape functor along the lattice-symmetry functor" was a function in pullback's clothing. Replaced by deterministic `canonical_encoding(lattice, decoration) → (basis, form)` with a single-slot default. Bundle (multi-slot) interface preserved on `ResidualGenerator.canonical-encoding` for V2 promotion without refactor. See `IMPLEMENTATION-PLAN.md` §28.
 
 - **Open questions Q1, Q2, Q3, Q4, Q5, Q7: RESOLVED.** See `RESEARCH-BRIEF.md` §20. Q6 (Layer 1.75 spec content) and Q8 (applicability decidability) remain open.
 
-- **META-AUDIT factor errors: corrected.** Optical absorption gains factor 2; f-sum gains 2/π; acoustic-sum is summed over all R; Landau-Lifshitz form correctly named (was called Gilbert); Vineyard typed correctly (products-over-modes, not spectra).
+- **META-AUDIT factor errors: corrected.** Optical absorption gains factor 2; operator-spectrum-area sum rule gains 2/π; acoustic sum rule is summed over all lattice translations R; the magnetic relaxation term is the orientation-preserving form `S × (S × H_eff)` (previously labeled by a person-name); harmonic transition-rate normalization typed correctly (products-over-modes scalars, not spectra).
 
 - **Residual category rename: applied.** `structural-validity → static-validity`; hull-distance moved to `thermodynamic-consistency`. Categories disjoint by input domain.
 

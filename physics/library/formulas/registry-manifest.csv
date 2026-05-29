@@ -29,9 +29,9 @@
 28,acoustic-mismatch-TBR,"`(ρ_1,v_1,ρ_2,v_2) → R_K`",B6,T0,D1,cheap,S4,mechanics ×2
 29,diffuse-mismatch-TBR,"`(DOS_ph_1, DOS_ph_2) → R_K`",B6,T1,D2,cheap,S4,phonon-DOS ×2
 30,defect-formation-energy-zhang-northrup,"`(E_def, E_host, μ_i, q, E_F) → E_form`",B4,T0,D1,cheap,S1+S2+S3,"E_def, μ_i, E_F"
-31,makov-payne-correction,"`(q, ε, L_cell) → ΔE_MP`",B4,T0,D0,cheap,S3,"q, ε"
-32,freysoldt-correction,"`(q, ε, V_q-V_0, L) → ΔE_FNV`",B4,T0,D0,cheap,S1+S2+S3,"q, ε, potential"
-33,lany-zunger-correction,"`(q, ε, L, ξ) → ΔE_LZ`",B4,T0,D0,cheap,S3,"q, ε"
+31,charged-supercell-extrapolation-isotropic-cubic,"`(q, ε, L_cell) → ΔE_iso`",B4,T0,D0,cheap,"S3 (a.k.a. Makov-Payne)","q, ε"
+32,charged-supercell-extrapolation-planar-aligned,"`(q, ε, V_q-V_0, L) → ΔE_planar`",B4,T0,D0,cheap,"S1+S2+S3 (a.k.a. Freysoldt / FNV)","q, ε, potential"
+33,charged-supercell-extrapolation-image-charge,"`(q, ε, L, ξ) → ΔE_image`",B4,T0,D0,cheap,"S3 (a.k.a. Lany-Zunger)","q, ε"
 34,charge-transition-level,"`(E_form(q1), E_form(q2)) → ε(q1/q2)`",B4,T0,D1,cheap,S1+S3,E_form
 35,defect-boltzmann-population,"`(E_form, T, μ_i) → c_def`",B4,T0,D1,cheap,S2+S3,"E_form, T"
 36,self-consistent-charge-balance,"`(c_def(E_F), n(E_F), p(E_F)) → E_F*`",B4/B1,T1,D2,cheap,S3,"populations, n,p"
@@ -86,20 +86,20 @@
 85,structure-uniqueness-CSP,"`(structure, set) → bool + d`",B10,T1,D3,cheap,S2,structure set
 86,bi-slab-grand-potential,"`(slab_A, slab_B, μ_env) → Ω`",B5/B6,T1,D2,cheap,S2,"slabs, μ"
 87,reference-phase-energy-cache,`(phase-id) → E_ref`,B8,T3,D0,faithful,S2+S3,DFT battery
-88,lo-to-non-analytic-correction,"`(D(q), q̂, Z*, ε∞, Ω) → D_NA(q)`",B2,T1,D2,faithful,V1-γ',"Z*, ε∞ (L1 primitives)"
-89,makov-payne-correction,"`(q, ε, L, α_M) → ΔE_MP`",B4,T0,D0,cheap,V1-γ',"q, ε, Madelung"
-90,kumagai-oba-correction,"`(q, ε, V_atomic, L) → ΔE_KO`",B4,T0,D0,cheap,V1-γ',"q, ε, atomic-site potential"
-91,madelung-constant,`(lattice) → α_M`,L1,T1,D0,cheap,V1-γ',lattice
-92,born-effective-charge-tensor,"`(γ̂, R, h) → Z*[I,α,β]`",L1,T2,D2,faithful,V1-γ',linear-response sub-stage
-93,high-frequency-dielectric-tensor,"`(γ̂, h) → ε∞[α,β]`",L1,T2,D2,faithful,V1-γ',linear-response sub-stage
-94,electronic-susceptibility-chi-infinity,"`(γ̂, h) → χ∞[α,β]`",L1,T2,D2,faithful,V1-γ',linear-response sub-stage
-95,redlich-kister-excess-gibbs,"`(x, T, {L_ν}) → G_ex`",B8,T0,D1,cheap,V1-γ',"composition, RK parameters"
-96,symmetry-indicator-group,"`(SG_number, AZ_class) → AbelianGroup`",B1/B11,T1,D0,cheap,V1-γ'',"SG, AZ class; SNF on EBR matrix"
-97,band-rep-matrix,"`(SG, [Wyckoff], [orbital]) → IntMatrix`",B1,T1,D0,cheap,V1-γ'',"SG, Wyckoff, orbital basis"
-98,compatibility-relation-matrix,"`(SG, high-sym-momenta) → IntMatrix`",B1,T0,D0,cheap,V1-γ'',SG
-99,chern-number-from-bloch,"`(Bloch_states_on_grid) → Integer`",B1,T2,D3,faithful,V1-γ'',Bloch states
-100,z2-invariant-from-bloch,"`(Bloch_states_on_grid, TR_op) → ℤ₂`",B1,T2,D3,faithful,V1-γ'',"Bloch, TR"
-101,wilson-loop-spectrum,"`(Bloch_states_on_loop) → [phase]`",B1,T2,D3,faithful,V1-γ'',Bloch on loop
-102,bulk-edge-mode-count,"`(X_BS_element, slab_orientation) → Integer`",B5,T1,D0,cheap,V1-γ'',"X_BS, slab orient (Khalaf et al.)"
+88,long-range-coulomb-directional-limit-correction,"`(D(q), q̂, Z*, ε∞, Ω) → D_NA(q)`",B2,T1,D2,faithful,"V1-γ' (a.k.a. Pick-Cochran-Martin / Gonze-Lee)","Z*, ε∞ (L1 primitives)"
+89,charged-supercell-extrapolation-isotropic-general,"`(q, ε, L, α_M) → ΔE_iso`",B4,T0,D0,cheap,"V1-γ' (lattice-general; α_M explicit)","q, ε, Madelung"
+90,charged-supercell-extrapolation-atomic-site-averaged,"`(q, ε, V_atomic, L) → ΔE_atomic`",B4,T0,D0,cheap,"V1-γ' (a.k.a. Kumagai-Oba)","q, ε, atomic-site potential"
+91,lattice-coulomb-summation-scalar,`(lattice) → α_M`,L1,T1,D0,cheap,"V1-γ' (a.k.a. Madelung constant)",lattice
+92,operator-position-derivative-tensor,"`(γ̂, R, h) → Z*[I,α,β]`",L1,T2,D2,faithful,"V1-γ' (a.k.a. Born effective charges Z*)",linear-response sub-stage
+93,high-frequency-response-tensor,"`(γ̂, h) → ε∞[α,β]`",L1,T2,D2,faithful,"V1-γ' (a.k.a. high-frequency dielectric ε∞)",linear-response sub-stage
+94,electronic-linear-response-tensor,"`(γ̂, h) → χ∞[α,β]`",L1,T2,D2,faithful,"V1-γ' (a.k.a. electronic susceptibility χ∞)",linear-response sub-stage
+95,composition-dependent-excess-free-energy-basis,"`(x, T, {L_ν}) → G_ex`",B8,T0,D1,cheap,"V1-γ' (a.k.a. Redlich-Kister)","composition, basis parameters"
+96,symmetry-classification-group-via-snf,"`(SG_number, AZ_class) → AbelianGroup`",B1/B11,T1,D0,cheap,"V1-γ'' (X_BS; SNF on orbit-rep matrix)","SG, AZ class"
+97,symmetry-orbit-representation-matrix,"`(SG, [site-orbit], [orbital]) → IntMatrix`",B1,T1,D0,cheap,"V1-γ'' (a.k.a. EBR / band-representation matrix)","SG, orbits, orbital basis"
+98,irrep-compatibility-matrix,"`(SG, high-sym-momenta) → IntMatrix`",B1,T0,D0,cheap,"V1-γ'' (compatibility relations)",SG
+99,first-band-invariant-from-eigenstate-grid,"`(eigenstates_on_grid) → Integer`",B1,T2,D3,faithful,"V1-γ'' (a.k.a. Chern number)",eigenstate grid
+100,binary-invariant-with-symmetry-from-eigenstate-grid,"`(eigenstates_on_grid, antiunitary_op) → ℤ₂`",B1,T2,D3,faithful,"V1-γ'' (a.k.a. Z₂ invariant)","eigenstates, antiunitary"
+101,holonomy-spectrum-on-loop,"`(eigenstates_on_loop) → [phase]`",B1,T2,D3,faithful,"V1-γ'' (a.k.a. Wilson loop spectrum)",eigenstates on loop
+102,boundary-mode-multiplicity-from-classification,"`(X_BS_element, boundary_orientation) → Integer`",B5,T1,D0,cheap,"V1-γ'' (indicator-factor → boundary-state lookup)","X_BS element, boundary orientation"
 103,F-equals-minus-grad-E,"(architectural — autodiff, NOT residualized)",—,—,—,—,S5,(rejected per S5)
 104,equivariance,"(architectural — by construction, NOT residualized)",—,—,—,—,S5,(rejected per S5)

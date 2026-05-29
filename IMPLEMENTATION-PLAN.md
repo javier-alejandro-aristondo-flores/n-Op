@@ -145,10 +145,10 @@ L (Poisson, antisymmetric):
 M (dissipative, symmetric PSD):
   - phonon-phonon scattering       three- and four-phonon collision kernels
   - electron-phonon scattering     Fermi-golden-rule from g_{nm,ν}(k,q)
-  - Landau-Lifshitz damping        α S × (S × H_eff) for magnetic dynamics
-                                   (Gilbert form is dS/dt = α S × dS/dt; the
-                                    S × (S × H_eff) form is Landau-Lifshitz —
-                                    META-AUDIT terminology fix)
+  - orientation-preserving spin relaxation   α S × (S × H_eff)
+                                             (the relaxation form, not the
+                                              implicit `dS/dt = α S × dS/dt`
+                                              form — META-AUDIT correction)
   - radiative damping              spontaneous-emission rate for optical
   - chemical rate matrix           symmetrized W_ij from detailed balance
 ```
@@ -179,7 +179,7 @@ both; static is the equilibrium limit.
 | Mechanical | 2nd strain-derivatives of `F` at equilibrium |
 | Thermal | Eigendecomposition of `∂²E_BO/∂u²` (phonons); BTE for phonon distribution (full GENERIC) |
 | Electronic | SCF as gradient flow on `E_KS`; TDKS as Liouville on `γ̂` (pure L) |
-| Magnetic | Pauli-spinor extension of `γ̂`; LLG = L (precession) + M (Gilbert) |
+| Magnetic | spin-doubled extension of `γ̂`; spin EOM = L (precession bracket) + M (orientation-preserving relaxation `S × (S × H_eff)`) |
 | Optical | Response of `γ̂` to `A(t)` via L; absorption via M (radiative damping) |
 | Transport | BTE on emergent carrier distribution: L (streaming) + M (collisions) |
 | Thermodynamic | min `F` at fixed `(T, V, N)`; convex hull of `{F_φ}` |
@@ -328,7 +328,7 @@ Level 2 → Level 1.
   data (band structure, phonons) and free energies
 - **Math:** Boltzmann transport equation; Kubo / Green–Kubo
   linear response; GENERIC two-bracket; master equation; Marcus
-  theory; TST / hTST / Vineyard; NEB
+  theory; harmonic transition-rate normalization (products-over-modes ratio); minimum-energy-path search
 - **Regimes covered:** TRANSPORT, CHEMICAL/SURFACE; PHONON
   TRANSPORT (part of thermal)
 - **Irreducible state at this level:** emergent distributions and
@@ -443,7 +443,7 @@ These 12 methods cover every observable on the slide.
 
 > **γ' update (validator-1):** templates 12 → 14. Added: `SelfConsistentRenormalizationOf` (covers SCPH/SSCHA, GW self-energy, polaron, BSE-iterated; method selector picks variant), and `ConfigurationalFreeEnergyOf` (covers cluster-expansion AND Redlich-Kister composition-dependent excess Gibbs as separate parameterizations — they are NOT the same formula).
 >
-> **γ'' update (topology atlas):** templates 14 → 15. Added: `SymmetryAdaptedHamiltonianOf(space-group, wyckoff-orbits, orbital-basis, neighbor-shells) → ParameterizedBlochHamiltonian`. The constructive Stage-1 of Topological Quantum Chemistry — from a symmetry specification, generate the most general symmetry-allowed H(k). This is the load-bearing template that lets every composed material be classified via X_BS (Smith-Normal-Form polynomial-time computation; see §30). Symmetry becomes constitutive of the substrate, not bolted on later.
+> **γ'' update (topology atlas):** templates 14 → 15. Added: `SymmetryAdaptedHamiltonianOf(space-group, site-orbits, orbital-basis, neighbor-shells) → ParameterizedDualSpaceOperator`. Constructive emission of the most general operator (parameterized over the free couplings the symmetry allows) consistent with the declared discrete symmetry group acting on the orbits and the orbital basis. This is the load-bearing template that lets every composed material be classified via X_BS (computed in polynomial time via Smith Normal Form on the integer matrix of orbit-induced representations; see §28). Symmetry becomes constitutive of the substrate, not bolted on later.
 
 Templates are **parameterized method chains**. Concrete observables
 are template instantiations. The discipline: collapse "N
@@ -545,11 +545,11 @@ abstract-properties/
 
 ## 9. Named formulas registry (closed; canonical list in `registry-manifest.csv`)
 
-> **γ' update (validator-1):** the brief listing below is illustrative; the canonical, machine-readable registry is `physics/library/formulas/registry-manifest.csv` (95 substantive rows + 2 architectural markers). γ' additions (rows 88–95): `lo-to-non-analytic-correction` (Gonze-Lee, requires Z\*/ε∞ from L1 linear-response sub-stage), `makov-payne-correction` (Madelung-based, separate from FNV/LZ — NOT merged), `kumagai-oba-correction` (atomic-site averaging), `madelung-constant` (L1 primitive), `born-effective-charge-tensor` (L1 primitive), `high-frequency-dielectric-tensor` (L1 primitive), `electronic-susceptibility-chi-infinity` (L1 primitive), `redlich-kister-excess-gibbs` (registered separate from cluster-expansion — see §8 template note). The strategy-pattern dispatcher `charged-defect-correction(scheme ∈ {MP, FNV, LZ, KumagaiOba})` lives in `methods/`, not `formulas/`.
+> **γ' update (validator-1):** the brief listing below is illustrative; the canonical, machine-readable registry is `physics/library/formulas/registry-manifest.csv` (95 substantive rows + 2 architectural markers). γ' additions (rows 88–95): `long-range-coulomb-directional-limit-correction` (requires Z\*/ε∞ from the linear-response sub-stage at Layer 1), `charged-supercell-extrapolation-isotropic`, `charged-supercell-extrapolation-atomic-site-averaged`, plus four Layer 1 primitives (Madelung scalar, effective-charge tensor, high-frequency dielectric tensor, electronic susceptibility), and a separate composition-dependent excess-free-energy basis (registered separately from the discrete-lattice cluster expansion — see §8 template note). The strategy-pattern dispatcher `charged-supercell-extrapolation(scheme)` lives in `methods/`, not `formulas/`; it selects among the per-scheme formulas at compose-time.
 >
-> **γ'' update (topology atlas):** registry rows 96–102 add the topology atlas: `symmetry-indicator-group` (X_BS via SNF), `band-rep-matrix`, `compatibility-relation-matrix`, `chern-number-from-bloch`, `z2-invariant-from-bloch`, `wilson-loop-spectrum`, `bulk-edge-mode-count`. Cheap classification (SNF, table lookup) is always-on at compose-time; expensive integrals (Chern, Z₂, Wilson) are opt-in per observable. See §28.
+> **γ'' update (topology atlas):** registry rows 96–102 add the topology atlas: `symmetry-classification-group-via-snf` (X_BS computed by Smith Normal Form), `symmetry-orbit-representation-matrix`, `irrep-compatibility-matrix`, `first-band-invariant-from-eigenstate-grid` (integer-valued global invariant), `binary-invariant-with-symmetry-from-eigenstate-grid`, `holonomy-spectrum-on-loop`, `boundary-mode-multiplicity-from-classification`. Cheap classification (SNF, lookup) is always-on at compose-time; expensive global integrals over the dual-space grid are opt-in per observable. See §28.
 >
-> **γ'' update (META-AUDIT corrections):** the following formula-text errors flagged by META-AUDIT are corrected in §15 and downstream files: optical absorption gains the missing factor 2 (`(2ω/c)·Im(√ε)`); f-sum acquires the `2/π` prefactor; acoustic-sum is summed over all lattice translations R (not just R=0); the magnetic-damping term that this plan called "Gilbert" is the Landau-Lifshitz form (`S × (S × H_eff)`); the Vineyard prefactor consumes products-over-modes (scalars), not spectra (typed correction in §15 §7).
+> **γ'' update (META-AUDIT corrections):** the following formula-text errors flagged by META-AUDIT are corrected in §15 and downstream files: optical absorption gains the missing factor 2 (`(2ω/c)·Im(√ε)`); the operator-spectrum-area sum rule acquires the `2/π` prefactor; the acoustic sum rule is summed over all lattice translations R (not just R=0); the magnetic relaxation term that this plan previously labeled with a person-name is the orientation-preserving form `S × (S × H_eff)`; the harmonic transition-rate normalization consumes products-over-modes (scalars), not spectra (typed correction in §15 §7).
 
 
 Every algebraic combination invokes a NAMED FORMULA with typed
@@ -732,15 +732,17 @@ cert/
 ├── obligation-6-degeneracy           GENERIC-specific: L δS = 0, M δE = 0,
 │                                     and named-formula consistency across
 │                                     equivalent compositions (BTE ≡ Kubo, etc.)
-└── obligation-7-bulk-edge            [γ'' content] Khalaf-Po-Vishwanath-Watanabe
-                                      bulk-edge correspondence: for a bulk with
-                                      X_BS = k, the slab built from it must carry
-                                      anomalous surface states with multiplicities
-                                      determined by the per-indicator-factor rules.
-                                      Cert checks: bulk-edge-mode-count(k, orient)
-                                      = observed surface-band crossings on slab.
+└── obligation-7-boundary-correspondence
+                                      [γ'' content] bulk-boundary correspondence:
+                                      for a bulk classified as X_BS = k, the slab
+                                      built from it must carry anomalous boundary
+                                      states with multiplicities determined by a
+                                      lookup table indexed on (k_generator,
+                                      boundary_orientation). Cert checks:
+                                      boundary-mode-multiplicity-from-classification(k, orient)
+                                      = observed boundary-band crossings on slab.
                                       Disagreement trips the cert with both
-                                      witnesses (bulk class + observed surface count).
+                                      witnesses (bulk class + observed boundary count).
 ```
 
 The certificate emitted for any prediction is an inert s-expression
@@ -1331,7 +1333,7 @@ Eleven sequential phases, each producing a verifiable artifact.
     γ̂, Maxwell, semiclassical streaming). Assembly module
     `total-L.rkt`.
 23. Implement `M` sub-brackets (phonon collisions, e-ph
-    scattering, Gilbert, radiative, chemical rates). Assembly
+    scattering, spin relaxation, radiative, chemical rates). Assembly
     `total-M.rkt`.
 24. Tests: `L^T = -L` (antisymmetry), `M ⪰ 0` (PSD), Jacobi
     identity for `L`, degeneracy conditions.
@@ -1693,7 +1695,7 @@ What validator-1 got right (now canonical):
 
 What validator-1 got wrong (corrected here):
 - LO/TO is a real Layer 2 formula entry (row 88), not "automatic from a richer L1" — the q→0 directional limit is a load-bearing cert obligation
-- MP / FNV / LZ / Kumagai-Oba are physically distinct correction methods; the strategy-pattern dispatcher lives in `methods/`, formulas stay separate
+- The four charged-supercell extrapolation schemes (isotropic asymptotic series, planar-averaged with alignment, atomic-site averaged, image-charge with screening parameter) compute distinct integrals; the strategy-pattern dispatcher lives in `methods/`, individual formulas stay separate
 - Redlich-Kister is NOT a cluster-expansion instance; both live as separate parameterizations of `ConfigurationalFreeEnergyOf`
 - Layer 1 primitives Z\*, ε∞, χ^∞ are registered (rows 92–94) rather than left implicit
 
@@ -1718,7 +1720,7 @@ Form  ∈ { Dense, Sparse, BlockDiag, LowRank }
 ```
 
 First-class V1 encodings (named pairs):
-- `(Reciprocal, BlockDiag)` — Bloch substrate for periodic crystals (the old R2)
+- `(Reciprocal, BlockDiag)` — discrete-translation-symmetry-induced block-diagonal substrate for periodic compositions (the old R2)
 - `(Real, Sparse)` — locality-dominant; defects, surfaces, amorphous regions (the old R3)
 - `(Wannier, Sparse)` — localized post-DFT; interface layers, MIGS, dangling bonds
 - `(NaturalOrbital, LowRank)` — eigenbasis with rank truncation; low-rank substrate (the old R1)
@@ -1743,7 +1745,7 @@ Atlas construction (one-shot, at compose-time):
 ```
 TopologyAtlasEntry =
   ( space-group        : 1..230 (+ magnetic)
-  , AZ-class           : Cartan tenfold-way label
+  , AZ-class           : ten-element symmetry-class label (TRS × PHS × chiral combinations)
   , X_BS               : finite abelian group  -- via symmetry-indicator-group
   , EBRs               : List<ElementaryBandRep>
   , compatibility      : IntMatrix             -- compatibility-relation-matrix
@@ -1755,7 +1757,7 @@ atlas_for : (Lattice, SiteDecoration) → TopologyAtlasEntry
 The atlas tells you, before you ever evaluate γ̂ or run a single residual, **which topological class the composition lives in**. 117 of 230 space groups have nontrivial X_BS (spinful + TRS); max |X_BS| = 72. SNF is polynomial-time; the table lookup is constant-time per (SG, AZ) pair.
 
 Compute-overhead discipline:
-- Cheap parts (always-on): X_BS class, EBR decomposition, compatibility check, bulk-edge mode counts via Khalaf et al. — all polynomial in cell complexity.
+- Cheap parts (always-on): X_BS class, orbit-induced-representation decomposition, compatibility check, boundary-mode multiplicity via the indicator-factor lookup table — all polynomial in cell complexity.
 - Expensive parts (opt-in per observable): Wilson loops, Chern integrals, Z₂ via Pfaffian — these go through `chern-number-from-bloch`, `z2-invariant-from-bloch`, `wilson-loop-spectrum` (registry rows 99–101) and pay their cost only when an observable explicitly requests them.
 
 ### 28.4 Why this matters at compose-time

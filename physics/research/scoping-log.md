@@ -1836,3 +1836,18 @@ Canonical declaration: `IMPLEMENTATION-PLAN.md` §11.
 The architectural decisions that remain genuinely open (not deferred-by-default, but actively undecided): implementation language and the remaining items in §23.
 
 ---
+
+## γ''' stress test
+
+Six deliberately hard cases (free energy, phonon dispersion, Hall conductivity, reaction-coordinate profile, defect formation energy, total thermal conductivity) typed through the alphabet. Top-level shape decomposition held — every case typed without a new sibling typeclass. Cracks all in the law layer, clustered into four groups:
+
+- **Group A** — `Differentiable` weakened to almost-everywhere with declared `exceptionSet` (phase boundaries, band crossings, charge-transition levels). §11.2 amended.
+- **Group B** — `HasAnalyticStructure.Witness` becomes a list/sum of `(Local | Global)` witnesses (multi-witness per Sampleable; non-local witnesses like Onsager involution). §11.2 amended.
+- **Group C** — `Differentiable` gains `chart :: f -> ChartTag` to address parameterization-dependence. §11.2 amended.
+- **Group D** — `Quantity` gains `combineTol` for tolerance composition under arithmetic. §11.2 amended. Two cross-layer items (provenance + applicability composition under arithmetic) deferred to cert-subsystem design pass.
+
+Full report: `IMPLEMENTATION-PLAN.md` §15.0.1.
+
+Project path migrated externally during this session from `~/Desktop/Physics/Programs/n-Op` to `~/Projects/physics/Programs/n-Op`. Git history intact.
+
+---

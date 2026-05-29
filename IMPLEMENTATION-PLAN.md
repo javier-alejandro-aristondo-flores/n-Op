@@ -655,15 +655,24 @@ A genuinely separate **fourth bucket** absorbs the combinatorial / discrete-stru
 class Quantity a where
   type Units     a                  -- phantom-dimensional tag
   type Tolerance a                  -- absolute, relative, or mixed
-  unitsOf   :: a -> Units a
-  approxEq  :: Tolerance a -> a -> a -> Bool
-  rescale   :: UnitConversion (Units a) (Units b) -> a -> b
+  unitsOf    :: a -> Units a
+  approxEq   :: Tolerance a -> a -> a -> Bool
+  rescale    :: UnitConversion (Units a) (Units b) -> a -> b
+  combineTol :: Tolerance a -> Tolerance a -> Tolerance a   -- γ''' stress-fix Group D
 
 -- Laws:
 --   approxEq t x x = True
 --   rescale id = id
 --   rescale (g . f) = rescale g . rescale f          -- functorial
 --   unitsOf is invariant under rescale within the same physical dimension
+--   combineTol is associative, commutative, and monotone (combining tighter tolerances
+--     cannot produce a looser result than combining looser ones). Per-Quantity choice:
+--     either max-of-absolute-tolerances or root-sum-square of relative tolerances —
+--     the instance declares which.
+-- Stress-test rationale (Group D): summed observables (e.g. κ = κ_el + κ_ph) need a
+-- declared rule for how their tolerances compose. See §15.0.1.
+-- Cross-layer note: provenance and applicability composition under Quantity arithmetic
+-- live in cert subsystem and §26 respectively; Quantity does NOT carry them directly.
 
 
 -- AXIS B: Shape — the function-on-a-domain abstraction.
@@ -690,11 +699,19 @@ class Sampleable f => Integrable f where
 
 class Sampleable f => Differentiable f where
   type Tangent f
-  derivative :: f -> Domain f -> Tangent f
+  type ChartTag f                                   -- γ''' stress-fix Group C
+  derivative   :: f -> Domain f -> Maybe (Tangent f)   -- γ''' stress-fix Group A
+  exceptionSet :: f -> Set (Domain f)               -- γ''' stress-fix Group A
+  chart        :: f -> ChartTag f                   -- γ''' stress-fix Group C
 -- Laws:
 --   linearity
 --   chain rule
+--   `derivative` is total on `Domain f \\ exceptionSet f`; returns Nothing on exceptionSet
+--   `derivative` outputs from two instances agree only if their `chart` tags agree
+--     (cross-chart agreement requires an explicit chart-conversion morphism)
 --   agreement with the adjoint declared at registration (the adjoint-cert gate from §19)
+-- Stress-test rationale: phase transitions, band crossings, charge-transition levels
+-- (Group A); reaction-coordinate / BZ chart dependence (Group C). See §15.0.1.
 
 class Sampleable f => Restrictable f where
   type Subdomain f
@@ -708,14 +725,23 @@ class Sampleable f => Restrictable f where
 -- Causality, hermiticity, convexity, KK-pairing are NOT shape interfaces;
 -- they are structural witnesses attached to a Sampleable.
 class Sampleable f => HasAnalyticStructure f where
-  data Witness f
-       -- e.g. KramersKronig | HermitianSymmetric | Convex | QuantizedZ | QuantizedZ2
-  certifyAnalytic :: f -> Either (Failure f) (Witness f)
+  data Witness f                                    -- γ''' stress-fix Group B
+       -- a SUM/LIST of (Local | Global)-tagged witnesses.
+       -- Local examples: HermitianSymmetric, Convex (point-wise on Codomain).
+       -- Global examples: KramersKronig (KK Hilbert pairing across Domain),
+       --                  OnsagerInvolution (σ(B) + σ(−B) = 0 — non-local across Domain),
+       --                  AxisRestrictedConvexity (convex on a sub-set of Domain axes).
+  certifyAnalytic :: f -> Either (Failure f) [Witness f]
 
 -- Laws:
---   if certifyAnalytic f = Right w, then any operation declared structure-preserving
---   for that witness (Hilbert transform for KK; projection for Hermitian; epigraph
---   intersection for Convex) returns a value whose certifyAnalytic also yields Right w.
+--   if certifyAnalytic f = Right ws, then for each w ∈ ws:
+--     Local witness:  operations declared structure-preserving for w must commute with w
+--                     at each evaluation point.
+--     Global witness: operations must commute with the Domain-level involution / equivariance
+--                     declared by w (e.g. preserve Domain inversion for OnsagerInvolution).
+-- Stress-test rationale (Group B): observables carry multiple constraints simultaneously
+-- (Hall conductivity = OnsagerInvolution + antisymmetric tensor on Codomain;
+--  free energy = mixed convexity per Domain axis). See §15.0.1.
 
 
 -- AXIS D: Combinatorial / discrete structure outputs.
@@ -1246,6 +1272,115 @@ instance DiscreteStructure ChernNumber where
 --     What used to be an escape hatch is now first-class.
 ```
 
+### 0.1 Stress test — six deliberately hard cases
+
+Two easy worked examples (a continuous causal frequency response; a single integer invariant) do not prove the alphabet honest. They prove it handles the textbook cases. The stress test below picks six observables I expected to *bend* the alphabet for different reasons and types each through it. Each ends with a "cracks found" note that is either empty or names a concrete §11 amendment.
+
+---
+
+#### Case 1 — Free energy `F(T, V, N)`
+
+Axis coordinates: `Quantity` (energy) + `Sampleable` (Domain = `(Temperature, Volume, MoleVector)`) + `Integrable` (along single-axis paths) + `Differentiable` (partials yield −S, −P, μ_i) + `HasAnalyticStructure` with multi-witness ({Convex in N at fixed T,P}, {Concave in T at fixed V,N}).
+
+```haskell
+newtype FreeEnergy = FreeEnergy { unFE :: (Temperature, Volume, MoleVector) -> Energy }
+
+instance Sampleable FreeEnergy where
+  type Domain   FreeEnergy = (Temperature, Volume, MoleVector)
+  type Codomain FreeEnergy = Energy
+  evaluate (FreeEnergy f) p = f p
+
+instance HasAnalyticStructure FreeEnergy where
+  data Witness FreeEnergy
+    = MixedConvexity { convexIn :: [DomainAxis], concaveIn :: [DomainAxis] }
+  certifyAnalytic = ...
+```
+
+Cracks found:
+- **C-1.1 (real): single-witness assumption.** §11.2's `HasAnalyticStructure` declares one `Witness` per Sampleable. Free energy has *direction-dependent* convexity (convex in N, concave in T). Either `Witness` must be a sum-of-witnesses, or the typeclass must allow multiple instances per type.
+- **C-1.2 (real): phase transitions break pointwise differentiability.** First-order transitions are discontinuities in `derivative`'s first component; second-order are kinks in the second. The `Differentiable` law as currently written is false for any free energy with a phase boundary. Fix: weaken `Differentiable` to *almost-everywhere with declared exception set*; carry the exception set as an associated type or value.
+
+---
+
+#### Case 2 — Phonon dispersion `ω_λ(q)`
+
+Axis coordinates: `Quantity` (frequency) + `Sampleable` (Domain = `(BandIndex, BZPoint)`) + `Integrable` (DOS) + `Differentiable` (group velocity).
+
+Cracks found:
+- **C-2.1 (real, same root as C-1.2): band crossings.** At any q where two bands cross, `derivative` is ill-defined on a measure-zero set. Same exception-set fix as C-1.2.
+- **C-2.2 (real): band-index labeling is not globally well-defined.** Across a band crossing, which branch is "λ=1" is convention. The Domain `(BandIndex, BZPoint)` implicitly assumes a global labeling that doesn't exist. Fix: declare BandIndex as a *locally-defined* index; add a `LocallyIndexed` marker that opts out of Sampleable's global-totality clause.
+- **C-2.3 (non-crack): dynamical stability `ω² ≥ 0` is a `Quantity`-side positivity on the squared codomain, not a `HasAnalyticStructure` witness on ω. Resolved by `Quantity` ordering; no new typeclass.
+
+---
+
+#### Case 3 — Hall conductivity `σ_xy(B)`
+
+Axis coordinates: `Sampleable` (Domain = `MagneticField`, Codomain = antisymmetric 3×3 tensor of `Conductivity`) + `HasAnalyticStructure` with two witnesses: `OnsagerInvolution` (non-local across Domain: σ(B) + σ(−B) = 0) AND per-value antisymmetry (lives on Codomain via `Quantity`/`GroupAction`, not here).
+
+Cracks found:
+- **C-3.1 (real): non-local witnesses.** §11.2's `HasAnalyticStructure` law assumes locality. Onsager-symmetry relates values at two *different* points in the Domain. The law needs to admit non-local witnesses, or split into `LocalWitness` and `GlobalWitness`. Recommend the split.
+- **C-3.2 (subsumed by C-1.1).** Hall conductivity needs multi-witness; same fix.
+- **C-3.3 (subsumed by C-1.2).** Inversion symmetry breaks derivative at B = 0; same fix.
+
+---
+
+#### Case 4 — Reaction-coordinate / migration-path profile `E(ξ)`
+
+Axis coordinates: `Quantity` (energy) + `Sampleable` (Domain = `ReactionCoordinate` ∈ [0,1]) + `Differentiable`. The barrier is `StateReadoutOf(profile, extractor = max-value)` — a derived Scalar, not a property of the Sampleable.
+
+Cracks found:
+- **C-4.1 (real): parameterization-dependence of derivatives.** `evaluate` is parameterization-invariant; `derivative` is NOT (re-parameterize ξ' = f(ξ) and `dE/dξ'` differs by a Jacobian). Same crack arises for BZ-mesh `derivative` under change of fractional vs Cartesian k. The `Differentiable` law is silent on this. Fix: add `chart :: f -> ChartTag` and a law "derivative outputs agree across instances iff `chart` tags agree." More principled (deferred): make `Tangent f` a section of the tangent bundle declared on `Domain f`.
+- **C-4.2 (non-crack): "designated stationary point" is handled by composition with `StateReadoutOf`. No new typeclass.
+
+---
+
+#### Case 5 — Defect formation energy `E_form(E_F, μ_i)`
+
+Axis coordinates: `Quantity` (energy) + `Sampleable` (Domain = `(FermiLevel, ChemicalPotentialVector)`) + `Differentiable` (piecewise; `∂E_form/∂E_F = −q` is integer-valued and step-discontinuous at charge-transition levels).
+
+Cracks found:
+- **C-5.1 (subsumed by C-1.2 / C-2.1): step-discontinuous derivative.** Same exception-set fix.
+- **C-5.2 (non-crack): parametric Environment dependence is just `Sampleable`'s Domain.** Confirms the suspicion from §11 that "parametric output" is not a separate structural axis.
+
+---
+
+#### Case 6 — Total thermal conductivity `κ = κ_el + κ_ph`
+
+Axis coordinates: `Quantity` (thermal conductivity) on each summand, combined by `Quantity` arithmetic.
+
+Cracks found:
+- **C-6.1 (real): tolerance composition under arithmetic.** If summands carry different tolerances (5% cheap-tier vs 1% faithful-tier), the sum's tolerance is unspecified by current `Quantity` laws. Fix: add `combineTol :: Tolerance a -> Tolerance a -> Tolerance a` to `Quantity`, with a declared composition law (associative + commutative + monotone). Per-Quantity choice between max and root-sum-square.
+- **C-6.2 (real, cross-layer): provenance composition under arithmetic.** The audit trail of the sum must record both summands' construction history. Currently `Quantity` says nothing. Options: (a) `Quantity` carries a `ProvenanceRef` slot (heavy); (b) cert subsystem wraps everything and `(+)` emits a cert mention (lighter). Defer to cert-subsystem design pass; flag the gap.
+- **C-6.3 (real, cross-layer): applicability composition under arithmetic.** If `κ_el` is applicable only when `is-conductor-or-semiconductor` and `κ_ph` is always applicable, `κ_total`'s applicability is their AND. §26 declares applicability per-residual, not per-arithmetic-step. Fix: applicability classifiers compose under value-level arithmetic; the sum's applicability is the conjunction.
+
+---
+
+### 0.2 Crack summary and required §11 amendments
+
+The alphabet held on **structural shape**: every observable typed, no observable required a new top-level typeclass. The cracks are all in the **law layer** and cluster into four groups:
+
+**Group A — Differentiability is too strong.** Cracks C-1.2, C-2.1, C-3.3, C-5.1.
+- **Fix (§11.2 Differentiable):** weaken to `derivative :: f -> Domain f -> Maybe (Tangent f)` with an explicit `exceptionSet :: f -> Set (Domain f)`. Law: `derivative` total on `Domain f \\ exceptionSet f`.
+
+**Group B — Single-witness `HasAnalyticStructure` is too narrow.** Cracks C-1.1, C-3.1, C-3.2.
+- **Fix (§11.2 HasAnalyticStructure):** `Witness f` becomes a list/sum of `(Local | Global)` witnesses; one Sampleable can carry several. Split preservation law into `preserves-locally` and `preserves-globally`.
+
+**Group C — Parameterization-dependence of derivatives.** Crack C-4.1.
+- **Fix (§11.2 Differentiable):** add `chart :: f -> ChartTag` and a law "`derivative` outputs agree across instances iff their `chart` tags agree." Principled-but-deferred upgrade: `Tangent f` as a section of the tangent bundle on `Domain f`.
+
+**Group D — `Quantity` arithmetic side-channels.** Cracks C-6.1 (in §11), C-6.2 / C-6.3 (cross-layer).
+- **Fix (§11.2 Quantity):** add `combineTol` with declared composition law.
+- **Cross-layer (cert subsystem + §26):** provenance and applicability composition under arithmetic. Flag for the cert design pass; do not load `Quantity` with these.
+
+### 0.3 What the stress test actually tells us
+
+- The alphabet's **top-level shape decomposition is sound.** No case required a new sibling typeclass. `Quantity`, `Sampleable` + capabilities, `HasAnalyticStructure`, `DiscreteStructure` covered everything.
+- The **law statements need refinement** before formulas can be typed cleanly. Three of the four refinements (Groups A, B, C) are localized §11.2 edits — not a rewrite. Group D needs a downstream design pass.
+- The **non-cracks recorded** (C-2.3, C-4.2, C-5.2) confirm three architectural intuitions: positivity on derived quantities resolves via `Quantity` ordering; "designated extrema" are derived by composition; "parametric output" is `Sampleable`'s `Domain`, not a new axis.
+
+A reviewer reading §15.0.1 alone can judge whether the alphabet is honest and whether the four law-group fixes are sufficient.
+
+---
 
 ### 1. Structural
 

@@ -448,7 +448,10 @@ n-Op/
 │   │   ├── residuals/               (7 categories + factory)
 │   │   ├── cert/                    (10 obligations + reference-data/)
 │   │   ├── pino-bridge/             (Generate, Validate, Import)
-│   │   └── interfaces/              (Scalar, FieldOnGrid, Tensor, Response)
+│   │   └── interfaces/              (Quantity, Sampleable + Integrable/Differentiable/Restrictable,
+│   │                                  HasAnalyticStructure, DiscreteStructure;
+│   │                                  Scalar/FieldOnGrid/Tensor/Response retained as type aliases —
+│   │                                  see IMPLEMENTATION-PLAN.md §11 for the γ''' RESHAPE)
 │   └── research/                    (25 migrated research documents covering
 │                                     S1–S7 streams, γ̂ framings A–E, mesh-pair
 │                                     analyses AB–DE, group audits, applicability,

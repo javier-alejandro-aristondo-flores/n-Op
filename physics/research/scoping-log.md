@@ -1812,6 +1812,23 @@ Dispatched lit-review orchestrator (opus, max effort). Returned a full synthesis
 
 - **META-AUDIT factor errors: corrected.** Optical absorption gains factor 2; operator-spectrum-area sum rule gains 2/π; acoustic sum rule is summed over all lattice translations R; the magnetic relaxation term is the orientation-preserving form `S × (S × H_eff)` (previously labeled by a person-name); harmonic transition-rate normalization typed correctly (products-over-modes scalars, not spectra).
 
+---
+
+## γ''' pass — Layer 0 RESHAPE
+
+Language locked to Haskell. Research orchestrator (Layer 0 naturality) returned a RESHAPE verdict, accepted by user. The flat four-interface sketch (Scalar / FieldOnGrid / Tensor / Response) is replaced by a three-axis / four-typeclass decomposition:
+
+| Axis | Typeclass | Purpose |
+|---|---|---|
+| Value | `Quantity` | units, tolerance, change-of-units |
+| Shape | `Sampleable` + capabilities (`Integrable`, `Differentiable`, `Restrictable`) | function-on-domain; à-la-carte capabilities |
+| Constraint | `HasAnalyticStructure` (witness-bearing) | causality, hermiticity, convexity, KK-pairing as orthogonal constraints |
+| Combinatorial | `DiscreteStructure` | missing fourth axis: classification groups, integer invariants, holonomy spectra, polyhedra, hulls — the topology atlas's natural home |
+
+Old names (Scalar, Tensor, FieldOnGrid, Response) preserved as type aliases over the new alphabet; downstream prose reads unchanged. Cert obligations now map mechanically onto the axes (§13.1). Topology atlas outputs are first-class `DiscreteStructure` instances, not escape hatches (§28.4). Two worked examples (DielectricFunction, ChernNumber) typed through the new alphabet in §15.0.
+
+Canonical declaration: `IMPLEMENTATION-PLAN.md` §11.
+
 - **Residual category rename: applied.** `structural-validity → static-validity`; hull-distance moved to `thermodynamic-consistency`. Categories disjoint by input domain.
 
 - **Read-path / write-path diagram: applied.** Replaces misleading linear 5-layer stack (`IMPLEMENTATION-PLAN.md` §31).

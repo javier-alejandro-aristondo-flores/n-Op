@@ -632,23 +632,137 @@ implements one or more cross-cutting interfaces.
 
 ---
 
-## 11. Cross-cutting interfaces (4)
+## 11. Cross-cutting interfaces — the structural alphabet
 
-Define what *operations* an output supports. Closed, stable set:
+> **γ''' RESHAPE:** the earlier sketch (`Scalar / FieldOnGrid / Tensor / Response` as four sibling interfaces) was diagnosed as two orthogonal axes braided into a list. The braiding hid ~12 registry rows (integer invariants, classification groups, holonomy spectra, convex hulls) that fit none of the four cleanly, and treated causality (a global *constraint* on a function) as a sibling of "function-on-a-grid" (a *shape*). The replacement, below, is three orthogonal axes captured by four typeclasses. The old four names persist as type aliases for common parameterizations — so downstream prose reads the same; what changes is what the names *mean* underneath.
 
+### 11.1 The three axes
+
+| Axis | What it captures |
+|---|---|
+| **Value** | The kind of value an output carries — units, equality-with-tolerance, behavior under change of units / change of basis. Every numeric output is one. |
+| **Shape** | Whether the output is a *function on a domain* (function-on-grid in the broadest sense), and which capabilities it supports (integrate, differentiate, restrict). These capabilities are à-la-carte; nothing is forced into an all-or-nothing interface. |
+| **Constraint** | Whether the output satisfies a *global analytic law* — causality, hermiticity, convexity, paired-real-imaginary parts, sum rules. A constraint is not a shape; it is a witness-bearing structure attached to a shape. |
+
+A genuinely separate **fourth bucket** absorbs the combinatorial / discrete-structure outputs (integer invariants, classification groups, polyhedra, convex hulls). These are not numeric quantities and are not functions on domains; they are objects in a discrete category with their own morphisms.
+
+### 11.2 The four typeclasses (Haskell, with laws)
+
+```haskell
+-- AXIS A: Value
+-- Every numeric output carries units, a tolerance for equality, and a way to rescale
+-- under change-of-units (and, for tensor-valued outputs, change-of-basis).
+class Quantity a where
+  type Units     a                  -- phantom-dimensional tag
+  type Tolerance a                  -- absolute, relative, or mixed
+  unitsOf   :: a -> Units a
+  approxEq  :: Tolerance a -> a -> a -> Bool
+  rescale   :: UnitConversion (Units a) (Units b) -> a -> b
+
+-- Laws:
+--   approxEq t x x = True
+--   rescale id = id
+--   rescale (g . f) = rescale g . rescale f          -- functorial
+--   unitsOf is invariant under rescale within the same physical dimension
+
+
+-- AXIS B: Shape — the function-on-a-domain abstraction.
+-- Subsumes the old FieldOnGrid, Tensor, and the function-side of Response.
+class Quantity (Codomain f) => Sampleable f where
+  type Domain   f
+  type Codomain f
+  evaluate :: f -> Domain f -> Codomain f
+
+-- Laws:
+--   evaluate is total on the domain f claims (no partial functions).
+--   evaluate respects the equivalence on Domain f (e.g. crystallographic equivalence
+--   for BZ-indexed outputs; physical-equivalence for Wyckoff-orbit-indexed outputs).
+
+
+-- Capabilities of Sampleable: ALL OPTIONAL, declared per output.
+class Sampleable f => Integrable f where
+  type Measure f
+  integrate :: Measure f -> f -> Codomain f
+-- Laws:
+--   linearity in f (with respect to the Codomain's Quantity algebra)
+--   monotonicity in f when the Codomain carries an order
+--   change-of-variables under measure-preserving Domain automorphisms
+
+class Sampleable f => Differentiable f where
+  type Tangent f
+  derivative :: f -> Domain f -> Tangent f
+-- Laws:
+--   linearity
+--   chain rule
+--   agreement with the adjoint declared at registration (the adjoint-cert gate from §19)
+
+class Sampleable f => Restrictable f where
+  type Subdomain f
+  restrict :: Subdomain f -> f -> f
+-- Laws:
+--   restrict (whole-of-Domain) = id
+--   restrict s1 . restrict s2 = restrict (s1 `intersect` s2)
+
+
+-- AXIS C: Constraint — global analytic laws as witnesses.
+-- Causality, hermiticity, convexity, KK-pairing are NOT shape interfaces;
+-- they are structural witnesses attached to a Sampleable.
+class Sampleable f => HasAnalyticStructure f where
+  data Witness f
+       -- e.g. KramersKronig | HermitianSymmetric | Convex | QuantizedZ | QuantizedZ2
+  certifyAnalytic :: f -> Either (Failure f) (Witness f)
+
+-- Laws:
+--   if certifyAnalytic f = Right w, then any operation declared structure-preserving
+--   for that witness (Hilbert transform for KK; projection for Hermitian; epigraph
+--   intersection for Convex) returns a value whose certifyAnalytic also yields Right w.
+
+
+-- AXIS D: Combinatorial / discrete structure outputs.
+-- The genuinely missing fourth axis. Integer invariants, classification groups,
+-- holonomy spectra, polyhedra, hulls live here. NOT Quantity (no units),
+-- NOT Sampleable (no domain), NOT HasAnalyticStructure (quantization itself
+-- is the "analytic structure," captured discretely).
+class DiscreteStructure a where
+  type Morphism a
+  identity :: a -> Morphism a
+  compose  :: Morphism a -> Morphism a -> Morphism a
+  isoEq    :: a -> a -> Bool                       -- equality up to declared canonical form
+
+-- Laws:
+--   identity is a two-sided unit for compose
+--   compose is associative
+--   isoEq is reflexive, symmetric, transitive
+--   (groupoid axioms when Morphism is invertible; category axioms otherwise)
 ```
-interfaces/
-├── scalar                  arithmetic on a number with units
-├── field-on-grid           evaluate, tabulate, integrate, restrict, differentiate
-├── tensor                  index, contract, change-of-basis, symmetrize
-└── response                evaluate, Hilbert-transform, integrate, causality-check
+
+### 11.3 Type aliases — the old vocabulary preserved
+
+The four old names persist as type aliases for common parameterizations of the new alphabet. Existing prose throughout the plan continues to read sensibly.
+
+```haskell
+type Scalar       a   = Quantity a                                      -- value-only; no Sampleable
+type Tensor       a   = (Quantity a, Sampleable f, Domain f ~ FiniteProductIndex)
+                                                                         -- with a GroupAction declared separately
+type FieldOnGrid  f   = (Sampleable f, Integrable f, Differentiable f, Restrictable f)
+type Response     f   = ( Sampleable f, Integrable f, Differentiable f
+                        , HasAnalyticStructure f                         -- with Witness = KramersKronig
+                        , Domain f ~ Frequency
+                        , Codomain f ~ ComplexQuantity )
 ```
 
-These are orthogonal to bundles — an output's bundle determines
-its shape; the interface determines what operations make sense on
-that shape. Many outputs implement multiple interfaces
-(`OpticalAbsorption` is `FieldOnGrid` over `EnergyAxis` AND
-`Response` with causality structure).
+### 11.4 Composition pattern
+
+The axes compose independently. An output's full structure is the product of (which `Quantity` it inhabits) × (which `Sampleable` capabilities it has) × (which `HasAnalyticStructure` witness, if any). `DiscreteStructure` sits orthogonal — outputs in that bucket do not inhabit Quantity/Sampleable; they form a separate sub-category.
+
+This means: when adding a new observable to the registry, you declare its axis-coordinates independently. There is no "which of the four interfaces does this implement?" question; there are three orthogonal "which inhabitants does this have?" questions, plus the discrete bucket as a separate answer.
+
+### 11.5 What changes downstream
+
+- **§13 cert obligations** map cleanly onto the axes (see §13.1 below).
+- **§15 typed compositions** unchanged in surface form — the type aliases preserve the old names.
+- **§28 topology atlas** outputs are first-class `DiscreteStructure` instances; the "topology as escape hatch" framing dissolves.
+- **§19 ResidualGenerator** consumes the typeclass constraints in its type signature; `bias-correction` is an `AffineMap` between two `Quantity` instances; `adjoint-cert` checks the `Differentiable` law.
 
 ---
 
@@ -747,8 +861,21 @@ cert/
 
 The certificate emitted for any prediction is an inert s-expression
 carrying scalar verdicts for each obligation, plus the numeric
-witnesses for any failures. Same discipline as the source library:
-schema is the cross-workstream contract.
+witnesses for any failures. Schema is the cross-workstream contract.
+
+### 13.1 Obligation-to-axis mapping (γ''')
+
+Each obligation has a natural home on the Layer 0 alphabet (§11). The mapping makes the cert subsystem mechanical to write — each obligation's checker is a generic function over one of the typeclasses.
+
+| Obligation | Axis | Mechanism |
+|---|---|---|
+| 1 — symmetry equivariance | `Sampleable` × `GroupAction` | check that applying a symmetry op to the domain produces a value equal (under `Quantity.approxEq`) to applying the orbit-induced action to the codomain |
+| 2 — physical bounds | `Quantity` ordering | for each declared bound, check the value against it under the Codomain's ordering |
+| 3 — analytic limits | `HasAnalyticStructure` | evaluate the limit, check the witness predicate (`Witness = QuantizedZ` for Chern in a known phase; `Witness = KramersKronig` for ε∞ → 1; etc.) |
+| 4 — reference battery | content-side | not a typeclass-mapped obligation; reads from `cert/reference-data/*.csv` and compares under `Quantity.approxEq` |
+| 5 — conservation | `Integrable` | check that `integrate measure f = declared-invariant` to tolerance |
+| 6 — degeneracy / named-formula consistency | `Sampleable` + `Quantity.approxEq` | for two `Sampleable` outputs of the same `Codomain` claiming the same physical quantity, check agreement on the shared `Domain`; this IS the primary-path discipline of §29 |
+| 7 — boundary correspondence | `DiscreteStructure` morphism | the lookup table `(X_BS_generator, boundary_orientation) → boundary_mode_count` is a morphism in `DiscreteStructure`; the cert checks that the observed boundary-band count matches the morphism's output |
 
 ---
 
@@ -1035,9 +1162,90 @@ n-Op/
 
 ## 15. All 36 observables as typed compositions
 
-Every item on `properties.md` written as a one-line typed
-composition. This is the validation that the architecture covers
-the slide.
+Every item on `properties.md` written as a one-line typed composition. This is the validation that the architecture covers the slide.
+
+> **γ''' preamble:** the type signatures below use the Layer 0 alphabet from §11. The four old interface names (`Scalar`, `Tensor`, `FieldOnGrid`, `Response`) persist as type aliases over the new typeclasses, so the compositions below read unchanged. Two worked examples typed *through the new alphabet* are in §15.0 — one for a continuous causal observable (`DielectricFunction`), one for a discrete invariant (`ChernNumber`). They illustrate how the typeclass coordinates select cert obligations automatically.
+
+### 0. Two worked examples through the Layer 0 alphabet
+
+**Example A — `DielectricFunction ε(ω)`** (continuous, causal, integrable, differentiable):
+
+```haskell
+data EpsValue = EpsValue
+  { components :: V3 (V3 (Complex Double))
+  , units      :: Dimensionless                      -- relative permittivity is dimensionless
+  }
+
+instance Quantity EpsValue where
+  type Units     EpsValue = Dimensionless
+  type Tolerance EpsValue = RelTol
+  approxEq tol a b = maxFrobeniusDiff a b <= tol * maxNorm a
+  rescale = id
+  -- GroupAction(SO(3)) declared separately on the 3×3 tensor part
+
+newtype DielectricFunction = DielectricFunction { unDF :: Frequency -> EpsValue }
+
+instance Sampleable     DielectricFunction where
+  type Domain   DielectricFunction = Frequency               -- positive real axis
+  type Codomain DielectricFunction = EpsValue
+  evaluate (DielectricFunction f) ω = f ω
+
+instance Integrable     DielectricFunction where
+  type Measure DielectricFunction = LebesgueOn Frequency
+  integrate μ (DielectricFunction f) = integrateMeasure μ f
+
+instance Differentiable DielectricFunction where
+  type Tangent DielectricFunction = EpsValue                 -- dε/dω has same units
+  derivative (DielectricFunction f) ω = autoOrNumeric f ω
+
+instance HasAnalyticStructure DielectricFunction where
+  data Witness DielectricFunction
+    = KramersKronig
+        { reFromIm        :: ImaginaryPart -> RealPart
+        , imFromRe        :: RealPart -> ImaginaryPart
+        , sumRuleOmegaP   :: Frequency
+        }
+  certifyAnalytic df
+    | kkResidual < tolKK && sumRuleResidual < tolSR
+        = Right (KramersKronig {..})
+    | otherwise
+        = Left (AnalyticViolation kkResidual sumRuleResidual)
+
+-- What this buys mechanically:
+--   * cert obligation-3 (analytic limits): consumes the HasAnalyticStructure witness;
+--     limit-checks ε(ω → ∞) = 1, ε(ω → 0) = ε₀ are predicates on the witness.
+--   * cert obligation-5 (conservation): the operator-spectrum-area sum rule
+--     ((2/π) ∫ ω·Im(ε(ω)) dω = ω_p²) is one call to `integrate` from Integrable.
+--   * cert obligation-6 (named-formula consistency): if a second pathway also produces
+--     a DielectricFunction (e.g., from current-current correlator vs. density-density),
+--     Quantity.approxEq + Sampleable on the shared Domain gives the agreement check.
+--   * §19 ResidualGenerator: closes over the HasAnalyticStructure witness and the
+--     Integrable instance for KK-residual loss; adjoint-cert checks the Differentiable
+--     law for the autodiff path.
+```
+
+**Example B — `ChernNumber`** (discrete invariant; the old four-interface vocabulary has no honest home for this):
+
+```haskell
+newtype ChernNumber = ChernNumber Int
+
+instance DiscreteStructure ChernNumber where
+  type Morphism ChernNumber = ChernNumber -> BoundaryModeMultiplicity
+  identity _      = const noModes
+  compose g f     = g . f
+  isoEq (ChernNumber a) (ChernNumber b) = a == b
+
+-- What this buys mechanically:
+--   * ChernNumber is NOT Quantity (no units), NOT Sampleable (no domain),
+--     NOT HasAnalyticStructure (the quantization itself is the analytic structure,
+--     captured discretely as DiscreteStructure membership).
+--   * Cert obligation-7 (boundary correspondence) is a Morphism in DiscreteStructure:
+--     the bulk's ChernNumber compose'd with the boundary-multiplicity morphism yields
+--     the predicted boundary mode count; cert compares against observed.
+--   * The topology atlas (§28) emits values of this typeclass family directly.
+--     What used to be an escape hatch is now first-class.
+```
+
 
 ### 1. Structural
 
@@ -1760,7 +1968,13 @@ Compute-overhead discipline:
 - Cheap parts (always-on): X_BS class, orbit-induced-representation decomposition, compatibility check, boundary-mode multiplicity via the indicator-factor lookup table — all polynomial in cell complexity.
 - Expensive parts (opt-in per observable): Wilson loops, Chern integrals, Z₂ via Pfaffian — these go through `chern-number-from-bloch`, `z2-invariant-from-bloch`, `wilson-loop-spectrum` (registry rows 99–101) and pay their cost only when an observable explicitly requests them.
 
-### 28.4 Why this matters at compose-time
+### 28.4 The atlas outputs are `DiscreteStructure` instances (γ''')
+
+Every atlas-emitted value — the symmetry-classification group X_BS (a finite abelian group), the orbit-induced representation matrix (an integer matrix with row/column equivalences), the integer-valued global invariants (first-band integer invariant, binary-with-symmetry invariant), the holonomy spectrum (a list of phases on a circle, with the group action of rotation), the boundary-mode multiplicity lookup — inhabits the `DiscreteStructure` typeclass (§11.2 Axis D).
+
+Concretely: the boundary-correspondence cert obligation (§13 obligation-7) is *literally a Morphism* in `DiscreteStructure`, mapping `X_BS` group elements to boundary-mode multiplicities under a chosen boundary orientation. There is no escape hatch — the obligation's checker is the generic `DiscreteStructure`-axis cert-check from §13.1, applied to this morphism.
+
+### 28.5 Why this matters at compose-time
 
 The atlas gives the PINO a *navigational signal* — when training across many compositions, X_BS tells the model "these compositions are topologically equivalent; gradients in one inform the other." Without the atlas, the model has to rediscover topological equivalence from scratch. This is the user-stated reframing: topology is the map, not a feature.
 

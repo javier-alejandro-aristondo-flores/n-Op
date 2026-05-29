@@ -94,5 +94,12 @@
 93,high-frequency-dielectric-tensor,"`(γ̂, h) → ε∞[α,β]`",L1,T2,D2,faithful,V1-γ',linear-response sub-stage
 94,electronic-susceptibility-chi-infinity,"`(γ̂, h) → χ∞[α,β]`",L1,T2,D2,faithful,V1-γ',linear-response sub-stage
 95,redlich-kister-excess-gibbs,"`(x, T, {L_ν}) → G_ex`",B8,T0,D1,cheap,V1-γ',"composition, RK parameters"
-96,F-equals-minus-grad-E,"(architectural — autodiff, NOT residualized)",—,—,—,—,S5,(rejected per S5)
-97,equivariance,"(architectural — by construction, NOT residualized)",—,—,—,—,S5,(rejected per S5)
+96,symmetry-indicator-group,"`(SG_number, AZ_class) → AbelianGroup`",B1/B11,T1,D0,cheap,V1-γ'',"SG, AZ class; SNF on EBR matrix"
+97,band-rep-matrix,"`(SG, [Wyckoff], [orbital]) → IntMatrix`",B1,T1,D0,cheap,V1-γ'',"SG, Wyckoff, orbital basis"
+98,compatibility-relation-matrix,"`(SG, high-sym-momenta) → IntMatrix`",B1,T0,D0,cheap,V1-γ'',SG
+99,chern-number-from-bloch,"`(Bloch_states_on_grid) → Integer`",B1,T2,D3,faithful,V1-γ'',Bloch states
+100,z2-invariant-from-bloch,"`(Bloch_states_on_grid, TR_op) → ℤ₂`",B1,T2,D3,faithful,V1-γ'',"Bloch, TR"
+101,wilson-loop-spectrum,"`(Bloch_states_on_loop) → [phase]`",B1,T2,D3,faithful,V1-γ'',Bloch on loop
+102,bulk-edge-mode-count,"`(X_BS_element, slab_orientation) → Integer`",B5,T1,D0,cheap,V1-γ'',"X_BS, slab orient (Khalaf et al.)"
+103,F-equals-minus-grad-E,"(architectural — autodiff, NOT residualized)",—,—,—,—,S5,(rejected per S5)
+104,equivariance,"(architectural — by construction, NOT residualized)",—,—,—,—,S5,(rejected per S5)

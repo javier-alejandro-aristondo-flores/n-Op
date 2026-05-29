@@ -1799,3 +1799,23 @@ The consolidation is complete when:
 End of plan. Ready for ExitPlanMode → execute the file migration + amendment application.
 
 ---
+
+## γ'' pass — lit-review orchestrator integration
+
+Dispatched lit-review orchestrator (opus, max effort). Returned a full synthesis. User-approved actions applied to canonical docs:
+
+- **Topology task #9: CLOSED.** Resolution = topology integrated as the *navigational atlas* over composition space (not deferred). `SymmetryAdaptedHamiltonianOf` template added; X_BS via SNF and bulk-edge correspondence rules from Khalaf-Po-Vishwanath-Watanabe added as Layer 1.25 primitives. See `IMPLEMENTATION-PLAN.md` §28.
+
+- **γ̂ pullback / bundle: REJECTED for V1.** User critique: "if we have a single canonical form for the lattice, why do we need a pullback?" The orchestrator's "pullback of the bundle-shape functor along the lattice-symmetry functor" was a function in pullback's clothing. Replaced by deterministic `canonical_encoding(lattice, decoration) → (basis, form)` with a single-slot default. Bundle (multi-slot) interface preserved on `ResidualGenerator.canonical-encoding` for V2 promotion without refactor. See `IMPLEMENTATION-PLAN.md` §28.
+
+- **Open questions Q1, Q2, Q3, Q4, Q5, Q7: RESOLVED.** See `RESEARCH-BRIEF.md` §20. Q6 (Layer 1.75 spec content) and Q8 (applicability decidability) remain open.
+
+- **META-AUDIT factor errors: corrected.** Optical absorption gains factor 2; f-sum gains 2/π; acoustic-sum is summed over all R; Landau-Lifshitz form correctly named (was called Gilbert); Vineyard typed correctly (products-over-modes, not spectra).
+
+- **Residual category rename: applied.** `structural-validity → static-validity`; hull-distance moved to `thermodynamic-consistency`. Categories disjoint by input domain.
+
+- **Read-path / write-path diagram: applied.** Replaces misleading linear 5-layer stack (`IMPLEMENTATION-PLAN.md` §31).
+
+The architectural decisions that remain genuinely open (not deferred-by-default, but actively undecided): implementation language and the remaining items in §23.
+
+---

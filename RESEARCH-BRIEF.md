@@ -412,16 +412,16 @@ These are flagged for the user to make; none have been resolved.
 
 ## 20. Open questions for the independent researcher
 
-These are the load-bearing questions on which a unified architecture proposal would substantially depend.
+These are the load-bearing questions on which a unified architecture proposal would substantially depend. Status updates from the lit-review orchestrator pass (γ'') noted in-line.
 
-1. **Is the free-algebra-of-effects view (Section 17) a real structural observation, or is it a rename?** A negative finding is informative — it would strengthen the case for keeping the multi-layer view explicit.
-2. **Does the topology integration (Section 16) need its own deep research session, or does Alternative D's placement of the topological-invariant primitive in Layer 1.25 substantively close it?**
-3. **In the layered γ̂ hybrid, is the basis × form factoring (Section 9.3) the right axis decomposition, or is there a cleaner one?** Specifically, should `(NaturalOrbital, LowRank)` and `(Wannier, Sparse)` be first-class encodings in V1?
-4. **The two-tier accuracy discipline introduces two implementations per observable. Under what discipline are they kept in sync?** A naive answer is "the faithful path is the oracle that the cheap path is tested against." Are there sharper alternatives?
-5. **Are seven residual categories the right count, or should some be merged / split?** In particular: thermodynamic-consistency vs structural-validity overlap on hull-distance.
-6. **For Layer 1.75 (iterative dressing, V2 code, V1 spec): what is the minimum spec content that lets a V2 contributor implement scGW or DMFT without re-litigating the architecture?**
-7. **What does the cert layer do when two equivalent compositions of the same observable disagree?** (E.g., Kubo σ vs BTE σ. The current answer is "trip a cert with both witnesses"; is that adequate?)
-8. **Are there observables in the eleven bundles whose applicability classifier is not first-order-decidable from the descriptor inputs?** If so, those need either deferred classifiers or a stricter input vocabulary.
+1. **[RESOLVED, γ'' §30]** Free-algebra-of-effects view: real for elements that inhabit the same effect signature (two-tier accuracy, three pino-bridge exports, Layer 1.25/1.75, cert gates, source-tag, dressing-tag, applicability guards). NOT real for the γ̂ pipeline or the BO hierarchy — those are categorically distinct functors composed into a pipeline. The rule: same-type → free-algebra; type changes between stages → multi-layer. See `IMPLEMENTATION-PLAN.md` §30.
+2. **[RESOLVED, γ'' §28]** Topology integration: included as the **navigational atlas** over composition space, not deferred. `SymmetryAdaptedHamiltonianOf` template added (§8 entry 15); X_BS via SNF, EBR matrix, compatibility relations, Wilson loops, Chern, Z₂, bulk-edge mode counts added as registry rows 96–102. Cheap parts always-on at compose-time; expensive parts opt-in per observable. Cert obligation-7 (bulk-edge correspondence) filled with Khalaf-Po-Vishwanath-Watanabe rules.
+3. **[RESOLVED, γ'' §28.1]** Basis × form is the right factoring. V1 first-class pairs: `(Reciprocal, BlockDiag)`, `(Real, Sparse)`, `(Wannier, Sparse)`, `(NaturalOrbital, LowRank)`, `(SymmetryAdapted, BlockDiag)`. Single-slot per material chosen by `canonical_encoding(lattice, decoration)` at compose-time. The "bundle" generalization to multiple synchronized slots is preserved in the type (`Optional<(Basis, Form)>` on `ResidualGenerator`) and deferred to V2.
+4. **[RESOLVED, γ'' §19 + §28]** Two-tier sync discipline: cheap path generates labels; faithful path generates residuals; their *accuracies do not need to match*. The cheap path's bias against faithful is measured on a held-out battery during the Calibrate curriculum phase and corrected by a single optional `bias-correction : Optional<AffineMap>` field on `ResidualGenerator`, applied at the Polish phase. Faithful is the oracle for bias measurement only.
+5. **[RESOLVED, γ'' §12]** Seven categories retained, with `structural-validity → static-validity` renamed for disjointness. Hull-distance lives under `thermodynamic-consistency` (needs environment); `static-validity` is snapshot-only (Born stability, dynamical stability, space-group equivariance, valence sum). Categories now disjoint by input domain.
+6. **OPEN.** Layer 1.75 minimum spec for scGW/DMFT — partial scaffolding via `IterativeResult` cert vocabulary in `IMPLEMENTATION-PLAN.md` §27, but the spec content sufficient for a V2 contributor to implement is not yet written.
+7. **[RESOLVED, γ'' §29]** Primary-path discipline: every observable declares one composition as primary; cert obligation-6 evaluates secondary paths and trips on disagreement above declared tolerance with both values as witnesses. No averaging, no silent selection.
+8. **OPEN.** Whether any of the eleven bundle observables has a non-first-order-decidable applicability classifier — to be checked observable-by-observable in Phase 6 (registry build-out). Stub predicates are acceptable V1.0; the question becomes load-bearing only at V1.1 refinement.
 
 ---
 

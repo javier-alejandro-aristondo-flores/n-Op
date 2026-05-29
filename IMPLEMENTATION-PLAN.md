@@ -10,7 +10,8 @@
 > - Named formulas: ~22 → 87 (manifest at `physics/library/formulas/registry-manifest.csv`)
 > - Abstract templates: 12 → 18 (+InterfaceEquilibriumOf, +SelfConsistentChargeBalanceOf, +HarmonicStiffnessHessianOf, +BiSlabGrandPotentialOf, +MassActionEquilibriumOf, +ClusterExpansionOf)
 > - Observable bundles: 8 → 11 (+defect-resolved, +surface-resolved, +interface-resolved, +field-resolved, +hot-carrier-resolved, +degradation)
-> - Residual categories: 5 → 7 (+structural-validity, +thermodynamic-consistency)
+> - Residual categories: 5 → 7 (+static-validity, +thermodynamic-consistency)
+>   [γ'' cleanup: renamed from `structural-validity` for disjointness — see §12 note]
 > - Cert obligations: 6 → 10 (+bulk-edge-correspondence, +reference-battery-versioned, +surrogate-net-validity, +adjoint-existence-at-registration)
 > - Methods: 12 (unchanged) + 2 new sub-methods (field-line-integral, interface-tunneling)
 > - State vector: **UNCHANGED** — the 7-tuple `(h, R_I, P_I, Π_h, Z_I, γ̂, A)` is confirmed sufficient (S4 finding); non-equilibrium quantities are emergent
@@ -144,7 +145,10 @@ L (Poisson, antisymmetric):
 M (dissipative, symmetric PSD):
   - phonon-phonon scattering       three- and four-phonon collision kernels
   - electron-phonon scattering     Fermi-golden-rule from g_{nm,ν}(k,q)
-  - Gilbert damping                α S × (S × H_eff) for magnetic dynamics
+  - Landau-Lifshitz damping        α S × (S × H_eff) for magnetic dynamics
+                                   (Gilbert form is dS/dt = α S × dS/dt; the
+                                    S × (S × H_eff) form is Landau-Lifshitz —
+                                    META-AUDIT terminology fix)
   - radiative damping              spontaneous-emission rate for optical
   - chemical rate matrix           symmetrized W_ij from detailed balance
 ```
@@ -435,10 +439,11 @@ These 12 methods cover every observable on the slide.
 
 ---
 
-## 8. Abstract property templates (14)
+## 8. Abstract property templates (15)
 
-> **γ' update (validator-1):** templates 12 → 14. Added at bottom:
-> `SelfConsistentRenormalizationOf` (covers SCPH/SSCHA, GW self-energy, polaron, BSE-iterated; method selector picks variant), and `ConfigurationalFreeEnergyOf` (covers cluster-expansion AND Redlich-Kister composition-dependent excess Gibbs as separate parameterizations — they are NOT the same formula).
+> **γ' update (validator-1):** templates 12 → 14. Added: `SelfConsistentRenormalizationOf` (covers SCPH/SSCHA, GW self-energy, polaron, BSE-iterated; method selector picks variant), and `ConfigurationalFreeEnergyOf` (covers cluster-expansion AND Redlich-Kister composition-dependent excess Gibbs as separate parameterizations — they are NOT the same formula).
+>
+> **γ'' update (topology atlas):** templates 14 → 15. Added: `SymmetryAdaptedHamiltonianOf(space-group, wyckoff-orbits, orbital-basis, neighbor-shells) → ParameterizedBlochHamiltonian`. The constructive Stage-1 of Topological Quantum Chemistry — from a symmetry specification, generate the most general symmetry-allowed H(k). This is the load-bearing template that lets every composed material be classified via X_BS (Smith-Normal-Form polynomial-time computation; see §30). Symmetry becomes constitutive of the substrate, not bolted on later.
 
 Templates are **parameterized method chains**. Concrete observables
 are template instantiations. The discipline: collapse "N
@@ -507,17 +512,33 @@ abstract-properties/
 │                                        SCPH/SSCHA, GW self-energy, BSE iteration, polaron;
 │                                        emits IterativeResult cert evidence — see §27]
 │
-└── configurational-free-energy-of    ConfigurationalFreeEnergyOf(
-                                          parameterization: {ClusterExpansion(ECI),
-                                                             RedlichKister(L_ν, order),
-                                                             BraggWilliams},
-                                          composition: x,
-                                          T: Temperature
-                                       ) → G_config
-                                       [γ' addition; cluster-expansion (discrete T=0 lattice
-                                        energy) and Redlich-Kister (continuous composition-
-                                        dependent excess Gibbs) are DISTINCT parameterizations
-                                        of this template, NOT instances of each other]
+├── configurational-free-energy-of    ConfigurationalFreeEnergyOf(
+│                                          parameterization: {ClusterExpansion(ECI),
+│                                                             RedlichKister(L_ν, order),
+│                                                             BraggWilliams},
+│                                          composition: x,
+│                                          T: Temperature
+│                                       ) → G_config
+│                                       [γ' addition; cluster-expansion (discrete T=0 lattice
+│                                        energy) and Redlich-Kister (continuous composition-
+│                                        dependent excess Gibbs) are DISTINCT parameterizations
+│                                        of this template, NOT instances of each other]
+│
+└── symmetry-adapted-hamiltonian-of   SymmetryAdaptedHamiltonianOf(
+                                          space-group: SpaceGroup,        -- 1..230 (+ magnetic)
+                                          wyckoff-orbits: List<WyckoffOrbit>,
+                                          orbital-basis: List<Orbital>,
+                                          neighbor-shells: Integer
+                                       ) → ParameterizedBlochHamiltonian
+                                       [γ'' addition; constructive Stage-1 of Topological
+                                        Quantum Chemistry. From a symmetry specification,
+                                        emits the most general symmetry-allowed H(k). This
+                                        template makes "compose lattice + decoration + laws
+                                        → material" first-class: the result is a parametric
+                                        family of Hamiltonians indexed by the free couplings
+                                        symmetry allows. Downstream consumers (X_BS
+                                        classification, band structure, etc.) read this as
+                                        their substrate.]
 ```
 
 ---
@@ -525,6 +546,10 @@ abstract-properties/
 ## 9. Named formulas registry (closed; canonical list in `registry-manifest.csv`)
 
 > **γ' update (validator-1):** the brief listing below is illustrative; the canonical, machine-readable registry is `physics/library/formulas/registry-manifest.csv` (95 substantive rows + 2 architectural markers). γ' additions (rows 88–95): `lo-to-non-analytic-correction` (Gonze-Lee, requires Z\*/ε∞ from L1 linear-response sub-stage), `makov-payne-correction` (Madelung-based, separate from FNV/LZ — NOT merged), `kumagai-oba-correction` (atomic-site averaging), `madelung-constant` (L1 primitive), `born-effective-charge-tensor` (L1 primitive), `high-frequency-dielectric-tensor` (L1 primitive), `electronic-susceptibility-chi-infinity` (L1 primitive), `redlich-kister-excess-gibbs` (registered separate from cluster-expansion — see §8 template note). The strategy-pattern dispatcher `charged-defect-correction(scheme ∈ {MP, FNV, LZ, KumagaiOba})` lives in `methods/`, not `formulas/`.
+>
+> **γ'' update (topology atlas):** registry rows 96–102 add the topology atlas: `symmetry-indicator-group` (X_BS via SNF), `band-rep-matrix`, `compatibility-relation-matrix`, `chern-number-from-bloch`, `z2-invariant-from-bloch`, `wilson-loop-spectrum`, `bulk-edge-mode-count`. Cheap classification (SNF, table lookup) is always-on at compose-time; expensive integrals (Chern, Z₂, Wilson) are opt-in per observable. See §28.
+>
+> **γ'' update (META-AUDIT corrections):** the following formula-text errors flagged by META-AUDIT are corrected in §15 and downstream files: optical absorption gains the missing factor 2 (`(2ω/c)·Im(√ε)`); f-sum acquires the `2/π` prefactor; acoustic-sum is summed over all lattice translations R (not just R=0); the magnetic-damping term that this plan called "Gilbert" is the Landau-Lifshitz form (`S × (S × H_eff)`); the Vineyard prefactor consumes products-over-modes (scalars), not spectra (typed correction in §15 §7).
 
 
 Every algebraic combination invokes a NAMED FORMULA with typed
@@ -653,16 +678,31 @@ residuals/
 │
 ├── algebraic-identities/             named-formula consistency
 │   ├── kramers-kronig                Re ε and Im ε satisfy KK Hilbert transform
-│   ├── f-sum                         ∫ ω Im ε(ω) dω = ω_p²
-│   ├── acoustic-sum                  Σ_J Φ_{IαJβ}(0) = 0
+│   ├── f-sum                         (2/π) ∫ ω Im ε(ω) dω = ω_p²   -- META-AUDIT fix: 2/π
+│   ├── acoustic-sum                  Σ_J Σ_R Φ_{IαJβ}(R) = 0       -- META-AUDIT fix: sum over R
 │   ├── detailed-balance              W_ij P_j^eq = W_ji P_i^eq
 │   ├── einstein-relation             D = μ k_B T / q
 │   ├── onsager-symmetry              L_αβ(B) = L_βα(-B)
 │   ├── maxwell-relations             (∂S/∂V)_T = (∂P/∂T)_V (and cyclic)
 │   └── method-equivalence            BTE-σ ≡ Kubo-σ in linear response limit
 │
+├── static-validity/                 snapshot-only checks (no environment input)
+│   ├── pauling-rule                 valence-bond-sum charge balance
+│   ├── born-stability               C ⪰ 0 on symmetric strain modes
+│   ├── dynamical-stability          ω² ≥ 0 everywhere on BZ mesh
+│   └── space-group-equivariance     state respects its declared point/space group
+│
+├── thermodynamic-consistency/       checks involving environment (T, μ, P, x)
+│   ├── hull-distance                ΔE above the convex hull at given chemical potentials
+│   ├── formation-energy-from-refs   matches references at given μ_i
+│   ├── solubility                   x_solute consistent with μ_solvent, T
+│   ├── mass-action                  reaction quotient = K_eq(T)
+│   └── carbide-formation            ΔG_carbide(T, μ_C) consistent with phase diagram
+│
 └── total-residual                    outer linear combination with regime-aware weights
 ```
+
+> **γ'' note (B):** the rename `structural-validity → static-validity` makes the residual categories cleanly disjoint by their input domain. `static-validity` takes the snapshot alone; `thermodynamic-consistency` takes snapshot + environment. Hull-distance lives under thermodynamic (it needs reference phases at given T, μ, P).
 
 The **total residual** is the weighted sum of the above. Weights
 are exposed as parameters; the cert layer verifies that all
@@ -671,7 +711,7 @@ consistent.
 
 ---
 
-## 13. Cert sub-tree (6 obligations)
+## 13. Cert sub-tree (7 obligations)
 
 ```
 cert/
@@ -689,9 +729,18 @@ cert/
 ├── obligation-5-conservation         DOS integrates to electron count;
 │                                     Cv consistent with phonon DOS;
 │                                     Maxwell relations hold
-└── obligation-6-degeneracy           GENERIC-specific: L δS = 0, M δE = 0,
-                                      and named-formula consistency across
-                                      equivalent compositions (BTE ≡ Kubo, etc.)
+├── obligation-6-degeneracy           GENERIC-specific: L δS = 0, M δE = 0,
+│                                     and named-formula consistency across
+│                                     equivalent compositions (BTE ≡ Kubo, etc.)
+└── obligation-7-bulk-edge            [γ'' content] Khalaf-Po-Vishwanath-Watanabe
+                                      bulk-edge correspondence: for a bulk with
+                                      X_BS = k, the slab built from it must carry
+                                      anomalous surface states with multiplicities
+                                      determined by the per-indicator-factor rules.
+                                      Cert checks: bulk-edge-mode-count(k, orient)
+                                      = observed surface-band crossings on slab.
+                                      Disagreement trips the cert with both
+                                      witnesses (bulk class + observed surface count).
 ```
 
 The certificate emitted for any prediction is an inert s-expression
@@ -1027,7 +1076,7 @@ DielectricFunction = ResponseOfTo(observable=γ̂,
                                     kernel=current-current-correlator,
                                     frequency=ω-mesh)
 Absorption(ω)      = AlgebraicOf({DielectricFunction},
-                                   formula=(ω/c)·Im(√ε))
+                                   formula=(2ω/c)·Im(√ε))   -- META-AUDIT fix: factor 2
 RefractiveIndex(ω) = AlgebraicOf({DielectricFunction},
                                    formula=Re(√ε))
 PhotoluminescenceTrend = RadiativeEmissionOf(excited_state=γ̂-pumped,
@@ -1112,11 +1161,15 @@ Conductivity        = match method-flag: BTE → ConductivityViaBTE; Kubo → Co
                       (cert obligation 6 verifies equivalence)
 CarrierMobility     = AlgebraicOf({Conductivity, carrier-density},
                                     formula=μ=σ/(n·e))
-IonicDiffusion(species) = let ν₀ = AlgebraicOf(
-                                       {ν_min=SpectrumOf(SecondDerivativeOf(E_BO,initial,u),
-                                                          normal-modes),
-                                        ν_saddle=SpectrumOf(SecondDerivativeOf(E_BO,saddle,u),
-                                                              normal-modes-minus-unstable)},
+IonicDiffusion(species) = let ν_min_spec = SpectrumOf(SecondDerivativeOf(E_BO,initial,u),
+                                                        normal-modes)
+                              ν_sad_spec = SpectrumOf(SecondDerivativeOf(E_BO,saddle,u),
+                                                        normal-modes-minus-unstable)
+                              -- META-AUDIT fix: vineyard-prefactor takes the PRODUCT of
+                              -- normal-mode frequencies, not the spectra themselves.
+                              ν₀ = AlgebraicOf(
+                                       {ν_min = StateReadoutOf(ν_min_spec, extractor=product-of-modes),
+                                        ν_saddle = StateReadoutOf(ν_sad_spec, extractor=product-of-modes)},
                                        formula=formulas/vineyard-prefactor)
                               D₀ = AlgebraicOf({a=jump-distance, Z=coord, ν₀},
                                        formula=formulas/jump-diffusivity)
@@ -1415,6 +1468,17 @@ record ResidualGenerator {
                          ~30% on diamond and CANNOT be averaged; multi-source training discipline
                          (§21) requires explicit dressing-tag exposure so the loop can per-tag
                          the loss instead of mixing. See §27 for OneShotCert/IterativeResult.
+  canonical-encoding: Optional<(Basis, Form)>
+                      -- γ'' addition (C): when the residual operates on γ̂, declares the
+                         single canonical encoding selected at compose-time by
+                         canonical_encoding(lattice, decoration). See §28 for the
+                         vocabulary and selection function. None ⇒ encoding-agnostic.
+  bias-correction   : Optional<AffineMap>
+                      -- γ'' addition (F): single optional affine correction (scalar or
+                         low-rank linear map) trained against the faithful path on a
+                         held-out battery during the Calibrate phase of the curriculum.
+                         Applied at the Polish phase. Closes the cheap↔faithful sync
+                         discipline gap (open question Q4).
   applicability     : (Crystal, Env) → Bool  -- per-sample masking (see §26)
   input-contract    : List<TypedSlot>
   output-contract   : TypedSlot
@@ -1638,3 +1702,152 @@ What validator-1 got wrong (corrected here):
 - True self-consistent GW, full SSCHA, DMFT, BSE iterative variants: V2, scaffolded only in V1
 - Strong correlation (Mott, frustrated Wigner, spin liquids): out of scope per §22; the L1 substrate remains mean-field
 - The 30% bare-vs-dressed disagreement on diamond is *expected* and is what motivates `dressing-tag`; it is not a bug to be averaged away
+
+
+## 28. Encoding vocabulary + topology atlas (γ'')
+
+**(Source: lit-review orchestrator + user reframing on compose-time navigation.)**
+
+### 28.1 Encoding vocabulary: basis × form
+
+The earlier R1/R2/R3 catalogue conflated two orthogonal axes. The canonical factoring is `Encoding = Basis × Form`:
+
+```
+Basis ∈ { Real, Reciprocal, Wannier, NaturalOrbital, SymmetryAdapted }
+Form  ∈ { Dense, Sparse, BlockDiag, LowRank }
+```
+
+First-class V1 encodings (named pairs):
+- `(Reciprocal, BlockDiag)` — Bloch substrate for periodic crystals (the old R2)
+- `(Real, Sparse)` — locality-dominant; defects, surfaces, amorphous regions (the old R3)
+- `(Wannier, Sparse)` — localized post-DFT; interface layers, MIGS, dangling bonds
+- `(NaturalOrbital, LowRank)` — eigenbasis with rank truncation; low-rank substrate (the old R1)
+- `(SymmetryAdapted, BlockDiag)` — irrep-graded; output of `SymmetryAdaptedHamiltonianOf` (§8 template 15)
+
+### 28.2 The selection function
+
+```
+canonical_encoding : (Lattice, SiteDecoration, Environment) → (Basis, Form)
+```
+
+Deterministic. Single-slot default: each composed material carries ONE encoding, chosen at compose-time. Transcoders convert on demand. The earlier "bundle E" generalization to multiple synchronized slots is **deferred to V2**; it becomes useful only when a single composition genuinely demands simultaneous encodings (e.g., a heterostructure with bulk-crystalline regions adjacent to an amorphous interface layer). V1 ships single-slot.
+
+Rationale recorded for posterity: the bundle was rejected as a pullback by the user — "if we have a single canonical form for the lattice, why do we need a pullback?" Correct critique. The selection function is a function, not a pullback. Operationally for diamond MVP (and most periodic-substrate cases), one encoding plus on-demand FFT / Wannier rotation beats maintained-bundle overhead. The bundle interface is preserved in `ResidualGenerator.canonical-encoding : Optional<(Basis, Form)>` so V2 promotion to multi-slot does not require a refactor.
+
+### 28.3 Topology as atlas, not feature
+
+The architecture treats a *material* as a composition `(Lattice + SiteDecoration + Laws) → Material` whose properties are *derived*, never hardcoded. The topology atlas is what makes that derivation navigable.
+
+Atlas construction (one-shot, at compose-time):
+
+```
+TopologyAtlasEntry =
+  ( space-group        : 1..230 (+ magnetic)
+  , AZ-class           : Cartan tenfold-way label
+  , X_BS               : finite abelian group  -- via symmetry-indicator-group
+  , EBRs               : List<ElementaryBandRep>
+  , compatibility      : IntMatrix             -- compatibility-relation-matrix
+  )
+
+atlas_for : (Lattice, SiteDecoration) → TopologyAtlasEntry
+```
+
+The atlas tells you, before you ever evaluate γ̂ or run a single residual, **which topological class the composition lives in**. 117 of 230 space groups have nontrivial X_BS (spinful + TRS); max |X_BS| = 72. SNF is polynomial-time; the table lookup is constant-time per (SG, AZ) pair.
+
+Compute-overhead discipline:
+- Cheap parts (always-on): X_BS class, EBR decomposition, compatibility check, bulk-edge mode counts via Khalaf et al. — all polynomial in cell complexity.
+- Expensive parts (opt-in per observable): Wilson loops, Chern integrals, Z₂ via Pfaffian — these go through `chern-number-from-bloch`, `z2-invariant-from-bloch`, `wilson-loop-spectrum` (registry rows 99–101) and pay their cost only when an observable explicitly requests them.
+
+### 28.4 Why this matters at compose-time
+
+The atlas gives the PINO a *navigational signal* — when training across many compositions, X_BS tells the model "these compositions are topologically equivalent; gradients in one inform the other." Without the atlas, the model has to rediscover topological equivalence from scratch. This is the user-stated reframing: topology is the map, not a feature.
+
+Cross-references:
+- §8 template 15 `SymmetryAdaptedHamiltonianOf` — constructive Stage-1
+- §13 obligation-7 — bulk-edge correspondence cert
+- §15 §1 (Structural) and §2 (Electronic) — atlas-derived observables feed both
+
+
+## 29. Primary-path discipline (γ'')
+
+**(Source: lit-review orchestrator §1.3.7; resolves RESEARCH-BRIEF §20 Q7.)**
+
+Several observables admit multiple equivalent compositions in the abstract — e.g., conductivity σ via `KineticEvolutionOf(BTE)` vs `ResponseOfTo(Kubo)` in the linear-response limit. Both are valid; both must agree on equilibrium states.
+
+**Discipline:** every observable in the registry declares one composition as its *primary* (truth-bearing) path. Secondary paths are recorded with their declared agreement tolerance.
+
+```
+record ObservableSpec {
+  name             : Symbol
+  bundle           : BundleId
+  primary-path     : Composition          -- the canonical computation
+  secondary-paths  : List<(Composition, Tolerance)>   -- alternatives + tolerances
+}
+```
+
+Cert behavior on disagreement:
+- Cert obligation-6 (named-formula consistency) evaluates the primary path AND each secondary path.
+- If `|secondary − primary| > tolerance`, the cert trips with `(primary-value, secondary-value, deviation)` as witnesses.
+- The architecture does NOT average; it does NOT silently pick one. It surfaces the disagreement with both values intact.
+
+Selection rule for primary path (recorded once per observable): pick the composition with the lowest cost-tier among those satisfying applicability. Where two compositions tie on cost, prefer the one with the smaller dressing-tag (bare > dressed-G₀W₀ > dressed-scGW).
+
+
+## 30. Free-algebra rule (γ'')
+
+**(Source: RESEARCH-BRIEF §17 + lit-review orchestrator §1.3.1; resolves RESEARCH-BRIEF §20 Q1.)**
+
+The "free algebra of typed effects with multiple handler stacks" framing applies to architectural elements that are **parallel interpretations of the same effect signature**. It does NOT apply to elements that are **stages of a pipeline with different effect signatures**.
+
+**Adopt the free-algebra framing for:**
+- Two-tier accuracy (cheap vs faithful) — both inhabit `ComputeObservable(template, args)`
+- Three pino-bridge exports (Generate / Validate / Import) — three handlers for one boundary protocol
+- Layer 1.25 vs Layer 1.75 — `Dress(scheme)` with two handler families (`OneShotCert` vs `IterativeResult`)
+- Cert obligations as registration-time gates — handler-registration laws
+- `ResidualGenerator.source-tag` and `dressing-tag` — selector fields for handler dispatch
+- Applicability classifiers — guards on handler dispatch
+
+**Do NOT use the framing for:**
+- The γ̂ representation pipeline (codata interface → term staging → encoding selection → contraction substrate) — these are categorically distinct functors, NOT parallel handlers
+- The 4-level BO hierarchy — successive coarse-grainings, not parallel handlers
+- The 3-layer architecture (Synthesis / Property / PINO-bridge) — pipeline stages
+
+Rule of thumb: ask "do these inhabit the same type?" — if yes, free-algebra. If they compose into a pipeline with type changes between stages, keep the multi-layer view explicit.
+
+
+## 31. γ̂ pipeline diagram (γ'') — replaces the linear 5-layer presentation
+
+**(Source: BD and BE mesh analyses; lit-review orchestrator §1.3.3.)**
+
+The earlier presentation of γ̂'s representation hybrid as a linear 5-layer stack `B → A → C? → E → D` is misleading: it implies every operation traverses every layer. In practice the read path (which dominates trajectory evolution) is much shorter than the write path. The corrected diagram:
+
+```
+                    ┌── READ PATH ──┐
+                    
+                    B ──destructor──→ D
+                    
+                    (most γ̂ traffic: apply Ĥ, density, trace, eigendecomp.
+                     Lazy materialization; no term staging, no bundle sync.)
+                    
+                    
+                    ┌── WRITE PATH ──┐
+                    
+                    B → A → Planner → (C?) → (E or single-slot) → D
+                    
+                    (construction, self-consistent step, time-stepping.
+                     C optional (e-graph saturation only when worthwhile).
+                     E optional (multi-slot bundle only when composition demands it;
+                                 V1 ships single-slot per §28).)
+                    
+                    
+                    ┌── STRUCTURAL VIEW ──┐
+                    
+                    B is the outer shell (interface; codata destructors)
+                    A is outside B at compose-time (term-algebra construction)
+                    Planner sits on the A/E boundary (workload-driven encoding choice)
+                    C is the optional optimizer-time rewriter (e-graph saturation)
+                    E is INSIDE a γ̂-handle (single slot in V1, multi-slot in V2)
+                    D is INSIDE each E-slot (the contraction graph for that encoding)
+```
+
+This matters operationally: a naive linear 5-layer implementation would pay term-staging cost on every read, ~5× overhead. The split keeps the hot path (B → D) direct.

@@ -435,7 +435,10 @@ These 12 methods cover every observable on the slide.
 
 ---
 
-## 8. Abstract property templates (12)
+## 8. Abstract property templates (14)
+
+> **γ' update (validator-1):** templates 12 → 14. Added at bottom:
+> `SelfConsistentRenormalizationOf` (covers SCPH/SSCHA, GW self-energy, polaron, BSE-iterated; method selector picks variant), and `ConfigurationalFreeEnergyOf` (covers cluster-expansion AND Redlich-Kister composition-dependent excess Gibbs as separate parameterizations — they are NOT the same formula).
 
 Templates are **parameterized method chains**. Concrete observables
 are template instantiations. The discipline: collapse "N
@@ -487,15 +490,42 @@ abstract-properties/
 │                                                          optical_coupling: Operator) → Field
 │                                                          (PL spectra, photoemission)
 │
-└── microkinetic-steady-state-of      MicrokineticSteadyStateOf(network: RateNetwork,
-                                                                  initial: Coverage,
-                                                                  driving: Environment) → Coverage
-                                                                  (catalytic activity, TOF)
+├── microkinetic-steady-state-of      MicrokineticSteadyStateOf(network: RateNetwork,
+│                                                                  initial: Coverage,
+│                                                                  driving: Environment) → Coverage
+│                                                                  (catalytic activity, TOF)
+│
+├── self-consistent-renormalization-of  SelfConsistentRenormalizationOf(
+│                                          bare: BareSubstrate,
+│                                          method: {SCP-perturbative, SSCHA-stochastic,
+│                                                   TDEP, GW-one-shot, GW-self-consistent,
+│                                                   BSE-iterated, polaron-self-consistent},
+│                                          T: Temperature,
+│                                          convergence: ConvergenceCriterion
+│                                       ) → DressedQuantity
+│                                       [γ' addition; fixed-point structure shared across
+│                                        SCPH/SSCHA, GW self-energy, BSE iteration, polaron;
+│                                        emits IterativeResult cert evidence — see §27]
+│
+└── configurational-free-energy-of    ConfigurationalFreeEnergyOf(
+                                          parameterization: {ClusterExpansion(ECI),
+                                                             RedlichKister(L_ν, order),
+                                                             BraggWilliams},
+                                          composition: x,
+                                          T: Temperature
+                                       ) → G_config
+                                       [γ' addition; cluster-expansion (discrete T=0 lattice
+                                        energy) and Redlich-Kister (continuous composition-
+                                        dependent excess Gibbs) are DISTINCT parameterizations
+                                        of this template, NOT instances of each other]
 ```
 
 ---
 
-## 9. Named formulas registry (closed, ~22)
+## 9. Named formulas registry (closed; canonical list in `registry-manifest.csv`)
+
+> **γ' update (validator-1):** the brief listing below is illustrative; the canonical, machine-readable registry is `physics/library/formulas/registry-manifest.csv` (95 substantive rows + 2 architectural markers). γ' additions (rows 88–95): `lo-to-non-analytic-correction` (Gonze-Lee, requires Z\*/ε∞ from L1 linear-response sub-stage), `makov-payne-correction` (Madelung-based, separate from FNV/LZ — NOT merged), `kumagai-oba-correction` (atomic-site averaging), `madelung-constant` (L1 primitive), `born-effective-charge-tensor` (L1 primitive), `high-frequency-dielectric-tensor` (L1 primitive), `electronic-susceptibility-chi-infinity` (L1 primitive), `redlich-kister-excess-gibbs` (registered separate from cluster-expansion — see §8 template note). The strategy-pattern dispatcher `charged-defect-correction(scheme ∈ {MP, FNV, LZ, KumagaiOba})` lives in `methods/`, not `formulas/`.
+
 
 Every algebraic combination invokes a NAMED FORMULA with typed
 inputs and explicit output type. No string formulas, no embedded
@@ -1380,6 +1410,11 @@ record ResidualGenerator {
   cost-tier         : T0 | T1 | T2 | T3      -- per-step / per-batch / per-epoch / on-demand
   diff-tag          : D0 | D1 | D2 | D3 | D4 -- closed-form / autodiff / adjoint / FD / relaxed
   source-tag        : cheap-generate | faithful-residual | ground-truth-bridge | cert-only
+  dressing-tag      : bare | dressed(scheme: SCP|SSCHA|GW|BSE|polaron, cert: OneShotCert|IterativeResult, T: Temperature)
+                      -- γ' addition: residuals from bare-KS and G₀W₀-dressed paths disagree by
+                         ~30% on diamond and CANNOT be averaged; multi-source training discipline
+                         (§21) requires explicit dressing-tag exposure so the loop can per-tag
+                         the loss instead of mixing. See §27 for OneShotCert/IterativeResult.
   applicability     : (Crystal, Env) → Bool  -- per-sample masking (see §26)
   input-contract    : List<TypedSlot>
   output-contract   : TypedSlot
@@ -1531,3 +1566,75 @@ Open design questions on soft vs hard classifiers, classifier composition, and t
 ---
 
 End of amendment. Original plan §1–§18 stands. §19–§26 supersede or extend per amendment status banner at top of file.
+
+
+## 27. Alternative D — Layer 1.25 / Layer 1.75 split (canonical)
+
+**(Source: validator-1 + validator-2 mesh discussion; locked in this revision as the canonical architectural decision on renormalization placement.)**
+
+The originally proposed "Layer 1.5 renormalization layer" (one undifferentiated layer absorbing SCPH, SSCHA, GW, BSE, DMFT, polaron) was rejected. Validator-2's critique stands: BSE is not iterated in the same sense as SCPH; polaron is mostly closed-form; the "all share fixed-point structure" framing was an over-elegant rationalization. Instead:
+
+### Layer 1.25 — One-shot dressing (V1 scope)
+
+Single-pass corrections applied to a bare Layer 1 substrate to produce a *dressed* quantity used by Layer 2 downstream. No iteration. Each entry produces an explicit `OneShotCert` carrying provenance.
+
+```
+record OneShotCert {
+  scheme              : G0W0 | SCP-perturbative | LO-TO-NA-correction
+                      | Born-charge-DFPT | epsilon-infinity-DFPT
+  inputs-hash         : Sha256                  -- bare-substrate inputs frozen
+  parameters          : Map<Symbol, Value>      -- e.g. k-mesh, cutoff
+  output              : DressedQuantity
+  one-shot-residual   : Scalar                  -- single-pass closure check
+  cost-tier           : T1 | T2
+  emitted-at          : Timestamp
+}
+```
+
+**Layer 1.25 V1 members:** G₀W₀ quasi-particle energies, perturbative SCP (lowest-order), DFPT linear-response sub-stage (produces Z\*, ε∞, χ^∞ — the L1 primitives at registry rows 92–94), LO/TO non-analytic correction (uses Z\* and ε∞).
+
+### Layer 1.75 — Iterative dressing (V2 scope, specified for forward compatibility)
+
+Genuinely self-consistent fixed-point procedures. Specified but **deferred to V2**; the cert vocabulary below is reserved so that a V2 contributor can implement scGW or DMFT without re-litigating the architecture.
+
+```
+record IterativeResult {
+  scheme              : scGW | SSCHA-stochastic | TDEP | BSE-iterated
+                      | DMFT | polaron-self-consistent
+  inputs-hash         : Sha256
+  parameters          : Map<Symbol, Value>      -- mixing, broadening, max-iter
+  trajectory          : List<IterationSnapshot> -- per-iteration residual, energy
+  converged?          : true | false
+  divergence-witness  : Optional<Witness>       -- non-null iff converged? = false
+  final               : DressedQuantity
+  cost-tier           : T3
+  emitted-at          : Timestamp
+}
+```
+
+**Layer 1.75 V2-deferred members:** self-consistent GW (scGW), full SCPH / SSCHA stochastic, DMFT, BSE iterative variants, self-consistent Migdal polaron.
+
+**Discipline:** V1 ships with Layer 1.25 wired; Layer 1.75 ships as type/cert scaffolding only with `not-implemented-in-V1` stubs that fail loudly. The architecture is forward-compatible without paying V2 cost in V1.
+
+### Integration with §19 ResidualGenerator
+
+The `dressing-tag` slot on `ResidualGenerator` (added in §19) carries either `bare`, `dressed(scheme, OneShotCert, T)`, or `dressed(scheme, IterativeResult, T)`. The training loop (§21) per-tags loss contributions; bare and G₀W₀-dressed residuals on the same observable are tracked as **separate residuals**, never averaged.
+
+### Path γ' validation summary
+
+What validator-1 got right (now canonical):
+- Wegscheider cycle-basis reduction is a *technique* within `KineticEvolutionOf`, not a new formula entry
+- SCP/SSCHA belong under a template (`SelfConsistentRenormalizationOf`) with method selector, not as 3 separate formulas
+- The pattern "audit-flagged 'missing formula' often resolves to a thinly-specified Layer 1 sub-stage exposing a derived primitive" generalizes
+
+What validator-1 got wrong (corrected here):
+- LO/TO is a real Layer 2 formula entry (row 88), not "automatic from a richer L1" — the q→0 directional limit is a load-bearing cert obligation
+- MP / FNV / LZ / Kumagai-Oba are physically distinct correction methods; the strategy-pattern dispatcher lives in `methods/`, formulas stay separate
+- Redlich-Kister is NOT a cluster-expansion instance; both live as separate parameterizations of `ConfigurationalFreeEnergyOf`
+- Layer 1 primitives Z\*, ε∞, χ^∞ are registered (rows 92–94) rather than left implicit
+
+### Out-of-scope confirmation (extends §22)
+
+- True self-consistent GW, full SSCHA, DMFT, BSE iterative variants: V2, scaffolded only in V1
+- Strong correlation (Mott, frustrated Wigner, spin liquids): out of scope per §22; the L1 substrate remains mean-field
+- The 30% bare-vs-dressed disagreement on diamond is *expected* and is what motivates `dressing-tag`; it is not a bug to be averaged away

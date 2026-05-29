@@ -86,5 +86,13 @@
 85,structure-uniqueness-CSP,"`(structure, set) → bool + d`",B10,T1,D3,cheap,S2,structure set
 86,bi-slab-grand-potential,"`(slab_A, slab_B, μ_env) → Ω`",B5/B6,T1,D2,cheap,S2,"slabs, μ"
 87,reference-phase-energy-cache,`(phase-id) → E_ref`,B8,T3,D0,faithful,S2+S3,DFT battery
-88,F-equals-minus-grad-E,"(architectural — autodiff, NOT residualized)",—,—,—,—,S5,(rejected per S5)
-89,equivariance,"(architectural — by construction, NOT residualized)",—,—,—,—,S5,(rejected per S5)
+88,lo-to-non-analytic-correction,"`(D(q), q̂, Z*, ε∞, Ω) → D_NA(q)`",B2,T1,D2,faithful,V1-γ',"Z*, ε∞ (L1 primitives)"
+89,makov-payne-correction,"`(q, ε, L, α_M) → ΔE_MP`",B4,T0,D0,cheap,V1-γ',"q, ε, Madelung"
+90,kumagai-oba-correction,"`(q, ε, V_atomic, L) → ΔE_KO`",B4,T0,D0,cheap,V1-γ',"q, ε, atomic-site potential"
+91,madelung-constant,`(lattice) → α_M`,L1,T1,D0,cheap,V1-γ',lattice
+92,born-effective-charge-tensor,"`(γ̂, R, h) → Z*[I,α,β]`",L1,T2,D2,faithful,V1-γ',linear-response sub-stage
+93,high-frequency-dielectric-tensor,"`(γ̂, h) → ε∞[α,β]`",L1,T2,D2,faithful,V1-γ',linear-response sub-stage
+94,electronic-susceptibility-chi-infinity,"`(γ̂, h) → χ∞[α,β]`",L1,T2,D2,faithful,V1-γ',linear-response sub-stage
+95,redlich-kister-excess-gibbs,"`(x, T, {L_ν}) → G_ex`",B8,T0,D1,cheap,V1-γ',"composition, RK parameters"
+96,F-equals-minus-grad-E,"(architectural — autodiff, NOT residualized)",—,—,—,—,S5,(rejected per S5)
+97,equivariance,"(architectural — by construction, NOT residualized)",—,—,—,—,S5,(rejected per S5)

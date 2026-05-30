@@ -1,8 +1,8 @@
-# Stream S6 — Cheap-Residual Catalog & Residual-Generator Factory Specification
+# Cheap-Residual Catalog & Residual-Generator Factory Specification
 
 ## Preface
 
-This document synthesizes Phase-1 outputs (S1–S5) into a single executable substrate for Stream S7's architecture amendment. The deliverable is operational: every entry is typed, tiered, and tagged so that a residual-generator factory can mechanically instantiate it from the /physics vocabulary. Physics names are paired with computer-science contracts throughout; no string formulas appear in signatures.
+This document organizes the cheap-residual catalog into a single executable substrate for the residual-generator factory. The catalog is operational: every entry is typed, tiered, and tagged so that the factory can mechanically instantiate it from the /physics vocabulary. Physics names are paired with computer-science contracts throughout; no string formulas appear in signatures.
 
 Diamond is the anchor substrate. Where streams disagree, this document binds the resolution.
 

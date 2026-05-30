@@ -52,10 +52,10 @@ CSV is the lowest-common-denominator format that survives language-decision unce
 
 The seed dataset will be assembled from:
 
-- The 14-row diamond-metal interface table in S3 (work functions, Schottky barriers, carbide formation E_a)
-- S1's material-constant anchors (bandgaps, dielectrics, elastic moduli for diamond, c-BN, AlN, GaN, β-Ga₂O₃)
-- S3's defect-formation-energy table (B in diamond, P in diamond, V_C, NV center, V_Ga in GaN, V_O in β-Ga₂O₃)
-- S4's high-field anchors (breakdown fields, saturation velocities, Caughey-Thomas exponents per material)
+- The diamond–metal interface table (work functions, Schottky barriers, carbide formation E_a)
+- Material-constant anchors (bandgaps, dielectrics, elastic moduli for diamond, c-BN, AlN, GaN, β-Ga₂O₃)
+- The defect-formation-energy table (B in diamond, P in diamond, V_C, NV center, V_Ga in GaN, V_O in β-Ga₂O₃)
+- High-field anchors (breakdown fields, saturation velocities, Caughey-Thomas exponents per material)
 
 Population is **incremental and reviewable** — every row should be defensible against a literature citation before commit.
 

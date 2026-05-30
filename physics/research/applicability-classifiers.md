@@ -69,4 +69,4 @@ The factory `make-residual-generator` reads the applicability predicate from the
 
 ## Status
 
-V1 commitment: every entry in the 87-formula registry, every entry in the 11 observable bundles, and every applicable cert obligation gets an explicit `applicability` field. Stub predicates (always-true) are acceptable for V1.0; refinement happens incrementally as material-specific edge cases emerge from training.
+V1 commitment: every entry in the formula registry, every entry in the 11 observable bundles, and every applicable cert obligation gets an explicit `applicability` field. Stub predicates (always-true) are acceptable for V1.0; refinement happens incrementally as material-specific edge cases emerge from training.

@@ -1,10 +1,4 @@
-I'll begin by surveying the existing `/physics` structure to ground my recommendations, then produce the requested research findings.
-I have sufficient context on the architecture, GENERIC framing, BTE/RTA-Kubo-DD vocabulary, two-tier accuracy idea, and CS-only header discipline. Let me also briefly peek at the implementation plan for state-vector / method / observable vocabulary to ensure my Part J slots correctly.
-I have enough grounding. Now I'll produce the Stream S4 research deliverable.
-
----
-
-# Stream S4 — Non-Equilibrium, High-Field, Hot-Carrier Physics for UWBG Chips
+# Non-Equilibrium, High-Field, Hot-Carrier Physics for UWBG Chips
 
 **Scope.** Translate the physics that governs UWBG semiconductors in jet-turbine-class operating envelopes (T_L ≥ 500 °C, E up to several MV/cm, current densities pushing the velocity-saturation regime, possible vibration / radiation overlays) into the typed-formula / typed-residual vocabulary already established for `/physics`. Materials anchor set: **diamond (C), c-BN, h-BN, AlN, GaN, β-Ga₂O₃, AlGaN ternary, plus refractory metals (W, Mo, Re, Ir, TiN, TaN) and standard dielectrics (SiO₂, Al₂O₃, HfO₂)** as contact/dielectric counterparts. Diamond is the non-polar anchor (no Fröhlich term); the other UWBG anchors are polar.
 
@@ -447,7 +441,7 @@ Registry size grows from ~24 to ~42. This is large but **none introduces a new f
 
 ### J.2 Observable bundles — additions
 
-The existing 8 bundles already cover most outputs:
+The existing observable bundles already cover most outputs:
 
 - κ(T), μ(T,E), v_sat(T) → **temperature-resolved** + **tensor-indexed**
 - Mobility tensor under stress → **tensor-indexed**
@@ -558,7 +552,7 @@ Diamond, c-BN, h-BN, AlN, GaN, β-Ga₂O₃, AlGaN ternary, refractory metals, d
 7. **`Environment` extension** (minor): add an optional `temperature_gradient` field for the heat-flow boundary condition input; everything else (`applied_electric_field`, `applied_stress`, `temperature`) is already present.
 8. **One interface generalization**: the `response` interface needs a `causal? : Boolean` parameter so it can host non-causal real-valued nonlinear responses like α(E), J_FN(E).
 
-Files of interest for cross-stream:
-- `/home/javier/Desktop/Physics/Programs/n-Op/IMPLEMENTATION-PLAN.md` (sections 3.1 unified state, 8 templates, 9 formula registry, 10 bundles, 12 residuals)
-- `/home/javier/Desktop/Physics/Programs/n-Op/properties.md` (target property scope)
-- `/home/javier/Desktop/Physics/Programs/n-Op/research/group-C-transport-thermo-chemical.md` (existing transport-regime formalism this stream extends)
+Related documents:
+- `docs/implementation-plan.md` (unified state, templates, formula registry, bundles, residuals)
+- `docs/properties.md` (target property scope)
+- `physics/research/group-C-transport-thermo-chemical.md` (transport-regime formalism this extends)

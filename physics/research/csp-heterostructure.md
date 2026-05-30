@@ -1,6 +1,6 @@
-# Stream S2: Crystal-Structure-Prediction & Heterostructure-Prediction Residuals for `/physics`
+# Crystal-Structure-Prediction & Heterostructure-Prediction Residuals for `/physics`
 
-Scoping note before the report. I'm Stream S2 of a 5-stream Phase-1 research session. No source files needed reading for this task — the deliverable is a methodology survey grounded in the project context already provided. I'll treat the architecture description (12 methods × 12 templates × 24 formulas, 8 observable bundles, 5 residual categories, GENERIC dx/dt = L·δE/δx + M·δS/δx, 4-level BO hierarchy) as authoritative and propose where new residuals plug in.
+This is a methodology survey of crystal-structure-prediction and heterostructure residuals, grounded in the project architecture (GENERIC dynamics dx/dt = L·δE/δx + M·δS/δx, the 4-level Born–Oppenheimer hierarchy, and the closed method / template / formula registries), proposing where new residuals plug in.
 
 All "typed signatures" below use the convention `name : (input-types) -> output-type [cost-tier, differentiability]`, with cost tiers `T0` (closed-form, ~µs), `T1` (small linear algebra / sums, ~ms), `T2` (ML-potential single-point, ~10ms–1s), `T3` (DFT-single-point, minutes–hours), `T4` (full self-consistent loop, hours–days). Differentiability ratings: `D+` (smooth analytic), `D0` (piecewise smooth, subgradient OK), `D-` (combinatorial; needs surrogate / softening).
 
@@ -240,7 +240,7 @@ That brings the count from 24 → roughly 39 named formulas. Plausible scope.
 
 ### F.3 New observable bundles
 
-The current 8 bundles likely cover scalars, vector fields, etc. New bundles needed:
+The existing observable bundles likely cover scalars, vector fields, etc. New bundles needed:
 
 1. **`structural-validity`** — vector of validity residuals per candidate; output of `structure-validity-method`. Used as the gating filter for any CSP backend.
 2. **`band-alignment`** — at interfaces, (Φ_metal, χ_semi, Φ_B^n, Φ_B^p, dipole) tuple per interface. Used for Schottky/Ohmic prediction.
@@ -292,7 +292,7 @@ Total cheap-path cost: ~50 ms. This is the inner-compute residual vector consume
 5. **The two-tier discipline maps cleanly onto cost tiers.** Cheap path = T0+T1, faithful = T3+T4, T2 (MLIP) sits in between and is the natural **bridge** for active learning. Recommend adding T2 (MLIP single-point) as a third tier for the residuals that benefit most: `R_FormationEnergy`, `R_DynamicStab`, `R_InterfaceEnergy`. MACE-MP-0 or similar foundation MLIPs cover most of the diamond + UWBG + transition-metal chemistry in scope, out of the box.
 
 6. **What this stream did NOT cover** (flagging for other streams / Phase 2):
-   - Quantum-tunneling residuals at metal-semiconductor barriers (likely Stream S3 or electronic-transport stream).
+   - Quantum-tunneling residuals at metal-semiconductor barriers (likely the defects/interfaces or electronic-transport area).
    - High-frequency / RF response residuals (likely transport stream).
    - Radiation-damage cascade modeling (mentioned briefly in E; deserves its own deep dive).
    - Surface-chemistry residuals during CVD growth (μ_H, μ_CH₄ dependent — relevant for n-type doping investigation).

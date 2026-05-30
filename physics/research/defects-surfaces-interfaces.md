@@ -1,4 +1,4 @@
-# Stream S3: Defects, Doping, Surfaces, and Interfaces for UWBG-Semiconductor PINO
+# Defects, Doping, Surfaces, and Interfaces for the UWBG-Semiconductor PINO
 
 Survey of defect, doping, surface, and interface physics for diamond-centric UWBG semiconductors under harsh-environment (≥500°C, vibration, high-j) conditions. Read-only research; formulas typed in `/physics` registry style with two-tier (cheap/faithful) parameterizations.
 
@@ -617,4 +617,4 @@ Existing bundles likely cover scalars, atom-indexed, T-resolved. **New bundle ne
 - **Reference-battery residuals** (predicted vs known) are a strong candidate for a new universal residual category — useful beyond defects (e.g., for cohesive energies, lattice constants, band gaps). Recommend a cross-stream RFC.
 - **H diffusion** (G.2) couples Part-S3 surface termination to Part-G long-time bulk evolution AND to dopant activation (Mg–H in GaN) — this is a three-way coupling that needs one stream to own it; flagging as cross-cutting.
 
-End of Stream S3 report.
+End of report.

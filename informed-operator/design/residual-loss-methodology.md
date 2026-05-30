@@ -1,4 +1,4 @@
-# Stream S5: PINO Methodology — Residual Loss Design for Multi-Source Training
+# PINO Residual-Loss Methodology — Multi-Source Training Design
 
 This is a literature-grounded methodology survey for the `n-Op` PINO. The focus is residual loss machinery suited to the four-source supervisory regime (cheap-compute, VASP, experiment, physics residuals) targeting UWBG-semiconductor screening.
 
@@ -403,7 +403,7 @@ Loss terms read `coverage-mask` to mask absent labels. This is mandatory for the
 
 ---
 
-## Summary for the Conductor
+## Summary
 
 The methodology recommendation set for `n-Op`:
 

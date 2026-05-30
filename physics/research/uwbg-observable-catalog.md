@@ -1,4 +1,4 @@
-# Stream S1 — UWBG Diamond-Centric Observable Catalog for n-Op `/physics`
+# UWBG Diamond-Centric Observable Catalog for n-Op `/physics`
 
 ## Part A — Material Scope Review
 
@@ -257,4 +257,4 @@ These gaps are the most important input for Streams S2–S5: each gap represents
 
 ---
 
-**Catalog total: 52 observables across 8 bundles.** Diamond-relevant observables flagged in Part A; centrality ranking in Part D; honest-limits and registry-gap flags in Parts E & F together form the scoping handoff to downstream streams.
+**Catalog total: 52 observables across 8 data-shape bundles.** Diamond-relevant observables flagged in Part A; centrality ranking in Part D; honest-limits and registry-gap flags in Parts E & F together form the scoping handoff to downstream streams.

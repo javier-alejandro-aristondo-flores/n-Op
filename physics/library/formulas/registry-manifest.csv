@@ -86,20 +86,20 @@
 85,structure-uniqueness-CSP,"`(structure, set) → bool + d`",B10,T1,D3,cheap,S2,structure set
 86,bi-slab-grand-potential,"`(slab_A, slab_B, μ_env) → Ω`",B5/B6,T1,D2,cheap,S2,"slabs, μ"
 87,reference-phase-energy-cache,`(phase-id) → E_ref`,B8,T3,D0,faithful,S2+S3,DFT battery
-88,long-range-coulomb-directional-limit-correction,"`(D(q), q̂, Z*, ε∞, Ω) → D_NA(q)`",B2,T1,D2,faithful,"V1-γ' (a.k.a. Pick-Cochran-Martin / Gonze-Lee)","Z*, ε∞ (L1 primitives)"
-89,charged-supercell-extrapolation-isotropic-general,"`(q, ε, L, α_M) → ΔE_iso`",B4,T0,D0,cheap,"V1-γ' (lattice-general; α_M explicit)","q, ε, Madelung"
-90,charged-supercell-extrapolation-atomic-site-averaged,"`(q, ε, V_atomic, L) → ΔE_atomic`",B4,T0,D0,cheap,"V1-γ' (a.k.a. Kumagai-Oba)","q, ε, atomic-site potential"
-91,lattice-coulomb-summation-scalar,`(lattice) → α_M`,L1,T1,D0,cheap,"V1-γ' (a.k.a. Madelung constant)",lattice
-92,operator-position-derivative-tensor,"`(γ̂, R, h) → Z*[I,α,β]`",L1,T2,D2,faithful,"V1-γ' (a.k.a. Born effective charges Z*)",linear-response sub-stage
-93,high-frequency-response-tensor,"`(γ̂, h) → ε∞[α,β]`",L1,T2,D2,faithful,"V1-γ' (a.k.a. high-frequency dielectric ε∞)",linear-response sub-stage
-94,electronic-linear-response-tensor,"`(γ̂, h) → χ∞[α,β]`",L1,T2,D2,faithful,"V1-γ' (a.k.a. electronic susceptibility χ∞)",linear-response sub-stage
-95,composition-dependent-excess-free-energy-basis,"`(x, T, {L_ν}) → G_ex`",B8,T0,D1,cheap,"V1-γ' (a.k.a. Redlich-Kister)","composition, basis parameters"
-96,symmetry-classification-group-via-snf,"`(SG_number, AZ_class) → AbelianGroup`",B1/B11,T1,D0,cheap,"V1-γ'' (X_BS; SNF on orbit-rep matrix)","SG, AZ class"
-97,symmetry-orbit-representation-matrix,"`(SG, [site-orbit], [orbital]) → IntMatrix`",B1,T1,D0,cheap,"V1-γ'' (a.k.a. EBR / band-representation matrix)","SG, orbits, orbital basis"
-98,irrep-compatibility-matrix,"`(SG, high-sym-momenta) → IntMatrix`",B1,T0,D0,cheap,"V1-γ'' (compatibility relations)",SG
-99,first-band-invariant-from-eigenstate-grid,"`(eigenstates_on_grid) → Integer`",B1,T2,D3,faithful,"V1-γ'' (a.k.a. Chern number)",eigenstate grid
-100,binary-invariant-with-symmetry-from-eigenstate-grid,"`(eigenstates_on_grid, antiunitary_op) → ℤ₂`",B1,T2,D3,faithful,"V1-γ'' (a.k.a. Z₂ invariant)","eigenstates, antiunitary"
-101,holonomy-spectrum-on-loop,"`(eigenstates_on_loop) → [phase]`",B1,T2,D3,faithful,"V1-γ'' (a.k.a. Wilson loop spectrum)",eigenstates on loop
-102,boundary-mode-multiplicity-from-classification,"`(X_BS_element, boundary_orientation) → Integer`",B5,T1,D0,cheap,"V1-γ'' (indicator-factor → boundary-state lookup)","X_BS element, boundary orientation"
+88,long-range-coulomb-directional-limit-correction,"`(D(q), q̂, Z*, ε∞, Ω) → D_NA(q)`",B2,T1,D2,faithful,"extension (a.k.a. Pick-Cochran-Martin / Gonze-Lee)","Z*, ε∞ (L1 primitives)"
+89,charged-supercell-extrapolation-isotropic-general,"`(q, ε, L, α_M) → ΔE_iso`",B4,T0,D0,cheap,"extension (lattice-general; α_M explicit)","q, ε, Madelung"
+90,charged-supercell-extrapolation-atomic-site-averaged,"`(q, ε, V_atomic, L) → ΔE_atomic`",B4,T0,D0,cheap,"extension (a.k.a. Kumagai-Oba)","q, ε, atomic-site potential"
+91,lattice-coulomb-summation-scalar,`(lattice) → α_M`,L1,T1,D0,cheap,"extension (a.k.a. Madelung constant)",lattice
+92,operator-position-derivative-tensor,"`(γ̂, R, h) → Z*[I,α,β]`",L1,T2,D2,faithful,"extension (a.k.a. Born effective charges Z*)",linear-response sub-stage
+93,high-frequency-response-tensor,"`(γ̂, h) → ε∞[α,β]`",L1,T2,D2,faithful,"extension (a.k.a. high-frequency dielectric ε∞)",linear-response sub-stage
+94,electronic-linear-response-tensor,"`(γ̂, h) → χ∞[α,β]`",L1,T2,D2,faithful,"extension (a.k.a. electronic susceptibility χ∞)",linear-response sub-stage
+95,composition-dependent-excess-free-energy-basis,"`(x, T, {L_ν}) → G_ex`",B8,T0,D1,cheap,"extension (a.k.a. Redlich-Kister)","composition, basis parameters"
+96,symmetry-classification-group-via-snf,"`(SG_number, AZ_class) → AbelianGroup`",B1/B11,T1,D0,cheap,"topology atlas (X_BS; SNF on orbit-rep matrix)","SG, AZ class"
+97,symmetry-orbit-representation-matrix,"`(SG, [site-orbit], [orbital]) → IntMatrix`",B1,T1,D0,cheap,"topology atlas (a.k.a. EBR / band-representation matrix)","SG, orbits, orbital basis"
+98,irrep-compatibility-matrix,"`(SG, high-sym-momenta) → IntMatrix`",B1,T0,D0,cheap,"topology atlas (compatibility relations)",SG
+99,first-band-invariant-from-eigenstate-grid,"`(eigenstates_on_grid) → Integer`",B1,T2,D3,faithful,"topology atlas (a.k.a. Chern number)",eigenstate grid
+100,binary-invariant-with-symmetry-from-eigenstate-grid,"`(eigenstates_on_grid, antiunitary_op) → ℤ₂`",B1,T2,D3,faithful,"topology atlas (a.k.a. Z₂ invariant)","eigenstates, antiunitary"
+101,holonomy-spectrum-on-loop,"`(eigenstates_on_loop) → [phase]`",B1,T2,D3,faithful,"topology atlas (a.k.a. Wilson loop spectrum)",eigenstates on loop
+102,boundary-mode-multiplicity-from-classification,"`(X_BS_element, boundary_orientation) → Integer`",B5,T1,D0,cheap,"topology atlas (indicator-factor → boundary-state lookup)","X_BS element, boundary orientation"
 103,F-equals-minus-grad-E,"(architectural — autodiff, NOT residualized)",—,—,—,—,S5,(rejected per S5)
 104,equivariance,"(architectural — by construction, NOT residualized)",—,—,—,—,S5,(rejected per S5)

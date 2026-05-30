@@ -1,5 +1,6 @@
-_darcs/
+# Build / cache artifacts
 __pycache__/
 .ipynb_checkpoints/
-*.fasl
+
+# Local agent settings & cache
 .claude/

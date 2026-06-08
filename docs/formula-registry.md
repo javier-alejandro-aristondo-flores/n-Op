@@ -9,10 +9,12 @@ This file is the human-readable index over it.
 
 Every algebraic combination in `/physics` invokes a **named formula** with a
 typed signature and an explicit output type — no inline math, no string-encoded
-expressions. Each formula is independently citable to published references and
-independently verifiable by the cert sub-tree. New formulas enter only through a
-controlled, cert-validated process; the registry is a contract, not a
-convenience.
+expressions. Each formula is a typing rule for a `FormulaApply` node in the
+`PhysicsGraph` (see `architecture/06-physics-graph.md`); the registry is the
+closed vocabulary that bounds Stage-1 graph construction. Each formula is
+independently citable to published references and independently verifiable by
+the cert sub-tree. New formulas enter only through a controlled, cert-validated
+process; the registry is a contract, not a convenience.
 
 ## Counts
 
@@ -49,7 +51,7 @@ The manifest is a CSV with one row per formula:
 | `Bundle` | Observable bundle membership, `B1`–`B11` (see `architecture.md §8.4`). |
 | `Tier` | Cost tier `T0`–`T3`. |
 | `Diff` | Differentiability tag `D0`–`D4`. |
-| `Path` | `cheap` (approximate, for label generation) or `faithful` (physically accurate, for residual loss). |
+| `Path` | **Retired column.** Under the always-cheap pipeline (see `architecture/07-pipeline.md`), every formula is on the single residual surface; the `cheap`/`faithful` distinction has been collapsed. The column survives in the CSV for historical row identity only. |
 | `Source` | Provenance: the research grounding, or "extension" / "topology atlas" for rows 88–102. |
 | `Depends on` | Upstream formulas / primitives. |
 
@@ -67,9 +69,11 @@ implicit-function adjoint via fixed-point linearization · `D4` autodiff relaxed
 ## How a formula becomes a residual
 
 At library load time the residual-generator factory reads each formula record
-and produces a `ResidualGenerator` (see `implementation-plan.md §8`). The tags
-drive everything downstream: the cost tier sets sampling cadence, the
-differentiability tag sets whether the residual is gradient-bearing and triggers
-the registration-time adjoint gate for `D2` entries, the path selects
-cheap-generate vs faithful-residual behavior, and the applicability classifier
-masks the residual per training sample.
+and produces a `ResidualGenerator` (see
+`implementation/07-residual-factory.md`). The tags drive everything downstream:
+the cost tier sets sampling cadence, the differentiability tag sets whether the
+residual is gradient-bearing and triggers the registration-time adjoint gate
+for `D2` entries, and the applicability classifier masks the residual per
+training sample. Each generator unfolds along its declared `axes` to emit a
+content-addressed `Map<ResidualKey, Scalar>`; weighting and aggregation belong
+to `/informed-operator` (see `architecture/11-residuals.md`).

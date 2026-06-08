@@ -1,0 +1,60 @@
+# Glossary
+
+Single-line definitions for the load-bearing terms. Each term lists
+the file that owns its full definition (`canonical-for`).
+
+| Term | Definition | Canonical |
+|---|---|---|
+| **PhysicsGraph** | The compose-time directed acyclic graph that is the canonical data structure of `/physics`. Nodes are `Input`, `FormulaApply`, or `MethodInvoke`; edges are typed dataflow. | `arch-06-physics-graph` |
+| **Node** | A vertex of the `PhysicsGraph` with four fields: `id`, `type`, `kind`, `role`. Sidecars hang off `id` per stage; they are not stored on the node. | `arch-06-physics-graph` |
+| **NodeKind** | The discriminator on a node: `Input(InputKind) \| FormulaApply(formula, args) \| MethodInvoke(method, args)`. | `arch-06-physics-graph` |
+| **InputKind** | What an `Input` node carries: `StateSlot(StateComponent) \| EnvScalar(EnvField)`. | `arch-06-physics-graph` |
+| **OutputRole** | Why a node exists: `Internal \| Observable(bundle) \| ResidualLeaf(key)`. Meaningful union name (no anonymous tag union). | `arch-06-physics-graph` |
+| **ResidualKey** | Content-addressed identity of a residual contribution: `(producer, axes)` where producer ∈ `Formula(NamedFormula) \| Method(NamedMethod)`. | `arch-11-residuals` |
+| **ContributionFacets** | Sidecar attached to each `ResidualLeaf`: `(category : CategoryTag, bundle : BundleId, dressing : bare \| dressed(scheme))`. Queryable; not part of identity. | `arch-11-residuals` |
+| **CategoryTag** | Closed enum of 17 symbolic residual category tags: `EOM/{γ̂,A,R,P,h,Π_h,Z}`, `Degeneracy`, `Conservation`, `Positivity`, `Algebraic/{Kramers-Kronig,SumRules,BalanceLaws,Symmetries,MethodEquivalence}`, `Static/Snapshot`, `Static/Thermodynamic`. | `arch-11-residuals` |
+| **AxisLabel** | Open vocabulary of axis names a `ResidualGenerator` unfolds along (`k-point`, `frequency`, `atomic-pair`, `shell`, `band`, `slab-subdomain`, …). | `impl-07-residual-factory` |
+| **IterationSnapshot** | One element of `IterativeResult.trajectory`: `(iter, residual : Map<ResidualKey, Scalar>, energy, witness?, params)`. | `impl-07-residual-factory` |
+| **CertEvidence** | Material a cert obligation produces (refs, residuals, witnesses) for traceable verification. | `arch-12-cert` |
+| **GroundTruthBridgeGenerator** | The `ResidualGenerator` subtype produced by `pino-bridge.Import`; loss is σ-scaled Huber against the imported target. | `arch-16-pino-bridge` |
+| **ResidualVector** | The runtime kernel's residual output: `Map<ResidualKey, Scalar>`. Aggregation lives in `/informed-operator`. | `arch-11-residuals` |
+| **ResidualGenerator** | The factory record that lifts a named formula into a `ResidualLeaf`-emitting generator. | `impl-07-residual-factory` |
+| **CompressionPlan** | Stage-4 codegen choice for compressed operator forms (HODLR, TT) and density-matrix encodings (`Basis × Form`). | `arch-15-gamma-hat` |
+| **Stage 1** | Symbolic lift: `PhysicsGraph` construction from named formulas + methods. | `arch-07-pipeline` |
+| **Stage 2** | Symmetry quotient: IBZ + irreps reduction (up to 48× cubic, 96× with time reversal). | `arch-07-pipeline` |
+| **Stage 3** | Algebraic simplification: hash-consing, structural-simplify, common-subexpression elimination. | `arch-07-pipeline` |
+| **Stage 4** | Lowering + adjoint synthesis: codegen, compression-plan instantiation, implicit-diff adjoint via Blondel 2022. | `arch-07-pipeline` |
+| **Stage 5** | Runtime kernel application (no graph mutation; pure evaluation). | `arch-07-pipeline` |
+| **pino-bridge** | The narrow protocol surface between `/physics` and `/informed-operator`. Two exports: `Validate` (differentiated residual + observable surface) and `Import` (external ground-truth ingestion). | `arch-16-pino-bridge` |
+| **Applicability classifier** | Per-residual-generator predicate `(Crystal, Environment) → Bool` deciding whether the generator participates in the current composition. | `arch-13-applicability` |
+| **Topology atlas** | Closed catalog of topological invariants (symmetry-indicator group, EBR, compatibility relations, Chern / Z₂ / Wilson, boundary-mode multiplicity). | `arch-14-topology` |
+| **Dressing tier** | V1/V2 implementation-scope tag for L1 corrections: Layer 1 (bare), 1.25 (closed-form one-shot), 1.75 (iterative; V2-deferred), 2 (property machinery), 3 (PINO). Not a runtime path-selector. | `arch-08-bo-levels` |
+| **BO levels** | The 4-level Born–Oppenheimer hierarchy partitioning state-component space: L1 quantum substrate, L2 BO surface, L3 equilibrium statistics, L4 non-equilibrium kinetics. Derivable from a node's transitive inputs. | `arch-08-bo-levels` |
+| **State component** | One of the seven 1st-class DOFs: `γ̂, A, R, P, h, Π_h, Z`. | `arch-04-state` |
+| **Bundle** | One of 11 typed observable bundles `B1..B11` grouping observables that share a kernel signature. | `arch-09-vocabularies` |
+| **Cost tier** | `T0..T3` from closed-form (≤10 µs) to self-consistent / PDE solve (≤10 min). | `formula-registry` |
+| **Diff tag** | `D0..D4` differentiability classification; `D2` requires adjoint validated at registration time. | `formula-registry` |
+| **OneShotCert** | Schema attached to Layer-1.25 dressed `MethodInvoke` nodes (G₀W₀, SCP-perturbative, LO/TO, Born-charge, ε∞, χ∞). | `impl-07-residual-factory` |
+| **IterativeResult** | Schema attached to Layer-1.75 dressed `MethodInvoke` nodes (V2-deferred; specified for forward compatibility). | `impl-07-residual-factory` |
+| **Always-cheap discipline** | Compose-time guarantee that every kernel emerging from Stage 4 of the pipeline is fast by construction: specialization, symmetry quotienting, compression, and structural sharing collectively bound runtime cost below the training budget. | `arch-07-pipeline` |
+| **CouplingChannel** | Generic record declaring one cross-regime physics channel: `{pieces, target ∈ {Scalar, AntisymmForm, PSDSymmForm}, order, derivative, applicability}`. Replaces the hand-rolled list of named couplings; instances generate their explicit terms via the Stage-2.5 invariant synthesizer. | `arch-19-coupling-structure` |
+| **StatePiece** | One factor of a `CouplingChannel.pieces` tensor product: `(component : StateComponent, sub-dof : SubDofTag)`. | `arch-19-coupling-structure` |
+| **InvariantTerm** | One basis vector of the trivial-irrep subspace returned by the invariant generator for a channel: `{channel, irrep-coefficients, symbolic-form, generator-hash}`. Becomes one `FormulaApply` node. | `arch-19-coupling-structure` |
+| **CrystalSymmetryGroup** | First-class typeclass entity assembled at Stage 1+2 from `PeriodicityStructure × SiteDecoration`: space group × time-reversal × U(1) gauge × SU(2) spin where applicable. Input to the invariant generator and Stage-2 IBZ machinery. | `arch-09-vocabularies` |
+| **IrrepLabel** | Symbol naming one irreducible representation of a `CrystalSymmetryGroup`; output of Stage-2 block-diagonalization and input to the Stage-2.5 invariant generator. | `arch-09-vocabularies` |
+| **generate-invariants** | Stage-2.5 routine `CrystalSymmetryGroup × CouplingChannel → List<InvariantTerm>`. Constructive dual of the Stage-2 irrep-decomposition rewrite; produces the explicit basis of symmetry-invariant terms of the requested target shape. | `arch-19-coupling-structure` |
+| **CouplingSpec** | The list of active `CouplingChannel`s carried alongside a composition request; the spec author declares channels, not individual coupling terms. | `arch-19-coupling-structure` |
+| **SubDofTag** | Closed vocabulary of internal-DOF labels a `StateComponent` carries: `orbital, spin, sublattice, valley, strain, gauge, charge, none`. | `arch-19-coupling-structure` |
+| **ContentAddress** | Domain-separated SHA-256 digest over canonical-serialized bytes; the single identity discipline for graph nodes, generators, sidecar fingerprints, residual cache keys, reference rows, evidence, and symbolic-form roots. | `arch-20-representations` |
+| **Universe** | Typed indexed registry of elements with optional dense ordinals and a density-derived backend policy; every C1 vocabulary, generator registry, and indexed leaf set is a `Universe` instance. | `arch-20-representations` |
+| **SparseSet** | Subset of a `Universe` with backend chosen by density (sorted tuple ≤ 8, bitset for dense small, Roaring for sparse large, HAMT/Merkle for persistent diffable); set identity is a Merkle root. | `arch-20-representations` |
+| **PersistentMap** | Stage-visible HAMT (branching 32) keyed by a typed `ContentAddress`; the storage shape of every sidecar and every value annotation in `/physics`. | `arch-20-representations` |
+| **TypedMerkleDAG** | Hash-consed Merkle DAG parametric over an op signature `S` and leaf type `L`; one substrate covering symbolic forms (`SymbolicTensorOps`), applicability (`PredicateOps` ROBDD), and evidence (`EvidenceOps`). | `arch-20-representations` |
+| **EvidenceBearing** | Sidecar value wrapper `(value, evidence : Optional<EvidenceId>, status_cache?)` — the attachment interface that fuses the C3 sidecar layer with the C4 persistent evidence DAG without merging their lifecycles. | `arch-20-representations` |
+| **EvidenceDAG** | Persistent `TypedMerkleDAG[EvidenceOps, EvidencePayload]` covering `Witness`, `OneShotCert`, `IterativeResult`, and the ten cert-obligation outputs as one indexed family with verdict-semilattice aggregation. | `arch-20-representations` |
+| **SymbolicTensorOps** | Op signature derived from the target shapes (`Scalar`, `AntisymmForm`, `PSDSymmForm`) of `arch-19-coupling-structure`; presented as a colored-operad / free symmetric monoidal category whose terms are stored as a hash-consed Merkle DAG. | `arch-20-representations` |
+| **PredicateOps** | ROBDD op signature over typed parameterized C1 atoms with a versioned atom order; the storage shape of every `applicability` predicate. | `arch-20-representations` |
+| **GroupOps** | Op signature for `CrystalSymmetryGroup` finite-quotient algebra (multiplication, inversion, restriction, antipode/TR-twist, character, projector); derived outputs (irrep tables, Fourier projectors, BZ stalks) are ordinary substrate fibers. | `arch-20-representations` |
+| **SqliteReferenceCache** | Single-file SQLite store (WAL mode) at `physics/library/cert/reference-data/cache.sqlite` backing cert obligations 4 + 8. Content-addressed by `ContentAddress(observable, value, sigma, provenance, coverage-mask)` (SHA-256 backed); schema-versioned. | `arch-12-cert` |
+| **RoaringCoverageMask** | Serialized Roaring bitmap over a flat lexicographic index built from a generator's `axes`; declares which axis tuples an imported datum constrains. Sparse-from-start by design. | `arch-16-pino-bridge` |
+| **Curriculum gating defaults** | Normative default schedule on `CategoryTag` participation by training fraction: Warmup `[0.00, 0.10)`, Refine `[0.10, 0.60)`, Polish `[0.60, 0.90)`, Cooldown `[0.90, 1.00]`. Overridable by `/informed-operator`. | `arch-11-residuals` |

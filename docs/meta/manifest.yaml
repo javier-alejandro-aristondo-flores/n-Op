@@ -1,0 +1,131 @@
+# Assembly manifest for the docs tree.
+#
+# Each entry under `monoliths` regenerates one top-level document by
+# concatenating the listed atomic files in order. Each entry under
+# `bundles` defines a named LLM-context subset.
+#
+# `assemble.py` consumes this file. `lint.py` cross-checks that every
+# file under architecture/, implementation/, mvp/ appears in exactly
+# one monolith.
+
+monoliths:
+
+  architecture:
+    output: architecture.md
+    title: n-Op Architecture
+    sources:
+      - architecture/01-purpose.md
+      - architecture/02-libraries.md
+      - architecture/03-inputs.md
+      - architecture/04-state.md
+      - architecture/05-generic.md
+      - architecture/06-physics-graph.md
+      - architecture/07-pipeline.md
+      - architecture/08-bo-levels.md
+      - architecture/09-vocabularies.md
+      - architecture/10-typeclasses.md
+      - architecture/11-residuals.md
+      - architecture/12-cert.md
+      - architecture/13-applicability.md
+      - architecture/14-topology.md
+      - architecture/15-gamma-hat.md
+      - architecture/16-pino-bridge.md
+      - architecture/17-out-of-scope.md
+      - architecture/18-open-decisions.md
+      - architecture/19-coupling-structure.md
+      - architecture/20-representations.md
+
+  implementation:
+    output: implementation-plan.md
+    title: n-Op Implementation Plan
+    sources:
+      - implementation/01-principles.md
+      - implementation/02-methods.md
+      - implementation/03-templates.md
+      - implementation/04-formulas.md
+      - implementation/05-bundles.md
+      - implementation/06-compositions.md
+      - implementation/07-residual-factory.md
+      - implementation/08-cert-detail.md
+      - implementation/09-cross-cutting.md
+      - implementation/10-build-sequence.md
+      - implementation/11-verification.md
+
+  mvp:
+    output: mvp-slice.md
+    title: n-Op Diamond MVP Slice
+    sources:
+      - mvp/01-system.md
+      - mvp/02-gamma-budget.md
+      - mvp/03-capabilities.md
+      - mvp/04-in-mvp-vs-deferred.md
+      - mvp/05-decisions-forced.md
+      - mvp/06-build-order.md
+
+bundles:
+
+  full-spec:
+    title: n-Op Full Specification
+    output: _bundles/full-spec.md
+    sources:
+      - architecture/01-purpose.md
+      - architecture/02-libraries.md
+      - architecture/03-inputs.md
+      - architecture/04-state.md
+      - architecture/05-generic.md
+      - architecture/06-physics-graph.md
+      - architecture/07-pipeline.md
+      - architecture/08-bo-levels.md
+      - architecture/09-vocabularies.md
+      - architecture/10-typeclasses.md
+      - architecture/11-residuals.md
+      - architecture/12-cert.md
+      - architecture/13-applicability.md
+      - architecture/14-topology.md
+      - architecture/15-gamma-hat.md
+      - architecture/16-pino-bridge.md
+      - architecture/17-out-of-scope.md
+      - architecture/18-open-decisions.md
+      - architecture/19-coupling-structure.md
+      - architecture/20-representations.md
+      - implementation/01-principles.md
+      - implementation/02-methods.md
+      - implementation/03-templates.md
+      - implementation/04-formulas.md
+      - implementation/05-bundles.md
+      - implementation/06-compositions.md
+      - implementation/07-residual-factory.md
+      - implementation/08-cert-detail.md
+      - implementation/09-cross-cutting.md
+      - implementation/10-build-sequence.md
+      - implementation/11-verification.md
+      - mvp/01-system.md
+      - mvp/02-gamma-budget.md
+      - mvp/03-capabilities.md
+      - mvp/04-in-mvp-vs-deferred.md
+      - mvp/05-decisions-forced.md
+      - mvp/06-build-order.md
+
+  llm-context-arch-only:
+    title: n-Op Architecture (LLM context bundle)
+    output: _bundles/llm-context-arch-only.md
+    sources:
+      - architecture/06-physics-graph.md
+      - architecture/07-pipeline.md
+      - architecture/04-state.md
+      - architecture/05-generic.md
+      - architecture/09-vocabularies.md
+      - architecture/11-residuals.md
+      - architecture/16-pino-bridge.md
+
+  llm-context-mvp-build:
+    title: n-Op Diamond MVP Build (LLM context bundle)
+    output: _bundles/llm-context-mvp-build.md
+    sources:
+      - mvp/01-system.md
+      - mvp/02-gamma-budget.md
+      - mvp/03-capabilities.md
+      - mvp/05-decisions-forced.md
+      - mvp/06-build-order.md
+      - implementation/07-residual-factory.md
+      - implementation/10-build-sequence.md

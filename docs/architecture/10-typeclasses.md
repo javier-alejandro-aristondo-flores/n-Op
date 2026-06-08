@@ -1,0 +1,50 @@
+---
+id: arch-10-typeclasses
+title: Layer-0 typeclass alphabet
+status: draft
+revision: 1
+canonical-for:
+  - Layer-0 typeclasses
+depends-on: []
+referenced-by:
+  - arch-06-physics-graph
+  - arch-11-residuals
+  - arch-20-representations
+research-sources: []
+---
+# Layer-0 typeclass alphabet
+
+Every observable output is typed by three orthogonal axes plus a discrete
+bucket, captured as four typeclasses. (Presented here as language-neutral typed
+pseudocode; the implementation language is undecided — see §17.)
+
+- **`Quantity` (Value axis).** Units, equality-with-tolerance, behavior under
+  change of units/basis. Every numeric output is a `Quantity`. Carries
+  `unitsOf`, `approxEq(tol)`, `rescale`, and `combineTol` (how tolerances
+  compose under arithmetic — e.g. `κ = κ_el + κ_ph`; associative, commutative,
+  monotone; per-instance choice of max-absolute or root-sum-square).
+- **`Sampleable` (Shape axis).** Whether the output is a function on a domain,
+  with `evaluate : f → Domain → Codomain` total on its claimed domain. Optional
+  à-la-carte capabilities:
+  - `Integrable` — `integrate(measure)`; linear, change-of-variables.
+  - `Differentiable` — `derivative : f → Domain → Maybe Tangent`, total on
+    `Domain \ exceptionSet` (phase transitions, band crossings,
+    charge-transition levels live in the exception set); carries a `chart` tag so
+    derivatives only compare across instances with matching charts.
+  - `Restrictable` — `restrict(subdomain)`.
+- **`HasAnalyticStructure` (Constraint axis).** Global analytic laws as
+  witnesses — causality/Kramers–Kronig, hermiticity, convexity, Onsager
+  involution, sum rules. A `Witness` is a list of `(Local | Global)`-tagged
+  witnesses (one output can carry several simultaneously); `certifyAnalytic`
+  returns the witnesses or a typed failure.
+- **`DiscreteStructure` (Combinatorial axis).** Integer invariants,
+  classification groups, holonomy spectra, polyhedra, convex hulls — objects in a
+  discrete category with `identity`, `compose`, and `isoEq`. Not `Quantity` (no
+  units), not `Sampleable` (no domain). The topology-atlas outputs live here.
+
+The old names `Scalar / FieldOnGrid / Tensor / Response` survive only as
+aliases over common parameterizations (`Response = Sampleable + Integrable +
+Differentiable + HasAnalyticStructure(KramersKronig)` over a frequency domain,
+etc.). Cert obligations (§12) map onto these axes mechanically.
+
+---

@@ -1,25 +1,19 @@
-<!-- GENERATED FILE — do not edit. Source files under docs/{architecture,implementation,mvp}/. Regenerate with `python docs/meta/assemble.py`. -->
+# n-Op — Implementation Plan
 
-# n-Op Implementation Plan
+The detailed companion to `architecture.md`. This document gives typed
+signatures for the closed vocabularies, the typed composition of every target
+observable, the residual and cert machinery in record-level detail, and a phased
+build sequence. It refers to `architecture.md` for the model and for all
+canonical counts; where a number is needed it is cited, not restated.
 
-## Contents
+Notation is **language-neutral pseudocode**: `name(arg: Type, …) → ReturnType`
+for functions and `record Name { field : Type }` for records. The
+implementation language is undecided (see `architecture.md §17`); nothing below
+assumes one.
 
-- [Architectural principles](#impl-01-principles)
-- [The 12 computational methods](#impl-02-methods)
-- [The 20 abstract-property templates](#impl-03-templates)
-- [The named-formula registry](#impl-04-formulas)
-- [The 11 observable bundles](#impl-05-bundles)
-- [Target observables as typed compositions](#impl-06-compositions)
-- [Residual machinery](#impl-07-residual-factory)
-- [Cert obligations — detail and axis mapping](#impl-08-cert-detail)
-- [Cross-cutting design rules](#impl-09-cross-cutting)
-- [Build sequence](#impl-10-build-sequence)
-- [Verification](#impl-11-verification)
+---
 
-
-<a id="impl-01-principles"></a>
-
-# Architectural principles
+## 1. Architectural principles
 
 Carried throughout the build:
 
@@ -45,10 +39,7 @@ Carried throughout the build:
 
 ---
 
-
-<a id="impl-02-methods"></a>
-
-# The 12 computational methods
+## 2. The 12 computational methods (typed signatures)
 
 The closed primitive set. Each carries a typed signature and a sub-method
 dispatch.
@@ -125,14 +116,11 @@ a regression-freeze entry.
 
 ---
 
-
-<a id="impl-03-templates"></a>
-
-# The 20 abstract-property templates
+## 3. The 20 abstract-property templates (typed signatures)
 
 Templates are parameterized method chains; concrete observables are
-instantiations. See `arch-09-vocabularies §9.2` for the grouping and the
-"produces" summary; signatures follow.
+instantiations. See `architecture.md §8.2` for the grouping and the "produces"
+summary; signatures follow.
 
 ```
 StateReadoutOf(x: State, extractor: Extractor) → Value
@@ -226,10 +214,7 @@ duplicating it.
 
 ---
 
-
-<a id="impl-04-formulas"></a>
-
-# The named-formula registry
+## 4. The named-formula registry
 
 The canonical, machine-readable list is
 `physics/library/formulas/registry-manifest.csv` — 102 substantive rows plus 2
@@ -247,6 +232,7 @@ record FormulaRecord {
   bundle             : {BundleId}              -- one or more of B1..B11
   cost-tier          : T0 | T1 | T2 | T3
   diff-tag           : D0 | D1 | D2 | D3 | D4
+  path               : cheap | faithful
   source             : provenance pointer (research file / literature DOI)
   depends-on         : {Symbol}                -- upstream formulas / primitives
   applicability      : (Crystal, Environment) → Bool
@@ -270,22 +256,12 @@ absorption uses `(2ω/c)·Im(√ε)`; the operator-spectrum-area sum rule carrie
 orientation-preserving form `S × (S × H_eff)`; the harmonic transition-rate
 normalization consumes products-over-modes (scalars), not spectra.
 
-**Applicability-decidability invariant.** Every `applicability` predicate is
-first-order decidable in `(Crystal, Environment)` — finite case analysis on
-typeclass tags (lattice type, site decoration, environment-field presence),
-not on numeric thresholds or solver outputs. Non-decidable classifiers are
-forbidden at registration; see the registry-build gate
-(`impl-10-build-sequence` Phase 7).
-
 ---
 
+## 5. The 11 observable bundles
 
-<a id="impl-05-bundles"></a>
-
-# The 11 observable bundles
-
-The eleven physics-domain bundles `B1..B11` are listed in
-`arch-09-vocabularies §9.4`. Representative contents:
+The eleven physics-domain bundles `B1..B11` are listed in `architecture.md §8.4`.
+Representative contents:
 
 - **B1 electronic-structure** — BandStructure, DOS, BandGap, ChargeDensity,
   effective-mass tensor, k-resolved DOS.
@@ -317,10 +293,7 @@ the residual-driving grouping is the eleven physics-domain bundles.)
 
 ---
 
-
-<a id="impl-06-compositions"></a>
-
-# Target observables as typed compositions
+## 6. The target observables as typed compositions
 
 Every property in `properties.md` written as a typed composition — the
 validation that the closed vocabulary covers the target scope. Each invokes only
@@ -404,10 +377,8 @@ ConductivityViaBTE  = KineticEvolutionOf(distribution = carrier-f_n,
                                          truncation = first-order)
 ConductivityViaKubo = ResponseOfTo(observable = current-operator-ĵ, perturbation = A,
                                    kernel = current-current-correlator, frequency = ω→0⁺)
-Conductivity        = { ConductivityViaBTE, ConductivityViaKubo }
-                      (both formulas evaluated; method-equivalence is enforced
-                       by cert obligation-6 as an Algebraic/MethodEquivalence
-                       residual — arch-11-residuals, arch-12-cert)
+Conductivity        = primary-path = ConductivityViaBTE; secondary = ConductivityViaKubo
+                      (cert obligation-6 verifies equivalence — §8, §10)
 CarrierMobility     = AlgebraicOf({Conductivity, carrier-density}, formula = σ/(n·e))
 IonicDiffusion      = let ν_min   = SpectrumOf(HarmonicStiffnessHessianOf(E_BO, init), normal-modes)
                           ν_saddle = SpectrumOf(HarmonicStiffnessHessianOf(E_BO, saddle),
@@ -462,168 +433,119 @@ All target observables resolve to typed compositions over the closed vocabulary.
 
 ---
 
+## 7. Residual contract
 
-<a id="impl-07-residual-factory"></a>
+The seven residual categories (`architecture.md §11`) in detail:
 
+```
+eom-violation/            ‖dx/dt − (L δE/δx + M δS/δx)‖²        PRIMARY
+                          incl. coupled-multi-physics-pde (Joule + heat eq. +
+                          drift-diffusion-Poisson + Maxwell) as a Level-4 sub-residual
+degeneracy/               ‖L δS/δx‖² + ‖M δE/δx‖²
+conservation/             energy · particle-number/charge · momentum/crystal-momentum · spin
+positivity/               M ⪰ 0 · f∈[0,1] · ρ≥0 · ω²≥0 · σ⪰0 · |S_i|=1
+algebraic-identities/     kramers-kronig · f-sum ((2/π)∫ω Im ε = ω_p²) ·
+                          acoustic-sum (Σ_J Σ_R Φ_{IαJβ}(R)=0) · detailed-balance ·
+                          einstein (D=μk_BT/q) · onsager (L(B)=Lᵀ(−B)) ·
+                          maxwell-relations · method-equivalence (BTE-σ ≡ Kubo-σ)
+static-validity/          pauling-rule · born-stability · dynamical-stability ·
+                          space-group-equivariance       (snapshot only)
+thermodynamic-consistency/ hull-distance · formation-energy-from-refs · solubility ·
+                          mass-action · carbide-formation  (snapshot + environment)
+total-residual            weighted sum; cert verifies weights ≥ 0 and dimensional consistency
+```
 
-# Residual machinery
+`static-validity` and `thermodynamic-consistency` are disjoint by input domain.
 
-The PINO-facing factory that turns named formulas (`impl-04-formulas`)
-into `ResidualLeaf` nodes (`arch-06-physics-graph §6.3`) in the
-`PhysicsGraph`. Under the always-cheap reframe (`arch-07-pipeline`),
-this is now part of Stage 1 (graph construction). The factory has
-three responsibilities: generate the leaves with content-addressed keys,
-gate registration on adjoint correctness, and provide the per-formula
-metadata the runtime kernel uses for its outputs.
+---
 
-## 7.1 The `ResidualGenerator` record
+## 8. ResidualGenerator factory
+
+The PINO-facing machinery. Every formula registers once at load time, producing:
 
 ```
 record ResidualGenerator {
   name              : Symbol
   observable        : ObservableRef
-  bundle            : BundleId                 -- B1..B11 (facet, not identity)
-  category          : CategoryTag              -- 17 named tags (arch-11-residuals §11.1)
-  layer             : 1..7                     -- compose-time DAG layer
+  bundle            : BundleId                -- B1..B11
+  layer             : 1..7                    -- dependency-DAG layer
   cost-tier         : T0 | T1 | T2 | T3
   diff-tag          : D0 | D1 | D2 | D3 | D4
-  dressing-tag      : bare | dressed(scheme: G0W0|SCP|LO-TO|Born-charge|epsilon-infinity)
-                      -- provenance label only; not a loss-weighting axis
-  axes              : List<AxisLabel>          -- the dimensions this generator unfolds over
-                                                  (k-point, frequency, atomic pair, shell, …)
+  source-tag        : cheap-generate | faithful-residual | ground-truth-bridge | cert-only
+  dressing-tag      : bare | dressed(scheme: SCP|SSCHA|GW|BSE|polaron,
+                                     cert: OneShotCert|IterativeResult, T: Temperature)
+                      -- bare and G₀W₀-dressed residuals on the same observable are
+                         SEPARATE residuals, never averaged
+  canonical-encoding: Optional<(Basis, Form)>  -- when operating on γ̂; None ⇒ encoding-agnostic
+  bias-correction   : Optional<AffineMap>      -- cheap↔faithful sync; trained in Calibrate,
+                                                  applied in Polish
   applicability     : (Crystal, Environment) → Bool
   input-contract    : {TypedSlot}
   output-contract   : TypedSlot
   forward           : Inputs → Output
-  loss-projection   : Output → Map<ResidualKey, Scalar>
-                      -- emits one entry per axis tuple; key is content-addressed (arch-11-residuals)
-  weight-policy     : ConsumedBy(/informed-operator)
-                      -- /physics declares the granularity; aggregation lives downstream
+  backward          : Inputs × Output × Cotangent → Cotangent   -- required iff D2
+  loss              : Output → Scalar
+  weight-policy     : GradNormGroup | NTKInit | Fixed | CurriculumStaged
   sampling-policy   : UniformBatch | RAD(τ) | Importance | ValidationOnly
   dependencies      : {Symbol}                 -- same-pass fixed-point co-convergence
   adjoint-cert      : Passed | Failed(witness) | NotApplicable | Relaxed(rationale)
-  registration-hash : ContentAddress           -- cert-tripwire detection
+  registration-hash : Sha256                   -- cert-tripwire detection
 }
 ```
 
-## 7.2 Granularity (canonical reference: `arch-11-residuals`)
+**Factory:**
+`make-residual-generator(observable, path, distance, weight-policy, sampling-policy,
+source-tag, applicability) → ResidualGenerator`.
 
-Each generator unfolds along its `axes` to emit *N* residual
-contributions, one per axis tuple. Each contribution is a
-`ResidualLeaf` node with a content-addressed `ResidualKey`:
+**Registration-time adjoint gate (hard).** D2 entries run a vJp-vs-JvP check on
+N≈64 sampled points; if the max relative error exceeds `τ_adj` (default 1e-4) the
+build fails loud, forcing an honest gradient or an explicit downgrade to D3/D4
+with recorded rationale. No PINO can train against a silently-broken backward.
 
-```
-ResidualKey = (producer : Producer, axes : Tuple<AxisLabel>)
-Producer    = Formula(NamedFormula) | Method(NamedMethod)
-```
+**Training-loop consumption** (executed by `/informed-operator`): enumerate the
+active residuals for the current curriculum phase, group by DAG layer, sample
+each per its policy, evaluate forward + loss, and run the same-pass fixed-point
+iteration at the layer barrier for the L3↔non-equilibrium cycle.
 
-The PINO holds `Map<ResidualKey, Weight>`; `/physics` emits
-`Map<ResidualKey, Scalar>`. Category, bundle, and dressing-tag are
-queryable facets via a parallel `Map<ResidualKey, ContributionFacets>`.
-The `dressing` facet is a provenance label for cert and audit; bare and
-dressed residuals on the same observable live as distinct
-`FormulaApply`/`MethodInvoke` chains in the graph (`arch-09-vocabularies`),
-not as weighted siblings.
+---
 
-## 7.3 Factory entry point
+## 9. Dressing-layer cert records
 
-```
-make-residual-generator(observable     : ObservableRef,
-                        formula        : NamedFormula,
-                        axes           : List<AxisLabel>,
-                        sampling-policy: SamplingPolicy,
-                        applicability  : (Crystal, Environment) → Bool)
-                      → ResidualGenerator
-```
-
-Called once per formula at load time. The returned generator is
-inserted into Stage 1 of the pipeline when its `applicability`
-predicate holds for the current composition.
-
-## 7.4 Generator subtypes
-
-Three generator subtypes:
-
-- **Standard residual** — derived from a named formula; participates in
-  loss; D2 entries gated on adjoint existence.
-- **Ground-truth-bridge** — anchors a generator to an `Import`-supplied
-  target value with `(value, σ, provenance, coverage-mask)`
-  (`arch-16-pino-bridge §16.2`); loss is the σ-scaled Huber against the
-  target.
-- **Cert-only** — no loss contribution; runs as part of cert evidence
-  (`arch-12-cert`), not as part of training loss.
-
-## 7.5 Registration-time adjoint gate (hard)
-
-D2 entries run a vJp-vs-JvP check on `N ≈ 64` sampled points at
-registration time; if the max relative error exceeds `τ_adj` (default
-`1e-4`) the build fails loud. Forces an honest gradient or an explicit
-downgrade to D3 / D4 with recorded rationale.
-
-Under the always-cheap reframe, most D2 generators with a fixed-point
-solve in their forward pass are wired to the **implicit-diff adjoint**
-synthesized at Stage 4 (`arch-07-pipeline §7.4`); the gate verifies
-that synthesized adjoint, not a hand-written backward.
-
-## 7.6 Training-loop consumption
-
-Executed by `/informed-operator`: enumerate the active residuals for
-the current curriculum phase (Warmup → Refine → Polish), sample each
-per its policy, evaluate forward + projection, and run same-pass
-fixed-point iteration at the DAG layer barrier for the
-L3↔non-equilibrium cycle. Aggregation across `ResidualKey`s lives
-entirely in `/informed-operator`, not in this factory.
-
-## 7.7 Dressing certificates
-
-The `OneShotCert` and `IterativeResult` records (Layer 1.25 and Layer
-1.75 per `arch-08-bo-levels`) survive as **schemas attached to dressed
-`MethodInvoke` nodes**, no longer as a separate per-generator field:
+Layer 1.25 (V1) and Layer 1.75 (V2, scaffolded) per `architecture.md §6`:
 
 ```
-record OneShotCert {
+record OneShotCert {                          -- Layer 1.25 (one-shot, no iteration)
   scheme            : G0W0 | SCP-perturbative | LO-TO-NA-correction
                     | Born-charge | epsilon-infinity | electronic-susceptibility
-  inputs-hash       : ContentAddress
-  parameters        : Map<Symbol, Value>          -- k-mesh, cutoff, …
+  inputs-hash       : Sha256
+  parameters        : Map<Symbol, Value>      -- k-mesh, cutoff, …
   output            : DressedQuantity
-  closure-residual  : Map<ResidualKey, Scalar>    -- one entry per (axis tuple)
-                                                  --   the cert verifies; granular
-                                                  --   like every other residual
-                                                  --   emission (arch-11-residuals)
+  one-shot-residual : Scalar                  -- single-pass closure check
   cost-tier         : T1 | T2
 }
 
-record IterationSnapshot {                        -- one element of trajectory
-  iter              : Nat
-  residual          : Map<ResidualKey, Scalar>    -- per-key closure residual
-  energy            : Scalar                      -- functional value at this iter
-  witness           : Optional<Witness>           -- non-null iff divergent
-  params            : Map<Symbol, Value>          -- mixing factor, broadening, …
-}
-
-record IterativeResult {                          -- Layer 1.75 (V2-deferred)
+record IterativeResult {                      -- Layer 1.75 (V2-deferred; scaffolded)
   scheme            : scGW | SSCHA-stochastic | TDEP | BSE-iterated
                     | DMFT | polaron-self-consistent
-  inputs-hash       : ContentAddress
-  parameters        : Map<Symbol, Value>          -- mixing, broadening, max-iter
-  trajectory        : List<IterationSnapshot>
+  inputs-hash       : Sha256
+  parameters        : Map<Symbol, Value>      -- mixing, broadening, max-iter
+  trajectory        : {IterationSnapshot}     -- per-iteration residual, energy
   converged?        : Bool
-  divergence-witness: Optional<Witness>           -- non-null iff not converged
+  divergence-witness: Optional<Witness>       -- non-null iff not converged
   final             : DressedQuantity
   cost-tier         : T3
 }
 ```
 
-V1 ships Layer 1.25 wired and Layer 1.75 as type/cert scaffolding only,
-with `not-implemented-in-V1` stubs that fail loud.
+V1 ships Layer 1.25 wired and Layer 1.75 as type/cert scaffolding only, with
+`not-implemented-in-V1` stubs that fail loudly. The `dressing-tag` on
+`ResidualGenerator` carries which cert applies.
 
+---
 
-<a id="impl-08-cert-detail"></a>
+## 10. Cert obligations — detail and axis mapping
 
-# Cert obligations — detail and axis mapping
-
-The ten obligations are listed in `arch-12-cert`. Each maps onto a
+The ten obligations are listed in `architecture.md §12`. Each maps onto a
 Layer-0 axis, so its checker is a generic function over a typeclass:
 
 | Obligation | Axis / mechanism |
@@ -633,7 +555,7 @@ Layer-0 axis, so its checker is a generic function over a typeclass:
 | 3 analytic limits | `HasAnalyticStructure`: evaluate the limit, check the witness predicate |
 | 4 reference battery | content-side: read `cert/reference-data/*.csv`, compare under `approxEq` |
 | 5 conservation | `Integrable`: `integrate(measure) = declared-invariant` to tolerance |
-| 6 degeneracy / named-formula consistency | `Sampleable` + `approxEq`: two formulas claiming one quantity agree on the shared domain (Algebraic/MethodEquivalence category, `arch-11-residuals`) |
+| 6 degeneracy / named-formula consistency | `Sampleable` + `approxEq`: two paths claiming one quantity agree on the shared domain (the primary-path discipline, §11) |
 | 7 boundary correspondence | `DiscreteStructure` morphism: observed boundary-band count matches `(X_BS_generator, orientation) → multiplicity` |
 | 8 reference-battery-versioned | versioning discipline on obligation 4; per-entry provenance; trips at >3σ |
 | 9 surrogate-net validity | for D4: declared input domain contains the query, surrogate uncertainty below tolerance, refresh up to date |
@@ -646,97 +568,82 @@ freeze fixture, a tamper tripwire, and a high-precision oracle cross-check
 
 ---
 
+## 11. Cross-cutting design rules
 
-<a id="impl-09-cross-cutting"></a>
+**Primary-path discipline.** Several observables admit multiple equivalent
+compositions (e.g. conductivity via BTE vs Kubo). Each observable declares one
+**primary** (truth-bearing) path; secondary paths are recorded with an agreement
+tolerance. Cert obligation-6 evaluates primary and secondary; if
+`|secondary − primary| > tolerance` it trips with both values as witnesses. The
+architecture never averages and never silently selects. The primary path is the
+lowest-cost-tier composition satisfying applicability; ties break toward the
+smaller dressing-tag (bare > dressed-G₀W₀ > dressed-scGW).
 
-# Cross-cutting design rules
-
-These rules cut across formulas, methods, residuals, cert, and the
-pino-bridge surface. They are not architectural decisions — those live in
-`arch-*`. They are reusable patterns that show up in more than one place
-in the implementation.
-
-## 9.1 Method equivalence as a residual, not a path-selector
-
-Several observables admit multiple formulas that should agree on their
-shared domain (conductivity via BTE-RTA vs Kubo; thermal conductivity via
-QHA+Callaway vs DFPT+3-phonon-BTE; effective mass from `k·p` vs DFT
-band-curvature). The discipline under the always-cheap pipeline
-(`arch-07-pipeline`) and the granularity rule (`arch-11-residuals`)
-is:
-
-- All applicable formulas for an observable are instantiated as
-  `FormulaApply` nodes (`arch-06-physics-graph §6.2`); hash-consing
-  collapses shared subgraphs.
-- Equivalence is enforced via the `Algebraic/MethodEquivalence`
-  residual category (`arch-11-residuals §11.1`), one `ResidualLeaf`
-  per agreeing pair.
-- Cert obligation 6 (`arch-12-cert`) consumes the
-  `Algebraic/MethodEquivalence` leaf; if `|f₁ − f₂| > tolerance` it
-  trips with both values as witnesses.
-- The `Observable` output role (`arch-06-physics-graph §6.3`)
-  designates which compose-time-selected formula is the *exposed*
-  value to downstream consumers; selection is by `ContributionFacets`
-  precedence (declared dressing tier, then registration order). The
-  unselected formulas still contribute their residual leaves.
-
-The architecture never averages observables and never silently selects
-between formulas at runtime; both are exposed in the graph and the
-disagreement is a typed residual.
-
-## 9.2 Same-type → shared interpretation; type-change → explicit stage
-
-Elements that are *parallel interpretations of one signature* — the 17
-`CategoryTag`s (`arch-11-residuals §11.1`), the dressing tiers within L1
-(`arch-08-bo-levels §8.1`), the 10 cert obligations
-(`arch-12-cert`), source/dressing tags on `ContributionFacets`,
-applicability guards (`arch-13-applicability`) — share one interface
-with multiple handlers.
-
-Elements that *compose into a pipeline with a type change between
-stages* — the γ̂ encoding pipeline (`arch-15-gamma-hat`), the 4 BO
-levels (`arch-08-bo-levels`), the 5-stage compose-time pipeline
-(`arch-07-pipeline`), the synthesis → property → PINO layering — stay
-explicit multi-stage structures.
-
-Rule of thumb: same type ⇒ one interface, many handlers; type changes
-between stages ⇒ keep the stages.
-
-## 9.3 Provenance tags are not weighting axes
-
-`ContributionFacets` (`arch-11-residuals §11.5`) attaches `(category,
-bundle, dressing)` to every `ResidualLeaf` as a sidecar — purely
-queryable provenance, never part of `ResidualKey` identity and never
-the basis for a per-residual loss weight. Loss weighting lives in
-`/informed-operator`'s curriculum schedule (`arch-11-residuals §11.4`),
-keyed by `CategoryTag` participation gates only. A facet field exists
-to answer "which residuals belong to bundle B?", not "what is the
-weight of residual r?".
-
-## 9.4 Couplings are declared channels; terms are generated
-
-Cross-regime physics is not a hand-rolled list. The library author
-declares `CouplingChannel` records (`arch-19-coupling-structure`),
-each specifying `{pieces, target, order, derivative, applicability}`.
-The Stage-2.5 invariant synthesizer takes the crystal's symmetry
-group and the active channels and *generates* the explicit
-`InvariantTerm`s — symmetry-respecting tensors that become
-`FormulaApply` nodes in the graph. Adding a new physical regime
-(piezoelectricity, magnon-phonon coupling, …) is a channel
-declaration, not a code edit. Channels register through the same
-factory pattern as residual generators (`impl-07-residual-factory §7.3`):
-content-addressed by parameter tuple, applicability validated as
-first-order decidable.
+**Same-type → shared interpretation; type-change → explicit stage.** Elements
+that are *parallel interpretations of one signature* (two-tier cheap/faithful;
+the three pino-bridge exports; Layer-1.25 vs 1.75 dressing; cert gates;
+source/dressing tags; applicability guards) share one interface with multiple
+handlers. Elements that *compose into a pipeline with a type change between
+stages* (the γ̂ representation pipeline; the 4-level BO hierarchy; the
+synthesis → property → PINO layering) stay explicit multi-stage structures. Rule
+of thumb: same type ⇒ one interface, many handlers; type changes between stages
+⇒ keep the stages.
 
 ---
 
+## 12. The three pino-bridge exports (signatures)
 
-<a id="impl-10-build-sequence"></a>
+The only surfaces `/informed-operator` sees (`architecture.md §15`):
 
-# Build sequence
+```
+Generate(inputs:  (PeriodicityStructure, SiteDecoration, Environment),
+         request: {ObservableRef},
+         tier:    cheap-only | cheap-with-fallback)
+       → Map<ObservableRef, GeneratedLabel>
+  -- cheap-compute labels; NOT differentiated through; T3 never emitted
+
+Validate(state:   UnifiedState,            -- the 7-tuple of architecture.md §4
+         env:     Environment,
+         phase:   CurriculumPhase,
+         request: all | {ResidualGeneratorRef})
+       → ( total-loss    : Scalar,
+           per-residual  : Map<ResidualGeneratorRef, Scalar>,
+           gradients     : Optional<Cotangent>,
+           cert-evidence : CertEvidence )
+  -- faithful-residual path; IS differentiated through (the factory-synthesized
+     backward closures are load-bearing here)
+
+Import(source:     vasp | experimental | curated-battery,
+       provenance: Provenance,
+       payload:    ExternalPayload)
+     → ( training-targets : Map<ObservableRef, TargetEntry>,   -- (value, σ, provenance, coverage-mask)
+         cert-evidence    : CertEvidence )
+  -- external ground truth; NOT differentiated through
+```
+
+Exactly these three are exported; all other public functions (`Predict`,
+`Certify`, `EnumerateObservables`) remain available to non-PINO consumers.
+
+---
+
+## 13. Per-regime GENERIC extraction
+
+The extraction table is in `architecture.md §5`. The full mathematical
+derivation of each regime from the unified GENERIC structure — how structural,
+mechanical, and thermal observables fall out of `E_BO` and its derivatives; how
+electronic/optical/magnetic observables are functionals of `γ̂`; how
+transport/thermodynamic/chemical observables embed in the two-bracket form — is
+in `physics/research/group-A-ion-dynamics.md`,
+`physics/research/group-B-electronic-magnetic-optical.md`, and
+`physics/research/group-C-transport-thermo-chemical.md`. Those derivations are
+the load-bearing grounding; this plan does not duplicate them.
+
+---
+
+## 14. Build sequence (language-neutral)
 
 Each phase produces a verifiable artifact. Phase 1 is blocked by the language
-decision (`arch-18-open-decisions §1`).
+decision (`architecture.md §17`).
 
 | Phase | Scope | Artifact |
 |---|---|---|
@@ -747,24 +654,21 @@ decision (`arch-18-open-decisions §1`).
 | 4 | **Unified state** (`state`): the 7-tuple container; per-level components (L1–L4); enumerate/serialize/hash | State encoding complete |
 | 5 | **Methods vocabulary** (`methods`): the 12 methods + sub-method dispatch | Computational vocabulary, tested per method |
 | 6 | **Templates** (`abstract-properties`): the 20 templates as typed factories | Template machinery, tested with multiple argument tuples |
-| 7 | **Formula registry** (`formulas`): the 102 formulas with typed signatures + citations; the manifest; **applicability-decidability gate** (every classifier first-order decidable on typeclass tags; non-decidable entries rejected — `impl-04-formulas`) | Closed registry; algebraic combinations no longer hand-waved |
-| 8 | **GENERIC operators** (`generic`): L sub-brackets, M sub-brackets, assembly; **instantiate active `CouplingSpec` via Stage-2.5 invariant synthesis** (`arch-19-coupling-structure`) and attach generated `InvariantTerm`s to the `E_coupling`, `L_assembly`, `M_assembly` aggregators | Antisymmetry of L, PSD of M, Jacobi, degeneracy verified |
+| 7 | **Formula registry** (`formulas`): the 102 formulas with typed signatures + citations; the manifest | Closed registry; algebraic combinations no longer hand-waved |
+| 8 | **GENERIC operators** (`generic`): L sub-brackets, M sub-brackets, assembly | Antisymmetry of L, PSD of M, Jacobi, degeneracy verified |
 | 9 | **Canonicals** (`canonicals`): E[x] and S[x] assembled across levels | Dimensional + analytic-limit checks pass |
 | 10 | **Observables** (`observables`): the target observables as compositions (§6), in 11 bundles | Library callable for any observable; reference-crystal checks |
-| 11 | **Residuals + Cert** (`residuals`, `cert`): 17 named categories, ResidualGenerator factory, 10 obligations, schema/freeze/oracle | Self-certifying outputs; usable residual contract |
+| 11 | **Residuals + Cert** (`residuals`, `cert`): 7 categories, ResidualGenerator factory, 10 obligations, schema/freeze/oracle | Self-certifying outputs; usable residual contract |
 | 12 | **Dynamics + integration validation** (`dynamics`): assemble the unified RHS; validate on harmonic oscillator, two-level Rabi, ideal-gas relaxation | Unified dynamics callable; RHS handed to any integrator |
-| 13 | **API seal + pino-bridge**: the single typed seal; `Validate` and `Import` (`arch-16-pino-bridge`); worked examples; end-to-end demo | Shippable; downstream libraries can build against it |
+| 13 | **API seal + pino-bridge**: the single typed seal; Generate/Validate/Import; worked examples; end-to-end demo | Shippable; downstream libraries can build against it |
 
-Recommended start order: substrate (Phases 1–7) before any concrete observable,
-then GENERIC/canonicals/observables (Phases 8–10), then residuals/cert/dynamics
-(Phases 11–12), then the seal (Phase 13).
+Recommended start order: shared substrate first (Phases 1–7) before any concrete
+observable, then GENERIC/canonicals/observables, then residuals/cert/dynamics,
+then the seal.
 
 ---
 
-
-<a id="impl-11-verification"></a>
-
-# Verification
+## 15. Verification
 
 ### 15.1 Internal consistency (static)
 
@@ -776,14 +680,14 @@ The spec is internally consistent when:
    parameters.
 3. The directory tree (Phase 0) contains every concept named in this plan and in
    `architecture.md`.
-4. The nine regime extractions (`arch-05-generic`) are realizable as the
-   compositions in `impl-06-compositions`.
+4. The nine regime extractions (`architecture.md §5`) are realizable as the
+   compositions in §6.
 5. Every residual category (§7) is grounded in a GENERIC identity or a named
    formula.
 6. Every cert obligation (§10) corresponds to a residual category or an algebraic
    identity, and maps to a Layer-0 axis.
-7. The counts here match `arch-09-vocabularies` exactly (12 methods, 20 templates,
-   102 formulas, 11 bundles, 17 residual categories, 10 cert obligations).
+7. The counts here match `architecture.md §8` exactly (12 methods, 20 templates,
+   102 formulas, 11 bundles, 7 residual categories, 10 cert obligations).
 
 Once the Phase-0 skeleton exists, items 1–7 are checkable mechanically by walking
 the tree and the registry manifest.
@@ -794,9 +698,8 @@ Five sequential gates validate the built system:
 
 1. **Registration sanity.** All 102 formulas instantiate as `ResidualGenerator`
    records without error; every D2 entry passes the registration-time adjoint
-   gate (`impl-07-residual-factory §7.5`); every D4 entry carries an
-   obligation-9 rationale; D0/D1 entries register without an adjoint (none
-   needed).
+   gate (§8); every D4 entry carries an obligation-9 rationale; D0/D1 entries
+   register with no backward.
 2. **End-to-end worked example — Diamond–W Schottky at 500 °C.** Input: diamond
    bulk + W contact + Si substrate, `Environment(T = 773 K, field = 1 MV/cm)`.
    The DAG layers fire in order; the L3 ↔ non-equilibrium cycle (charge balance
@@ -805,7 +708,7 @@ Five sequential gates validate the built system:
    Schottky barrier, drift velocity, electron temperature, self-heating ΔT,
    predicted MTTF. The run completes within its declared cost budget and cert
    obligations 1, 2, 3, 5, 8 emit verdicts.
-3. **Curriculum sanity (synthetic).** A three-phase training run on Si bulk
+3. **Curriculum sanity (synthetic).** A four-phase training run on Si bulk
    (~5 observables, ~1k samples) completes without GradNorm divergence, without a
    Layer-3 ↔ non-equilibrium fixed-point failure, and without an adjoint-cert
    reset mid-training.
@@ -815,9 +718,8 @@ Five sequential gates validate the built system:
    adjoint is refused at registration — loud, at build time); obligation-7
    (non-topological diamond emits NA with rationale; a contrived Z₂ system emits
    the predicted edge-state count).
-5. **`/informed-operator` integration smoke test.** `Validate` with `gradient =
-   Skip` populates label values for ~10 Si observables; `Validate` with
-   `gradient = Compute` returns finite per-residual scalars and finite
-   cotangents of the declared shape on a randomly-initialized state; `Import`
-   accepts a synthetic VASP-formatted payload and returns `TargetEntry` records
-   with coverage masks. All return within their typed contracts.
+5. **`/informed-operator` integration smoke test.** `Generate` populates labels
+   for ~10 Si observables; `Validate` returns finite loss and finite gradients of
+   the declared shape on a randomly-initialized state; `Import` accepts a
+   synthetic VASP-formatted payload and returns `TargetEntry` records with
+   coverage masks. All three return within their typed contracts.

@@ -23,30 +23,61 @@ spec is comprehensive; the build is diamond-first.
   time-evolution operator.
 - **`interface/`** — the user-facing surface (not yet designed).
 
+## Architectural framing
+
+`/physics` is structured around two load-bearing concepts:
+
+- **The `PhysicsGraph`** (`docs/architecture/06-physics-graph.md`) — the
+  canonical compose-time data structure. Three node kinds (`Input`,
+  `FormulaApply`, `MethodInvoke`); typed dataflow edges; per-stage sidecars.
+  Every observable, every residual, every certificate is a node.
+- **The 4+1 stage compose-time pipeline** (`docs/architecture/07-pipeline.md`)
+  — symbolic lift → symmetry quotient → algebraic simplification → lowering +
+  adjoint synthesis → runtime kernel. The earlier cheap/faithful split is
+  retired; every kernel emerging from Stage 4 is fast by construction
+  ("always-cheap" discipline).
+
 ## Where to start
 
-| Document | What it is |
+The spec lives in an atomic-file tree under `docs/`. The three legacy
+monoliths are regenerated from the tree by `docs/meta/assemble.py`.
+
+| Path | What it is |
 |---|---|
-| [`docs/architecture.md`](docs/architecture.md) | The conceptual specification and the **single source of truth for vocabularies and counts**. Start here. |
-| [`docs/implementation-plan.md`](docs/implementation-plan.md) | Typed signatures, the target observables as compositions, the residual/cert machinery, and the phased build sequence. |
-| [`docs/formula-registry.md`](docs/formula-registry.md) | Narrative index over the closed formula registry. |
-| [`docs/properties.md`](docs/properties.md) | The nine categories of material property the operator targets. |
+| `docs/architecture/` | The conceptual specification, one concept per file. Start at `01-purpose.md` and `06-physics-graph.md`. **Single source of truth for vocabularies and counts.** |
+| `docs/mvp/` | The diamond MVP projected onto the spec: γ̂ budget, three capabilities, decisions forced, build order. Start here for the build. |
+| `docs/implementation/` | Typed signatures, observable compositions, residual/cert machinery, phased build sequence. |
+| `docs/meta/conventions.md` | Atomic-file rules (frontmatter, anchors, lint discipline). |
+| `docs/meta/glossary.md` | One-line definitions for the load-bearing terms. |
+| `docs/meta/manifest.yaml` | Assembly order + named LLM-context bundles. |
+| `docs/formula-registry.md` | Narrative index over the closed formula registry. |
+| `docs/properties.md` | The nine property categories with bundle/formula-row mapping. |
 | `physics/library/formulas/registry-manifest.csv` | The canonical, machine-readable formula list (102 entries + 2 markers). |
-| `physics/research/` | The mathematical grounding: per-regime derivations (`group-A/B/C`) and the UWBG domain catalogs. |
-| `informed-operator/design/residual-loss-methodology.md` | The PINO multi-source training methodology. |
+| `physics/research/` | Mathematical grounding: per-regime derivations and UWBG catalogs. |
+| `informed-operator/design/residual-loss-methodology.md` | PINO multi-source training methodology. |
+
+The regenerated monoliths (`docs/architecture.md`,
+`docs/implementation-plan.md`, `docs/mvp-slice.md`) are convenience reads only;
+edits go to the atomic files.
 
 ## Directory map
 
 ```
 n-Op/
 ├── README.md
-├── docs/                          the canonical specification set
-│   ├── architecture.md
-│   ├── implementation-plan.md
+├── docs/
+│   ├── architecture/              atomic spec files (18 sections)
+│   ├── implementation/            atomic build-plan files (11 sections)
+│   ├── mvp/                       atomic diamond-MVP files (6 sections)
+│   ├── meta/                      manifest.yaml, conventions.md, glossary.md,
+│   │                              assemble.py, lint.py
+│   ├── architecture.md            regenerated monolith
+│   ├── implementation-plan.md     regenerated monolith
+│   ├── mvp-slice.md               regenerated monolith
 │   ├── formula-registry.md
 │   └── properties.md
 ├── physics/
-│   ├── library/                   the implementation scaffold (empty; awaiting language decision)
+│   ├── library/                   implementation scaffold (empty; awaiting language decision)
 │   │   ├── formulas/registry-manifest.csv
 │   │   └── cert/reference-data/    machine-readable cert reference battery
 │   └── research/                   mathematical grounding + UWBG domain catalogs
@@ -58,11 +89,11 @@ n-Op/
 ## The one open decision
 
 The **implementation language is not yet chosen**, and it blocks the first
-implementation phase. The hot numeric path, the autodiff requirement for
-adjoint-bearing (D2) residuals, the compile-time staging of `γ̂` code, and the
-crystallographic/topology tool ecosystem all bear on the choice. Everything in
-`docs/` is written language-neutrally so the architecture is independent of this
-decision. See `docs/architecture.md §17` for the full list of open decisions.
+implementation phase. The always-cheap pipeline narrows the candidates to
+those with first-class staging + AD + sparse linear algebra: **Julia**
+(Symbolics + ModelingToolkit + Enzyme), **Python + JAX** (jit + JAXopt), or a
+**custom MLIR** stack. Everything in `docs/` is written language-neutrally.
+See `docs/architecture/18-open-decisions.md` for the full list.
 
 No code has been written yet. `physics/library/` is an empty scaffold whose
 directory names match the architecture.

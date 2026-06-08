@@ -1,0 +1,152 @@
+---
+id: impl-06-compositions
+title: Target observables as typed compositions
+status: draft
+revision: 1
+canonical-for:
+  - per-regime compositions
+depends-on: []
+referenced-by: []
+research-sources: []
+---
+# Target observables as typed compositions
+
+Every property in `properties.md` written as a typed composition — the
+validation that the closed vocabulary covers the target scope. Each invokes only
+methods (§2), templates (§3), and named formulas (§4).
+
+### Structural
+
+```
+LatticeParameters = StateReadoutOf(state.h, extractor = cell-metric-extraction)
+BondLengths       = StateReadoutOf((state.R, state.h), extractor = pairwise-distance-PBC)
+CrystalStructure  = ClassifyOf((state.R, state.h), classifier = space-group-detection)
+Defects(energy)   = AlgebraicOf({E_defect = E_BO(crystal-with-defect),
+                                 E_perfect = E_BO(reference),
+                                 Δn, μ = env.chem-pots, q, E_F = env.Fermi-level},
+                                formula = defect-formation-energy)
+Defects(char.)    = ComparisonOf(state, reference-perfect, metric = atom-matching)
+Surfaces(region)  = StateReadoutOf(state, extractor = extract-surface-region)
+Surfaces(energy)  = AlgebraicOf({E_slab, E_bulk, n, A}, formula = slab-arithmetic)
+```
+
+### Electronic
+
+```
+BandStructure = SpectrumOf(Ĥ_KS[γ̂], domain = BZMesh(nx, ny, nz))
+DOS           = SpectralAggregateOf(BandStructure, aggregator = delta-energy-bin,
+                                    weights = uniform)
+BandGap       = AlgebraicOf({BandStructure}, formula = conduction-min-minus-valence-max)
+ChargeDensity = StateReadoutOf(γ̂, extractor = position-diagonal-trace)
+```
+
+### Optical
+
+```
+DielectricFunction = ResponseOfTo(observable = γ̂, perturbation = A-ext,
+                                  kernel = current-current-correlator, frequency = ω-mesh)
+Absorption(ω)      = AlgebraicOf({DielectricFunction}, formula = (2ω/c)·Im(√ε))
+RefractiveIndex(ω) = AlgebraicOf({DielectricFunction}, formula = Re(√ε))
+Photoluminescence  = RadiativeEmissionOf(excited_state = γ̂-pumped, optical_coupling = dipole-d)
+```
+
+### Mechanical
+
+```
+ElasticConstants = SecondDerivativeOf(F = E_BO, x₀ = equilibrium-state,
+                                      coord = symmetric-strain-η,
+                                      metric = Frobenius²-volume-normalized)
+BulkModulus      = AlgebraicOf({ElasticConstants}, formula = voigt-reuss-hill.K)
+StressStrain(lin)= AlgebraicOf({ElasticConstants, applied-ε},
+                               formula = linear-elasticity-stress-strain)
+Hardness(model)  = AlgebraicOf({K, G, …}, formula = {chen | teter | tian | mazhnik-oganov}-hardness)
+```
+
+### Thermal
+
+```
+PhononDispersion    = SpectrumOf(operator = HarmonicStiffnessHessianOf(E_BO, R₀, u),
+                                 domain = BZMesh)
+HeatCapacity(T)     = SpectralAggregateOf(PhononDispersion, aggregator = bose-einstein-cv(T),
+                                          weights = uniform)
+ThermalConductivity = KineticEvolutionOf(distribution = phonon-distribution(n_qν),
+                                         collisions = three-phonon-anharmonic-Ψ,
+                                         gradient = ∇T, method = BTE-RTA)
+ThermalExpansion    = AlgebraicOf({ModeGrüneisen(T), HeatCapacity(T)}, formula = QHA-expansion)
+```
+
+### Magnetic
+
+```
+MagneticMoments      = StateReadoutOf(γ̂, extractor = atomic-sphere-spin-integral)
+SpinDensity          = StateReadoutOf(γ̂, extractor = position-diagonal-spin-trace)
+ExchangeInteractions = ResponseOfTo(observable = γ̂, perturbation = infinitesimal-spin-rotation,
+                                    kernel = exchange-coupling-formula, frequency = 0)
+```
+
+### Transport
+
+```
+ConductivityViaBTE  = KineticEvolutionOf(distribution = carrier-f_n,
+                                         collisions = e-phonon-scattering-g²,
+                                         gradient = applied-E-field, method = BTE-RTA,
+                                         truncation = first-order)
+ConductivityViaKubo = ResponseOfTo(observable = current-operator-ĵ, perturbation = A,
+                                   kernel = current-current-correlator, frequency = ω→0⁺)
+Conductivity        = { ConductivityViaBTE, ConductivityViaKubo }
+                      (both formulas evaluated; method-equivalence is enforced
+                       by cert obligation-6 as an Algebraic/MethodEquivalence
+                       residual — arch-11-residuals, arch-12-cert)
+CarrierMobility     = AlgebraicOf({Conductivity, carrier-density}, formula = σ/(n·e))
+IonicDiffusion      = let ν_min   = SpectrumOf(HarmonicStiffnessHessianOf(E_BO, init), normal-modes)
+                          ν_saddle = SpectrumOf(HarmonicStiffnessHessianOf(E_BO, saddle),
+                                                normal-modes-minus-unstable)
+                          ν₀ = AlgebraicOf({StateReadoutOf(ν_min,    product-of-modes),
+                                            StateReadoutOf(ν_saddle, product-of-modes)},
+                                           formula = harmonic-transition-rate-normalization)
+                          D₀ = AlgebraicOf({a, Z, ν₀}, formula = jump-diffusivity)
+                          E_a = StateReadoutOf(PathStationaryOf(E_BO, init, fin),
+                                               extractor = saddle-vs-min-difference)
+                      in AlgebraicOf({D₀, E_a, T}, formula = arrhenius)
+MigrationBarrier    = PathStationaryOf(F = E_BO, initial = site-i, final = site-j,
+                                       method = climbing-image-NEB, n_images = 9, tol = 1e-3)
+```
+
+(The harmonic transition-rate normalization consumes the **product** of
+normal-mode frequencies via the `product-of-modes` extractor, not the spectra.)
+
+### Thermodynamic
+
+```
+TotalEnergy     = StateReadoutOf(E[x], extractor = identity)
+FormationEnergy = AlgebraicOf({E_compound = E_BO(target),
+                               E_refs = {E_BO(ref)}, n_i, μ_i = env.chem-pots},
+                              formula = formation-energy-from-references)
+PhaseStability  = ConvexOptimization(points = {(x_φ, F_φ)}, objective = lower-convex-envelope)
+FreeEnergy(T)   = AlgebraicOf({E_BO,
+                               F_vib = SpectralAggregateOf(PhononDispersion, bose-einstein-helmholtz(T)),
+                               F_el  = SpectralAggregateOf(BandStructure, fermi-dirac-helmholtz(T))},
+                              formula = F = E_BO + F_vib + F_el)
+```
+
+### Chemical / surface
+
+```
+AdsorptionEnergy = AlgebraicOf({E_BO(slab+ads), E_BO(slab), E_BO(molecule)},
+                               formula = adsorption-energy-difference)
+ReactionPathway  = PathStationaryOf(F = E_BO, initial = reactant, final = product,
+                                    method = climbing-image-NEB)
+CatalyticActivity= let RateNetwork = {(step, AlgebraicOf({ν₀ = harmonic-rate-prefactor,
+                                                          E_a = PathStationaryOf(…).saddle,
+                                                          T}, formula = htst-rate))}
+                       θ = MicrokineticSteadyStateOf(network = RateNetwork,
+                                                     initial = vacuum-coverage,
+                                                     driving = env.chem-pots)
+                   in AlgebraicOf({θ, RateNetwork, RC-step}, formula = turnover-frequency)
+SurfaceEnergy    = AlgebraicOf({E_BO(slab), E_BO(bulk-per-formula-unit), n, A},
+                               formula = slab-arithmetic)
+```
+
+All target observables resolve to typed compositions over the closed vocabulary.
+
+---

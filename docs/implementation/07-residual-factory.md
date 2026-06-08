@@ -1,0 +1,173 @@
+---
+id: impl-07-residual-factory
+title: Residual machinery
+status: draft
+revision: 1
+canonical-for:
+  - ResidualGenerator record
+  - residual factory
+  - registration-time adjoint gate
+depends-on:
+  - arch-06-physics-graph
+  - arch-07-pipeline
+  - arch-08-bo-levels
+  - arch-11-residuals
+  - impl-04-formulas
+referenced-by:
+  - impl-09-cross-cutting
+  - arch-19-coupling-structure
+  - arch-20-representations
+research-sources: []
+---
+
+# Residual machinery
+
+The PINO-facing factory that turns named formulas (`impl-04-formulas`)
+into `ResidualLeaf` nodes (`arch-06-physics-graph §6.3`) in the
+`PhysicsGraph`. Under the always-cheap reframe (`arch-07-pipeline`),
+this is now part of Stage 1 (graph construction). The factory has
+three responsibilities: generate the leaves with content-addressed keys,
+gate registration on adjoint correctness, and provide the per-formula
+metadata the runtime kernel uses for its outputs.
+
+## 7.1 The `ResidualGenerator` record
+
+```
+record ResidualGenerator {
+  name              : Symbol
+  observable        : ObservableRef
+  bundle            : BundleId                 -- B1..B11 (facet, not identity)
+  category          : CategoryTag              -- 17 named tags (arch-11-residuals §11.1)
+  layer             : 1..7                     -- compose-time DAG layer
+  cost-tier         : T0 | T1 | T2 | T3
+  diff-tag          : D0 | D1 | D2 | D3 | D4
+  dressing-tag      : bare | dressed(scheme: G0W0|SCP|LO-TO|Born-charge|epsilon-infinity)
+                      -- provenance label only; not a loss-weighting axis
+  axes              : List<AxisLabel>          -- the dimensions this generator unfolds over
+                                                  (k-point, frequency, atomic pair, shell, …)
+  applicability     : (Crystal, Environment) → Bool
+  input-contract    : {TypedSlot}
+  output-contract   : TypedSlot
+  forward           : Inputs → Output
+  loss-projection   : Output → Map<ResidualKey, Scalar>
+                      -- emits one entry per axis tuple; key is content-addressed (arch-11-residuals)
+  weight-policy     : ConsumedBy(/informed-operator)
+                      -- /physics declares the granularity; aggregation lives downstream
+  sampling-policy   : UniformBatch | RAD(τ) | Importance | ValidationOnly
+  dependencies      : {Symbol}                 -- same-pass fixed-point co-convergence
+  adjoint-cert      : Passed | Failed(witness) | NotApplicable | Relaxed(rationale)
+  registration-hash : ContentAddress           -- cert-tripwire detection
+}
+```
+
+## 7.2 Granularity (canonical reference: `arch-11-residuals`)
+
+Each generator unfolds along its `axes` to emit *N* residual
+contributions, one per axis tuple. Each contribution is a
+`ResidualLeaf` node with a content-addressed `ResidualKey`:
+
+```
+ResidualKey = (producer : Producer, axes : Tuple<AxisLabel>)
+Producer    = Formula(NamedFormula) | Method(NamedMethod)
+```
+
+The PINO holds `Map<ResidualKey, Weight>`; `/physics` emits
+`Map<ResidualKey, Scalar>`. Category, bundle, and dressing-tag are
+queryable facets via a parallel `Map<ResidualKey, ContributionFacets>`.
+The `dressing` facet is a provenance label for cert and audit; bare and
+dressed residuals on the same observable live as distinct
+`FormulaApply`/`MethodInvoke` chains in the graph (`arch-09-vocabularies`),
+not as weighted siblings.
+
+## 7.3 Factory entry point
+
+```
+make-residual-generator(observable     : ObservableRef,
+                        formula        : NamedFormula,
+                        axes           : List<AxisLabel>,
+                        sampling-policy: SamplingPolicy,
+                        applicability  : (Crystal, Environment) → Bool)
+                      → ResidualGenerator
+```
+
+Called once per formula at load time. The returned generator is
+inserted into Stage 1 of the pipeline when its `applicability`
+predicate holds for the current composition.
+
+## 7.4 Generator subtypes
+
+Three generator subtypes:
+
+- **Standard residual** — derived from a named formula; participates in
+  loss; D2 entries gated on adjoint existence.
+- **Ground-truth-bridge** — anchors a generator to an `Import`-supplied
+  target value with `(value, σ, provenance, coverage-mask)`
+  (`arch-16-pino-bridge §16.2`); loss is the σ-scaled Huber against the
+  target.
+- **Cert-only** — no loss contribution; runs as part of cert evidence
+  (`arch-12-cert`), not as part of training loss.
+
+## 7.5 Registration-time adjoint gate (hard)
+
+D2 entries run a vJp-vs-JvP check on `N ≈ 64` sampled points at
+registration time; if the max relative error exceeds `τ_adj` (default
+`1e-4`) the build fails loud. Forces an honest gradient or an explicit
+downgrade to D3 / D4 with recorded rationale.
+
+Under the always-cheap reframe, most D2 generators with a fixed-point
+solve in their forward pass are wired to the **implicit-diff adjoint**
+synthesized at Stage 4 (`arch-07-pipeline §7.4`); the gate verifies
+that synthesized adjoint, not a hand-written backward.
+
+## 7.6 Training-loop consumption
+
+Executed by `/informed-operator`: enumerate the active residuals for
+the current curriculum phase (Warmup → Refine → Polish), sample each
+per its policy, evaluate forward + projection, and run same-pass
+fixed-point iteration at the DAG layer barrier for the
+L3↔non-equilibrium cycle. Aggregation across `ResidualKey`s lives
+entirely in `/informed-operator`, not in this factory.
+
+## 7.7 Dressing certificates
+
+The `OneShotCert` and `IterativeResult` records (Layer 1.25 and Layer
+1.75 per `arch-08-bo-levels`) survive as **schemas attached to dressed
+`MethodInvoke` nodes**, no longer as a separate per-generator field:
+
+```
+record OneShotCert {
+  scheme            : G0W0 | SCP-perturbative | LO-TO-NA-correction
+                    | Born-charge | epsilon-infinity | electronic-susceptibility
+  inputs-hash       : ContentAddress
+  parameters        : Map<Symbol, Value>          -- k-mesh, cutoff, …
+  output            : DressedQuantity
+  closure-residual  : Map<ResidualKey, Scalar>    -- one entry per (axis tuple)
+                                                  --   the cert verifies; granular
+                                                  --   like every other residual
+                                                  --   emission (arch-11-residuals)
+  cost-tier         : T1 | T2
+}
+
+record IterationSnapshot {                        -- one element of trajectory
+  iter              : Nat
+  residual          : Map<ResidualKey, Scalar>    -- per-key closure residual
+  energy            : Scalar                      -- functional value at this iter
+  witness           : Optional<Witness>           -- non-null iff divergent
+  params            : Map<Symbol, Value>          -- mixing factor, broadening, …
+}
+
+record IterativeResult {                          -- Layer 1.75 (V2-deferred)
+  scheme            : scGW | SSCHA-stochastic | TDEP | BSE-iterated
+                    | DMFT | polaron-self-consistent
+  inputs-hash       : ContentAddress
+  parameters        : Map<Symbol, Value>          -- mixing, broadening, max-iter
+  trajectory        : List<IterationSnapshot>
+  converged?        : Bool
+  divergence-witness: Optional<Witness>           -- non-null iff not converged
+  final             : DressedQuantity
+  cost-tier         : T3
+}
+```
+
+V1 ships Layer 1.25 wired and Layer 1.75 as type/cert scaffolding only,
+with `not-implemented-in-V1` stubs that fail loud.

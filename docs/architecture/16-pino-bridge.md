@@ -1,0 +1,102 @@
+---
+id: arch-16-pino-bridge
+title: The pino-bridge exports
+status: draft
+revision: 1
+canonical-for:
+  - pino-bridge surface contract
+  - Validate signature
+  - Import signature
+depends-on:
+  - arch-06-physics-graph
+  - arch-07-pipeline
+  - arch-11-residuals
+  - arch-12-cert
+referenced-by:
+  - impl-09-cross-cutting
+research-sources:
+  - informed-operator/design/residual-loss-methodology.md
+---
+
+# The pino-bridge exports
+
+`pino-bridge` is the only surface `/informed-operator` (and other
+downstream consumers) sees. Two exports.
+
+## 16.1 `Validate` — the differentiated residual surface
+
+```
+Validate(state    : UnifiedState,           -- the 7-tuple of arch-04-state
+         env      : Environment,
+         request  : all | {ResidualKey} | {ObservableRef},
+         gradient : Skip | Compute)
+       → ( residuals : Map<ResidualKey, Scalar>           -- granular per arch-11-residuals
+         , values    : Map<ObservableRef, Value>          -- bundled observable outputs
+         , cograds   : Optional<Map<ResidualKey, Cotangent>>
+         , cert      : CertEvidence )
+```
+
+Single entry point. The `request` parameter selects which subgraph of
+the compiled kernel to evaluate (full graph, a subset of residual leaves
+keyed by `ResidualKey`, or a subset of observables). The `gradient`
+parameter toggles the adjoint — when `Skip`, the kernel runs
+forward-only, emitting residual values and observables without their
+cotangents.
+
+The output is **granular by construction** (`arch-11-residuals`): each
+contribution is its own scalar with its own key. The PINO chooses
+aggregation; `/physics` does not pre-sum.
+
+## 16.2 `Import` — external ground truth
+
+```
+Import(named-target : ObservableRef,
+       value        : Value,
+       sigma        : Scalar,
+       provenance   : Provenance,
+       coverage-mask : CoverageMask)
+     → GroundTruthBridgeGenerator
+```
+
+Per-target ingestion. Each call wraps one external datum (a VASP
+energy, an experimental mobility curve, a curated battery row) as a
+`GroundTruthBridgeGenerator` — the dataset analogue of
+`ResidualGenerator` (`impl-07-residual-factory §7.1`). At Stage 1
+(`arch-07-pipeline §7.1`) the generator inserts a pinned `Input`
+node carrying `(value, sigma)` and a cert-only `ResidualLeaf` node
+keyed by the named target's `ResidualKey`. `Import` is not
+differentiated through; its `ResidualLeaf` outputs serve obligation
+4 (reference battery, `arch-12-cert`) and feed `/informed-operator`'s
+target-vs-prediction comparison.
+
+### 16.2.1 `CoverageMask = RoaringCoverageMask`
+
+`CoverageMask` declares which axis tuples of the named target the
+imported datum actually constrains. The wire format is a serialized
+**Roaring bitmap** over a flat index built from the generator's `axes`
+(`impl-07-residual-factory §7.2`):
+
+```
+flat-index(axes) = enumerate(product(axes))   -- lexicographic over axis values
+RoaringCoverageMask = serialized Roaring bitmap of selected flat-index positions
+```
+
+- **Sparse-from-start.** Coverage is overwhelmingly sparse: a battery
+  row touches one `(k-point, band)`; an experimental σ(T) curve touches
+  one axis; a phonon-dispersion datum touches one branch over a
+  one-dimensional `k`-path. Dense-with-compression buys nothing and
+  forces a full decode before lookup.
+- **Why Roaring.** O(1) membership, fast intersection/union/cardinality
+  for set ops the cert evaluator needs (e.g., "which (k, n) pairs are
+  covered by *some* battery row?"), industry-standard format with
+  bindings in every candidate language.
+- **Persisted form.** The serialized Roaring bytes go into the
+  `coverage_mask` column of `SqliteReferenceCache.entries`
+  (`arch-12-cert §12.1`).
+
+## 16.3 What is not exported
+
+`Predict`, `Certify`, and `EnumerateObservables` remain available as
+internal `/physics` API for non-PINO consumers (the future
+`/interface`, debugging tools, the cert-only batch validator). They are
+not part of the pino-bridge contract.

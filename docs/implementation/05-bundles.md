@@ -1,0 +1,45 @@
+---
+id: impl-05-bundles
+title: The 11 observable bundles
+status: draft
+revision: 1
+canonical-for:
+  - bundle signatures
+depends-on: []
+referenced-by: []
+research-sources: []
+---
+# The 11 observable bundles
+
+The eleven physics-domain bundles `B1..B11` are listed in
+`arch-09-vocabularies §9.4`. Representative contents:
+
+- **B1 electronic-structure** — BandStructure, DOS, BandGap, ChargeDensity,
+  effective-mass tensor, k-resolved DOS.
+- **B2 phonon** — PhononDispersion, PhononDOS, group velocity, Grüneisen,
+  self-consistent phonons.
+- **B3 transport** — conductivity (BTE & Kubo), mobility (Matthiessen,
+  Caughey–Thomas), Seebeck, Wiedemann–Franz κ_e, Hall mobility.
+- **B4 defect-resolved** — DefectFormationEnergy, charge-transition levels,
+  populations, SRH / Auger recombination, multiphonon capture, Huang–Rhys.
+- **B5 surface-resolved** — SurfaceEnergy, surface grand potential, Wulff shape,
+  termination stability window.
+- **B6 interface-resolved** — Schottky barrier (Schottky–Mott + MIGS), band
+  offset, interface dipole, adhesion, contact resistance, field emission.
+- **B7 mechanics** — elastic constants C_ij, bulk modulus, sound velocity,
+  hardness, deformation potentials, piezoresistance.
+- **B8 thermodynamics** — Gibbs free energy, phase-diagram convex hull,
+  chemical-potential references, Clausius–Clapeyron.
+- **B9 non-equilibrium-operating** — self-heating T_op, coupled EM–thermal PDE,
+  hot-carrier temperature balance, impact ionization, avalanche, tunneling
+  currents (Fowler–Nordheim, Richardson–Dushman, Padovani–Stratton), NEGF
+  transmission.
+- **B10 static-validity** — bond-valence sum, Pauling radius ratio, Born
+  stability, generalized stacking-fault energy, structure uniqueness.
+- **B11 degradation** — carbide growth, electromigration MTTF, Coffin–Manson
+  fatigue.
+
+(A file tree may additionally group observable *modules* by output data-shape;
+the residual-driving grouping is the eleven physics-domain bundles.)
+
+---

@@ -1,0 +1,87 @@
+---
+id: impl-02-methods
+title: The 12 computational methods
+status: draft
+revision: 1
+canonical-for:
+  - method signatures
+depends-on: []
+referenced-by: []
+research-sources: []
+---
+# The 12 computational methods
+
+The closed primitive set. Each carries a typed signature and a sub-method
+dispatch.
+
+```
+state-readout            StateReadout(x: State, extractor: Extractor) → Value
+                         sub: pairwise-distance-PBC, atomic-sphere-integral,
+                              position-diagonal-trace, cell-metric-extraction,
+                              spectral-extremum, occupation-sum
+
+algebraic-combination    AlgebraicCombination(inputs: {Value},
+                                               formula: NamedFormula) → Value
+                         (ALWAYS invokes a named registry formula — no inline math)
+
+functional-differentiation
+                         FunctionalDifferentiation(F: Functional, wrt: Coordinate,
+                                                   at: StatePoint, order: ℕ = 1) → Tensor
+                         sub: gradient (order 1), hessian (order 2), higher-order
+
+variational-minimization VariationalMinimization(F: Functional, target: Coordinate,
+                                                  fixed: Coordinate, method: Optimizer,
+                                                  tol: Real) → StatePoint
+                         sub: steepest-descent, conjugate-gradient, BFGS, FIRE,
+                              Newton, SCF-mixing, Pulay-mixing
+
+spectral-decomposition   SpectralDecomposition(Op: Operator, basis: Basis,
+                                                k: Int = full, method: EigenSolver)
+                                                → (Spectrum, Eigenvectors)
+                         sub: full-diagonalization, Lanczos, Davidson,
+                              inverse-iteration, shift-invert
+
+spectral-aggregation     SpectralAggregation(spectrum: Spectrum, aggregator: Aggregator,
+                                              weights: Field) → Field
+                         sub: delta-sum (DOS), partition-Z (log-sum-exp),
+                              thermal-average (Bose / Fermi / Maxwell-Boltzmann)
+
+linear-response          LinearResponse(observable: Operator, perturbation: Operator,
+                                         kernel: ResponseKernel, frequency: Real = 0)
+                                         → Response
+                         sub: Kubo, Linear-Response-DFT (Dyson), Greens-function,
+                              Sternheimer, interface-tunneling †
+
+path-search              PathSearch(F: Functional, initial: StatePoint, final: StatePoint,
+                                     method: PathMethod, n_images: Int = 9, tol: Real)
+                                     → MinimumEnergyPath
+                         sub: NEB, climbing-image-NEB, dimer, string-method,
+                              field-line-integral †
+
+convex-optimization      ConvexOptimization(points: {StatePoint}, objective: ConvexObjective,
+                                             method: ConvexSolver) → Solution
+                         sub: convex-hull (lower envelope), common-tangent,
+                              quadratic-program
+
+kinetic-evolution        KineticEvolution(distribution: Distribution, collisions: CollisionKernel,
+                                           gradient: AppliedGradient, method: KineticMethod,
+                                           truncation: Int) → SteadyState
+                         sub: BTE-RTA, BTE-full, master-equation, drift-diffusion,
+                              Cahn-Hilliard, Allen-Cahn
+
+statistical-sampling     StatisticalSampling(distribution: Distribution, method: Sampler,
+                                              n_samples: Int) → SampleSet
+                         sub: Monte-Carlo, molecular-dynamics, kMC, importance-sampling
+
+symmetry-projection      SymmetryProjection(target: Tensor, group: SymmetryGroup,
+                                             projection_kind: ProjKind) → Tensor
+                         sub: point-group-projection, space-group-projection,
+                              time-reversal-symmetrize
+```
+
+† `interface-tunneling` and `field-line-integral` are the two registered
+sub-methods added for the UWBG scope. Sub-methods extend a method's dispatch
+table without changing its typed signature; each requires a sub-method test and
+a regression-freeze entry.
+
+---

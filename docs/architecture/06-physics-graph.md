@@ -1,0 +1,179 @@
+---
+id: arch-06-physics-graph
+title: The PhysicsGraph
+status: draft
+revision: 1
+canonical-for:
+  - PhysicsGraph schema
+  - NodeKind, OutputRole, ResidualKey
+  - per-stage sidecars
+depends-on:
+  - arch-04-state
+  - arch-05-generic
+  - arch-09-vocabularies
+  - arch-10-typeclasses
+referenced-by:
+  - arch-07-pipeline
+  - arch-08-bo-levels
+  - arch-11-residuals
+  - arch-15-gamma-hat
+  - arch-16-pino-bridge
+  - impl-07-residual-factory
+  - arch-19-coupling-structure
+  - arch-20-representations
+research-sources: []
+---
+
+# The PhysicsGraph
+
+Given the inputs (`arch-03-inputs`), the unified state (`arch-04-state`),
+and the GENERIC dynamics (`arch-05-generic`), there is one data structure
+that everything else in `/physics` is a view of:
+
+> **The `PhysicsGraph`.**
+
+A typed, hash-consed, content-addressed directed acyclic graph. It is what
+the compose-time pipeline (`arch-07-pipeline`) produces, what the runtime
+kernel evaluates, what the cert obligations (`arch-12-cert`) traverse, and
+what `/informed-operator` trains against. Every other "thing" in
+`/physics` — formulas, methods, templates, observables, residuals, bundles,
+applicability classifiers, the topology atlas — is a kind of node, a
+labeled subset, or a per-stage sidecar indexed by node id.
+
+## 6.1 Anatomy of a node
+
+```
+Node =
+  ( id   : ContentAddress    -- hash-cons identity (substrate identity rule
+                             --   of arch-20-representations §20.1; the typed
+                             --   family is Address[GraphNode])
+  , type : Layer0Type        -- arch-10-typeclasses
+  , kind : NodeKind          -- §6.2
+  , role : OutputRole        -- §6.3
+  )
+```
+
+Four fields. Two (`kind`, `role`) are named sum types whose names earn
+their keep; one (`type`) reuses the existing Layer-0 typeclass alphabet;
+one (`id`) is the hash-cons identity. Per-node decorations —
+applicability predicates, symmetry annotations, compression plans,
+adjoint strategies, cert hooks, provenance tags — live instead in
+per-stage sidecars (§6.4), produced by one stage and consumed by the
+next, never carried into the runtime kernel.
+
+## 6.2 The three node kinds
+
+```
+NodeKind =
+  | Input(InputKind)
+  | FormulaApply(formula : NamedFormula, args : List<NodeId>)
+  | MethodInvoke(method  : NamedMethod,  args : List<NodeId>)
+
+InputKind = StateSlot(StateComponent) | EnvScalar(EnvField)
+```
+
+Every operation in `/physics` is one of these three:
+
+1. **`Input`** — a slot for a state component (`h`, `R_I`, `P_I`, `Π_h`,
+   `Z_I`, `γ̂`, `A`) or an environmental scalar (`T`, `μ`, `E_field`, …).
+2. **`FormulaApply`** — application of one of the 102 named formulas
+   (`arch-09-vocabularies §9.3`) to typed argument nodes.
+3. **`MethodInvoke`** — application of one of the 12 computational
+   methods (`arch-09-vocabularies §9.1`) to typed argument nodes.
+
+What about constructs that look like they might be additional node kinds?
+
+- **Symmetry projection** is `MethodInvoke(symmetry-projection, …)` —
+  one of the existing 12 methods. Stage 2 (`arch-07-pipeline §7.2`)
+  inserts these as `MethodInvoke` nodes, not as a new species.
+- **Fixed-point solves** (SCF, BTE-RTA, Liouville steady state) are
+  `MethodInvoke` of the methods that have fixed-point semantics
+  (`variational-minimization`, `kinetic-evolution`'s SCF/BTE-RTA modes).
+  The fixed-point property is a fact about the named method, looked up
+  at Stage 4 when adjoints are synthesized.
+- **Observables and residuals** are *roles* (§6.3), not kinds. The same
+  computation can be `Internal` in one composition and an `Observable`
+  in another.
+
+## 6.3 Output role
+
+```
+OutputRole =
+  | Internal
+  | Observable(bundle : 1..11)
+  | ResidualLeaf(key : ResidualKey)
+```
+
+The role tells the runtime kernel which nodes are *exposed* in the
+output. `Internal` nodes are evaluated but never returned. `Observable`
+nodes feed the `pino-bridge` outputs (`arch-16-pino-bridge`) and are
+bundle-tagged. `ResidualLeaf` nodes produce the entries of the
+granularity-keyed `ResidualVector` defined in `arch-11-residuals`.
+
+## 6.4 Per-stage sidecars
+
+Information that stages decide *about* nodes lives in maps keyed by
+`NodeId`. Each map is produced by one stage and consumed by the next;
+sidecars are not part of the node's identity, are not hash-consed, and
+do not survive past their consumer.
+
+```
+Stage1Sidecar.applicability  : Map<NodeId, Predicate>      -- consumed and discarded
+Stage2Sidecar.symmetry       : Map<NodeId, IrrepBlock>     -- consumed by Stage 4
+Stage4Sidecar.compression    : Map<NodeId, CompressionPlan>
+Stage4Sidecar.adjoint        : Map<FixedPointNodeId, AdjointSolver>
+
+CompressionPlan =
+  | Dense
+  | Sparse(sparsity-pattern)
+  | LowRank(rank)
+  | HODLR(params)
+  | TT(ranks)
+  | …
+```
+
+The PINO never sees these sidecars. The runtime kernel doesn't carry
+them either — they are codegen inputs, consumed at Stage 4 and erased.
+
+## 6.5 The graph *is* every other vocabulary
+
+| Vocabulary item | Realized as |
+|---|---|
+| 102 formulas (`arch-09-vocabularies §9.3`) | typing rules for `FormulaApply` nodes |
+| 12 methods (`arch-09-vocabularies §9.1`) | typing rules for `MethodInvoke` nodes |
+| 20 templates (`arch-09-vocabularies §9.2`) | graph-construction macros that emit subgraphs |
+| 11 bundles (`arch-09-vocabularies §9.4`) | the `bundle` payload of `Observable` roles |
+| 17 residual categories (`arch-11-residuals`) | facet on `ResidualLeaf`, in `ContributionFacets.category` (a `CategoryTag` enum) |
+| 4 BO levels (`arch-08-bo-levels`) | a layer label derivable from a node's transitive inputs; not stored |
+| 4 Layer-0 typeclasses (`arch-10-typeclasses`) | the `type` field on every node |
+| Applicability classifier (`arch-13-applicability`) | a Stage 1 sidecar that *prunes* the graph; not retained |
+| Topology atlas (`arch-14-topology`) | a precomputed table consumed by Stage 2 |
+| 10 cert obligations (`arch-12-cert`) | global traversals over the graph, indexed by `NodeKind` and `OutputRole` |
+| γ̂ hybrid representation (`arch-15-gamma-hat`) | a Stage 4 `CompressionPlan` for nodes whose `type` is the density-matrix typeclass |
+| `pino-bridge.Validate` (`arch-16-pino-bridge`) | the differentiated projection to `Observable` + `ResidualLeaf` outputs |
+| `pino-bridge.Import` (`arch-16-pino-bridge`) | Stage 1 insertion of `Input` nodes pinned to external values, plus cert-only `ResidualLeaf` nodes |
+
+## 6.6 Why it is *the* data structure
+
+- **Closure.** Every closed vocabulary in `arch-09-vocabularies` is
+  either a typing rule for a node kind, a labeled subset of nodes, or
+  an annotation field on a node. Nothing in `/physics` lives outside
+  the graph.
+- **Composition.** Composing observables literally is composing
+  subgraphs. The 20 templates (`arch-09-vocabularies §9.2`) are
+  graph-construction macros.
+- **Correctness.** The cert layer (`arch-12-cert`) is a graph traversal;
+  the granularity discipline (`arch-11-residuals`) is "leaves are
+  addressable"; the symmetry discipline is a Stage 2 rewrite; the
+  adjoint discipline is a per-node Stage 4 strategy.
+- **Performance.** The pipeline (`arch-07-pipeline`) is graph rewrites
+  and lowering; performance work has no other surface.
+- **Substrate-agnosticism.** The graph is language-neutral typed
+  pseudocode; whether it lives in Julia Symbolics, JAX traced jaxpr,
+  or MLIR is the implementation-language decision
+  (`arch-18-open-decisions`). The *concept* is invariant.
+
+> The `PhysicsGraph` is to `/physics` what the relational schema is
+> to a database: every other notion is a view, a query, or an
+> annotation over it. Picking a language is picking a host for
+> *this* graph.

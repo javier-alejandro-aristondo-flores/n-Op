@@ -5,6 +5,7 @@ status: draft
 revision: 1
 canonical-for:
   - vocabulary counts
+  - theory-context vocabularies
 depends-on: []
 referenced-by:
   - arch-06-physics-graph
@@ -34,6 +35,7 @@ Every other document references these numbers rather than restating them.
 | Layer-0 typeclasses | 4 | yes |
 | Crystal symmetry group | first-class (space group × time-reversal × U(1) × SU(2)) | yes |
 | State sub-DOF tags | `orbital, spin, sublattice, valley, strain, gauge, charge, none` | yes |
+| Theory-context vocabularies | 10 (`XCFunctionalTag`, `PPType`, `PPSourceTag`, `ManyBodyLevel`, `GWScheme`, `DoubleCountingTag`, `ImpuritySolverTag`, `OrbitalBasisTag`, `RelativisticTreatment`, `SOCScheme`) — see §9.7 | yes (versioned) |
 
 ### 9.1 Twelve computational methods
 
@@ -178,5 +180,45 @@ sub-DOF; the allowed pairs are:
 
 `StatePiece` constructors (`arch-19-coupling-structure §19.2`) reject
 pairs not listed here at registration time.
+
+### 9.7 Theory-context vocabularies
+
+The four axes of `TheoryContext` (`arch-19-coupling-structure §19.11`) —
+the global theory frame a `CouplingSpec` is interpreted in — are built
+from ten closed C1 vocabularies. They are genuinely new (no existing
+arch-09 vocabulary covers them; the closest neighbour, the
+`{SCP, SSCHA, GW, BSE-iterated, polaron}` selector inside the §9.2
+`SelfConsistentRenormalizationOf` template, is a *per-observable dressing
+method*, a different axis from the composition-global theory frame). Each
+is a `Universe[T]` instance with `carrier_kind = Closed` and dense `u32`
+ordinals (`arch-20-representations §20.1, §20.3`); adding a member is a
+versioned `schema_version` bump (`arch-20 §20.9`), not an open-registry
+append, because it changes the meaning of every recorded coefficient.
+
+| Vocabulary | Members (MVP) | Notes |
+|---|---|---|
+| `XCFunctionalTag` | `LDA(·) \| GGA(·) \| MetaGGA(·) \| Hybrid(flavour, exx_fraction, screening_omega?)` | exchange-correlation functional; hybrid carries float exact-exchange fraction in payload |
+| `PPType` | `NormConserving \| Ultrasoft \| PAW` | pseudopotential construction kind |
+| `PPSourceTag` | `PseudoDojo(version) \| SSSP(version, accuracy) \| GBRV(version) \| VASP_PAW(set) \| Custom(DOI?)` | the table version string is an open key, content-pinned by an optional `Address[PPFile]` digest |
+| `ManyBodyLevel` | `KohnSham \| KohnShamPlusU(HubbardParams) \| GW(GWScheme) \| DMFT(DMFTParams) \| HybridAsManyBody(·)*` | discriminator closed; `+U`/DMFT carry sub-records with `PersistentMap` fields |
+| `GWScheme` | `G0W0 \| GW0 \| scGW \| QSGW` | |
+| `DoubleCountingTag` | `FLL \| AMF \| Dudarev` | DFT+U / DMFT double-counting |
+| `ImpuritySolverTag` | `CTQMC \| ED \| NRG \| IPT` | DMFT impurity solver |
+| `OrbitalBasisTag` | `Wannier \| PAW \| Lowdin` | the +U projection basis (also closes the gauge-choice ambiguity for downfolded channels) |
+| `RelativisticTreatment` | `NonRelativistic \| ScalarRelativistic \| FullRelativistic(SOCScheme)` | |
+| `SOCScheme` | `DiracPAW \| TwoComponentZORA \| SecondVariational \| PerturbativeSOC` | |
+
+`AtomicSpecies` (the key universe of `pseudopotential_set`) is the
+ordinary closed vocabulary of the elements; for the MVP it is `{C, B, N,
+Al, Ga}`. `* HybridAsManyBody` is reserved/deprecated for V1 — a hybrid
+is always recorded as `XCFunctionalTag.Hybrid` with `ManyBodyLevel.KohnSham`,
+normalized by `make-theory-context` (`arch-19 §19.8`) so the
+`Address[TheoryContext]` is canonical.
+
+These vocabularies condition the *interpretation and verification* of
+coefficients, never the *enumeration* of the symmetry-invariant basis;
+accordingly they touch the reference-battery, named-formula-consistency,
+reference-versioning, and surrogate-validity cert obligations
+(`arch-12-cert`), and none of the others.
 
 ---

@@ -702,6 +702,7 @@ Every other document references these numbers rather than restating them.
 | Layer-0 typeclasses | 4 | yes |
 | Crystal symmetry group | first-class (space group × time-reversal × U(1) × SU(2)) | yes |
 | State sub-DOF tags | `orbital, spin, sublattice, valley, strain, gauge, charge, none` | yes |
+| Theory-context vocabularies | 10 (`XCFunctionalTag`, `PPType`, `PPSourceTag`, `ManyBodyLevel`, `GWScheme`, `DoubleCountingTag`, `ImpuritySolverTag`, `OrbitalBasisTag`, `RelativisticTreatment`, `SOCScheme`) — see §9.7 | yes (versioned) |
 
 ### 9.1 Twelve computational methods
 
@@ -846,6 +847,46 @@ sub-DOF; the allowed pairs are:
 
 `StatePiece` constructors (`arch-19-coupling-structure §19.2`) reject
 pairs not listed here at registration time.
+
+### 9.7 Theory-context vocabularies
+
+The four axes of `TheoryContext` (`arch-19-coupling-structure §19.11`) —
+the global theory frame a `CouplingSpec` is interpreted in — are built
+from ten closed C1 vocabularies. They are genuinely new (no existing
+arch-09 vocabulary covers them; the closest neighbour, the
+`{SCP, SSCHA, GW, BSE-iterated, polaron}` selector inside the §9.2
+`SelfConsistentRenormalizationOf` template, is a *per-observable dressing
+method*, a different axis from the composition-global theory frame). Each
+is a `Universe[T]` instance with `carrier_kind = Closed` and dense `u32`
+ordinals (`arch-20-representations §20.1, §20.3`); adding a member is a
+versioned `schema_version` bump (`arch-20 §20.9`), not an open-registry
+append, because it changes the meaning of every recorded coefficient.
+
+| Vocabulary | Members (MVP) | Notes |
+|---|---|---|
+| `XCFunctionalTag` | `LDA(·) \| GGA(·) \| MetaGGA(·) \| Hybrid(flavour, exx_fraction, screening_omega?)` | exchange-correlation functional; hybrid carries float exact-exchange fraction in payload |
+| `PPType` | `NormConserving \| Ultrasoft \| PAW` | pseudopotential construction kind |
+| `PPSourceTag` | `PseudoDojo(version) \| SSSP(version, accuracy) \| GBRV(version) \| VASP_PAW(set) \| Custom(DOI?)` | the table version string is an open key, content-pinned by an optional `Address[PPFile]` digest |
+| `ManyBodyLevel` | `KohnSham \| KohnShamPlusU(HubbardParams) \| GW(GWScheme) \| DMFT(DMFTParams) \| HybridAsManyBody(·)*` | discriminator closed; `+U`/DMFT carry sub-records with `PersistentMap` fields |
+| `GWScheme` | `G0W0 \| GW0 \| scGW \| QSGW` | |
+| `DoubleCountingTag` | `FLL \| AMF \| Dudarev` | DFT+U / DMFT double-counting |
+| `ImpuritySolverTag` | `CTQMC \| ED \| NRG \| IPT` | DMFT impurity solver |
+| `OrbitalBasisTag` | `Wannier \| PAW \| Lowdin` | the +U projection basis (also closes the gauge-choice ambiguity for downfolded channels) |
+| `RelativisticTreatment` | `NonRelativistic \| ScalarRelativistic \| FullRelativistic(SOCScheme)` | |
+| `SOCScheme` | `DiracPAW \| TwoComponentZORA \| SecondVariational \| PerturbativeSOC` | |
+
+`AtomicSpecies` (the key universe of `pseudopotential_set`) is the
+ordinary closed vocabulary of the elements; for the MVP it is `{C, B, N,
+Al, Ga}`. `* HybridAsManyBody` is reserved/deprecated for V1 — a hybrid
+is always recorded as `XCFunctionalTag.Hybrid` with `ManyBodyLevel.KohnSham`,
+normalized by `make-theory-context` (`arch-19 §19.8`) so the
+`Address[TheoryContext]` is canonical.
+
+These vocabularies condition the *interpretation and verification* of
+coefficients, never the *enumeration* of the symmetry-invariant basis;
+accordingly they touch the reference-battery, named-formula-consistency,
+reference-versioning, and surrogate-validity cert obligations
+(`arch-12-cert`), and none of the others.
 
 ---
 
@@ -1515,17 +1556,6 @@ The architecture above is committed. These remain to be decided.
    self-consistent GW / DMFT.
 6. The integrator interface — the exact signature `dynamics` exposes to
    `/informed-operator` for handing off the assembled GENERIC right-hand side.
-7. **Coupling-channel template registry.** Enumerate the principled
-   set of `CouplingChannel` templates (sector-pair × target shape × default
-   order) covering the physics regimes we care about — expected ~10 entries
-   spanning orbital-phonon, spin-orbit, spin-strain, gauge-matter
-   (minimal coupling), multipole-external-field (Zeeman / Stark), ion-ion
-   electrostatic, plus sub-DOF variants. Each entry: one `CouplingChannel`
-   record + `Active(MVP) | V2-deferred | Excluded(rationale)` flag +
-   applicability predicate. The actual coupling terms are *generated* by
-   the Stage-2.5 invariant synthesizer (`arch-19-coupling-structure`); the
-   registry only lists which channels to instantiate.
-
 ## Closed decisions
 
 - **ReferenceCache backend** = `SqliteReferenceCache` (`arch-12-cert §12.1`).
@@ -1545,6 +1575,19 @@ The architecture above is committed. These remain to be decided.
   (`arch-19-coupling-structure`). The nine named cross-regime strings of
   `arch-05-generic` collapse to a handful of channel declarations; the
   per-coupling terms are generated, not registered.
+- **Coupling-channel coverage policy** = a bounded `CoverageBound`
+  (global cap `(order ≤ 4, Gradient(1))` + a per-mechanism inner table)
+  plus the runtime rule "active channels are those whose `applicability`
+  holds and whose invariant basis is non-empty," **not** a hand-curated
+  registry (`arch-19-coupling-structure §19.9`). Each channel carries a
+  `mechanism_range` tag whose derived `polynomial_sufficient` flag decides
+  whether the symmetry-generated basis is the whole coupling; long-range
+  channels carry a typed `KernelExt` for the non-polynomial part
+  (§19.10–§19.11). The composition's theory frame is a `TheoryContext` on
+  `CouplingSpec` (XC functional / pseudopotentials / many-body level /
+  relativistic treatment), and `PSDSymmForm` channels carry documented PSD
+  assumptions rather than a runtime SDP search (§19.11–§19.12). MVP default
+  theory context: `PBE / PseudoDojo-v0.4.1-NC / KohnSham / ScalarRelativistic`.
 - **Representation substrate** = one substrate contract (typed indexed
   universes, content-addressed Merkle DAGs, sparse-set backends,
   persistent stage-visible maps) plus a small parametric op-signature
@@ -1603,6 +1646,11 @@ record CouplingChannel {
   order         : Nat                         -- # tensor factors (typically 2..4)
   derivative    : Ultralocal | Gradient(Nat)  -- spatial-derivative depth
   applicability : (Crystal, Environment) → Bool
+  -- coverage-policy fields (§19.9–§19.10):
+  mechanism_range  : MechanismRange               -- curated; source of truth for the next flag
+  kernel_extension : Optional<KernelExt>          -- the non-polynomial part; present iff ¬polynomial_sufficient
+  gauge_rule       : Optional<GaugeRule>          -- basis/gauge fixing (e.g. Wannier gauge); usually None
+  provenance       : Optional<ProvenanceLedger>   -- where the coefficients came from; the normal annotation
 }
 
 record StatePiece {
@@ -1623,11 +1671,23 @@ state-component definition.
 the underlying physical structure; they are the compose-time choice of
 how high in the multipole / multi-tensor expansion to go.
 
+The last four fields carry the coverage policy. `mechanism_range`
+(§19.10) records whether the channel's mediating interaction is
+short-range or long-range; from it the derived flag
+`polynomial_sufficient` decides whether the symmetry-generated
+polynomial basis is the *whole* coupling or only its short-range part.
+When it is only a part, `kernel_extension` (§19.11) carries the
+non-polynomial remainder. `gauge_rule` fixes a residual basis ambiguity
+for the rare channels that have one; `provenance` records where the
+numeric coefficients came from and is the ordinary annotation every
+channel may carry. All four are `make-coupling-channel`-validated
+(§19.8).
+
 ## 19.3 The invariant generator
 
 ```
 generate-invariants : CrystalSymmetryGroup × CouplingChannel
-                    → List<InvariantTerm>
+                    → GeneratorOutput
 ```
 
 Standard representation theory. Given the crystal's symmetry group
@@ -1651,10 +1711,62 @@ record InvariantTerm {
 }
 ```
 
+The generator returns a `GeneratorOutput`, not a bare list, because a
+channel's full coupling may be the polynomial basis *plus* a
+non-polynomial kernel (§19.10–§19.11):
+
+```
+record GeneratorOutput {
+  polynomial_invariants : List<InvariantTerm>     -- the symmetry-generated basis
+  polynomial_sufficient : Bool                     -- echoed certificate (derived, §19.10)
+  kernel_extension      : Optional<KernelExt>      -- the non-polynomial remainder, if any (§19.11)
+  gauge_rule            : Optional<GaugeRule>       -- a basis-fixing rule, if any
+  output_hash           : Address[GeneratorOutput]  -- domain-separated; folds in all three above
+}
+```
+
+The `polynomial_sufficient` flag is echoed into the output so that a
+downstream stage holding only `polynomial_invariants` can never silently
+treat a partial (short-range) basis as the complete coupling.
+
 The generator is the *constructive* direction of the irrep machinery
 that Stage 2 already uses *decompositionally* (`arch-07-pipeline §7.2`
 block-diagonalizes operators by irrep). Same module; same primitives;
 new direction.
+
+**Contract.** The routine runs three integrity guards, a free O(1)
+spinor-parity pre-prune, then the projector:
+
+```
+generate-invariants(G, c) :
+  -- (0) well-formedness (§19.10): the flag and the kernel must agree
+  if ¬polynomial_sufficient(c) ∧ c.kernel_extension = None: error "partial coverage, no kernel"
+  if  polynomial_sufficient(c) ∧ c.kernel_extension ≠ None: error "sufficient channel carries a kernel"
+  if ¬polynomial_sufficient(c) ∧ ¬kernel_tag_matches_range(c): error "kernel tag ≠ mechanism_range"
+  -- (1) spinor-parity pre-prune: an odd total spinor count cannot form a Scalar / PSDSymmForm /
+  --     AntisymmForm invariant, so the basis is empty before any character is computed
+  if odd_spinor_count(c.pieces) ∧ c.target ∈ {Scalar, PSDSymmForm, AntisymmForm}: poly = []
+  else: poly = trivial_irrep_projector(G, c.pieces, c.target, c.order, c.derivative)
+  -- (2) return both parts; the kernel rides through untouched by the symmetry projector
+  return GeneratorOutput{ poly, polynomial_sufficient(c), c.kernel_extension, c.gauge_rule, … }
+```
+
+**Emptiness and complexity.** Emptiness of `poly` is decided by the
+character inner product `⟨χ_T, χ_trivial⟩_G = (1/|G|) Σ_g χ_T(g)`, a
+single trace per group element — never forming `ρ(g)` explicitly. For
+the MVP worst case (`|G| ≤ 192` with the double cover and time reversal,
+`dim(T) ≤ ~250` at `order = 4, Gradient(1)`): the character pre-prune is
+O(|G|) ≤ ~200 ops; the full Reynolds projection `P = (1/|G|) Σ_g ρ(g)`,
+run only when the basis is non-empty, is O(|G|·dim(T)²) ≤ ~12M ops. The
+result is cached on `Address[CrystalSymmetryGroup] × Address[CouplingChannel]`
+(`arch-20-representations §20.4`), so per-composition cost is one-shot.
+The cache key does **not** include the theory context (§19.11): the
+polynomial basis is symmetry-determined and theory-independent.
+
+> **Emptiness ≠ correctness.** A non-empty `poly` is *correct as far as
+> it goes* but may still be only the short-range part of a long-range
+> coupling. Whether `poly` is the *whole* coupling is the separate
+> `polynomial_sufficient` question (§19.10), not the emptiness question.
 
 ## 19.4 Worked example — diamond electron-phonon
 
@@ -1700,8 +1812,8 @@ Inputs  : Stage1Sidecar.coupling-channels  : List<CouplingChannel>
           CrystalSymmetryGroup             (constructed in Stage 1+2)
 Action  : For each channel c whose c.applicability holds, compute
           generate-invariants(group, c); attach the returned
-          List<InvariantTerm> to the channel.
-Outputs : Stage2_5Sidecar.invariants : Map<CouplingChannel, List<InvariantTerm>>
+          GeneratorOutput to the channel.
+Outputs : Stage2_5Sidecar.invariants : Map<CouplingChannel, GeneratorOutput>
 ```
 
 Consumed by Stages 3–4 when lowering invariants into `FormulaApply`
@@ -1723,28 +1835,48 @@ nodes targeted at the existing `E_coupling`, `L_assembly`,
   *one* `CouplingChannel` with a larger tensor product (more `pieces`),
   not two channels with an extra correlation parameter. This keeps the
   V1 algebra additive.
+- **Kernel extensions add as one more summand.** When a channel carries
+  a `kernel_extension` (§19.11), its lowered kernel node adds into the
+  same aggregator as its polynomial invariants:
+  `full_coupling = Σ poly_invariants + kernel_extension(q, ω)`. No new
+  aggregator and no new composition primitive — the kernel is one summand
+  in the existing direct sum. A long-range mechanism is therefore split
+  into **two channels** — a short-range polynomial channel and a
+  long-range kernel channel — rather than one channel that is partly
+  polynomial and partly not (e.g. electron-phonon = a deformation-potential
+  channel + a Fröhlich channel, the standard Verdi–Giustino SR/LR split,
+  `arch-19 §19.10`).
 
 ## 19.7 Cert hooks
 
 The invariant-generator structure simplifies two cert obligations
 (`arch-12-cert`):
 
-- **Obligation 1 (symmetry equivariance).** Invariants are
+- **The symmetry-equivariance obligation.** Polynomial invariants are
   trivial-irrep basis vectors *by construction*; equivariance is
   automatic. Cert reduces to a numerical projection-residual check:
   `||v.symbolic-form − π_trivial v.symbolic-form|| < ε` on a sampled
-  evaluation. Failure indicates a generator bug, not a physics bug.
-- **Obligation 5 (conservation / antisymmetry of L / PSD of M).**
+  evaluation. Failure indicates a generator bug, not a physics bug. A
+  `kernel_extension` is **not** exempt: it is "scalar under the
+  little-group of q" (`KernelExt.symmetry_law`, §19.11), so cert checks
+  `‖K(Rq,ω) − D(R) K(q,ω) D(R)†‖ < ε` over little-group elements `R` —
+  a checkable equivariance, just not a polynomial one.
+- **The positivity obligation** (antisymmetry of `L` / PSD of `M`).
   The `target` tag determines a projection rule applied at the
   generator step: `AntisymmForm` invariants are projected onto the
   antisymmetric component of the candidate tensor; `PSDSymmForm`
   invariants are projected onto the PSD cone. The projection is part
   of the generator's contract; cert numerically verifies the projected
-  output matches the emitted `symbolic-form` within `ε`.
+  output matches the emitted `symbolic-form` within `ε`. For
+  `PSDSymmForm` channels, PSD *existence* is a structural theorem rather
+  than a runtime search — see the documented assumptions in §19.12.
 
-Both checks are O(1) per invariant; both are integrated with
-`SymmetryAdaptedHamiltonianOf` (`arch-09-vocabularies §8.2`) which
-already lives in the symmetry machinery.
+The polynomial checks are O(1) per invariant; both are integrated with
+`SymmetryAdaptedHamiltonianOf` (`arch-09-vocabularies §9.2`) which
+already lives in the symmetry machinery. (Cert obligations are named
+rather than numbered here: `arch-12-cert`'s list and its §12.0.1 use
+inconsistent indices for the positivity / PSD-of-`M` clause; the names
+are unambiguous.)
 
 ## 19.8 Registration discipline
 
@@ -1762,23 +1894,272 @@ under the canonical-serialization rule of `arch-20-representations §20.4`
 (domain-separated, schema-versioned); identical channels collapse to one
 address.
 
-The set of *active* channels in a composition is the **`CouplingSpec`** —
-a `SparseSet[CouplingRegistry]` (`arch-20-representations §20.3`) whose
-identity is its Merkle root, carried alongside the existing composition
-request (`arch-07-pipeline §7.1`). The diamond MVP's `CouplingSpec` is
-short: electron-phonon + minimal coupling + ion-ion electrostatic +
-phonon-phonon scattering (in M).
+The active channels in a composition, **together with the theory frame
+they are interpreted in**, are the **`CouplingSpec`**:
 
-## 19.9 Open — coupling-channel template registry
+```
+record CouplingSpec {
+  channels       : SparseSet[CouplingRegistry]   -- the active channels (arch-20 §20.3)
+  theory_context : TheoryContext                  -- the global theory frame (§19.11)
+}
+```
 
-The principled set of `CouplingChannel` *templates* covering the
-physics regimes (~10 entries) — orbital-phonon, spin-orbit, spin-strain,
-gauge-matter (minimal coupling), multipole-external-field
-(Zeeman / Stark), ion-ion electrostatic, plus sub-DOF variants — is not
-enumerated here. Tracked as an open decision in
-`arch-18-open-decisions §7`. The actual `InvariantTerm`s are generated
-by the Stage-2.5 synthesizer; the registry only lists which channels
-to instantiate.
+`CouplingSpec` was previously a bare `SparseSet[CouplingRegistry]`; it is
+now a two-field record. Its `Address` is computed by the
+`arch-20-representations §20.4` record rule, so two specs with identical
+channel sets but different `theory_context` are guaranteed distinct
+addresses — the theory frame is part of identity, automatically. The
+`CouplingSpec` schema version is **bumped** (`arch-20 §20.9`) so old
+bare-set addresses cannot collide with new record addresses. The spec is
+carried alongside the composition request (`arch-07-pipeline §7.1`). The
+diamond MVP's `CouplingSpec` is short: electron-phonon (short-range) +
+minimal coupling + ion-ion electrostatic + phonon-phonon scattering
+(in `M`), under the MVP default theory context (§19.11).
+
+`theory_context` is **definitional input**: it is set at Stage 1, and it
+must exist before Stage 2 builds the (possibly double-cover) symmetry
+group, because the relativistic treatment determines whether the group
+carries the spin SU(2) factor. A `make-theory-context(raw) → TheoryContext`
+smart constructor (mirroring `make-coupling-channel`) **must** normalize
+and validate before any `Address[TheoryContext]` is taken — this is
+load-bearing for content addressing, not optional: it normalizes the
+hybrid-functional double representation (a hybrid is always
+`XCFunctionalTag.Hybrid` with `ManyBodyLevel.KohnSham`, never
+`HybridAsManyBody`) and enforces relativistic PP/run consistency, so two
+byte-distinct encodings of the same physics can never produce two
+addresses.
+
+## 19.9 Coverage policy (not a hand-curated registry)
+
+The "coupling-channel template registry" is **not** an enumerated list of
+coupling terms. A channel is a tuple in the parameter space
+`(pieces, target, order, derivative, mechanism_range, applicability)`; the
+registry is a **coverage policy** — a bounded subset of that space — plus
+the runtime rule:
+
+> the active channels for crystal `C` are those whose `applicability`
+> holds and whose invariant basis is non-empty under the crystal's
+> symmetry group `G_C`.
+
+The invariant generator (§19.3) is the filter that culls structurally
+empty tuples; the spec author never enumerates terms, only declares
+bounds wide enough that generator + applicability prune to the right
+active set automatically. The bound is the `CoverageBound`:
+
+```
+record CoverageBound {
+  global_cap         : (max_order : Nat, max_derivative : Derivative)  -- (4, Gradient(1)) for the MVP
+  per_mechanism_caps : PersistentMap<MechanismClass, (Nat, Derivative)> -- tighter inner pruning table
+}
+```
+
+The MVP global cap is `(max_order = 4, max_derivative = Gradient(1))`.
+The single driver of `order = 4` is lattice anharmonicity (4-phonon
+scattering, significant for diamond/GaN above room temperature); every
+other mechanism class fits inside `(2, Gradient(1))`, with a few reaching
+`order = 3`. The per-mechanism inner table prunes tuples *before* the
+character test so the generator never spends cycles on orders physics
+never visits for that mechanism. Both are coverage-policy parameters, not
+physical claims.
+
+The principled template set (~14 rows) is the `mechanism_range` table of
+§19.10. This **closes `arch-18-open-decisions §7`**.
+
+## 19.10 Mechanism range and polynomial sufficiency
+
+Some couplings are not polynomials of any finite degree in the state
+variables: they are functions of the wavevector `q` and/or frequency `ω`
+with an *essential* non-polynomial structure — a pole at `q = 0` (the
+Fröhlich `1/|q|²` polar-optical coupling) or poles in `ω` (dynamical
+screening: the screened Coulomb interaction `W(q,ω)`, the GW self-energy
+`Σ(k,ω)`, the TDDFT kernel `f_xc(q,ω)`). For these, the generator's
+polynomial basis is correct but **incomplete** — it captures the
+short-range part and misses the long-range/dynamical part.
+
+Whether a channel is complete is **not** decidable from
+`(pieces, target, order, derivative)` and the symmetry group alone: the
+short-range deformation-potential e-ph channel and the long-range
+Fröhlich e-ph channel have *identical* signatures. Long-range-ness is a
+property of the physical mechanism, so it is carried explicitly:
+
+```
+record MechanismRange =
+  | ShortRange                          -- analytic / exponentially-localized mediator
+  | LongRangeStatic(pole_order : Nat)   -- 1/|q|^p, ω-independent (Fröhlich p = 2, van der Waals, bare-Coulomb head)
+  | LongRangeDynamical                  -- frequency-dependent screening: poles in ω (W, Σ, f_xc)
+```
+
+`mechanism_range` is curated once per template (the table below). The
+flag `polynomial_sufficient` is then a total, O(1) **derived projection**:
+
+```
+polynomial_sufficient(c) =
+  match c.mechanism_range with
+  | ShortRange         => true
+  | LongRangeStatic(0) => true            -- a constant "pole" is just a coefficient
+  | LongRangeStatic(_) => false
+  | LongRangeDynamical => false
+```
+
+with the well-formedness invariant enforced by `make-coupling-channel`:
+`polynomial_sufficient(c) ⟺ (c.kernel_extension = None)`, and a non-sufficient
+channel's `kernel_extension.tag` must match its `mechanism_range`.
+
+`mechanism_range` says "this mechanism is long-range *when active*";
+`applicability` (§19.2) independently says "this mechanism is active for
+this crystal." They are orthogonal: a Fröhlich channel is long-range by
+mechanism yet inert in a non-polar crystal (diamond, zero Born charges)
+via `applicability`.
+
+The coverage-policy template table (the ~14 principled channels;
+all `ShortRange`/polynomial-sufficient except where noted):
+
+| Channel template | `mechanism_range` | `polynomial_sufficient` |
+|---|---|---|
+| electron-phonon (deformation-potential, SR) | `ShortRange` | true |
+| electron-phonon (Fröhlich polar-optical, LR) | `LongRangeStatic(2)` | **false** |
+| spin-orbit | `ShortRange` | true |
+| magneto-elastic | `ShortRange` | true |
+| minimal coupling / light-matter | `ShortRange` | true |
+| phonon-phonon (anharmonic) | `ShortRange` | true |
+| radiative damping | `ShortRange` | true |
+| exchange / Heisenberg | `ShortRange` | true |
+| Zeeman | `ShortRange` | true |
+| Stark / electric-dipole | `ShortRange` | true |
+| strain-electronic (Bir-Pikus) | `ShortRange` | true |
+| screened Coulomb / RPA `W(q,ω)` | `LongRangeDynamical` | **false** |
+| GW self-energy `Σ(k,ω)` | `LongRangeDynamical` | **false** |
+| TDDFT `f_xc(q,ω)` | `LongRangeDynamical` | **false** |
+
+The frequency-dependent screening channels are not in the diamond MVP
+`CouplingSpec`; they are the forcing function for the schema. ALDA
+`f_xc` is the degenerate corner of `LongRangeDynamical` (a constant
+kernel): tag a channel by its *general* mechanism, not by the cheapest
+approximation of it, so swapping ALDA → a tabulated kernel needs no
+re-tag.
+
+## 19.11 Extension types — `KernelExt`, `GaugeRule`, `TheoryContext`
+
+**`KernelExt`** carries the non-polynomial part of a long-range coupling.
+All four variants share one backbone: a section of a `BZ × ℝ_ω` fiber
+bundle valued in a bounded-rank tensor — they differ only in tensor rank,
+real-vs-complex value, and whether they are given parametrically or as a
+tabulated grid. No new substrate primitive is needed; every field maps
+onto the `arch-20-representations §20.1` primitives.
+
+```
+record KernelExt {
+  tag           : FroehlichLongRange | ScreenedCoulombRPA | GWQuasiparticleSelfEnergy | TDDFTXCKernel
+  domain        : MomentumOnly | MomentumFrequency | KpointFrequency | RealSpaceRadial
+  value_rank    : Rank0 | Rank2_GG | Rank2_bands | Rank2_cart
+  value_field   : RealField | ComplexField
+  symmetry_law  : QSymmetryLaw                    -- "K is scalar under the little-group of q" — the bridge to symmetry
+  representation : Parametric(KernelParams) | Tabulated(KernelGrid) | Hybrid(KernelParams, KernelGrid)
+  provenance    : Optional<ProvenanceLedger>
+}
+```
+
+`Parametric` kernels (Fröhlich: `ε_∞`, `ε_static`, Born charges `Z*`,
+`ω_LO`; LRC `f_xc`: a single `α`) are tiny (< 1 KB). `Tabulated` kernels
+(the RPA dielectric matrix, the GW self-energy) can be large: the
+full-frequency dense dielectric matrix for diamond (`12³` q-mesh × 64
+frequencies × 500 G-vectors, complex) is ≈ **440 GB** worst case,
+dropping to ≈ 0.5 GB after a plasmon-pole model + irreducible-BZ
+reduction. The grid is a `CacheEligible` sidecar attached by
+`Address[TabulatedField]` (`arch-20 §20.6`) — folded into the channel's
+identity by address, never by value, so content-addressing stays O(1).
+**No MVP channel is tabulated** (the active set is all-polynomial;
+Fröhlich for the polar members is `Parametric`); tabulated storage is a
+V2 concern, and the 440 GB figure is the number the persistent-storage
+tier must be designed against before those channels turn on.
+
+**`GaugeRule`** resolves a residual continuous basis ambiguity (e.g. the
+Wannier-gauge / orbital-projection choice for a downfolded channel). It is
+`None` for every MVP channel and is recorded only when a P3 gauge-fixing
+rule is genuinely attached.
+
+**`TheoryContext`** is the global theory frame on `CouplingSpec` (§19.8).
+A coupling constant is meaningful only relative to the simulation that
+produced it — a `J_ij` under PBE is a different number than under HSE06 —
+so the frame is part of the spec's identity:
+
+```
+record TheoryContext {
+  xc_functional          : XCFunctionalTag                         -- closed C1 vocabulary (arch-09 §9.7)
+  pseudopotential_set    : PersistentMap<AtomicSpecies, PPRecord>  -- closed discriminators; open file id (content-pinned)
+  many_body_level        : ManyBodyLevel                            -- closed C1; sub-records for +U / GW / DMFT
+  relativistic_treatment : RelativisticTreatment                    -- closed C1
+}
+```
+
+The four vocabularies are defined in `arch-09-vocabularies §9.7`. The
+theory context does **not** enter the `generate-invariants` cache key
+(the polynomial basis is symmetry-only; the relativistic treatment's
+one effect — spin-orbit — enters through the symmetry group's double
+cover, captured by `Address[CrystalSymmetryGroup]`, not here). It does
+**not** enter the runtime kernel either: by Stage 4 the theory choice has
+already selected the symmetry group and conditioned the coefficient
+values, so the lowered kernel is theory-agnostic. `theory_context` is
+therefore solely metadata for the cert + provenance layer (§19.7).
+
+The **MVP default theory context** is `GGA(PBE)` / PseudoDojo v0.4.1
+norm-conserving (Ga with the `3d` semicore shell promoted to valence) /
+`KohnSham` (plain DFT) / `ScalarRelativistic` (no explicit SOC; the MVP
+set is non-magnetic with no SOC-dependent observable). PBE's known
+underestimate of UWBG band gaps is handled by theory-conditioning the
+reference-battery obligation (§19.7), not by upgrading the default;
+`Hybrid(HSE06)` is the documented accuracy upgrade for gap-sensitive work.
+
+## 19.12 PSD closure for `PSDSymmForm` channels
+
+A `PSDSymmForm` channel lands as an off-diagonal block of the GENERIC
+friction operator `M`, which must be positive-semidefinite so that
+entropy production stays non-negative. The invariant generator returns a
+basis of `G`-invariant *symmetric* tensors, but membership in that linear
+subspace does not by itself guarantee any combination is PSD (a linear
+condition vs. a convex-cone condition).
+
+For all three MVP `PSDSymmForm` channels, PSD is **structurally
+guaranteed by physics** — it is a documented assumption, not a runtime
+search:
+
+```
+Assumption [PSD-e-ph]   — electron-phonon dissipation kernel M_{e-ph}
+  Origin:    GENERIC M-block axiom + fluctuation-dissipation theorem
+             + Fermi-golden-rule Gram structure (sum of squared coupling matrix elements)
+  Reference: Öttinger 2005 §5.3 (DOI 10.1002/0471727903); Callen–Welton 1951
+             (DOI 10.1103/PhysRev.83.34); Giustino 2017 (DOI 10.1103/RevModPhys.89.015003)
+  Closure:   tight (a PSD G-invariant representative provably exists) / loose (learned coefficients not pinned)
+
+Assumption [PSD-ph-ph] — phonon-phonon scattering kernel M_{ph-ph}
+  Origin:    GENERIC axiom + Onsager/detailed-balance + FDT
+  Reference: Öttinger 2005 §5.3; De Groot & Mazur Ch. IV (ISBN 978-0-486-64741-8);
+             Maradudin & Fein 1962 (DOI 10.1103/PhysRev.128.2589)
+  Closure:   tight / loose
+
+Assumption [PSD-rad]    — radiative damping kernel M_{rad}
+  Origin:    GENERIC axiom + Lindblad/GKSL completely-positive structure (rate Γ ≥ 0); FDT root
+  Reference: Öttinger 2005 §5.3; Breuer & Petruccione 2002 Ch. 3 (ISBN 978-0-19-852063-4);
+             Jackson 1998 §17.2
+  Closure:   tight / loose (trivial sign check when the invariant basis has dimension 1)
+```
+
+The closure is **tight at the operator level** — a PSD `G`-invariant
+representative provably exists (the Reynolds image of a PSD seed is PSD),
+so the positivity obligation (§19.7) never runs a semidefinite-feasibility
+search for these channels; feasibility is a theorem, recorded as the
+assumption above. The closure is **loose at the coefficient level** — the
+PINO learns the basis coefficients and could transiently leave the PSD
+cone during training — so the positivity obligation **keeps** a cheap
+per-evaluation guard `λ_min(M_block) ≥ −ε` on the small realized block.
+
+**Dormant SDP fallback (V2).** A future `PSDSymmForm` channel with no
+structural PSD guarantee would, at registration, solve the semidefinite
+feasibility program "find `c` with `Σ c_i B_i ⪰ 0`" (interior-point,
+`O(dim^{3.5})`, microseconds-to-milliseconds at registration only;
+block-diagonalizable along the irrep decomposition per Gatermann–Parrilo
+2004, DOI 10.1016/j.jpaa.2003.12.011); infeasibility rejects the channel.
+No MVP channel needs it; it is specified for forward-compatibility only.
 
 ---
 
@@ -1908,6 +2289,18 @@ One rule, used everywhere `Address[D]` is computed:
    table-version `Address`.
 9. **Group action laws.** Normalized homomorphism / twist generators
    over layer ids; relation rows sorted by `(domain, codomain, action_label)`.
+10. **Optional values.** `None` serializes as a single `0x00` byte; `Some(v)`
+    as `0x01 ‖ length-prefixed value bytes`. The two are never confusable with
+    an empty-but-present value, so a present-with-no-data field and an absent
+    field hash distinctly. (Used by `kernel_extension`, `gauge_rule`,
+    `provenance`, and every `T?` field in `arch-19-coupling-structure`.)
+11. **Scalar leaves.** `Nat` / `Int` serialize as fixed-width big-endian
+    (`u64` / `i64`); `Float` as IEEE-754 `binary64` big-endian with two
+    normalizations applied first — every `NaN` maps to one canonical
+    quiet-NaN bit pattern, and `-0.0` maps to `+0.0` — so numerically equal
+    values always share an address. (Rule 8 covers only U(1)/SU(2) sector
+    weights; arbitrary model floats such as `pole_order`, `exx_fraction`,
+    `alpha`, `g_cutoff` use this rule.)
 
 `SqliteReferenceCache` (`arch-12-cert §12.1`) and the residual cache
 (`impl-07-residual-factory`) both consume this rule unchanged.

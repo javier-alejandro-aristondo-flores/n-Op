@@ -37,17 +37,6 @@ The architecture above is committed. These remain to be decided.
    self-consistent GW / DMFT.
 6. The integrator interface — the exact signature `dynamics` exposes to
    `/informed-operator` for handing off the assembled GENERIC right-hand side.
-7. **Coupling-channel template registry.** Enumerate the principled
-   set of `CouplingChannel` templates (sector-pair × target shape × default
-   order) covering the physics regimes we care about — expected ~10 entries
-   spanning orbital-phonon, spin-orbit, spin-strain, gauge-matter
-   (minimal coupling), multipole-external-field (Zeeman / Stark), ion-ion
-   electrostatic, plus sub-DOF variants. Each entry: one `CouplingChannel`
-   record + `Active(MVP) | V2-deferred | Excluded(rationale)` flag +
-   applicability predicate. The actual coupling terms are *generated* by
-   the Stage-2.5 invariant synthesizer (`arch-19-coupling-structure`); the
-   registry only lists which channels to instantiate.
-
 ## Closed decisions
 
 - **ReferenceCache backend** = `SqliteReferenceCache` (`arch-12-cert §12.1`).
@@ -67,6 +56,19 @@ The architecture above is committed. These remain to be decided.
   (`arch-19-coupling-structure`). The nine named cross-regime strings of
   `arch-05-generic` collapse to a handful of channel declarations; the
   per-coupling terms are generated, not registered.
+- **Coupling-channel coverage policy** = a bounded `CoverageBound`
+  (global cap `(order ≤ 4, Gradient(1))` + a per-mechanism inner table)
+  plus the runtime rule "active channels are those whose `applicability`
+  holds and whose invariant basis is non-empty," **not** a hand-curated
+  registry (`arch-19-coupling-structure §19.9`). Each channel carries a
+  `mechanism_range` tag whose derived `polynomial_sufficient` flag decides
+  whether the symmetry-generated basis is the whole coupling; long-range
+  channels carry a typed `KernelExt` for the non-polynomial part
+  (§19.10–§19.11). The composition's theory frame is a `TheoryContext` on
+  `CouplingSpec` (XC functional / pseudopotentials / many-body level /
+  relativistic treatment), and `PSDSymmForm` channels carry documented PSD
+  assumptions rather than a runtime SDP search (§19.11–§19.12). MVP default
+  theory context: `PBE / PseudoDojo-v0.4.1-NC / KohnSham / ScalarRelativistic`.
 - **Representation substrate** = one substrate contract (typed indexed
   universes, content-addressed Merkle DAGs, sparse-set backends,
   persistent stage-visible maps) plus a small parametric op-signature

@@ -149,6 +149,18 @@ One rule, used everywhere `Address[D]` is computed:
    table-version `Address`.
 9. **Group action laws.** Normalized homomorphism / twist generators
    over layer ids; relation rows sorted by `(domain, codomain, action_label)`.
+10. **Optional values.** `None` serializes as a single `0x00` byte; `Some(v)`
+    as `0x01 ‖ length-prefixed value bytes`. The two are never confusable with
+    an empty-but-present value, so a present-with-no-data field and an absent
+    field hash distinctly. (Used by `kernel_extension`, `gauge_rule`,
+    `provenance`, and every `T?` field in `arch-19-coupling-structure`.)
+11. **Scalar leaves.** `Nat` / `Int` serialize as fixed-width big-endian
+    (`u64` / `i64`); `Float` as IEEE-754 `binary64` big-endian with two
+    normalizations applied first — every `NaN` maps to one canonical
+    quiet-NaN bit pattern, and `-0.0` maps to `+0.0` — so numerically equal
+    values always share an address. (Rule 8 covers only U(1)/SU(2) sector
+    weights; arbitrary model floats such as `pole_order`, `exx_fraction`,
+    `alpha`, `g_cutoff` use this rule.)
 
 `SqliteReferenceCache` (`arch-12-cert §12.1`) and the residual cache
 (`impl-07-residual-factory`) both consume this rule unchanged.

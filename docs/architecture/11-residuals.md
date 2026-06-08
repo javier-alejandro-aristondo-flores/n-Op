@@ -125,6 +125,12 @@ internals; weights persist across compose-time recompiles. Facets are
 exposed via a parallel `Map<ResidualKey, ContributionFacets>` that the
 PINO consults for category- or bundle-level aggregation.
 
+`ResidualKey` is a typed `ContentAddress` instance in the substrate's
+sense (`arch-20-representations §20.3` row for cluster C5);
+`CategoryTag`, `BundleId`, and `AxisLabel` are `Universe[T]` instances
+(cluster C1); `ContributionFacets` is the value type of a typed sidecar
+fiber and never participates in `ResidualKey` identity (cluster C3).
+
 ## 11.3 Examples of what becomes a separately-weightable contribution
 
 Not "the algebraic-identities category" but each of:

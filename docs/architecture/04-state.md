@@ -41,4 +41,9 @@ reintroduce the integration pathology the formulation avoids.
 `/physics` does not hold values of `x(t)`; it defines what `x(t)` is and how to
 test a candidate against the laws.
 
+The seven slot labels above are the elements of the closed C1 vocabulary
+`StateComponent`, realized as a `Universe[StateComponent]` instance per
+`arch-20-representations §20.3`. Downstream files address state slots by
+that universe's dense ordinal handle rather than by raw symbol.
+
 ---

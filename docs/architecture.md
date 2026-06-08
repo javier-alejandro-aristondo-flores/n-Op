@@ -160,6 +160,11 @@ reintroduce the integration pathology the formulation avoids.
 `/physics` does not hold values of `x(t)`; it defines what `x(t)` is and how to
 test a candidate against the laws.
 
+The seven slot labels above are the elements of the closed C1 vocabulary
+`StateComponent`, realized as a `Universe[StateComponent]` instance per
+`arch-20-representations §20.3`. Downstream files address state slots by
+that universe's dense ordinal handle rather than by raw symbol.
+
 ---
 
 
@@ -294,6 +299,15 @@ applicability predicates, symmetry annotations, compression plans,
 adjoint strategies, cert hooks, provenance tags — live instead in
 per-stage sidecars (§6.4), produced by one stage and consumed by the
 next, never carried into the runtime kernel.
+
+`NodeKind` (§6.2) is the closed C1 vocabulary that discriminates the
+typed payload sum; this is the substrate's primary closed-polymorphism
+mechanism (`arch-20-representations §20.6`). Sidecars (§6.4) are typed
+`PersistentMap` fibers in the substrate's sense (`arch-20 §20.3`,
+cluster C3). Graph identity is the closure of the multiset of output
+`Address[GraphNode]` values under children-pointers
+(`arch-20 §20.3` row for `PhysicsGraph`); the graph has no separate
+identifier independent of its outputs.
 
 ## 6.2 The three node kinds
 
@@ -965,6 +979,12 @@ internals; weights persist across compose-time recompiles. Facets are
 exposed via a parallel `Map<ResidualKey, ContributionFacets>` that the
 PINO consults for category- or bundle-level aggregation.
 
+`ResidualKey` is a typed `ContentAddress` instance in the substrate's
+sense (`arch-20-representations §20.3` row for cluster C5);
+`CategoryTag`, `BundleId`, and `AxisLabel` are `Universe[T]` instances
+(cluster C1); `ContributionFacets` is the value type of a typed sidecar
+fiber and never participates in `ResidualKey` identity (cluster C3).
+
 ## 11.3 Examples of what becomes a separately-weightable contribution
 
 Not "the algebraic-identities category" but each of:
@@ -1073,6 +1093,17 @@ verdicts plus numeric witnesses for failures.
 Each obligation maps onto a Layer-0 axis (§10), making the cert checkers generic
 functions over the typeclasses.
 
+The cert evidence produced by the ten obligations is one
+`MerkleDAG[EvidenceOps, EvidencePayload]` per composition, in the
+substrate's sense (`arch-20-representations §20.2`, §20.3 row for
+cluster C4). Each obligation's output is a typed leaf attached as an
+`EvidenceOps.attestation` node; aggregation across obligations is the
+semilattice meet of `EvidenceOps`, so a composition's overall verdict
+is `Failed` if any obligation leaf is `Failed`, `Pending` if any leaf
+is `Pending` and none is `Failed`, and `Passed` otherwise. The
+attestation DAG's root `Address` is the cert artifact `/informed-
+operator` consumes.
+
 ## 12.0.1 Coupling-derived simplifications (obligations 1, 5)
 
 When a formula node originates from the invariant generator
@@ -1160,6 +1191,20 @@ perturbation, and current-vs-initial-state evaluation for trajectory training.
 the same predicate contract: a first-order decidable function on typeclass
 tags. A channel whose `applicability` returns `false` is skipped at Stage 2.5
 and contributes no invariants to the composition.
+
+The storage shape for an applicability predicate is a
+`MerkleDAG[PredicateOps, C1Atom]` root in the substrate's sense
+(`arch-20-representations §20.2`, §20.3 row for the applicability
+cluster): a reduced ordered Boolean DAG over typed parameterized atoms
+drawn from the C1 typeclass-tag vocabularies (`arch-10-typeclasses`).
+The atom order is part of the predicate-vocabulary version
+(`arch-20 §20.9`); adding a new atom creates a new order id and forces
+explicit re-canonicalization of stored predicate roots rather than
+silent reinterpretation. Cert obligation checkers (`arch-12-cert`) are
+**not** ROBDDs over typeclass-tag atoms — they are typed registered
+morphisms from GENERIC artifacts to evidence, registered through the
+C2 generator-registry machinery (`arch-20 §20.7`). The split is
+preserved.
 
 ---
 
@@ -1582,7 +1627,9 @@ record InvariantTerm {
   channel         : CouplingChannel
   irrep-coefficients : IrrepCoefficientTable   -- the trivial-irrep coefficients
                                                -- of the underlying tensor product
-  symbolic-form   : SymbolicTensor             -- the explicit term
+  symbolic-form   : SymbolicTensor             -- the explicit term; stored as the
+                                               -- root of a MerkleDAG[SymbolicTensorOps,
+                                               -- TypedLeaf] per arch-20 §20.2
   generator-hash  : Address[InvariantTerm]     -- domain-separated content address
 }
 ```

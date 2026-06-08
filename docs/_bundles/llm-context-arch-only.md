@@ -53,6 +53,15 @@ adjoint strategies, cert hooks, provenance tags — live instead in
 per-stage sidecars (§6.4), produced by one stage and consumed by the
 next, never carried into the runtime kernel.
 
+`NodeKind` (§6.2) is the closed C1 vocabulary that discriminates the
+typed payload sum; this is the substrate's primary closed-polymorphism
+mechanism (`arch-20-representations §20.6`). Sidecars (§6.4) are typed
+`PersistentMap` fibers in the substrate's sense (`arch-20 §20.3`,
+cluster C3). Graph identity is the closure of the multiset of output
+`Address[GraphNode]` values under children-pointers
+(`arch-20 §20.3` row for `PhysicsGraph`); the graph has no separate
+identifier independent of its outputs.
+
 ## 6.2 The three node kinds
 
 ```
@@ -358,6 +367,11 @@ reintroduce the integration pathology the formulation avoids.
 `x(t)` is a **type** that the PINO's predictions instantiate at each time step.
 `/physics` does not hold values of `x(t)`; it defines what `x(t)` is and how to
 test a candidate against the laws.
+
+The seven slot labels above are the elements of the closed C1 vocabulary
+`StateComponent`, realized as a `Universe[StateComponent]` instance per
+`arch-20-representations §20.3`. Downstream files address state slots by
+that universe's dense ordinal handle rather than by raw symbol.
 
 ---
 
@@ -728,6 +742,12 @@ PINO holds `Map<ResidualKey, Weight>` independent of `/physics`'s
 internals; weights persist across compose-time recompiles. Facets are
 exposed via a parallel `Map<ResidualKey, ContributionFacets>` that the
 PINO consults for category- or bundle-level aggregation.
+
+`ResidualKey` is a typed `ContentAddress` instance in the substrate's
+sense (`arch-20-representations §20.3` row for cluster C5);
+`CategoryTag`, `BundleId`, and `AxisLabel` are `Universe[T]` instances
+(cluster C1); `ContributionFacets` is the value type of a typed sidecar
+fiber and never participates in `ResidualKey` identity (cluster C3).
 
 ## 11.3 Examples of what becomes a separately-weightable contribution
 

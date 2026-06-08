@@ -61,6 +61,15 @@ adjoint strategies, cert hooks, provenance tags — live instead in
 per-stage sidecars (§6.4), produced by one stage and consumed by the
 next, never carried into the runtime kernel.
 
+`NodeKind` (§6.2) is the closed C1 vocabulary that discriminates the
+typed payload sum; this is the substrate's primary closed-polymorphism
+mechanism (`arch-20-representations §20.6`). Sidecars (§6.4) are typed
+`PersistentMap` fibers in the substrate's sense (`arch-20 §20.3`,
+cluster C3). Graph identity is the closure of the multiset of output
+`Address[GraphNode]` values under children-pointers
+(`arch-20 §20.3` row for `PhysicsGraph`); the graph has no separate
+identifier independent of its outputs.
+
 ## 6.2 The three node kinds
 
 ```

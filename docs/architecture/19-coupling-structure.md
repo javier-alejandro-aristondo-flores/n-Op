@@ -97,7 +97,9 @@ record InvariantTerm {
   channel         : CouplingChannel
   irrep-coefficients : IrrepCoefficientTable   -- the trivial-irrep coefficients
                                                -- of the underlying tensor product
-  symbolic-form   : SymbolicTensor             -- the explicit term
+  symbolic-form   : SymbolicTensor             -- the explicit term; stored as the
+                                               -- root of a MerkleDAG[SymbolicTensorOps,
+                                               -- TypedLeaf] per arch-20 §20.2
   generator-hash  : Address[InvariantTerm]     -- domain-separated content address
 }
 ```

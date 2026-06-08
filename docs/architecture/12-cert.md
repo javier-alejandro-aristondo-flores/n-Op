@@ -42,6 +42,17 @@ verdicts plus numeric witnesses for failures.
 Each obligation maps onto a Layer-0 axis (§10), making the cert checkers generic
 functions over the typeclasses.
 
+The cert evidence produced by the ten obligations is one
+`MerkleDAG[EvidenceOps, EvidencePayload]` per composition, in the
+substrate's sense (`arch-20-representations §20.2`, §20.3 row for
+cluster C4). Each obligation's output is a typed leaf attached as an
+`EvidenceOps.attestation` node; aggregation across obligations is the
+semilattice meet of `EvidenceOps`, so a composition's overall verdict
+is `Failed` if any obligation leaf is `Failed`, `Pending` if any leaf
+is `Pending` and none is `Failed`, and `Passed` otherwise. The
+attestation DAG's root `Address` is the cert artifact `/informed-
+operator` consumes.
+
 ## 12.0.1 Coupling-derived simplifications (obligations 1, 5)
 
 When a formula node originates from the invariant generator

@@ -36,4 +36,18 @@ the same predicate contract: a first-order decidable function on typeclass
 tags. A channel whose `applicability` returns `false` is skipped at Stage 2.5
 and contributes no invariants to the composition.
 
+The storage shape for an applicability predicate is a
+`MerkleDAG[PredicateOps, C1Atom]` root in the substrate's sense
+(`arch-20-representations §20.2`, §20.3 row for the applicability
+cluster): a reduced ordered Boolean DAG over typed parameterized atoms
+drawn from the C1 typeclass-tag vocabularies (`arch-10-typeclasses`).
+The atom order is part of the predicate-vocabulary version
+(`arch-20 §20.9`); adding a new atom creates a new order id and forces
+explicit re-canonicalization of stored predicate roots rather than
+silent reinterpretation. Cert obligation checkers (`arch-12-cert`) are
+**not** ROBDDs over typeclass-tag atoms — they are typed registered
+morphisms from GENERIC artifacts to evidence, registered through the
+C2 generator-registry machinery (`arch-20 §20.7`). The split is
+preserved.
+
 ---

@@ -12,8 +12,11 @@ research-sources: []
 ---
 # Build sequence
 
-Each phase produces a verifiable artifact. Phase 1 is blocked by the language
-decision (`arch-18-open-decisions §1`).
+Each phase produces a verifiable artifact. The implementation-language decision is
+resolved (`arch-18-open-decisions`, Closed decisions;
+`physics/research/implementation-language.md`): a **Haskell** compiler-host for
+Stages 1–4 + the substrate, emitting a **Julia** Stage-5 runtime, with **GAP** and
+**Lean 4** offline.
 
 | Phase | Scope | Artifact |
 |---|---|---|

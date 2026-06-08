@@ -1532,32 +1532,43 @@ obligation-3 flags suspect cases.
 
 The architecture above is committed. These remain to be decided.
 
-1. **Implementation language — the single blocking decision.** No language is
-   chosen. The always-cheap pipeline (`arch-07-pipeline`) narrows the candidates
-   to those with first-class staging + AD + sparse linear algebra:
-   - **Julia** — Symbolics.jl + ModelingToolkit.jl + Enzyme/Diffractor; closest
-     analogue to the symbolic-IR + Stage-4-codegen design.
-   - **Python + JAX** — `jax.jit` for staging, JAXopt for implicit-diff,
-     Pennylane-style symbolic frontends for the IR; strongest ML/GPU ecosystem.
-   - **Custom MLIR stack** — most control over Stage-4 codegen at highest cost.
-
-   Haskell/TTH and Scala 3 are technically viable for the staging story but
-   lack the numerical ecosystem (compressed-ops, IBZ tooling, GPU codegen) the
-   pipeline depends on; demoted from candidates.
-
-   This blocks the first implementation phase.
-2. Surrogate-net build vs adopt, for the D4 surrogate formulas.
-3. PDE-mesh format + adjoint library, for `KineticEvolutionOf` instances needing
+1. Surrogate-net build vs adopt, for the D4 surrogate formulas.
+2. PDE-mesh format + adjoint library, for `KineticEvolutionOf` instances needing
    an explicit mesh.
-4. The `γ̂` open questions of `arch-15-gamma-hat §15.4` (ε-equality,
+3. The `γ̂` open questions of `arch-15-gamma-hat §15.4` (ε-equality,
    materialization policy, long-trajectory drift / rank-refresh, rank-dependent
    applicability of the LowRank slot).
-5. Layer-1.75 minimum spec sufficient for a V2 contributor to implement
+4. Layer-1.75 minimum spec sufficient for a V2 contributor to implement
    self-consistent GW / DMFT.
-6. The integrator interface — the exact signature `dynamics` exposes to
+5. The integrator interface — the exact signature `dynamics` exposes to
    `/informed-operator` for handing off the assembled GENERIC right-hand side.
 ## Closed decisions
 
+- **Implementation language** = a **polyglot of domain-specific DSLs** joined at
+  the pipeline's Stage-4→Stage-5 codegen seam, not a single language
+  (`physics/research/implementation-language.md`). This was the single blocking
+  decision; closing it unblocks the first implementation phase.
+  - **Haskell** hosts Stages 1–4 + the `arch-20` substrate (the symbolic-IR
+    compiler): GADTs / `DataKinds` / type families type the op-indexed Merkle DAG
+    and the `SymbolicTensorOps` operad at compile time; `hegg` provides the
+    Stage-3 e-graph; `GHC.Generics` derives the §20.4 canonical serializer; our
+    own AD drives Stage-4 adjoint synthesis. (OCaml is the documented fallback
+    host.)
+  - **Julia** is the Stage-5 runtime: Stage 4 **emits Julia source**, JIT-compiled
+    once per composition, so the hot loop is native Julia with no per-sample FFI;
+    Julia owns the optional GPU codegen.
+  - **GAP** (offline) generates/validates the Stage-2/2.5 character tables and
+    Reynolds projectors (`|G|≤192`), baked into the compiler.
+  - **Lean 4** (offline) proves §20.4 pre-hash canonical-encoding injectivity and
+    the `EvidenceOps` / `GroupOps` / ROBDD algebraic laws.
+
+  Hardware: a **CPU-dominant compiler**; GPU is a Stage-5-only optional accelerator
+  chosen per-composition (the symmetry quotient yields small irrep blocks — a GPU
+  anti-pattern — so the diamond MVP often runs fastest on CPU). The polyglot split
+  is a net win **conditional on** a Stage-4→Stage-5 differential golden test; the
+  single-host fallback is Julia-only or Haskell-only. Rust (the single-language
+  winner) is excluded by preference; Python+JAX is disqualified — its tracer owns
+  differentiation, which conflicts with bring-your-own adjoint synthesis.
 - **ReferenceCache backend** = `SqliteReferenceCache` (`arch-12-cert §12.1`).
 - **Coverage-mask format** = `RoaringCoverageMask` (`arch-16-pino-bridge §16.2.1`).
 - **Curriculum schedule** = `0.10 / 0.60 / 0.90` cumulative fractions, last
@@ -3141,8 +3152,11 @@ first-order decidable.
 
 # Build sequence
 
-Each phase produces a verifiable artifact. Phase 1 is blocked by the language
-decision (`arch-18-open-decisions §1`).
+Each phase produces a verifiable artifact. The implementation-language decision is
+resolved (`arch-18-open-decisions`, Closed decisions;
+`physics/research/implementation-language.md`): a **Haskell** compiler-host for
+Stages 1–4 + the substrate, emitting a **Julia** Stage-5 runtime, with **GAP** and
+**Lean 4** offline.
 
 | Phase | Scope | Artifact |
 |---|---|---|
@@ -3378,12 +3392,14 @@ The buildable unit is roughly one-third of the full vocabulary.
 
 # Decisions this slice forces
 
-- **Implementation language (H1).** Now decidable against concrete needs:
-  reverse-mode AD through implicit-diff adjoints (BTE-RTA, SCF, G₀W₀), staged
-  symbolic IR with Stage-4 codegen, IBZ tooling, and GPU support for k-point
-  meshes. Candidates per `arch-18-open-decisions §1`: Julia (Symbolics +
-  ModelingToolkit + Enzyme), Python + JAX (jit + JAXopt), or a custom MLIR
-  stack.
+- **Implementation language (H1) — resolved.** The concrete needs (reverse-mode
+  AD through implicit-diff adjoints for BTE-RTA / SCF / G₀W₀, staged symbolic IR
+  with Stage-4 codegen, IBZ tooling, optional GPU for k-point meshes) are met by a
+  **polyglot of DSLs** (`arch-18-open-decisions`, Closed decisions;
+  `physics/research/implementation-language.md`): a **Haskell** compiler-host for
+  Stages 1–4 + the substrate, emitting a **Julia** Stage-5 runtime (which owns the
+  optional GPU codegen), with **GAP** (group-theory tables) and **Lean 4** (spec
+  proofs) offline.
 - **TB-3NN-sp³d⁵ for carbon as warm-start initializer.** Used as a seed for
   the SCF inner loop only; not a separately-evaluated formula and not an
   independent residual.

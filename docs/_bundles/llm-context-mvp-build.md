@@ -129,12 +129,14 @@ stability; one heterostructure check (c-BN on diamond) via lattice matching.*
 
 # Decisions this slice forces
 
-- **Implementation language (H1).** Now decidable against concrete needs:
-  reverse-mode AD through implicit-diff adjoints (BTE-RTA, SCF, G₀W₀), staged
-  symbolic IR with Stage-4 codegen, IBZ tooling, and GPU support for k-point
-  meshes. Candidates per `arch-18-open-decisions §1`: Julia (Symbolics +
-  ModelingToolkit + Enzyme), Python + JAX (jit + JAXopt), or a custom MLIR
-  stack.
+- **Implementation language (H1) — resolved.** The concrete needs (reverse-mode
+  AD through implicit-diff adjoints for BTE-RTA / SCF / G₀W₀, staged symbolic IR
+  with Stage-4 codegen, IBZ tooling, optional GPU for k-point meshes) are met by a
+  **polyglot of DSLs** (`arch-18-open-decisions`, Closed decisions;
+  `physics/research/implementation-language.md`): a **Haskell** compiler-host for
+  Stages 1–4 + the substrate, emitting a **Julia** Stage-5 runtime (which owns the
+  optional GPU codegen), with **GAP** (group-theory tables) and **Lean 4** (spec
+  proofs) offline.
 - **TB-3NN-sp³d⁵ for carbon as warm-start initializer.** Used as a seed for
   the SCF inner loop only; not a separately-evaluated formula and not an
   independent residual.
@@ -333,8 +335,11 @@ with `not-implemented-in-V1` stubs that fail loud.
 
 # Build sequence
 
-Each phase produces a verifiable artifact. Phase 1 is blocked by the language
-decision (`arch-18-open-decisions §1`).
+Each phase produces a verifiable artifact. The implementation-language decision is
+resolved (`arch-18-open-decisions`, Closed decisions;
+`physics/research/implementation-language.md`): a **Haskell** compiler-host for
+Stages 1–4 + the substrate, emitting a **Julia** Stage-5 runtime, with **GAP** and
+**Lean 4** offline.
 
 | Phase | Scope | Artifact |
 |---|---|---|

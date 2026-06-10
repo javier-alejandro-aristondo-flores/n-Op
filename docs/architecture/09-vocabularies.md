@@ -29,7 +29,7 @@ Every other document references these numbers rather than restating them.
 | Dressing layers | 1 / 1.25 / 1.75 / 2 / 3 | yes |
 | Computational methods | 12 (+2 sub-methods) | yes |
 | Abstract-property templates | 20 | yes |
-| Named formulas | 110 substantive (+2 rejected markers) | yes — see `formula-registry.md` |
+| Named formulas | 117 substantive (+2 rejected markers) | yes — see `formula-registry.md` |
 | Observable bundles | 11 (B1–B11) | yes |
 | Residual categories | 19 | yes |
 | Cert obligations | 10 | yes |
@@ -95,17 +95,19 @@ Bulk-boundary correspondence is **not** a template; it is handled at the cert
 layer (obligation-7, a `DiscreteStructure` morphism over the topology atlas,
 §14).
 
-### 9.3 110 named formulas
+### 9.3 117 named formulas
 
 Closed registry of typed, fully-parameterized algebraic formulas, named by
 behavior (person-attribution names appear only as parenthetical literature
 pointers). The canonical machine-readable list is
-`physics/library/formulas/registry-manifest.csv` (110 substantive rows + 2
+`physics/library/formulas/registry-manifest.csv` (117 substantive rows + 2
 markers for relations that are enforced architecturally and therefore *not*
 residualized: force = −∇energy, and equivariance). Rows 1–87 are grounded in the
 domain research (`physics/research/`); rows 88–102 are the linear-response and
 topology-atlas extensions; rows 105–112 are the slow-tier degradation / radiation
-extensions (`arch-21-multiscale-state §21.13`). Each formula carries a typed signature, a cost tier
+extensions (`arch-21-multiscale-state §21.13`); rows 113–119 are the
+polarization / piezoelectric / 2DEG package (`is-polar-material`-gated; GaN/AlN/AlGaN
+HEMTs). Each formula carries a typed signature, a cost tier
 `T0..T3`, a differentiability tag `D0..D4`, and an applicability classifier
 (§13). See `formula-registry.md` for the narrative index.
 

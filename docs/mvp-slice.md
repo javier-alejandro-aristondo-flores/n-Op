@@ -129,7 +129,7 @@ stability; one heterostructure check (c-BN on diamond) via lattice matching.*
 # In-MVP vs deferred
 
 **In the MVP**
-- ~35 named formulas (the rows above) of the 110.
+- ~35 named formulas (the rows above) of the 117.
 - 9 of the 12 methods (all but `path-search`, `convex-optimization` beyond the
   hull check, `statistical-sampling`, `microkinetic-steady-state` — chemical/MC
   machinery not on the diamond path).

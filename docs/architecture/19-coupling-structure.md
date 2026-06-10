@@ -397,8 +397,11 @@ character test so the generator never spends cycles on orders physics
 never visits for that mechanism. Both are coverage-policy parameters, not
 physical claims.
 
-The principled template set (~14 rows) is the `mechanism_range` table of
-§19.10. This **closes `arch-18-open-decisions §7`**.
+The principled template set (~15 rows) is the `mechanism_range` table of
+§19.10 — which now includes the **piezoelectric acoustic** channel
+(`LongRangeStatic(1)`, `1/q` pole) alongside the Fröhlich (`1/q²`) one, the second
+long-range e-ph mechanism the polar III-N members carry (`is-polar-material`-gated;
+inert for diamond). This **closes `arch-18-open-decisions §7`**.
 
 ## 19.10 Mechanism range and polynomial sufficiency
 
@@ -453,6 +456,7 @@ all `ShortRange`/polynomial-sufficient except where noted):
 |---|---|---|
 | electron-phonon (deformation-potential, SR) | `ShortRange` | true |
 | electron-phonon (Fröhlich polar-optical, LR) | `LongRangeStatic(2)` | **false** |
+| electron-phonon (piezoelectric acoustic, LR) | `LongRangeStatic(1)` | **false** |
 | spin-orbit | `ShortRange` | true |
 | magneto-elastic | `ShortRange` | true |
 | minimal coupling / light-matter | `ShortRange` | true |

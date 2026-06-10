@@ -105,7 +105,7 @@ lowered into `FormulaApply` nodes attached to the `E_coupling`,
   residuals (a band structure, a charge density, a force field, a
   dynamical matrix) collapse to a single node referenced by all
   consumers.
-- **Cross-formula CSE.** The 110 named formulas often share
+- **Cross-formula CSE.** The 117 named formulas often share
   intermediate quantities; CSE pulls these out.
 - **Tearing and alias elimination.** Algebraic dependencies are
   resolved at compose-time (ModelingToolkit-style); sparsity patterns

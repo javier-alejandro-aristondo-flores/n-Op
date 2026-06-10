@@ -18,8 +18,10 @@ process; the registry is a contract, not a convenience.
 
 ## Counts
 
-- **110 substantive formulas** (rows 1–102 + 105–112). Rows 105–112 are the
-  slow-tier degradation / radiation formulas (`arch-21-multiscale-state §21.13`).
+- **117 substantive formulas** (rows 1–102 + 105–119). Rows 105–112 are the
+  slow-tier degradation / radiation formulas (`arch-21-multiscale-state §21.13`);
+  rows 113–119 are the polarization / piezoelectric / 2DEG package
+  (`is-polar-material`-gated; GaN/AlN/AlGaN HEMTs).
 - **2 architectural markers** (rows 103–104) for relations enforced *by
   construction* and therefore **not** residualized: force = −∇energy (an
   autodiff identity) and equivariance (a structural constraint). They appear in

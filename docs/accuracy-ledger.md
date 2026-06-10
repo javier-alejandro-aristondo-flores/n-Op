@@ -51,7 +51,7 @@ gap is named (and tracked in the audit's P2 list).
 | 32 | contact_resistivity ρ_c | ±50% (orders span) | dominated by φ_B |
 | 33 | interface_trap_density D_it | factor-2 | dangling-bond + strain |
 | 34 | tunneling_transmission T_WKB | ±20% in log | Fowler–Nordheim closed form |
-| 35 | spontaneous + piezo polarization P_sp/P_pz | ±5% | **MISSING (Berry-phase/λ-path) — P1.3** |
+| 35 | spontaneous + piezo polarization P_sp/P_pz | ±5% | landed: Z*-composition (rows 113–114); absolute Berry-phase λ-path deferred V2 |
 | 36 | elastic_tensor C_ijkl | ±5% | DFT stress-strain / DFPT |
 | 37 | bulk/shear modulus B,G | ±5% | Voigt average |
 | 38 | sound_velocity v_s | ±5% | Christoffel |
@@ -68,7 +68,7 @@ gap is named (and tracked in the audit's P2 list).
 | 49 | hot_carrier_distribution f(E,F) | shape ±20%; high-E tail decisive | **OUTSIDE registry** (full-band MC) |
 | 50 | electromigration E_a^EM | ±0.1 eV | NEB interface hop |
 | 51 | defect_evolution dN/dt | **factor-2** | master-equation / kMC (slow tier, `arch-21`) |
-| 52 | 2DEG_sheet_density n_s | ±10% | **MISSING — needs P_sp, φ_B, ΔE_C, D_it (P1.3)** |
+| 52 | 2DEG_sheet_density n_s | ±10% | landed: Ambacher composition (row 115) from rows 113/114/116 |
 
 (The **16 FoMs** — BFOM, JFOM, combined breakdown/mobility/thermal figures — are algebraic
 compositions of the above and inherit their composed `combineTol` budget.)

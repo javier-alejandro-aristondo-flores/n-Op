@@ -27,6 +27,11 @@ Stated and held, so the architecture is honest about what it does not cover:
   registered D4 surrogate with an obligation-9 validity domain; **no such surrogate
   ships in V1** (the closed-form / Layer-1.25 path is used, with the accuracy regime
   declared in the ledger, `arch-11-residuals §11.7`).
+- Absolute Berry-phase / Wannier-center polarization (the λ-path `P_sp` evaluator) —
+  deferred to V2. V1 uses the Z*-composition path (`arch-19`/registry rows 113–114, ±5%,
+  `accuracy-ledger` #35); the absolute modern-theory integral needs a
+  `berry-phase-polarization` sub-stage not in the closed 12-method alphabet, analogous to
+  the G₀W₀ gap upgrade over PBE.
 - Plasma-process surface damage; grain-boundary statistics; continuum creep /
   dislocation climb; quantum-tunneling-corrected reaction rates (classical
   Eyring TST adequate at T_op ≥ 600 K).

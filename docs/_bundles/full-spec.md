@@ -401,7 +401,7 @@ Every operation in `/physics` is one of these three:
 
 1. **`Input`** — a slot for a state component (`h`, `R_I`, `P_I`, `Π_h`,
    `Z_I`, `γ̂`, `A`) or an environmental scalar (`T`, `μ`, `E_field`, …).
-2. **`FormulaApply`** — application of one of the 110 named formulas
+2. **`FormulaApply`** — application of one of the 117 named formulas
    (`arch-09-vocabularies §9.3`) to typed argument nodes.
 3. **`MethodInvoke`** — application of one of the 12 computational
    methods (`arch-09-vocabularies §9.1`) to typed argument nodes.
@@ -464,7 +464,7 @@ them either — they are codegen inputs, consumed at Stage 4 and erased.
 
 | Vocabulary item | Realized as |
 |---|---|
-| 110 formulas (`arch-09-vocabularies §9.3`) | typing rules for `FormulaApply` nodes |
+| 117 formulas (`arch-09-vocabularies §9.3`) | typing rules for `FormulaApply` nodes |
 | 12 methods (`arch-09-vocabularies §9.1`) | typing rules for `MethodInvoke` nodes |
 | 20 templates (`arch-09-vocabularies §9.2`) | graph-construction macros that emit subgraphs |
 | 11 bundles (`arch-09-vocabularies §9.4`) | the `bundle` payload of `Observable` roles |
@@ -588,7 +588,7 @@ lowered into `FormulaApply` nodes attached to the `E_coupling`,
   residuals (a band structure, a charge density, a force field, a
   dynamical matrix) collapse to a single node referenced by all
   consumers.
-- **Cross-formula CSE.** The 110 named formulas often share
+- **Cross-formula CSE.** The 117 named formulas often share
   intermediate quantities; CSE pulls these out.
 - **Tearing and alias elimination.** Algebraic dependencies are
   resolved at compose-time (ModelingToolkit-style); sparsity patterns
@@ -783,7 +783,7 @@ Every other document references these numbers rather than restating them.
 | Dressing layers | 1 / 1.25 / 1.75 / 2 / 3 | yes |
 | Computational methods | 12 (+2 sub-methods) | yes |
 | Abstract-property templates | 20 | yes |
-| Named formulas | 110 substantive (+2 rejected markers) | yes — see `formula-registry.md` |
+| Named formulas | 117 substantive (+2 rejected markers) | yes — see `formula-registry.md` |
 | Observable bundles | 11 (B1–B11) | yes |
 | Residual categories | 19 | yes |
 | Cert obligations | 10 | yes |
@@ -849,17 +849,19 @@ Bulk-boundary correspondence is **not** a template; it is handled at the cert
 layer (obligation-7, a `DiscreteStructure` morphism over the topology atlas,
 §14).
 
-### 9.3 110 named formulas
+### 9.3 117 named formulas
 
 Closed registry of typed, fully-parameterized algebraic formulas, named by
 behavior (person-attribution names appear only as parenthetical literature
 pointers). The canonical machine-readable list is
-`physics/library/formulas/registry-manifest.csv` (110 substantive rows + 2
+`physics/library/formulas/registry-manifest.csv` (117 substantive rows + 2
 markers for relations that are enforced architecturally and therefore *not*
 residualized: force = −∇energy, and equivariance). Rows 1–87 are grounded in the
 domain research (`physics/research/`); rows 88–102 are the linear-response and
 topology-atlas extensions; rows 105–112 are the slow-tier degradation / radiation
-extensions (`arch-21-multiscale-state §21.13`). Each formula carries a typed signature, a cost tier
+extensions (`arch-21-multiscale-state §21.13`); rows 113–119 are the
+polarization / piezoelectric / 2DEG package (`is-polar-material`-gated; GaN/AlN/AlGaN
+HEMTs). Each formula carries a typed signature, a cost tier
 `T0..T3`, a differentiability tag `D0..D4`, and an applicability classifier
 (§13). See `formula-registry.md` for the narrative index.
 
@@ -1678,6 +1680,11 @@ Stated and held, so the architecture is honest about what it does not cover:
   registered D4 surrogate with an obligation-9 validity domain; **no such surrogate
   ships in V1** (the closed-form / Layer-1.25 path is used, with the accuracy regime
   declared in the ledger, `arch-11-residuals §11.7`).
+- Absolute Berry-phase / Wannier-center polarization (the λ-path `P_sp` evaluator) —
+  deferred to V2. V1 uses the Z*-composition path (`arch-19`/registry rows 113–114, ±5%,
+  `accuracy-ledger` #35); the absolute modern-theory integral needs a
+  `berry-phase-polarization` sub-stage not in the closed 12-method alphabet, analogous to
+  the G₀W₀ gap upgrade over PBE.
 - Plasma-process surface damage; grain-boundary statistics; continuum creep /
   dislocation climb; quantum-tunneling-corrected reaction rates (classical
   Eyring TST adequate at T_op ≥ 600 K).
@@ -2172,8 +2179,11 @@ character test so the generator never spends cycles on orders physics
 never visits for that mechanism. Both are coverage-policy parameters, not
 physical claims.
 
-The principled template set (~14 rows) is the `mechanism_range` table of
-§19.10. This **closes `arch-18-open-decisions §7`**.
+The principled template set (~15 rows) is the `mechanism_range` table of
+§19.10 — which now includes the **piezoelectric acoustic** channel
+(`LongRangeStatic(1)`, `1/q` pole) alongside the Fröhlich (`1/q²`) one, the second
+long-range e-ph mechanism the polar III-N members carry (`is-polar-material`-gated;
+inert for diamond). This **closes `arch-18-open-decisions §7`**.
 
 ## 19.10 Mechanism range and polynomial sufficiency
 
@@ -2228,6 +2238,7 @@ all `ShortRange`/polynomial-sufficient except where noted):
 |---|---|---|
 | electron-phonon (deformation-potential, SR) | `ShortRange` | true |
 | electron-phonon (Fröhlich polar-optical, LR) | `LongRangeStatic(2)` | **false** |
+| electron-phonon (piezoelectric acoustic, LR) | `LongRangeStatic(1)` | **false** |
 | spin-orbit | `ShortRange` | true |
 | magneto-elastic | `ShortRange` | true |
 | minimal coupling / light-matter | `ShortRange` | true |
@@ -2851,7 +2862,7 @@ duplicating it.
 # The named-formula registry
 
 The canonical, machine-readable list is
-`physics/library/formulas/registry-manifest.csv` — 110 substantive rows plus 2
+`physics/library/formulas/registry-manifest.csv` — 117 substantive rows plus 2
 markers for relations enforced architecturally and therefore not residualized
 (force = −∇energy; equivariance). `formula-registry.md` is the narrative index.
 Every algebraic combination invokes a named formula with typed inputs and an
@@ -3391,7 +3402,7 @@ Stages 1–4 + the substrate, emitting a **Julia** Stage-5 runtime, with **GAP**
 | 4 | **Unified state** (`state`): the 7-tuple container; per-level components (L1–L4); enumerate/serialize/hash | State encoding complete |
 | 5 | **Methods vocabulary** (`methods`): the 12 methods + sub-method dispatch | Computational vocabulary, tested per method |
 | 6 | **Templates** (`abstract-properties`): the 20 templates as typed factories | Template machinery, tested with multiple argument tuples |
-| 7 | **Formula registry** (`formulas`): the 110 formulas with typed signatures + citations; the manifest; **applicability-decidability gate** (every classifier first-order decidable on typeclass tags; non-decidable entries rejected — `impl-04-formulas`) | Closed registry; algebraic combinations no longer hand-waved |
+| 7 | **Formula registry** (`formulas`): the 117 formulas with typed signatures + citations; the manifest; **applicability-decidability gate** (every classifier first-order decidable on typeclass tags; non-decidable entries rejected — `impl-04-formulas`) | Closed registry; algebraic combinations no longer hand-waved |
 | 8 | **GENERIC operators** (`generic`): L sub-brackets, M sub-brackets, assembly; **instantiate active `CouplingSpec` via Stage-2.5 invariant synthesis** (`arch-19-coupling-structure`) and attach generated `InvariantTerm`s to the `E_coupling`, `L_assembly`, `M_assembly` aggregators | Antisymmetry of L, PSD of M, Jacobi, degeneracy verified |
 | 9 | **Canonicals** (`canonicals`): E[x] and S[x] assembled across levels | Dimensional + analytic-limit checks pass |
 | 10 | **Observables** (`observables`): the target observables as compositions (§6), in 11 bundles | Library callable for any observable; reference-crystal checks |
@@ -3427,7 +3438,7 @@ The spec is internally consistent when:
 6. Every cert obligation (§10) corresponds to a residual category or an algebraic
    identity, and maps to a Layer-0 axis.
 7. The counts here match `arch-09-vocabularies` exactly (12 methods, 20 templates,
-   110 formulas, 11 bundles, 19 residual categories, 10 cert obligations).
+   117 formulas, 11 bundles, 19 residual categories, 10 cert obligations).
 
 Once the Phase-0 skeleton exists, items 1–7 are checkable mechanically by walking
 the tree and the registry manifest.
@@ -3436,7 +3447,7 @@ the tree and the registry manifest.
 
 Five sequential gates validate the built system:
 
-1. **Registration sanity.** All 110 formulas instantiate as `ResidualGenerator`
+1. **Registration sanity.** All 117 formulas instantiate as `ResidualGenerator`
    records without error; every D2 entry passes the registration-time adjoint
    gate (`impl-07-residual-factory §7.5`); every D4 entry carries an
    obligation-9 rationale; D0/D1 entries register without an adjoint (none
@@ -3584,7 +3595,7 @@ stability; one heterostructure check (c-BN on diamond) via lattice matching.*
 # In-MVP vs deferred
 
 **In the MVP**
-- ~35 named formulas (the rows above) of the 110.
+- ~35 named formulas (the rows above) of the 117.
 - 9 of the 12 methods (all but `path-search`, `convex-optimization` beyond the
   hull check, `statistical-sampling`, `microkinetic-steady-state` — chemical/MC
   machinery not on the diamond path).

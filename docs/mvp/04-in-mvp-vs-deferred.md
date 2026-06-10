@@ -12,7 +12,7 @@ research-sources: []
 # In-MVP vs deferred
 
 **In the MVP**
-- ~35 named formulas (the rows above) of the 117.
+- ~35 named formulas (the rows above) of the 125.
 - 9 of the 12 methods (all but `path-search`, `convex-optimization` beyond the
   hull check, `statistical-sampling`, `microkinetic-steady-state` — chemical/MC
   machinery not on the diamond path).
@@ -29,7 +29,7 @@ research-sources: []
 - Layers 1 + 1.25 (G₀W₀, QHA, DFPT) wired.
 
 **Deferred (the other ~⅔ of the spec)**
-- The remaining ~75 formulas: the defect zoo beyond row 30, surface chemistry,
+- The remaining ~90 formulas: the defect zoo beyond row 30, surface chemistry,
   interface/Schottky physics (no metal contact in the pure-diamond MVP), high-
   field / hot-carrier / breakdown, degradation, most of the topology atlas (rows
   96–102) beyond basic symmetry classification.

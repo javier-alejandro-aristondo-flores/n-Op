@@ -235,7 +235,7 @@ Node = ( id   : Address[GraphNode]          -- hash-cons identity
        , kind : NodeKind , role : OutputRole )
 
 NodeKind   = Input(StateSlot | EnvScalar)
-           | FormulaApply(formula : NamedFormula, args : [NodeId])     -- 117 formulas
+           | FormulaApply(formula : NamedFormula, args : [NodeId])     -- 125 formulas
            | MethodInvoke(method  : NamedMethod,  args : [NodeId])     -- 12 methods
 OutputRole = Internal | Observable(bundle : 1..11) | ResidualLeaf(ResidualKey)
 ```
@@ -303,7 +303,7 @@ the work Stage 5 will do*:
    `E_coupling` / `L_assembly` / `M_assembly` aggregators (`arch-05`).
 
 **Stage 3 — algebraic simplification.** Hash-consing (intern identical subexpressions, `O(1)`
-amortized), cross-formula common-subexpression elimination (the 117 formulas share
+amortized), cross-formula common-subexpression elimination (the 125 formulas share
 intermediates), tearing / alias elimination, sparsity-pattern inference. Implemented as
 equality-saturation over an e-graph (union-find of equivalence classes + e-matching). Symbolic;
 no numeric cost. **This is the hardest pass to build** and the one whose performance is
@@ -345,7 +345,7 @@ optional adjoint pass is reverse-mode by structural projection, `O(residual-vect
 | 7 | linear-response (Kubo, LR-DFT/Dyson, Green's-fn, Sternheimer, interface-tunneling) | sparse linear solves / resolvent | `O(n³)` full; `O(freq·n²)` per-frequency | **Sternheimer** solves `(H−εI)|δψ⟩ = −P·perturbation` to avoid an explicit sum-over-states; near-resonance the system is near-singular → regularize with a finite broadening `η` (controls conditioning vs accuracy) |
 | 8 | path-search (NEB, CI-NEB, dimer, string, field-line-integral) | constrained optimization on a curve + ODE | `O(images · force-eval)`; field-line = stiff ODE integrator | saddle search is **inherently ill-conditioned** (one negative-curvature direction); CI-NEB converges on the perpendicular force; dimer avoids needing both endpoints |
 | 9 | convex-optimization (convex-hull, common-tangent, QP) | computational geometry / LP / QP | hull `O(n log n)`; LP `O(n²·L)` interior-point | floating-point hulls need **robust orientation predicates** to avoid topological inconsistency; rational/exact arithmetic ideal for the combinatorial part |
-| 10 | kinetic-evolution (BTE-RTA, BTE-full, master-eq, drift-diffusion, Cahn–Hilliard, Allen–Cahn) | sparse transport / PDE timestepping | BTE-RTA `O(n_k·n_band)` (diagonal collision, direct); BTE-full = large sparse iterative solve; PDEs ∝ #timesteps | **stiffness** drives the choice: implicit timestepping for stiff diffusion (stability beats explicit-CFL limits); off-diagonal collision matrices are large+sparse, conditioning set by scattering stiffness; high-dim collision → TT-cross (built once at Stage 4) |
+| 10 | kinetic-evolution (BTE-RTA, BTE-full, master-eq, drift-diffusion, Cahn–Hilliard, Allen–Cahn, mesh-interpolation) | sparse transport / PDE timestepping | BTE-RTA `O(n_k·n_band)` (diagonal collision, direct); BTE-full = large sparse iterative solve; PDEs ∝ #timesteps; mesh-interpolation = compile-time Fourier/Wannier band+e-ph upsampling (runtime reads grid) | **stiffness** drives the choice: implicit timestepping for stiff diffusion (stability beats explicit-CFL limits); off-diagonal collision matrices are large+sparse, conditioning set by scattering stiffness; high-dim collision → TT-cross (built once at Stage 4). **drift-diffusion face flux: Scharfetter–Gummel** exponential fitting (cell Péclet ≈40 at MV/cm; central differencing makes the residual operator itself wrong) |
 | 11 | statistical-sampling (MC, MD, kMC, importance) | Monte-Carlo / dynamics | variance `O(1/√samples)`; MD ∝ #timesteps | symplectic integrators for MD (bounded energy drift); importance sampling for variance reduction; kMC for rare-event time-scales |
 | 12 | symmetry-projection (point-group, space-group, time-reversal) | group Reynolds projector + algebra | multiply `O(1)` avg (Schreier–Sims); projection `O(\|G\|·dim²)` | exact up to floating round-off in `ρ(g)`; projector cached as an `Address` after first eval |
 
@@ -373,11 +373,11 @@ applied method chain with a typed `inputs → output`. Representative signatures
 `InterfaceEquilibriumOf`, `BiSlabGrandPotentialOf`, `MassActionEquilibriumOf` — follow the same
 macro-emits-subgraph pattern; see `arch-09 §9.2`, `impl-03`.)
 
-### 6.3 The 117 formulas — distribution (`arch-09 §9.3`, `physics/library/formulas/registry-manifest.csv`)
+### 6.3 The 125 formulas — distribution (`arch-09 §9.3`, `physics/library/formulas/registry-manifest.csv`)
 
 Leaf evaluations with typed signatures, grouped into 11 bundles (B1–B11) and tagged:
-- **cost-tier:** T0 closed-form ≤ 10 µs (66 formulas) · T1 small LA / 1-D quadrature ≤ 10 ms (36) · T2 BZ/mesh integral ≤ 10 s (12) · T3 self-consistent loop / PDE ≤ 10 min (3).
-- **diff-tag:** D0 no-AD / integer-categorical (21) · D1 analytic forward (66) · D2 adjoint-required-and-gated (25) · D3 implicit-function adjoint / FD (2) · D4 surrogate / relaxation, e.g. log-sum-exp soft-hull / Gumbel-Softmax (3).
+- **cost-tier:** T0 closed-form ≤ 10 µs (69 formulas) · T1 small LA / 1-D quadrature ≤ 10 ms (40) · T2 BZ/mesh integral ≤ 10 s (12) · T3 self-consistent loop / PDE ≤ 10 min (4).
+- **diff-tag:** D0 no-AD / integer-categorical (21) · D1 analytic forward (73) · D2 adjoint-required-and-gated (25) · D3 implicit-function adjoint / FD (3) · D4 surrogate / relaxation, e.g. log-sum-exp soft-hull / Gumbel-Softmax (3).
 
 ### 6.4 The dynamics, computationally (`arch-05`)
 
@@ -421,11 +421,12 @@ evaluate(state, env, request : all|{ResidualKey}|{ObservableRef}, gradient : Ski
 
 - **`ResidualKey = (producer, axes)`**, `producer = Formula(NamedFormula) | Method(NamedMethod)`;
   content-addressed (C5). Output is **granular by construction** — one scalar per
-  `(producer, axis-tuple)`, no pre-aggregation; the consumer chooses the reduction. The 17
-  `CategoryTag`s (7 EOM-per-component, 3 GENERIC-structural `Degeneracy`/`Conservation`/
-  `Positivity`, 5 `Algebraic/*` identities, 2 `Static/*` constraints) are a **facet** in a
-  parallel `Map<ResidualKey, ContributionFacets>`, **never part of identity and never a loss
-  weight** (`impl-09 §9.3`).
+  `(producer, axis-tuple)`, no pre-aggregation; the consumer chooses the reduction. The 19
+  `CategoryTag`s (9 EOM-family — 7 micro per-component + the slow/macro
+  `EOM/DefectPopulation`/`EOM/Continuum` siblings, 3 GENERIC-structural
+  `Degeneracy`/`Conservation`/`Positivity`, 5 `Algebraic/*` identities, 2 `Static/*`
+  constraints) are a **facet** in a parallel `Map<ResidualKey, ContributionFacets>`, **never
+  part of identity and never a loss weight** (`impl-09 §9.3`).
 - **Gradients:** one reverse-mode pass over the selected subgraph, projected per key →
   `O(output size)`. Granularity adds only that leaves are individually addressable; upstream
   sharing is already deduplicated by Stage-3 hash-consing.
@@ -463,7 +464,7 @@ solver on the cert path.**
 **`SqliteReferenceCache`** (`arch-12 §12.1`): a content-addressed table keyed by the §2.2 hash
 over `(observable, value, σ, provenance, coverage_mask, schema_version)`; **write-once** (updates
 = new row, deletes disallowed); WAL mode for concurrent reads; `O(log n)` B-tree lookup,
-`n ≈ 10–10⁴` rows. The five **runtime gates** (`impl-11 §15.2`) — registration sanity (all 117
+`n ≈ 10–10⁴` rows. The five **runtime gates** (`impl-11 §15.2`) — registration sanity (all 125
 formulas instantiate, D2 pass the τ_adj gate), an end-to-end worked example (the L3↔non-eq fixed
 point closes in ≤ 5 iterations), curriculum sanity, cross-regime obligation firing, and a
 consumer smoke test — are the acceptance battery.
@@ -540,8 +541,12 @@ device-scale bridge) and normalizing the GENERIC degeneracy layer (`arch-05`). W
   the 52-observable (+16 FoM) catalog, the crystal-structure-validity residual catalog, and the
   rest of the `B9` bundle. (The per-host defect inventory + degradation kinetics landed as the
   slow tier `arch-21`; the polarization/piezo/2DEG package landed as registry rows 113–119 +
-  `arch-19 §19.10` — only the absolute Berry-phase λ-path evaluator remains, deferred to V2.) These are *enumeration*
-  tasks tracked in the audit's P0/P1 lists.
+  `arch-19 §19.10`; the per-material accuracy package — AHC gap(T) dressing, the 4-phonon /
+  iterative-LBTE κ(T) siblings, high-field provenance + the breakdown T-slope, mesh-interpolation,
+  and the consistency residuals — landed as rows 120–127 + the sub-method. The V2 deferrals are the
+  absolute Berry-phase λ-path evaluator, the *live* iterative-LBTE solve, non-adiabatic AHC, and
+  the BTE / full-band-MC EDF-tail anchors.) These are *enumeration* tasks tracked in the audit's
+  P0/P1 lists, now fully remediated through P2.
 - **Genuinely open data-structure problems** — the four `γ̂` `§15.4` items (§3.2 above): ε-equality
   error tracking, materialization policy, long-trajectory rank drift, rank-dependent applicability.
   These are the only *open CS problems* in the design.

@@ -40,7 +40,13 @@ is:
   per agreeing pair.
 - Cert obligation 6 (`arch-12-cert`) consumes the
   `Algebraic/MethodEquivalence` leaf; if `|f₁ − f₂| > tolerance` it
-  trips with both values as witnesses.
+  trips with both values as witnesses. The tolerance kind depends on the
+  pair's sub-kind (`arch-11-residuals §11.1` cat-15): an **equivalence pair**
+  (BTE-σ ≡ Kubo-σ, sharing an agreement theorem) trips on any disagreement,
+  while a **consistency pair** (QHA+Callaway κ vs iterative-LBTE κ — *no* agreement
+  theorem, only a bounded model gap) trips only on excess beyond the declared
+  `τ_method`. Treating the Callaway-vs-BTE κ pair as an equivalence would wrongly
+  score the legitimate model gap as a bug; it is a consistency pair.
 - The `Observable` output role (`arch-06-physics-graph §6.3`)
   designates which compose-time-selected formula is the *exposed*
   value to downstream consumers; selection is by `ContributionFacets`
@@ -53,7 +59,7 @@ disagreement is a typed residual.
 
 ## 9.2 Same-type → shared interpretation; type-change → explicit stage
 
-Elements that are *parallel interpretations of one signature* — the 17
+Elements that are *parallel interpretations of one signature* — the 19
 `CategoryTag`s (`arch-11-residuals §11.1`), the dressing tiers within L1
 (`arch-08-bo-levels §8.1`), the 10 cert obligations
 (`arch-12-cert`), source/dressing tags on `ContributionFacets`,

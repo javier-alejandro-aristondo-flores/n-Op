@@ -146,14 +146,16 @@ stability; one heterostructure check (c-BN on diamond) via lattice matching.*
   the MVP requires — specify them when building `state/level-1`.
 - **Reference-battery seed (H4).** Seed `physics/library/cert/reference-data/`
   with the ~10 diamond rows the MVP validates against: lattice a, indirect gap,
-  C₁₁/C₁₂/C₄₄, Debye T, κ(300 K), max phonon energy, cohesive/formation energy,
-  and the diamond–graphite boundary point.
+  C₁₁/C₁₂/C₄₄, Debye T, κ(300 K), **κ(773 K) ≈ 620 W/m·K** (the high-T 4-phonon
+  anchor), max phonon energy, cohesive/formation energy, and the diamond–graphite
+  boundary point.
 - **Design-grade accuracy targets (H8).** The MVP's headline outputs must meet
   declared accuracy: gap ±0.15 eV post-G₀W₀, C_ij ±5%, κ(300 K) ±20%, E_form
   ±0.2 eV, μ factor-2 (full per-observable ledger in `docs/accuracy-ledger.md`,
   wired via `arch-11-residuals §11.7`). Cert obligation 4 checks them at the
-  battery anchors; the high-T anchors κ(773 K)/κ(1100 K) are added with the
-  4-phonon work (deferred).
+  battery anchors; the high-T anchors κ(773 K)/κ(1100 K) are **landed** (registry
+  rows 121–122, the 4-phonon correction + iterative-LBTE sibling; curated κ(T)
+  battery in `docs/accuracy-ledger.md`).
 
 ---
 
@@ -374,11 +376,11 @@ Stages 1–4 + the substrate, emitting a **Julia** Stage-5 runtime, with **GAP**
 | 4 | **Unified state** (`state`): the 7-tuple container; per-level components (L1–L4); enumerate/serialize/hash | State encoding complete |
 | 5 | **Methods vocabulary** (`methods`): the 12 methods + sub-method dispatch | Computational vocabulary, tested per method |
 | 6 | **Templates** (`abstract-properties`): the 20 templates as typed factories | Template machinery, tested with multiple argument tuples |
-| 7 | **Formula registry** (`formulas`): the 117 formulas with typed signatures + citations; the manifest; **applicability-decidability gate** (every classifier first-order decidable on typeclass tags; non-decidable entries rejected — `impl-04-formulas`) | Closed registry; algebraic combinations no longer hand-waved |
+| 7 | **Formula registry** (`formulas`): the 125 formulas with typed signatures + citations; the manifest; **applicability-decidability gate** (every classifier first-order decidable on typeclass tags; non-decidable entries rejected — `impl-04-formulas`) | Closed registry; algebraic combinations no longer hand-waved |
 | 8 | **GENERIC operators** (`generic`): L sub-brackets, M sub-brackets, assembly; **instantiate active `CouplingSpec` via Stage-2.5 invariant synthesis** (`arch-19-coupling-structure`) and attach generated `InvariantTerm`s to the `E_coupling`, `L_assembly`, `M_assembly` aggregators | Antisymmetry of L, PSD of M, Jacobi, degeneracy verified |
 | 9 | **Canonicals** (`canonicals`): E[x] and S[x] assembled across levels | Dimensional + analytic-limit checks pass |
 | 10 | **Observables** (`observables`): the target observables as compositions (§6), in 11 bundles | Library callable for any observable; reference-crystal checks |
-| 11 | **Residuals + Cert** (`residuals`, `cert`): 17 named categories, ResidualGenerator factory, 10 obligations, schema/freeze/oracle | Self-certifying outputs; usable residual contract |
+| 11 | **Residuals + Cert** (`residuals`, `cert`): 19 named categories, ResidualGenerator factory, 10 obligations, schema/freeze/oracle | Self-certifying outputs; usable residual contract |
 | 12 | **Dynamics + integration validation** (`dynamics`): assemble the unified RHS; validate on harmonic oscillator, two-level Rabi, ideal-gas relaxation | Unified dynamics callable; RHS handed to any integrator |
 | 13 | **API seal + pino-bridge**: the single typed seal; `Validate` and `Import` (`arch-16-pino-bridge`); worked examples; end-to-end demo | Shippable; downstream libraries can build against it |
 

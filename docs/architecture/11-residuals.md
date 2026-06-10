@@ -83,7 +83,10 @@ each contribution, not a granularity floor or a unit of weighting.
  10. `Positivity` — `M ⪰ 0`, `f ∈ [0,1]`, `ρ ≥ 0`, `ω² ≥ 0`,
      `σ ⪰ 0`, `|S_i| = 1`. `ω² ≥ 0` is **applicability-gated** to phases claimed
      dynamically stable, so it does not penalize legitimate saddle / transition
-     configurations the trajectories must traverse (e.g. along an NEB path).
+     configurations the trajectories must traverse (e.g. along an NEB path). Also the
+     electron-temperature bound `T_e ≥ T_L` (reads registry row 72) and the
+     avalanche breakdown-integral guard `max(0, ∫α dx − 1)²` (reads registry row 75) —
+     both reference existing rows, no new formula row.
 
 **Algebraic identities — 5 categories** (the former umbrella, now
 split by analytic kind):
@@ -91,14 +94,25 @@ split by analytic kind):
  11. `Algebraic/Kramers-Kronig` — causality dispersion identities on
      response functions.
  12. `Algebraic/SumRules` — f-sum `(2/π)∫ω·Im ε dω = ω_p²`; acoustic
-     sum `Σ_J Σ_R Φ_{IαJβ}(R) = 0`; oscillator strengths.
+     sum `Σ_J Σ_R Φ_{IαJβ}(R) = 0`; the **rotational** sum rule
+     `(Σ_J [Φ R_γ − Φ R_β])²` (Born–Huang / Gazis–Wallis, registry row 126);
+     oscillator strengths.
  13. `Algebraic/BalanceLaws` — detailed balance; Einstein relation
-     between mobility and diffusion.
+     between mobility and diffusion; the **Wegscheider reaction-cycle**
+     closure `(Σ_r σ_r ln K_r)²` (registry row 125).
  14. `Algebraic/Symmetries` — Onsager reciprocity; Maxwell relations;
      space-group equivariance of response tensors.
  15. `Algebraic/MethodEquivalence` — different formulas claiming the
      same observable agree on their shared domain (BTE-σ ≡ Kubo-σ in
-     linear response, etc.).
+     linear response, etc.). Two sub-kinds (an annotation, not a new tag): an
+     **equivalence pair** binds two formulas that share an *agreement theorem* and
+     trips on any disagreement beyond `δ_sym`/`τ_adj` (BTE-σ ≡ Kubo-σ); a
+     **consistency pair** binds a cheap model to a microscopic reference that have
+     **no** agreement theorem — Callaway/Slack κ vs iterative-LBTE κ, cheap-Chynoweth
+     vs BTE/MC α — and trips only on *excess beyond a declared model-gap tolerance*
+     `τ_method` (`arch-12 §12.0.2`), so a legitimate model gap is not scored as a bug.
+     The κ 4-phonon / iterative-LBTE siblings (registry rows 121–122) bind to row 25
+     as a **consistency pair**.
 
 **Constraint violations (by input-domain type) — 2 categories.**
 Disjoint by the *type* of input the constraint reads:
@@ -109,7 +123,10 @@ Disjoint by the *type* of input the constraint reads:
      the snapshot.
  17. `Static/Thermodynamic` — depends on snapshot + environment
      (temperature, chemical potentials, partial pressures).
-     Hull-distance, formation-energy-from-references, solubility,
+     Hull-distance — including the **T,P-aware metastability** form
+     `max(0, ΔG_form(T,P) − ΔG_hull(T,P) − δ_meta)²` with a metastability band so
+     diamond (+25 meV/atom at T=0) reads `R=0` (registry row 124) —
+     formation-energy-from-references, solubility,
      mass-action, carbide-formation. Also the three slow-tier
      thermodynamic-consistency identities — Gibbs adsorption `dγ/dμ = −Γ`,
      charge–Fermi Maxwell `dE_form/dE_F = q`, and the Clausius–Clapeyron analog

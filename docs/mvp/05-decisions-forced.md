@@ -28,13 +28,15 @@ research-sources: []
   the MVP requires — specify them when building `state/level-1`.
 - **Reference-battery seed (H4).** Seed `physics/library/cert/reference-data/`
   with the ~10 diamond rows the MVP validates against: lattice a, indirect gap,
-  C₁₁/C₁₂/C₄₄, Debye T, κ(300 K), max phonon energy, cohesive/formation energy,
-  and the diamond–graphite boundary point.
+  C₁₁/C₁₂/C₄₄, Debye T, κ(300 K), **κ(773 K) ≈ 620 W/m·K** (the high-T 4-phonon
+  anchor), max phonon energy, cohesive/formation energy, and the diamond–graphite
+  boundary point.
 - **Design-grade accuracy targets (H8).** The MVP's headline outputs must meet
   declared accuracy: gap ±0.15 eV post-G₀W₀, C_ij ±5%, κ(300 K) ±20%, E_form
   ±0.2 eV, μ factor-2 (full per-observable ledger in `docs/accuracy-ledger.md`,
   wired via `arch-11-residuals §11.7`). Cert obligation 4 checks them at the
-  battery anchors; the high-T anchors κ(773 K)/κ(1100 K) are added with the
-  4-phonon work (deferred).
+  battery anchors; the high-T anchors κ(773 K)/κ(1100 K) are **landed** (registry
+  rows 121–122, the 4-phonon correction + iterative-LBTE sibling; curated κ(T)
+  battery in `docs/accuracy-ledger.md`).
 
 ---

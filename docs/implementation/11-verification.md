@@ -28,7 +28,7 @@ The spec is internally consistent when:
 6. Every cert obligation (§10) corresponds to a residual category or an algebraic
    identity, and maps to a Layer-0 axis.
 7. The counts here match `arch-09-vocabularies` exactly (12 methods, 20 templates,
-   117 formulas, 11 bundles, 19 residual categories, 10 cert obligations).
+   125 formulas, 11 bundles, 19 residual categories, 10 cert obligations).
 
 Once the Phase-0 skeleton exists, items 1–7 are checkable mechanically by walking
 the tree and the registry manifest.
@@ -37,7 +37,7 @@ the tree and the registry manifest.
 
 Five sequential gates validate the built system:
 
-1. **Registration sanity.** All 117 formulas instantiate as `ResidualGenerator`
+1. **Registration sanity.** All 125 formulas instantiate as `ResidualGenerator`
    records without error; every D2 entry passes the registration-time adjoint
    gate (`impl-07-residual-factory §7.5`); every D4 entry carries an
    obligation-9 rationale; D0/D1 entries register without an adjoint (none

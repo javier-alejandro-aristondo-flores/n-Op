@@ -28,8 +28,22 @@ for Pt/diamond, true for Ti/diamond).
 
 V1 commitment: every registry entry gets an explicit `applicability` field;
 always-true stubs are acceptable for V1.0 and refined incrementally. Open
-questions (deferred): soft `[0,1]` classifiers, classifier composition under
-perturbation, and current-vs-initial-state evaluation for trajectory training.
+questions (deferred): soft `[0,1]` classifiers, and classifier composition under
+perturbation.
+
+**Swept-Environment validity windows (committed, V1).** A predicate or formula
+*validity window* that depends on a **runtime-swept** `Environment` scalar — temperature
+(QHA window, the regime windows of `arch-21-multiscale-state §21.7.1`, the `ω²≥0`
+claimed-stable gate, the Chynoweth field domain, the 4-phonon `T ≳ 0.4 Θ_D` window) — is
+**re-evaluated per training sample** in the PINO loss mask, *not* once against the
+composition's nominal `(Crystal, Environment)`. The per-sample mask path already exists
+(`arch-16-pino-bridge`); compose-time `Stage-2.5` structure decisions are frozen, but the
+*mask* over them is a runtime read of the swept scalar. To make this checkable, each emitted
+kernel is **tagged with the `Environment` box** (the scalar ranges) on which its Stage-2.5
+structure is valid; a sample whose swept scalar leaves that box is masked out (and, for a
+cert query, trips the relevant obligation) rather than silently scored against a stale kernel.
+This is the resolution of the former "current-vs-initial-state evaluation for trajectory
+training" question.
 
 `CouplingChannel.applicability` (`arch-19-coupling-structure §19.2`) uses
 the same predicate contract: a first-order decidable function on typeclass

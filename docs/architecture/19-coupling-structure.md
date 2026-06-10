@@ -329,6 +329,29 @@ entry** (an unprovenanced coefficient is a silent accuracy hole). For the MVP th
 diamond coefficients are `curated`; other materials are `per-material-DFPT` and their
 provenance is the gating data-acquisition task before that material is claimed.
 
+**`slope-kind` tag — machine-checkable double-count guard for `dE_g/dT` (AHC).** Any
+temperature-slope coefficient feeding `ahc-gap-renormalization` (registry row 120) additionally
+carries `slope-kind ∈ {isochoric, total}`. The quoted experimental `dE_g/dT` slopes are mostly
+*total* (they already fold in the lattice-expansion part that registry row 63 — `Ξ·strain` —
+carries separately, ~30–40% of the shift). A **cert obligation refuses any composition in which a
+`total`-tagged AHC slope and row-63's thermal-expansion T-path are both active on the same
+observable** (double-counting the expansion contribution); an `isochoric`-tagged slope composes
+with row 63 freely. The tag is a first-class field on the coefficient, so the check is a tag
+comparison at compose time, not a reviewer caveat. (Curated AHC entries in the MVP ZPR/slope
+table, `docs/accuracy-ledger.md §1/§15`, are tagged at entry.)
+
+**Learned-correction training contract (`Δα` EDF-tail and any PINO-fit residual coefficient).** A
+coefficient whose `source` is a PINO-learned correction — the high-field EDF-tail correction
+`Δα(E,T_L,T_e)` of the avalanche channel is the only V1 instance — is constrained two ways so it
+cannot launder away its own supervision signal: (1) it is fit **only against external anchors**
+(measurements or future BTE / full-band-MC points) and is **frozen with respect to the PINO
+training loss** — gradients of the physics loss do not flow into it — because a correction trained
+on the same residual it modifies can co-adapt to zero that residual and silently destroy the
+obligation-9 domain it is meant to protect; (2) until such external anchors exist (the V1 corpus
+has none — `docs/accuracy-ledger.md §49`), `Δα` **ships as the identity** (zero correction) and the
+high-E×high-T corner stays **cert-refused** (`obligation 9`), making the ">500 °C breakdown =
+cert-refused" stance load-bearing rather than decorative.
+
 The active channels in a composition, **together with the theory frame
 they are interpreted in**, are the **`CouplingSpec`**:
 

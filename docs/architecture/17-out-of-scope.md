@@ -22,11 +22,38 @@ Stated and held, so the architecture is honest about what it does not cover:
   modeled.
 - Deep-defect non-Markovian dynamics — Markov master-equation closure assumed.
 - Polaron localization beyond Fröhlich.
-- 4-phonon scattering, full NEGF tunneling, full SCPH/SSCHA — deferred to
-  Layer-1.75 V2 scaffolding. Where a cheap proxy is needed during training it is a
-  registered D4 surrogate with an obligation-9 validity domain; **no such surrogate
-  ships in V1** (the closed-form / Layer-1.25 path is used, with the accuracy regime
-  declared in the ledger, `arch-11-residuals §11.7`).
+- Full NEGF tunneling, full SCPH/SSCHA, and the **live** iterative-LBTE / full
+  4-phonon BTE solve — deferred to Layer-1.75 V2 scaffolding. The **closed-form
+  high-T 4-phonon correction** (Slack-like multiplicative κ-factor, valid `T ≳ 0.4 Θ_D`,
+  registry row 121) and the **iterative-LBTE κ sibling anchored to published `κ_iter`**
+  (row 122, dormant `MethodEquivalence` binding — no live solve) **do** ship in V1 as the
+  Layer-1.25 / closed-form path; only the live BTE solve is V2. Where a cheap proxy is
+  needed during training it is a registered D4 surrogate with an obligation-9 validity
+  domain; **no such surrogate ships in V1**, with the accuracy regime declared in the
+  ledger (`arch-11-residuals §11.7`, `docs/accuracy-ledger.md`).
+- **AHC e-ph gap renormalization beyond the adiabatic one-shot** — the faithful
+  `A_qν` Brillouin-zone sum and **non-adiabatic AHC** (Layer-1.75; ~25% on polar ZPR)
+  are deferred to V2. V1 ships the adiabatic one-shot dressing `ΔE_g=ZPR·coth(Θ/2T)`
+  (registry row 120) with per-material ZPR/slope coefficients (`docs/accuracy-ledger.md`).
+- **EDF-tail / hot-carrier breakdown above ~500 °C** — the BTE-full / full-band-MC
+  high-E×high-T tail correction needs per-material BTE/MC anchor data that **do not exist
+  in the V1 corpus**; until they do, the learned `Δα` correction ships as identity and the
+  corner is **cert-refused** (`arch-19-coupling-structure §19.8`, `arch-12-cert §12.0.3`),
+  not claimed as a met target.
+- **Plasmon–phonon coupling / LST-relation breakdown at degenerate doping** — above
+  `n ≳ 10²⁰ cm⁻³` (reached by p⁺ B-doped diamond contact layers), the
+  Lyddane–Sachs–Teller-derived static `ε_r` and Fröhlich screening lose validity. V1
+  **applicability-gates** the LST `ε_r` path and Fröhlich screening on `n < n_degenerate(host)`;
+  outside the gate the quantity is masked, not silently extrapolated. (Same gate carries the
+  degenerate-Einstein refinement, `arch-21-multiscale-state §21.7.2`.)
+- **III-N high-temperature thermal expansion** — QHA breaks above ~Θ_D/2 (GaN fails by
+  ~500 °C); V1 has **no design-grade path**, only per-material σ-widening in the ledger
+  (`accuracy-ledger §14`). This propagates into gap(T) (row-63 strain), `G(T)`, and the
+  T,P-hull for the flagship polar materials. V2 = a first-order self-consistent-phonon
+  correction as a second Layer-1.25 dressing (one-shot, same amortization shape as AHC).
+- **Alloy-disorder mobility in AlGaN beyond the closed-form Harrison term** — the
+  `is-alloy`-gated row 127 (`τ_alloy⁻¹∝x(1−x)ΔU²g(E)`) ships in V1; a full
+  configurationally-averaged disorder treatment is V2.
 - Absolute Berry-phase / Wannier-center polarization (the λ-path `P_sp` evaluator) —
   deferred to V2. V1 uses the Z*-composition path (`arch-19`/registry rows 113–114, ±5%,
   `accuracy-ledger` #35); the absolute modern-theory integral needs a

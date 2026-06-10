@@ -177,11 +177,17 @@ Every process is a new `FormulaRecord`; all Arrhenius rates use `rate = ν₀·e
 - **F-H1 `nrt-displacements`** — `(T_dam,E_d) → N_d`, `non-eq…md:367` (H.1):
   `N_d = 0.8·T_dam/(2·E_d)`. `E_d`: diamond ~37–50 eV, GaN ~20 eV, Ga₂O₃ ~25 eV, AlN ~35 eV.
   T0/D1; `algebraic-of`; B11/B4; feeds F-H2.
-- **F-H2 `frenkel-pair-yield`** — `(N_d,T_L,η_recomb,Φ_dose) → DefectDensity`, `non-eq…md:371`:
-  `[V]_irr = N_d·(1−η_recomb)·Φ_dose`, gated by Part-A/C `E_form`. T0/D1; `master-equation`; B11/B4;
-  this is `G_irradiation` of F-G1. *(Research-flagged: `non-eq…md:361`/`catalog…md:232` mark full
-  cascade dynamics out-of-scope; `η_recomb(T_L)` has **no closed form in the corpus** — only the
-  coupling structure is specified, not invented.)*
+- **F-H2 `frenkel-pair-yield`** — `(N_d,Σ_d,Φ_dose,η_recomb) → DefectDensity`, `non-eq…md:371`:
+  `[V]_irr = Φ_dose·Σ_d·N_d·(1−η_recomb)` (cm⁻³), where the **macroscopic displacement cross-section**
+  `Σ_d = N_atom·σ_d` (cm⁻¹) supplies the missing length⁻¹ so the product of `N_d` (displacements
+  per PKA, dimensionless), `Σ_d` (cm⁻¹) and the fluence `Φ_dose` (cm⁻²) is a `Concentration`
+  (cm⁻³) — without `Σ_d` the bare `N_d·(1−η)·Φ_dose` is cm⁻² (a fluence), not a density. `σ_d` is
+  the per-`(host, particle-type, energy)` NIEL-derived displacement cross-section, one curated
+  `ProvenanceLedger` coefficient (`arch-19-coupling-structure §19.8`). T0/D1; `master-equation`;
+  B11/B4; this is `G_irradiation` of F-G1. *(Research-flagged: `non-eq…md:361`/`catalog…md:232`
+  mark full cascade dynamics out-of-scope; `η_recomb(T_L)` and `σ_d` have **no closed form in the
+  corpus** — only the coupling structure + the curated-coefficient slot are specified, not
+  invented.)*
 
 ---
 
@@ -291,6 +297,16 @@ Drift-diffusion `j = qμ(E,T)nE − qD∇n` (holes: sign-flip), Einstein `D = μ
 β` are micro-supplied (§21.8). Faithful tier verifies vs BTE-`j(E)` as an
 `Algebraic/MethodEquivalence` residual.
 
+**Degenerate-statistics caveat (declared model-form error).** The Einstein relation `D = μk_BT/q`
+is the **nondegenerate** form. p⁺ B-doped diamond contact layers (and n⁺ degenerate III-N) run at
+`10²⁰–10²¹ cm⁻³`, where Fermi–Dirac statistics make the generalized relation
+`D/μ = (k_BT/q)·F_{1/2}(η)/F_{−1/2}(η)` (`η = (E_F−E_C)/k_BT`) the correct one. V1 carries the
+nondegenerate form with this discrepancy entered as a **declared model-form-error term** in the
+`combineTol` budget (`arch-11-residuals §11.7`) on any composition whose carrier density crosses
+`n_degenerate(host)`; the generalized `F_{1/2}/F_{−1/2}` variant is a gated refinement (it shares
+the §21.7.2 closed form, no new method). The same `n < n_degenerate(host)` gate carries the
+plasmon–phonon / LST exclusion (`arch-17-out-of-scope`).
+
 ## 21.8 THE HOMOGENIZATION MAP (the micro→device coefficient bridge)
 
 The three macro balance PDEs (`non-eq…md:230–232`, `group-C…md:96–100`):
@@ -306,7 +322,7 @@ relation evaluated at the local cell state:
 | # | Micro output (formula) | Homogenization relation | Macro coeff / term | Eq |
 |---|---|---|---|---|
 | HM-1 | `κ(T)` (`phonon-kappa-T`, Slack) | `D_thermal(r) = κ(T_L(r))/(C_p ρ_m)`; face flux `q_f = −κ(T_L,f)(∇T_L)_f` | heat diffusion `κ(T_L(r))` | (H) |
-| HM-2 | `σ(T)`/`μ₀(T,N_D)` (`mobility-impurity-phonon`) | `σ(r)=qn μ₀(T_L(r),N_D)`; drift `μ(E,T)=μ₀[1+(μ₀|E|/v_sat)^β]^(−1/β)` at `E(r)=−∇φ` | drift `qμn`, diffusion `qD` | (DD) |
+| HM-2 | `σ(T)`/`μ₀(T,N_D)` (`mobility-impurity-phonon`) | `σ(r)=qn μ₀(T_L(r),N_D)`; drift `μ(E,T)=μ₀[1+(μ₀|E|/v_sat)^β]^(−1/β)` at `E(r)=−∇φ`; face flux via Scharfetter–Gummel (§21.9); Einstein `D=μk_BT/q` nondegenerate (degenerate caveat §21.7.2) | drift `qμn`, diffusion `qD` | (DD) |
 | HM-3 | `v_sat` (`v-sat-*`) | saturated regime: `j_drift = q n v_sat` (decouples `j` from `E`) | saturated drift | (DD) |
 | HM-4 | `α_ii(E)` (`chynoweth`, `a·exp(−b/E)`) | `G_av(r)=α_n(|E|)n v_n + α_p(|E|)p v_p` at `|E(r)|`; breakdown `M=1/(1−∫α dx)` (row 75) | avalanche source | (DD) |
 | HM-5 | SRH + G–R rates | `S_carrier = G_av + G_opt − R_SRH(n,p; defect-density(r))`; `R_SRH` reads the **slow tier** per-cell defect density | `G − R` source | (DD) |
@@ -336,6 +352,20 @@ with `RHS_field` the finite-volume discretization (§21.6.1):
 | `n` | `(1/V_c)[ −Σ_f j_f A_f/q + (G−R)(c)V_c ]` | HM-2/3,4,5 |
 | `p` | same, hole sign | HM-2/3,4,5 |
 | `j` | algebraic closure: `‖j(c) − (qμnE − qD∇n)(c)‖²` | HM-2/3 |
+
+**Drift-diffusion face flux — Scharfetter–Gummel (required, not central differencing).** The
+inter-cell carrier flux `j_f` in the `n`/`p` rows **must** use the Scharfetter–Gummel
+exponentially-fitted form, not naive/central finite-volume differencing:
+```
+j_f = (qD/Δx)·[ n_{c⁺}·B(Δψ) − n_{c⁻}·B(−Δψ) ],   Δψ = q(φ_{c⁺}−φ_{c⁻})/k_BT,   B(t)=t/(e^t−1)
+```
+(`B` the Bernoulli function). At the UWBG operating point the cell Péclet number
+`Pe = qEΔx/k_BT ≈ 40` (1 MV/cm × ~10 nm cell ÷ 25 mV), where a centrally-differenced `j_f` makes
+the **residual operator itself wrong at the operating point** — the PINO would then be scored
+against a discretization artifact rather than the physics. Scharfetter–Gummel is closed-form and
+differentiable (one removable singularity at `Δψ→0`, guarded by the series `B(t)≈1−t/2`),
+preserving C1 / no-runtime-solver. The interface heat flux (HM-8) and the Poisson/`j` constraints
+are unaffected; only the convection-dominated carrier flux needs the exponential fitting.
 
 `φ`,`j` are **algebraic/constraint** balances (no `∂_t`). Axes `(MeshCell, MacroField)`; the
 per-cell-per-field scalar is the atomic contribution (`arch-11 §11.3`, spatial bin = mesh cell);
@@ -413,7 +443,7 @@ Rows 105–112 (rows 103–104 are the existing rejected markers; F-F5 =
 109,air-oxidation-rate-eyring,"`(T, p_O2, ΔG‡, ν) → dx_ox/dt`",B11/B5,T0,D1,cheap,"S3 (catalog #46, Eyring)","T, p_O2"
 110,hydrogen-desorption-rate-eyring,"`(T, E_des, ν) → r_H`",B11/B5,T0,D1,cheap,"S3 (catalog #47, E_des=3.8eV)","T, surface c_H"
 111,nrt-displacements,"`(T_dam, E_d) → N_d`",B11/B4,T0,D1,cheap,"S4 (non-eq H.1)","T_dam, E_d(host)"
-112,frenkel-pair-yield,"`(N_d, T_L, η_recomb, Φ_dose) → DefectDensity`",B11/B4,T0,D1,cheap,"S4 (non-eq H.2)","nrt-displacements, E_form"
+112,frenkel-pair-yield,"`(N_d, Σ_d, Φ_dose, η_recomb) → DefectDensity`",B11/B4,T0,D1,cheap,"S4 (non-eq H.2; [V]_irr=Φ·Σ_d·N_d·(1−η_recomb), Σ_d=N_atom·σ_d NIEL)","nrt-displacements, σ_d(host,particle)"
 ```
 
 ## 21.14 Open sub-decisions (flagged, not silent)
@@ -431,9 +461,11 @@ not a silent gap:
 4. **Bidirectional slow↔macro coupling** — HM-5 reads slow defect density (macro←slow); the
    back-reaction (carrier-driven defect generation, F-G1's `G_irradiation`) is macro→slow; the
    rate law is the slow tier's (§21.3/§21.5), the contract is noted here.
-5. **`η_recomb(T_L)` and per-material regime thresholds** — no closed form in the corpus (only
-   the coupling); regime-switch field windows are order-of-magnitude — flagged as calibration
-   tasks, not invented.
+5. **`η_recomb(T_L)`, `σ_d(host,particle)`, and per-material regime thresholds** — no closed form
+   in the corpus (only the coupling structure); the NIEL displacement cross-section `σ_d` (F-H2)
+   and recombination efficiency are curated `ProvenanceLedger` coefficients, and regime-switch
+   field windows are order-of-magnitude — flagged as calibration / data-acquisition tasks, not
+   invented.
 
 ## 21.15 Landing edits to existing docs
 

@@ -385,7 +385,7 @@ Every operation in `/physics` is one of these three:
 
 1. **`Input`** — a slot for a state component (`h`, `R_I`, `P_I`, `Π_h`,
    `Z_I`, `γ̂`, `A`) or an environmental scalar (`T`, `μ`, `E_field`, …).
-2. **`FormulaApply`** — application of one of the 117 named formulas
+2. **`FormulaApply`** — application of one of the 125 named formulas
    (`arch-09-vocabularies §9.3`) to typed argument nodes.
 3. **`MethodInvoke`** — application of one of the 12 computational
    methods (`arch-09-vocabularies §9.1`) to typed argument nodes.
@@ -448,7 +448,7 @@ them either — they are codegen inputs, consumed at Stage 4 and erased.
 
 | Vocabulary item | Realized as |
 |---|---|
-| 117 formulas (`arch-09-vocabularies §9.3`) | typing rules for `FormulaApply` nodes |
+| 125 formulas (`arch-09-vocabularies §9.3`) | typing rules for `FormulaApply` nodes |
 | 12 methods (`arch-09-vocabularies §9.1`) | typing rules for `MethodInvoke` nodes |
 | 20 templates (`arch-09-vocabularies §9.2`) | graph-construction macros that emit subgraphs |
 | 11 bundles (`arch-09-vocabularies §9.4`) | the `bundle` payload of `Observable` roles |
@@ -572,7 +572,7 @@ lowered into `FormulaApply` nodes attached to the `E_coupling`,
   residuals (a band structure, a charge density, a force field, a
   dynamical matrix) collapse to a single node referenced by all
   consumers.
-- **Cross-formula CSE.** The 117 named formulas often share
+- **Cross-formula CSE.** The 125 named formulas often share
   intermediate quantities; CSE pulls these out.
 - **Tearing and alias elimination.** Algebraic dependencies are
   resolved at compose-time (ModelingToolkit-style); sparsity patterns
@@ -765,9 +765,9 @@ Every other document references these numbers rather than restating them.
 | State DOFs | 7-tuple | yes |
 | BO hierarchy levels | 4 | yes |
 | Dressing layers | 1 / 1.25 / 1.75 / 2 / 3 | yes |
-| Computational methods | 12 (+2 sub-methods) | yes |
+| Computational methods | 12 (+3 sub-methods) | yes |
 | Abstract-property templates | 20 | yes |
-| Named formulas | 117 substantive (+2 rejected markers) | yes — see `formula-registry.md` |
+| Named formulas | 125 substantive (+2 rejected markers) | yes — see `formula-registry.md` |
 | Observable bundles | 11 (B1–B11) | yes |
 | Residual categories | 19 | yes |
 | Cert obligations | 10 | yes |
@@ -785,8 +785,12 @@ Closed vocabulary; instances are programs in this vocabulary:
 `linear-response`, `path-search`, `convex-optimization`, `kinetic-evolution`,
 `statistical-sampling`, `symmetry-projection`.
 
-Plus two registered sub-methods: `field-line-integral` (under `path-search`) and
-`interface-tunneling` (under `linear-response`).
+Plus three registered sub-methods: `field-line-integral` (under `path-search`),
+`interface-tunneling` (under `linear-response`), and `mesh-interpolation` (under
+`kinetic-evolution`) — the compile-time band/e-ph interpolator (Fourier for gauge-free band
+energies/velocities, Wannier–EPW for gauge-sensitive e-ph matrix elements, with mandatory
+dipole/quadrupole polar corrections; runtime reads the interpolated grid only, C1-clean). The
+closed 12-method alphabet is preserved; interpolation is a sub-method, not a new top-level method.
 
 ### 9.2 Twenty abstract-property templates
 
@@ -833,19 +837,22 @@ Bulk-boundary correspondence is **not** a template; it is handled at the cert
 layer (obligation-7, a `DiscreteStructure` morphism over the topology atlas,
 §14).
 
-### 9.3 117 named formulas
+### 9.3 125 named formulas
 
 Closed registry of typed, fully-parameterized algebraic formulas, named by
 behavior (person-attribution names appear only as parenthetical literature
 pointers). The canonical machine-readable list is
-`physics/library/formulas/registry-manifest.csv` (117 substantive rows + 2
+`physics/library/formulas/registry-manifest.csv` (125 substantive rows + 2
 markers for relations that are enforced architecturally and therefore *not*
 residualized: force = −∇energy, and equivariance). Rows 1–87 are grounded in the
 domain research (`physics/research/`); rows 88–102 are the linear-response and
 topology-atlas extensions; rows 105–112 are the slow-tier degradation / radiation
 extensions (`arch-21-multiscale-state §21.13`); rows 113–119 are the
 polarization / piezoelectric / 2DEG package (`is-polar-material`-gated; GaN/AlN/AlGaN
-HEMTs). Each formula carries a typed signature, a cost tier
+HEMTs); rows 120–127 are the per-material accuracy package (AHC gap(T) renormalization,
+the 4-phonon / iterative-LBTE κ(T) siblings, the breakdown-field T-slope, the T,P-aware
+metastability hull, the Wegscheider and rotational sum-rule consistency residuals, and
+alloy-disorder scattering). Each formula carries a typed signature, a cost tier
 `T0..T3`, a differentiability tag `D0..D4`, and an applicability classifier
 (§13). See `formula-registry.md` for the narrative index.
 
@@ -1068,7 +1075,10 @@ each contribution, not a granularity floor or a unit of weighting.
  10. `Positivity` — `M ⪰ 0`, `f ∈ [0,1]`, `ρ ≥ 0`, `ω² ≥ 0`,
      `σ ⪰ 0`, `|S_i| = 1`. `ω² ≥ 0` is **applicability-gated** to phases claimed
      dynamically stable, so it does not penalize legitimate saddle / transition
-     configurations the trajectories must traverse (e.g. along an NEB path).
+     configurations the trajectories must traverse (e.g. along an NEB path). Also the
+     electron-temperature bound `T_e ≥ T_L` (reads registry row 72) and the
+     avalanche breakdown-integral guard `max(0, ∫α dx − 1)²` (reads registry row 75) —
+     both reference existing rows, no new formula row.
 
 **Algebraic identities — 5 categories** (the former umbrella, now
 split by analytic kind):
@@ -1076,14 +1086,25 @@ split by analytic kind):
  11. `Algebraic/Kramers-Kronig` — causality dispersion identities on
      response functions.
  12. `Algebraic/SumRules` — f-sum `(2/π)∫ω·Im ε dω = ω_p²`; acoustic
-     sum `Σ_J Σ_R Φ_{IαJβ}(R) = 0`; oscillator strengths.
+     sum `Σ_J Σ_R Φ_{IαJβ}(R) = 0`; the **rotational** sum rule
+     `(Σ_J [Φ R_γ − Φ R_β])²` (Born–Huang / Gazis–Wallis, registry row 126);
+     oscillator strengths.
  13. `Algebraic/BalanceLaws` — detailed balance; Einstein relation
-     between mobility and diffusion.
+     between mobility and diffusion; the **Wegscheider reaction-cycle**
+     closure `(Σ_r σ_r ln K_r)²` (registry row 125).
  14. `Algebraic/Symmetries` — Onsager reciprocity; Maxwell relations;
      space-group equivariance of response tensors.
  15. `Algebraic/MethodEquivalence` — different formulas claiming the
      same observable agree on their shared domain (BTE-σ ≡ Kubo-σ in
-     linear response, etc.).
+     linear response, etc.). Two sub-kinds (an annotation, not a new tag): an
+     **equivalence pair** binds two formulas that share an *agreement theorem* and
+     trips on any disagreement beyond `δ_sym`/`τ_adj` (BTE-σ ≡ Kubo-σ); a
+     **consistency pair** binds a cheap model to a microscopic reference that have
+     **no** agreement theorem — Callaway/Slack κ vs iterative-LBTE κ, cheap-Chynoweth
+     vs BTE/MC α — and trips only on *excess beyond a declared model-gap tolerance*
+     `τ_method` (`arch-12 §12.0.2`), so a legitimate model gap is not scored as a bug.
+     The κ 4-phonon / iterative-LBTE siblings (registry rows 121–122) bind to row 25
+     as a **consistency pair**.
 
 **Constraint violations (by input-domain type) — 2 categories.**
 Disjoint by the *type* of input the constraint reads:
@@ -1094,7 +1115,10 @@ Disjoint by the *type* of input the constraint reads:
      the snapshot.
  17. `Static/Thermodynamic` — depends on snapshot + environment
      (temperature, chemical potentials, partial pressures).
-     Hull-distance, formation-energy-from-references, solubility,
+     Hull-distance — including the **T,P-aware metastability** form
+     `max(0, ΔG_form(T,P) − ΔG_hull(T,P) − δ_meta)²` with a metastability band so
+     diamond (+25 meV/atom at T=0) reads `R=0` (registry row 124) —
+     formation-energy-from-references, solubility,
      mass-action, carbide-formation. Also the three slow-tier
      thermodynamic-consistency identities — Gibbs adsorption `dγ/dμ = −Γ`,
      charge–Fermi Maxwell `dE_form/dE_F = q`, and the Clausius–Clapeyron analog
@@ -1330,6 +1354,27 @@ composes into the per-observable error budget (`arch-11-residuals §11.7`).
 | `τ_adj` | registration adjoint vJp-vs-JvP gate (`impl-07-residual-factory §7.5`) | `1e-4` relative |
 | `δ_surrogate` | D4 surrogate / relaxation validity (obligation 9), measured on a dev set | per-formula |
 
+## 12.0.3 Composition-validity refusals (machine-checkable, not reviewer caveats)
+
+Three compose-time refusals are decided by tag/field comparison on the active `CouplingSpec` +
+`ProvenanceLedger`, emitted as obligation leaves rather than left to documentation. Each is a
+`Failed` verdict with a witness (the offending coefficient / row pair).
+
+- **Unprovenanced-coefficient refusal** (obligation 4/9 family, `arch-19-coupling-structure §19.8`).
+  Any active channel carrying a coefficient with no `ProvenanceLedger` entry refuses the
+  composition — an unprovenanced coefficient is a silent accuracy hole.
+- **AHC `slope-kind` double-count refusal** (obligation 6, named-formula consistency).
+  `ahc-gap-renormalization` (row 120) slopes carry `slope-kind ∈ {isochoric, total}`
+  (`arch-19 §19.8`). A composition in which a `total`-tagged AHC slope and row 63's
+  thermal-expansion (`Ξ·strain`) T-path are both active on the same observable is refused — the
+  two paths would double-count the lattice-expansion part of `dE_g/dT`. Witness: the
+  `(row 120 coeff, row 63 instance, observable)` triple. An `isochoric`-tagged slope passes.
+- **Learned-correction-without-anchor refusal** (obligation 9, surrogate validity). A PINO-learned
+  correction coefficient (V1: the EDF-tail `Δα`, `arch-19 §19.8`) is admissible only if external
+  anchor data back its declared validity domain; with no anchors it ships as identity and any query
+  inside the unanchored high-E×high-T corner trips obligation 9 with a domain witness (the
+  ">500 °C breakdown = cert-refused, not met" stance).
+
 ## 12.1 `SqliteReferenceCache` — backend for obligations 4 + 8
 
 The reference battery (obligation 4) and its versioning discipline
@@ -1390,8 +1435,22 @@ for Pt/diamond, true for Ti/diamond).
 
 V1 commitment: every registry entry gets an explicit `applicability` field;
 always-true stubs are acceptable for V1.0 and refined incrementally. Open
-questions (deferred): soft `[0,1]` classifiers, classifier composition under
-perturbation, and current-vs-initial-state evaluation for trajectory training.
+questions (deferred): soft `[0,1]` classifiers, and classifier composition under
+perturbation.
+
+**Swept-Environment validity windows (committed, V1).** A predicate or formula
+*validity window* that depends on a **runtime-swept** `Environment` scalar — temperature
+(QHA window, the regime windows of `arch-21-multiscale-state §21.7.1`, the `ω²≥0`
+claimed-stable gate, the Chynoweth field domain, the 4-phonon `T ≳ 0.4 Θ_D` window) — is
+**re-evaluated per training sample** in the PINO loss mask, *not* once against the
+composition's nominal `(Crystal, Environment)`. The per-sample mask path already exists
+(`arch-16-pino-bridge`); compose-time `Stage-2.5` structure decisions are frozen, but the
+*mask* over them is a runtime read of the swept scalar. To make this checkable, each emitted
+kernel is **tagged with the `Environment` box** (the scalar ranges) on which its Stage-2.5
+structure is valid; a sample whose swept scalar leaves that box is masked out (and, for a
+cert query, trips the relevant obligation) rather than silently scored against a stale kernel.
+This is the resolution of the former "current-vs-initial-state evaluation for trajectory
+training" question.
 
 `CouplingChannel.applicability` (`arch-19-coupling-structure §19.2`) uses
 the same predicate contract: a first-order decidable function on typeclass
@@ -1659,11 +1718,38 @@ Stated and held, so the architecture is honest about what it does not cover:
   modeled.
 - Deep-defect non-Markovian dynamics — Markov master-equation closure assumed.
 - Polaron localization beyond Fröhlich.
-- 4-phonon scattering, full NEGF tunneling, full SCPH/SSCHA — deferred to
-  Layer-1.75 V2 scaffolding. Where a cheap proxy is needed during training it is a
-  registered D4 surrogate with an obligation-9 validity domain; **no such surrogate
-  ships in V1** (the closed-form / Layer-1.25 path is used, with the accuracy regime
-  declared in the ledger, `arch-11-residuals §11.7`).
+- Full NEGF tunneling, full SCPH/SSCHA, and the **live** iterative-LBTE / full
+  4-phonon BTE solve — deferred to Layer-1.75 V2 scaffolding. The **closed-form
+  high-T 4-phonon correction** (Slack-like multiplicative κ-factor, valid `T ≳ 0.4 Θ_D`,
+  registry row 121) and the **iterative-LBTE κ sibling anchored to published `κ_iter`**
+  (row 122, dormant `MethodEquivalence` binding — no live solve) **do** ship in V1 as the
+  Layer-1.25 / closed-form path; only the live BTE solve is V2. Where a cheap proxy is
+  needed during training it is a registered D4 surrogate with an obligation-9 validity
+  domain; **no such surrogate ships in V1**, with the accuracy regime declared in the
+  ledger (`arch-11-residuals §11.7`, `docs/accuracy-ledger.md`).
+- **AHC e-ph gap renormalization beyond the adiabatic one-shot** — the faithful
+  `A_qν` Brillouin-zone sum and **non-adiabatic AHC** (Layer-1.75; ~25% on polar ZPR)
+  are deferred to V2. V1 ships the adiabatic one-shot dressing `ΔE_g=ZPR·coth(Θ/2T)`
+  (registry row 120) with per-material ZPR/slope coefficients (`docs/accuracy-ledger.md`).
+- **EDF-tail / hot-carrier breakdown above ~500 °C** — the BTE-full / full-band-MC
+  high-E×high-T tail correction needs per-material BTE/MC anchor data that **do not exist
+  in the V1 corpus**; until they do, the learned `Δα` correction ships as identity and the
+  corner is **cert-refused** (`arch-19-coupling-structure §19.8`, `arch-12-cert §12.0.3`),
+  not claimed as a met target.
+- **Plasmon–phonon coupling / LST-relation breakdown at degenerate doping** — above
+  `n ≳ 10²⁰ cm⁻³` (reached by p⁺ B-doped diamond contact layers), the
+  Lyddane–Sachs–Teller-derived static `ε_r` and Fröhlich screening lose validity. V1
+  **applicability-gates** the LST `ε_r` path and Fröhlich screening on `n < n_degenerate(host)`;
+  outside the gate the quantity is masked, not silently extrapolated. (Same gate carries the
+  degenerate-Einstein refinement, `arch-21-multiscale-state §21.7.2`.)
+- **III-N high-temperature thermal expansion** — QHA breaks above ~Θ_D/2 (GaN fails by
+  ~500 °C); V1 has **no design-grade path**, only per-material σ-widening in the ledger
+  (`accuracy-ledger §14`). This propagates into gap(T) (row-63 strain), `G(T)`, and the
+  T,P-hull for the flagship polar materials. V2 = a first-order self-consistent-phonon
+  correction as a second Layer-1.25 dressing (one-shot, same amortization shape as AHC).
+- **Alloy-disorder mobility in AlGaN beyond the closed-form Harrison term** — the
+  `is-alloy`-gated row 127 (`τ_alloy⁻¹∝x(1−x)ΔU²g(E)`) ships in V1; a full
+  configurationally-averaged disorder treatment is V2.
 - Absolute Berry-phase / Wannier-center polarization (the λ-path `P_sp` evaluator) —
   deferred to V2. V1 uses the Z*-composition path (`arch-19`/registry rows 113–114, ±5%,
   `accuracy-ledger` #35); the absolute modern-theory integral needs a
@@ -2094,6 +2180,29 @@ composition whose active channels carry coefficients without a `ProvenanceLedger
 entry** (an unprovenanced coefficient is a silent accuracy hole). For the MVP the
 diamond coefficients are `curated`; other materials are `per-material-DFPT` and their
 provenance is the gating data-acquisition task before that material is claimed.
+
+**`slope-kind` tag — machine-checkable double-count guard for `dE_g/dT` (AHC).** Any
+temperature-slope coefficient feeding `ahc-gap-renormalization` (registry row 120) additionally
+carries `slope-kind ∈ {isochoric, total}`. The quoted experimental `dE_g/dT` slopes are mostly
+*total* (they already fold in the lattice-expansion part that registry row 63 — `Ξ·strain` —
+carries separately, ~30–40% of the shift). A **cert obligation refuses any composition in which a
+`total`-tagged AHC slope and row-63's thermal-expansion T-path are both active on the same
+observable** (double-counting the expansion contribution); an `isochoric`-tagged slope composes
+with row 63 freely. The tag is a first-class field on the coefficient, so the check is a tag
+comparison at compose time, not a reviewer caveat. (Curated AHC entries in the MVP ZPR/slope
+table, `docs/accuracy-ledger.md §1/§15`, are tagged at entry.)
+
+**Learned-correction training contract (`Δα` EDF-tail and any PINO-fit residual coefficient).** A
+coefficient whose `source` is a PINO-learned correction — the high-field EDF-tail correction
+`Δα(E,T_L,T_e)` of the avalanche channel is the only V1 instance — is constrained two ways so it
+cannot launder away its own supervision signal: (1) it is fit **only against external anchors**
+(measurements or future BTE / full-band-MC points) and is **frozen with respect to the PINO
+training loss** — gradients of the physics loss do not flow into it — because a correction trained
+on the same residual it modifies can co-adapt to zero that residual and silently destroy the
+obligation-9 domain it is meant to protect; (2) until such external anchors exist (the V1 corpus
+has none — `docs/accuracy-ledger.md §49`), `Δα` **ships as the identity** (zero correction) and the
+high-E×high-T corner stays **cert-refused** (`obligation 9`), making the ">500 °C breakdown =
+cert-refused" stance load-bearing rather than decorative.
 
 The active channels in a composition, **together with the theory frame
 they are interpreted in**, are the **`CouplingSpec`**:
@@ -2776,11 +2885,17 @@ Every process is a new `FormulaRecord`; all Arrhenius rates use `rate = ν₀·e
 - **F-H1 `nrt-displacements`** — `(T_dam,E_d) → N_d`, `non-eq…md:367` (H.1):
   `N_d = 0.8·T_dam/(2·E_d)`. `E_d`: diamond ~37–50 eV, GaN ~20 eV, Ga₂O₃ ~25 eV, AlN ~35 eV.
   T0/D1; `algebraic-of`; B11/B4; feeds F-H2.
-- **F-H2 `frenkel-pair-yield`** — `(N_d,T_L,η_recomb,Φ_dose) → DefectDensity`, `non-eq…md:371`:
-  `[V]_irr = N_d·(1−η_recomb)·Φ_dose`, gated by Part-A/C `E_form`. T0/D1; `master-equation`; B11/B4;
-  this is `G_irradiation` of F-G1. *(Research-flagged: `non-eq…md:361`/`catalog…md:232` mark full
-  cascade dynamics out-of-scope; `η_recomb(T_L)` has **no closed form in the corpus** — only the
-  coupling structure is specified, not invented.)*
+- **F-H2 `frenkel-pair-yield`** — `(N_d,Σ_d,Φ_dose,η_recomb) → DefectDensity`, `non-eq…md:371`:
+  `[V]_irr = Φ_dose·Σ_d·N_d·(1−η_recomb)` (cm⁻³), where the **macroscopic displacement cross-section**
+  `Σ_d = N_atom·σ_d` (cm⁻¹) supplies the missing length⁻¹ so the product of `N_d` (displacements
+  per PKA, dimensionless), `Σ_d` (cm⁻¹) and the fluence `Φ_dose` (cm⁻²) is a `Concentration`
+  (cm⁻³) — without `Σ_d` the bare `N_d·(1−η)·Φ_dose` is cm⁻² (a fluence), not a density. `σ_d` is
+  the per-`(host, particle-type, energy)` NIEL-derived displacement cross-section, one curated
+  `ProvenanceLedger` coefficient (`arch-19-coupling-structure §19.8`). T0/D1; `master-equation`;
+  B11/B4; this is `G_irradiation` of F-G1. *(Research-flagged: `non-eq…md:361`/`catalog…md:232`
+  mark full cascade dynamics out-of-scope; `η_recomb(T_L)` and `σ_d` have **no closed form in the
+  corpus** — only the coupling structure + the curated-coefficient slot are specified, not
+  invented.)*
 
 ---
 
@@ -2890,6 +3005,16 @@ Drift-diffusion `j = qμ(E,T)nE − qD∇n` (holes: sign-flip), Einstein `D = μ
 β` are micro-supplied (§21.8). Faithful tier verifies vs BTE-`j(E)` as an
 `Algebraic/MethodEquivalence` residual.
 
+**Degenerate-statistics caveat (declared model-form error).** The Einstein relation `D = μk_BT/q`
+is the **nondegenerate** form. p⁺ B-doped diamond contact layers (and n⁺ degenerate III-N) run at
+`10²⁰–10²¹ cm⁻³`, where Fermi–Dirac statistics make the generalized relation
+`D/μ = (k_BT/q)·F_{1/2}(η)/F_{−1/2}(η)` (`η = (E_F−E_C)/k_BT`) the correct one. V1 carries the
+nondegenerate form with this discrepancy entered as a **declared model-form-error term** in the
+`combineTol` budget (`arch-11-residuals §11.7`) on any composition whose carrier density crosses
+`n_degenerate(host)`; the generalized `F_{1/2}/F_{−1/2}` variant is a gated refinement (it shares
+the §21.7.2 closed form, no new method). The same `n < n_degenerate(host)` gate carries the
+plasmon–phonon / LST exclusion (`arch-17-out-of-scope`).
+
 ## 21.8 THE HOMOGENIZATION MAP (the micro→device coefficient bridge)
 
 The three macro balance PDEs (`non-eq…md:230–232`, `group-C…md:96–100`):
@@ -2905,7 +3030,7 @@ relation evaluated at the local cell state:
 | # | Micro output (formula) | Homogenization relation | Macro coeff / term | Eq |
 |---|---|---|---|---|
 | HM-1 | `κ(T)` (`phonon-kappa-T`, Slack) | `D_thermal(r) = κ(T_L(r))/(C_p ρ_m)`; face flux `q_f = −κ(T_L,f)(∇T_L)_f` | heat diffusion `κ(T_L(r))` | (H) |
-| HM-2 | `σ(T)`/`μ₀(T,N_D)` (`mobility-impurity-phonon`) | `σ(r)=qn μ₀(T_L(r),N_D)`; drift `μ(E,T)=μ₀[1+(μ₀|E|/v_sat)^β]^(−1/β)` at `E(r)=−∇φ` | drift `qμn`, diffusion `qD` | (DD) |
+| HM-2 | `σ(T)`/`μ₀(T,N_D)` (`mobility-impurity-phonon`) | `σ(r)=qn μ₀(T_L(r),N_D)`; drift `μ(E,T)=μ₀[1+(μ₀|E|/v_sat)^β]^(−1/β)` at `E(r)=−∇φ`; face flux via Scharfetter–Gummel (§21.9); Einstein `D=μk_BT/q` nondegenerate (degenerate caveat §21.7.2) | drift `qμn`, diffusion `qD` | (DD) |
 | HM-3 | `v_sat` (`v-sat-*`) | saturated regime: `j_drift = q n v_sat` (decouples `j` from `E`) | saturated drift | (DD) |
 | HM-4 | `α_ii(E)` (`chynoweth`, `a·exp(−b/E)`) | `G_av(r)=α_n(|E|)n v_n + α_p(|E|)p v_p` at `|E(r)|`; breakdown `M=1/(1−∫α dx)` (row 75) | avalanche source | (DD) |
 | HM-5 | SRH + G–R rates | `S_carrier = G_av + G_opt − R_SRH(n,p; defect-density(r))`; `R_SRH` reads the **slow tier** per-cell defect density | `G − R` source | (DD) |
@@ -2935,6 +3060,20 @@ with `RHS_field` the finite-volume discretization (§21.6.1):
 | `n` | `(1/V_c)[ −Σ_f j_f A_f/q + (G−R)(c)V_c ]` | HM-2/3,4,5 |
 | `p` | same, hole sign | HM-2/3,4,5 |
 | `j` | algebraic closure: `‖j(c) − (qμnE − qD∇n)(c)‖²` | HM-2/3 |
+
+**Drift-diffusion face flux — Scharfetter–Gummel (required, not central differencing).** The
+inter-cell carrier flux `j_f` in the `n`/`p` rows **must** use the Scharfetter–Gummel
+exponentially-fitted form, not naive/central finite-volume differencing:
+```
+j_f = (qD/Δx)·[ n_{c⁺}·B(Δψ) − n_{c⁻}·B(−Δψ) ],   Δψ = q(φ_{c⁺}−φ_{c⁻})/k_BT,   B(t)=t/(e^t−1)
+```
+(`B` the Bernoulli function). At the UWBG operating point the cell Péclet number
+`Pe = qEΔx/k_BT ≈ 40` (1 MV/cm × ~10 nm cell ÷ 25 mV), where a centrally-differenced `j_f` makes
+the **residual operator itself wrong at the operating point** — the PINO would then be scored
+against a discretization artifact rather than the physics. Scharfetter–Gummel is closed-form and
+differentiable (one removable singularity at `Δψ→0`, guarded by the series `B(t)≈1−t/2`),
+preserving C1 / no-runtime-solver. The interface heat flux (HM-8) and the Poisson/`j` constraints
+are unaffected; only the convection-dominated carrier flux needs the exponential fitting.
 
 `φ`,`j` are **algebraic/constraint** balances (no `∂_t`). Axes `(MeshCell, MacroField)`; the
 per-cell-per-field scalar is the atomic contribution (`arch-11 §11.3`, spatial bin = mesh cell);
@@ -3012,7 +3151,7 @@ Rows 105–112 (rows 103–104 are the existing rejected markers; F-F5 =
 109,air-oxidation-rate-eyring,"`(T, p_O2, ΔG‡, ν) → dx_ox/dt`",B11/B5,T0,D1,cheap,"S3 (catalog #46, Eyring)","T, p_O2"
 110,hydrogen-desorption-rate-eyring,"`(T, E_des, ν) → r_H`",B11/B5,T0,D1,cheap,"S3 (catalog #47, E_des=3.8eV)","T, surface c_H"
 111,nrt-displacements,"`(T_dam, E_d) → N_d`",B11/B4,T0,D1,cheap,"S4 (non-eq H.1)","T_dam, E_d(host)"
-112,frenkel-pair-yield,"`(N_d, T_L, η_recomb, Φ_dose) → DefectDensity`",B11/B4,T0,D1,cheap,"S4 (non-eq H.2)","nrt-displacements, E_form"
+112,frenkel-pair-yield,"`(N_d, Σ_d, Φ_dose, η_recomb) → DefectDensity`",B11/B4,T0,D1,cheap,"S4 (non-eq H.2; [V]_irr=Φ·Σ_d·N_d·(1−η_recomb), Σ_d=N_atom·σ_d NIEL)","nrt-displacements, σ_d(host,particle)"
 ```
 
 ## 21.14 Open sub-decisions (flagged, not silent)
@@ -3030,9 +3169,11 @@ not a silent gap:
 4. **Bidirectional slow↔macro coupling** — HM-5 reads slow defect density (macro←slow); the
    back-reaction (carrier-driven defect generation, F-G1's `G_irradiation`) is macro→slow; the
    rate law is the slow tier's (§21.3/§21.5), the contract is noted here.
-5. **`η_recomb(T_L)` and per-material regime thresholds** — no closed form in the corpus (only
-   the coupling); regime-switch field windows are order-of-magnitude — flagged as calibration
-   tasks, not invented.
+5. **`η_recomb(T_L)`, `σ_d(host,particle)`, and per-material regime thresholds** — no closed form
+   in the corpus (only the coupling structure); the NIEL displacement cross-section `σ_d` (F-H2)
+   and recombination efficiency are curated `ProvenanceLedger` coefficients, and regime-switch
+   field windows are order-of-magnitude — flagged as calibration / data-acquisition tasks, not
+   invented.
 
 ## 21.15 Landing edits to existing docs
 

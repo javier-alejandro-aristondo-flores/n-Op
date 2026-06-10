@@ -13,7 +13,7 @@ research-sources: []
 # The named-formula registry
 
 The canonical, machine-readable list is
-`physics/library/formulas/registry-manifest.csv` — 117 substantive rows plus 2
+`physics/library/formulas/registry-manifest.csv` — 125 substantive rows plus 2
 markers for relations enforced architecturally and therefore not residualized
 (force = −∇energy; equivariance). `formula-registry.md` is the narrative index.
 Every algebraic combination invokes a named formula with typed inputs and an

@@ -102,6 +102,27 @@ composes into the per-observable error budget (`arch-11-residuals §11.7`).
 | `τ_adj` | registration adjoint vJp-vs-JvP gate (`impl-07-residual-factory §7.5`) | `1e-4` relative |
 | `δ_surrogate` | D4 surrogate / relaxation validity (obligation 9), measured on a dev set | per-formula |
 
+## 12.0.3 Composition-validity refusals (machine-checkable, not reviewer caveats)
+
+Three compose-time refusals are decided by tag/field comparison on the active `CouplingSpec` +
+`ProvenanceLedger`, emitted as obligation leaves rather than left to documentation. Each is a
+`Failed` verdict with a witness (the offending coefficient / row pair).
+
+- **Unprovenanced-coefficient refusal** (obligation 4/9 family, `arch-19-coupling-structure §19.8`).
+  Any active channel carrying a coefficient with no `ProvenanceLedger` entry refuses the
+  composition — an unprovenanced coefficient is a silent accuracy hole.
+- **AHC `slope-kind` double-count refusal** (obligation 6, named-formula consistency).
+  `ahc-gap-renormalization` (row 120) slopes carry `slope-kind ∈ {isochoric, total}`
+  (`arch-19 §19.8`). A composition in which a `total`-tagged AHC slope and row 63's
+  thermal-expansion (`Ξ·strain`) T-path are both active on the same observable is refused — the
+  two paths would double-count the lattice-expansion part of `dE_g/dT`. Witness: the
+  `(row 120 coeff, row 63 instance, observable)` triple. An `isochoric`-tagged slope passes.
+- **Learned-correction-without-anchor refusal** (obligation 9, surrogate validity). A PINO-learned
+  correction coefficient (V1: the EDF-tail `Δα`, `arch-19 §19.8`) is admissible only if external
+  anchor data back its declared validity domain; with no anchors it ships as identity and any query
+  inside the unanchored high-E×high-T corner trips obligation 9 with a domain witness (the
+  ">500 °C breakdown = cert-refused, not met" stance).
+
 ## 12.1 `SqliteReferenceCache` — backend for obligations 4 + 8
 
 The reference battery (obligation 4) and its versioning discipline

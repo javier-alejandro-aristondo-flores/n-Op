@@ -27,9 +27,9 @@ Every other document references these numbers rather than restating them.
 | State DOFs | 7-tuple | yes |
 | BO hierarchy levels | 4 | yes |
 | Dressing layers | 1 / 1.25 / 1.75 / 2 / 3 | yes |
-| Computational methods | 12 (+2 sub-methods) | yes |
+| Computational methods | 12 (+3 sub-methods) | yes |
 | Abstract-property templates | 20 | yes |
-| Named formulas | 117 substantive (+2 rejected markers) | yes — see `formula-registry.md` |
+| Named formulas | 125 substantive (+2 rejected markers) | yes — see `formula-registry.md` |
 | Observable bundles | 11 (B1–B11) | yes |
 | Residual categories | 19 | yes |
 | Cert obligations | 10 | yes |
@@ -47,8 +47,12 @@ Closed vocabulary; instances are programs in this vocabulary:
 `linear-response`, `path-search`, `convex-optimization`, `kinetic-evolution`,
 `statistical-sampling`, `symmetry-projection`.
 
-Plus two registered sub-methods: `field-line-integral` (under `path-search`) and
-`interface-tunneling` (under `linear-response`).
+Plus three registered sub-methods: `field-line-integral` (under `path-search`),
+`interface-tunneling` (under `linear-response`), and `mesh-interpolation` (under
+`kinetic-evolution`) — the compile-time band/e-ph interpolator (Fourier for gauge-free band
+energies/velocities, Wannier–EPW for gauge-sensitive e-ph matrix elements, with mandatory
+dipole/quadrupole polar corrections; runtime reads the interpolated grid only, C1-clean). The
+closed 12-method alphabet is preserved; interpolation is a sub-method, not a new top-level method.
 
 ### 9.2 Twenty abstract-property templates
 
@@ -95,19 +99,22 @@ Bulk-boundary correspondence is **not** a template; it is handled at the cert
 layer (obligation-7, a `DiscreteStructure` morphism over the topology atlas,
 §14).
 
-### 9.3 117 named formulas
+### 9.3 125 named formulas
 
 Closed registry of typed, fully-parameterized algebraic formulas, named by
 behavior (person-attribution names appear only as parenthetical literature
 pointers). The canonical machine-readable list is
-`physics/library/formulas/registry-manifest.csv` (117 substantive rows + 2
+`physics/library/formulas/registry-manifest.csv` (125 substantive rows + 2
 markers for relations that are enforced architecturally and therefore *not*
 residualized: force = −∇energy, and equivariance). Rows 1–87 are grounded in the
 domain research (`physics/research/`); rows 88–102 are the linear-response and
 topology-atlas extensions; rows 105–112 are the slow-tier degradation / radiation
 extensions (`arch-21-multiscale-state §21.13`); rows 113–119 are the
 polarization / piezoelectric / 2DEG package (`is-polar-material`-gated; GaN/AlN/AlGaN
-HEMTs). Each formula carries a typed signature, a cost tier
+HEMTs); rows 120–127 are the per-material accuracy package (AHC gap(T) renormalization,
+the 4-phonon / iterative-LBTE κ(T) siblings, the breakdown-field T-slope, the T,P-aware
+metastability hull, the Wegscheider and rotational sum-rule consistency residuals, and
+alloy-disorder scattering). Each formula carries a typed signature, a cost tier
 `T0..T3`, a differentiability tag `D0..D4`, and an applicability classifier
 (§13). See `formula-registry.md` for the narrative index.
 

@@ -15,10 +15,23 @@ reference-data/
 ├── material-constants.csv             (lattice constants, gaps, dielectrics per material)
 ├── interface-properties.csv           (Schottky barriers, work functions, carbide-formation E_a per metal-semiconductor pair)
 ├── elastic-tensors.csv                (C_ij components for each anchor material)
-├── phonon-frequencies.csv             (key LO/TO modes, Debye temperatures)
+├── phonon-frequencies.csv             (key LO/TO modes, Debye temperatures, mode Grüneisen)
 ├── transport-coefficients.csv         (mobilities, breakdown fields, thermal conductivities at reference T)
+├── polarization-piezoelectric.csv     (P_sp, Born Z*, piezoelectric e_ij, 2DEG n_s — polar materials)
 └── chemical-potentials.csv            (μ_elemental references at standard conditions)
 ```
+
+**Population status (2026-06-10, Wave 1).** `material-constants`, `elastic-tensors`,
+`phonon-frequencies`, `transport-coefficients`, and `polarization-piezoelectric` are seeded with
+the **III-N flagships (GaN, AlN, AlGaN)** — fully sourced and adversarially audited
+(`docs/superpowers/specs/2026-06-10-wave1-iii-n-seeding.md`,
+`docs/audits/2026-06-10-wave1-iii-n-audit.md`) — plus the diamond anchors already in
+`docs/accuracy-ledger.md`. **Polarization e₃₁ is the PROPER constant, paired with the ZB-reference
+P_sp** (the self-consistent convention enforced by `arch-12 §12.0.3`; never mix with improper e₃₁).
+Pending later waves: β-Ga₂O₃ (Wave 2), c-BN / 4H-SiC (Wave 3), the full diamond structural battery
+(`mvp-05 §H4`: lattice a, C_ij, cohesive/formation energy, diamond–graphite boundary),
+`interface-properties.csv`, `defect-formation-energies.csv`, `chemical-potentials.csv`, and the
+explicitly-flagged GAPs (AlN electron Caughey–Thomas quartet, AlN μ_p, AlN measured α_ii).
 
 ## Schema discipline
 

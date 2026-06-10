@@ -29,13 +29,13 @@ gap is named (and tracked in the audit's P2 list).
 | 10 | phonon_DOS F(ω) | ±5% | derived from #9 |
 | 11 | mode_gruneisen γ_λ(q) | ±15% | single γ_avg acceptable cheap |
 | 12 | phonon_lifetimes τ_λ(q,T) | ±20% (gives κ ±10%) | 4-phonon correction needed **≳0.4 Θ_D** (diamond ≈880 K), landed row 121 (Slack-like factor) |
-| 13 | thermal_conductivity κ(T) | ±20% @300 K (diamond, anchored), ±25% @773 K, ±35%→±15% @1100 K | RTA/3-ph **underestimates** 30–50% near 300 K; anchor diamond ±20% to `κ_iter≈2200` (rows 25+121+122), **not** `κ_RTA≈1800`; diamond κ(773 K) & β-Ga₂O₃ high-T are interpolations (±40%, lowest confidence) |
+| 13 | thermal_conductivity κ(T) | ±20% @300 K (diamond, anchored), ±25% @773 K, ±35%→±15% @1100 K | RTA/3-ph **underestimates** diamond 30–50% near 300 K (anchor to `κ_iter≈2200`, **not** `κ_RTA≈1800`); but **3-ph BTE OVERpredicts GaN/AlN at high T** (measured GaN κ∝T^−1.2→−1.5, Zheng PRMat 3 014601 2019) — carry both 3-ph (upper) and measured (GaN ~60@773K/~35–40@1100K, lower); **AlN high-T is theory-only** (no >500 K single-crystal measurement); diamond κ(773 K) & β-Ga₂O₃ high-T are interpolations (±40%) |
 | 14 | thermal_expansion α_αβ(T) | ±10% (diamond); **III-N σ widened, no design-grade path** | QHA breaks above ~Θ_D/2 (GaN fails at 500 °C); III-N high-T is a flagged hole (`arch-17`), V2 = first-order self-consistent-phonon dressing (Layer-1.25 shape); propagates into gap(T) row-63 strain, G(T), T,P-hull |
-| 15 | e-ph self-energy Σ_ep (AHC) | ±0.05 eV non-polar / ±0.1 eV polar on T-shift | **landed row 120**; per-material ZPR (diamond −345 meV indirect; omitting it mis-states `n_i` by ×11 @800 K) — see curated table below |
-| 16 | carrier_mobility_electron μ_n | ±20% @300 K, ±30% @800 K | BTE-RTA; **alloy-disorder scattering (row 127) dominant for AlGaN channel** — without it μ(AlGaN) is systematically optimistic |
+| 15 | e-ph self-energy Σ_ep (AHC) | ±0.05 eV non-polar / ±0.1 eV polar on T-shift | **landed row 120**; per-material **isochoric** ZPR (the `coth` amplitude; lattice expansion via row 63) — diamond −345 meV indirect, GaN −189, AlN −399; omitting diamond ZPR mis-states `n_i` by ×11 @800 K — see curated table below |
+| 16 | carrier_mobility_electron μ_n | ±20% @300 K, ±30% @800 K | BTE-RTA; **alloy-disorder scattering (row 127) dominant for AlGaN channel** — without it μ(AlGaN) is systematically optimistic; **μ_n(AlN) intrinsic 871(⊥)/619(∥), best exp 426 — the "≈300" is doped/defective, not intrinsic** (Wang arXiv 2506.09240; Taniyasu APL 89 2006) |
 | 17 | carrier_mobility_hole μ_p | ±20% (critical, p-type diamond) | as #16 |
 | 18 | saturation_velocity v_sat | ±15% | Shockley / Caughey–Thomas |
-| 19 | impact_ionization α_ii | **factor-2** (per-material σ: diamond ×2.5 contested, GaN ×1.5, 4H-SiC ×1.3, β-Ga₂O₃ ×3, AlN/AlGaN ×2+) | Chynoweth `α=a·exp(−b/E)` landed (row 74 + curated `(a,b,σ)` below); misses hot-electron tail — the EDF-tail `Δα` correction ships as identity until external anchors exist (#49) |
+| 19 | impact_ionization α_ii | **factor-2+** (per-material σ: diamond ×2.5 contested, **GaN ≥×3** — published prefactors span >4 orders, 4H-SiC ×1.3, β-Ga₂O₃ ×3, **AlN measured = GAP / cert-refused**, only Bulutay MC electron-only) | Chynoweth `α=a·exp(−b/E)` landed (row 74 + curated `(a,b,σ)` below; GaN reseeded to Cao 2018 — prior values were **Özbek 2011** mis-cited as "Maeda APL 112"); misses hot-electron tail — EDF-tail `Δα` ships as identity until external anchors exist (#49) |
 | 20 | breakdown_field E_b | ±15% @≤500 °C (critical, BFOM, enters cubed → σ(BFOM)≈±60% diamond); **>500 °C cert-refused / frontier** | **E_b RISES with T** (`κ_BR>0`, +5×10⁻⁴/K diamond, +7×10⁻⁴/K 4H-SiC; row 123) — UWBG breakdown *hardens* with T; the prior "drops ~20%" was a sign error (conflated with mobility collapse). The EDF-tail anchor data are absent, so >500 °C is **not a met target** |
 | 21 | hall_factor r_H | ±10% | constant r_H≈1.18 acceptable |
 | 22 | seebeck S | ±15% | Mott formula |
@@ -47,11 +47,11 @@ gap is named (and tracked in the audit's P2 list).
 | 28 | defect_level_in_gap E_t | ±0.1 eV | trap-assisted leakage |
 | 29 | capture_cross_section σ_n,p | factor-3 | **OUTSIDE registry** (Huang–Rhys+Marcus) |
 | 30 | surface_dipole p_s | ±0.1 D | tabulated by termination |
-| 31 | schottky_barrier φ_B | ±0.1 eV (→ ×e⁴ contact R @500 °C) | Cowley–Sze; carbide shifts with soak; **image-force-lowering inconsistency (0.06 vs 0.18 eV across research files) unresolved — must be reconciled before any barrier-lowering coefficient seeds a `ProvenanceLedger` table** (shifts φ_B-derived contact R by `e^(Δ/kT)`) |
+| 31 | schottky_barrier φ_B | ±0.1 eV (→ ×e⁴ contact R @500 °C) | Cowley–Sze; carbide shifts with soak; **image-force lowering reconciled: Δφ=√(qE/4πε_sε₀), diamond ε_s=5.7 → 0.16 eV @10⁶ V/cm, 0.50 eV @10⁷** (the prior 0.06 eV was a √10 field-scaling error; 0.18 eV ~13% high — both dropped) |
 | 32 | contact_resistivity ρ_c | ±50% (orders span) | dominated by φ_B |
 | 33 | interface_trap_density D_it | factor-2 | dangling-bond + strain |
 | 34 | tunneling_transmission T_WKB | ±20% in log | Fowler–Nordheim closed form |
-| 35 | spontaneous + piezo polarization P_sp/P_pz | ±5% (on the interface ΔP that `n_s` consumes) | landed: Z*-composition (rows 113–114); the linearized `Z*·Δw` path is ±10–20% on *absolute* P_sp, but the ±5% claim holds because `n_s` reads interface *differences* ΔP where the reference ambiguity largely cancels; absolute Berry-phase λ-path deferred V2 |
+| 35 | spontaneous + piezo polarization P_sp/P_pz | ±5% on interface ΔP (**AlGaN/GaN only**); ±10–20% on absolute P_sp | landed: Z*-composition (rows 113–114). The ±5% on ΔP holds by an **accidental cancellation** (Dreyer PRX 6 021038 2016 §V.D–E): the spurious ZB-reference term and the proper/improper-e₃₁ error are large, opposite-sign, and nearly cancel — **not** generic reference-cancellation. Requires **ZB-ref P_sp + PROPER e₃₁ + no ZB-correction** (pairing cert `arch-12 §12.0.3`); **fails for high-In InGaN/GaN** (cert-refused). Absolute Berry-phase λ-path deferred V2 |
 | 36 | elastic_tensor C_ijkl | ±5% | DFT stress-strain / DFPT |
 | 37 | bulk/shear modulus B,G | ±5% | Voigt average |
 | 38 | sound_velocity v_s | ±5% | Christoffel |
@@ -97,25 +97,30 @@ curated-coefficient seed. Each is a `ProvenanceLedger` entry `(value, σ, source
 `per-material-DFPT` (the gating data-acquisition task before that material is claimed). Values are
 literature-anchored (full citations in `docs/superpowers/specs/2026-06-10-pass-c-accuracy-design.md`).
 
-**AHC ZPR / gap T-slope (row 120; `slope-kind` tagged):**
+**AHC ZPR / gap T-slope (row 120; `slope-kind` tagged — the `coth` amplitude is the *isochoric*
+electron-phonon ZPR; zero-point lattice expansion is row 63's job, `arch-19 §19.8`):**
 
-| Material | ZPR (meV) | dE_g/dT (meV/K) | slope-kind | source |
-|---|---|---|---|---|
-| diamond | −345 (indirect; exp 340–370) | −0.45 | total | Cardona / Engel PAW −323; **−628 meV is the *direct* gap (Antonius PRL 112 215501, 2014), kept separate** |
-| c-BN | −400 | ~−0.50 (unmeasured) | total | Engel −402 / Miglio −406 |
-| AlN | −385 | −0.55 | total | Engel −377 |
-| GaN | −180 | −0.50 | total | Engel −171; Varshni (Nepal APL 2005) |
-| β-Ga₂O₃ | −200 | −0.90 (anisotropic, polar) | total | Lee APL Mater. 2023 |
+| Material | ZPR isochoric (meV) | ZPR_lat (meV) | total (meV) | dE_g/dT e-ph (meV/K) | slope-kind | source |
+|---|---|---|---|---|---|---|
+| GaN | −189 (Engel AE −171) | −49 | −238 | −0.45 | isochoric | Engel PRB 106 094316 (2022); Miglio npj CM 6 167 (2020); Nepal APL 87 (2005) |
+| AlN | −399 (Engel −377) | −85 | −484 | −0.55 | isochoric | Engel 2022; Miglio 2020 |
+| diamond (indirect) | −345 (band −320…−366) | small | ≈−345 | −0.45 | isochoric | Antonius PRL 112 215501 (2014)/arXiv 1505.07738; Engel −323 |
+| c-BN | −402 | — | — | ~−0.50 (unmeasured) | isochoric | Engel −402 / Miglio −406 |
+| β-Ga₂O₃ | −200 | — | — | −0.90 (anisotropic, polar) | total (⚠ Wave-2: verify isochoric/total — not yet audited) | Lee APL Mater. 2023 |
 
-(`total`-tagged ⇒ cert refuses co-activation with row-63 strain on the same observable, `arch-12 §12.0.3`.)
+(`isochoric`-tagged ⇒ composes with row-63 strain freely; a `total` tag makes the cert **refuse**
+co-activation with row 63 on the same observable, `arch-12 §12.0.3` — so the tag must describe what
+the value contains. The Engel/Miglio AHC values are clamped-lattice e-ph only; the prior `total`
+tag on isochoric magnitudes was the worst of both. diamond **direct**-gap ZPR −628 meV stays
+quarantined — different valley — Antonius 2014.)
 
 **κ(T) battery (W/m·K @ 300 / 773 / 1100 K; rows 121–122):**
 
 | Material | 300 K | 773 K | 1100 K | source |
 |---|---|---|---|---|
 | diamond | 2200 (exp 2000–2500) | 620 | 450 | Feng–Lindsay–Ruan PRB 96 161201 (2017); Broido APL 91 231922 (2007) |
-| GaN (a) | 240 | 100 | 70 | almaBTE |
-| AlN (c) | 339 | ~140 | ~95 | Lindsay–Broido–Reinecke PRL 109 095901 (2012) |
+| GaN (a) | 240 (3-ph) / ~200 (exp) | 3-ph 100 / **meas. ~60** | 3-ph 70 / **meas. ~35–40** | 3-ph almaBTE; meas. Zheng PRMat 3 014601 (2019), κ∝T^−1.2→−1.5 |
+| AlN (c) | 339 (exp+FP) | ~140 (theory-only) | ~95 (theory-only) | Rounds/Slack APEX 11 071001 (2018) + Slack JPCS 48 641 (1987); **no >500 K single-crystal measurement** |
 | β-Ga₂O₃ | [010] 27, [100] 11 (tensor, ~2.5–3× anisotropy) | — | — | Guo APL 106 111909 (2015) |
 
 **High-field Chynoweth `α_ii=a·exp(−b/E)` + Caughey–Thomas + `κ_BR` (rows 123, 74):**
@@ -123,13 +128,64 @@ literature-anchored (full citations in `docs/superpowers/specs/2026-06-10-pass-c
 | Material | a (cm⁻¹) | b (V/cm) | σ (×a) | v_sat (cm/s), β | κ_BR (K⁻¹) | source |
 |---|---|---|---|---|---|---|
 | diamond | 1.93e5 | 7.59e6 | ×2.5 (contested) | 1.5e7, β=1; μ₀∝T^(−1.5..−2.8) | +5e−4 (±50%) | Hiraiwa–Kawarada JAP 114 034506 (2013); Isberg JAP 109 (2011) |
-| GaN | e 1.5e5 / h 6.4e5 | e 1.41e7 / h 1.45e7 | ×1.5 | 2.5e7, β=2 | — | Maeda APL 112 (2018) |
+| GaN | e 4.48e8 (Cao) / h 7.13e6 ; spread incl. Özbek e 1.5e5 | e 3.39e7 / h 1.46e7 ; Özbek e 1.41e7 | **≥×3** (prefactor spread >4 orders) | v_sat 1.4e7 / v_peak 2.85e7, β=2 | +3.85e−4 (device dV_BR/dT; normalized K⁻¹ GAP) | Cao APL 112 262103 (2018); **Özbek & Baliga IEEE EDL 32 1361 (2011)** (the prior "Maeda APL 112 2018" cite was wrong); Frontiers Mater. 9 846418 (2022) |
+| AlN | e 8.875e6 (Bulutay MC, electron-only) ; **measured GAP** | e 3.759e8 (Bulutay) | unbounded | v_sat 1.4e7, β~2 | GAP (no avalanche; +by analogy) | Bulutay SST 17 L59 (2002); measured α_ii cert-refused |
 | 4H-SiC (ref) | 1.88e6 | 9.13e6 | ×1.3 | — | +7e−4 | literature |
 | β-Ga₂O₃ | e (anisotropic) | E_c 10.2/4.8/7.6 MV/cm | ×3 | — | — | Ghosh–Singisetti JAP 124 (2018); **holes never measured** |
 
+**Per-material III-N seed (Wave 1: GaN / AlN / Al_xGa_{1-x}N). Full tables + per-value sources in
+`docs/superpowers/specs/2026-06-10-wave1-iii-n-seeding.md`; adversarial audit in
+`docs/audits/2026-06-10-wave1-iii-n-audit.md`.**
+
+*Electronic baseline + deformation potentials (rows 1–6, 63):*
+
+| Quantity | GaN | AlN | source |
+|---|---|---|---|
+| E_g (0 K, direct Γ) | 3.51 eV | 6.25 eV | Vurgaftman & Meyer JAP 94 (2003) |
+| Varshni α / β | 0.909 meV/K / 830 K | 1.799 / 1462 | VM 2003 (Nepal APL 87 2005: 0.94/791, 2.63/2082) |
+| AlGaN bowing b | 0.7–1.0 eV | — | VM 2003; Nepal 2005 |
+| m*_e (⊥ / ∥) | 0.20 / 0.20 | 0.32 / 0.33 | VM 2003; Rinke PRB 77 (2008) |
+| ε_0 / ε_∞ (⊥) | 8.9 / 5.35 | 8.5 / 4.77 | Ioffe NSM; Wagner–Bechstedt PRB 66 (2002) |
+| gap def. pot. a_V | −7.6 eV | −9.8 eV | Rinke 2008 (wurtzite (a_cz−D1) etc.: Yan APL 95 2009) |
+
+*Polarization / piezo / Born (ZB-reference P_sp + **PROPER** e₃₁; self-consistent-pairing cert,
+`arch-12 §12.0.3` / `arch-19 §19.8`):*
+
+| Quantity | GaN | AlN | source |
+|---|---|---|---|
+| P_sp (ZB ref) | −0.029…−0.034 | −0.081…−0.090 C/m² | BFV PRB 56 (1997); Zoroddu PRB 63 (2001) |
+| Z*_∥ (cation +) | +2.7 | +2.7 | BFV 1997 |
+| e₃₃ (full) | 0.73 / 1.02 (HSE) | 1.46 / 1.57 | BFV 1997; Dreyer PRX 6 (2016) |
+| **e₃₁ PROPER** | −0.49 / −0.55 (HSE) | −0.60 / −0.68 C/m² | BFV 1997; Dreyer 2016 |
+| e₃₁ improper (**do NOT pair with ZB P_sp**) | −1.86 | −2.03 | Dreyer 2016 (ref only) |
+| n_s (Ga-face, x≈0.3) | 1.1×10¹³ cm⁻² | — | Ambacher JAP 87 (2000) |
+
+*Elastic constants (GPa; pin GaN→Polian, AlN→McNeil; **exclude superseded AlN SAW set**):*
+
+| Quantity | GaN | AlN | source |
+|---|---|---|---|
+| C₁₁/C₁₂/C₁₃/C₃₃/C₄₄ | 390/145/106/398/105 | 410.5/148.5/98.9/388.5/124.6 | Polian JAP 79 (1996); McNeil JACerS 76 (1993) |
+| B; ρ (g/cm³) | 210; 6.15 | 210; 3.23 | Ioffe NSM |
+| AlGaN | linear Vegard (≤4.7% bowing, max C₄₄; **C₁₃ weak link**) | Łopuszyński arXiv 1110.1346 |
+
+*Carrier transport (Caughey–Thomas; Fröhlich; alloy):*
+
+| Quantity | GaN | AlN | source |
+|---|---|---|---|
+| C-T μ_n (μ_max/μ_min/N_ref/α) | 1460.7 / 295 / 1e17 / 0.66 | **GAP** (paywalled — Farahmand Tbl II) | Farahmand IEEE TED 48 (2001) |
+| C-T μ_p (μ_max/μ_min/N_ref/γ) | 170 / 10 / 2.5e17 / 1.5 | **GAP** (genuine) | Mnatsakanov SSE 47 (2003) |
+| μ FP ceiling n / p (300 K) | 1034 / 52 | 871(⊥) / 619(∥) [n] | Ponce PRB 100 (2019); Wang arXiv 2506.09240 (2025) |
+| Fröhlich α_F ; ω_LO | 0.40 ; 92 meV | 0.58 ; 110–114 meV | Mora-Ramos cond-mat/9812021; Davydov PRB 58 (1998) |
+| Θ_D | ~600 K | ~1000 K (exp 971) | Slack/Zheng; Wang–Zhao |
+| alloy ΔU ; μ-min(x) | ΔU = 1.8 eV ; min at x≈0.5–0.6 (~7× below GaN) | Pant APL 121 (2022) |
+
 Residue (cert-refused / frontier until provenanced): diamond `α_n`/`α_p` never separated;
-pure-AlN and β-Ga₂O₃-hole `α_ii` missing; per-`(host,particle)` NIEL `σ_d` (row 112) and
-`η_recomb(T_L)` have no closed form; BTE/MC EDF-tail anchors absent.
+**pure-AlN `α_ii` measured (only Bulutay MC, electron-only) and AlN-hole `α_ii`** missing;
+β-Ga₂O₃-hole `α_ii` missing; **AlN electron Caughey–Thomas quartet (paywalled — one targeted
+follow-up) and AlN hole mobility μ_p** (deep Mg) missing; **`κ_BR` as normalized (1/E)dE/dT in K⁻¹
+for GaN/AlN** (only device `dV_BR/dT`; sign positive confirmed); **Z*_⊥ (perpendicular Born charge)
+and the e₁₅ sign** (literature split ±); per-`(host,particle)` NIEL `σ_d` (row 112) and
+`η_recomb(T_L)` have no closed form; BTE/MC EDF-tail anchors absent (III-N `Δα` ships as identity).
 
 ## Composition
 

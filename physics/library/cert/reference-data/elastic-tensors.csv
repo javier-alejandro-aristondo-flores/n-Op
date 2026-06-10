@@ -1,0 +1,16 @@
+Property,Material,Environment,Value,Uncertainty,Source,Source class,Version,Added,Modified
+elastic-C11,GaN (wz),300 K,390 GPa,15 GPa,Polian Grimsditch Grzegory JAP 79 3343 (1996) 10.1063/1.361236,experimental,1,2026-06-10,2026-06-10
+elastic-C12,GaN (wz),300 K,145 GPa,20 GPa,Polian et al. JAP 79 3343 (1996),experimental,1,2026-06-10,2026-06-10
+elastic-C13,GaN (wz),300 K,106 GPa,20 GPa,Polian et al. 1996 (weak link — validate in-house),experimental,1,2026-06-10,2026-06-10
+elastic-C33,GaN (wz),300 K,398 GPa,20 GPa,Polian et al. 1996,experimental,1,2026-06-10,2026-06-10
+elastic-C44,GaN (wz),300 K,105 GPa,10 GPa,Polian et al. 1996,experimental,1,2026-06-10,2026-06-10
+elastic-C11,AlN (wz),300 K,410.5 GPa,10 GPa,McNeil Grimsditch French JACerS 76 1132 (1993) 10.1111/j.1151-2916.1993.tb03730.x,experimental,1,2026-06-10,2026-06-10
+elastic-C12,AlN (wz),300 K,148.5 GPa,10 GPa,McNeil et al. 1993,experimental,1,2026-06-10,2026-06-10
+elastic-C13,AlN (wz),300 K,98.9 GPa,3.5 GPa,McNeil et al. 1993 (weak link — exclude Tsubouchi SAW set),experimental,1,2026-06-10,2026-06-10
+elastic-C33,AlN (wz),300 K,388.5 GPa,10 GPa,McNeil et al. 1993,experimental,1,2026-06-10,2026-06-10
+elastic-C44,AlN (wz),300 K,124.6 GPa,4.5 GPa,McNeil et al. 1993,experimental,1,2026-06-10,2026-06-10
+bulk-modulus,GaN (wz),300 K,210 GPa,10 GPa,Polian et al. 1996; Ioffe NSM,experimental,1,2026-06-10,2026-06-10
+bulk-modulus,AlN (wz),300 K,210 GPa,—,Ioffe NSM,experimental,1,2026-06-10,2026-06-10
+mass-density,GaN (wz),300 K,6.15 g/cm3,—,Ioffe NSM,experimental,1,2026-06-10,2026-06-10
+mass-density,AlN (wz),300 K,3.23 g/cm3,—,Ioffe NSM,experimental,1,2026-06-10,2026-06-10
+elastic-Cij-interpolation,AlGaN,—,linear Vegard (≤4.7% bowing; C13 superlinear),—,Łopuszyński & Majewski arXiv 1110.1346,dft-vff,1,2026-06-10,2026-06-10

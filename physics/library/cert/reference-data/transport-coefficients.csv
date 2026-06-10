@@ -1,0 +1,32 @@
+Property,Material,Environment,Value,Uncertainty,Source,Source class,Version,Added,Modified
+caughey-thomas-mu-n-max,GaN (wz),300 K,1460.7 cm2/Vs,×0.1,Farahmand et al. IEEE TED 48 535 (2001) 10.1109/16.906448,monte-carlo-fit,1,2026-06-10,2026-06-10
+caughey-thomas-mu-n-min,GaN (wz),300 K,295 cm2/Vs,—,Farahmand et al. 2001,monte-carlo-fit,1,2026-06-10,2026-06-10
+caughey-thomas-mu-n-Nref,GaN (wz),300 K,1e17 cm-3,—,Farahmand et al. 2001,monte-carlo-fit,1,2026-06-10,2026-06-10
+caughey-thomas-mu-n-alpha,GaN (wz),300 K,0.66,—,Farahmand et al. 2001,monte-carlo-fit,1,2026-06-10,2026-06-10
+caughey-thomas-mu-p-max,GaN (wz),300 K,170 cm2/Vs,—,Mnatsakanov et al. SSE 47 111 (2003) 10.1016/S0038-1101(02)00256-3,analytic-fit,1,2026-06-10,2026-06-10
+caughey-thomas-mu-p-min,GaN (wz),300 K,10 cm2/Vs,—,Mnatsakanov et al. 2003,analytic-fit,1,2026-06-10,2026-06-10
+caughey-thomas-mu-n-set,AlN (wz),300 K,GAP — paywalled (Farahmand 2001 Tbl II / Wang 2025 Tbl SIII),—,one targeted follow-up,gap,1,2026-06-10,2026-06-10
+mobility-electron-fp-ceiling,GaN (wz),300 K,1034 cm2/Vs,×0.15,Ponce Jena Giustino PRB 100 085204 (2019),first-principles-bte,1,2026-06-10,2026-06-10
+mobility-hole-fp-ceiling,GaN (wz),300 K,52 cm2/Vs,×0.15,Ponce et al. 2019,first-principles-bte,1,2026-06-10,2026-06-10
+mobility-electron-intrinsic-perp,AlN (wz),300 K,871 cm2/Vs,×0.25,Wang et al. arXiv 2506.09240 (2025),first-principles-bte,1,2026-06-10,2026-06-10
+mobility-electron-intrinsic-para,AlN (wz),300 K,619 cm2/Vs,×0.25,Wang et al. 2025,first-principles-bte,1,2026-06-10,2026-06-10
+mobility-electron-best-exp,AlN (wz),300 K,426 cm2/Vs,—,Taniyasu Kasu Makimoto APL 89 182112 (2006) 10.1063/1.2378726,experimental,1,2026-06-10,2026-06-10
+mobility-hole,AlN (wz),300 K,GAP — deep Mg acceptor; holes < 1e10 cm-3,—,genuine gap,gap,1,2026-06-10,2026-06-10
+saturation-velocity,GaN (wz),high field,1.4e7 cm/s,×0.15,Foutz JAP 85 7727 (1999); O'Leary JMSE 17 87 (2006),monte-carlo,1,2026-06-10,2026-06-10
+peak-velocity,GaN (wz),~150 kV/cm,2.85e7 cm/s,×0.15,Foutz 1999; O'Leary 2006,monte-carlo,1,2026-06-10,2026-06-10
+saturation-velocity,AlN (wz),high field,1.4e7 cm/s,×0.2,O'Leary JMSE 17 87 (2006),monte-carlo,1,2026-06-10,2026-06-10
+frohlich-alpha,GaN (wz),—,0.40,0.05,Mora-Ramos et al. arXiv cond-mat/9812021,first-principles,1,2026-06-10,2026-06-10
+frohlich-alpha,AlN (wz),—,0.58,0.1,derived from band/dielectric inputs (Davydov omega_LO 110-114 meV),derived,1,2026-06-10,2026-06-10
+alloy-disorder-potential,AlGaN,—,1.8 eV,0.2 eV,Pant Lee Sanders Kioupakis APL 121 032105 (2022) 10.1063/5.0099516,first-principles,1,2026-06-10,2026-06-10
+thermal-conductivity,GaN (wz a-axis),300 K,240 W/mK,×0.2,almaBTE 3-ph; exp ~200 Zheng PRMat 3 014601 (2019),first-principles-bte,1,2026-06-10,2026-06-10
+thermal-conductivity,GaN (wz a-axis),773 K,60 W/mK,×0.3,Zheng PRMat 3 014601 (2019) measured; 3-ph overpredicts ~100,experimental,1,2026-06-10,2026-06-10
+thermal-conductivity,GaN (wz a-axis),1100 K,37 W/mK,×0.4,Zheng 2019 extrapolation (T^-1.5),experimental,1,2026-06-10,2026-06-10
+thermal-conductivity,AlN (wz c-axis),300 K,339 W/mK,7 W/mK,Rounds/Slack APEX 11 071001 (2018); Slack JPCS 48 641 (1987),experimental,1,2026-06-10,2026-06-10
+thermal-conductivity,AlN (wz c-axis),773 K,140 W/mK,×0.3,3-ph BTE / Slack extrapolation (theory-only),first-principles-bte,1,2026-06-10,2026-06-10
+breakdown-field-critical,GaN (wz),300 K,3.3 MV/cm,×0.15,Maeda JAP 129 185702 (2021),experimental,1,2026-06-10,2026-06-10
+breakdown-field-slope-kBR,GaN (wz),300-500 K,+3.85e-4 /K,—,Frontiers Mater 9 846418 (2022) device dV_BR/dT; normalized K-1 is a GAP,experimental,1,2026-06-10,2026-06-10
+impact-ionization-an,GaN (wz),high field,4.48e8 cm-1,×3,Cao Ye Wang Fay APL 112 262103 (2018) 10.1063/1.5031785,experimental,1,2026-06-10,2026-06-10
+impact-ionization-bn,GaN (wz),high field,3.39e7 V/cm,×3,Cao et al. 2018,experimental,1,2026-06-10,2026-06-10
+impact-ionization-ap,GaN (wz),high field,7.13e6 cm-1,×3,Cao et al. 2018,experimental,1,2026-06-10,2026-06-10
+impact-ionization-bp,GaN (wz),high field,1.46e7 V/cm,×3,Cao et al. 2018,experimental,1,2026-06-10,2026-06-10
+impact-ionization-an,AlN (wz),high field,8.875e6 cm-1,unbounded,Bulutay SST 17 L59 (2002) Monte-Carlo electron-only; measured = GAP,monte-carlo,1,2026-06-10,2026-06-10

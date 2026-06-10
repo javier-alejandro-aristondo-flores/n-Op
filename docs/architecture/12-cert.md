@@ -122,6 +122,15 @@ Three compose-time refusals are decided by tag/field comparison on the active `C
   anchor data back its declared validity domain; with no anchors it ships as identity and any query
   inside the unanchored high-E×high-T corner trips obligation 9 with a domain witness (the
   ">500 °C breakdown = cert-refused, not met" stance).
+- **Polarization-convention pairing refusal** (obligation 6, named-formula consistency;
+  `arch-19 §19.8`). Each spontaneous-polarization (`P_sp`, row 113) and piezoelectric (`e₃₁`,
+  rows 114/117) coefficient carries `polarization-reference ∈ {ZB-proper, H-improper}`. A
+  composition whose active `P_sp` and `e₃₁` carry **mismatched** tags is refused — mixing a
+  ZB-reference `P_sp` with an improper `e₃₁` (or vice versa) breaks the Dreyer accidental
+  cancellation (PRX 6 021038 (2016)) and corrupts the 2DEG `n_s` (improper `e₃₁ ≈ 3.4× proper`).
+  Witness: the `(P_sp coeff, e₃₁ coeff)` tag pair. The ±5%-ΔP target is additionally scoped
+  `is-AlGaN-GaN`; a high-In InGaN/GaN composition (where the cancellation is incomplete) is
+  σ-degraded or refused. The curated III-N coefficients are `ZB-proper` (`docs/accuracy-ledger.md`).
 
 ## 12.1 `SqliteReferenceCache` — backend for obligations 4 + 8
 

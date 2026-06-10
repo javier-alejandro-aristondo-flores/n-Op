@@ -337,8 +337,29 @@ carries separately, ~30–40% of the shift). A **cert obligation refuses any com
 `total`-tagged AHC slope and row-63's thermal-expansion T-path are both active on the same
 observable** (double-counting the expansion contribution); an `isochoric`-tagged slope composes
 with row 63 freely. The tag is a first-class field on the coefficient, so the check is a tag
-comparison at compose time, not a reviewer caveat. (Curated AHC entries in the MVP ZPR/slope
-table, `docs/accuracy-ledger.md §1/§15`, are tagged at entry.)
+comparison at compose time, not a reviewer caveat. The curated ZPR amplitudes feeding the `coth`
+path (`docs/accuracy-ledger.md §1/§15`) are the **isochoric** electron-phonon values (Engel PRB 106
+094316 (2022) / Miglio npj CM 6 167 (2020) AHC: GaN −189, AlN −399, diamond −345 meV), tagged
+`isochoric`; the zero-point lattice-expansion part (Miglio: GaN −49, AlN −85 meV) is row 63's job —
+so seeding a `total` magnitude into the e-ph `coth` path while row 63 is active is exactly the
+double-count this guard refuses. (Wave-1 III-N audit: `docs/audits/2026-06-10-wave1-iii-n-audit.md`;
+the prior `total` tag on isochoric Engel magnitudes was corrected there.)
+
+**Polarization reference / proper-improper `e₃₁` self-consistency — machine-checkable pairing
+guard.** Spontaneous polarization is reference-dependent; the 2DEG density `n_s` (registry row 115)
+consumes an interface *difference* `ΔP` whose ±5% accuracy for AlGaN/GaN rests on an **accidental
+cancellation** (Dreyer et al. PRX 6 021038 (2016) §V.D–E) between the spurious zinc-blende(ZB)-
+reference term in `P_sp` and the proper-vs-improper `e₃₁` error — two large, opposite-sign
+quantities — **not** generic reference-cancellation. The cancellation holds only under a
+**self-consistent pairing**: either (a) ZB-reference `P_sp` + **proper** `e₃₁` + no ZB-correction
+(the spec's path), or (b) layered-hexagonal-reference `P_sp` + `ΔP_corr` + **improper** `e₃₁`.
+Because improper `e₃₁ ≈ 3.4× proper` for GaN/AlN, mixing conventions silently corrupts `n_s`. Each
+polarization coefficient (`P_sp` row 113, `e₃₁` rows 114/117) therefore carries
+`polarization-reference ∈ {ZB-proper, H-improper}`; a **cert obligation refuses any composition
+whose active `P_sp` and `e₃₁` carry mismatched tags** (`arch-12 §12.0.3`). The ±5%-ΔP target also
+carries an `is-AlGaN-GaN` validity scope — the cancellation **fails for high-In InGaN/GaN** and is
+σ-degraded / cert-refused there. The spec's curated III-N coefficients (`docs/accuracy-ledger.md`)
+are all `ZB-proper`.
 
 **Learned-correction training contract (`Δα` EDF-tail and any PINO-fit residual coefficient).** A
 coefficient whose `source` is a PINO-learned correction — the high-field EDF-tail correction

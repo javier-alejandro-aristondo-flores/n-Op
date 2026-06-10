@@ -54,6 +54,14 @@ Stated and held, so the architecture is honest about what it does not cover:
 - **Alloy-disorder mobility in AlGaN beyond the closed-form Harrison term** — the
   `is-alloy`-gated row 127 (`τ_alloy⁻¹∝x(1−x)ΔU²g(E)`) ships in V1; a full
   configurationally-averaged disorder treatment is V2.
+- **Pure-AlN avalanche & p-type transport, and measurement-grade AlN high-T `κ`** — AlN has no
+  measured impact-ionization coefficients (only Bulutay's full-band-MC *electron* values, SST 17
+  L59 (2002); no hole), no measured bulk hole mobility (deep Mg acceptor, holes `< 10¹⁰ cm⁻³`), and
+  no single-crystal `κ` measurement above ~500 K. V1 **cert-refuses** measured-AlN avalanche and
+  p-AlN transport claims, and flags AlN high-T `κ` as theory-only (`docs/accuracy-ledger.md`;
+  `docs/superpowers/specs/2026-06-10-wave1-iii-n-seeding.md`). The AlN electron Caughey–Thomas
+  mobility quartet exists but is paywalled (Farahmand IEEE TED 48 535 (2001) Tbl II / Wang arXiv
+  2506.09240 (2025) Tbl SIII) — a targeted acquisition follow-up, not a V2 deferral.
 - Absolute Berry-phase / Wannier-center polarization (the λ-path `P_sp` evaluator) —
   deferred to V2. V1 uses the Z*-composition path (`arch-19`/registry rows 113–114, ±5%,
   `accuracy-ledger` #35); the absolute modern-theory integral needs a

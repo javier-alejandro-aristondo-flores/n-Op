@@ -1,0 +1,17 @@
+Property,Material,Environment,Value,Uncertainty,Source,Source class,Version,Added,Modified
+phonon-omega-TO-A1,GaN (wz),300 K,66.1 meV,—,Davydov et al. PRB 58 12899 (1998) 10.1103/PhysRevB.58.12899,experimental,1,2026-06-10,2026-06-10
+phonon-omega-TO-E1,GaN (wz),300 K,69.6 meV,—,Davydov et al. 1998,experimental,1,2026-06-10,2026-06-10
+phonon-omega-LO-A1,GaN (wz),300 K,91.1 meV,—,Davydov et al. 1998,experimental,1,2026-06-10,2026-06-10
+phonon-omega-LO-E1,GaN (wz),300 K,92.1 meV,—,Davydov et al. 1998,experimental,1,2026-06-10,2026-06-10
+phonon-omega-TO-A1,AlN (wz),300 K,76.1 meV,—,Davydov et al. PRB 58 12899 (1998),experimental,1,2026-06-10,2026-06-10
+phonon-omega-TO-E1,AlN (wz),300 K,83.4 meV,—,Davydov et al. 1998,experimental,1,2026-06-10,2026-06-10
+phonon-omega-LO-A1,AlN (wz),300 K,110.7 meV,—,Davydov et al. 1998,experimental,1,2026-06-10,2026-06-10
+phonon-omega-LO-E1,AlN (wz),300 K,113.6 meV,—,Davydov et al. 1998,experimental,1,2026-06-10,2026-06-10
+debye-temperature,GaN (wz),—,600 K,40 K,Slack est.; Zheng PRMat 3 014601 (2019) cite 636 K,experimental,1,2026-06-10,2026-06-10
+debye-temperature,AlN (wz),—,1000 K,80 K,Wang–Zhao Powder Diffr. (971 K); DFT 950–1050 K,experimental,1,2026-06-10,2026-06-10
+gruneisen-mode-TA,GaN (wz),—,0.18,—,first-principles QHA arXiv 2211.03960,dft-qha,1,2026-06-10,2026-06-10
+gruneisen-mode-LA,GaN (wz),—,1.36,—,first-principles QHA arXiv 2211.03960,dft-qha,1,2026-06-10,2026-06-10
+gruneisen-mode-TA,AlN (wz),—,0.16,—,first-principles QHA arXiv 2211.03960,dft-qha,1,2026-06-10,2026-06-10
+gruneisen-mode-LA,AlN (wz),—,1.04,—,first-principles QHA arXiv 2211.03960,dft-qha,1,2026-06-10,2026-06-10
+phonon-max-energy,diamond,300 K,165 meV,—,curated MVP anchor (see accuracy-ledger.md),experimental,1,2026-06-10,2026-06-10
+debye-temperature,diamond,—,2200 K,—,curated MVP anchor (see accuracy-ledger.md),experimental,1,2026-06-10,2026-06-10

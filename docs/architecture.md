@@ -1374,6 +1374,15 @@ Three compose-time refusals are decided by tag/field comparison on the active `C
   anchor data back its declared validity domain; with no anchors it ships as identity and any query
   inside the unanchored high-E×high-T corner trips obligation 9 with a domain witness (the
   ">500 °C breakdown = cert-refused, not met" stance).
+- **Polarization-convention pairing refusal** (obligation 6, named-formula consistency;
+  `arch-19 §19.8`). Each spontaneous-polarization (`P_sp`, row 113) and piezoelectric (`e₃₁`,
+  rows 114/117) coefficient carries `polarization-reference ∈ {ZB-proper, H-improper}`. A
+  composition whose active `P_sp` and `e₃₁` carry **mismatched** tags is refused — mixing a
+  ZB-reference `P_sp` with an improper `e₃₁` (or vice versa) breaks the Dreyer accidental
+  cancellation (PRX 6 021038 (2016)) and corrupts the 2DEG `n_s` (improper `e₃₁ ≈ 3.4× proper`).
+  Witness: the `(P_sp coeff, e₃₁ coeff)` tag pair. The ±5%-ΔP target is additionally scoped
+  `is-AlGaN-GaN`; a high-In InGaN/GaN composition (where the cancellation is incomplete) is
+  σ-degraded or refused. The curated III-N coefficients are `ZB-proper` (`docs/accuracy-ledger.md`).
 
 ## 12.1 `SqliteReferenceCache` — backend for obligations 4 + 8
 
@@ -1750,6 +1759,14 @@ Stated and held, so the architecture is honest about what it does not cover:
 - **Alloy-disorder mobility in AlGaN beyond the closed-form Harrison term** — the
   `is-alloy`-gated row 127 (`τ_alloy⁻¹∝x(1−x)ΔU²g(E)`) ships in V1; a full
   configurationally-averaged disorder treatment is V2.
+- **Pure-AlN avalanche & p-type transport, and measurement-grade AlN high-T `κ`** — AlN has no
+  measured impact-ionization coefficients (only Bulutay's full-band-MC *electron* values, SST 17
+  L59 (2002); no hole), no measured bulk hole mobility (deep Mg acceptor, holes `< 10¹⁰ cm⁻³`), and
+  no single-crystal `κ` measurement above ~500 K. V1 **cert-refuses** measured-AlN avalanche and
+  p-AlN transport claims, and flags AlN high-T `κ` as theory-only (`docs/accuracy-ledger.md`;
+  `docs/superpowers/specs/2026-06-10-wave1-iii-n-seeding.md`). The AlN electron Caughey–Thomas
+  mobility quartet exists but is paywalled (Farahmand IEEE TED 48 535 (2001) Tbl II / Wang arXiv
+  2506.09240 (2025) Tbl SIII) — a targeted acquisition follow-up, not a V2 deferral.
 - Absolute Berry-phase / Wannier-center polarization (the λ-path `P_sp` evaluator) —
   deferred to V2. V1 uses the Z*-composition path (`arch-19`/registry rows 113–114, ±5%,
   `accuracy-ledger` #35); the absolute modern-theory integral needs a
@@ -2189,8 +2206,29 @@ carries separately, ~30–40% of the shift). A **cert obligation refuses any com
 `total`-tagged AHC slope and row-63's thermal-expansion T-path are both active on the same
 observable** (double-counting the expansion contribution); an `isochoric`-tagged slope composes
 with row 63 freely. The tag is a first-class field on the coefficient, so the check is a tag
-comparison at compose time, not a reviewer caveat. (Curated AHC entries in the MVP ZPR/slope
-table, `docs/accuracy-ledger.md §1/§15`, are tagged at entry.)
+comparison at compose time, not a reviewer caveat. The curated ZPR amplitudes feeding the `coth`
+path (`docs/accuracy-ledger.md §1/§15`) are the **isochoric** electron-phonon values (Engel PRB 106
+094316 (2022) / Miglio npj CM 6 167 (2020) AHC: GaN −189, AlN −399, diamond −345 meV), tagged
+`isochoric`; the zero-point lattice-expansion part (Miglio: GaN −49, AlN −85 meV) is row 63's job —
+so seeding a `total` magnitude into the e-ph `coth` path while row 63 is active is exactly the
+double-count this guard refuses. (Wave-1 III-N audit: `docs/audits/2026-06-10-wave1-iii-n-audit.md`;
+the prior `total` tag on isochoric Engel magnitudes was corrected there.)
+
+**Polarization reference / proper-improper `e₃₁` self-consistency — machine-checkable pairing
+guard.** Spontaneous polarization is reference-dependent; the 2DEG density `n_s` (registry row 115)
+consumes an interface *difference* `ΔP` whose ±5% accuracy for AlGaN/GaN rests on an **accidental
+cancellation** (Dreyer et al. PRX 6 021038 (2016) §V.D–E) between the spurious zinc-blende(ZB)-
+reference term in `P_sp` and the proper-vs-improper `e₃₁` error — two large, opposite-sign
+quantities — **not** generic reference-cancellation. The cancellation holds only under a
+**self-consistent pairing**: either (a) ZB-reference `P_sp` + **proper** `e₃₁` + no ZB-correction
+(the spec's path), or (b) layered-hexagonal-reference `P_sp` + `ΔP_corr` + **improper** `e₃₁`.
+Because improper `e₃₁ ≈ 3.4× proper` for GaN/AlN, mixing conventions silently corrupts `n_s`. Each
+polarization coefficient (`P_sp` row 113, `e₃₁` rows 114/117) therefore carries
+`polarization-reference ∈ {ZB-proper, H-improper}`; a **cert obligation refuses any composition
+whose active `P_sp` and `e₃₁` carry mismatched tags** (`arch-12 §12.0.3`). The ±5%-ΔP target also
+carries an `is-AlGaN-GaN` validity scope — the cancellation **fails for high-In InGaN/GaN** and is
+σ-degraded / cert-refused there. The spec's curated III-N coefficients (`docs/accuracy-ledger.md`)
+are all `ZB-proper`.
 
 **Learned-correction training contract (`Δα` EDF-tail and any PINO-fit residual coefficient).** A
 coefficient whose `source` is a PINO-learned correction — the high-field EDF-tail correction

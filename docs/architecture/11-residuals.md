@@ -6,7 +6,7 @@ revision: 1
 canonical-for:
   - residual granularity discipline
   - ResidualKey / ContributionFacets schema
-  - the seventeen residual categories
+  - the nineteen residual categories
 depends-on:
   - arch-06-physics-graph
   - arch-07-pipeline
@@ -18,6 +18,7 @@ referenced-by:
   - impl-09-cross-cutting
   - arch-19-coupling-structure
   - arch-20-representations
+  - arch-21-multiscale-state
 research-sources:
   - physics/research/residual-generator-catalog.md
 ---
@@ -31,14 +32,16 @@ emission discipline is **granular**: every independent component is
 its own scalar with its own content-addressed key, and `/physics`
 never preaggregates.
 
-## 11.1 The seventeen categories (a taxonomy facet)
+## 11.1 The nineteen categories (a taxonomy facet)
 
-Residuals fall into seventeen categories, identified by symbolic
-tags rather than ordinals. The categories are a *facet* on each
-contribution, not a granularity floor or a unit of weighting.
+Residuals fall into nineteen categories (the seventeen primary categories below,
+plus the two cross-tier EOM-violation siblings of `arch-21-multiscale-state`),
+identified by symbolic tags rather than ordinals. The categories are a *facet* on
+each contribution, not a granularity floor or a unit of weighting.
 
-**EOM-violation (per state component) — 7 categories.** One per
-DOF of the unified state (`arch-04-state`):
+**EOM-violation — 9 categories.** Seven per micro state-component DOF
+(`arch-04-state`), plus two cross-tier siblings (slow and macro,
+`arch-21-multiscale-state`):
 
   1. `EOM/γ̂` — `‖∂γ̂/∂t − …‖²` on the density-matrix DOF.
   2. `EOM/A` — same form on the EM gauge potential.
@@ -58,13 +61,28 @@ DOF of the unified state (`arch-04-state`):
   (`arch-19-coupling-structure`). Each generated invariant adds its
   own axis tuple; there is no per-coupling residual category.
 
+  Two **cross-tier** EOM-violation siblings extend the family
+  (`arch-21-multiscale-state`), sharing the same
+  `‖∂_t x − (L δE/δx + M δS/δx)‖²` shape with `x` ranging over a non-micro tier:
+
+  - `EOM/DefectPopulation` — slow-tier defect-population kinetics,
+    `‖d[D]^q/dt − (G − [D]^q·k_ann)‖²` (`arch-21 §21.4`).
+  - `EOM/Continuum` — macro-tier continuum-field balance,
+    `‖∂_t field − RHS(fields; homogenized coeffs)‖²`, generalizing the
+    device-PDE residual (`arch-21 §21.9`).
+
 **Structural axes of GENERIC — 3 categories.**
 
-  8. `Degeneracy` — `‖L δS/δx‖² + ‖M δE/δx‖²`.
+  8. `Degeneracy` — `‖L δS/δx‖² + ‖M δE/δx‖²`. **Cert-only**: identically
+     zero by construction under the per-tier GENERIC generators
+     (`arch-05-generic`), so it is a generator-construction-bug tripwire, not a
+     PINO training-loss term.
   9. `Conservation` — energy, particle-number / charge, momentum /
      crystal-momentum, spin.
  10. `Positivity` — `M ⪰ 0`, `f ∈ [0,1]`, `ρ ≥ 0`, `ω² ≥ 0`,
-     `σ ⪰ 0`, `|S_i| = 1`.
+     `σ ⪰ 0`, `|S_i| = 1`. `ω² ≥ 0` is **applicability-gated** to phases claimed
+     dynamically stable, so it does not penalize legitimate saddle / transition
+     configurations the trajectories must traverse (e.g. along an NEB path).
 
 **Algebraic identities — 5 categories** (the former umbrella, now
 split by analytic kind):
@@ -91,15 +109,19 @@ Disjoint by the *type* of input the constraint reads:
  17. `Static/Thermodynamic` — depends on snapshot + environment
      (temperature, chemical potentials, partial pressures).
      Hull-distance, formation-energy-from-references, solubility,
-     mass-action, carbide-formation.
+     mass-action, carbide-formation. Also the three slow-tier
+     thermodynamic-consistency identities — Gibbs adsorption `dγ/dμ = −Γ`,
+     charge–Fermi Maxwell `dE_form/dE_F = q`, and the Clausius–Clapeyron analog
+     `d ln[D]/d(1/T)` vs `S_form` (`arch-21-multiscale-state §21.12`).
 
 Categories 16 and 17 stay disjoint because they consume
 type-distinct inputs (snapshot vs snapshot+environment), and the
 PINO curriculum schedules them differently for that reason.
 
-The `CategoryTag` enum is the closed set of 17 symbols above. It
-appears in `ContributionFacets.category` and nowhere else carries
-semantic weight.
+The `CategoryTag` enum is the closed set of **19** symbols: the 17 above plus the
+two cross-tier EOM-violation siblings `EOM/DefectPopulation` and `EOM/Continuum`
+(`arch-21-multiscale-state §21.4, §21.9`). It appears in
+`ContributionFacets.category` and nowhere else carries semantic weight.
 
 ## 11.2 The atomic unit: residual contribution
 
@@ -113,7 +135,7 @@ ResidualKey = (producer : Producer, axes : Tuple<AxisLabel>)
 Producer    = Formula(NamedFormula) | Method(NamedMethod)
 
 ContributionFacets =                         -- sidecar; not part of identity
-  ( category : CategoryTag                   -- one of 17 symbolic tags (§11.1)
+  ( category : CategoryTag                   -- one of 19 symbolic tags (§11.1)
   , bundle   : BundleId                      -- B1..B11
   , dressing : bare | dressed(scheme)        -- provenance label
   )
@@ -172,7 +194,8 @@ reports per-component values; the consumer chooses how to reduce them.
 fraction ∈ [0, 1] of total training budget
 [0.00, 0.10)  Warmup    — Conservation + Positivity only
 [0.10, 0.60)  Refine    — add all EOM/* + all Algebraic/* except MethodEquivalence
-[0.60, 0.90)  Polish    — add Algebraic/MethodEquivalence + Static/Snapshot + Static/Thermodynamic + Degeneracy
+[0.60, 0.90)  Polish    — add Algebraic/MethodEquivalence + Static/Snapshot + Static/Thermodynamic
+                          (Degeneracy is cert-only, §11.1 item 8 — never a training residual)
 [0.90, 1.00]  Cooldown  — no new categories; weights frozen for final evaluation
 ```
 

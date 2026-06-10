@@ -14,6 +14,7 @@ referenced-by:
   - impl-09-cross-cutting
   - arch-19-coupling-structure
   - arch-20-representations
+  - arch-21-multiscale-state
 research-sources: []
 ---
 # Canonical vocabularies and counts
@@ -28,9 +29,9 @@ Every other document references these numbers rather than restating them.
 | Dressing layers | 1 / 1.25 / 1.75 / 2 / 3 | yes |
 | Computational methods | 12 (+2 sub-methods) | yes |
 | Abstract-property templates | 20 | yes |
-| Named formulas | 102 substantive (+2 rejected markers) | yes — see `formula-registry.md` |
+| Named formulas | 110 substantive (+2 rejected markers) | yes — see `formula-registry.md` |
 | Observable bundles | 11 (B1–B11) | yes |
-| Residual categories | 17 | yes |
+| Residual categories | 19 | yes |
 | Cert obligations | 10 | yes |
 | Layer-0 typeclasses | 4 | yes |
 | Crystal symmetry group | first-class (space group × time-reversal × U(1) × SU(2)) | yes |
@@ -94,16 +95,17 @@ Bulk-boundary correspondence is **not** a template; it is handled at the cert
 layer (obligation-7, a `DiscreteStructure` morphism over the topology atlas,
 §14).
 
-### 9.3 102 named formulas
+### 9.3 110 named formulas
 
 Closed registry of typed, fully-parameterized algebraic formulas, named by
 behavior (person-attribution names appear only as parenthetical literature
 pointers). The canonical machine-readable list is
-`physics/library/formulas/registry-manifest.csv` (102 substantive rows + 2
+`physics/library/formulas/registry-manifest.csv` (110 substantive rows + 2
 markers for relations that are enforced architecturally and therefore *not*
 residualized: force = −∇energy, and equivariance). Rows 1–87 are grounded in the
 domain research (`physics/research/`); rows 88–102 are the linear-response and
-topology-atlas extensions. Each formula carries a typed signature, a cost tier
+topology-atlas extensions; rows 105–112 are the slow-tier degradation / radiation
+extensions (`arch-21-multiscale-state §21.13`). Each formula carries a typed signature, a cost tier
 `T0..T3`, a differentiability tag `D0..D4`, and an applicability classifier
 (§13). See `formula-registry.md` for the narrative index.
 

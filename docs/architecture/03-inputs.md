@@ -6,7 +6,8 @@ revision: 1
 canonical-for:
   - top-level inputs
 depends-on: []
-referenced-by: []
+referenced-by:
+  - arch-21-multiscale-state
 research-sources: []
 ---
 # Inputs
@@ -24,7 +25,10 @@ conditions":
    are **special cases of `SiteDecoration`**, not new top-level types.
 3. **`Environment`** — external conditions: temperature, pressure (or volume),
    chemical potentials, applied electric/magnetic fields, applied stress,
-   temperature gradient, carrier-injection conditions.
+   temperature gradient, carrier-injection conditions; plus the
+   harsh-environment fields the slow-tier kinetics read — `radiation_flux`,
+   `radiation_dose`, per-host displacement threshold `E_d`, mechanical-vibration
+   spectrum, and oxygen partial pressure `p_O2` (`arch-21-multiscale-state §21.11`).
 
 `Reference` (a bag of `(Crystal, Environment, weight)` baselines) and `Property`
 (the requested observable) are **not** top-level inputs: `Reference` composes

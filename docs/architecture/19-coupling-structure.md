@@ -27,6 +27,7 @@ referenced-by:
   - impl-09-cross-cutting
   - impl-10-build-sequence
   - arch-20-representations
+  - arch-21-multiscale-state
 research-sources: []
 ---
 # Coupling structure
@@ -211,7 +212,11 @@ At compose time:
    node attached to the `E_coupling` aggregator (a
    `MethodInvoke(hamiltonian-assemble, …)` node).
 
-The author never wrote `g_{nm,ν}(k,q)`. The symmetry group did.
+The symmetry group generates the admissible **form** of `g_{nm,ν}(k,q)` — which
+invariants exist and their index structure. The **numerical values** (deformation
+potentials, Fröhlich and anharmonic parameters) are supplied by the
+`ProvenanceLedger` (DFPT / finite-difference / fits), outside the generative
+structure: symmetry generates the form, provenance supplies the values.
 
 Spin-orbit, magneto-elastic, minimal coupling (γ̂ ↔ A), Stark, Zeeman,
 phonon-phonon, radiative damping — each one is a `CouplingChannel`

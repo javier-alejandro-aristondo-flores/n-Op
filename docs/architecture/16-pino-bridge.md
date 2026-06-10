@@ -14,6 +14,7 @@ depends-on:
   - arch-12-cert
 referenced-by:
   - impl-09-cross-cutting
+  - arch-21-multiscale-state
 research-sources:
   - informed-operator/design/residual-loss-methodology.md
 ---

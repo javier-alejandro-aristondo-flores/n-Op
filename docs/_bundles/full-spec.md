@@ -138,7 +138,10 @@ conditions":
    are **special cases of `SiteDecoration`**, not new top-level types.
 3. **`Environment`** — external conditions: temperature, pressure (or volume),
    chemical potentials, applied electric/magnetic fields, applied stress,
-   temperature gradient, carrier-injection conditions.
+   temperature gradient, carrier-injection conditions; plus the
+   harsh-environment fields the slow-tier kinetics read — `radiation_flux`,
+   `radiation_dose`, per-host displacement threshold `E_d`, mechanical-vibration
+   spectrum, and oxygen partial pressure `p_O2` (`arch-21-multiscale-state §21.11`).
 
 `Reference` (a bag of `(Crystal, Environment, weight)` baselines) and `Property`
 (the requested observable) are **not** top-level inputs: `Reference` composes
@@ -165,13 +168,26 @@ x(t) = ( h,      cell vectors                       ∈ GL⁺(3, ℝ)   (3×3 re
          A )     external EM vector potential        ∈ ℝ³ field A(r,t)
 ```
 
-These are the **irreducible degrees of freedom**. Phonon distributions
-`n_{q,s}`, carrier distributions `f_n(k,r)`, surface coverages `θ_i`, electron
-and lattice temperatures, current density, internal fields, defect populations,
-and composition vectors are all **emergent** — coarse-grainings, Bloch
-transforms, or semiclassical limits of `x(t)`. Adding any of them to the state
-would create a constraint manifold tying it back to the irreducible DOFs and
-reintroduce the integration pathology the formulation avoids.
+These are the **irreducible degrees of freedom of the micro tier**. Quantities
+recoverable from the 7-tuple by coarse-graining **on the micro timescale and
+scale** — phonon distributions `n_{q,s}`, the carrier distribution `f_n(k,r)`,
+surface coverages `θ_i`, electron/lattice temperatures, current density, internal
+fields — are **emergent** and stay out of the micro state: adding such a
+*same-timescale* coarse-graining would create a constraint manifold tying it
+back to the irreducible DOFs and reintroduce the integration pathology the
+formulation avoids.
+
+Quantities that are **not** recoverable on the micro timescale or scale are
+**first-class state in their own tier**, not emergent: slow, history-dependent
+**defect populations** and **composition vectors** (hours–years), and
+**homogenized device-scale fields** (lattice-temperature, potential, and
+carrier-density profiles on a device mesh). They couple to the micro tier only
+parametrically — adiabatic driving (slow) or homogenization (macro) — so they
+introduce *no* constraint manifold. See `arch-21-multiscale-state` for the
+refined emergence axiom and the slow / macro tiers. (This is also the
+reconciliation of the earlier "distributions are emergent" wording with
+`arch-08-bo-levels`, which correctly states L4 introduces its own irreducible
+distribution state.)
 
 `x(t)` is a **type** that the PINO's predictions instantiate at each time step.
 `/physics` does not hold values of `x(t)`; it defines what `x(t)` is and how to
@@ -274,6 +290,50 @@ The per-regime derivations of each extraction from the unified structure are in
 the `docs/implementation/` tree (especially `impl-06-compositions`) and grounded
 in `physics/research/group-{A,B,C}-*.md`.
 
+### Generator structure is per-tier (degeneracy / Jacobi normalization)
+
+The two-generator form and its degeneracy conditions `L·δS/δx = 0`, `M·δE/δx = 0`
+hold **per tier / per BO level with the generators active at that tier**, not as a
+single global bracket over all variables simultaneously. This is what reconciles
+the written functionals with the degeneracy conditions and the `impl-10` Phase-8
+"degeneracy verified" artifact. (The tiers are defined in
+`arch-21-multiscale-state`; the standard GENERIC mechanical-vs-thermal split.)
+
+- **The `γ̂`-block of `L` is the Lie–Poisson bracket** — `{A,B}(γ̂) = Tr( γ̂ ·
+  [δA/δγ̂, δB/δγ̂] )`, giving `∂γ̂/∂t = −(i/ℏ)[Ĥ_KS, γ̂]` with `Ĥ_KS = δE/δγ̂`,
+  written `[·, γ̂]` **not** the bare `[Ĥ_KS, ·]`. The Lie–Poisson form satisfies the
+  **Jacobi identity by construction** and **degeneracy**: the Fermi–Dirac
+  electronic entropy is a spectral functional of `γ̂`, so `δS_el/δγ̂` commutes with
+  `γ̂` and `L_γ̂·δS_el/δγ̂ = [δS_el/δγ̂, γ̂] = 0`.
+- **L2 (the mechanical surface) is single-generator (Hamiltonian) at fixed
+  entropy.** The symplectic and Parrinello–Rahman blocks generate the `E_BO`-flow;
+  `S_vib(R,h)` is a slow / parametric functional whose `(R,h)`-dependence drives the
+  dissipative dynamics of the slow and macro tiers, not the L2 bracket. The apparent
+  `L·δS_vib/δR ≠ 0` is therefore not a degeneracy violation: at L2 the active
+  generator is `E` alone (an isothermal single-generator contraction); entropy
+  production lives with the distribution / configurational variables.
+
+**Jacobi status per `L`-block.** Canonical blocks (symplectic `(R,P)`, `(h,Π_h)`;
+Lie–Poisson `γ̂`; Maxwell `A`) satisfy Jacobi **exactly**. Generated `AntisymmForm`
+cross-blocks (`arch-19-coupling-structure`) conserve energy by antisymmetry but do
+**not** automatically satisfy Jacobi (an additional condition); V1 restricts them to
+the semidirect-product / Lie–Poisson class (Jacobi by construction) or flags them.
+`impl-10` Phase-8 "Jacobi verified" is exact for canonical blocks and a cert-side
+numerical check for generated cross-blocks — not a global symbolic proof.
+
+**`Degeneracy` is cert-only, not a training residual.** Under the per-tier generator
+structure the `Degeneracy` category (`arch-11-residuals §11.1`) is **identically zero
+by construction**; it is a cert obligation — a generator-construction-bug tripwire —
+not a PINO loss term (removed from the `arch-11 §11.4.1` training gate).
+
+**`E`-functional activation is level-conditional.** `E[x]` is not a flat simultaneous
+sum: at L1 the active electronic energy is `E_KS[γ̂; R₀, h₀]` — **parametric in the
+frozen geometry** (it carries `∫ v_ext(R)·n + V_II(R,h)` even though `γ̂` is the
+active variable); at L2, `E_BO(R,h) = min_γ̂ E_KS[γ̂; R,h]` *replaces* `E_KS` with `γ̂`
+resolved (no double-count). The e-ph coupling channel contributes the linear-order
+cross-term for the `L`/`M` blocks and the beyond-reference part of `E_coupling`, not
+the full electron–ion energy.
+
 ---
 
 
@@ -341,7 +401,7 @@ Every operation in `/physics` is one of these three:
 
 1. **`Input`** — a slot for a state component (`h`, `R_I`, `P_I`, `Π_h`,
    `Z_I`, `γ̂`, `A`) or an environmental scalar (`T`, `μ`, `E_field`, …).
-2. **`FormulaApply`** — application of one of the 102 named formulas
+2. **`FormulaApply`** — application of one of the 110 named formulas
    (`arch-09-vocabularies §9.3`) to typed argument nodes.
 3. **`MethodInvoke`** — application of one of the 12 computational
    methods (`arch-09-vocabularies §9.1`) to typed argument nodes.
@@ -404,11 +464,11 @@ them either — they are codegen inputs, consumed at Stage 4 and erased.
 
 | Vocabulary item | Realized as |
 |---|---|
-| 102 formulas (`arch-09-vocabularies §9.3`) | typing rules for `FormulaApply` nodes |
+| 110 formulas (`arch-09-vocabularies §9.3`) | typing rules for `FormulaApply` nodes |
 | 12 methods (`arch-09-vocabularies §9.1`) | typing rules for `MethodInvoke` nodes |
 | 20 templates (`arch-09-vocabularies §9.2`) | graph-construction macros that emit subgraphs |
 | 11 bundles (`arch-09-vocabularies §9.4`) | the `bundle` payload of `Observable` roles |
-| 17 residual categories (`arch-11-residuals`) | facet on `ResidualLeaf`, in `ContributionFacets.category` (a `CategoryTag` enum) |
+| 19 residual categories (`arch-11-residuals`) | facet on `ResidualLeaf`, in `ContributionFacets.category` (a `CategoryTag` enum) |
 | 4 BO levels (`arch-08-bo-levels`) | a layer label derivable from a node's transitive inputs; not stored |
 | 4 Layer-0 typeclasses (`arch-10-typeclasses`) | the `type` field on every node |
 | Applicability classifier (`arch-13-applicability`) | a Stage 1 sidecar that *prunes* the graph; not retained |
@@ -528,7 +588,7 @@ lowered into `FormulaApply` nodes attached to the `E_coupling`,
   residuals (a band structure, a charge density, a force field, a
   dynamical matrix) collapse to a single node referenced by all
   consumers.
-- **Cross-formula CSE.** The 102 named formulas often share
+- **Cross-formula CSE.** The 110 named formulas often share
   intermediate quantities; CSE pulls these out.
 - **Tearing and alias elimination.** Algebraic dependencies are
   resolved at compose-time (ModelingToolkit-style); sparsity patterns
@@ -636,6 +696,17 @@ irreducible state. A regime is a navigational *view* across the levels
 that contribute to it (thermal spans L3 statistics and L4 phonon
 transport).
 
+**L4's "own irreducible state" is the macro continuum tier.** L4 introduces
+distributions over phase space, which are not recoverable from a single micro
+7-tuple. That irreducible state is made concrete as the **macro continuum-field
+tier** (homogenized `T_L(r), φ(r), n(r), p(r), j(r)` on a device mesh), with the
+full distribution kept emergent by moment closure; in parallel, slow
+history-dependent **defect populations** form a first-class **slow /
+configurational tier** on an hours–years timescale. Both are specified in
+`arch-21-multiscale-state`. The micro 7-tuple (`arch-04-state`) is the L1/L2 tier;
+this resolves the apparent tension with `arch-04`'s emergence wording (see
+`arch-04-state` and `arch-21-multiscale-state §21.0`).
+
 In the `PhysicsGraph`, BO level is **derivable** from the transitive
 inputs of a node — it is not a stored field on `Node`
 (`arch-06-physics-graph §6.5`). Stage 1 ordering follows the level
@@ -695,9 +766,9 @@ Every other document references these numbers rather than restating them.
 | Dressing layers | 1 / 1.25 / 1.75 / 2 / 3 | yes |
 | Computational methods | 12 (+2 sub-methods) | yes |
 | Abstract-property templates | 20 | yes |
-| Named formulas | 102 substantive (+2 rejected markers) | yes — see `formula-registry.md` |
+| Named formulas | 110 substantive (+2 rejected markers) | yes — see `formula-registry.md` |
 | Observable bundles | 11 (B1–B11) | yes |
-| Residual categories | 17 | yes |
+| Residual categories | 19 | yes |
 | Cert obligations | 10 | yes |
 | Layer-0 typeclasses | 4 | yes |
 | Crystal symmetry group | first-class (space group × time-reversal × U(1) × SU(2)) | yes |
@@ -761,16 +832,17 @@ Bulk-boundary correspondence is **not** a template; it is handled at the cert
 layer (obligation-7, a `DiscreteStructure` morphism over the topology atlas,
 §14).
 
-### 9.3 102 named formulas
+### 9.3 110 named formulas
 
 Closed registry of typed, fully-parameterized algebraic formulas, named by
 behavior (person-attribution names appear only as parenthetical literature
 pointers). The canonical machine-readable list is
-`physics/library/formulas/registry-manifest.csv` (102 substantive rows + 2
+`physics/library/formulas/registry-manifest.csv` (110 substantive rows + 2
 markers for relations that are enforced architecturally and therefore *not*
 residualized: force = −∇energy, and equivariance). Rows 1–87 are grounded in the
 domain research (`physics/research/`); rows 88–102 are the linear-response and
-topology-atlas extensions. Each formula carries a typed signature, a cost tier
+topology-atlas extensions; rows 105–112 are the slow-tier degradation / radiation
+extensions (`arch-21-multiscale-state §21.13`). Each formula carries a typed signature, a cost tier
 `T0..T3`, a differentiability tag `D0..D4`, and an applicability classifier
 (§13). See `formula-registry.md` for the narrative index.
 
@@ -943,14 +1015,16 @@ emission discipline is **granular**: every independent component is
 its own scalar with its own content-addressed key, and `/physics`
 never preaggregates.
 
-## 11.1 The seventeen categories (a taxonomy facet)
+## 11.1 The nineteen categories (a taxonomy facet)
 
-Residuals fall into seventeen categories, identified by symbolic
-tags rather than ordinals. The categories are a *facet* on each
-contribution, not a granularity floor or a unit of weighting.
+Residuals fall into nineteen categories (the seventeen primary categories below,
+plus the two cross-tier EOM-violation siblings of `arch-21-multiscale-state`),
+identified by symbolic tags rather than ordinals. The categories are a *facet* on
+each contribution, not a granularity floor or a unit of weighting.
 
-**EOM-violation (per state component) — 7 categories.** One per
-DOF of the unified state (`arch-04-state`):
+**EOM-violation — 9 categories.** Seven per micro state-component DOF
+(`arch-04-state`), plus two cross-tier siblings (slow and macro,
+`arch-21-multiscale-state`):
 
   1. `EOM/γ̂` — `‖∂γ̂/∂t − …‖²` on the density-matrix DOF.
   2. `EOM/A` — same form on the EM gauge potential.
@@ -970,13 +1044,28 @@ DOF of the unified state (`arch-04-state`):
   (`arch-19-coupling-structure`). Each generated invariant adds its
   own axis tuple; there is no per-coupling residual category.
 
+  Two **cross-tier** EOM-violation siblings extend the family
+  (`arch-21-multiscale-state`), sharing the same
+  `‖∂_t x − (L δE/δx + M δS/δx)‖²` shape with `x` ranging over a non-micro tier:
+
+  - `EOM/DefectPopulation` — slow-tier defect-population kinetics,
+    `‖d[D]^q/dt − (G − [D]^q·k_ann)‖²` (`arch-21 §21.4`).
+  - `EOM/Continuum` — macro-tier continuum-field balance,
+    `‖∂_t field − RHS(fields; homogenized coeffs)‖²`, generalizing the
+    device-PDE residual (`arch-21 §21.9`).
+
 **Structural axes of GENERIC — 3 categories.**
 
-  8. `Degeneracy` — `‖L δS/δx‖² + ‖M δE/δx‖²`.
+  8. `Degeneracy` — `‖L δS/δx‖² + ‖M δE/δx‖²`. **Cert-only**: identically
+     zero by construction under the per-tier GENERIC generators
+     (`arch-05-generic`), so it is a generator-construction-bug tripwire, not a
+     PINO training-loss term.
   9. `Conservation` — energy, particle-number / charge, momentum /
      crystal-momentum, spin.
  10. `Positivity` — `M ⪰ 0`, `f ∈ [0,1]`, `ρ ≥ 0`, `ω² ≥ 0`,
-     `σ ⪰ 0`, `|S_i| = 1`.
+     `σ ⪰ 0`, `|S_i| = 1`. `ω² ≥ 0` is **applicability-gated** to phases claimed
+     dynamically stable, so it does not penalize legitimate saddle / transition
+     configurations the trajectories must traverse (e.g. along an NEB path).
 
 **Algebraic identities — 5 categories** (the former umbrella, now
 split by analytic kind):
@@ -1003,15 +1092,19 @@ Disjoint by the *type* of input the constraint reads:
  17. `Static/Thermodynamic` — depends on snapshot + environment
      (temperature, chemical potentials, partial pressures).
      Hull-distance, formation-energy-from-references, solubility,
-     mass-action, carbide-formation.
+     mass-action, carbide-formation. Also the three slow-tier
+     thermodynamic-consistency identities — Gibbs adsorption `dγ/dμ = −Γ`,
+     charge–Fermi Maxwell `dE_form/dE_F = q`, and the Clausius–Clapeyron analog
+     `d ln[D]/d(1/T)` vs `S_form` (`arch-21-multiscale-state §21.12`).
 
 Categories 16 and 17 stay disjoint because they consume
 type-distinct inputs (snapshot vs snapshot+environment), and the
 PINO curriculum schedules them differently for that reason.
 
-The `CategoryTag` enum is the closed set of 17 symbols above. It
-appears in `ContributionFacets.category` and nowhere else carries
-semantic weight.
+The `CategoryTag` enum is the closed set of **19** symbols: the 17 above plus the
+two cross-tier EOM-violation siblings `EOM/DefectPopulation` and `EOM/Continuum`
+(`arch-21-multiscale-state §21.4, §21.9`). It appears in
+`ContributionFacets.category` and nowhere else carries semantic weight.
 
 ## 11.2 The atomic unit: residual contribution
 
@@ -1025,7 +1118,7 @@ ResidualKey = (producer : Producer, axes : Tuple<AxisLabel>)
 Producer    = Formula(NamedFormula) | Method(NamedMethod)
 
 ContributionFacets =                         -- sidecar; not part of identity
-  ( category : CategoryTag                   -- one of 17 symbolic tags (§11.1)
+  ( category : CategoryTag                   -- one of 19 symbolic tags (§11.1)
   , bundle   : BundleId                      -- B1..B11
   , dressing : bare | dressed(scheme)        -- provenance label
   )
@@ -1084,7 +1177,8 @@ reports per-component values; the consumer chooses how to reduce them.
 fraction ∈ [0, 1] of total training budget
 [0.00, 0.10)  Warmup    — Conservation + Positivity only
 [0.10, 0.60)  Refine    — add all EOM/* + all Algebraic/* except MethodEquivalence
-[0.60, 0.90)  Polish    — add Algebraic/MethodEquivalence + Static/Snapshot + Static/Thermodynamic + Degeneracy
+[0.60, 0.90)  Polish    — add Algebraic/MethodEquivalence + Static/Snapshot + Static/Thermodynamic
+                          (Degeneracy is cert-only, §11.1 item 8 — never a training residual)
 [0.90, 1.00]  Cooldown  — no new categories; weights frozen for final evaluation
 ```
 
@@ -1533,8 +1627,11 @@ obligation-3 flags suspect cases.
 The architecture above is committed. These remain to be decided.
 
 1. Surrogate-net build vs adopt, for the D4 surrogate formulas.
-2. PDE-mesh format + adjoint library, for `KineticEvolutionOf` instances needing
-   an explicit mesh.
+2. PDE-mesh **adjoint scheme** (discrete- vs continuous-adjoint of the
+   finite-volume operator) for the macro continuum tier. The mesh **format** is no
+   longer open — it is committed as a `DeviceMesh` finite-volume `Universe` with
+   fields as fibers (`arch-21-multiscale-state §21.6`); only the adjoint binding
+   remains, reusing the Stage-4→Stage-5 AD seam.
 3. The `γ̂` open questions of `arch-15-gamma-hat §15.4` (ε-equality,
    materialization policy, long-trajectory drift / rank-refresh, rank-dependent
    applicability of the LowRank slot).
@@ -1544,6 +1641,19 @@ The architecture above is committed. These remain to be decided.
    `/informed-operator` for handing off the assembled GENERIC right-hand side.
 ## Closed decisions
 
+- **Multiscale state (slow + macro tiers) & the device scale-bridge** =
+  the state is stratified into three tiers (`arch-21-multiscale-state`): the micro
+  7-tuple (unchanged), a **slow / configurational tier** (defect populations,
+  H content, oxidation/carbide fronts) evolving by Arrhenius generation–annihilation
+  kinetics — **aging is core `/physics`** state the PINO predicts and `/physics`
+  scores — and a **macro continuum tier** (homogenized `T_L(r), φ(r), n(r), p(r),
+  j(r)` on a `DeviceMesh`) bridged to the micro tier by an explicit homogenization
+  map. The emergence axiom is refined to *same-timescale/scale* coarse-graining
+  (resolving the `arch-04`↔`arch-08` tension); the full distribution stays emergent
+  by moment closure (no DAE); two EOM-family residual categories
+  (`EOM/DefectPopulation`, `EOM/Continuum`) are added. No new computational method is
+  introduced (the slow tier reuses `kinetic-evolution`). Residue: the PDE-mesh
+  adjoint scheme (open item 2 above).
 - **Implementation language** = a **polyglot of domain-specific DSLs** joined at
   the pipeline's Stage-4→Stage-5 codegen seam, not a single language
   (`physics/research/implementation-language.md`). This was the single blocking
@@ -1806,7 +1916,11 @@ At compose time:
    node attached to the `E_coupling` aggregator (a
    `MethodInvoke(hamiltonian-assemble, …)` node).
 
-The author never wrote `g_{nm,ν}(k,q)`. The symmetry group did.
+The symmetry group generates the admissible **form** of `g_{nm,ν}(k,q)` — which
+invariants exist and their index structure. The **numerical values** (deformation
+potentials, Fröhlich and anharmonic parameters) are supplied by the
+`ProvenanceLedger` (DFPT / finite-difference / fits), outside the generative
+structure: symmetry generates the form, provenance supplies the values.
 
 Spin-orbit, magneto-elastic, minimal coupling (γ̂ ↔ A), Stark, Zeeman,
 phonon-phonon, radiative damping — each one is a `CouplingChannel`
@@ -2649,7 +2763,7 @@ duplicating it.
 # The named-formula registry
 
 The canonical, machine-readable list is
-`physics/library/formulas/registry-manifest.csv` — 102 substantive rows plus 2
+`physics/library/formulas/registry-manifest.csv` — 110 substantive rows plus 2
 markers for relations enforced architecturally and therefore not residualized
 (force = −∇energy; equivariance). `formula-registry.md` is the narrative index.
 Every algebraic combination invokes a named formula with typed inputs and an
@@ -3167,7 +3281,7 @@ Stages 1–4 + the substrate, emitting a **Julia** Stage-5 runtime, with **GAP**
 | 4 | **Unified state** (`state`): the 7-tuple container; per-level components (L1–L4); enumerate/serialize/hash | State encoding complete |
 | 5 | **Methods vocabulary** (`methods`): the 12 methods + sub-method dispatch | Computational vocabulary, tested per method |
 | 6 | **Templates** (`abstract-properties`): the 20 templates as typed factories | Template machinery, tested with multiple argument tuples |
-| 7 | **Formula registry** (`formulas`): the 102 formulas with typed signatures + citations; the manifest; **applicability-decidability gate** (every classifier first-order decidable on typeclass tags; non-decidable entries rejected — `impl-04-formulas`) | Closed registry; algebraic combinations no longer hand-waved |
+| 7 | **Formula registry** (`formulas`): the 110 formulas with typed signatures + citations; the manifest; **applicability-decidability gate** (every classifier first-order decidable on typeclass tags; non-decidable entries rejected — `impl-04-formulas`) | Closed registry; algebraic combinations no longer hand-waved |
 | 8 | **GENERIC operators** (`generic`): L sub-brackets, M sub-brackets, assembly; **instantiate active `CouplingSpec` via Stage-2.5 invariant synthesis** (`arch-19-coupling-structure`) and attach generated `InvariantTerm`s to the `E_coupling`, `L_assembly`, `M_assembly` aggregators | Antisymmetry of L, PSD of M, Jacobi, degeneracy verified |
 | 9 | **Canonicals** (`canonicals`): E[x] and S[x] assembled across levels | Dimensional + analytic-limit checks pass |
 | 10 | **Observables** (`observables`): the target observables as compositions (§6), in 11 bundles | Library callable for any observable; reference-crystal checks |
@@ -3203,7 +3317,7 @@ The spec is internally consistent when:
 6. Every cert obligation (§10) corresponds to a residual category or an algebraic
    identity, and maps to a Layer-0 axis.
 7. The counts here match `arch-09-vocabularies` exactly (12 methods, 20 templates,
-   102 formulas, 11 bundles, 17 residual categories, 10 cert obligations).
+   110 formulas, 11 bundles, 19 residual categories, 10 cert obligations).
 
 Once the Phase-0 skeleton exists, items 1–7 are checkable mechanically by walking
 the tree and the registry manifest.
@@ -3212,7 +3326,7 @@ the tree and the registry manifest.
 
 Five sequential gates validate the built system:
 
-1. **Registration sanity.** All 102 formulas instantiate as `ResidualGenerator`
+1. **Registration sanity.** All 110 formulas instantiate as `ResidualGenerator`
    records without error; every D2 entry passes the registration-time adjoint
    gate (`impl-07-residual-factory §7.5`); every D4 entry carries an
    obligation-9 rationale; D0/D1 entries register without an adjoint (none

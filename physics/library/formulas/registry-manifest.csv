@@ -103,3 +103,11 @@
 102,boundary-mode-multiplicity-from-classification,"`(X_BS_element, boundary_orientation) → Integer`",B5,T1,D0,cheap,"topology atlas (indicator-factor → boundary-state lookup)","X_BS element, boundary orientation"
 103,F-equals-minus-grad-E,"(architectural — autodiff, NOT residualized)",—,—,—,—,S5,(rejected per S5)
 104,equivariance,"(architectural — by construction, NOT residualized)",—,—,—,—,S5,(rejected per S5)
+105,vacancy-generation-arrhenius,"`(c_V^q, T, μ, j, x_ox', ρ_dis, k_ann) → dc_V/dt`",B11/B4,T0,D1,cheap,S3 (defects G.1),"E_form, T, k_ann"
+106,hydrogen-redistribution-drift-diffusion,"`(c_H(r), T, E, μ_drift) → ∂c_H/∂t`",B11/B5,T3,D3,cheap,S3 (defects G.2),"D_0, E_diff, E-field"
+107,platelet-nucleation-allen-cahn,"`(c_platelet, c_Ns, T) → dc_platelet/dt`",B11/B4,T1,D2,cheap,S3 (defects G.3),"c_Ns, k_nuc(E_nuc=3.5eV)"
+108,vibration-induced-vacancy-generation,"`(ρ_dis, σ_stress, f_vib, v_dis, b) → (dρ_dis/dt, G_V)`",B11,T1,D1,cheap,S3 (defects G.7),"ρ_dis, σ_stress"
+109,air-oxidation-rate-eyring,"`(T, p_O2, ΔG‡, ν) → dx_ox/dt`",B11/B5,T0,D1,cheap,"S3 (catalog #46, Eyring)","T, p_O2"
+110,hydrogen-desorption-rate-eyring,"`(T, E_des, ν) → r_H`",B11/B5,T0,D1,cheap,"S3 (catalog #47, E_des=3.8eV)","T, surface c_H"
+111,nrt-displacements,"`(T_dam, E_d) → N_d`",B11/B4,T0,D1,cheap,"S4 (non-eq H.1)","T_dam, E_d(host)"
+112,frenkel-pair-yield,"`(N_d, T_L, η_recomb, Φ_dose) → DefectDensity`",B11/B4,T0,D1,cheap,"S4 (non-eq H.2)","nrt-displacements, E_form"

@@ -13,6 +13,7 @@ depends-on:
 referenced-by:
   - impl-07-residual-factory
   - impl-09-cross-cutting
+  - arch-21-multiscale-state
 research-sources:
   - physics/research/group-A-ion-dynamics.md
   - physics/research/group-B-electronic-magnetic-optical.md
@@ -48,6 +49,17 @@ Each level uses lower levels as inputs but introduces its own
 irreducible state. A regime is a navigational *view* across the levels
 that contribute to it (thermal spans L3 statistics and L4 phonon
 transport).
+
+**L4's "own irreducible state" is the macro continuum tier.** L4 introduces
+distributions over phase space, which are not recoverable from a single micro
+7-tuple. That irreducible state is made concrete as the **macro continuum-field
+tier** (homogenized `T_L(r), φ(r), n(r), p(r), j(r)` on a device mesh), with the
+full distribution kept emergent by moment closure; in parallel, slow
+history-dependent **defect populations** form a first-class **slow /
+configurational tier** on an hours–years timescale. Both are specified in
+`arch-21-multiscale-state`. The micro 7-tuple (`arch-04-state`) is the L1/L2 tier;
+this resolves the apparent tension with `arch-04`'s emergence wording (see
+`arch-04-state` and `arch-21-multiscale-state §21.0`).
 
 In the `PhysicsGraph`, BO level is **derivable** from the transitive
 inputs of a node — it is not a stored field on `Node`

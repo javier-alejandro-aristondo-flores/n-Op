@@ -6,7 +6,8 @@ revision: 1
 canonical-for:
   - open decisions
 depends-on: []
-referenced-by: []
+referenced-by:
+  - arch-21-multiscale-state
 research-sources:
   - physics/research/implementation-language.md
 ---
@@ -15,8 +16,11 @@ research-sources:
 The architecture above is committed. These remain to be decided.
 
 1. Surrogate-net build vs adopt, for the D4 surrogate formulas.
-2. PDE-mesh format + adjoint library, for `KineticEvolutionOf` instances needing
-   an explicit mesh.
+2. PDE-mesh **adjoint scheme** (discrete- vs continuous-adjoint of the
+   finite-volume operator) for the macro continuum tier. The mesh **format** is no
+   longer open — it is committed as a `DeviceMesh` finite-volume `Universe` with
+   fields as fibers (`arch-21-multiscale-state §21.6`); only the adjoint binding
+   remains, reusing the Stage-4→Stage-5 AD seam.
 3. The `γ̂` open questions of `arch-15-gamma-hat §15.4` (ε-equality,
    materialization policy, long-trajectory drift / rank-refresh, rank-dependent
    applicability of the LowRank slot).
@@ -26,6 +30,19 @@ The architecture above is committed. These remain to be decided.
    `/informed-operator` for handing off the assembled GENERIC right-hand side.
 ## Closed decisions
 
+- **Multiscale state (slow + macro tiers) & the device scale-bridge** =
+  the state is stratified into three tiers (`arch-21-multiscale-state`): the micro
+  7-tuple (unchanged), a **slow / configurational tier** (defect populations,
+  H content, oxidation/carbide fronts) evolving by Arrhenius generation–annihilation
+  kinetics — **aging is core `/physics`** state the PINO predicts and `/physics`
+  scores — and a **macro continuum tier** (homogenized `T_L(r), φ(r), n(r), p(r),
+  j(r)` on a `DeviceMesh`) bridged to the micro tier by an explicit homogenization
+  map. The emergence axiom is refined to *same-timescale/scale* coarse-graining
+  (resolving the `arch-04`↔`arch-08` tension); the full distribution stays emergent
+  by moment closure (no DAE); two EOM-family residual categories
+  (`EOM/DefectPopulation`, `EOM/Continuum`) are added. No new computational method is
+  introduced (the slow tier reuses `kinetic-evolution`). Residue: the PDE-mesh
+  adjoint scheme (open item 2 above).
 - **Implementation language** = a **polyglot of domain-specific DSLs** joined at
   the pipeline's Stage-4→Stage-5 codegen seam, not a single language
   (`physics/research/implementation-language.md`). This was the single blocking

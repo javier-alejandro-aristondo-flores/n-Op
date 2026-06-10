@@ -132,7 +132,18 @@ is the closure of output addresses under children-pointers — no separate edge 
 
 ---
 
-## 3. The data operated on — state and `γ̂` (`arch-04`, `arch-15`, `arch-08`)
+## 3. The data operated on — state and `γ̂` (`arch-04`, `arch-15`, `arch-08`, `arch-21`)
+
+**Three-tier state (`arch-21-multiscale-state`).** The state is stratified by
+timescale/scale into **micro** (the 7-tuple below, unchanged), **slow** (defect
+populations / aging — first-class state evolving by Arrhenius generation–annihilation
+kinetics, which the PINO predicts and `/physics` scores), and **macro** (homogenized
+device-mesh fields `T_L(r), φ(r), n(r), p(r), j(r)`). The full carrier distribution
+stays *emergent* by moment closure (`T_e`, `j` closed-form), so no distribution-as-state
+DAE arises. The slow tier is an adiabatic parameter of the micro tier; the macro tier is
+homogenized from it (micro `κ(T), σ(T), α(E)` → device-PDE coefficients). The 7-tuple
+below is the micro tier; the slow and macro tiers, the homogenization map, and the two
+extra EOM-family residuals (`EOM/DefectPopulation`, `EOM/Continuum`) are in `arch-21`.
 
 ### 3.1 The 7-tuple `x = (h, R_I, P_I, Π_h, Z_I, γ̂, A)` — computational types
 
@@ -224,7 +235,7 @@ Node = ( id   : Address[GraphNode]          -- hash-cons identity
        , kind : NodeKind , role : OutputRole )
 
 NodeKind   = Input(StateSlot | EnvScalar)
-           | FormulaApply(formula : NamedFormula, args : [NodeId])     -- 102 formulas
+           | FormulaApply(formula : NamedFormula, args : [NodeId])     -- 110 formulas
            | MethodInvoke(method  : NamedMethod,  args : [NodeId])     -- 12 methods
 OutputRole = Internal | Observable(bundle : 1..11) | ResidualLeaf(ResidualKey)
 ```
@@ -292,7 +303,7 @@ the work Stage 5 will do*:
    `E_coupling` / `L_assembly` / `M_assembly` aggregators (`arch-05`).
 
 **Stage 3 — algebraic simplification.** Hash-consing (intern identical subexpressions, `O(1)`
-amortized), cross-formula common-subexpression elimination (the 102 formulas share
+amortized), cross-formula common-subexpression elimination (the 110 formulas share
 intermediates), tearing / alias elimination, sparsity-pattern inference. Implemented as
 equality-saturation over an e-graph (union-find of equivalence classes + e-matching). Symbolic;
 no numeric cost. **This is the hardest pass to build** and the one whose performance is
@@ -362,7 +373,7 @@ applied method chain with a typed `inputs → output`. Representative signatures
 `InterfaceEquilibriumOf`, `BiSlabGrandPotentialOf`, `MassActionEquilibriumOf` — follow the same
 macro-emits-subgraph pattern; see `arch-09 §9.2`, `impl-03`.)
 
-### 6.3 The 102 formulas — distribution (`arch-09 §9.3`, `physics/library/formulas/registry-manifest.csv`)
+### 6.3 The 110 formulas — distribution (`arch-09 §9.3`, `physics/library/formulas/registry-manifest.csv`)
 
 Leaf evaluations with typed signatures, grouped into 11 bundles (B1–B11) and tagged:
 - **cost-tier:** T0 closed-form ≤ 10 µs (~50 formulas) · T1 small LA / 1-D quadrature ≤ 10 ms (~35) · T2 BZ/mesh integral ≤ 10 s (~15) · T3 self-consistent loop / PDE ≤ 10 min (~2).
@@ -452,7 +463,7 @@ solver on the cert path.**
 **`SqliteReferenceCache`** (`arch-12 §12.1`): a content-addressed table keyed by the §2.2 hash
 over `(observable, value, σ, provenance, coverage_mask, schema_version)`; **write-once** (updates
 = new row, deletes disallowed); WAL mode for concurrent reads; `O(log n)` B-tree lookup,
-`n ≈ 10–10⁴` rows. The five **runtime gates** (`impl-11 §15.2`) — registration sanity (all 102
+`n ≈ 10–10⁴` rows. The five **runtime gates** (`impl-11 §15.2`) — registration sanity (all 110
 formulas instantiate, D2 pass the τ_adj gate), an end-to-end worked example (the L3↔non-eq fixed
 point closes in ≤ 5 iterations), curriculum sanity, cross-regime obligation firing, and a
 consumer smoke test — are the acceptance battery.
@@ -518,20 +529,24 @@ are generated, not registered** (`impl-09 §9.4`).
 
 ## 13. State of the research, and deliberately-open items
 
-The conceptual/computational design is **complete and internally coherent** (37 atomic docs,
-lint-clean): every data structure, pass, kernel, output, and check above is specified and
-cross-consistent, all over the one substrate. What remains is **not conceptual design**:
+The conceptual/computational design is internally coherent (38 atomic docs, lint-clean) and
+was deep-audited (`docs/audits/2026-06-09-physics-audit.md`). The **multiscale-state decision**
+(`arch-21-multiscale-state`) since stratified the state into micro/slow/macro tiers — closing
+the audit's two biggest structural gaps (the aging/degradation state mechanism and the
+device-scale bridge) and normalizing the GENERIC degeneracy layer (`arch-05`). What remains is
+**not conceptual design**:
 
-- **Formalization gaps (engineering, not design)** — researched but not yet machine-readable:
-  the ~80-entry observable catalog, the per-host defect inventory, the crystal-structure-validity
-  residual catalog, and the detailed `B9` non-equilibrium bundle. These are *enumeration* tasks
-  that will become the parallel-build work-lists.
+- **Formalization gaps (engineering, not design)** — researched but not yet fully machine-readable:
+  the ~80-entry observable catalog, the crystal-structure-validity residual catalog, the
+  polarization/piezo/2DEG package, and the rest of the `B9` bundle. (The per-host defect inventory
+  and degradation kinetics are now landed as the slow tier, `arch-21`.) These are *enumeration*
+  tasks tracked in the audit's P0/P1 lists.
 - **Genuinely open data-structure problems** — the four `γ̂` `§15.4` items (§3.2 above): ε-equality
   error tracking, materialization policy, long-trajectory rank drift, rank-dependent applicability.
   These are the only *open CS problems* in the design.
 - **Deferred engineering decisions** (`arch-18`, open list) — surrogate-net build-vs-adopt, the
-  PDE-mesh + adjoint library, the integrator interface signature, the `γ̂` materialization policy,
-  and the Layer-1.75 (self-consistent GW / DMFT) onramp. Each resolves just-in-time as the build
+  PDE-mesh **adjoint scheme** (the mesh *format* is now committed in `arch-21`), the integrator
+  interface signature, the `γ̂` materialization policy, and the Layer-1.75 (GW / DMFT) onramp. Each resolves just-in-time as the build
   reaches it; none blocks the substrate or the MVP.
 
 A validator should treat §§1–12 as claims that **should be valid** against the cited atomic

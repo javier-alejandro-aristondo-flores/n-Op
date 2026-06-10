@@ -23,7 +23,8 @@ depends-on:
   - arch-13-applicability
   - arch-19-coupling-structure
   - impl-07-residual-factory
-referenced-by: []
+referenced-by:
+  - arch-21-multiscale-state
 research-sources: []
 ---
 # Representation substrate

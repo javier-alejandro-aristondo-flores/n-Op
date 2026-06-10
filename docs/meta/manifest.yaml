@@ -34,6 +34,7 @@ monoliths:
       - architecture/18-open-decisions.md
       - architecture/19-coupling-structure.md
       - architecture/20-representations.md
+      - architecture/21-multiscale-state.md
 
   implementation:
     output: implementation-plan.md

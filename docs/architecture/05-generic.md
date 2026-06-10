@@ -12,6 +12,7 @@ referenced-by:
   - arch-08-bo-levels
   - arch-19-coupling-structure
   - arch-20-representations
+  - arch-21-multiscale-state
 research-sources: []
 ---
 # Dynamics — GENERIC
@@ -100,5 +101,49 @@ the `E`, `S`, `L`, and `M` terms that act on its irreducible state.
 The per-regime derivations of each extraction from the unified structure are in
 the `docs/implementation/` tree (especially `impl-06-compositions`) and grounded
 in `physics/research/group-{A,B,C}-*.md`.
+
+### Generator structure is per-tier (degeneracy / Jacobi normalization)
+
+The two-generator form and its degeneracy conditions `L·δS/δx = 0`, `M·δE/δx = 0`
+hold **per tier / per BO level with the generators active at that tier**, not as a
+single global bracket over all variables simultaneously. This is what reconciles
+the written functionals with the degeneracy conditions and the `impl-10` Phase-8
+"degeneracy verified" artifact. (The tiers are defined in
+`arch-21-multiscale-state`; the standard GENERIC mechanical-vs-thermal split.)
+
+- **The `γ̂`-block of `L` is the Lie–Poisson bracket** — `{A,B}(γ̂) = Tr( γ̂ ·
+  [δA/δγ̂, δB/δγ̂] )`, giving `∂γ̂/∂t = −(i/ℏ)[Ĥ_KS, γ̂]` with `Ĥ_KS = δE/δγ̂`,
+  written `[·, γ̂]` **not** the bare `[Ĥ_KS, ·]`. The Lie–Poisson form satisfies the
+  **Jacobi identity by construction** and **degeneracy**: the Fermi–Dirac
+  electronic entropy is a spectral functional of `γ̂`, so `δS_el/δγ̂` commutes with
+  `γ̂` and `L_γ̂·δS_el/δγ̂ = [δS_el/δγ̂, γ̂] = 0`.
+- **L2 (the mechanical surface) is single-generator (Hamiltonian) at fixed
+  entropy.** The symplectic and Parrinello–Rahman blocks generate the `E_BO`-flow;
+  `S_vib(R,h)` is a slow / parametric functional whose `(R,h)`-dependence drives the
+  dissipative dynamics of the slow and macro tiers, not the L2 bracket. The apparent
+  `L·δS_vib/δR ≠ 0` is therefore not a degeneracy violation: at L2 the active
+  generator is `E` alone (an isothermal single-generator contraction); entropy
+  production lives with the distribution / configurational variables.
+
+**Jacobi status per `L`-block.** Canonical blocks (symplectic `(R,P)`, `(h,Π_h)`;
+Lie–Poisson `γ̂`; Maxwell `A`) satisfy Jacobi **exactly**. Generated `AntisymmForm`
+cross-blocks (`arch-19-coupling-structure`) conserve energy by antisymmetry but do
+**not** automatically satisfy Jacobi (an additional condition); V1 restricts them to
+the semidirect-product / Lie–Poisson class (Jacobi by construction) or flags them.
+`impl-10` Phase-8 "Jacobi verified" is exact for canonical blocks and a cert-side
+numerical check for generated cross-blocks — not a global symbolic proof.
+
+**`Degeneracy` is cert-only, not a training residual.** Under the per-tier generator
+structure the `Degeneracy` category (`arch-11-residuals §11.1`) is **identically zero
+by construction**; it is a cert obligation — a generator-construction-bug tripwire —
+not a PINO loss term (removed from the `arch-11 §11.4.1` training gate).
+
+**`E`-functional activation is level-conditional.** `E[x]` is not a flat simultaneous
+sum: at L1 the active electronic energy is `E_KS[γ̂; R₀, h₀]` — **parametric in the
+frozen geometry** (it carries `∫ v_ext(R)·n + V_II(R,h)` even though `γ̂` is the
+active variable); at L2, `E_BO(R,h) = min_γ̂ E_KS[γ̂; R,h]` *replaces* `E_KS` with `γ̂`
+resolved (no double-count). The e-ph coupling channel contributes the linear-order
+cross-term for the `L`/`M` blocks and the beyond-reference part of `E_coupling`, not
+the full electron–ion energy.
 
 ---

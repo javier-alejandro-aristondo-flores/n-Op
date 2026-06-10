@@ -12,6 +12,7 @@ referenced-by:
   - arch-15-gamma-hat
   - arch-19-coupling-structure
   - arch-20-representations
+  - arch-21-multiscale-state
 research-sources: []
 ---
 # The unified state
@@ -29,13 +30,26 @@ x(t) = ( h,      cell vectors                       ∈ GL⁺(3, ℝ)   (3×3 re
          A )     external EM vector potential        ∈ ℝ³ field A(r,t)
 ```
 
-These are the **irreducible degrees of freedom**. Phonon distributions
-`n_{q,s}`, carrier distributions `f_n(k,r)`, surface coverages `θ_i`, electron
-and lattice temperatures, current density, internal fields, defect populations,
-and composition vectors are all **emergent** — coarse-grainings, Bloch
-transforms, or semiclassical limits of `x(t)`. Adding any of them to the state
-would create a constraint manifold tying it back to the irreducible DOFs and
-reintroduce the integration pathology the formulation avoids.
+These are the **irreducible degrees of freedom of the micro tier**. Quantities
+recoverable from the 7-tuple by coarse-graining **on the micro timescale and
+scale** — phonon distributions `n_{q,s}`, the carrier distribution `f_n(k,r)`,
+surface coverages `θ_i`, electron/lattice temperatures, current density, internal
+fields — are **emergent** and stay out of the micro state: adding such a
+*same-timescale* coarse-graining would create a constraint manifold tying it
+back to the irreducible DOFs and reintroduce the integration pathology the
+formulation avoids.
+
+Quantities that are **not** recoverable on the micro timescale or scale are
+**first-class state in their own tier**, not emergent: slow, history-dependent
+**defect populations** and **composition vectors** (hours–years), and
+**homogenized device-scale fields** (lattice-temperature, potential, and
+carrier-density profiles on a device mesh). They couple to the micro tier only
+parametrically — adiabatic driving (slow) or homogenization (macro) — so they
+introduce *no* constraint manifold. See `arch-21-multiscale-state` for the
+refined emergence axiom and the slow / macro tiers. (This is also the
+reconciliation of the earlier "distributions are emergent" wording with
+`arch-08-bo-levels`, which correctly states L4 introduces its own irreducible
+distribution state.)
 
 `x(t)` is a **type** that the PINO's predictions instantiate at each time step.
 `/physics` does not hold values of `x(t)`; it defines what `x(t)` is and how to

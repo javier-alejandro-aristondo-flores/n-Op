@@ -53,25 +53,54 @@ is `Pending` and none is `Failed`, and `Passed` otherwise. The
 attestation DAG's root `Address` is the cert artifact `/informed-
 operator` consumes.
 
-## 12.0.1 Coupling-derived simplifications (obligations 1, 5)
+## 12.0.1 Coupling-derived simplifications (obligations 1, 2, 5)
 
 When a formula node originates from the invariant generator
-(`arch-19-coupling-structure §19.3`), obligations 1 and 5 collapse to
-projection-residual checks:
+(`arch-19-coupling-structure §19.3`), obligations 1, 2, and 5 collapse to
+projection-residual checks (tolerances named in §12.0.2):
 
 - **Obligation 1 (symmetry equivariance).** Invariants are
   trivial-irrep basis vectors by construction. Cert verifies the
   emitted `InvariantTerm.symbolic-form` lies in the claimed subspace:
-  `||v − π_trivial v|| / ||v|| < ε` on a sampled evaluation. Failure
+  `||v − π_trivial v|| / ||v|| < δ_sym` on a sampled evaluation. Failure
   is a generator bug, not a physics bug.
-- **Obligation 5 (antisymmetry of L, PSD of M).** The
-  `InvariantTerm.channel.target` tag determines the projection rule:
-  `AntisymmForm` invariants project onto the antisymmetric component;
-  `PSDSymmForm` invariants project onto the PSD cone. Cert verifies
-  the emitted form equals its projection within `ε`.
+- **Obligation 5 (antisymmetry of `L` — a conservation property).**
+  `AntisymmForm` invariants project onto the antisymmetric component; cert
+  verifies the emitted form equals its projection within `δ_sym`. (Antisymmetry
+  conserves energy; Jacobi status per `arch-05-generic`.)
+- **Obligation 2 (PSD of `M` — a bounds/positivity property).** For
+  `PSDSymmForm` targets the projector is the **congruence-action Reynolds
+  operator** (averaging `ρ(g)ᵀ M ρ(g)`) — only the congruence action preserves
+  positive-semidefiniteness; a bare orthogonal subspace projection does not. The
+  PSD condition is stated on the **assembled dissipative super-block per
+  mechanism** (the diagonal kernels together with their off-diagonal
+  cross-kernels), via a Schur-complement / Gram condition — **not** per
+  off-diagonal kernel in isolation (an off-diagonal cross-kernel alone is not
+  sign-definite). Cert checks `λ_min(M_block) ≥ −δ_PSD` on that assembled
+  super-block. PSD *existence* is the structural theorem of `arch-19 §19.12`;
+  this is its runtime guard.
 
-Both checks are O(1) per invariant and run alongside the generator at
-Stage 2.5.
+These checks are `O(1)`–`O(block)` per invariant and run alongside the generator
+at Stage 2.5.
+
+## 12.0.2 Tolerance ledger
+
+Canonical names and default values for every tolerance / error bound in `/physics`.
+The symbol `δ` / `τ` denotes a *tolerance* throughout; `ε` is reserved for
+permittivity in the physics formulas (this ends the `ε` collision noted in
+`arch-19`). These values are the inputs `arch-10-typeclasses` `Quantity.combineTol`
+composes into the per-observable error budget (`arch-11-residuals §11.7`).
+
+| Name | Meaning | Default |
+|---|---|---|
+| `δ_sym` | symmetry / antisymmetry projection residual (obligations 1, 5) | `1e-6` relative |
+| `δ_PSD` | assembled-super-block negative-eigenvalue guard (obligation 2) | `1e-9` absolute |
+| `τ_SCF,strict` | SCF / minimization gradient-norm convergence (reference / compile side) | `1e-8` Ha |
+| `τ_SCF,train` | SCF convergence on the runtime / training path (looser) | `1e-4` Ha |
+| `τ_L3L4` | L3↔non-equilibrium same-pass fixed-point residual (≤ 5 iters) | `1e-4` |
+| `τ_method` | `Algebraic/MethodEquivalence` relative-error envelope (obligation 6) | `10–20%`, declared per formula pair |
+| `τ_adj` | registration adjoint vJp-vs-JvP gate (`impl-07-residual-factory §7.5`) | `1e-4` relative |
+| `δ_surrogate` | D4 surrogate / relaxation validity (obligation 9), measured on a dev set | per-formula |
 
 ## 12.1 `SqliteReferenceCache` — backend for obligations 4 + 8
 

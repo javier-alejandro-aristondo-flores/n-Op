@@ -39,10 +39,14 @@ record FormulaRecord {
 (≤10 ms) · T2 Brillouin-zone / mesh integral (≤10 s) · T3 self-consistent loop or
 PDE solve (≤10 min).
 
-**Differentiability tags:** D0 no autodiff needed (pure read) · D1 analytic
-forward derivative · D2 adjoint required (validated at registration) · D3
-implicit-function adjoint via fixed-point linearization · D4 autodiff relaxed
-(surrogate-net bridge or finite-difference fallback, approved at registration).
+**Differentiability tags:** D0 no autodiff needed — a pure read, **or an integer /
+categorical output with no useful derivative** (topology invariants, discrete CSP
+metrics: "exception-set everywhere") · D1 analytic forward derivative · D2 adjoint
+required (validated at registration) · D3 implicit-function adjoint via fixed-point
+linearization, **or a finite-difference surrogate where there is no fixed point**
+(stated in the formula's docs) · D4 autodiff relaxed via a differentiable surrogate
+— surrogate-net bridge, **log-sum-exp soft-hull, or Gumbel-Softmax relaxation** —
+approved at registration with an obligation-9 validity domain.
 
 The corrected physics is canonical in the registry and in §6 below: optical
 absorption uses `(2ω/c)·Im(√ε)`; the operator-spectrum-area sum rule carries the

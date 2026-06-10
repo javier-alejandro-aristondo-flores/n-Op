@@ -276,11 +276,11 @@ The invariant-generator structure simplifies two cert obligations
 - **The symmetry-equivariance obligation.** Polynomial invariants are
   trivial-irrep basis vectors *by construction*; equivariance is
   automatic. Cert reduces to a numerical projection-residual check:
-  `||v.symbolic-form − π_trivial v.symbolic-form|| < ε` on a sampled
+  `||v.symbolic-form − π_trivial v.symbolic-form|| < δ_sym` on a sampled
   evaluation. Failure indicates a generator bug, not a physics bug. A
   `kernel_extension` is **not** exempt: it is "scalar under the
   little-group of q" (`KernelExt.symmetry_law`, §19.11), so cert checks
-  `‖K(Rq,ω) − D(R) K(q,ω) D(R)†‖ < ε` over little-group elements `R` —
+  `‖K(Rq,ω) − D(R) K(q,ω) D(R)†‖ < δ_sym` over little-group elements `R` —
   a checkable equivariance, just not a polynomial one.
 - **The positivity obligation** (antisymmetry of `L` / PSD of `M`).
   The `target` tag determines a projection rule applied at the
@@ -288,16 +288,18 @@ The invariant-generator structure simplifies two cert obligations
   antisymmetric component of the candidate tensor; `PSDSymmForm`
   invariants are projected onto the PSD cone. The projection is part
   of the generator's contract; cert numerically verifies the projected
-  output matches the emitted `symbolic-form` within `ε`. For
-  `PSDSymmForm` channels, PSD *existence* is a structural theorem rather
-  than a runtime search — see the documented assumptions in §19.12.
+  output matches the emitted `symbolic-form` within `δ_sym` (`arch-12 §12.0.2`).
+  For `PSDSymmForm` channels, PSD *existence* is a structural theorem rather
+  than a runtime search — see the documented assumptions in §19.12 — and the
+  runtime PSD guard is checked on the **assembled dissipative super-block per
+  mechanism** (diagonal + off-diagonal kernels together), not per off-diagonal
+  kernel, via `arch-12 §12.0.1` obligation 2.
 
 The polynomial checks are O(1) per invariant; both are integrated with
 `SymmetryAdaptedHamiltonianOf` (`arch-09-vocabularies §9.2`) which
-already lives in the symmetry machinery. (Cert obligations are named
-rather than numbered here: `arch-12-cert`'s list and its §12.0.1 use
-inconsistent indices for the positivity / PSD-of-`M` clause; the names
-are unambiguous.)
+already lives in the symmetry machinery. The cert-obligation indices are now
+fixed in `arch-12 §12.0.1`: equivariance = obligation 1, antisymmetry of `L` =
+obligation 5 (conservation), PSD of `M` = obligation 2 (positivity).
 
 ## 19.8 Registration discipline
 
@@ -314,6 +316,18 @@ decidable on typeclass tags (the registration-time invariant from
 under the canonical-serialization rule of `arch-20-representations §20.4`
 (domain-separated, schema-versioned); identical channels collapse to one
 address.
+
+**Coefficient-provenance contract.** Symmetry generates the *form* of a channel's
+invariants; the *values* (deformation potentials, Fröhlich and anharmonic
+parameters, compact-model coefficients) enter through the channel's
+`ProvenanceLedger` (§19.4 caveat). Each provenanced coefficient must carry:
+`(value, σ, source, cost-class)` — where `cost-class ∈ {curated, per-material-DFPT,
+fit}` declares its acquisition pipeline and `σ` its uncertainty (reusing the
+reference-battery `σ` machinery, `arch-12 §12.1`). A **cert obligation refuses any
+composition whose active channels carry coefficients without a `ProvenanceLedger`
+entry** (an unprovenanced coefficient is a silent accuracy hole). For the MVP the
+diamond coefficients are `curated`; other materials are `per-material-DFPT` and their
+provenance is the gating data-acquisition task before that material is claimed.
 
 The active channels in a composition, **together with the theory frame
 they are interpreted in**, are the **`CouplingSpec`**:
@@ -572,7 +586,8 @@ search for these channels; feasibility is a theorem, recorded as the
 assumption above. The closure is **loose at the coefficient level** — the
 PINO learns the basis coefficients and could transiently leave the PSD
 cone during training — so the positivity obligation **keeps** a cheap
-per-evaluation guard `λ_min(M_block) ≥ −ε` on the small realized block.
+per-evaluation guard `λ_min(M_block) ≥ −δ_PSD` on the assembled per-mechanism
+super-block (`arch-12 §12.0.1` obligation 2; tolerances valued in `arch-12 §12.0.2`).
 
 **Dormant SDP fallback (V2).** A future `PSDSymmForm` channel with no
 structural PSD guarantee would, at registration, solve the semidefinite

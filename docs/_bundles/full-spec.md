@@ -609,6 +609,10 @@ upstream nodes does not collapse the leaves.
   `MethodInvoke(spectral-decomposition, …)` may be lowered to
   randomized SVD or Davidson; the BTE collision kernel
   (`MethodInvoke(kinetic-evolution, …)`) may be lowered to TT-cross.
+  **Each compression plan carries a per-plan error target** — the truncation
+  tolerance for the `LowRank`/`HODLR`/`TT` ranks — and the rank is chosen to *meet
+  that target*, not merely by structure. The target enters the per-residual error
+  budget via `Quantity.combineTol` (`arch-11-residuals §11.7`).
 - **Adjoint synthesis.** For every `MethodInvoke` whose method has
   fixed-point semantics, the **implicit-differentiation adjoint** is
   synthesized: gradient cost becomes one extra linear solve,
@@ -661,6 +665,19 @@ Environment-structural)`) keys a kernel cache. Scalar environment
 parameters that vary at training time (e.g. `T` sweeps) are passed as
 runtime inputs, not baked into the kernel; only structural changes
 trigger recompile.
+
+**Runtime cost is three-class, not one** (the "µs–ms" row above is only the
+per-sample core). Per the cadence policy (`impl-07-residual-factory §7.8`):
+
+| Class | What | Cost | Cadence |
+|---|---|---|---|
+| per-sample core | EOM-residual evaluation (T0/T1) | µs–ms | every SGD step / RAD-subsampled |
+| on-request spectral | BZ-resolved observables, full PDE residuals (T2) | 0.1–10 s | per-epoch, cached per composition |
+| per-composition reference | `E_BO`/DFPT/G₀W₀ property + reference solves (T3) | seconds–minutes | once per composition / calibration-only |
+
+The "compile seconds–minutes" figure above is the symbolic Stages 1–4; the
+per-composition *reference* solves the property observables require sit in the third
+class and are scheduled off the per-sample hot path by the cadence policy.
 
 
 <a id="arch-08-bo-levels"></a>
@@ -1214,6 +1231,28 @@ generator's `axes`), but residual *generators* (`impl-07-residual-factory
 the cert-only and ground-truth-bridge subtypes. The closed-vocabulary
 discipline (`arch-09-vocabularies`) holds at the generator level.
 
+## 11.7 Per-residual error composition (the accuracy ledger)
+
+Every `ResidualGenerator` (`impl-07-residual-factory §7.1`) carries a
+`characteristic-scale : σ` — the target accuracy of its observable, seeded from the
+**per-observable accuracy ledger** (`docs/accuracy-ledger.md`, restored from the
+research catalog). `σ` is a *declared scale*, not a fitted weight: it is the
+error-model input that `arch-10-typeclasses` `Quantity.combineTol` composes along the
+DAG (per-instance max-abs or RSS) into a per-`ResidualKey` error budget. The budget
+sums the contributing terms — input `σ`, **model-form error** (RTA/3-ph, compact
+models, QHA), **Stage-4 compression truncation** (the per-plan error target,
+`arch-07-pipeline §7.4`), **dressing staleness** (frozen Layer-1.25 one-shots), and
+**coefficient-provenance `σ`** (`arch-19-coupling-structure §19.8`) — so "is this
+closed-form choice accurate enough?" is answerable *by the system*, not only by
+external judgment.
+
+The MVP headline design-grade targets (gap ±0.15 eV post-G₀W₀, C_ij ±5%, κ(300 K)
+±20%, E_form ±0.2 eV, μ factor-2) and the full 52-observable ledger live in
+`docs/accuracy-ledger.md`; the reference battery (cert obligation 4, `arch-12 §12.1`)
+checks them at the MVP anchors. Every numeric tolerance named across `/physics`
+(`τ_adj`, `δ_sym`, `δ_PSD`, `τ_SCF,*`, `τ_method`, `δ_surrogate`) is valued once in the
+**tolerance ledger** (`arch-12 §12.0.2`).
+
 
 <a id="arch-12-cert"></a>
 
@@ -1256,25 +1295,54 @@ is `Pending` and none is `Failed`, and `Passed` otherwise. The
 attestation DAG's root `Address` is the cert artifact `/informed-
 operator` consumes.
 
-## 12.0.1 Coupling-derived simplifications (obligations 1, 5)
+## 12.0.1 Coupling-derived simplifications (obligations 1, 2, 5)
 
 When a formula node originates from the invariant generator
-(`arch-19-coupling-structure §19.3`), obligations 1 and 5 collapse to
-projection-residual checks:
+(`arch-19-coupling-structure §19.3`), obligations 1, 2, and 5 collapse to
+projection-residual checks (tolerances named in §12.0.2):
 
 - **Obligation 1 (symmetry equivariance).** Invariants are
   trivial-irrep basis vectors by construction. Cert verifies the
   emitted `InvariantTerm.symbolic-form` lies in the claimed subspace:
-  `||v − π_trivial v|| / ||v|| < ε` on a sampled evaluation. Failure
+  `||v − π_trivial v|| / ||v|| < δ_sym` on a sampled evaluation. Failure
   is a generator bug, not a physics bug.
-- **Obligation 5 (antisymmetry of L, PSD of M).** The
-  `InvariantTerm.channel.target` tag determines the projection rule:
-  `AntisymmForm` invariants project onto the antisymmetric component;
-  `PSDSymmForm` invariants project onto the PSD cone. Cert verifies
-  the emitted form equals its projection within `ε`.
+- **Obligation 5 (antisymmetry of `L` — a conservation property).**
+  `AntisymmForm` invariants project onto the antisymmetric component; cert
+  verifies the emitted form equals its projection within `δ_sym`. (Antisymmetry
+  conserves energy; Jacobi status per `arch-05-generic`.)
+- **Obligation 2 (PSD of `M` — a bounds/positivity property).** For
+  `PSDSymmForm` targets the projector is the **congruence-action Reynolds
+  operator** (averaging `ρ(g)ᵀ M ρ(g)`) — only the congruence action preserves
+  positive-semidefiniteness; a bare orthogonal subspace projection does not. The
+  PSD condition is stated on the **assembled dissipative super-block per
+  mechanism** (the diagonal kernels together with their off-diagonal
+  cross-kernels), via a Schur-complement / Gram condition — **not** per
+  off-diagonal kernel in isolation (an off-diagonal cross-kernel alone is not
+  sign-definite). Cert checks `λ_min(M_block) ≥ −δ_PSD` on that assembled
+  super-block. PSD *existence* is the structural theorem of `arch-19 §19.12`;
+  this is its runtime guard.
 
-Both checks are O(1) per invariant and run alongside the generator at
-Stage 2.5.
+These checks are `O(1)`–`O(block)` per invariant and run alongside the generator
+at Stage 2.5.
+
+## 12.0.2 Tolerance ledger
+
+Canonical names and default values for every tolerance / error bound in `/physics`.
+The symbol `δ` / `τ` denotes a *tolerance* throughout; `ε` is reserved for
+permittivity in the physics formulas (this ends the `ε` collision noted in
+`arch-19`). These values are the inputs `arch-10-typeclasses` `Quantity.combineTol`
+composes into the per-observable error budget (`arch-11-residuals §11.7`).
+
+| Name | Meaning | Default |
+|---|---|---|
+| `δ_sym` | symmetry / antisymmetry projection residual (obligations 1, 5) | `1e-6` relative |
+| `δ_PSD` | assembled-super-block negative-eigenvalue guard (obligation 2) | `1e-9` absolute |
+| `τ_SCF,strict` | SCF / minimization gradient-norm convergence (reference / compile side) | `1e-8` Ha |
+| `τ_SCF,train` | SCF convergence on the runtime / training path (looser) | `1e-4` Ha |
+| `τ_L3L4` | L3↔non-equilibrium same-pass fixed-point residual (≤ 5 iters) | `1e-4` |
+| `τ_method` | `Algebraic/MethodEquivalence` relative-error envelope (obligation 6) | `10–20%`, declared per formula pair |
+| `τ_adj` | registration adjoint vJp-vs-JvP gate (`impl-07-residual-factory §7.5`) | `1e-4` relative |
+| `δ_surrogate` | D4 surrogate / relaxation validity (obligation 9), measured on a dev set | per-formula |
 
 ## 12.1 `SqliteReferenceCache` — backend for obligations 4 + 8
 
@@ -1605,8 +1673,11 @@ Stated and held, so the architecture is honest about what it does not cover:
   modeled.
 - Deep-defect non-Markovian dynamics — Markov master-equation closure assumed.
 - Polaron localization beyond Fröhlich.
-- 4-phonon scattering, full NEGF tunneling, full SCPH/SSCHA — replaced by D4
-  surrogates or Layer-1.75 V2 scaffolding.
+- 4-phonon scattering, full NEGF tunneling, full SCPH/SSCHA — deferred to
+  Layer-1.75 V2 scaffolding. Where a cheap proxy is needed during training it is a
+  registered D4 surrogate with an obligation-9 validity domain; **no such surrogate
+  ships in V1** (the closed-form / Layer-1.25 path is used, with the accuracy regime
+  declared in the ledger, `arch-11-residuals §11.7`).
 - Plasma-process surface damage; grain-boundary statistics; continuum creep /
   dislocation climb; quantum-tunneling-corrected reaction rates (classical
   Eyring TST adequate at T_op ≥ 600 K).
@@ -1980,11 +2051,11 @@ The invariant-generator structure simplifies two cert obligations
 - **The symmetry-equivariance obligation.** Polynomial invariants are
   trivial-irrep basis vectors *by construction*; equivariance is
   automatic. Cert reduces to a numerical projection-residual check:
-  `||v.symbolic-form − π_trivial v.symbolic-form|| < ε` on a sampled
+  `||v.symbolic-form − π_trivial v.symbolic-form|| < δ_sym` on a sampled
   evaluation. Failure indicates a generator bug, not a physics bug. A
   `kernel_extension` is **not** exempt: it is "scalar under the
   little-group of q" (`KernelExt.symmetry_law`, §19.11), so cert checks
-  `‖K(Rq,ω) − D(R) K(q,ω) D(R)†‖ < ε` over little-group elements `R` —
+  `‖K(Rq,ω) − D(R) K(q,ω) D(R)†‖ < δ_sym` over little-group elements `R` —
   a checkable equivariance, just not a polynomial one.
 - **The positivity obligation** (antisymmetry of `L` / PSD of `M`).
   The `target` tag determines a projection rule applied at the
@@ -1992,16 +2063,18 @@ The invariant-generator structure simplifies two cert obligations
   antisymmetric component of the candidate tensor; `PSDSymmForm`
   invariants are projected onto the PSD cone. The projection is part
   of the generator's contract; cert numerically verifies the projected
-  output matches the emitted `symbolic-form` within `ε`. For
-  `PSDSymmForm` channels, PSD *existence* is a structural theorem rather
-  than a runtime search — see the documented assumptions in §19.12.
+  output matches the emitted `symbolic-form` within `δ_sym` (`arch-12 §12.0.2`).
+  For `PSDSymmForm` channels, PSD *existence* is a structural theorem rather
+  than a runtime search — see the documented assumptions in §19.12 — and the
+  runtime PSD guard is checked on the **assembled dissipative super-block per
+  mechanism** (diagonal + off-diagonal kernels together), not per off-diagonal
+  kernel, via `arch-12 §12.0.1` obligation 2.
 
 The polynomial checks are O(1) per invariant; both are integrated with
 `SymmetryAdaptedHamiltonianOf` (`arch-09-vocabularies §9.2`) which
-already lives in the symmetry machinery. (Cert obligations are named
-rather than numbered here: `arch-12-cert`'s list and its §12.0.1 use
-inconsistent indices for the positivity / PSD-of-`M` clause; the names
-are unambiguous.)
+already lives in the symmetry machinery. The cert-obligation indices are now
+fixed in `arch-12 §12.0.1`: equivariance = obligation 1, antisymmetry of `L` =
+obligation 5 (conservation), PSD of `M` = obligation 2 (positivity).
 
 ## 19.8 Registration discipline
 
@@ -2018,6 +2091,18 @@ decidable on typeclass tags (the registration-time invariant from
 under the canonical-serialization rule of `arch-20-representations §20.4`
 (domain-separated, schema-versioned); identical channels collapse to one
 address.
+
+**Coefficient-provenance contract.** Symmetry generates the *form* of a channel's
+invariants; the *values* (deformation potentials, Fröhlich and anharmonic
+parameters, compact-model coefficients) enter through the channel's
+`ProvenanceLedger` (§19.4 caveat). Each provenanced coefficient must carry:
+`(value, σ, source, cost-class)` — where `cost-class ∈ {curated, per-material-DFPT,
+fit}` declares its acquisition pipeline and `σ` its uncertainty (reusing the
+reference-battery `σ` machinery, `arch-12 §12.1`). A **cert obligation refuses any
+composition whose active channels carry coefficients without a `ProvenanceLedger`
+entry** (an unprovenanced coefficient is a silent accuracy hole). For the MVP the
+diamond coefficients are `curated`; other materials are `per-material-DFPT` and their
+provenance is the gating data-acquisition task before that material is claimed.
 
 The active channels in a composition, **together with the theory frame
 they are interpreted in**, are the **`CouplingSpec`**:
@@ -2276,7 +2361,8 @@ search for these channels; feasibility is a theorem, recorded as the
 assumption above. The closure is **loose at the coefficient level** — the
 PINO learns the basis coefficients and could transiently leave the PSD
 cone during training — so the positivity obligation **keeps** a cheap
-per-evaluation guard `λ_min(M_block) ≥ −ε` on the small realized block.
+per-evaluation guard `λ_min(M_block) ≥ −δ_PSD` on the assembled per-mechanism
+super-block (`arch-12 §12.0.1` obligation 2; tolerances valued in `arch-12 §12.0.2`).
 
 **Dormant SDP fallback (V2).** A future `PSDSymmForm` channel with no
 structural PSD guarantee would, at registration, solve the semidefinite
@@ -2353,7 +2439,8 @@ output.
 
 ## 20.2 The parametric op-signature family
 
-Three op signatures cover every Merkle DAG instance in `/physics`:
+Four op signatures parameterize the Merkle DAG instances in `/physics` (a fourth,
+`GroupOps`, is added below). Three cover the general expression DAGs:
 
 - **`PredicateOps`** — ROBDD reduced ordered Boolean ops over typed
   parameterized atoms drawn from a C1 vocabulary. Atom order is part of
@@ -2475,7 +2562,8 @@ property of the universe, not of an individual sparse set.
   `EvidenceId`, never duplicated into a sidecar payload.
 - **Three separate Merkle infrastructures.** `InvariantTerm` symbolic
   forms, applicability ROBDDs, and the evidence attestation DAG share
-  one `MerkleDAG[S, L]` substrate with three op signatures.
+  one `MerkleDAG[S, L]` substrate, each with its own op signature (three of the
+  four of §20.2; `GroupOps` is the group-algebra fourth).
 - **PhysicsGraph as a special object.** The graph is the closure of its
   output addresses under children-pointers. Edges are not separately
   identified; argument-list addresses inside the node payload are the
@@ -2789,10 +2877,14 @@ record FormulaRecord {
 (≤10 ms) · T2 Brillouin-zone / mesh integral (≤10 s) · T3 self-consistent loop or
 PDE solve (≤10 min).
 
-**Differentiability tags:** D0 no autodiff needed (pure read) · D1 analytic
-forward derivative · D2 adjoint required (validated at registration) · D3
-implicit-function adjoint via fixed-point linearization · D4 autodiff relaxed
-(surrogate-net bridge or finite-difference fallback, approved at registration).
+**Differentiability tags:** D0 no autodiff needed — a pure read, **or an integer /
+categorical output with no useful derivative** (topology invariants, discrete CSP
+metrics: "exception-set everywhere") · D1 analytic forward derivative · D2 adjoint
+required (validated at registration) · D3 implicit-function adjoint via fixed-point
+linearization, **or a finite-difference surrogate where there is no fixed point**
+(stated in the formula's docs) · D4 autodiff relaxed via a differentiable surrogate
+— surrogate-net bridge, **log-sum-exp soft-hull, or Gumbel-Softmax relaxation** —
+approved at registration with an obligation-9 validity domain.
 
 The corrected physics is canonical in the registry and in §6 below: optical
 absorption uses `(2ω/c)·Im(√ε)`; the operator-spectrum-area sum rule carries the
@@ -3149,6 +3241,24 @@ record IterativeResult {                          -- Layer 1.75 (V2-deferred)
 V1 ships Layer 1.25 wired and Layer 1.75 as type/cert scaffolding only,
 with `not-implemented-in-V1` stubs that fail loud.
 
+## 7.8 Cadence policy (cost-tier → training cadence)
+
+`sampling-policy` (§7.1) chooses *which* samples; the **cadence policy** chooses
+*how often* each generator is evaluated, binding the cost tier to the training loop
+so the expensive tiers never run per sample:
+
+| Tier | Cost | Cadence |
+|---|---|---|
+| T0 | ≤10 µs closed-form | **every SGD step** (per-sample, backprop-native) |
+| T1 | ≤10 ms small-LA / 1-D quadrature | **RAD-subsampled** (per-batch stochastic importance) |
+| T2 | ≤10 s BZ / mesh integral | **per-epoch cached** (offline reference cache per composition + `(T,P,q)` query) — e.g. `NEGF-transmission` (row 80: one linear solve per energy) |
+| T3 | ≤10 min iterative / PDE | **on-demand / calibration-only**, with a cheap T0/T1 proxy during training — e.g. `reference-phase-cache` (row 87) |
+
+Only the T0/T1 core runs on the per-sample hot path (the µs–ms class of
+`arch-07-pipeline §7.6`); T2 is on-request per-epoch; T3 is reference / calibration
+side. This is the policy that makes the always-cheap claim honest about *runtime
+cadence*, not just per-op cost.
+
 
 <a id="impl-08-cert-detail"></a>
 
@@ -3373,7 +3483,7 @@ Five sequential gates validate the built system:
 | Thermal conductivity | ~2000 W·m⁻¹K⁻¹ | the headline Cap-3 target |
 | Elastic constants | C₁₁≈1079, C₁₂≈124, C₄₄≈578 GPa | Cap-1 stability + sound velocity |
 | Polarity | **non-polar (homopolar)** | Z\*=0 by symmetry → **no LO-TO, no Fröhlich** → registry rows 17, 21, 22 excluded by applicability |
-| High-T failure | sp³→sp² (graphitization) above ~700 °C in vacuum | the diamond–graphite phase boundary is the Cap-1 thermodynamic check |
+| High-T failure | air-oxidation onset ~600–700 °C (the actual lifetime limiter); sp³→sp² graphitization only above ~1500 °C in vacuum | the diamond–graphite phase boundary is the Cap-1 thermodynamic check; oxidation is the slow-tier degradation channel (`arch-21`) |
 
 **Units.** Atomic units internally; report eV, Å, W·m⁻¹K⁻¹, cm²V⁻¹s⁻¹.
 
@@ -3474,26 +3584,29 @@ stability; one heterostructure check (c-BN on diamond) via lattice matching.*
 # In-MVP vs deferred
 
 **In the MVP**
-- ~35 named formulas (the rows above) of the 102.
+- ~35 named formulas (the rows above) of the 110.
 - 9 of the 12 methods (all but `path-search`, `convex-optimization` beyond the
   hull check, `statistical-sampling`, `microkinetic-steady-state` — chemical/MC
   machinery not on the diamond path).
 - ~9 templates of the 20.
 - Bundles B1, B2, B3, B7, B10 (+ B5 surface, B9 self-heating for two formulas) and
   the structural/thermo scalars — 5–7 of the 11.
-- Residual categories: EOM-violation, conservation, positivity, algebraic
-  identities, static-validity, thermodynamic-consistency (6 of 7; degeneracy
-  enters with full GENERIC dynamics).
-- Cert obligations 1–6 of 10.
+- Residual families exercised: micro EOM-violation, Conservation, Positivity,
+  Algebraic-identities, Static-snapshot, Static-thermodynamic. `Degeneracy` is
+  cert-only (`arch-05`, `arch-11 §11.1`); the slow/macro EOM siblings
+  (`EOM/DefectPopulation`, `EOM/Continuum`) defer with their tiers.
+- Cert obligations 1–6 **and 10** of 10 — the registration adjoint gate (10) stays
+  in the MVP (D2 gradients must be validated when the PINO first trains); only the
+  battery/topology obligations 7–9 defer.
 - Layers 1 + 1.25 (G₀W₀, QHA, DFPT) wired.
 
 **Deferred (the other ~⅔ of the spec)**
-- The remaining ~62 formulas: the defect zoo beyond row 30, surface chemistry,
+- The remaining ~75 formulas: the defect zoo beyond row 30, surface chemistry,
   interface/Schottky physics (no metal contact in the pure-diamond MVP), high-
   field / hot-carrier / breakdown, degradation, most of the topology atlas (rows
   96–102) beyond basic symmetry classification.
-- Cert obligations 7–10 (bulk-boundary, versioned battery, surrogate-net,
-  registration adjoint gate as a hard build gate).
+- Cert obligations 7–9 (bulk-boundary, versioned battery, surrogate-net). The
+  registration adjoint gate (10) is **not** deferred — see above.
 - Layer 1.75 (iterative dressing), SCPH/SSCHA, the D4 surrogate nets, the non-
   diamond materials, heterostructures beyond the single c-BN lattice-match.
 
@@ -3525,6 +3638,12 @@ The buildable unit is roughly one-third of the full vocabulary.
   with the ~10 diamond rows the MVP validates against: lattice a, indirect gap,
   C₁₁/C₁₂/C₄₄, Debye T, κ(300 K), max phonon energy, cohesive/formation energy,
   and the diamond–graphite boundary point.
+- **Design-grade accuracy targets (H8).** The MVP's headline outputs must meet
+  declared accuracy: gap ±0.15 eV post-G₀W₀, C_ij ±5%, κ(300 K) ±20%, E_form
+  ±0.2 eV, μ factor-2 (full per-observable ledger in `docs/accuracy-ledger.md`,
+  wired via `arch-11-residuals §11.7`). Cert obligation 4 checks them at the
+  battery anchors; the high-T anchors κ(773 K)/κ(1100 K) are added with the
+  4-phonon work (deferred).
 
 ---
 

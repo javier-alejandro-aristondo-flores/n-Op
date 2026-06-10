@@ -376,8 +376,8 @@ macro-emits-subgraph pattern; see `arch-09 §9.2`, `impl-03`.)
 ### 6.3 The 110 formulas — distribution (`arch-09 §9.3`, `physics/library/formulas/registry-manifest.csv`)
 
 Leaf evaluations with typed signatures, grouped into 11 bundles (B1–B11) and tagged:
-- **cost-tier:** T0 closed-form ≤ 10 µs (~50 formulas) · T1 small LA / 1-D quadrature ≤ 10 ms (~35) · T2 BZ/mesh integral ≤ 10 s (~15) · T3 self-consistent loop / PDE ≤ 10 min (~2).
-- **diff-tag:** D0 no AD (~15) · D1 analytic forward (~50) · D2 adjoint-required-and-gated (~25) · D3 implicit-function adjoint (~8) · D4 surrogate / finite-diff relaxed (~4).
+- **cost-tier:** T0 closed-form ≤ 10 µs (62 formulas) · T1 small LA / 1-D quadrature ≤ 10 ms (33) · T2 BZ/mesh integral ≤ 10 s (12) · T3 self-consistent loop / PDE ≤ 10 min (3).
+- **diff-tag:** D0 no-AD / integer-categorical (21) · D1 analytic forward (60) · D2 adjoint-required-and-gated (24) · D3 implicit-function adjoint / FD (2) · D4 surrogate / relaxation, e.g. log-sum-exp soft-hull / Gumbel-Softmax (3).
 
 ### 6.4 The dynamics, computationally (`arch-05`)
 
@@ -537,7 +537,7 @@ device-scale bridge) and normalizing the GENERIC degeneracy layer (`arch-05`). W
 **not conceptual design**:
 
 - **Formalization gaps (engineering, not design)** — researched but not yet fully machine-readable:
-  the ~80-entry observable catalog, the crystal-structure-validity residual catalog, the
+  the 52-observable (+16 FoM) catalog, the crystal-structure-validity residual catalog, the
   polarization/piezo/2DEG package, and the rest of the `B9` bundle. (The per-host defect inventory
   and degradation kinetics are now landed as the slow tier, `arch-21`.) These are *enumeration*
   tasks tracked in the audit's P0/P1 lists.

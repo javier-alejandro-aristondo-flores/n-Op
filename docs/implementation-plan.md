@@ -258,10 +258,14 @@ record FormulaRecord {
 (≤10 ms) · T2 Brillouin-zone / mesh integral (≤10 s) · T3 self-consistent loop or
 PDE solve (≤10 min).
 
-**Differentiability tags:** D0 no autodiff needed (pure read) · D1 analytic
-forward derivative · D2 adjoint required (validated at registration) · D3
-implicit-function adjoint via fixed-point linearization · D4 autodiff relaxed
-(surrogate-net bridge or finite-difference fallback, approved at registration).
+**Differentiability tags:** D0 no autodiff needed — a pure read, **or an integer /
+categorical output with no useful derivative** (topology invariants, discrete CSP
+metrics: "exception-set everywhere") · D1 analytic forward derivative · D2 adjoint
+required (validated at registration) · D3 implicit-function adjoint via fixed-point
+linearization, **or a finite-difference surrogate where there is no fixed point**
+(stated in the formula's docs) · D4 autodiff relaxed via a differentiable surrogate
+— surrogate-net bridge, **log-sum-exp soft-hull, or Gumbel-Softmax relaxation** —
+approved at registration with an obligation-9 validity domain.
 
 The corrected physics is canonical in the registry and in §6 below: optical
 absorption uses `(2ω/c)·Im(√ε)`; the operator-spectrum-area sum rule carries the
@@ -617,6 +621,24 @@ record IterativeResult {                          -- Layer 1.75 (V2-deferred)
 
 V1 ships Layer 1.25 wired and Layer 1.75 as type/cert scaffolding only,
 with `not-implemented-in-V1` stubs that fail loud.
+
+## 7.8 Cadence policy (cost-tier → training cadence)
+
+`sampling-policy` (§7.1) chooses *which* samples; the **cadence policy** chooses
+*how often* each generator is evaluated, binding the cost tier to the training loop
+so the expensive tiers never run per sample:
+
+| Tier | Cost | Cadence |
+|---|---|---|
+| T0 | ≤10 µs closed-form | **every SGD step** (per-sample, backprop-native) |
+| T1 | ≤10 ms small-LA / 1-D quadrature | **RAD-subsampled** (per-batch stochastic importance) |
+| T2 | ≤10 s BZ / mesh integral | **per-epoch cached** (offline reference cache per composition + `(T,P,q)` query) — e.g. `NEGF-transmission` (row 80: one linear solve per energy) |
+| T3 | ≤10 min iterative / PDE | **on-demand / calibration-only**, with a cheap T0/T1 proxy during training — e.g. `reference-phase-cache` (row 87) |
+
+Only the T0/T1 core runs on the per-sample hot path (the µs–ms class of
+`arch-07-pipeline §7.6`); T2 is on-request per-epoch; T3 is reference / calibration
+side. This is the policy that makes the always-cheap claim honest about *runtime
+cadence*, not just per-op cost.
 
 
 <a id="impl-08-cert-detail"></a>

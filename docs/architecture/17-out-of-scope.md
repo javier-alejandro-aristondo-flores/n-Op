@@ -22,8 +22,11 @@ Stated and held, so the architecture is honest about what it does not cover:
   modeled.
 - Deep-defect non-Markovian dynamics — Markov master-equation closure assumed.
 - Polaron localization beyond Fröhlich.
-- 4-phonon scattering, full NEGF tunneling, full SCPH/SSCHA — replaced by D4
-  surrogates or Layer-1.75 V2 scaffolding.
+- 4-phonon scattering, full NEGF tunneling, full SCPH/SSCHA — deferred to
+  Layer-1.75 V2 scaffolding. Where a cheap proxy is needed during training it is a
+  registered D4 surrogate with an obligation-9 validity domain; **no such surrogate
+  ships in V1** (the closed-form / Layer-1.25 path is used, with the accuracy regime
+  declared in the ledger, `arch-11-residuals §11.7`).
 - Plasma-process surface damage; grain-boundary statistics; continuum creep /
   dislocation climb; quantum-tunneling-corrected reaction rates (classical
   Eyring TST adequate at T_op ≥ 600 K).

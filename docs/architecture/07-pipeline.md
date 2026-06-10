@@ -126,6 +126,10 @@ upstream nodes does not collapse the leaves.
   `MethodInvoke(spectral-decomposition, …)` may be lowered to
   randomized SVD or Davidson; the BTE collision kernel
   (`MethodInvoke(kinetic-evolution, …)`) may be lowered to TT-cross.
+  **Each compression plan carries a per-plan error target** — the truncation
+  tolerance for the `LowRank`/`HODLR`/`TT` ranks — and the rank is chosen to *meet
+  that target*, not merely by structure. The target enters the per-residual error
+  budget via `Quantity.combineTol` (`arch-11-residuals §11.7`).
 - **Adjoint synthesis.** For every `MethodInvoke` whose method has
   fixed-point semantics, the **implicit-differentiation adjoint** is
   synthesized: gradient cost becomes one extra linear solve,
@@ -178,3 +182,16 @@ Environment-structural)`) keys a kernel cache. Scalar environment
 parameters that vary at training time (e.g. `T` sweeps) are passed as
 runtime inputs, not baked into the kernel; only structural changes
 trigger recompile.
+
+**Runtime cost is three-class, not one** (the "µs–ms" row above is only the
+per-sample core). Per the cadence policy (`impl-07-residual-factory §7.8`):
+
+| Class | What | Cost | Cadence |
+|---|---|---|---|
+| per-sample core | EOM-residual evaluation (T0/T1) | µs–ms | every SGD step / RAD-subsampled |
+| on-request spectral | BZ-resolved observables, full PDE residuals (T2) | 0.1–10 s | per-epoch, cached per composition |
+| per-composition reference | `E_BO`/DFPT/G₀W₀ property + reference solves (T3) | seconds–minutes | once per composition / calibration-only |
+
+The "compile seconds–minutes" figure above is the symbolic Stages 1–4; the
+per-composition *reference* solves the property observables require sit in the third
+class and are scheduled off the per-sample hot path by the cadence policy.

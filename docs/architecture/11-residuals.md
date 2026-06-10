@@ -7,6 +7,7 @@ canonical-for:
   - residual granularity discipline
   - ResidualKey / ContributionFacets schema
   - the nineteen residual categories
+  - per-residual error composition
 depends-on:
   - arch-06-physics-graph
   - arch-07-pipeline
@@ -230,3 +231,25 @@ generator's `axes`), but residual *generators* (`impl-07-residual-factory
 §7.1`) remain countable: one per `(formula, applicability cell)` plus
 the cert-only and ground-truth-bridge subtypes. The closed-vocabulary
 discipline (`arch-09-vocabularies`) holds at the generator level.
+
+## 11.7 Per-residual error composition (the accuracy ledger)
+
+Every `ResidualGenerator` (`impl-07-residual-factory §7.1`) carries a
+`characteristic-scale : σ` — the target accuracy of its observable, seeded from the
+**per-observable accuracy ledger** (`docs/accuracy-ledger.md`, restored from the
+research catalog). `σ` is a *declared scale*, not a fitted weight: it is the
+error-model input that `arch-10-typeclasses` `Quantity.combineTol` composes along the
+DAG (per-instance max-abs or RSS) into a per-`ResidualKey` error budget. The budget
+sums the contributing terms — input `σ`, **model-form error** (RTA/3-ph, compact
+models, QHA), **Stage-4 compression truncation** (the per-plan error target,
+`arch-07-pipeline §7.4`), **dressing staleness** (frozen Layer-1.25 one-shots), and
+**coefficient-provenance `σ`** (`arch-19-coupling-structure §19.8`) — so "is this
+closed-form choice accurate enough?" is answerable *by the system*, not only by
+external judgment.
+
+The MVP headline design-grade targets (gap ±0.15 eV post-G₀W₀, C_ij ±5%, κ(300 K)
+±20%, E_form ±0.2 eV, μ factor-2) and the full 52-observable ledger live in
+`docs/accuracy-ledger.md`; the reference battery (cert obligation 4, `arch-12 §12.1`)
+checks them at the MVP anchors. Every numeric tolerance named across `/physics`
+(`τ_adj`, `δ_sym`, `δ_PSD`, `τ_SCF,*`, `τ_method`, `δ_surrogate`) is valued once in the
+**tolerance ledger** (`arch-12 §12.0.2`).

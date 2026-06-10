@@ -23,7 +23,7 @@ research-sources: []
 | Thermal conductivity | ~2000 W·m⁻¹K⁻¹ | the headline Cap-3 target |
 | Elastic constants | C₁₁≈1079, C₁₂≈124, C₄₄≈578 GPa | Cap-1 stability + sound velocity |
 | Polarity | **non-polar (homopolar)** | Z\*=0 by symmetry → **no LO-TO, no Fröhlich** → registry rows 17, 21, 22 excluded by applicability |
-| High-T failure | sp³→sp² (graphitization) above ~700 °C in vacuum | the diamond–graphite phase boundary is the Cap-1 thermodynamic check |
+| High-T failure | air-oxidation onset ~600–700 °C (the actual lifetime limiter); sp³→sp² graphitization only above ~1500 °C in vacuum | the diamond–graphite phase boundary is the Cap-1 thermodynamic check; oxidation is the slow-tier degradation channel (`arch-21`) |
 
 **Units.** Atomic units internally; report eV, Å, W·m⁻¹K⁻¹, cm²V⁻¹s⁻¹.
 

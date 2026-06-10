@@ -28,7 +28,7 @@
 | Thermal conductivity | ~2000 W·m⁻¹K⁻¹ | the headline Cap-3 target |
 | Elastic constants | C₁₁≈1079, C₁₂≈124, C₄₄≈578 GPa | Cap-1 stability + sound velocity |
 | Polarity | **non-polar (homopolar)** | Z\*=0 by symmetry → **no LO-TO, no Fröhlich** → registry rows 17, 21, 22 excluded by applicability |
-| High-T failure | sp³→sp² (graphitization) above ~700 °C in vacuum | the diamond–graphite phase boundary is the Cap-1 thermodynamic check |
+| High-T failure | air-oxidation onset ~600–700 °C (the actual lifetime limiter); sp³→sp² graphitization only above ~1500 °C in vacuum | the diamond–graphite phase boundary is the Cap-1 thermodynamic check; oxidation is the slow-tier degradation channel (`arch-21`) |
 
 **Units.** Atomic units internally; report eV, Å, W·m⁻¹K⁻¹, cm²V⁻¹s⁻¹.
 
@@ -129,26 +129,29 @@ stability; one heterostructure check (c-BN on diamond) via lattice matching.*
 # In-MVP vs deferred
 
 **In the MVP**
-- ~35 named formulas (the rows above) of the 102.
+- ~35 named formulas (the rows above) of the 110.
 - 9 of the 12 methods (all but `path-search`, `convex-optimization` beyond the
   hull check, `statistical-sampling`, `microkinetic-steady-state` — chemical/MC
   machinery not on the diamond path).
 - ~9 templates of the 20.
 - Bundles B1, B2, B3, B7, B10 (+ B5 surface, B9 self-heating for two formulas) and
   the structural/thermo scalars — 5–7 of the 11.
-- Residual categories: EOM-violation, conservation, positivity, algebraic
-  identities, static-validity, thermodynamic-consistency (6 of 7; degeneracy
-  enters with full GENERIC dynamics).
-- Cert obligations 1–6 of 10.
+- Residual families exercised: micro EOM-violation, Conservation, Positivity,
+  Algebraic-identities, Static-snapshot, Static-thermodynamic. `Degeneracy` is
+  cert-only (`arch-05`, `arch-11 §11.1`); the slow/macro EOM siblings
+  (`EOM/DefectPopulation`, `EOM/Continuum`) defer with their tiers.
+- Cert obligations 1–6 **and 10** of 10 — the registration adjoint gate (10) stays
+  in the MVP (D2 gradients must be validated when the PINO first trains); only the
+  battery/topology obligations 7–9 defer.
 - Layers 1 + 1.25 (G₀W₀, QHA, DFPT) wired.
 
 **Deferred (the other ~⅔ of the spec)**
-- The remaining ~62 formulas: the defect zoo beyond row 30, surface chemistry,
+- The remaining ~75 formulas: the defect zoo beyond row 30, surface chemistry,
   interface/Schottky physics (no metal contact in the pure-diamond MVP), high-
   field / hot-carrier / breakdown, degradation, most of the topology atlas (rows
   96–102) beyond basic symmetry classification.
-- Cert obligations 7–10 (bulk-boundary, versioned battery, surrogate-net,
-  registration adjoint gate as a hard build gate).
+- Cert obligations 7–9 (bulk-boundary, versioned battery, surrogate-net). The
+  registration adjoint gate (10) is **not** deferred — see above.
 - Layer 1.75 (iterative dressing), SCPH/SSCHA, the D4 surrogate nets, the non-
   diamond materials, heterostructures beyond the single c-BN lattice-match.
 
@@ -180,6 +183,12 @@ The buildable unit is roughly one-third of the full vocabulary.
   with the ~10 diamond rows the MVP validates against: lattice a, indirect gap,
   C₁₁/C₁₂/C₄₄, Debye T, κ(300 K), max phonon energy, cohesive/formation energy,
   and the diamond–graphite boundary point.
+- **Design-grade accuracy targets (H8).** The MVP's headline outputs must meet
+  declared accuracy: gap ±0.15 eV post-G₀W₀, C_ij ±5%, κ(300 K) ±20%, E_form
+  ±0.2 eV, μ factor-2 (full per-observable ledger in `docs/accuracy-ledger.md`,
+  wired via `arch-11-residuals §11.7`). Cert obligation 4 checks them at the
+  battery anchors; the high-T anchors κ(773 K)/κ(1100 K) are added with the
+  4-phonon work (deferred).
 
 ---
 

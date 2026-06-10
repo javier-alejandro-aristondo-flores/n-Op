@@ -5,28 +5,29 @@ operator model developed in this repository — is designed to simulate.
 The categories below define the target scope: any quantity a user might
 ask the model to predict should fall into one of them.
 
-## Property → bundle → formula map
+## Property → bundle map
 
-Each category projects onto one or more typed observable bundles
-(`B1..B11`, defined in `architecture/09-vocabularies.md`); each bundle
-is realized by a contiguous range of rows in
-`physics/library/formulas/registry-manifest.csv`.
+Each property category projects onto one or more of the **canonical observable
+bundles** `B1..B11` (defined in `architecture/09-vocabularies.md §9.4`). The
+**authoritative per-formula bundle assignment is the `Bundle` column of**
+`physics/library/formulas/registry-manifest.csv`; the table below is the
+category→bundle overview only (it does not re-define bundle semantics).
 
-| Category | Bundles | Formula rows |
-|---|---|---|
-| 1. Structural | `B1` (lattice / structure), `B6` (defects / surfaces) | rows 1–14, 65–78 |
-| 2. Electronic | `B2` (band structure / DOS), `B11` (topology atlas) | rows 15–26, 95–104 |
-| 3. Optical | `B3` (dielectric / optical) | rows 27–34, 88–94 |
-| 4. Mechanical | `B4` (elastic / mechanical) | rows 35–42 |
-| 5. Thermal | `B5` (phonons / thermal) | rows 43–54 |
-| 6. Magnetic | `B7` (magnetic) | rows 55–60 |
-| 7. Transport / diffusion | `B8` (transport / kinetic) | rows 61–70 |
-| 8. Thermodynamic | `B9` (thermodynamic / phase) | rows 71–84 |
-| 9. Chemical / surface | `B10` (chemical / surface) | rows 79–87 |
+| Property category | Canonical bundles (`arch-09 §9.4`) |
+|---|---|
+| 1. Structural | `B10` static-validity, `B4` defect-resolved, `B5` surface-resolved |
+| 2. Electronic | `B1` electronic-structure |
+| 3. Optical | `B1` electronic-structure (linear-response / dielectric rows) |
+| 4. Mechanical | `B7` mechanics |
+| 5. Thermal | `B2` phonon, `B8` thermodynamics |
+| 6. Magnetic | — (mean-field `γ̂`; no dedicated UWBG bundle) |
+| 7. Transport / diffusion | `B3` transport, `B9` non-equilibrium |
+| 8. Thermodynamic | `B8` thermodynamics |
+| 9. Chemical / surface | `B5` surface-resolved, `B6` interface-resolved, `B11` degradation |
 
-Row ranges are indicative groupings over the 102-row registry; the
-canonical mapping per formula is the `Bundle` column in
-`registry-manifest.csv`.
+(The earlier `B1..B11` labels in this file were a stale pre-canon scheme — e.g.
+`B11`="topology atlas" — superseded by the `arch-09 §9.4` canon, where
+`B11`=degradation.)
 
 ### 1. Structural properties
 

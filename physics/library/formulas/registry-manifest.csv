@@ -43,7 +43,7 @@
 42,mass-action-defect-complex,"`(c_A, c_B, K_eq(T)) → c_AB`",B4,T0,D1,cheap,S2,"populations, K_eq"
 43,debye-screening-defect-defect,"`(c_def, T, ε) → λ_D`",B4,T0,D1,cheap,S3,"c_def, T, ε"
 44,surface-grand-potential-γ,"`(E_slab, μ_env, area) → γ(term,μ)`",B5,T1,D2,cheap,S2+S3,"slab energy, μ_env"
-45,wulff-shape,`(γ(hkl)) → polyhedron`,B5,T1,D3,faithful,S1,γ
+45,wulff-shape,`(γ(hkl)) → polyhedron`,B5,T1,D4,faithful,S1 (soft-hull log-sum-exp),γ
 46,termination-stability-window,"`(γ(term, μ_H,μ_O)) → phase-diagram`",B5,T1,D2,cheap,S3,γ family
 47,schottky-mott-alignment,"`(W_m, χ_s) → φ_B`",B6,T0,D1,cheap,S2+S3,"work-fn, affinity"
 48,MIGS-corrected-barrier,"`(W_m, χ_s, S, φ_CNL) → φ_B_eff`",B6,T0,D1,cheap,S3,"Schottky-Mott, S, φ_CNL"
@@ -65,7 +65,7 @@
 64,piezoresistance-coeff,"`(σ(ε), ε) → π_ij`",B7/B3,T1,D1,cheap,S4,"σ, strain"
 65,gibbs-free-energy-phase,"`(E_0, ω(q), T, P) → G(T,P)`",B8,T1,D2,cheap,S1,"E_0, phonons"
 66,chemical-potential-ref-table,"`(species, T, P) → μ_i`",B8,T0,D0,cheap,S2+S3,ref-cache lookup
-67,phase-diagram-convex-hull,"`(G_phases(μ,T)) → hull`",B8,T1,D3,faithful,S1,G
+67,phase-diagram-convex-hull,"`(G_phases(μ,T)) → hull`",B8,T1,D4,faithful,S1 (soft-min hull log-sum-exp),G
 68,clausius-clapeyron-boundary,"`(ΔH, ΔV) → dP/dT`",B8,T0,D1,cheap,S1,thermo
 69,maxwell-relation-residual,"`(∂μ_i/∂T, ∂S/∂N_i) → ‖Δ‖`",B8,T0,D1,cheap,S5,thermo derivatives
 70,self-heating-T_op,"`(P_diss, R_th, T_amb) → T_op`",B9,T0,D1,cheap,S1,"dissipation, R_th"
@@ -83,7 +83,7 @@
 82,black-electromigration-MTTF,"`(j, E_a, T, n) → MTTF`",B11,T0,D1,cheap,S3,"j, T"
 83,coffin-manson-fatigue,"`(Δε_p, c) → N_f`",B11,T0,D1,cheap,S3,thermal cycling
 84,cluster-expansion-energy,"`(ECI, σ-config) → E_CE`",B4/B8,T1,D4,cheap,S2,"ECI cache, config"
-85,structure-uniqueness-CSP,"`(structure, set) → bool + d`",B10,T1,D3,cheap,S2,structure set
+85,structure-uniqueness-CSP,"`(structure, set) → bool + d`",B10,T1,D0,cheap,S2 (discrete metric; exception-set everywhere),structure set
 86,bi-slab-grand-potential,"`(slab_A, slab_B, μ_env) → Ω`",B5/B6,T1,D2,cheap,S2,"slabs, μ"
 87,reference-phase-energy-cache,`(phase-id) → E_ref`,B8,T3,D0,faithful,S2+S3,DFT battery
 88,long-range-coulomb-directional-limit-correction,"`(D(q), q̂, Z*, ε∞, Ω) → D_NA(q)`",B2,T1,D2,faithful,"extension (a.k.a. Pick-Cochran-Martin / Gonze-Lee)","Z*, ε∞ (L1 primitives)"
@@ -97,9 +97,9 @@
 96,symmetry-classification-group-via-snf,"`(SG_number, AZ_class) → AbelianGroup`",B1/B11,T1,D0,cheap,"topology atlas (X_BS; SNF on orbit-rep matrix)","SG, AZ class"
 97,symmetry-orbit-representation-matrix,"`(SG, [site-orbit], [orbital]) → IntMatrix`",B1,T1,D0,cheap,"topology atlas (a.k.a. EBR / band-representation matrix)","SG, orbits, orbital basis"
 98,irrep-compatibility-matrix,"`(SG, high-sym-momenta) → IntMatrix`",B1,T0,D0,cheap,"topology atlas (compatibility relations)",SG
-99,first-band-invariant-from-eigenstate-grid,"`(eigenstates_on_grid) → Integer`",B1,T2,D3,faithful,"topology atlas (a.k.a. Chern number)",eigenstate grid
-100,binary-invariant-with-symmetry-from-eigenstate-grid,"`(eigenstates_on_grid, antiunitary_op) → ℤ₂`",B1,T2,D3,faithful,"topology atlas (a.k.a. Z₂ invariant)","eigenstates, antiunitary"
-101,holonomy-spectrum-on-loop,"`(eigenstates_on_loop) → [phase]`",B1,T2,D3,faithful,"topology atlas (a.k.a. Wilson loop spectrum)",eigenstates on loop
+99,first-band-invariant-from-eigenstate-grid,"`(eigenstates_on_grid) → Integer`",B1,T2,D0,faithful,"topology atlas (a.k.a. Chern number; integer, no derivative)",eigenstate grid
+100,binary-invariant-with-symmetry-from-eigenstate-grid,"`(eigenstates_on_grid, antiunitary_op) → ℤ₂`",B1,T2,D0,faithful,"topology atlas (a.k.a. Z₂ invariant; integer, no derivative)","eigenstates, antiunitary"
+101,holonomy-spectrum-on-loop,"`(eigenstates_on_loop) → [phase]`",B1,T2,D0,faithful,"topology atlas (a.k.a. Wilson loop spectrum; phases, no useful gradient)",eigenstates on loop
 102,boundary-mode-multiplicity-from-classification,"`(X_BS_element, boundary_orientation) → Integer`",B5,T1,D0,cheap,"topology atlas (indicator-factor → boundary-state lookup)","X_BS element, boundary orientation"
 103,F-equals-minus-grad-E,"(architectural — autodiff, NOT residualized)",—,—,—,—,S5,(rejected per S5)
 104,equivariance,"(architectural — by construction, NOT residualized)",—,—,—,—,S5,(rejected per S5)

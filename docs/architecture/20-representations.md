@@ -89,7 +89,8 @@ output.
 
 ## 20.2 The parametric op-signature family
 
-Three op signatures cover every Merkle DAG instance in `/physics`:
+Four op signatures parameterize the Merkle DAG instances in `/physics` (a fourth,
+`GroupOps`, is added below). Three cover the general expression DAGs:
 
 - **`PredicateOps`** — ROBDD reduced ordered Boolean ops over typed
   parameterized atoms drawn from a C1 vocabulary. Atom order is part of
@@ -211,7 +212,8 @@ property of the universe, not of an individual sparse set.
   `EvidenceId`, never duplicated into a sidecar payload.
 - **Three separate Merkle infrastructures.** `InvariantTerm` symbolic
   forms, applicability ROBDDs, and the evidence attestation DAG share
-  one `MerkleDAG[S, L]` substrate with three op signatures.
+  one `MerkleDAG[S, L]` substrate, each with its own op signature (three of the
+  four of §20.2; `GroupOps` is the group-algebra fourth).
 - **PhysicsGraph as a special object.** The graph is the closure of its
   output addresses under children-pointers. Edges are not separately
   identified; argument-list addresses inside the node payload are the

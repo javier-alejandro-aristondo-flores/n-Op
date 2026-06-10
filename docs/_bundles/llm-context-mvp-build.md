@@ -29,7 +29,7 @@
 | Thermal conductivity | ~2000 W·m⁻¹K⁻¹ | the headline Cap-3 target |
 | Elastic constants | C₁₁≈1079, C₁₂≈124, C₄₄≈578 GPa | Cap-1 stability + sound velocity |
 | Polarity | **non-polar (homopolar)** | Z\*=0 by symmetry → **no LO-TO, no Fröhlich** → registry rows 17, 21, 22 excluded by applicability |
-| High-T failure | sp³→sp² (graphitization) above ~700 °C in vacuum | the diamond–graphite phase boundary is the Cap-1 thermodynamic check |
+| High-T failure | air-oxidation onset ~600–700 °C (the actual lifetime limiter); sp³→sp² graphitization only above ~1500 °C in vacuum | the diamond–graphite phase boundary is the Cap-1 thermodynamic check; oxidation is the slow-tier degradation channel (`arch-21`) |
 
 **Units.** Atomic units internally; report eV, Å, W·m⁻¹K⁻¹, cm²V⁻¹s⁻¹.
 
@@ -148,6 +148,12 @@ stability; one heterostructure check (c-BN on diamond) via lattice matching.*
   with the ~10 diamond rows the MVP validates against: lattice a, indirect gap,
   C₁₁/C₁₂/C₄₄, Debye T, κ(300 K), max phonon energy, cohesive/formation energy,
   and the diamond–graphite boundary point.
+- **Design-grade accuracy targets (H8).** The MVP's headline outputs must meet
+  declared accuracy: gap ±0.15 eV post-G₀W₀, C_ij ±5%, κ(300 K) ±20%, E_form
+  ±0.2 eV, μ factor-2 (full per-observable ledger in `docs/accuracy-ledger.md`,
+  wired via `arch-11-residuals §11.7`). Cert obligation 4 checks them at the
+  battery anchors; the high-T anchors κ(773 K)/κ(1100 K) are added with the
+  4-phonon work (deferred).
 
 ---
 
@@ -329,6 +335,24 @@ record IterativeResult {                          -- Layer 1.75 (V2-deferred)
 
 V1 ships Layer 1.25 wired and Layer 1.75 as type/cert scaffolding only,
 with `not-implemented-in-V1` stubs that fail loud.
+
+## 7.8 Cadence policy (cost-tier → training cadence)
+
+`sampling-policy` (§7.1) chooses *which* samples; the **cadence policy** chooses
+*how often* each generator is evaluated, binding the cost tier to the training loop
+so the expensive tiers never run per sample:
+
+| Tier | Cost | Cadence |
+|---|---|---|
+| T0 | ≤10 µs closed-form | **every SGD step** (per-sample, backprop-native) |
+| T1 | ≤10 ms small-LA / 1-D quadrature | **RAD-subsampled** (per-batch stochastic importance) |
+| T2 | ≤10 s BZ / mesh integral | **per-epoch cached** (offline reference cache per composition + `(T,P,q)` query) — e.g. `NEGF-transmission` (row 80: one linear solve per energy) |
+| T3 | ≤10 min iterative / PDE | **on-demand / calibration-only**, with a cheap T0/T1 proxy during training — e.g. `reference-phase-cache` (row 87) |
+
+Only the T0/T1 core runs on the per-sample hot path (the µs–ms class of
+`arch-07-pipeline §7.6`); T2 is on-request per-epoch; T3 is reference / calibration
+side. This is the policy that makes the always-cheap claim honest about *runtime
+cadence*, not just per-op cost.
 
 
 <a id="impl-10-build-sequence"></a>

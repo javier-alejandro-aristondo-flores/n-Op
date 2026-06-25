@@ -19,8 +19,8 @@
 
 **Scoring, Not Solving: a verification oracle for materials physics**
 
-- Subtitle: *It is harder to solve a problem than to verify a solution — so we built the
-  verifier.*
+- Subtitle: *It is harder to solve a problem than to verify a solution — so verification is
+  what has been built.*
 - One line of stakes: the target application is designing **durable ultra-wide-bandgap
   devices** for harsh operating conditions.
 
@@ -40,9 +40,8 @@
   physical state; it grades a state it is handed.
 - The whole system is engineered to make *checking* fast, exhaustive, and trustworthy.
 
-> **Speaker note.** This is the organizing idea. Say explicitly: "I'll come back to this five
-> times." Everything downstream (compiler, types, AD) is in service of cheap, trustworthy
-> checking.
+> **Speaker note.** This is the organizing idea; flag that it returns five times. Everything
+> downstream (compiler, types, AD) is in service of cheap, trustworthy checking.
 
 ---
 
@@ -52,14 +51,14 @@
 
 - Contract, side by side:
   - **Solver:** search the space for an `x` with `F(x) = 0`. Expensive, iterative, global.
-  - **Oracle (`/physics`):** take the `x` you're handed, return `‖F(x)‖` + a cert. Local, direct.
+  - **Oracle (`/physics`):** take the `x` it is handed, return `‖F(x)‖` + a cert. Local, direct.
 - "`/physics` is a pure oracle" — it owns no training loop and no sample-selection logic
   (`arch-01-purpose §72–75`).
 - The scoring principle holds at **every length-and-time scale** — femtoseconds to years, atom
   to device (`arch-21-multiscale-state §87–88`).
 
 > **Speaker note.** The candidate state comes from a learned model (the neural operator) — but
-> that's another talk. Here the operator is just "whoever hands us an `x`." Keep the focus on
+> that's another talk. Here the operator is just "whoever supplies an `x`." Keep the focus on
 > the oracle's one job. Slides 4–5 show how cheap and how trustworthy that one job is.
 
 ---
@@ -82,7 +81,7 @@
 
 > **Speaker note.** This slide is the thesis made quantitative. The four-orders-of-magnitude gap
 > between "check it" (µs) and "solve it" (min) is the entire reason a learning loop is feasible:
-> you can afford to grade millions of candidates.
+> millions of candidates can be graded.
 
 ---
 
@@ -103,14 +102,14 @@
   (`arch-12-cert §24–40`).
 
 > **Speaker note.** Emphasize *independently checkable*: the cert is inert data, so a third party
-> (or a future you) can re-verify a result without re-running the oracle — the claim comes with
-> its receipt.
+> (or an auditor later) can re-verify a result without re-running the oracle — the claim comes
+> with its receipt.
 
 ---
 
 ## Slide 6 — Physics as a formal language I: the alphabet and grammar
 
-**The physics we score is a closed formal language.**
+**The physics being scored is a closed formal language.**
 
 - Closed vocabularies — a finite alphabet (`arch-09-vocabularies`):
   - 12 computational **methods** (+3 sub-methods)

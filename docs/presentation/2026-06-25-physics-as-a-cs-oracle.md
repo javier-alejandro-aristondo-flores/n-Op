@@ -3,17 +3,15 @@
 > **Slide-deck outline.** One block per slide: title, on-slide content, and a speaker note.
 > Ready to drop into Beamer / reveal.js / PowerPoint. This is a **presentation artifact**, a
 > hand-written companion to the spec — **not** part of the lint-enforced atomic tree (like
-> `docs/accuracy-ledger.md` and `docs/computational-overview.md`). Every CS claim cites its
+> `docs/accuracy-ledger.md` and `docs/computational-overview.md`). Every claim cites its
 > canonical `arch-xx` / `impl-xx` source so a skeptic can verify rather than take it on faith.
 >
-> **Audience.** General-technical — engineers, materials scientists, physicists. The presenter
-> is the room's only computer scientist; the deck's job is to make the computer science the
-> visible, load-bearing contribution.
+> **Audience.** General-technical — engineers, materials scientists, physicists.
 >
-> **Spine.** *Verifying a solution is cheaper than producing one.* `/physics` is an **oracle**
-> that grades a candidate state. Every CS technique in the deck — a compiler, a type system,
-> content addressing, automatic differentiation, a decidable grammar — makes that grading fast,
-> exhaustive, and trustworthy. We return to the spine in slides 2, 4, 9, 12, and 14.
+> **Through-line.** *Verifying a solution is cheaper than producing one.* `/physics` is an
+> **oracle** that grades a candidate state; a compiler, a type system, content addressing,
+> automatic differentiation, and a decidable grammar make that grading fast, exhaustive, and
+> trustworthy. The through-line recurs in slides 2, 4, 9, 12, and 14.
 
 ---
 
@@ -24,11 +22,10 @@
 - Subtitle: *It is harder to solve a problem than to verify a solution — so we built the
   verifier.*
 - One line of stakes: the target application is designing **durable ultra-wide-bandgap
-  semiconductor devices** for harsh environments (>500 °C, high field).
-- Pivot line: *This talk is about the computer science that makes that design loop possible.*
+  devices** for harsh operating conditions.
 
-> **Speaker note.** Set expectations in the first 20 seconds: the physics is the *domain*, but
-> the talk is a CS talk. Promise one organizing idea (the next slide) and tell them it recurs.
+> **Speaker note.** Set the organizing idea up front: solving is expensive, checking is cheap,
+> and the whole system is built on that gap. Promise it recurs (the next slide states it).
 
 ---
 
@@ -73,15 +70,15 @@
 
 - The four cost tiers (`impl-07-residual-factory §175–191`):
 
-  | Tier | Budget | Cadence | Example |
+  | Tier | Budget | Cadence | Shape of the work |
   |---|---|---|---|
-  | **T0** | ≤ 10 µs, closed-form | every gradient step | algebraic law residuals |
-  | **T1** | ≤ 10 ms, small linear algebra / 1-D quadrature | per batch (importance-sampled) | response functions |
-  | **T2** | ≤ 10 s, Brillouin-zone / mesh integral | per epoch (cached) | transmission spectra |
-  | **T3** | ≤ 10 min, iterative / PDE | calibration only | full transport solves |
+  | **T0** | ≤ 10 µs, closed-form | every gradient step | a few arithmetic ops |
+  | **T1** | ≤ 10 ms, small linear algebra / 1-D quadrature | per batch (importance-sampled) | a small dense solve |
+  | **T2** | ≤ 10 s, bounded integral over a fixed grid | per epoch (cached) | a sweep over a fixed mesh |
+  | **T3** | ≤ 10 min, iterative solve / PDE | calibration only | a fixed-point loop to convergence |
 
-- The corresponding *solve* (a full BTE / NEGF / SCF run) is the **T3** rung — minutes. The
-  oracle keeps scoring on the **T0/T1** rungs, "fast by construction" (`arch-07-pipeline §28–32`).
+- The corresponding *solve* — a full iterative loop from scratch — is the **T3** rung, minutes.
+  The oracle keeps scoring on the **T0/T1** rungs, "fast by construction" (`arch-07-pipeline §28–32`).
 
 > **Speaker note.** This slide is the thesis made quantitative. The four-orders-of-magnitude gap
 > between "check it" (µs) and "solve it" (min) is the entire reason a learning loop is feasible:
@@ -96,18 +93,18 @@
 - "The certificate emitted for any prediction is an inert s-expression carrying scalar verdicts
   plus numeric witnesses for failures" (`arch-12-cert §19–22`). This *is* an NP-style
   certificate: cheap to check, carries its own evidence.
-- A failure carries a **witness** — the exact offending data, e.g. a `(P_sp, e₃₁)` coefficient
-  pair or a `(row 120, row 63, observable)` triple (`arch-12-cert §109–119`).
+- A failure carries a **witness** — the exact offending input, e.g. the pair of values that
+  broke a consistency rule (`arch-12-cert §109–119`).
 - Verdicts combine by a **semilattice meet**: the composition passes only if every obligation
   leaf passes; one `Failed` leaf makes the whole verdict `Failed` (`impl-07-residual-factory §56–60`).
-  Lattice theory, used by name.
+  A standard lattice fold.
 - Ten obligations checked: symmetry, bounds, analytic limits, reference battery, conservation,
   consistency, bulk-boundary correspondence, versioning, surrogate validity, adjoint existence
   (`arch-12-cert §24–40`).
 
 > **Speaker note.** Emphasize *independently checkable*: the cert is inert data, so a third party
-> (or a future you) can re-verify a result without re-running the oracle. This is how you earn
-> trust from a room of physicists — the claim comes with its receipt.
+> (or a future you) can re-verify a result without re-running the oracle — the claim comes with
+> its receipt.
 
 ---
 
@@ -124,9 +121,9 @@
 - Why *closed* earns its keep: a finite, decidable grammar means the set of well-formed
   questions is **enumerable and exhaustive** — *"there should be no more questions one can ask."*
 
-> **Speaker note.** Materials scientists expect an open-ended pile of formulas. The CS move is to
-> close the set and make composition the only growth mechanism — that's what makes exhaustiveness
-> a provable property rather than an aspiration.
+> **Speaker note.** An open-ended pile of formulas can never be "complete." Closing the set and
+> making composition the only growth mechanism is what turns exhaustiveness into a provable
+> property rather than an aspiration.
 
 ---
 
@@ -158,16 +155,15 @@
   | Stage | Compiler analogue | What happens |
   |---|---|---|
   | **1 Symbolic lift** | parse / front-end | instantiate templates → initial typed graph (`§7.1`) |
-  | **2 Symmetry quotient** | domain optimization pass | irrep block-diagonalization; IBZ orbit collapse — *up to 48× fewer k-points* (`§7.2`) |
-  | **2.5 Invariant synthesis** | semantic analysis | build the symmetry-adapted basis (`§7.2.5`) |
+  | **2 Symmetry quotient** | domain optimization pass | a rewrite that collapses equivalent work — *up to 48× smaller problem* (`§7.2`) |
+  | **2.5 Invariant synthesis** | semantic analysis | build a reduced basis fixed by the problem's symmetry group (`§7.2.5`) |
   | **3 Algebraic simplification** | classic IR optimization | **hash-consing**, **cross-formula CSE**, **tearing / alias elimination** (`§7.3`) |
   | **4 Lowering + adjoint synthesis** | codegen + register allocation | choose compression plans, synthesize adjoints, emit kernel (`§7.4`) |
   | **5 Runtime kernel** | the compiled executable | straight-line numeric code; all symbolic work already resolved (`§7.5`) |
 
-> **Speaker note.** This is the "I built a compiler for physics" slide — land it. The named
-> optimizations (CSE, hash-consing, lowering) are the same ones in GCC/LLVM; here they run over
-> physics expressions. Stage 2's symmetry pass is the one *domain-specific* optimization, and it
-> buys a 48× constant factor for free.
+> **Speaker note.** Land the compiler framing here. The named optimizations (CSE, hash-consing,
+> lowering) are the same ones in GCC/LLVM, running over physics expressions. Stage 2's symmetry
+> pass is the one domain-specific optimization, and it buys a 48× constant factor for free.
 
 ---
 
@@ -183,33 +179,34 @@
 - This is *why* checking is cheap (slide 4): the system residualizes the physics once and then
   evaluates the residual forever.
 
-> **Speaker note.** Connect back to the spine explicitly: the µs cost on slide 4 isn't luck, it's
-> the payoff of staging. Partial evaluation is a recognizable CS technique (Futamura, staged
-> metaprogramming) — name it so the CS audience clocks the rigor.
+> **Speaker note.** Connect back to the through-line: the µs cost on slide 4 isn't luck, it's the
+> payoff of staging. This is partial evaluation / staged metaprogramming (Futamura) applied to
+> physics — the symbolic work is specialized away once, then never paid again.
 
 ---
 
-## Slide 10 — A type system, and real categorical structure
+## Slide 10 — A type system over the quantities
 
-**Four orthogonal typeclasses give every quantity a type; the algebra is genuine.**
+**Four orthogonal typeclasses give every quantity a type, and the checkers dispatch on it.**
 
 - Four Layer-0 typeclasses — orthogonal axes every output is typed against (`arch-10-typeclasses`):
   - `Quantity` (value / units) · `Sampleable` (shape / domain) ·
     `HasAnalyticStructure` (constraint / law) · `DiscreteStructure` (combinatorial invariant).
 - Cert checkers are "generic functions over the typeclasses" (`arch-12-cert §45–50`) —
   typeclass-dispatched parametric polymorphism: one checker per axis, reused across all physics.
-- The category theory is real and load-bearing, not decoration:
+- The same axes carry the algebraic structure that makes composition lawful:
   - cert obligation 7 is a "`DiscreteStructure` morphism" mapping bulk classification to boundary
     states (`arch-12-cert §31–34`);
   - `SymbolicTensorOps` forms a "colored-operad / free symmetric monoidal category"
     (`arch-20-representations §98–103`) — composition *is* operadic substitution;
-  - the Reynolds projector `P = (1/|G|) Σ_g ρ(g)` maps representations to their invariant
-    subspaces and **provably preserves positive-semidefiniteness** (`arch-19-coupling-structure`).
+  - the Reynolds projector `P = (1/|G|) Σ_g ρ(g)` maps each input onto the subspace its symmetry
+    group fixes, and **provably preserves a matrix invariant** (positive-semidefiniteness) that
+    downstream code relies on (`arch-19-coupling-structure`).
 
-> **Speaker note.** State precisely what each structure *buys*: the typeclasses buy generic
-> checkers (write once, dispatch everywhere); the operad buys lawful composition; the Reynolds
-> projector buys a provable physical guarantee (a PSD dissipation operator). That's how the rigor
-> reads as substance to engineers, not as jargon.
+> **Speaker note.** State what each structure *buys*: the typeclasses buy generic checkers
+> (write once, dispatch everywhere); the operad buys lawful composition; the projector buys a
+> guarantee that holds by construction (the assembled matrix stays positive-semidefinite). The
+> payoff is the point, not the vocabulary.
 
 ---
 
@@ -235,8 +232,8 @@
 
 **The oracle returns gradients, not just scores — cheaply.**
 
-- Stage 5 emits **cotangents** (`∂R/∂x̂`) alongside residuals — reverse-mode AD built into the
-  kernel.
+- Stage 5 emits **gradients** (`∂R/∂x̂`) alongside the residuals — reverse-mode AD built into
+  the kernel.
 - The **implicit-function-theorem adjoint** makes the gradient of a fixed-point solve cost "one
   extra linear solve, independent of forward iteration count" (`arch-07-pipeline §133–137`) —
   another instance of the verify-cheap asymmetry, now for derivatives.
@@ -269,11 +266,11 @@
 
 ---
 
-## Slide 14 — Why the computer science is the contribution
+## Slide 14 — Where each guarantee comes from
 
-**Every guarantee the domain cares about is delivered by a CS construct.**
+**Each property the system promises traces to one mechanism.**
 
-| The physicists want… | …delivered by |
+| Guarantee | Comes from |
 |---|---|
 | **Speed** (millions of evaluations) | staged compilation + the verify < solve asymmetry |
 | **Exhaustiveness** ("no more questions") | a closed grammar + decidable applicability |
@@ -281,10 +278,10 @@
 | **Composability** (new observables for free) | an AST with a type system |
 | **Gradients** (a learning loop) | first-class AD + implicit-function adjoints |
 
-- Closing line: *The physics is the domain; the computer science is what makes it a system.*
+- Closing line: *The physics is the domain; the machinery above is what makes it a system.*
 
-> **Speaker note.** This is the slide that answers "what did the computer scientist add?" — point
-> at each row. End on the closing line and stop; let it sit.
+> **Speaker note.** Point at each row: the promise on the left, the one mechanism that delivers
+> it on the right. End on the closing line and stop; let it sit.
 
 ---
 
@@ -305,9 +302,9 @@ Held in reserve for domain-expert questions:
 
 ---
 
-## Appendix — CS concept → where it lives (citation map)
+## Appendix — Concept → where it lives (citation map)
 
-| CS concept | In `/physics` | Cite |
+| Concept | In `/physics` | Cite |
 |---|---|---|
 | NP certificate / verify < solve | the cert + the scoring principle (grade the candidate) | `arch-12`, `arch-01`, `arch-21` |
 | Complexity tiers of checking | cadence T0–T3 | `impl-07 §175–191` |
@@ -319,5 +316,5 @@ Held in reserve for domain-expert questions:
 | Category theory (operad, morphism, Reynolds functor) | SymbolicTensorOps, obligation 7, invariant generator | `arch-20`, `arch-19` |
 | Lattice theory | verdict semilattice meet | `impl-07 §56–60` |
 | Merkle DAG / content addressing (Git) | `Address`, hash-consing | `arch-20 §20.4` |
-| Reverse-mode AD / implicit-diff adjoint | cotangent exports | `arch-07 §133–137`, `arch-16` |
+| Reverse-mode AD / implicit-diff adjoint | gradient exports | `arch-07 §133–137`, `arch-16` |
 | Decidability / type-checking / build automaton | applicability gate, refusals, 13-phase build | `impl-04`, `impl-10`, `arch-12 §12.0.3` |

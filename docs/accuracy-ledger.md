@@ -75,19 +75,26 @@ compositions of the above and inherit their composed `combineTol` budget.)
 
 ## MVP design-grade targets (the headline outputs the closed-form bet must meet)
 
+**Status legend (2026-07 clarification):** *path-met* = the closed-form path exists in the
+registry **and** its diamond reference anchors are seeded in the machine-readable battery
+(`physics/library/cert/reference-data/*.csv`), so cert obligation 4/8 can actually check the
+target. It is **not** a claim that a cert run has passed — no code exists yet. (The former
+bare "met" read as target-met; 2026-07 gap-audit D0.)
+
 | Observable | Design-grade target | Status |
 |---|---|---|
-| bandgap (300 K) | **±0.15 eV** post-G₀W₀ | met (registry row 6) |
-| C_ij (300 K) | **±5%** | met (row 36) |
-| κ(300 K) | **±20%** (anchored to `κ_iter≈2200`, not `κ_RTA`) | met (rows 25 + 121 + 122) |
-| κ(773 K) | **±25%** | met (4-ph correction row 121, `≳0.4 Θ_D`) |
-| κ(1100 K) | **±35%→±15%** with 4-ph | met (rows 121 + 122; battery anchors below) |
-| E_form (300 K) | **±0.2 eV** | met (rows 30 + FNV 31–33) |
-| μ (300 K) | **factor-2** | met with caveats |
+| bandgap (300 K) | **±0.15 eV** post-G₀W₀ | path-met (registry row 6; battery: `bandgap-indirect`, diamond) |
+| C_ij (300 K) | **±5%** | path-met (row 36; battery: `elastic-C11/C12/C44`, diamond) |
+| κ(300 K) | **±20%** (anchored to `κ_iter≈2200`, not `κ_RTA`) | path-met (rows 25 + 121 + 122; battery: κ(300 K)) |
+| κ(773 K) | **±25%** | path-met (4-ph correction row 121, `≳0.4 Θ_D`; battery: κ(773 K)) |
+| κ(1100 K) | **±35%→±15%** with 4-ph | path-met (rows 121 + 122; battery: κ(1100 K)) |
+| E_form (300 K) | **±0.2 eV** | path-met (rows 30 + FNV 31–33; battery: cohesive + graphite-boundary anchors) |
+| μ (300 K) | **factor-2** | path-met with caveats (battery: Isberg ToF μ_e/μ_h) |
 
-The reference battery (cert obligation 4, `arch-12 §12.1`) checks these at the MVP anchors;
-the **high-T κ anchors (κ(773 K), κ(1100 K)) are now landed** (rows 121–122 + the curated κ(T)
-battery below).
+The reference battery (cert obligation 4, `arch-12 §12.1`) checks these at the MVP anchors.
+The **full diamond battery is seeded** (2026-07-08, gap-audit Phase 3): lattice a, indirect
+gap, C₁₁/C₁₂/C₄₄ + B + ρ, Θ_D, phonon-max, κ(300/773/1100 K), cohesive energy, the
+diamond–graphite boundary point, ε_r, ToF mobilities, v_sat/β, and the Chynoweth pair.
 
 ## Per-material curated coefficients (ProvenanceLedger seed)
 

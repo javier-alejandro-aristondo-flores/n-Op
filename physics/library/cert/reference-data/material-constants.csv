@@ -24,3 +24,8 @@ ahc-zpr-isochoric,AlN (wz),0 K,−399 meV,25 meV,Engel 2022; Miglio 2020,dft-dfp
 ahc-zpr-lattice-expansion,GaN (wz),—,−49 meV,15 meV,Miglio npj CM 6 167 (2020),dft-dfpt,2,2026-06-10,2026-07-08
 ahc-zpr-lattice-expansion,AlN (wz),—,−85 meV,25 meV,Miglio 2020,dft-dfpt,2,2026-06-10,2026-07-08
 ahc-zpr-isochoric,diamond,0 K,−345 meV,25 meV,Antonius PRL 112 215501 (2014); Engel −323,gw,1,2026-06-10,2026-06-10
+lattice-constant-a,diamond,300 K,3.567 Å,0.001 Å,curated MVP anchor (mvp-01; standard XRD value),experimental,1,2026-07-08,2026-07-08
+bandgap-indirect,diamond,300 K,5.47 eV,0.01 eV,curated MVP anchor (mvp-01); PBE −23% ⇒ G₀W₀/hybrid path (registry row 6),experimental,1,2026-07-08,2026-07-08
+dielectric-static,diamond,300 K,5.7,0.05,standard value (feeds image-force lowering; Fröhlich inert — non-polar),experimental,1,2026-07-08,2026-07-08
+cohesive-energy,diamond,0 K,7.37 eV/atom,0.05 eV/atom,standard experimental atomization anchor,experimental,1,2026-07-08,2026-07-08
+formation-energy-vs-graphite,diamond,"300 K, 1 atm",+25 meV/atom,5 meV/atom,Berman–Simon boundary point; consistent with tp-aware-hull (registry row 124) reading R=0 inside δ_meta,experimental-review,1,2026-07-08,2026-07-08

@@ -30,3 +30,12 @@ impact-ionization-bn,GaN (wz),high field,3.39e7 V/cm,×3,Cao et al. 2018,experim
 impact-ionization-ap,GaN (wz),high field,7.13e6 cm-1,×3,Cao et al. 2018,experimental,1,2026-06-10,2026-06-10
 impact-ionization-bp,GaN (wz),high field,1.46e7 V/cm,×3,Cao et al. 2018,experimental,1,2026-06-10,2026-06-10
 impact-ionization-an,AlN (wz),high field,8.875e6 cm-1,unbounded,Bulutay SST 17 L59 (2002) Monte-Carlo electron-only; measured = GAP,monte-carlo,1,2026-06-10,2026-06-10
+thermal-conductivity,diamond (type IIa),300 K,2200 W/mK,×0.15,exp 2000–2500; Feng–Lindsay–Ruan PRB 96 161201 (2017); Broido APL 91 231922 (2007),experimental,1,2026-07-08,2026-07-08
+thermal-conductivity,diamond (type IIa),773 K,620 W/mK,×0.4,Pass C battery anchor (interpolation ±40%; independent est. 600–700; 2026-06-10 re-audit),theory-interpolation,1,2026-07-08,2026-07-08
+thermal-conductivity,diamond (type IIa),1100 K,450 W/mK,×0.4,Pass C battery anchor (κ∝T^−1.2 consistency),theory-interpolation,1,2026-07-08,2026-07-08
+mobility-electron-tof,diamond,300 K,4500 cm2/Vs,×0.15,Isberg et al. Science 297 1670 (2002) time-of-flight SC-CVD,experimental,1,2026-07-08,2026-07-08
+mobility-hole-tof,diamond,300 K,3800 cm2/Vs,×0.15,Isberg et al. Science 297 1670 (2002),experimental,1,2026-07-08,2026-07-08
+saturation-velocity,diamond (holes),high field,1.5e7 cm/s,×0.2,accuracy-ledger row-130 seed (Isberg JAP 109 (2011); Pass C §3),experimental-review,1,2026-07-08,2026-07-08
+caughey-thomas-beta,diamond,high field,1,0.5,Pass C / accuracy-ledger (β=1); supersedes non-eq Part A β≈2 (2026-07 gap-audit B8 resolution),experimental-review,1,2026-07-08,2026-07-08
+impact-ionization-a,diamond,high field,1.93e5 cm-1,×2.5,Hiraiwa & Kawarada JAP 114 034506 (2013); electron/hole never separated (ledger residue — cert treats as both),experimental,1,2026-07-08,2026-07-08
+impact-ionization-b,diamond,high field,7.59e6 V/cm,×2.5,Hiraiwa & Kawarada JAP 114 034506 (2013),experimental,1,2026-07-08,2026-07-08

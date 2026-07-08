@@ -14,3 +14,8 @@ bulk-modulus,AlN (wz),300 K,210 GPa,10 GPa,Ioffe NSM,experimental,2,2026-06-10,2
 mass-density,GaN (wz),300 K,6.15 g/cm3,0.02 g/cm3,Ioffe NSM,experimental,2,2026-06-10,2026-07-08
 mass-density,AlN (wz),300 K,3.23 g/cm3,0.02 g/cm3,Ioffe NSM,experimental,2,2026-06-10,2026-07-08
 elastic-Cij-interpolation,AlGaN,—,linear Vegard (≤4.7% bowing; C13 superlinear),—,Łopuszyński & Majewski arXiv 1110.1346,dft-vff,1,2026-06-10,2026-06-10
+elastic-C11,diamond,300 K,1079 GPa,5 GPa,McSkimin & Andreatch JAP 43 2944 (1972),experimental,1,2026-07-08,2026-07-08
+elastic-C12,diamond,300 K,124 GPa,5 GPa,McSkimin & Andreatch JAP 43 2944 (1972),experimental,1,2026-07-08,2026-07-08
+elastic-C44,diamond,300 K,578 GPa,2 GPa,McSkimin & Andreatch JAP 43 2944 (1972),experimental,1,2026-07-08,2026-07-08
+bulk-modulus,diamond,300 K,442 GPa,4 GPa,(C₁₁+2C₁₂)/3 from McSkimin & Andreatch 1972,experimental,1,2026-07-08,2026-07-08
+mass-density,diamond,300 K,3.515 g/cm3,0.001 g/cm3,standard,experimental,1,2026-07-08,2026-07-08

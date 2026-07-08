@@ -2,6 +2,8 @@
 
 Survey of defect, doping, surface, and interface physics for diamond-centric UWBG semiconductors under harsh-environment (≥500°C, vibration, high-j) conditions. Read-only research; formulas typed in `/physics` registry style with two-tier (cheap/faithful) parameterizations.
 
+> **Status note (2026-07 gap-audit).** Electron affinity χ is always **termination-tagged** (Part E is the canonical per-termination table). The F.4 barrier heights and carbide onsets are literature-survey grade — pin provenance before any value seeds a `ProvenanceLedger` at the metals wave. The charge-balance formula (B.3), the P-diamond worked example (B.4), the misfit convention (H.1: `(a_film − a_sub)/a_sub`), the diamond CTE anchor (G.6), and the Freysoldt symbol were corrected in place by the gap-audit (`docs/audits/2026-07-07-gap-audit.md`).
+
 ---
 
 ## Part A — Native defects in UWBG hosts
@@ -103,15 +105,15 @@ DX_transition     : (Host, Dopant, x_alloy) → E_DX_onset
 
 **Cheap path** (single-donor model):
 ```
-n(T) = (1/2) · [-N_C·g_d + √(N_C²·g_d² + 4·N_C·N_D·g_d·exp(-E_d/kT))]   with g_d = 2
+n(T) = (n₁/(2·g_d)) · [√(1 + 4·g_d·N_D/n₁) − 1]   with n₁ = N_C·exp(−E_d/kT), g_d = 2
 ```
 **Faithful path**: multi-level charge-balance with all defects from Part A, T-dependent μ (Part C), and finite κ via Freysoldt.
 
 ### B.4 Worked example: P-doped diamond at 500°C
 
 E_d = 0.57 eV, T = 773 K, kT = 0.0666 eV, N_D = 1e19 cm⁻³, N_C(773 K) ≈ 4e19 cm⁻³.
-exp(−E_d/kT) ≈ exp(−8.56) ≈ 1.9e−4. Activation fraction ≈ √(N_D/N_C) · √(exp(−E_d/kT)) ≈ 0.5 · 0.014 ≈ ~0.7%.
-n ≈ 7e16 cm⁻³ at 500°C — usable. Same dopant at RT gives ~3e13 cm⁻³ — useless. **Harsh-environment T turns marginal dopants into viable ones**; this is a real PINO-relevant inversion.
+exp(−E_d/kT) ≈ exp(−8.56) ≈ 1.9e−4 ⇒ n₁ ≈ 7.6e15 cm⁻³. Activation fraction (freeze-out limit) ≈ √(N_C/(g_d·N_D)) · exp(−E_d/2kT) ≈ 1.41 · 0.014 ≈ ~2%.
+n ≈ 2e17 cm⁻³ at 500°C — usable. Same dopant at RT gives ~1e14 cm⁻³ — useless. **Harsh-environment T turns marginal dopants into viable ones**; this is a real PINO-relevant inversion.
 
 ---
 
@@ -148,7 +150,8 @@ E_MP : (charge q, supercell_L, α_Madelung, ε_static, Q_r : QuadrupoleMoment?) 
 
 Splits the correction into **point-charge lattice term** + **potential alignment**:
 ```
-E_F = E_lat(q, ε, L) − q·ΔV_q/0     -- ΔV_q/0 = ⟨V_defect⟩ − ⟨V_pristine⟩ far from defect
+E_corr^FNV = E_lat(q, ε, L) − q·ΔV_q/0     -- ΔV_q/0 = ⟨V_defect⟩ − ⟨V_pristine⟩ far from defect
+                                           -- (symbol E_corr, not E_F: E_F is the Fermi level everywhere else)
 E_lat(q, ε, L) = (q²·α_M)/(2·ε·L) · [1 − f_shape(L, σ_model)]
 ```
 Type:
@@ -449,7 +452,7 @@ For 500°C operation at j=1e6 A/cm², refractory metals give MTTF ~10³–10⁴ 
 ε_thermal(T) = (α_metal − α_diamond) · ΔT
 N_cycles_to_failure : Coffin–Manson  N_f = C · (Δε_pl)^−β,   β ≈ 2 for ductile, β ≈ 4 for brittle interfaces
 ```
-| Metal | α (1e−6/K) | Δα vs diamond (α_dia ≈ 1.0 at RT, 5 at 500°C) | Notes |
+| Metal | α (1e−6/K) | Δα vs diamond (α_dia ≈ 1.1 at RT, ≈ 3 at 500°C, ≈ 4.5 near 1200°C) | Notes |
 |---|---|---|---|
 | W | 4.5 | small | best match |
 | Mo | 4.8 | small | |
@@ -474,8 +477,9 @@ G_V_from_dis = ξ · ρ_dis · v_dis · b   (vacancy generation per jog motion)
 ### H.1 Lattice mismatch & strain
 
 ```
-ε_mismatch = (a_substrate − a_film) / a_film
-σ_film = (E / (1−ν)) · ε_mismatch   -- biaxial elastic, valid below critical thickness
+ε_misfit = (a_film − a_substrate) / a_substrate    -- convention of the table below (diamond = film)
+ε_∥      = −ε_misfit / (1 + ε_misfit) ≈ −ε_misfit  -- in-plane film strain when coherent
+σ_film   = (E / (1−ν)) · ε_∥   -- biaxial elastic, valid below critical thickness
 ```
 
 | Heterostructure | a_substrate (Å) | mismatch with diamond a=3.567 | comment |
@@ -527,7 +531,7 @@ Diamond/SiC and diamond/Ir survive >1000 cycles to 500°C; diamond/Si fails by S
 
 | Existing formula | Reused here |
 |---|---|
-| Van Roosbroeck–Shockley radiative | direct reuse for D.3 (radiative branch) |
+| Van Roosbroeck–Shockley radiative (registry: `radiative-recombination-vrs`) | radiative-recombination branch of Part D — the complement to the non-radiative channels D.1 (SRH) / D.2 (Auger) / D.3 (multiphonon emission); D.3 itself is non-radiative |
 | Boltzmann statistics | A.3 equilibrium [D]^q |
 | Drift–diffusion currents | G.2 dopant-profile evolution |
 | GENERIC bracket {·,·} for energy | C.1 Zhang–Northrup is an energy-functional definition; lives in entropy/energy potentials |

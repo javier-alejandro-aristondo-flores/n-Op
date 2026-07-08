@@ -41,18 +41,19 @@ docs/
   meta/                            ← tooling: lint.py, assemble.py, carve.py, manifest.yaml,
                                        conventions.md, glossary.md  (read glossary.md for vocabulary)
 
-  architecture/   (the canonical spec — 20 atomic files; READ THESE for depth)
+  architecture/   (the canonical spec — 21 atomic files; READ THESE for depth)
     01-purpose          02-libraries        03-inputs           04-state
     05-generic (GENERIC dynamics)           06-physics-graph (the IR)
     07-pipeline (4+1 stages)                08-bo-levels (L1–L4 layering)
-    09-vocabularies (12 methods / 20 templates / 102 formulas / CrystalSymmetryGroup)
-    10-typeclasses (4 capability typeclasses)     11-residuals (17 categories)
+    09-vocabularies (12 methods / 20 templates / 125 formulas / CrystalSymmetryGroup)
+    10-typeclasses (4 capability typeclasses)     11-residuals (19 categories)
     12-cert (10 obligations)                13-applicability (predicates)
     14-topology (symmetry/topology atlas)   15-gamma-hat (the γ̂ data structure + open problems)
     16-pino-bridge (the output boundary)    17-out-of-scope
     18-open-decisions (5 open, incl. resolved impl-language)
     19-coupling-structure (the coupling generator — 580 ln, the keystone of cross-regime physics)
     20-representations (the substrate — the "canonical structure", 283 ln)
+    21-multiscale-state (slow + macro tiers: aging kinetics, device-mesh continuum, homogenization)
 
   implementation/ (how it gets built — 11 atomic files)
     01-principles  02-methods  03-templates  04-formulas  05-bundles  06-compositions
@@ -69,12 +70,13 @@ physics/research/   (the PRIMARY-SOURCE physics research the spec was synthesize
   residual-generator-catalog.md      (551) — the catalog of residual generators
   group-B-electronic-magnetic-optical.md (505) — electronic-structure, magnetic, optical regime physics
   csp-heterostructure.md             (302) — crystal-structure-prediction validity & heterostructure residuals
-  uwbg-observable-catalog.md         (260) — the ~80 target observables the PINO must predict
+  uwbg-observable-catalog.md         (260) — the 52 (+16 FoM) target observables the PINO must predict
   applicability-classifiers.md        (72) — per-property applicability predicates
   implementation-language.md         (210) — (the resolved language decision; context only, not physics)
 
-physics/library/    ← EMPTY SCAFFOLD (directory tree of .gitkeep placeholders) + one populated file:
-  formulas/registry-manifest.csv     ← the 102 named formulas, indexed (signatures, bundles, cost/diff tiers)
+physics/library/    ← EMPTY SCAFFOLD (directory tree of .gitkeep placeholders) + populated data:
+  formulas/registry-manifest.csv     ← the 125 named formulas, indexed (signatures, bundles, cost/diff tiers)
+  cert/reference-data/*.csv          ← the machine-readable cert battery (Wave-1 III-N seeded; see its README)
 informed-operator/, interface/       ← sibling modules; mostly empty. /physics must stay decoupled from them.
 ```
 
@@ -106,7 +108,7 @@ Now consider the computational structures that will implement the physics (the s
 Beyond Parts 1–2, investigate whatever you judge important. To seed that, here are the questions the commissioner most wants answered — pursue these and add your own:
 
 1. **An end-to-end accuracy / error model.** Compression (LowRank/HODLR/TT truncation), surrogate (D4) formulas, one-shot dressings (Layer 1.25), symmetry reduction (exact?), and the `γ̂` approximate-equality question all introduce error. Is there a *composed* error budget from inputs to emitted residual? Are truncation tolerances principled? Is error *tracked* anywhere, or silently dropped? (See the `γ̂` §15.4 ε-equality open problem and whether it generalizes to a systemic gap.)
-2. **The closed-form discipline's true boundary.** Classify the 12 methods and the 102 formulas by *genuine* computational character: which are truly closed-form, which hide an eigensolve / SCF loop / Boltzmann solve / PDE timestepper. Where is an iterative numerical method *unavoidable*, and is the "expensive at compile-time, cheap at runtime" amortization real for it (e.g., does an SCF inner loop or a BTE solve actually collapse to a precomputed structured apply at Stage 5, or does it recur per state sample)?
+2. **The closed-form discipline's true boundary.** Classify the 12 methods and the 125 formulas by *genuine* computational character: which are truly closed-form, which hide an eigensolve / SCF loop / Boltzmann solve / PDE timestepper. Where is an iterative numerical method *unavoidable*, and is the "expensive at compile-time, cheap at runtime" amortization real for it (e.g., does an SCF inner loop or a BTE solve actually collapse to a precomputed structured apply at Stage 5, or does it recur per state sample)?
 3. **Differentiability completeness.** Every residual must be differentiable for the PINO. Assess coverage across the differentiability tiers (D0–D4), the exception sets (band crossings, phase transitions, level crossings), and the implicit-differentiation adjoints for fixed-point methods. Are the synthesized adjoints accurate (the spec gates them at `τ_adj = 1e-4`)? Where does differentiability break or degrade, and does that matter for training?
 4. **Residual sufficiency for *learning*.** Do the 17 categories + the formula/coupling set give the PINO *enough* constraints — all relevant conservation laws, sum rules, symmetry/equivariance conditions, analytic-structure (Kramers–Kronig) constraints, detailed-balance/Onsager relations — to learn correct dynamics, not just locally-consistent ones? What residuals are missing?
 5. **GENERIC structural guarantees.** Are the structural conditions actually enforceable by construction: `L` antisymmetric, `M` PSD, and the degeneracy conditions `L·δS/δx = 0`, `M·δE/δx = 0`? Does the symmetry-generated coupling machinery *preserve* these (the spec routes `AntisymmForm`/`PSDSymmForm` targets and claims PSD-by-construction) — verify, don't assume.

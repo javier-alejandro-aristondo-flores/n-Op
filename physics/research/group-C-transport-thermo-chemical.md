@@ -1,5 +1,7 @@
 # Group C — Transport, Thermodynamic, Chemical/Surface
 
+> **Status note (2026-07 gap-audit).** The "regime N" numbers in §4.4's cross-references are a legacy global scheme that matches neither this file's local 1–3 numbering nor the canonical arch-05 nine-regime table — read §4.4's cross-references **by regime name, not number**. The transport-Lyapunov direction was corrected in place by the gap-audit (`docs/audits/2026-07-07-gap-audit.md`). κ here appears in both Green–Kubo (total) and electronic (Kubo second-moment) forms; the observable-level decomposition is `κ_total = κ_el + κ_ph` (arch-10).
+
 Deep mathematical research for the n-Op `/physics` library. Scope: three
 regimes that share statistical-mechanical and non-equilibrium structure
 (distribution functions, free energies, rate equations). These regimes are
@@ -527,7 +529,7 @@ Each regime has a **scalar Lyapunov functional**:
 
 | Regime | Lyapunov | Direction |
 |---|---|---|
-| Transport | $-S[f] = k_B\int(f\ln f + (1-f)\ln(1-f))$ | non-decreasing (H-theorem) |
+| Transport | $-S[f] = k_B\int(f\ln f + (1-f)\ln(1-f))$ | non-increasing (H-theorem: $dS/dt \ge 0$) |
 | Thermodynamic | $\mathcal{F}[c]$ (Helmholtz / Ginzburg–Landau) | non-increasing |
 | Chemical/surface | $\mathcal{F}_{\rm micro}[P] = \sum_C P(C)\ln(P(C)/P_{\rm eq}(C))$ | non-increasing |
 

@@ -1,5 +1,7 @@
 # Non-Equilibrium, High-Field, Hot-Carrier Physics for UWBG Chips
 
+> **Status note (2026-07 gap-audit).** Several III-N anchors in Parts A–C are **superseded** by the Wave-1 correction ledger (`docs/superpowers/specs/2026-06-10-wave1-iii-n-seeding.md` §3, A1–A16): GaN 2.5×10⁷ cm/s is the **peak** velocity (true v_sat ≈ 1.4×10⁷); AlN ω_LO ≈ 111–114 meV (not 100); Fröhlich α_F GaN ≈ 0.40 / AlN ≈ 0.58; μ(AlN) intrinsic 871⊥/619∥ (300 is doped/defective material); diamond image-force lowering ≈ 0.16 eV at 10⁶ V/cm. **Seed coefficients from the accuracy-ledger / reference-data CSVs, never from this file's tables.**
+
 **Scope.** Translate the physics that governs UWBG semiconductors in jet-turbine-class operating envelopes (T_L ≥ 500 °C, E up to several MV/cm, current densities pushing the velocity-saturation regime, possible vibration / radiation overlays) into the typed-formula / typed-residual vocabulary already established for `/physics`. Materials anchor set: **diamond (C), c-BN, h-BN, AlN, GaN, β-Ga₂O₃, AlGaN ternary, plus refractory metals (W, Mo, Re, Ir, TiN, TaN) and standard dielectrics (SiO₂, Al₂O₃, HfO₂)** as contact/dielectric counterparts. Diamond is the non-polar anchor (no Fröhlich term); the other UWBG anchors are polar.
 
 CS-discipline reminder applied throughout: every quantity below is presented as `name : (typed inputs) → typed output`, every residual as `‖LHS − RHS‖² over typed domain`, and every "method" is a sub-method already in the closed 12 (or, where genuinely new, flagged with a recommendation).

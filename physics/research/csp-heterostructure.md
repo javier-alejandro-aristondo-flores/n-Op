@@ -2,6 +2,8 @@
 
 This is a methodology survey of crystal-structure-prediction and heterostructure residuals, grounded in the project architecture (GENERIC dynamics dx/dt = L·δE/δx + M·δS/δx, the 4-level Born–Oppenheimer hierarchy, and the closed method / template / formula registries), proposing where new residuals plug in.
 
+> **Status note (2026-07 gap-audit).** The misfit convention here is normalized to `(a_film − a_sub)/a_sub` to match `defects-surfaces-interfaces.md` Part H, and the contact-table values (Pt barrier, carbide onsets) are harmonized with that file's F.4/F.5 — reconcile both against pinned provenance at the metals wave. χ is termination-tagged (defects file Part E is canonical). Fixes recorded in `docs/audits/2026-07-07-gap-audit.md`.
+
 All "typed signatures" below use the convention `name : (input-types) -> output-type [cost-tier, differentiability]`, with cost tiers `T0` (closed-form, ~µs), `T1` (small linear algebra / sums, ~ms), `T2` (ML-potential single-point, ~10ms–1s), `T3` (DFT-single-point, minutes–hours), `T4` (full self-consistent loop, hours–days). Differentiability ratings: `D+` (smooth analytic), `D0` (piecewise smooth, subgradient OK), `D-` (combinatorial; needs surrogate / softening).
 
 ---
@@ -116,13 +118,13 @@ with `k_r`, `k_θ` from a tabulated bond-angle force field. The Hessian eigenval
 
 ### C.3 Diamond-metal interface knowledge cheat-sheet
 
-This is the **harsh-environment chip** core question. Diamond is `χ ≈ −0.7` to `+1.3 eV` (negative electron affinity on H-terminated (111); positive on O-terminated). Diamond bandgap ≈ 5.47 eV.
+This is the **harsh-environment chip** core question. Diamond χ is termination-dependent and must always be termination-tagged: ≈ −1.3 eV (H-terminated (100)/(111), NEA) through +0.4…+0.7 eV (clean / OH) to +1.7/+2.6 eV (O ether/ketone, PEA) — canonical per-termination table in `defects-surfaces-interfaces.md` Part E. Diamond bandgap ≈ 5.47 eV.
 
 | Metal | Φ (eV) | Diamond contact behavior | Carbide? | T_stable | Use case |
 |---|---|---|---|---|---|
-| W | 4.55 | Schottky on undoped, near-Ohmic on heavily B-doped; carbide WC forms above ~800°C | Yes (WC, W₂C) | Excellent to 1000°C | Gate metal, refractory contact |
-| Mo | 4.60 | Similar to W; Mo₂C forms above ~700°C | Yes | Good to 900°C | Refractory contact |
-| Pt | 5.65 | High Schottky barrier (~1.7 eV) on H-term, ~2.0 eV on O-term; **no carbide** | No | Excellent to 1100°C | Schottky diode, gate |
+| W | 4.55 | Schottky on undoped, near-Ohmic on heavily B-doped; W₂C/WC growth measurable from ~600–700°C (kinetics: defects file F.5 — ~3 nm per 1000 h at 500°C) | Yes (WC, W₂C) | Excellent to 1000°C | Gate metal, refractory contact |
+| Mo | 4.60 | Similar to W; Mo₂C growth measurable from ~500–700°C (defects file F.5) | Yes | Good to 900°C | Refractory contact |
+| Pt | 5.65 | High Schottky barrier (~1.4–1.7 eV reported on H-term — pin provenance at the metals wave; ~2.0 eV on O-term); **no carbide** | No | Excellent to 1100°C | Schottky diode, gate |
 | Au | 5.10 | Schottky; **no carbide, no reactivity**; poor adhesion → Ti adhesion layer needed | No | Limited by adhesion; up to ~600°C | Probe pad, top metal |
 | Ti | 4.33 | Forms TiC at ~400°C — Ohmic contact after anneal; standard "Ti/Pt/Au" stack | Yes (TiC) | TiC stable to 1500°C, but interdiffusion | **Ohmic contact** |
 | Ni | 5.15 | Reacts above ~700°C; forms Ni-C eutectic-ish; used for diamond etching | Partial (Ni-C solution) | Poor for chips | Avoid as contact |
@@ -137,13 +139,13 @@ Residual implication: the PINO must learn **carbide-formation indicator** as a l
 
 ### C.4 Diamond-on-substrate (epitaxy)
 
-| Substrate | Lattice mismatch to diamond | Defect density typical | Notes |
+| Substrate | Misfit (a_dia − a_sub)/a_sub | Defect density typical | Notes |
 |---|---|---|---|
-| Ir(100) | 7.0% | 10⁶–10⁷ cm⁻² (best heteroepitaxy) | Bias-enhanced nucleation; current SOTA for single-crystal heteroepi-diamond |
-| Pt(111) | 11.4% | 10⁸ cm⁻² | Carbide-free; good template |
-| 3C-SiC(100) | 22% (but C-template) | Polycrystalline → nanocrystalline | C atoms readily; lattice large mismatch |
-| Si(100) | 52% (huge) | Polycrystalline only | Carbide buffer SiC forms; high TD density |
-| Sapphire (Al₂O₃) | ~16% via (0001) | Polycrystalline | Common substrate, MPCVD |
+| Ir(100) | −7% | 10⁶–10⁷ cm⁻² (best heteroepitaxy) | Bias-enhanced nucleation; current SOTA for single-crystal heteroepi-diamond |
+| Pt(111) | −9% | 10⁸ cm⁻² | Carbide-free; good template |
+| 3C-SiC(100) | −18% (but C-template) | Polycrystalline → nanocrystalline | C atoms readily; large misfit |
+| Si(100) | −34% (huge) | Polycrystalline only | Carbide buffer SiC forms; high TD density |
+| Sapphire (Al₂O₃) | large (basal-plane registry-dependent) | Polycrystalline | Common substrate, MPCVD |
 
 Residual: `R_HeteroEpiNucleation : (substrate, diamond_orientation, P_CH₄/H₂, T_growth) -> R⁺` — cheap form is `R_LatticeMatch · exp(−E_nuc(substrate)/kT)`; faithful form is wall-time first-principles nucleation barrier calculation (rarely done; usually empirical).
 
@@ -191,7 +193,7 @@ Operating temperature in a jet turbine: 500–1000°C. Native defect populations
 | `R_VacancyOrdering` | `(V_pattern, ordering_potential) -> R⁺` | Ising-like on sublattice: `Σ J·σ_i σ_j` against target ordering | DFT supercell sweep | T1 / T3 | D+ |
 | `R_AntisiteOrder` | `(A_on_B, B_on_A, μ, T) -> R⁺` | `Σ exp(−E_swap/kT)` vs predicted populations | DFT + special quasirandom structures (SQS) | T1 / T3 | D+ |
 | `R_StackingFault` | `(γ_SF, stacking_seq) -> R⁺` | γ-surface from harmonic model; residual = `Σ γ_SF · area_SF` | DFT generalized stacking fault energy surface | T1 / T3 | D+ |
-| `R_TwinBoundary` | `(Σ-value, γ_TB) -> R⁺` | Tabulated γ_TB for common Σ (Σ3 in diamond ≈ 0 — explains CVD twins) | DFT slab | T0 / T3 | D+ |
+| `R_TwinBoundary` | `(Σ-value, γ_TB) -> R⁺` | Tabulated γ_TB for common Σ (Σ3 in diamond ≈ tens of mJ/m², effectively 0 — explains CVD twins) | DFT slab | T0 / T3 | D+ |
 | `R_ThermalCycleStability` | `(defect_state₀, defect_state_after_cycles, ΔT) -> R⁺` | Defect-population drift `‖Δn_d‖²` under KMC | KMC with DFT migration barriers | T1 / T3 | D+ |
 | `R_NV-center-conc` (diamond-specific) | `(N_conc, V_conc, T_anneal) -> R⁺` | Mass-action: `[NV] ∝ [N]·[V]·exp(−E_b/kT)` | DFT defect-complex binding energy | T0 / T3 | D+ |
 
@@ -200,7 +202,7 @@ Operating temperature in a jet turbine: 500–1000°C. Native defect populations
 - **Vacancy V**: E_f ≈ 7 eV in pristine diamond → [V] at 1000°C ≈ 10⁻²⁵ atomic fraction, basically zero. But irradiation creates them.
 - **Divacancy V₂**: binding ~4 eV; relevant for radiation damage.
 - **NV center**: substitutional N + adjacent V; binding ~3 eV; concentration set by mass action.
-- **Σ3 twin boundary**: γ_TB ≈ 0 (coherent twin essentially free) — explains the dense twinning in CVD polycrystalline diamond. Residual must allow zero penalty.
+- **Σ3 twin boundary**: γ_TB ≈ tens of mJ/m² (coherent twin — essentially free relative to other GBs) — explains the dense twinning in CVD polycrystalline diamond. Residual must allow near-zero penalty.
 - **Stacking faults (intrinsic)**: γ_ISF ≈ 280 mJ/m² in diamond — modest, so SFs are common in heteroepitaxial growth.
 
 Harsh-environment residual: `R_ThermalCycleStability` is the **durability** residual. At jet-turbine duty cycle (cold start to 1000°C, repeated), defect populations equilibrate to T_op but **freeze** during cooldown. The residual must distinguish equilibrium populations (from `R_NativeDefectPop(T_op)`) from frozen-in populations after cycling.

@@ -1,5 +1,7 @@
 # UWBG Diamond-Centric Observable Catalog for n-Op `/physics`
 
+> **Status note (2026-07 gap-audit).** (1) Superseded numbers: AlN Θ_D ≈ 1000 K (not ~1150; Wave-1 ledger A10); the GaN displacement threshold is carried as ~20 eV in `non-equilibrium-high-field.md` H.1 vs ~25 eV here — resolve against primary sources when E_d seeds a `ProvenanceLedger`. (2) The 8-group organization of Part C is the pre-canon **data-shape** view; the canonical residual-driving grouping is the 11 physics-domain bundles of arch-09 §9.4. (3) Most "OUTSIDE registry" flags below were **closed** by registry rows 88–127 (linear-response/topology, slow-tier degradation incl. oxidation #46 → row 109 and H-desorption #47 → row 110, polarization/2DEG rows 113–119, per-material accuracy rows 120–127) — see `docs/formula-registry.md` for the row-band map; the flags are kept as historical record.
+
 ## Part A — Material Scope Review
 
 Operational rule for this section: every "physical property" is restated as **what the simulator must hold as state and what it must produce as output**. The "physics-distinctive" column names what makes that material's PINO surrogate hard.
@@ -41,7 +43,7 @@ Each FoM is a **scalar functional of a small set of observables**. The PINO must
 |---|---|---|
 | **Baliga (BFOM)** | `BFOM = ε_r · μ_n · E_b^3` — conduction loss in unipolar majority-carrier device | dielectric_constant_static, mobility_electron, breakdown_field |
 | **Johnson (JFOM)** | `JFOM = (E_b · v_sat) / (2π)` — high-frequency power capability | breakdown_field, saturation_velocity |
-| **Keyes (KFOM)** | `KFOM = k_th · sqrt(c · v_sat / (4π ε_r))` — thermal-limited switching | thermal_conductivity, saturation_velocity, dielectric_constant_static |
+| **Keyes (KFOM)** | `KFOM = k_th · sqrt(c · v_sat / (4π ε_r))` — thermal-limited switching (`c` = speed of light, per Keyes' original form — not specific heat) | thermal_conductivity, saturation_velocity, dielectric_constant_static |
 | **Q-Baliga (QBFOM)** | `μ · E_b^2` — switching loss variant | mobility_electron, breakdown_field |
 | **HMFOM / HCAFOM** | `E_b · sqrt(μ)` — Huang's, high-frequency | breakdown_field, mobility_electron |
 | **Thermal-coupled BFOM** | `BFOM · k_th / (T_op − T_ambient)` (custom) | adds thermal_conductivity_T, T_self_heating |

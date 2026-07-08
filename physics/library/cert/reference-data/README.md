@@ -41,7 +41,13 @@ Every row carries:
 - **Material** — IUPAC formula plus space group / polytype where ambiguous
 - **Environment** — temperature, pressure, applied field as applicable
 - **Value** — numerical value in canonical units
-- **Uncertainty (σ)** — one-sigma uncertainty band (instrumental or computational)
+- **Uncertainty (σ)** — one-sigma uncertainty band (instrumental or computational). Three encodings
+  appear and consumers must dispatch on the format: an **absolute σ** in the Value's units
+  (e.g. `7 W/mK`), a **multiplicative factor** `×N` (log-scale band — value known to within a
+  factor N, σ_ln = ln N), or **`unbounded`** (no constraining uncertainty exists; treat as
+  missing). A bare `—` means σ **not yet assigned**: such a row cannot back a `ProvenanceLedger`
+  coefficient until a σ-assignment pass values it (`arch-19 §19.8` requires `(value, σ, source,
+  cost-class)`; `arch-12 §12.0.3` refuses compositions carrying unprovenanced coefficients).
 - **Source** — DOI, paper title, page reference; OR computational provenance (DFT functional + k-mesh + cutoff)
 - **Source class** — `experimental` / `dft-pbe` / `dft-hse` / `gw` / `dft-d3` / etc.
 - **Version** — semantic version of this row (incremented on correction)

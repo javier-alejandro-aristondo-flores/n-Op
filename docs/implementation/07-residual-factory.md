@@ -37,7 +37,7 @@ record ResidualGenerator {
   name              : Symbol
   observable        : ObservableRef
   bundle            : BundleId                 -- B1..B11 (facet, not identity)
-  category          : CategoryTag              -- 17 named tags (arch-11-residuals §11.1)
+  category          : CategoryTag              -- 19 named tags (arch-11-residuals §11.1)
   layer             : 1..7                     -- compose-time DAG layer
   cost-tier         : T0 | T1 | T2 | T3
   diff-tag          : D0 | D1 | D2 | D3 | D4

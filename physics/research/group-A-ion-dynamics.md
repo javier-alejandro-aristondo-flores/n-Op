@@ -1,5 +1,7 @@
 # Group A — Ion Dynamics: Structural, Mechanical, Thermal
 
+> **Status note (2026-07 gap-audit).** Notation: the phonon branch index `s` here ≡ `ν` (e-ph passages here and in group-B) ≡ `λ` (group-C) — one object, three historical symbols. κ in this file is the **phonon (lattice)** part only; the observable-level total is `κ_total = κ_el + κ_ph` (spec: arch-10 `combineTol` example). The thermal-expansion row and the e-ph mass convention were corrected in place by the gap-audit (`docs/audits/2026-07-07-gap-audit.md`).
+
 Deep mathematical research for the n-Op `/physics` library. Scope: the three
 regimes whose primary degrees of freedom are the **ions** (nuclei) and the
 **lattice cell** that contains them. All three share a common substrate: the
@@ -485,7 +487,7 @@ conductivity tensor $\kappa_{ij}$.
 | Density of states $g(\omega)$ | $\omega_{\mathbf q s}$ | $g(\omega) = \sum_{\mathbf q s} \delta(\omega - \omega_{\mathbf q s})$ |
 | Heat capacity $C_v(T)$ | $g(\omega)$ | $C_v = k_B \int (\hbar\omega/k_B T)^2 \frac{e^{\hbar\omega/k_BT}}{(e^{\hbar\omega/k_BT}-1)^2} g(\omega)\,d\omega$ |
 | Mode Grüneisen $\gamma_{\mathbf q s}$ | $\omega_{\mathbf q s}(\Omega)$ | $-d\ln\omega/d\ln\Omega$ |
-| Thermal expansion $\alpha$ | $F(T,\boldsymbol\eta)$ | $\alpha_{IJ} = (S^{-1})_{IJKL} \sum_{\mathbf q s} \gamma_{\mathbf q s, KL} c_v(\omega_{\mathbf q s})$ |
+| Thermal expansion $\alpha$ | $F(T,\boldsymbol\eta)$ | $\alpha_{IJ} = \frac{1}{V} S_{IJKL} \sum_{\mathbf q s} \gamma^{(KL)}_{\mathbf q s}\, c_v(\omega_{\mathbf q s})$, with $S = C^{-1}$ the elastic **compliance** and $\gamma^{(KL)}_{\mathbf q s} = -\partial \ln \omega_{\mathbf q s}/\partial \eta_{KL}$ the strain-Grüneisen tensor (the scalar $\gamma_{\mathbf q s}$ above is its volumetric trace) |
 | Thermal conductivity $\kappa_{ij}$ | $n_{\mathbf q s}, \mathbf v_{\mathbf q s}, \tau_{\mathbf q s}$ | $\kappa_{ij} = \sum_{\mathbf q s} c_{\mathbf q s} v_i v_j \tau_{\mathbf q s}$ |
 | Mean square displacement $\langle u_{I\alpha}^2\rangle$ | $\omega_{\mathbf q s}, \boldsymbol\xi$ | $\sum_{\mathbf q s} \frac{\hbar}{2 M_I \omega_{\mathbf q s}}\coth(\hbar\omega/2k_BT)\,|\xi_{\mathbf q s, I\alpha}|^2$ |
 | Debye-Waller factor | $\langle u^2\rangle$ | $W = \tfrac12 \langle (\mathbf q \cdot \mathbf u)^2\rangle$ |
@@ -500,7 +502,10 @@ conductivity tensor $\kappa_{ij}$.
 - **Electronic** (out of group): **electron-phonon coupling**
   $g_{mn}^{\nu}(\mathbf k, \mathbf q) = \langle \psi_{m,\mathbf k+\mathbf q}
   | \partial_{\mathbf q \nu} V | \psi_{n,\mathbf k}\rangle / \sqrt{2 M
-  \omega_{\mathbf q \nu}}$ — drives phonon-limited resistivity,
+  \omega_{\mathbf q \nu}}$ (single-species shorthand; in a multi-species cell
+  the $1/\sqrt{2M\omega}$ factor generalizes to per-atom masses $M_\kappa$
+  carried by the mass-weighted phonon-eigenvector normalization
+  $\sum_\kappa M_\kappa |\mathbf e_\kappa|^2 = 1$) — drives phonon-limited resistivity,
   superconductivity, Allen-Heine-Cardona temperature renormalisation of
   band gaps (Fan + Debye-Waller terms), polaron formation.
 - **Optical** (out of group): IR absorption couples photons to

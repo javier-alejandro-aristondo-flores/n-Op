@@ -1,5 +1,7 @@
 # Group B — Electronic, Magnetic, Optical
 
+> **Status note (2026-07 gap-audit).** Units in this file are **Gaussian** unless marked (the `4π` factors in the f-sum, dielectric, and Maxwell-source expressions); the spec-side `Quantity.unitsOf` (arch-10) is canonical for any implementation. The Vignale–Rasolt attribution, the Dirac/SOC double-count, and the Maxwell source prefactor were corrected in place by the gap-audit (`docs/audits/2026-07-07-gap-audit.md`). Two response objects are used: the density–density `χ` (Dyson section) and the polarization–polarization `χ^{PP}` (observables table) — related but not identical; a residual implementer should derive from the Dyson-section definitions.
+
 Deep mathematical research for the n-Op `/physics` library. Scope: the three
 regimes whose primary degrees of freedom are the **electrons** (with spin) and
 their coupling to the **electromagnetic field**. The shared substrate is
@@ -132,7 +134,8 @@ $N_b$ bands, the orbital data is $N_G \times N_k \times N_b$ complex numbers.
 - **Structural**: Hellmann–Feynman forces $\mathbf F_I = -\partial E/\partial \mathbf R_I$.
   Electronic structure determines forces; forces drive ion dynamics.
 - **Thermal / phonon**: electron–phonon coupling
-  $g_{nm,\nu}(\mathbf k, \mathbf q) = \langle \psi_{n,\mathbf k+\mathbf q} | \partial V/\partial u_{\mathbf q,\nu} | \psi_{m,\mathbf k} \rangle / \sqrt{2 M \omega_{\mathbf q\nu}}$.
+  $g_{nm,\nu}(\mathbf k, \mathbf q) = \langle \psi_{n,\mathbf k+\mathbf q} | \partial V/\partial u_{\mathbf q,\nu} | \psi_{m,\mathbf k} \rangle / \sqrt{2 M \omega_{\mathbf q\nu}}$
+  (single-species shorthand — multi-species cells carry per-atom $M_\kappa$ via the mass-weighted eigenvector normalization; same convention note as group-A §3.6).
   Drives phonon-limited resistivity, superconductivity, Allen–Heine–Cardona
   temperature renormalization of band gap.
 - **Transport**: Boltzmann transport equation reads $\varepsilon_n(\mathbf k)$
@@ -170,7 +173,7 @@ $$
 
 with $\mathbf B_{\rm eff}(\mathbf r) = \mathbf B_{\rm ext}(\mathbf r) + \mathbf B_{xc}[\mathbf m](\mathbf r)$
 and the vector magnetization $\mathbf m(\mathbf r) = \mathrm{tr}_\sigma[\boldsymbol\sigma\,\hat\gamma(\mathbf r, \mathbf r)]$.
-This is the Vignale–Rasolt extension of DFT to the spin-current case.
+This is non-collinear spin-DFT (von Barth–Hedin / Kübler). (Vignale–Rasolt is the *current*-DFT extension — the orbital-current functional named correctly in the relativistic synthesis below; the two are distinct.)
 
 **Atomistic (effective spin model).** Project to localized spins:
 
@@ -313,7 +316,7 @@ with Rabi frequency $\Omega_{\mathbf k} = \mathbf d_{\mathbf k} \cdot \mathbf E(
 Coupled to Maxwell:
 
 $$
-(\partial_t^2 + c^2 \nabla \times \nabla \times)\,\mathbf E = -\partial_t^2 \mathbf P, \qquad \mathbf P = \sum_{\mathbf k} \mathbf d_{\mathbf k}\,p_{\mathbf k}.
+(\partial_t^2 + c^2 \nabla \times \nabla \times)\,\mathbf E = -4\pi\,\partial_t^2 \mathbf P, \qquad \mathbf P = \sum_{\mathbf k} \mathbf d_{\mathbf k}\,p_{\mathbf k} \quad \text{(Gaussian units)}.
 $$
 
 ### O.2 State at instant $t$
@@ -445,9 +448,11 @@ $$
 A fully relativistic many-body Hamiltonian on Pauli-spinor density matrix
 
 $$
-\hat H = \boldsymbol\alpha \cdot (\hat{\mathbf p} - (e/c)\mathbf A) + \beta m c^2 + V + \text{spin-orbit} + \hat V_{ee},
+\hat H = \boldsymbol\alpha \cdot (\hat{\mathbf p} - (e/c)\mathbf A) + \beta m c^2 + V + \hat V_{ee},
 $$
 
+(spin–orbit coupling is *contained* in the Dirac kinetic term — it emerges in the
+non-relativistic reduction, and must not be added by hand on top),
 reduced to a non-relativistic four-current $j^\mu(\mathbf r, t) = (\rho, \mathbf J)$
 and magnetization $\mathbf m(\mathbf r, t)$, gives a **current-spin-density
 functional** $E[\rho, \mathbf J, \mathbf m]$ (Vignale–Rasolt + spin extension).

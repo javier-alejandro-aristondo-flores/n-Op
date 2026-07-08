@@ -52,7 +52,7 @@ monoliths are regenerated from the tree by `docs/meta/assemble.py`.
 | `docs/meta/manifest.yaml` | Assembly order + named LLM-context bundles. |
 | `docs/formula-registry.md` | Narrative index over the closed formula registry. |
 | `docs/properties.md` | The nine property categories with bundle/formula-row mapping. |
-| `physics/library/formulas/registry-manifest.csv` | The canonical, machine-readable formula list (102 entries + 2 markers). |
+| `physics/library/formulas/registry-manifest.csv` | The canonical, machine-readable formula list (125 entries + 2 markers). |
 | `physics/research/` | Mathematical grounding: per-regime derivations and UWBG catalogs. |
 | `informed-operator/design/residual-loss-methodology.md` | PINO multi-source training methodology. |
 
@@ -66,7 +66,7 @@ edits go to the atomic files.
 n-Op/
 ├── README.md
 ├── docs/
-│   ├── architecture/              atomic spec files (18 sections)
+│   ├── architecture/              atomic spec files (21 sections)
 │   ├── implementation/            atomic build-plan files (11 sections)
 │   ├── mvp/                       atomic diamond-MVP files (6 sections)
 │   ├── meta/                      manifest.yaml, conventions.md, glossary.md,
@@ -77,7 +77,7 @@ n-Op/
 │   ├── formula-registry.md
 │   └── properties.md
 ├── physics/
-│   ├── library/                   implementation scaffold (empty; awaiting language decision)
+│   ├── library/                   implementation scaffold (empty; language decided, build not started)
 │   │   ├── formulas/registry-manifest.csv
 │   │   └── cert/reference-data/    machine-readable cert reference battery
 │   └── research/                   mathematical grounding + UWBG domain catalogs
@@ -86,14 +86,17 @@ n-Op/
 └── interface/                      placeholder
 ```
 
-## The one open decision
+## Open decisions
 
-The **implementation language is not yet chosen**, and it blocks the first
-implementation phase. The always-cheap pipeline narrows the candidates to
-those with first-class staging + AD + sparse linear algebra: **Julia**
-(Symbolics + ModelingToolkit + Enzyme), **Python + JAX** (jit + JAXopt), or a
-**custom MLIR** stack. Everything in `docs/` is written language-neutrally.
-See `docs/architecture/18-open-decisions.md` for the full list.
+The **implementation language is decided** (arch-18, closed 2026-06): a
+polyglot of domain-specific DSLs joined at the Stage-4→Stage-5 codegen seam —
+**Haskell** hosts the Stage-1–4 symbolic compiler and the `arch-20` substrate,
+**Julia** is the Stage-5 runtime (Stage 4 emits Julia source), with **GAP**
+(offline group theory) and **Lean 4** (offline proofs) as sidecars. Everything
+in `docs/` remains language-neutral. Five decisions remain open — surrogate-net
+build vs adopt, the PDE-mesh adjoint scheme, the γ̂ §15.4 questions, the
+Layer-1.75 V2 spec, and the integrator interface — see
+`docs/architecture/18-open-decisions.md`.
 
 No code has been written yet. `physics/library/` is an empty scaffold whose
 directory names match the architecture.

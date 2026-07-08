@@ -1,5 +1,7 @@
 # Cheap-Residual Catalog & Residual-Generator Factory Specification
 
+> **Status note (2026-07 gap-audit).** This catalog is the S1–S5 reconciliation **snapshot** (87 entries). The canonical registry has since grown to 125+ substantive rows: the enumeration holes of this snapshot — polarization/piezo/2DEG, oxidation and H-desorption rates, radiation displacement — are **closed** by registry rows 105–127. Row numbers cited here (`#N`) are snapshot-local, not current registry numbers. The `ResidualGenerator` record shown in §3 predates the `applicability` slot every registered generator now carries (arch-13). The diamond–W worked example (§6) was corrected in place by the gap-audit (p-type barrier in the leakage chain, non-polar scattering channels, image-force and κ anchors) — `docs/audits/2026-07-07-gap-audit.md`.
+
 ## Preface
 
 This document organizes the cheap-residual catalog into a single executable substrate for the residual-generator factory. The catalog is operational: every entry is typed, tiered, and tagged so that the factory can mechanically instantiate it from the /physics vocabulary. Physics names are paired with computer-science contracts throughout; no string formulas appear in signatures.
@@ -407,7 +409,7 @@ Residuals proposed across Phase-1 that cannot currently be made cheap+differenti
 |---|---|---|---|
 | Multiphonon-emission-capture (#40) | Huang-Rhys factor computation is autodiff-hostile (involves displacement-vector projections onto phonon modes that change identity under structural perturbation) | T2/D2 faithful | **Accept as faithful-only.** Train a small surrogate net f(ΔE, ω_LO, Z_def, T) → C_p from DFT battery; use surrogate at training time, DFT at validation. |
 | Huang-Rhys factor (#41) | Same — mode-projection discontinuities | T2/D2 faithful | **Same surrogate strategy.** |
-| 4-phonon scattering | No closed-form adjoint; full calculation is O(N_q⁴) | (deferred; not catalogued) | **Out of scope for v1.** Mark in /physics registry as known-gap. Use 3-phonon κ_L (#25) and absorb 4-phonon contribution into a learned correction factor at high-T (>1500K). |
+| 4-phonon scattering | No closed-form adjoint; full calculation is O(N_q⁴) | (superseded) | **Superseded (2026-06 Pass C):** closed-form high-T 4-phonon correction landed as registry row 121 (`kappa-4phonon-high-t-correction`, valid T ≳ 0.4·Θ_D), with the iterative-LBTE sibling as row 122 (dormant `MethodEquivalence`, anchored to published κ_iter). Only the *live* 4-ph BTE solve remains V2 (arch-17). |
 | NEGF transmission (#80) | Self-energy adjoint is expensive (matrix inverse per energy point); coverage limited to small devices | T3/D2 faithful | **Faithful-only, on-demand.** Build NEGF battery at design-time; use Padovani-Stratton (#79) and Fowler-Nordheim (#77) as cheap proxies during training. |
 | SCPH/SSCHA (#13) | Self-consistent loop with structural updates — adjoint requires nested IFT | T2/D2 faithful | **Periodic refresh, treat as fixed target between refreshes.** S7 should schedule SCPH refresh at curriculum phase boundaries (S5's Refine→Calibrate). |
 | Cluster-expansion config energy (#84) | Configuration σ is discrete | T1/D4 | **Gumbel-Softmax relaxation** with temperature scheduled by curriculum (high τ at Warmup, anneal to 0.1 by Polish). |
@@ -454,7 +456,7 @@ These instantiate at registration; the factory verifies all `AdjointFn` slots ar
 7. `bond-valence-sum(h_interface_slab)` → C-C valence ≈ 4, W-C valence ≈ 4  [#55]
 
 *Layer 2 — depends on Layer 1:*
-8. `schottky-mott-alignment(W_W=4.55 eV, χ_diamond=−0.1 eV)` → φ_B^SM ≈ 4.65 eV  [#47, T0/D1]
+8. `schottky-mott-alignment(W_W=4.55 eV, χ_diamond(partial-H termination)≈−0.1 eV)` → φ_B^SM ≈ 4.65 eV (n-type barrier; χ is termination-tagged — canonical per-termination table in defects file Part E)  [#47, T0/D1]
 9. `MIGS-corrected-barrier(W_W, χ_d, S_diamond≈0.85, φ_CNL_diamond≈4.0)` → φ_B^eff ≈ 4.5 eV  [#48, T0/D1]
 10. `interface-bond-counting(slab_W-diamond)` → W-C bonds per unit area  [#50, T1/D1]
 11. `surface-grand-potential-γ(diamond, μ_H_environment)` for H-terminated and bare → termination preference  [#44, T1/D2]
@@ -467,21 +469,21 @@ These instantiate at registration; the factory verifies all `AdjointFn` slots ar
 16. `self-consistent-charge-balance(c_def(E_F,T), n(E_F,T), p(E_F,T))` → E_F* via IFT-backed fixed point  [#36, T1/D2]
 17. `mobility-impurity-phonon(N_imp, T=773K, m*_h)` → μ_h(773K) ≈ 300 cm²/Vs (down from 2000 at RT)  [#20, T0/D1]
 18. `matthiessen-mobility(μ_imp, μ_ph)` → μ_total  [#15, T0/D1]
-19. `callaway-lattice-kappa(ω_λ, τ_λ(T=773K))` → κ_L(773K) ≈ 800 W/m·K (down from 2200 at RT)  [#25, T2/D2 — uses cached τ surrogate]
+19. `callaway-lattice-kappa(ω_λ, τ_λ(T=773K))` → κ_L(773K) ≈ 620 W/m·K (down from ~2200 at RT; the 620 figure is the curated battery anchor — accuracy-ledger κ(T) table)  [#25, T2/D2 — uses cached τ surrogate]
 20. `chemical-potential-ref-table('W,T=773K,P=1atm)` → μ_W(773K)  [#66, T0/D0]
 21. `gibbs-free-energy-phase(diamond, T=773K, P=1atm)` and same for WC, graphite, W₂C → confirms WC is downhill from W+C at 773K  [#65, T1/D2]
 
 *Layer 4 — operating-condition observables:*
 22. `caughey-thomas-mobility(μ_total(773K), E=10⁶ V/cm, v_sat, β)` → effective μ(E,T) under bias  [#16, T0/D1]
-23. `v-sat-POP-limit(ω_LO_diamond=165 meV, m*_h, ε∞, ε0)` → v_sat ≈ 1.5×10⁷ cm/s  [#17, T0/D1]
-24. `image-force-barrier-lowering(E=10⁶, ε_diamond)` → Δφ ≈ 0.06 eV  [#49, T0/D0]
-25. `richardson-dushman-thermionic(φ_B^eff − Δφ, T=773K, A*)` → J_TE leakage  [#78, T0/D1]
-26. `padovani-stratton-TFE(φ_B, N_A=10²⁰, T=773K, m*_h)` → J_TFE (dominates at this T and doping)  [#79, T0/D1]
-27. `fowler-nordheim-current(φ_B, E=10⁶, m*_h)` → J_FN (subdominant at 773K but rising)  [#77, T0/D1]
+23. `v-sat-intervalley(ω_phonon=165 meV, m*_h)` → v_sat ≈ 1.5×10⁷ cm/s (diamond is **non-polar**: the POP branch is masked by `is-polar-material`; acoustic-deformation + intervalley emission set v_sat)  [#17, T0/D1]
+24. `image-force-barrier-lowering(E=10⁶ V/cm, ε_s=5.7)` → Δφ ≈ 0.16 eV (Wave-1 reconciliation: 0.06 was a √10 field error)  [#49, T0/D0]
+25. `richardson-dushman-thermionic(φ_B^p − Δφ, T=773K, A*_h)` with φ_B^p = E_g − φ_B^eff ≈ 5.47 − 4.5 ≈ 1.0 eV → J_TE leakage (the contact is p-type B-doped: holes see the **p-barrier**, not the 4.5 eV n-barrier)  [#78, T0/D1]
+26. `padovani-stratton-TFE(φ_B^p, N_A=10²⁰, T=773K, m*_h)` → J_TFE (dominates at this T and doping)  [#79, T0/D1]
+27. `fowler-nordheim-current(φ_B^p, E=10⁶, m*_h)` → J_FN (subdominant at 773K but rising)  [#77, T0/D1]
 28. `chynoweth-impact-ionization(α0_diamond, β/E)` → α at 10⁶ V/cm  [#74, T0/D1]
 29. `avalanche-multiplication(α, L_depl)` → M (should be <2 for safe operation)  [#75, T1/D2]
 30. `hot-carrier-temperature-balance(j·E, τ_E(773K), T_L=773K)` → T_e ≈ 1100K (hot carriers significantly above lattice)  [#72, T0/D1]
-31. `frohlich-scattering-rate(α_F=0.06 diamond, T=773K, ε_k=T_e·k_B)` → τ_F⁻¹  [#22, T1/D1]
+31. `is-polar-material(diamond) = false` masks `frohlich-scattering-rate` [#22] (diamond has zero Born charges ⇒ α_F = 0); hot-carrier momentum relaxation runs through the acoustic-deformation-potential + intervalley rates instead  [T1/D1]
 32. `deformation-potential-gap-shift(E_g, ε_thermal_mismatch_strain)` → ΔE_g ≈ −0.02 eV under thermal stress  [#63, T1/D1]
 
 *Layer 5 — coupled EM-thermal closure:*

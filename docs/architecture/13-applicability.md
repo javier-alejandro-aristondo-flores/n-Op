@@ -26,6 +26,27 @@ metal-semiconductor interface; polar-optical scattering iff polar — false for
 diamond; carbide-formation iff the interface includes a carbide former — false
 for Pt/diamond, true for Ti/diamond).
 
+**Two distinct "polar" predicates (normative; 2026-07 gap-audit / Wave-2).**
+"Polar" conflates two independent crystal properties and the registry gates on
+each separately:
+
+- `is-polar-material` — nonzero Born effective charges / LO–TO splitting.
+  Gates the **Fröhlich / polar-optical-phonon** paths (the `LongRangeStatic`
+  e-ph channels, POP-limited v_sat, LST-derived ε_r). A property of the
+  *bonds*, not the point group.
+- `is-noncentrosymmetric` — piezoelectric crystal classes (no inversion
+  center). Gates the **polarization package**: P_sp, piezoelectric tensors,
+  2DEG n_s, pyroelectricity (rows 113–119, 128).
+
+The two coincide on the corpus anchors that made the conflation invisible —
+diamond (both false), wurtzite III-N (both true) — and **split on β-Ga₂O₃
+(C2/m: centrosymmetric, so no P_sp/piezo/pyro — yet strongly polar-phonon,
+with a massive multi-mode Fröhlich interaction that is its dominant mobility
+limiter).** Gating rows 113–119/128 on the Fröhlich-sense predicate would
+wrongly activate spontaneous polarization for β-Ga₂O₃; gating Fröhlich on the
+piezo-sense predicate would wrongly *deactivate* its dominant scattering
+channel.
+
 V1 commitment: every registry entry gets an explicit `applicability` field;
 always-true stubs are acceptable for V1.0 and refined incrementally. Open
 questions (deferred): soft `[0,1]` classifiers, and classifier composition under

@@ -656,7 +656,8 @@ residualized: force = −∇energy, and equivariance). Rows 1–87 are grounded 
 domain research (`physics/research/`); rows 88–102 are the linear-response and
 topology-atlas extensions; rows 105–112 are the slow-tier degradation / radiation
 extensions (`arch-21-multiscale-state §21.13`); rows 113–119 are the
-polarization / piezoelectric / 2DEG package (`is-polar-material`-gated; GaN/AlN/AlGaN
+polarization / piezoelectric / 2DEG package (`is-noncentrosymmetric`-gated —
+see the two-predicate split in `arch-13-applicability`; GaN/AlN/AlGaN
 HEMTs); rows 120–127 are the per-material accuracy package (AHC gap(T) renormalization,
 the 4-phonon / iterative-LBTE κ(T) siblings, the breakdown-field T-slope, the T,P-aware
 metastability hull, the Wegscheider and rotational sum-rule consistency residuals, and

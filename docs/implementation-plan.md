@@ -232,7 +232,7 @@ duplicating it.
 # The named-formula registry
 
 The canonical, machine-readable list is
-`physics/library/formulas/registry-manifest.csv` — 125 substantive rows plus 2
+`physics/library/formulas/registry-manifest.csv` — 132 substantive rows plus 2
 markers for relations enforced architecturally and therefore not residualized
 (force = −∇energy; equivariance). `formula-registry.md` is the narrative index.
 Every algebraic combination invokes a named formula with typed inputs and an
@@ -302,7 +302,9 @@ The eleven physics-domain bundles `B1..B11` are listed in
 - **B5 surface-resolved** — SurfaceEnergy, surface grand potential, Wulff shape,
   termination stability window.
 - **B6 interface-resolved** — Schottky barrier (Schottky–Mott + MIGS), band
-  offset, interface dipole, adhesion, contact resistance, field emission.
+  offset, interface dipole, adhesion, contact resistance, field emission;
+  the polarization / 2DEG package (rows 113–119) and the gate-dielectric
+  layer models (Poole–Frenkel row 129; pyroelectric n_s(T) row 128).
 - **B7 mechanics** — elastic constants C_ij, bulk modulus, sound velocity,
   hardness, deformation potentials, piezoresistance.
 - **B8 thermodynamics** — Gibbs free energy, phase-diagram convex hull,
@@ -312,9 +314,13 @@ The eleven physics-domain bundles `B1..B11` are listed in
   currents (Fowler–Nordheim, Richardson–Dushman, Padovani–Stratton), NEGF
   transmission.
 - **B10 static-validity** — bond-valence sum, Pauling radius ratio, Born
-  stability, generalized stacking-fault energy, structure uniqueness.
+  stability, generalized stacking-fault energy, structure uniqueness; the
+  XRD structure-factor channel (row 132).
 - **B11 degradation** — carbide growth, electromigration MTTF, Coffin–Manson
-  fatigue.
+  fatigue; the slow-tier kinetics (rows 105–112: vacancy generation,
+  H redistribution / desorption, platelet nucleation, vibration-driven
+  dislocation multiplication, air oxidation, radiation displacement); the
+  gate-dielectric lifetime pair (TDDB row 130, JMAK crystallization row 131).
 
 (A file tree may additionally group observable *modules* by output data-shape;
 the residual-driving grouping is the eleven physics-domain bundles.)
@@ -778,7 +784,7 @@ Stages 1–4 + the substrate, emitting a **Julia** Stage-5 runtime, with **GAP**
 | 4 | **Unified state** (`state`): the 7-tuple container; per-level components (L1–L4); enumerate/serialize/hash | State encoding complete |
 | 5 | **Methods vocabulary** (`methods`): the 12 methods + sub-method dispatch | Computational vocabulary, tested per method |
 | 6 | **Templates** (`abstract-properties`): the 20 templates as typed factories | Template machinery, tested with multiple argument tuples |
-| 7 | **Formula registry** (`formulas`): the 125 formulas with typed signatures + citations; the manifest; **applicability-decidability gate** (every classifier first-order decidable on typeclass tags; non-decidable entries rejected — `impl-04-formulas`) | Closed registry; algebraic combinations no longer hand-waved |
+| 7 | **Formula registry** (`formulas`): the 132 formulas with typed signatures + citations; the manifest; **applicability-decidability gate** (every classifier first-order decidable on typeclass tags; non-decidable entries rejected — `impl-04-formulas`) | Closed registry; algebraic combinations no longer hand-waved |
 | 8 | **GENERIC operators** (`generic`): L sub-brackets, M sub-brackets, assembly; **instantiate active `CouplingSpec` via Stage-2.5 invariant synthesis** (`arch-19-coupling-structure`) and attach generated `InvariantTerm`s to the `E_coupling`, `L_assembly`, `M_assembly` aggregators | Antisymmetry of L, PSD of M, Jacobi, degeneracy verified |
 | 9 | **Canonicals** (`canonicals`): E[x] and S[x] assembled across levels | Dimensional + analytic-limit checks pass |
 | 10 | **Observables** (`observables`): the target observables as compositions (§6), in 11 bundles | Library callable for any observable; reference-crystal checks |
@@ -814,7 +820,7 @@ The spec is internally consistent when:
 6. Every cert obligation (§10) corresponds to a residual category or an algebraic
    identity, and maps to a Layer-0 axis.
 7. The counts here match `arch-09-vocabularies` exactly (12 methods, 20 templates,
-   125 formulas, 11 bundles, 19 residual categories, 10 cert obligations).
+   132 formulas, 11 bundles, 19 residual categories, 10 cert obligations).
 
 Once the Phase-0 skeleton exists, items 1–7 are checkable mechanically by walking
 the tree and the registry manifest.
@@ -823,7 +829,7 @@ the tree and the registry manifest.
 
 Five sequential gates validate the built system:
 
-1. **Registration sanity.** All 125 formulas instantiate as `ResidualGenerator`
+1. **Registration sanity.** All 132 formulas instantiate as `ResidualGenerator`
    records without error; every D2 entry passes the registration-time adjoint
    gate (`impl-07-residual-factory §7.5`); every D4 entry carries an
    obligation-9 rationale; D0/D1 entries register without an adjoint (none

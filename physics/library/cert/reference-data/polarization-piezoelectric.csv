@@ -1,12 +1,12 @@
 Property,Material,Environment,Value,Uncertainty,Source,Source class,Version,Added,Modified
-spontaneous-polarization-ZBref,GaN (wz),—,−0.029 to −0.034 C/m2,—,Bernardini Fiorentini Vanderbilt PRB 56 R10024 (1997); Zoroddu PRB 63 045208 (2001) GGA,dft-lda,1,2026-06-10,2026-06-10
-spontaneous-polarization-ZBref,AlN (wz),—,−0.081 to −0.090 C/m2,—,BFV PRB 56 R10024 (1997); Zoroddu PRB 63 (2001),dft-lda,1,2026-06-10,2026-06-10
-born-charge-Zstar-axial,GaN (wz),—,+2.7 e,—,BFV PRB 56 R10024 (1997),dft-dfpt,1,2026-06-10,2026-06-10
-born-charge-Zstar-axial,AlN (wz),—,+2.7 e,—,BFV PRB 56 R10024 (1997),dft-dfpt,1,2026-06-10,2026-06-10
-piezoelectric-e33-full,GaN (wz),—,0.73 C/m2 (HSE 1.02),—,BFV 1997; Dreyer PRX 6 021038 (2016),dft-lda,1,2026-06-10,2026-06-10
-piezoelectric-e33-full,AlN (wz),—,1.46 C/m2 (HSE 1.57),—,BFV 1997; Dreyer 2016,dft-lda,1,2026-06-10,2026-06-10
-piezoelectric-e31-proper,GaN (wz),—,−0.49 C/m2 (HSE −0.55),—,BFV 1997; Dreyer 2016 — MUST pair with ZB-ref P_sp,dft-lda,1,2026-06-10,2026-06-10
-piezoelectric-e31-proper,AlN (wz),—,−0.60 C/m2 (HSE −0.68),—,BFV 1997; Dreyer 2016 — MUST pair with ZB-ref P_sp,dft-lda,1,2026-06-10,2026-06-10
-piezoelectric-e31-improper,GaN (wz),—,−1.86 C/m2,—,Dreyer PRX 6 021038 (2016) — do NOT pair with ZB-ref P_sp (reference only),dft-hse,1,2026-06-10,2026-06-10
-piezoelectric-e31-improper,AlN (wz),—,−2.03 C/m2,—,Dreyer 2016 — do NOT pair with ZB-ref P_sp (reference only),dft-hse,1,2026-06-10,2026-06-10
+spontaneous-polarization-ZBref,GaN (wz),—,−0.029 to −0.034 C/m2,0.003 C/m2,Bernardini Fiorentini Vanderbilt PRB 56 R10024 (1997); Zoroddu PRB 63 045208 (2001) GGA,dft-lda,2,2026-06-10,2026-07-08
+spontaneous-polarization-ZBref,AlN (wz),—,−0.081 to −0.090 C/m2,0.005 C/m2,BFV PRB 56 R10024 (1997); Zoroddu PRB 63 (2001),dft-lda,2,2026-06-10,2026-07-08
+born-charge-Zstar-axial,GaN (wz),—,+2.7 e,0.1 e,BFV PRB 56 R10024 (1997),dft-dfpt,2,2026-06-10,2026-07-08
+born-charge-Zstar-axial,AlN (wz),—,+2.7 e,0.1 e,BFV PRB 56 R10024 (1997),dft-dfpt,2,2026-06-10,2026-07-08
+piezoelectric-e33-full,GaN (wz),—,0.73 C/m2 (HSE 1.02),0.15 C/m2,BFV 1997; Dreyer PRX 6 021038 (2016),dft-lda,2,2026-06-10,2026-07-08
+piezoelectric-e33-full,AlN (wz),—,1.46 C/m2 (HSE 1.57),0.1 C/m2,BFV 1997; Dreyer 2016,dft-lda,2,2026-06-10,2026-07-08
+piezoelectric-e31-proper,GaN (wz),—,−0.49 C/m2 (HSE −0.55),0.05 C/m2,BFV 1997; Dreyer 2016 — MUST pair with ZB-ref P_sp,dft-lda,2,2026-06-10,2026-07-08
+piezoelectric-e31-proper,AlN (wz),—,−0.60 C/m2 (HSE −0.68),0.05 C/m2,BFV 1997; Dreyer 2016 — MUST pair with ZB-ref P_sp,dft-lda,2,2026-06-10,2026-07-08
+piezoelectric-e31-improper,GaN (wz),—,−1.86 C/m2,0.1 C/m2,Dreyer PRX 6 021038 (2016) — do NOT pair with ZB-ref P_sp (reference only),dft-hse,2,2026-06-10,2026-07-08
+piezoelectric-e31-improper,AlN (wz),—,−2.03 C/m2,0.1 C/m2,Dreyer 2016 — do NOT pair with ZB-ref P_sp (reference only),dft-hse,2,2026-06-10,2026-07-08
 2deg-sheet-density,AlGaN/GaN (Ga-face x≈0.3),—,1.1e13 cm-2,×0.1,Ambacher et al. JAP 87 334 (2000) 10.1063/1.371866,experimental,1,2026-06-10,2026-06-10

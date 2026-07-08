@@ -70,6 +70,30 @@ Stated and held, so the architecture is honest about what it does not cover:
 - Plasma-process surface damage; grain-boundary statistics; continuum creep /
   dislocation climb; quantum-tunneling-corrected reaction rates (classical
   Eyring TST adequate at T_op ≥ 600 K).
+- **Total-ionizing-dose (TID) radiation effects** — oxide trapped charge and
+  D_it buildup in gate dielectrics under ionizing flux. Displacement damage
+  (rows 111–112) is in scope; TID is predominantly amorphous-oxide physics and
+  is deferred with the dielectric wave (couples to the amorphous-ALD entry
+  below). (2026-07 gap-audit B5.)
+- **Single-event effects (SEE/SEU)** — transient upsets from single-particle
+  strikes; belongs to a digital-circuit layer above `/physics`
+  (`non-equilibrium-high-field.md` H.3 disposition, now registered here).
+- **h-BN as a host material** — appears in research anchor sets only; the
+  layered-material machinery it needs (direction-dependent moduli — the
+  bulk-modulus classifier already special-cases it — borderline-polar in-plane
+  response, van-der-Waals interlayer channel) is not in the V1 scope list
+  (arch-01). Decide in only if a 2D-substrate use case materializes.
+- **Amorphous ALD gate films** — `/physics` models the *crystalline* polymorphs
+  (α-Al₂O₃, monoclinic HfO₂, AlN-as-dielectric); as-deposited amorphous films
+  have no `PeriodicityStructure` and are out of scope as hosts. Their
+  *crystallization* — the >700 °C leakage-spike driver — **is** in scope as the
+  slow-tier JMAK row (registry row 131), and the dielectric compact-model rows
+  (Poole–Frenkel 129, TDDB 130) apply to the film as a parameterized layer, not
+  as a resolved crystal. (2026-07 gap-audit B2/B5.)
+- **General dopant redistribution** — row 106's drift–diffusion shape
+  instantiates per species; V1 carries H (the corpus's named "silent killer");
+  other dopants (Mg in GaN, …) are per-material wave instantiations of the same
+  row, not new physics.
 - True renormalization-group flow; inverse design / minimal-model search (would
   live in `/informed-operator` as a PINO head, not a `/physics` primitive);
   fragile topology.

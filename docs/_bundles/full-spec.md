@@ -168,6 +168,10 @@ x(t) = ( h,      cell vectors                       ∈ GL⁺(3, ℝ)   (3×3 re
          A )     external EM vector potential        ∈ ℝ³ field A(r,t)
 ```
 
+(`A` is carried in the Weyl gauge `A₀ ≡ 0`, transverse `∇·A = 0`; the
+electrostatic sector lives in the matter functionals — normative gauge/partition
+paragraph in `arch-05-generic`.)
+
 These are the **irreducible degrees of freedom of the micro tier**. Quantities
 recoverable from the 7-tuple by coarse-graining **on the micro timescale and
 scale** — phonon distributions `n_{q,s}`, the carrier distribution `f_n(k,r)`,
@@ -334,6 +338,21 @@ resolved (no double-count). The e-ph coupling channel contributes the linear-ord
 cross-term for the `L`/`M` blocks and the beyond-reference part of `E_coupling`, not
 the full electron–ion energy.
 
+**Gauge fixing and the electrostatic partition (normative).** The state's `A`
+(`arch-04-state`) is carried in the **Weyl gauge** `A₀ ≡ 0` with the residual
+time-independent gauge freedom fixed by transversality `∇·A = 0` — i.e. the
+Coulomb-gauge radiation field. Under this split, `E_EM[A] = (1/8π)∫(|E_⊥|² + |B|²)`
+counts the **transverse (radiation) sector only**; the **longitudinal /
+electrostatic sector is owned by the matter functionals** — the Hartree term inside
+`E_KS[γ̂]` and the ion–ion electrostatic channel — and appears nowhere in `E_EM`, so
+no electrostatic energy is double-counted between the field and matter terms. This
+is the standard nonrelativistic-QED partition (transverse field dynamical; Coulomb
+interaction instantaneous in the matter sector). Consequences: the `EOM/A` residual
+(`arch-11-residuals §11.1`) is evaluated on the transverse `A` in this gauge and is
+therefore gauge-unambiguous; the minimal-coupling channel (`arch-19`) reads the
+transverse `A`; gauge invariance of observables remains architectural (the
+equivariance marker, registry row 104). (2026-07 gap-audit A2.)
+
 ---
 
 
@@ -401,7 +420,7 @@ Every operation in `/physics` is one of these three:
 
 1. **`Input`** — a slot for a state component (`h`, `R_I`, `P_I`, `Π_h`,
    `Z_I`, `γ̂`, `A`) or an environmental scalar (`T`, `μ`, `E_field`, …).
-2. **`FormulaApply`** — application of one of the 125 named formulas
+2. **`FormulaApply`** — application of one of the 132 named formulas
    (`arch-09-vocabularies §9.3`) to typed argument nodes.
 3. **`MethodInvoke`** — application of one of the 12 computational
    methods (`arch-09-vocabularies §9.1`) to typed argument nodes.
@@ -464,7 +483,7 @@ them either — they are codegen inputs, consumed at Stage 4 and erased.
 
 | Vocabulary item | Realized as |
 |---|---|
-| 125 formulas (`arch-09-vocabularies §9.3`) | typing rules for `FormulaApply` nodes |
+| 132 formulas (`arch-09-vocabularies §9.3`) | typing rules for `FormulaApply` nodes |
 | 12 methods (`arch-09-vocabularies §9.1`) | typing rules for `MethodInvoke` nodes |
 | 20 templates (`arch-09-vocabularies §9.2`) | graph-construction macros that emit subgraphs |
 | 11 bundles (`arch-09-vocabularies §9.4`) | the `bundle` payload of `Observable` roles |
@@ -588,7 +607,7 @@ lowered into `FormulaApply` nodes attached to the `E_coupling`,
   residuals (a band structure, a charge density, a force field, a
   dynamical matrix) collapse to a single node referenced by all
   consumers.
-- **Cross-formula CSE.** The 125 named formulas often share
+- **Cross-formula CSE.** The 132 named formulas often share
   intermediate quantities; CSE pulls these out.
 - **Tearing and alias elimination.** Algebraic dependencies are
   resolved at compose-time (ModelingToolkit-style); sparsity patterns
@@ -783,7 +802,7 @@ Every other document references these numbers rather than restating them.
 | Dressing layers | 1 / 1.25 / 1.75 / 2 / 3 | yes |
 | Computational methods | 12 (+3 sub-methods) | yes |
 | Abstract-property templates | 20 | yes |
-| Named formulas | 125 substantive (+2 rejected markers) | yes — see `formula-registry.md` |
+| Named formulas | 132 substantive (+2 rejected markers) | yes — see `formula-registry.md` |
 | Observable bundles | 11 (B1–B11) | yes |
 | Residual categories | 19 | yes |
 | Cert obligations | 10 | yes |
@@ -853,12 +872,12 @@ Bulk-boundary correspondence is **not** a template; it is handled at the cert
 layer (obligation-7, a `DiscreteStructure` morphism over the topology atlas,
 §14).
 
-### 9.3 125 named formulas
+### 9.3 132 named formulas
 
 Closed registry of typed, fully-parameterized algebraic formulas, named by
 behavior (person-attribution names appear only as parenthetical literature
 pointers). The canonical machine-readable list is
-`physics/library/formulas/registry-manifest.csv` (125 substantive rows + 2
+`physics/library/formulas/registry-manifest.csv` (132 substantive rows + 2
 markers for relations that are enforced architecturally and therefore *not*
 residualized: force = −∇energy, and equivariance). Rows 1–87 are grounded in the
 domain research (`physics/research/`); rows 88–102 are the linear-response and
@@ -868,9 +887,12 @@ polarization / piezoelectric / 2DEG package (`is-polar-material`-gated; GaN/AlN/
 HEMTs); rows 120–127 are the per-material accuracy package (AHC gap(T) renormalization,
 the 4-phonon / iterative-LBTE κ(T) siblings, the breakdown-field T-slope, the T,P-aware
 metastability hull, the Wegscheider and rotational sum-rule consistency residuals, and
-alloy-disorder scattering). Each formula carries a typed signature, a cost tier
-`T0..T3`, a differentiability tag `D0..D4`, and an applicability classifier
-(§13). See `formula-registry.md` for the narrative index.
+alloy-disorder scattering); rows 128–134 are the 2026-07 gap-audit package
+(pyroelectric n_s(T), the gate-dielectric aging trio — Poole–Frenkel, TDDB,
+JMAK crystallization — the XRD / Raman experimental-structure channels, and the
+radiative-recombination detailed-balance rate). Each formula carries a typed
+signature, a cost tier `T0..T3`, a differentiability tag `D0..D4`, and an
+applicability classifier (§13). See `formula-registry.md` for the narrative index.
 
 ### 9.4 Eleven observable bundles
 
@@ -974,8 +996,14 @@ append, because it changes the meaning of every recorded coefficient.
 | `SOCScheme` | `DiracPAW \| TwoComponentZORA \| SecondVariational \| PerturbativeSOC` | |
 
 `AtomicSpecies` (the key universe of `pseudopotential_set`) is the
-ordinary closed vocabulary of the elements; for the MVP it is `{C, B, N,
-Al, Ga}`. `* HybridAsManyBody` is reserved/deprecated for V1 — a hybrid
+ordinary closed vocabulary of the elements; for V1 it is `{C, B, N, Al,
+Ga, O, H}` — O and H are required by the committed content, not future
+scope: β-Ga₂O₃ is an arch-01 host (and a `DefectSpecies` host,
+`arch-21 §21.2.1`), the O-bearing defects (`O_N`, `V_Al–O`, `V_Ga–O_N`,
+`V_O–H`) decorate III-N/oxide hosts, and the seeded slow-tier rows read H
+(rows 106, 110) and O via `p_O2` (row 109). Si and the contact-metal
+species enter with their waves (schema_version bump per `arch-20 §20.9`).
+`* HybridAsManyBody` is reserved/deprecated for V1 — a hybrid
 is always recorded as `XCFunctionalTag.Hybrid` with `ManyBodyLevel.KohnSham`,
 normalized by `make-theory-context` (`arch-19 §19.8`) so the
 `Address[TheoryContext]` is canonical.
@@ -1087,7 +1115,11 @@ each contribution, not a granularity floor or a unit of weighting.
      (`arch-05-generic`), so it is a generator-construction-bug tripwire, not a
      PINO training-loss term.
   9. `Conservation` — energy, particle-number / charge, momentum /
-     crystal-momentum, spin.
+     crystal-momentum, spin. Particle number includes the **static γ̂-trace
+     admissibility** `‖Tr γ̂ − N_e‖²` (N_e fixed by `SiteDecoration`) checked per
+     snapshot — a candidate state must carry the right electron count, not merely
+     conserve whatever count it has along a trajectory. Structural on the state;
+     no new formula row.
  10. `Positivity` — `M ⪰ 0`, `f ∈ [0,1]`, `ρ ≥ 0`, `ω² ≥ 0`,
      `σ ⪰ 0`, `|S_i| = 1`. `ω² ≥ 0` is **applicability-gated** to phases claimed
      dynamically stable, so it does not penalize legitimate saddle / transition
@@ -1095,6 +1127,16 @@ each contribution, not a granularity floor or a unit of weighting.
      electron-temperature bound `T_e ≥ T_L` (reads registry row 72) and the
      avalanche breakdown-integral guard `max(0, ∫α dx − 1)²` (reads registry row 75) —
      both reference existing rows, no new formula row.
+     Also **γ̂ admissibility** (ensemble N-representability, the state-level
+     analogue of `f ∈ [0,1]`): `γ̂† = γ̂` and `0 ⪯ γ̂ ⪯ 1`, evaluated as per-k-block
+     spectral bounds on the `(Reciprocal, BlockDiag)` encoding (`arch-15-gamma-hat`
+     §15.5 — extreme eigenvalues per block are cheap); the T=0 idempotency
+     `‖γ̂² − γ̂‖²` is applicability-gated to claimed-zero-temperature states exactly
+     as `ω² ≥ 0` is gated to claimed-stable phases. A candidate γ̂ outside these
+     bounds can zero every EOM residual while being unphysical — these are the
+     admissibility gates that make the oracle sound as a *verifier* of the state
+     itself, not only of its dynamics (2026-07 gap-audit A1). Structural on the
+     state; no new formula row.
 
 **Algebraic identities — 5 categories** (the former umbrella, now
 split by analytic kind):
@@ -1791,6 +1833,30 @@ Stated and held, so the architecture is honest about what it does not cover:
 - Plasma-process surface damage; grain-boundary statistics; continuum creep /
   dislocation climb; quantum-tunneling-corrected reaction rates (classical
   Eyring TST adequate at T_op ≥ 600 K).
+- **Total-ionizing-dose (TID) radiation effects** — oxide trapped charge and
+  D_it buildup in gate dielectrics under ionizing flux. Displacement damage
+  (rows 111–112) is in scope; TID is predominantly amorphous-oxide physics and
+  is deferred with the dielectric wave (couples to the amorphous-ALD entry
+  below). (2026-07 gap-audit B5.)
+- **Single-event effects (SEE/SEU)** — transient upsets from single-particle
+  strikes; belongs to a digital-circuit layer above `/physics`
+  (`non-equilibrium-high-field.md` H.3 disposition, now registered here).
+- **h-BN as a host material** — appears in research anchor sets only; the
+  layered-material machinery it needs (direction-dependent moduli — the
+  bulk-modulus classifier already special-cases it — borderline-polar in-plane
+  response, van-der-Waals interlayer channel) is not in the V1 scope list
+  (arch-01). Decide in only if a 2D-substrate use case materializes.
+- **Amorphous ALD gate films** — `/physics` models the *crystalline* polymorphs
+  (α-Al₂O₃, monoclinic HfO₂, AlN-as-dielectric); as-deposited amorphous films
+  have no `PeriodicityStructure` and are out of scope as hosts. Their
+  *crystallization* — the >700 °C leakage-spike driver — **is** in scope as the
+  slow-tier JMAK row (registry row 131), and the dielectric compact-model rows
+  (Poole–Frenkel 129, TDDB 130) apply to the film as a parameterized layer, not
+  as a resolved crystal. (2026-07 gap-audit B2/B5.)
+- **General dopant redistribution** — row 106's drift–diffusion shape
+  instantiates per species; V1 carries H (the corpus's named "silent killer");
+  other dopants (Mg in GaN, …) are per-material wave instantiations of the same
+  row, not new physics.
 - True renormalization-group flow; inverse design / minimal-model search (would
   live in `/informed-operator` as a PINO head, not a `/physics` primitive);
   fragile topology.
@@ -3009,7 +3075,7 @@ duplicating it.
 # The named-formula registry
 
 The canonical, machine-readable list is
-`physics/library/formulas/registry-manifest.csv` — 125 substantive rows plus 2
+`physics/library/formulas/registry-manifest.csv` — 132 substantive rows plus 2
 markers for relations enforced architecturally and therefore not residualized
 (force = −∇energy; equivariance). `formula-registry.md` is the narrative index.
 Every algebraic combination invokes a named formula with typed inputs and an
@@ -3079,7 +3145,9 @@ The eleven physics-domain bundles `B1..B11` are listed in
 - **B5 surface-resolved** — SurfaceEnergy, surface grand potential, Wulff shape,
   termination stability window.
 - **B6 interface-resolved** — Schottky barrier (Schottky–Mott + MIGS), band
-  offset, interface dipole, adhesion, contact resistance, field emission.
+  offset, interface dipole, adhesion, contact resistance, field emission;
+  the polarization / 2DEG package (rows 113–119) and the gate-dielectric
+  layer models (Poole–Frenkel row 129; pyroelectric n_s(T) row 128).
 - **B7 mechanics** — elastic constants C_ij, bulk modulus, sound velocity,
   hardness, deformation potentials, piezoresistance.
 - **B8 thermodynamics** — Gibbs free energy, phase-diagram convex hull,
@@ -3089,9 +3157,13 @@ The eleven physics-domain bundles `B1..B11` are listed in
   currents (Fowler–Nordheim, Richardson–Dushman, Padovani–Stratton), NEGF
   transmission.
 - **B10 static-validity** — bond-valence sum, Pauling radius ratio, Born
-  stability, generalized stacking-fault energy, structure uniqueness.
+  stability, generalized stacking-fault energy, structure uniqueness; the
+  XRD structure-factor channel (row 132).
 - **B11 degradation** — carbide growth, electromigration MTTF, Coffin–Manson
-  fatigue.
+  fatigue; the slow-tier kinetics (rows 105–112: vacancy generation,
+  H redistribution / desorption, platelet nucleation, vibration-driven
+  dislocation multiplication, air oxidation, radiation displacement); the
+  gate-dielectric lifetime pair (TDDB row 130, JMAK crystallization row 131).
 
 (A file tree may additionally group observable *modules* by output data-shape;
 the residual-driving grouping is the eleven physics-domain bundles.)
@@ -3555,7 +3627,7 @@ Stages 1–4 + the substrate, emitting a **Julia** Stage-5 runtime, with **GAP**
 | 4 | **Unified state** (`state`): the 7-tuple container; per-level components (L1–L4); enumerate/serialize/hash | State encoding complete |
 | 5 | **Methods vocabulary** (`methods`): the 12 methods + sub-method dispatch | Computational vocabulary, tested per method |
 | 6 | **Templates** (`abstract-properties`): the 20 templates as typed factories | Template machinery, tested with multiple argument tuples |
-| 7 | **Formula registry** (`formulas`): the 125 formulas with typed signatures + citations; the manifest; **applicability-decidability gate** (every classifier first-order decidable on typeclass tags; non-decidable entries rejected — `impl-04-formulas`) | Closed registry; algebraic combinations no longer hand-waved |
+| 7 | **Formula registry** (`formulas`): the 132 formulas with typed signatures + citations; the manifest; **applicability-decidability gate** (every classifier first-order decidable on typeclass tags; non-decidable entries rejected — `impl-04-formulas`) | Closed registry; algebraic combinations no longer hand-waved |
 | 8 | **GENERIC operators** (`generic`): L sub-brackets, M sub-brackets, assembly; **instantiate active `CouplingSpec` via Stage-2.5 invariant synthesis** (`arch-19-coupling-structure`) and attach generated `InvariantTerm`s to the `E_coupling`, `L_assembly`, `M_assembly` aggregators | Antisymmetry of L, PSD of M, Jacobi, degeneracy verified |
 | 9 | **Canonicals** (`canonicals`): E[x] and S[x] assembled across levels | Dimensional + analytic-limit checks pass |
 | 10 | **Observables** (`observables`): the target observables as compositions (§6), in 11 bundles | Library callable for any observable; reference-crystal checks |
@@ -3591,7 +3663,7 @@ The spec is internally consistent when:
 6. Every cert obligation (§10) corresponds to a residual category or an algebraic
    identity, and maps to a Layer-0 axis.
 7. The counts here match `arch-09-vocabularies` exactly (12 methods, 20 templates,
-   125 formulas, 11 bundles, 19 residual categories, 10 cert obligations).
+   132 formulas, 11 bundles, 19 residual categories, 10 cert obligations).
 
 Once the Phase-0 skeleton exists, items 1–7 are checkable mechanically by walking
 the tree and the registry manifest.
@@ -3600,7 +3672,7 @@ the tree and the registry manifest.
 
 Five sequential gates validate the built system:
 
-1. **Registration sanity.** All 125 formulas instantiate as `ResidualGenerator`
+1. **Registration sanity.** All 132 formulas instantiate as `ResidualGenerator`
    records without error; every D2 entry passes the registration-time adjoint
    gate (`impl-07-residual-factory §7.5`); every D4 entry carries an
    obligation-9 rationale; D0/D1 entries register without an adjoint (none
@@ -3748,7 +3820,7 @@ stability; one heterostructure check (c-BN on diamond) via lattice matching.*
 # In-MVP vs deferred
 
 **In the MVP**
-- ~35 named formulas (the rows above) of the 125.
+- ~35 named formulas (the rows above) of the 132.
 - 9 of the 12 methods (all but `path-search`, `convex-optimization` beyond the
   hull check, `statistical-sampling`, `microkinetic-steady-state` — chemical/MC
   machinery not on the diamond path).

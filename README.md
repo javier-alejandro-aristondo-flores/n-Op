@@ -52,7 +52,7 @@ monoliths are regenerated from the tree by `docs/meta/assemble.py`.
 | `docs/meta/manifest.yaml` | Assembly order + named LLM-context bundles. |
 | `docs/formula-registry.md` | Narrative index over the closed formula registry. |
 | `docs/properties.md` | The nine property categories with bundle/formula-row mapping. |
-| `physics/library/formulas/registry-manifest.csv` | The canonical, machine-readable formula list (125 entries + 2 markers). |
+| `physics/library/formulas/registry-manifest.csv` | The canonical, machine-readable formula list (132 entries + 2 markers). |
 | `physics/research/` | Mathematical grounding: per-regime derivations and UWBG catalogs. |
 | `informed-operator/design/residual-loss-methodology.md` | PINO multi-source training methodology. |
 

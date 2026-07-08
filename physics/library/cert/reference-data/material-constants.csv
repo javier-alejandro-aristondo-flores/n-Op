@@ -1,26 +1,26 @@
 Property,Material,Environment,Value,Uncertainty,Source,Source class,Version,Added,Modified
 bandgap-direct,GaN (wz),0 K,3.51 eV,0.01 eV,Vurgaftman & Meyer JAP 94 3675 (2003) 10.1063/1.1600519,experimental-review,1,2026-06-10,2026-06-10
 bandgap-direct,AlN (wz),0 K,6.25 eV,0.05 eV,Vurgaftman & Meyer JAP 94 3675 (2003),experimental-review,1,2026-06-10,2026-06-10
-varshni-alpha,GaN (wz),—,0.909 meV/K,—,Vurgaftman & Meyer 2003 (Nepal APL 87 242104 2005: 0.94),experimental-review,1,2026-06-10,2026-06-10
-varshni-beta,GaN (wz),—,830 K,—,Vurgaftman & Meyer 2003 (Nepal 2005: 791 K),experimental-review,1,2026-06-10,2026-06-10
-varshni-alpha,AlN (wz),—,1.799 meV/K,—,Vurgaftman & Meyer 2003 (Nepal 2005: 2.63),experimental-review,1,2026-06-10,2026-06-10
-varshni-beta,AlN (wz),—,1462 K,—,Vurgaftman & Meyer 2003 (Nepal 2005: 2082 K),experimental-review,1,2026-06-10,2026-06-10
+varshni-alpha,GaN (wz),—,0.909 meV/K,0.15 meV/K,Vurgaftman & Meyer 2003 (Nepal APL 87 242104 2005: 0.94),experimental-review,2,2026-06-10,2026-07-08
+varshni-beta,GaN (wz),—,830 K,150 K,Vurgaftman & Meyer 2003 (Nepal 2005: 791 K),experimental-review,2,2026-06-10,2026-07-08
+varshni-alpha,AlN (wz),—,1.799 meV/K,0.5 meV/K,Vurgaftman & Meyer 2003 (Nepal 2005: 2.63),experimental-review,2,2026-06-10,2026-07-08
+varshni-beta,AlN (wz),—,1462 K,400 K,Vurgaftman & Meyer 2003 (Nepal 2005: 2082 K),experimental-review,2,2026-06-10,2026-07-08
 bandgap-bowing-b,AlGaN,—,0.7 to 1.0 eV,0.3 eV,Vurgaftman & Meyer 2003 (rec 0.7); Nepal 2005 (exp ~1.0),experimental-review,1,2026-06-10,2026-06-10
 effective-mass-electron-perp,GaN (wz),—,0.20 m0,0.02,Vurgaftman & Meyer 2003; Rinke PRB 77 075202 (2008),experimental-review,1,2026-06-10,2026-06-10
 effective-mass-electron-para,GaN (wz),—,0.20 m0,0.02,Vurgaftman & Meyer 2003,experimental-review,1,2026-06-10,2026-06-10
 effective-mass-electron-perp,AlN (wz),—,0.32 m0,0.03,Vurgaftman & Meyer 2003; Rinke 2008,experimental-review,1,2026-06-10,2026-06-10
 effective-mass-electron-para,AlN (wz),—,0.33 m0,0.03,Vurgaftman & Meyer 2003,experimental-review,1,2026-06-10,2026-06-10
-effective-mass-hole-A-para,GaN (wz),—,1.88 m0,—,Rinke PRB 77 075202 (2008) OEPx+G0W0,gw,1,2026-06-10,2026-06-10
-effective-mass-hole-A-perp,GaN (wz),—,0.33 m0,—,Rinke 2008,gw,1,2026-06-10,2026-06-10
+effective-mass-hole-A-para,GaN (wz),—,1.88 m0,0.3,Rinke PRB 77 075202 (2008) OEPx+G0W0,gw,2,2026-06-10,2026-07-08
+effective-mass-hole-A-perp,GaN (wz),—,0.33 m0,0.1,Rinke 2008,gw,2,2026-06-10,2026-07-08
 dielectric-static-perp,GaN (wz),300 K,8.9,0.3,Ioffe NSM; Wagner & Bechstedt PRB 66 115202 (2002),experimental,1,2026-06-10,2026-06-10
 dielectric-static-para,GaN (wz),300 K,10.4,0.3,Ioffe NSM; Wagner & Bechstedt 2002,experimental,1,2026-06-10,2026-06-10
 dielectric-optical-perp,GaN (wz),—,5.35,0.2,Ioffe NSM; Wagner & Bechstedt 2002,experimental,1,2026-06-10,2026-06-10
 dielectric-static-perp,AlN (wz),300 K,8.5,0.3,Ioffe NSM; Wagner & Bechstedt 2002,experimental,1,2026-06-10,2026-06-10
 dielectric-optical-perp,AlN (wz),—,4.77,0.1,Ioffe NSM; Wagner & Bechstedt 2002,experimental,1,2026-06-10,2026-06-10
-deformation-potential-gap-aV,GaN (wz),—,−7.6 eV,—,Rinke PRB 77 075202 (2008),gw,1,2026-06-10,2026-06-10
-deformation-potential-gap-aV,AlN (wz),—,−9.8 eV,—,Rinke 2008,gw,1,2026-06-10,2026-06-10
-ahc-zpr-isochoric,GaN (wz),0 K,−189 meV,—,Engel PRB 106 094316 (2022); Miglio npj CM 6 167 (2020),dft-dfpt,1,2026-06-10,2026-06-10
-ahc-zpr-isochoric,AlN (wz),0 K,−399 meV,—,Engel 2022; Miglio 2020,dft-dfpt,1,2026-06-10,2026-06-10
-ahc-zpr-lattice-expansion,GaN (wz),—,−49 meV,—,Miglio npj CM 6 167 (2020),dft-dfpt,1,2026-06-10,2026-06-10
-ahc-zpr-lattice-expansion,AlN (wz),—,−85 meV,—,Miglio 2020,dft-dfpt,1,2026-06-10,2026-06-10
+deformation-potential-gap-aV,GaN (wz),—,−7.6 eV,1.5 eV,Rinke PRB 77 075202 (2008),gw,2,2026-06-10,2026-07-08
+deformation-potential-gap-aV,AlN (wz),—,−9.8 eV,1.5 eV,Rinke 2008,gw,2,2026-06-10,2026-07-08
+ahc-zpr-isochoric,GaN (wz),0 K,−189 meV,20 meV,Engel PRB 106 094316 (2022); Miglio npj CM 6 167 (2020),dft-dfpt,2,2026-06-10,2026-07-08
+ahc-zpr-isochoric,AlN (wz),0 K,−399 meV,25 meV,Engel 2022; Miglio 2020,dft-dfpt,2,2026-06-10,2026-07-08
+ahc-zpr-lattice-expansion,GaN (wz),—,−49 meV,15 meV,Miglio npj CM 6 167 (2020),dft-dfpt,2,2026-06-10,2026-07-08
+ahc-zpr-lattice-expansion,AlN (wz),—,−85 meV,25 meV,Miglio 2020,dft-dfpt,2,2026-06-10,2026-07-08
 ahc-zpr-isochoric,diamond,0 K,−345 meV,25 meV,Antonius PRL 112 215501 (2014); Engel −323,gw,1,2026-06-10,2026-06-10

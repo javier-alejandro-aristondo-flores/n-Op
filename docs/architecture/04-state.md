@@ -30,6 +30,10 @@ x(t) = ( h,      cell vectors                       ∈ GL⁺(3, ℝ)   (3×3 re
          A )     external EM vector potential        ∈ ℝ³ field A(r,t)
 ```
 
+(`A` is carried in the Weyl gauge `A₀ ≡ 0`, transverse `∇·A = 0`; the
+electrostatic sector lives in the matter functionals — normative gauge/partition
+paragraph in `arch-05-generic`.)
+
 These are the **irreducible degrees of freedom of the micro tier**. Quantities
 recoverable from the 7-tuple by coarse-graining **on the micro timescale and
 scale** — phonon distributions `n_{q,s}`, the carrier distribution `f_n(k,r)`,

@@ -160,6 +160,20 @@ quarantined — different valley — Antonius 2014.)
 | e₃₁ improper (**do NOT pair with ZB P_sp**) | −1.86 | −2.03 | Dreyer 2016 (ref only) |
 | n_s (Ga-face, x≈0.3) | 1.1×10¹³ cm⁻² | — | Ambacher JAP 87 (2000) |
 
+*Composition- and temperature-dependence of polarization (2026-07 gap-audit B1/B3):*
+
+- **P_sp(x), e_ij(x) for Al_xGa₁₋ₓN are NOT linear-Vegard.** Use the quadratic-bowing
+  (nonlinear-polarization) form `P_sp(x) = x·P_AlN + (1−x)·P_GaN − b_P·x(1−x)` (and the analogous
+  form per e_ij component): the nonlinearity exceeds the ±5% ΔP target at mid-to-high x
+  (Fiorentini–Bernardini nonlinear macroscopic polarization). `b_P` and the e_ij bowings are a
+  **Wave-2 acquisition** (primary sources; adversarial audit before seeding); until seeded,
+  mid-x AlGaN ΔP claims carry a widened σ in `combineTol`.
+- **P_sp(T) — pyroelectric drift (registry row 128):** `P_sp(T) = P_sp(T₀) + p·(T−T₀)` with `p`
+  the primary+secondary pyroelectric coefficient at fixed stress, O(−(4–7)×10⁻⁶ C/m²K) for
+  GaN/AlN — i.e. **~20–30% of n_s·q over ΔT ≈ 750 K**, larger than the ±5% ΔP budget at the
+  harsh-env operating point. Per-material `p` is a **Wave-2 acquisition**; until seeded,
+  n_s(T ≫ 300 K) claims carry the pyro term as a declared model-form error in `combineTol`.
+
 *Elastic constants (GPa; pin GaN→Polian, AlN→McNeil; **exclude superseded AlN SAW set**):*
 
 | Quantity | GaN | AlN | source |
@@ -186,6 +200,18 @@ follow-up) and AlN hole mobility μ_p** (deep Mg) missing; **`κ_BR` as normaliz
 for GaN/AlN** (only device `dV_BR/dT`; sign positive confirmed); **Z*_⊥ (perpendicular Born charge)
 and the e₁₅ sign** (literature split ±); per-`(host,particle)` NIEL `σ_d` (row 112) and
 `η_recomb(T_L)` have no closed form; BTE/MC EDF-tail anchors absent (III-N `Δα` ships as identity).
+
+## 2026-07 gap-audit additions (registry rows 128–134) — accuracy regimes
+
+| # | Observable (row) | Accuracy regime | Notes |
+|---|---|---|---|
+| 53 | pyroelectric slope p (128) | ±30% on p | primary+secondary at fixed stress; Wave-2 coefficients; drives n_s(T) |
+| 54 | J_PF dielectric leakage (129) | ±1 decade | trap-parameter-dominated (φ_t, N_t per film); dielectric-wave coefficients |
+| 55 | t_BD TDDB (130) | order of magnitude | thermochemical E-model ΔH₀‡/p_eff per film; a lifetime FoM, not a precision target |
+| 56 | X_cryst JMAK (131) | factor ~3 on k(T) | ALD-film-history-dependent; onset window (≈700 °C for Al₂O₃) is the load-bearing output |
+| 57 | \|F_hkl\|² XRD (132) | peak positions exact given (h, R_I); ±10% on intensity ratios | kinematic limit (no extinction / multiple scattering); Debye–Waller from phonon DOS |
+| 58 | Raman (133) | shifts ±0.2 meV (Γ-phonon grade); activities factor ~2 | shifts ride row 9; activities are the new linear-response output |
+| 59 | R_rad (134) | order of magnitude on B_rad | negligible in UWBG device balance (tiny n_i); PL/validation channel only |
 
 ## Composition
 

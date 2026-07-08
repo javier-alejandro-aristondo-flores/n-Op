@@ -235,7 +235,7 @@ Node = ( id   : Address[GraphNode]          -- hash-cons identity
        , kind : NodeKind , role : OutputRole )
 
 NodeKind   = Input(StateSlot | EnvScalar)
-           | FormulaApply(formula : NamedFormula, args : [NodeId])     -- 125 formulas
+           | FormulaApply(formula : NamedFormula, args : [NodeId])     -- 132 formulas
            | MethodInvoke(method  : NamedMethod,  args : [NodeId])     -- 12 methods
 OutputRole = Internal | Observable(bundle : 1..11) | ResidualLeaf(ResidualKey)
 ```
@@ -303,7 +303,7 @@ the work Stage 5 will do*:
    `E_coupling` / `L_assembly` / `M_assembly` aggregators (`arch-05`).
 
 **Stage 3 — algebraic simplification.** Hash-consing (intern identical subexpressions, `O(1)`
-amortized), cross-formula common-subexpression elimination (the 125 formulas share
+amortized), cross-formula common-subexpression elimination (the 132 formulas share
 intermediates), tearing / alias elimination, sparsity-pattern inference. Implemented as
 equality-saturation over an e-graph (union-find of equivalence classes + e-matching). Symbolic;
 no numeric cost. **This is the hardest pass to build** and the one whose performance is
@@ -373,11 +373,11 @@ applied method chain with a typed `inputs → output`. Representative signatures
 `InterfaceEquilibriumOf`, `BiSlabGrandPotentialOf`, `MassActionEquilibriumOf` — follow the same
 macro-emits-subgraph pattern; see `arch-09 §9.2`, `impl-03`.)
 
-### 6.3 The 125 formulas — distribution (`arch-09 §9.3`, `physics/library/formulas/registry-manifest.csv`)
+### 6.3 The 132 formulas — distribution (`arch-09 §9.3`, `physics/library/formulas/registry-manifest.csv`)
 
 Leaf evaluations with typed signatures, grouped into 11 bundles (B1–B11) and tagged:
-- **cost-tier:** T0 closed-form ≤ 10 µs (69 formulas) · T1 small LA / 1-D quadrature ≤ 10 ms (40) · T2 BZ/mesh integral ≤ 10 s (12) · T3 self-consistent loop / PDE ≤ 10 min (4).
-- **diff-tag:** D0 no-AD / integer-categorical (21) · D1 analytic forward (73) · D2 adjoint-required-and-gated (25) · D3 implicit-function adjoint / FD (3) · D4 surrogate / relaxation, e.g. log-sum-exp soft-hull / Gumbel-Softmax (3).
+- **cost-tier:** T0 closed-form ≤ 10 µs (75 formulas) · T1 small LA / 1-D quadrature ≤ 10 ms (40) · T2 BZ/mesh integral ≤ 10 s (13) · T3 self-consistent loop / PDE ≤ 10 min (4).
+- **diff-tag:** D0 no-AD / integer-categorical (21) · D1 analytic forward (80) · D2 adjoint-required-and-gated (25) · D3 implicit-function adjoint / FD (3) · D4 surrogate / relaxation, e.g. log-sum-exp soft-hull / Gumbel-Softmax (3).
 
 ### 6.4 The dynamics, computationally (`arch-05`)
 
@@ -464,7 +464,7 @@ solver on the cert path.**
 **`SqliteReferenceCache`** (`arch-12 §12.1`): a content-addressed table keyed by the §2.2 hash
 over `(observable, value, σ, provenance, coverage_mask, schema_version)`; **write-once** (updates
 = new row, deletes disallowed); WAL mode for concurrent reads; `O(log n)` B-tree lookup,
-`n ≈ 10–10⁴` rows. The five **runtime gates** (`impl-11 §15.2`) — registration sanity (all 125
+`n ≈ 10–10⁴` rows. The five **runtime gates** (`impl-11 §15.2`) — registration sanity (all 132
 formulas instantiate, D2 pass the τ_adj gate), an end-to-end worked example (the L3↔non-eq fixed
 point closes in ≤ 5 iterations), curriculum sanity, cross-regime obligation firing, and a
 consumer smoke test — are the acceptance battery.

@@ -29,7 +29,7 @@ Every other document references these numbers rather than restating them.
 | Dressing layers | 1 / 1.25 / 1.75 / 2 / 3 | yes |
 | Computational methods | 12 (+3 sub-methods) | yes |
 | Abstract-property templates | 20 | yes |
-| Named formulas | 125 substantive (+2 rejected markers) | yes — see `formula-registry.md` |
+| Named formulas | 132 substantive (+2 rejected markers) | yes — see `formula-registry.md` |
 | Observable bundles | 11 (B1–B11) | yes |
 | Residual categories | 19 | yes |
 | Cert obligations | 10 | yes |
@@ -99,12 +99,12 @@ Bulk-boundary correspondence is **not** a template; it is handled at the cert
 layer (obligation-7, a `DiscreteStructure` morphism over the topology atlas,
 §14).
 
-### 9.3 125 named formulas
+### 9.3 132 named formulas
 
 Closed registry of typed, fully-parameterized algebraic formulas, named by
 behavior (person-attribution names appear only as parenthetical literature
 pointers). The canonical machine-readable list is
-`physics/library/formulas/registry-manifest.csv` (125 substantive rows + 2
+`physics/library/formulas/registry-manifest.csv` (132 substantive rows + 2
 markers for relations that are enforced architecturally and therefore *not*
 residualized: force = −∇energy, and equivariance). Rows 1–87 are grounded in the
 domain research (`physics/research/`); rows 88–102 are the linear-response and
@@ -114,9 +114,12 @@ polarization / piezoelectric / 2DEG package (`is-polar-material`-gated; GaN/AlN/
 HEMTs); rows 120–127 are the per-material accuracy package (AHC gap(T) renormalization,
 the 4-phonon / iterative-LBTE κ(T) siblings, the breakdown-field T-slope, the T,P-aware
 metastability hull, the Wegscheider and rotational sum-rule consistency residuals, and
-alloy-disorder scattering). Each formula carries a typed signature, a cost tier
-`T0..T3`, a differentiability tag `D0..D4`, and an applicability classifier
-(§13). See `formula-registry.md` for the narrative index.
+alloy-disorder scattering); rows 128–134 are the 2026-07 gap-audit package
+(pyroelectric n_s(T), the gate-dielectric aging trio — Poole–Frenkel, TDDB,
+JMAK crystallization — the XRD / Raman experimental-structure channels, and the
+radiative-recombination detailed-balance rate). Each formula carries a typed
+signature, a cost tier `T0..T3`, a differentiability tag `D0..D4`, and an
+applicability classifier (§13). See `formula-registry.md` for the narrative index.
 
 ### 9.4 Eleven observable bundles
 
@@ -220,8 +223,14 @@ append, because it changes the meaning of every recorded coefficient.
 | `SOCScheme` | `DiracPAW \| TwoComponentZORA \| SecondVariational \| PerturbativeSOC` | |
 
 `AtomicSpecies` (the key universe of `pseudopotential_set`) is the
-ordinary closed vocabulary of the elements; for the MVP it is `{C, B, N,
-Al, Ga}`. `* HybridAsManyBody` is reserved/deprecated for V1 — a hybrid
+ordinary closed vocabulary of the elements; for V1 it is `{C, B, N, Al,
+Ga, O, H}` — O and H are required by the committed content, not future
+scope: β-Ga₂O₃ is an arch-01 host (and a `DefectSpecies` host,
+`arch-21 §21.2.1`), the O-bearing defects (`O_N`, `V_Al–O`, `V_Ga–O_N`,
+`V_O–H`) decorate III-N/oxide hosts, and the seeded slow-tier rows read H
+(rows 106, 110) and O via `p_O2` (row 109). Si and the contact-metal
+species enter with their waves (schema_version bump per `arch-20 §20.9`).
+`* HybridAsManyBody` is reserved/deprecated for V1 — a hybrid
 is always recorded as `XCFunctionalTag.Hybrid` with `ManyBodyLevel.KohnSham`,
 normalized by `make-theory-context` (`arch-19 §19.8`) so the
 `Address[TheoryContext]` is canonical.

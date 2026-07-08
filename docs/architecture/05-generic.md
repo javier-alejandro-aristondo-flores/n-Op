@@ -146,4 +146,19 @@ resolved (no double-count). The e-ph coupling channel contributes the linear-ord
 cross-term for the `L`/`M` blocks and the beyond-reference part of `E_coupling`, not
 the full electron–ion energy.
 
+**Gauge fixing and the electrostatic partition (normative).** The state's `A`
+(`arch-04-state`) is carried in the **Weyl gauge** `A₀ ≡ 0` with the residual
+time-independent gauge freedom fixed by transversality `∇·A = 0` — i.e. the
+Coulomb-gauge radiation field. Under this split, `E_EM[A] = (1/8π)∫(|E_⊥|² + |B|²)`
+counts the **transverse (radiation) sector only**; the **longitudinal /
+electrostatic sector is owned by the matter functionals** — the Hartree term inside
+`E_KS[γ̂]` and the ion–ion electrostatic channel — and appears nowhere in `E_EM`, so
+no electrostatic energy is double-counted between the field and matter terms. This
+is the standard nonrelativistic-QED partition (transverse field dynamical; Coulomb
+interaction instantaneous in the matter sector). Consequences: the `EOM/A` residual
+(`arch-11-residuals §11.1`) is evaluated on the transverse `A` in this gauge and is
+therefore gauge-unambiguous; the minimal-coupling channel (`arch-19`) reads the
+transverse `A`; gauge invariance of observables remains architectural (the
+equivariance marker, registry row 104). (2026-07 gap-audit A2.)
+
 ---

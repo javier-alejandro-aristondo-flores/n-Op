@@ -25,7 +25,9 @@ The eleven physics-domain bundles `B1..B11` are listed in
 - **B5 surface-resolved** — SurfaceEnergy, surface grand potential, Wulff shape,
   termination stability window.
 - **B6 interface-resolved** — Schottky barrier (Schottky–Mott + MIGS), band
-  offset, interface dipole, adhesion, contact resistance, field emission.
+  offset, interface dipole, adhesion, contact resistance, field emission;
+  the polarization / 2DEG package (rows 113–119) and the gate-dielectric
+  layer models (Poole–Frenkel row 129; pyroelectric n_s(T) row 128).
 - **B7 mechanics** — elastic constants C_ij, bulk modulus, sound velocity,
   hardness, deformation potentials, piezoresistance.
 - **B8 thermodynamics** — Gibbs free energy, phase-diagram convex hull,
@@ -35,9 +37,13 @@ The eleven physics-domain bundles `B1..B11` are listed in
   currents (Fowler–Nordheim, Richardson–Dushman, Padovani–Stratton), NEGF
   transmission.
 - **B10 static-validity** — bond-valence sum, Pauling radius ratio, Born
-  stability, generalized stacking-fault energy, structure uniqueness.
+  stability, generalized stacking-fault energy, structure uniqueness; the
+  XRD structure-factor channel (row 132).
 - **B11 degradation** — carbide growth, electromigration MTTF, Coffin–Manson
-  fatigue.
+  fatigue; the slow-tier kinetics (rows 105–112: vacancy generation,
+  H redistribution / desorption, platelet nucleation, vibration-driven
+  dislocation multiplication, air oxidation, radiation displacement); the
+  gate-dielectric lifetime pair (TDDB row 130, JMAK crystallization row 131).
 
 (A file tree may additionally group observable *modules* by output data-shape;
 the residual-driving grouping is the eleven physics-domain bundles.)

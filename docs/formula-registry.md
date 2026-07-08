@@ -18,7 +18,7 @@ process; the registry is a contract, not a convenience.
 
 ## Counts
 
-- **125 substantive formulas** (rows 1–102 + 105–127). Rows 105–112 are the
+- **132 substantive formulas** (rows 1–102 + 105–134). Rows 105–112 are the
   slow-tier degradation / radiation formulas (`arch-21-multiscale-state §21.13`);
   rows 113–119 are the polarization / piezoelectric / 2DEG package
   (`is-polar-material`-gated; GaN/AlN/AlGaN HEMTs); rows 120–127 are the
@@ -27,7 +27,15 @@ process; the registry is a contract, not a convenience.
   (the κ(T) high-temperature siblings of row 25), `breakdown-field-temperature-slope`
   (`κ_BR > 0` — breakdown hardens with T), `tp-aware-hull` (T,P-aware metastability),
   `wegscheider-cycle` + `rotational-sum-rule` (consistency residuals), and
-  `alloy-disorder-scattering` (`is-alloy`-gated AlGaN mobility limiter).
+  `alloy-disorder-scattering` (`is-alloy`-gated AlGaN mobility limiter); rows
+  128–134 are the **2026-07 gap-audit package**: `pyroelectric-coefficient`
+  (P_sp(T) — the ~20–30% n_s(T) drift over harsh-env ΔT), the gate-dielectric
+  aging trio `poole-frenkel-current` + `tddb-thermochemical-e-model` +
+  `dielectric-crystallization-jmak` (all `is-dielectric-layer`-gated), the
+  experimental-structure channels `xrd-structure-factor` + `raman-activity`
+  (the two most abundant `Import` channels for real crystals), and
+  `radiative-recombination-vrs` (detailed-balance rate backing
+  `RadiativeEmissionOf`).
 - **2 architectural markers** (rows 103–104) for relations enforced *by
   construction* and therefore **not** residualized: force = −∇energy (an
   autodiff identity) and equivariance (a structural constraint). They appear in

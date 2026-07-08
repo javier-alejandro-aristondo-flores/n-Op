@@ -79,7 +79,11 @@ each contribution, not a granularity floor or a unit of weighting.
      (`arch-05-generic`), so it is a generator-construction-bug tripwire, not a
      PINO training-loss term.
   9. `Conservation` — energy, particle-number / charge, momentum /
-     crystal-momentum, spin.
+     crystal-momentum, spin. Particle number includes the **static γ̂-trace
+     admissibility** `‖Tr γ̂ − N_e‖²` (N_e fixed by `SiteDecoration`) checked per
+     snapshot — a candidate state must carry the right electron count, not merely
+     conserve whatever count it has along a trajectory. Structural on the state;
+     no new formula row.
  10. `Positivity` — `M ⪰ 0`, `f ∈ [0,1]`, `ρ ≥ 0`, `ω² ≥ 0`,
      `σ ⪰ 0`, `|S_i| = 1`. `ω² ≥ 0` is **applicability-gated** to phases claimed
      dynamically stable, so it does not penalize legitimate saddle / transition
@@ -87,6 +91,16 @@ each contribution, not a granularity floor or a unit of weighting.
      electron-temperature bound `T_e ≥ T_L` (reads registry row 72) and the
      avalanche breakdown-integral guard `max(0, ∫α dx − 1)²` (reads registry row 75) —
      both reference existing rows, no new formula row.
+     Also **γ̂ admissibility** (ensemble N-representability, the state-level
+     analogue of `f ∈ [0,1]`): `γ̂† = γ̂` and `0 ⪯ γ̂ ⪯ 1`, evaluated as per-k-block
+     spectral bounds on the `(Reciprocal, BlockDiag)` encoding (`arch-15-gamma-hat`
+     §15.5 — extreme eigenvalues per block are cheap); the T=0 idempotency
+     `‖γ̂² − γ̂‖²` is applicability-gated to claimed-zero-temperature states exactly
+     as `ω² ≥ 0` is gated to claimed-stable phases. A candidate γ̂ outside these
+     bounds can zero every EOM residual while being unphysical — these are the
+     admissibility gates that make the oracle sound as a *verifier* of the state
+     itself, not only of its dynamics (2026-07 gap-audit A1). Structural on the
+     state; no new formula row.
 
 **Algebraic identities — 5 categories** (the former umbrella, now
 split by analytic kind):

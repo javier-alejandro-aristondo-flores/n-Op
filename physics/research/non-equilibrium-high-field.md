@@ -1,6 +1,9 @@
 # Non-Equilibrium, High-Field, Hot-Carrier Physics for UWBG Chips
 
-> **Status note (2026-07 gap-audit).** Several III-N anchors in Parts A–C are **superseded** by the Wave-1 correction ledger (`docs/specs/2026-06-10-wave1-iii-n-seeding.md` §3, A1–A16): GaN 2.5×10⁷ cm/s is the **peak** velocity (true v_sat ≈ 1.4×10⁷); AlN ω_LO ≈ 111–114 meV (not 100); Fröhlich α_F GaN ≈ 0.40 / AlN ≈ 0.58; μ(AlN) intrinsic 871⊥/619∥ (300 is doped/defective material); diamond image-force lowering ≈ 0.16 eV at 10⁶ V/cm. **Seed coefficients from the accuracy-ledger / reference-data CSVs, never from this file's tables.**
+> **Provenance rule.** Coefficient values below carry `[Wave-1 …]` tags where the
+> 2026-06-10 III-N audit corrected them (`docs/specs/2026-06-10-wave1-iii-n-seeding.md` §3).
+> **Seed coefficients from the accuracy-ledger / reference-data CSVs, never from this
+> file's tables** — the CSVs are the audited canonical values.
 
 **Scope.** Translate the physics that governs UWBG semiconductors in jet-turbine-class operating envelopes (T_L ≥ 500 °C, E up to several MV/cm, current densities pushing the velocity-saturation regime, possible vibration / radiation overlays) into the typed-formula / typed-residual vocabulary already established for `/physics`. Materials anchor set: **diamond (C), c-BN, h-BN, AlN, GaN, β-Ga₂O₃, AlGaN ternary, plus refractory metals (W, Mo, Re, Ir, TiN, TaN) and standard dielectrics (SiO₂, Al₂O₃, HfO₂)** as contact/dielectric counterparts. Diamond is the non-polar anchor (no Fröhlich term); the other UWBG anchors are polar.
 
@@ -28,8 +31,8 @@ Approximate field anchors per material (300 K; weakly T-dependent):
 | Diamond | ~2000 (intrinsic) | ~1.5×10⁷ | 10–20 | Non-polar; acoustic + intervalley dominate |
 | c-BN | ~825 | ~1.5×10⁷ | ~17.5 | Polar but weak; large gap |
 | h-BN | anisotropic | – | ~12 | Layered, anisotropic transport |
-| AlN | ~300 | ~1.7×10⁷ | ~12 | Strong polar |
-| GaN | ~1500 | ~2.5×10⁷ | ~3.5 | Strong polar |
+| AlN | 871(⊥)/619(∥) intrinsic FP; best exp 426 [Wave-1 A13] | ~1.4×10⁷ [Wave-1] | ~12 | Strong polar |
+| GaN | ~1500 | 1.4×10⁷ (v_peak 2.85×10⁷) [Wave-1 A11] | ~3.5 | Strong polar |
 | β-Ga₂O₃ | ~200 | ~2×10⁷ | ~8 | Strong polar, low μ, low κ |
 | Al_xGa_{1-x}N | interp. | interp. | 3.5→12 | Linear-ish interpolation, bowing for gap |
 
@@ -94,8 +97,8 @@ Anchors (electrons):
 
 | Material | ω_LO (meV) | ε₀ | ε∞ | m*/m_e | α |
 |---|---|---|---|---|---|
-| GaN | 92 | 8.9 | 5.35 | 0.20 | ~0.49 |
-| AlN | 100 | 8.5 | 4.77 | 0.32 | ~0.65 |
+| GaN | 92 | 8.9 | 5.35 | 0.20 | ~0.40 [Wave-1 A12] |
+| AlN | 111–114 [Wave-1 A9] | 8.5 | 4.77 | 0.32 | ~0.58 [Wave-1 A12] |
 | β-Ga₂O₃ | 44 (avg) | 10.2 | 3.6 | 0.28 | ~1.7 |
 | c-BN | 161 | 6.8 | 4.5 | 0.35 | ~0.34 |
 | Diamond | 165 (TO) | 5.7 | 5.7 | 0.36 | 0 (non-polar) |
@@ -330,7 +333,7 @@ For diamond Schottky contacts at 800 K with N_D = 10¹⁸: E_00 ≈ 8 meV, k_BT 
 
 Δφ = √(qE/(4πε_s)).
 
-For diamond ε_s ≈ 5.7 ε₀ at E = 10⁶ V/cm: Δφ ≈ 0.18 eV — non-trivial relative to typical Schottky barriers (~1–2 eV on diamond).
+For diamond ε_s ≈ 5.7 ε₀ at E = 10⁶ V/cm: Δφ ≈ 0.16 eV [Wave-1 A15 reconciliation; 0.50 eV at 10⁷ V/cm] — non-trivial relative to typical Schottky barriers (~1–2 eV on diamond).
 
 ### F.4 Method assignment
 
@@ -558,3 +561,16 @@ Related documents:
 - `docs/implementation-plan.md` (unified state, templates, formula registry, bundles, residuals)
 - `docs/properties.md` (target property scope)
 - `physics/research/group-C-transport-thermo-chemical.md` (transport-regime formalism this extends)
+
+## Changelog
+
+- **2026-07-16 (reconciliation pass):** superseded III-N anchors rewritten to the
+  Wave-1-audited values in place, each tagged `[Wave-1 A#]`
+  (`docs/specs/2026-06-10-wave1-iii-n-seeding.md` §3). Old values, for the record:
+  GaN v_sat listed as 2.5×10⁷ (that is v_peak; true v_sat 1.4×10⁷, A11); AlN ω_LO 100 meV
+  (→ 111–114, A9); Fröhlich α_F GaN 0.49 / AlN 0.65 (→ 0.40 / 0.58, A12); AlN μ_e ~300
+  (doped/defective; intrinsic first-principles 871⊥/619∥, best experimental 426, A13);
+  diamond image-force lowering 0.18 eV at 10⁶ V/cm (→ 0.16 eV, A15 — the older in-repo
+  0.06 eV elsewhere was a √10 field-scaling error). Status banner converted to this
+  changelog; the seed-from-CSVs rule stays in the header.
+- **2026-07-07 (gap-audit):** supersession banner added; `docs/specs/` path sweep.

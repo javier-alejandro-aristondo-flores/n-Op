@@ -639,7 +639,7 @@ so the expensive tiers never run per sample:
 | T0 | ≤10 µs closed-form | **every SGD step** (per-sample, backprop-native) |
 | T1 | ≤10 ms small-LA / 1-D quadrature | **RAD-subsampled** (per-batch stochastic importance) |
 | T2 | ≤10 s BZ / mesh integral | **per-epoch cached** (offline reference cache per composition + `(T,P,q)` query) — e.g. `NEGF-transmission` (row 80: one linear solve per energy) |
-| T3 | ≤10 min iterative / PDE | **on-demand / calibration-only**, with a cheap T0/T1 proxy during training — e.g. `reference-phase-cache` (row 87) |
+| T3 | ≤10 min iterative / PDE | **on-demand / calibration-only**, with a cheap T0/T1 proxy during training — e.g. `reference-phase-energy-cache` (row 87) |
 
 Only the T0/T1 core runs on the per-sample hot path (the µs–ms class of
 `arch-07-pipeline §7.6`); T2 is on-request per-epoch; T3 is reference / calibration

@@ -11,7 +11,7 @@ research-sources: []
 ---
 # Out of scope
 
-Stated and held, so the architecture is honest about what it does not cover:
+Stated and held:
 
 - Strongly-correlated systems (frustrated Wigner crystals, spin liquids, Mott
   physics) — `γ̂` is mean-field by construction; UWBG materials are large-gap and

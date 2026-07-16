@@ -1,10 +1,10 @@
 # n-Op
 
-A **physically-informed neural operator (PINO)** that predicts how the
-multiphysics state of a crystalline material evolves in time, in service of
+n-Op trains a **physically-informed neural operator (PINO)** that predicts how
+the multiphysics state of a crystalline material evolves in time, in service of
 designing **durable ultra-wide-bandgap (UWBG) semiconductor chips for harsh
-environments** (jet-turbine-class: high temperature, thermal cycling, high
-field, high current density).
+environments** (jet-turbine-class: high temperature (>500 °C), thermal cycling,
+mechanical vibration, high field, high current density, possibly radiation).
 
 The minimum viable demonstration is **diamond**, with three capabilities:
 crystal-structure prediction, electron-cloud diffusion, and heat diffusion. The
@@ -32,8 +32,8 @@ spec is comprehensive; the build is diamond-first.
   `FormulaApply`, `MethodInvoke`); typed dataflow edges; per-stage sidecars.
   Every observable, every residual, every certificate is a node.
 - **The 4+1 stage compose-time pipeline** (`docs/architecture/07-pipeline.md`)
-  — symbolic lift → symmetry quotient → algebraic simplification → lowering +
-  adjoint synthesis → runtime kernel. The earlier cheap/faithful split is
+  — symbolic lift → symmetry quotient → invariant synthesis (Stage 2.5) →
+  algebraic simplification → lowering + adjoint synthesis → runtime kernel. The earlier cheap/faithful split is
   retired; every kernel emerging from Stage 4 is fast by construction
   ("always-cheap" discipline).
 
@@ -44,7 +44,7 @@ monoliths are regenerated from the tree by `docs/meta/assemble.py`.
 
 | Path | What it is |
 |---|---|
-| `docs/architecture/` | The conceptual specification, one concept per file. Start at `01-purpose.md` and `06-physics-graph.md`. **Single source of truth for vocabularies and counts.** |
+| `docs/architecture/` | The conceptual specification, one concept per file. Start at `01-purpose.md` and `06-physics-graph.md`. **Single source of truth for vocabularies and category/bundle counts** (the formula count is owned by the registry CSV below). |
 | `docs/mvp/` | The diamond MVP projected onto the spec: γ̂ budget, three capabilities, decisions forced, build order. Start here for the build. |
 | `docs/implementation/` | Typed signatures, observable compositions, residual/cert machinery, phased build sequence. |
 | `docs/meta/conventions.md` | Atomic-file rules (frontmatter, anchors, lint discipline). |
@@ -80,7 +80,7 @@ n-Op/
 │   ├── formula-registry.md
 │   └── properties.md
 ├── physics/
-│   ├── library/                   implementation scaffold (empty; language decided, build not started)
+│   ├── library/                   code scaffold (no code yet) + the registry CSV and cert battery
 │   │   ├── formulas/registry-manifest.csv
 │   │   └── cert/reference-data/    machine-readable cert reference battery
 │   └── research/                   mathematical grounding + UWBG domain catalogs
@@ -101,5 +101,7 @@ build vs adopt, the PDE-mesh adjoint scheme, the γ̂ §15.4 questions, the
 Layer-1.75 V2 spec, and the integrator interface — see
 `docs/architecture/18-open-decisions.md`.
 
-No code has been written yet. `physics/library/` is an empty scaffold whose
-directory names match the architecture.
+No code has been written yet. `physics/library/` is a code-free scaffold whose
+directory names match the architecture; its two populated corners are the
+canonical formula registry (`formulas/registry-manifest.csv`) and the cert
+reference battery (`cert/reference-data/`).

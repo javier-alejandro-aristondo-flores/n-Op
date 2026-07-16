@@ -26,7 +26,7 @@
 | Indirect gap | 5.47 eV (X-point) | PBE gives ~4.2 eV (−23%); **G₀W₀ or hybrid required** (registry row 6) |
 | Max phonon energy | ~165 meV (~1332 cm⁻¹) | highest of any solid; phonon grid must resolve it |
 | Debye temperature | ~2200 K | **QHA valid through ~800 °C** → SCPH (row 13) deferred |
-| Thermal conductivity | ~2000 W·m⁻¹K⁻¹ | the headline Cap-3 target |
+| Thermal conductivity | ~2200 W·m⁻¹K⁻¹ (300 K; battery anchor, exp 2000–2500) | the headline Cap-3 target |
 | Elastic constants | C₁₁≈1079, C₁₂≈124, C₄₄≈578 GPa | Cap-1 stability + sound velocity |
 | Polarity | **non-polar (homopolar)** | Z\*=0 by symmetry → **no LO-TO, no Fröhlich** → registry rows 17, 21, 22 excluded by applicability |
 | High-T failure | air-oxidation onset ~600–700 °C (the actual lifetime limiter); sp³→sp² graphitization only above ~1500 °C in vacuum | the diamond–graphite phase boundary is the Cap-1 thermodynamic check; oxidation is the slow-tier degradation channel (`arch-21`) |
@@ -80,10 +80,10 @@ stability; one heterostructure check (c-BN on diamond) via lattice matching.*
 |---|---|
 | State used | `h`, `R_I`, `Z_I`; `γ̂` (T=0, for `E_BO`) |
 | BO levels | L1 (`E_BO = min_γ̂ E`) → L2 (relaxation on (R, h)) |
-| Methods | variational-minimization · functional-differentiation · classify-of · symmetry-projection · spectral-decomposition |
+| Methods | variational-minimization · functional-differentiation · algebraic-combination · symmetry-projection · spectral-decomposition |
 | Templates | `SymmetryAdaptedHamiltonianOf` · `SecondDerivativeOf` · `ClassifyOf` · `StateReadoutOf` · `AlgebraicOf` |
 | Formulas | **57** born-stability-criteria · **60** elastic-constants-Cij · **61** bulk-modulus · **62** sound-velocity-isotropic · **85** structure-uniqueness-CSP · **30** defect-formation-energy-zhang-northrup · **44** surface-grand-potential-γ (B5) · **52** vegard-correction · **54** matthews-blakeslee-critical-thickness (c-BN/diamond hetero) |
-| Bundles | B10 static-validity · B7 mechanics · (B5 surface for row 44) · structural scalars |
+| Bundles | B10 static-validity · B7 mechanics · B4 defect (row 30) · B6 interface (rows 52/54; row 54 also B11) · (B5 surface for row 44) |
 | Residuals | static-validity (Born stability, dynamical stability, space-group equivariance) · structural EOM (`∇_R E_BO = 0`, stress matches) · thermodynamic-consistency (diamond–graphite hull) |
 | Cert | 1 symmetry · 2 bounds · 3 analytic limits · 5 conservation |
 | Implementation | DFT `E_BO` + DFPT-stress `C_ij`; TB 3NN sp³d⁵ as SCF warm-start initializer (`mvp-05-decisions-forced`) |
@@ -115,7 +115,7 @@ stability; one heterostructure check (c-BN on diamond) via lattice matching.*
 | BO levels | L2 (`E_BO` Hessian → phonons) + L3 (Bose statistics) + L4 (phonon BTE) |
 | Methods | spectral-decomposition · spectral-aggregation · kinetic-evolution |
 | Templates | `HarmonicStiffnessHessianOf` · `SpectrumOf` · `SpectralAggregateOf` (heat capacity, aggregator = `bose-einstein-cv`) · `KineticEvolutionOf` |
-| Formulas | **7** acoustic-sum-rule · **8** dynamical-matrix-hermiticity · **9** phonon-dispersion · **10** phonon-DOS · **11** phonon-group-velocity · **12** grueneisen-mode (QHA / thermal expansion) · **25** callaway-lattice-kappa · **70** self-heating-T_op (B9; cheap closure) |
+| Formulas | **7** acoustic-sum-rule · **8** dynamical-matrix-hermiticity · **9** phonon-dispersion · **10** phonon-DOS · **11** phonon-group-velocity · **12** grueneisen-mode (QHA / thermal expansion) · **25** callaway-lattice-kappa · **121/122** high-T κ siblings of row 25 (4-phonon factor + dormant iterative-LBTE consistency pair) · **70** self-heating-T_op (B9; cheap closure) |
 | Deferred | **13** SCPH (QHA suffices ≤800 °C) · **26** phonon-poiseuille-length · **27** second-sound-speed (low-T hydrodynamics, out of harsh-env scope) |
 | Bundles | B2 phonon · B3 transport · (B9 self-heating for row 70) |
 | Residuals | EOM (phonon streaming + collision; heat equation `∂_t T = ∇·(κ∇T)`) · conservation (energy) · positivity (`ω² ≥ 0`) · algebraic (acoustic sum rule `Σ_J Σ_R Φ(R) = 0`) |
@@ -144,11 +144,13 @@ stability; one heterostructure check (c-BN on diamond) via lattice matching.*
   expose more than `γ̂`: G₀W₀ needs ~30–50 **unoccupied bands + wavefunctions**;
   QHA needs **volume-dependent (Grüneisen) phonons**. These are the L1 outputs
   the MVP requires — specify them when building `state/level-1`.
-- **Reference-battery seed (H4).** Seed `physics/library/cert/reference-data/`
-  with the ~10 diamond rows the MVP validates against: lattice a, indirect gap,
-  C₁₁/C₁₂/C₄₄, Debye T, κ(300 K), **κ(773 K) ≈ 620 W/m·K** (the high-T 4-phonon
-  anchor), max phonon energy, cohesive/formation energy, and the diamond–graphite
-  boundary point.
+- **Reference-battery seed (H4).** `physics/library/cert/reference-data/` carries
+  the full diamond battery (seeded 2026-07-08): lattice a, indirect gap,
+  C₁₁/C₁₂/C₄₄ + bulk modulus + density, Debye T, max phonon energy,
+  κ(300 K), **κ(773 K) ≈ 620 W/m·K** (the high-T 4-phonon anchor), κ(1100 K),
+  cohesive energy, the diamond–graphite boundary point, ε_r, the Isberg ToF
+  mobilities, v_sat/β, and the Chynoweth pair — every H8 target has a
+  machine-readable anchor.
 - **Design-grade accuracy targets (H8).** The MVP's headline outputs must meet
   declared accuracy: gap ±0.15 eV post-G₀W₀, C_ij ±5%, κ(300 K) ±20%, E_form
   ±0.2 eV, μ factor-2 (full per-observable ledger in `docs/accuracy-ledger.md`,
@@ -170,10 +172,11 @@ A focused subset of the phases in `impl-10-build-sequence`:
 2. `shared` — Ewald; the tight-binding (3NN sp³d⁵) carbon Hamiltonian builder.
 3. `inputs` — the diamond `PeriodicityStructure` + `SiteDecoration` + `Environment`.
 4. `state` — `γ̂` as k-blocked orbitals (§2); `(R, P, h)`.
-5. methods (the 9) and formulas (the ~35) of §3.
+5. methods (the 9) and formulas (the ~30, incl. the κ high-T siblings 121–122) of §3.
 6. canonicals — `E_BO` (DFT, with TB 3NN sp³d⁵ as SCF warm-start) and the phonon Hessian.
 7. the three capability residuals (Cap 1/2/3 rows above).
-8. cert obligations 1–6 + the 10-row diamond reference battery.
+8. cert obligations 1–6 and 10 (the registration adjoint gate stays in the MVP,
+   `mvp-04`) + the seeded diamond reference battery (`mvp-05` H4).
 9. validate: relaxed lattice, gap (with G₀W₀), C_ij, phonon max, κ(300 K) against
    the battery.
 

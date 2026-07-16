@@ -20,7 +20,7 @@ research-sources: []
 | Indirect gap | 5.47 eV (X-point) | PBE gives ~4.2 eV (−23%); **G₀W₀ or hybrid required** (registry row 6) |
 | Max phonon energy | ~165 meV (~1332 cm⁻¹) | highest of any solid; phonon grid must resolve it |
 | Debye temperature | ~2200 K | **QHA valid through ~800 °C** → SCPH (row 13) deferred |
-| Thermal conductivity | ~2000 W·m⁻¹K⁻¹ | the headline Cap-3 target |
+| Thermal conductivity | ~2200 W·m⁻¹K⁻¹ (300 K; battery anchor, exp 2000–2500) | the headline Cap-3 target |
 | Elastic constants | C₁₁≈1079, C₁₂≈124, C₄₄≈578 GPa | Cap-1 stability + sound velocity |
 | Polarity | **non-polar (homopolar)** | Z\*=0 by symmetry → **no LO-TO, no Fröhlich** → registry rows 17, 21, 22 excluded by applicability |
 | High-T failure | air-oxidation onset ~600–700 °C (the actual lifetime limiter); sp³→sp² graphitization only above ~1500 °C in vacuum | the diamond–graphite phase boundary is the Cap-1 thermodynamic check; oxidation is the slow-tier degradation channel (`arch-21`) |

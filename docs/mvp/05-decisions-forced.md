@@ -26,11 +26,13 @@ research-sources: []
   expose more than `γ̂`: G₀W₀ needs ~30–50 **unoccupied bands + wavefunctions**;
   QHA needs **volume-dependent (Grüneisen) phonons**. These are the L1 outputs
   the MVP requires — specify them when building `state/level-1`.
-- **Reference-battery seed (H4).** Seed `physics/library/cert/reference-data/`
-  with the ~10 diamond rows the MVP validates against: lattice a, indirect gap,
-  C₁₁/C₁₂/C₄₄, Debye T, κ(300 K), **κ(773 K) ≈ 620 W/m·K** (the high-T 4-phonon
-  anchor), max phonon energy, cohesive/formation energy, and the diamond–graphite
-  boundary point.
+- **Reference-battery seed (H4).** `physics/library/cert/reference-data/` carries
+  the full diamond battery (seeded 2026-07-08): lattice a, indirect gap,
+  C₁₁/C₁₂/C₄₄ + bulk modulus + density, Debye T, max phonon energy,
+  κ(300 K), **κ(773 K) ≈ 620 W/m·K** (the high-T 4-phonon anchor), κ(1100 K),
+  cohesive energy, the diamond–graphite boundary point, ε_r, the Isberg ToF
+  mobilities, v_sat/β, and the Chynoweth pair — every H8 target has a
+  machine-readable anchor.
 - **Design-grade accuracy targets (H8).** The MVP's headline outputs must meet
   declared accuracy: gap ±0.15 eV post-G₀W₀, C_ij ±5%, κ(300 K) ±20%, E_form
   ±0.2 eV, μ factor-2 (full per-observable ledger in `docs/accuracy-ledger.md`,

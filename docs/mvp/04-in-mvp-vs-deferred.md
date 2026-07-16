@@ -12,13 +12,13 @@ research-sources: []
 # In-MVP vs deferred
 
 **In the MVP**
-- ~35 named formulas (the rows above) of the 132.
-- 9 of the 12 methods (all but `path-search`, `convex-optimization` beyond the
-  hull check, `statistical-sampling`, `microkinetic-steady-state` — chemical/MC
-  machinery not on the diamond path).
-- ~9 templates of the 20.
-- Bundles B1, B2, B3, B7, B10 (+ B5 surface, B9 self-heating for two formulas) and
-  the structural/thermo scalars — 5–7 of the 11.
+- ~30 named formulas (the rows above, incl. the κ high-T siblings 121–122) of the 132.
+- 9 of the 12 methods (all but `path-search` and `statistical-sampling`, with
+  `convex-optimization` used only for the hull check — chemical/MC machinery is
+  not on the diamond path).
+- ~10 templates of the 20.
+- Bundles B1, B2, B3, B7, B10 as primaries, with per-row touches of B4 (row 30),
+  B5 (row 44), B6 (rows 52/54), B9 (row 70), B11 (row 54) — ~9 of the 11 touched.
 - Residual families exercised: micro EOM-violation, Conservation, Positivity,
   Algebraic-identities, Static-snapshot, Static-thermodynamic. `Degeneracy` is
   cert-only (`arch-05`, `arch-11 §11.1`); the slow/macro EOM siblings

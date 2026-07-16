@@ -19,3 +19,21 @@ elastic-C12,diamond,300 K,124 GPa,5 GPa,McSkimin & Andreatch JAP 43 2944 (1972),
 elastic-C44,diamond,300 K,578 GPa,2 GPa,McSkimin & Andreatch JAP 43 2944 (1972),experimental,1,2026-07-08,2026-07-08
 bulk-modulus,diamond,300 K,442 GPa,4 GPa,(C₁₁+2C₁₂)/3 from McSkimin & Andreatch 1972,experimental,1,2026-07-08,2026-07-08
 mass-density,diamond,300 K,3.515 g/cm3,0.001 g/cm3,standard,experimental,1,2026-07-08,2026-07-08
+lattice-a,β-Ga₂O₃ (C2/m),300 K,12.214 Å,0.005 Å,Åhman Svensson Albertsson Acta Cryst C52 1336 (1996) 10.1107/S0108270195016404,experimental,1,2026-07-16,2026-07-16
+lattice-b,β-Ga₂O₃ (C2/m),300 K,3.037 Å,0.002 Å,Åhman 1996 (3.0371),experimental,1,2026-07-16,2026-07-16
+lattice-c,β-Ga₂O₃ (C2/m),300 K,5.798 Å,0.002 Å,Åhman 1996 (5.7981),experimental,1,2026-07-16,2026-07-16
+monoclinic-angle-beta,β-Ga₂O₃ (C2/m),300 K,103.83 deg,0.05 deg,Åhman 1996,experimental,1,2026-07-16,2026-07-16
+mass-density,β-Ga₂O₃ (C2/m),300 K,5.96 g/cm3,0.02 g/cm3,crystallographic from the Åhman cell (Z=4),derived-experimental,1,2026-07-16,2026-07-16
+elastic-C11,β-Ga₂O₃ (C2/m),300 K,242.8 GPa,2.9 GPa,RUS+LDI JAP 124 085102 (2018); frame x∥a y∥b z∥c*,experimental,1,2026-07-16,2026-07-16
+elastic-C22,β-Ga₂O₃ (C2/m),300 K,343.8 GPa,3.8 GPa,RUS+LDI JAP 124 085102 (2018); frame x∥a y∥b z∥c*,experimental,1,2026-07-16,2026-07-16
+elastic-C33,β-Ga₂O₃ (C2/m),300 K,347.4 GPa,2.5 GPa,RUS+LDI JAP 124 085102 (2018); frame x∥a y∥b z∥c*,experimental,1,2026-07-16,2026-07-16
+elastic-C44,β-Ga₂O₃ (C2/m),300 K,47.8 GPa,0.2 GPa,RUS+LDI JAP 124 085102 (2018); frame x∥a y∥b z∥c*,experimental,1,2026-07-16,2026-07-16
+elastic-C55,β-Ga₂O₃ (C2/m),300 K,88.6 GPa,0.5 GPa,RUS+LDI JAP 124 085102 (2018); frame x∥a y∥b z∥c*,experimental,1,2026-07-16,2026-07-16
+elastic-C66,β-Ga₂O₃ (C2/m),300 K,104.0 GPa,0.5 GPa,RUS+LDI JAP 124 085102 (2018); frame x∥a y∥b z∥c*,experimental,1,2026-07-16,2026-07-16
+elastic-C12,β-Ga₂O₃ (C2/m),300 K,128.0 GPa,0.1 GPa,RUS+LDI JAP 124 085102 (2018); frame x∥a y∥b z∥c*,experimental,1,2026-07-16,2026-07-16
+elastic-C13,β-Ga₂O₃ (C2/m),300 K,160.0 GPa,1.5 GPa,RUS+LDI JAP 124 085102 (2018); frame x∥a y∥b z∥c*,experimental,1,2026-07-16,2026-07-16
+elastic-C23,β-Ga₂O₃ (C2/m),300 K,70.9 GPa,2.1 GPa,RUS+LDI JAP 124 085102 (2018); frame x∥a y∥b z∥c*,experimental,1,2026-07-16,2026-07-16
+elastic-C15,β-Ga₂O₃ (C2/m),300 K,-1.62 GPa,0.05 GPa,RUS+LDI JAP 124 085102 (2018); frame x∥a y∥b z∥c*,experimental,1,2026-07-16,2026-07-16
+elastic-C25,β-Ga₂O₃ (C2/m),300 K,0.36 GPa,0.01 GPa,RUS+LDI JAP 124 085102 (2018); frame x∥a y∥b z∥c*,experimental,1,2026-07-16,2026-07-16
+elastic-C35,β-Ga₂O₃ (C2/m),300 K,0.97 GPa,0.03 GPa,RUS+LDI JAP 124 085102 (2018); frame x∥a y∥b z∥c*,experimental,1,2026-07-16,2026-07-16
+elastic-C46,β-Ga₂O₃ (C2/m),300 K,5.59 GPa,0.69 GPa,RUS+LDI JAP 124 085102 (2018); frame x∥a y∥b z∥c*,experimental,1,2026-07-16,2026-07-16

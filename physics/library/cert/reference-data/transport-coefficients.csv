@@ -43,3 +43,23 @@ impact-ionization-bn,AlN (wz),high field,3.759e8 V/cm,unbounded,Bulutay SST 17 L
 thermal-conductivity,AlN (wz c-axis),1100 K,95 W/mK,×0.4,3-ph BTE / Slack extrapolation (theory-only; no >500 K single-crystal measurement),first-principles-bte,1,2026-07-16,2026-07-16
 caughey-thomas-mu-p-Nref,GaN (wz),—,2.5e17 cm-3,×0.5,Mnatsakanov SSE 47 111 (2003),experimental-review,1,2026-07-16,2026-07-16
 caughey-thomas-mu-p-gamma,GaN (wz),—,1.5,0.3,Mnatsakanov SSE 47 111 (2003),experimental-review,1,2026-07-16,2026-07-16
+thermal-conductivity,β-Ga₂O₃ (C2/m),300 K [010],27.0 W/mK,2.0 W/mK,Guo et al. APL 106 111909 (2015) TDTR ~1/T^1.1-1.3; Klimm CRT 58 2200204 (2023) principal-axis λ22=24.26 concurs ~10%,experimental,1,2026-07-16,2026-07-16
+thermal-conductivity,β-Ga₂O₃ (C2/m),300 K [100],10.9 W/mK,1.0 W/mK,Guo 2015; Handwerg SST 30 024006 (2015) 3ω [100]-only gives 13±1,experimental,1,2026-07-16,2026-07-16
+thermal-conductivity,β-Ga₂O₃ (C2/m),300 K [001],14 W/mK,1.5 W/mK,Guo 2015 Table-I fit (8140/300^1.12),experimental,1,2026-07-16,2026-07-16
+thermal-conductivity-773K,β-Ga₂O₃ (C2/m),773 K,GAP — Klimm CRT 58 2200204 (2023) covers 300-1275 K (principal-axis frame) but full text paywalled,—,acquisition item G2 (Wave-2 audit),gap,1,2026-07-16,2026-07-16
+thermal-conductivity-1100K,β-Ga₂O₃ (C2/m),1100 K,GAP — same acquisition (Klimm 2023),—,acquisition item G2 (Wave-2 audit),gap,1,2026-07-16,2026-07-16
+mobility-electron-pop-ceiling,β-Ga₂O₃ (C2/m),300 K n<1e18,200 cm2/Vs (upper bound),×0.2,Ma et al. APL 109 212101 (2016) 10.1063/1.4968550 — massive multi-mode Fröhlich despite GaN-like m*,theory-pop,1,2026-07-16,2026-07-16
+mobility-electron-bte-intrinsic,β-Ga₂O₃ (C2/m),300 K phonon-limited,115 cm2/Vs,×0.25,Ghosh & Singisetti APL 109 072102 (2016) Rode ab-initio,first-principles-bte,1,2026-07-16,2026-07-16
+mobility-electron-best-exp,β-Ga₂O₃ (C2/m),300 K,150-200 cm2/Vs,range,bulk CZ 152 / MOCVD 176-~200 / 2DEG 180 (Wave-2 audit compilation),experimental,1,2026-07-16,2026-07-16
+saturation-velocity,β-Ga₂O₃ (C2/m),high field (direction-dependent),1-1.5e7 cm/s (peak ~2e7 at ~200 kV/cm),×0.3,Ghosh & Singisetti JAP 122 035702 (2017) full-band MC,monte-carlo,1,2026-07-16,2026-07-16
+impact-ionization-an,β-Ga₂O₃ (C2/m),high field [E∥a],7.9e5 cm-1,×3,Ghosh & Singisetti JAP 124 085707 (2018) 10.1063/1.5034120 Table 1 (E_g=4.9 eV; to 8 MV/cm),monte-carlo,1,2026-07-16,2026-07-16
+impact-ionization-bn,β-Ga₂O₃ (C2/m),high field [E∥a],2.92e7 V/cm,×3,Ghosh & Singisetti 2018 Table 1,monte-carlo,1,2026-07-16,2026-07-16
+impact-ionization-an,β-Ga₂O₃ (C2/m),high field [E∥b],2.16e6 cm-1,×3,Ghosh & Singisetti 2018 Table 1,monte-carlo,1,2026-07-16,2026-07-16
+impact-ionization-bn,β-Ga₂O₃ (C2/m),high field [E∥b],1.77e7 V/cm,×3,Ghosh & Singisetti 2018 Table 1,monte-carlo,1,2026-07-16,2026-07-16
+impact-ionization-an,β-Ga₂O₃ (C2/m),high field [E∥c*] (c* 13.83° from [001]),7.06e5 cm-1,×3,Ghosh & Singisetti 2018 Table 1,monte-carlo,1,2026-07-16,2026-07-16
+impact-ionization-bn,β-Ga₂O₃ (C2/m),high field [E∥c*],2.10e7 V/cm,×3,Ghosh & Singisetti 2018 Table 1,monte-carlo,1,2026-07-16,2026-07-16
+impact-ionization-hole,β-Ga₂O₃ (C2/m),high field,"GAP — cert-refused: self-trapped holes, no band-like p-transport",unbounded,Varley et al. PRB 85 081109(R) (2012); holes never measured,gap,1,2026-07-16,2026-07-16
+breakdown-field-critical,β-Ga₂O₃ (C2/m),300 K [a] (E_g=4.9 eV ionization integral),10.2 MV/cm,×0.3,Ghosh-Singisetti 2018 Table 1; device-measured lower (Higashiwaki SST 31 034001 (2016) bandgap-scaling ≈8),monte-carlo,1,2026-07-16,2026-07-16
+breakdown-field-critical,β-Ga₂O₃ (C2/m),300 K [b],4.8 MV/cm,×0.3,Ghosh-Singisetti 2018 Table 1,monte-carlo,1,2026-07-16,2026-07-16
+breakdown-field-critical,β-Ga₂O₃ (C2/m),300 K [c*],7.6 MV/cm,×0.3,Ghosh-Singisetti 2018 Table 1,monte-carlo,1,2026-07-16,2026-07-16
+caughey-thomas-mu-n-set,β-Ga₂O₃ (C2/m),300 K,GAP — no consensus published fit; derive from μ(N_D) or acquire,—,Wave-2 audit confirmed genuine,gap,1,2026-07-16,2026-07-16

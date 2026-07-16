@@ -119,7 +119,7 @@ electron-phonon ZPR; zero-point lattice expansion is row 63's job, `arch-19 §19
 | AlN | −399 (Engel −377) | −85 | −484 | −0.55 | isochoric | Engel 2022; Miglio 2020 |
 | diamond (indirect) | −345 (band −320…−366) | small | ≈−345 | −0.45 | isochoric | Antonius PRL 112 215501 (2014)/arXiv 1505.07738; Engel −323 |
 | c-BN | −402 | — | — | ~−0.50 (unmeasured) | isochoric | Engel −402 / Miglio −406 |
-| β-Ga₂O₃ | −200 | — | — | −0.90 (anisotropic, polar) | total (⚠ Wave-2: verify isochoric/total — not yet audited) | Lee APL Mater. 2023 |
+| β-Ga₂O₃ | −200 | — | — | −0.90 (anisotropic, polar) | isochoric (Wave-2 audited 2026-07-16: clamped-cell ZPR, expansion minor 0–900 K; the −0.45 eV @700 K shift is *total* — don't compose that slope with row 63) | Lee APL Mater. 11 011106 (2023); Arabov arXiv 2603.29484 (2026) |
 
 (`isochoric`-tagged ⇒ composes with row-63 strain freely; a `total` tag makes the cert **refuse**
 co-activation with row 63 on the same observable, `arch-12 §12.0.3` — so the tag must describe what
@@ -134,7 +134,7 @@ quarantined — different valley — Antonius 2014.)
 | diamond | 2200 (exp 2000–2500) | 620 | 450 | Feng–Lindsay–Ruan PRB 96 161201 (2017); Broido APL 91 231922 (2007) |
 | GaN (a) | 240 (3-ph) / ~200 (exp) | 3-ph 100 / **meas. ~60** | 3-ph 70 / **meas. ~35–40** | 3-ph almaBTE; meas. Zheng PRMat 3 014601 (2019), κ∝T^−1.2→−1.5 |
 | AlN (c) | 339 (exp+FP) | ~140 (theory-only) | ~95 (theory-only) | Rounds/Slack APEX 11 071001 (2018) + Slack JPCS 48 641 (1987); **no >500 K single-crystal measurement** |
-| β-Ga₂O₃ | [010] 27, [100] 11 (tensor, ~2.5–3× anisotropy) | — | — | Guo APL 106 111909 (2015) |
+| β-Ga₂O₃ | [010] 27.0, [100] 10.9, [001] ≈14 (~2.5× anisotropy; Klimm principal-axis λ₂₂ 24.26 concurs) | — (773/1100 K = acquisition G2: Klimm CRT 58 2200204 (2023) paywalled) | — | Guo APL 106 111909 (2015); Wave-2 audit 2026-07-16 |
 
 **High-field Chynoweth `α_ii=a·exp(−b/E)` + Caughey–Thomas + `κ_BR` (rows 123, 74):**
 
@@ -144,7 +144,7 @@ quarantined — different valley — Antonius 2014.)
 | GaN | e 4.48e8 (Cao) / h 7.13e6 ; spread incl. Özbek e 1.5e5 | e 3.39e7 / h 1.46e7 ; Özbek e 1.41e7 | **≥×3** (prefactor spread >4 orders) | v_sat 1.4e7 / v_peak 2.85e7, β=2 | +3.85e−4 (device dV_BR/dT; normalized K⁻¹ GAP) | Cao APL 112 262103 (2018); **Özbek & Baliga IEEE EDL 32 1361 (2011)** (the prior "Maeda APL 112 2018" cite was wrong); Frontiers Mater. 9 846418 (2022) |
 | AlN | e 8.875e6 (Bulutay MC, electron-only) ; **measured GAP** | e 3.759e8 (Bulutay) | unbounded | v_sat 1.4e7, β~2 | GAP (no avalanche; +by analogy) | Bulutay SST 17 L59 (2002); measured α_ii cert-refused |
 | 4H-SiC (ref) | 1.88e6 | 9.13e6 | ×1.3 | — | +7e−4 | literature |
-| β-Ga₂O₃ | e (anisotropic) | E_c 10.2/4.8/7.6 MV/cm | ×3 | — | — | Ghosh–Singisetti JAP 124 (2018); **holes never measured** |
+| β-Ga₂O₃ | e per direction: 0.79/2.16/0.706 ×10⁶ cm⁻¹ [a/b/c*] | 2.92/1.77/2.10 ×10⁷ V/cm; E_c 10.2/4.8/7.6 MV/cm [a/b/c*] (c* ≈13.8° off [001]) | ×3 | 1–1.5e7 sat, peak ~2e7 (MC) | — | Ghosh–Singisetti JAP 124 085707 (2018) Table 1, extracted at the Wave-2 audit; **holes never measured (STH — cert-refused)** |
 
 **Per-material III-N seed (Wave 1: GaN / AlN / Al_xGa_{1-x}N). Full tables + per-value sources in
 `docs/specs/2026-06-10-wave1-iii-n-seeding.md`; adversarial audit in

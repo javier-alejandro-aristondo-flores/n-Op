@@ -29,3 +29,14 @@ bandgap-indirect,diamond,300 K,5.47 eV,0.01 eV,curated MVP anchor (mvp-01); PBE 
 dielectric-static,diamond,300 K,5.7,0.05,standard value (feeds image-force lowering; Fröhlich inert — non-polar),experimental,1,2026-07-08,2026-07-08
 cohesive-energy,diamond,0 K,7.37 eV/atom,0.05 eV/atom,standard experimental atomization anchor,experimental,1,2026-07-08,2026-07-08
 formation-energy-vs-graphite,diamond,"300 K, 1 atm",+25 meV/atom,5 meV/atom,Berman–Simon boundary point; consistent with tp-aware-hull (registry row 124) reading R=0 inside δ_meta,experimental-review,1,2026-07-08,2026-07-08
+bandgap-effective,β-Ga₂O₃ (C2/m),300 K,4.85 eV,0.10 eV,absorption/ellipsometry consensus; Ricci et al. JPCM 28 224005 (2016) compilation,experimental-review,1,2026-07-16,2026-07-16
+absorption-onset,β-Ga₂O₃ (C2/m),300 K [E∥c],4.55 eV,0.08 eV,polarized absorption; spread 4.50 (Matsumoto 1974) - 4.59 (Onuma APL 108 (2016)); Ueda 1997 4.52; never average across polarizations,experimental,1,2026-07-16,2026-07-16
+absorption-onset,β-Ga₂O₃ (C2/m),300 K [E∥b],4.80 eV,0.12 eV,polarized absorption; spread 4.65 (Matsumoto) - 4.90 (Onuma 2016); Ueda 1997 4.79; σ covers the spread (Wave-2 audit),experimental,1,2026-07-16,2026-07-16
+effective-mass-electron,β-Ga₂O₃ (C2/m),300 K (near-isotropic),0.284 m0,0.013 m0,mid-IR optical Hall; Knight et al. APL 112 012103 (2018),experimental,1,2026-07-16,2026-07-16
+epsilon-infinity,β-Ga₂O₃ (C2/m),300 K (per-axis 3.5-3.7),3.6,0.1,Schubert et al. PRB 93 125209 (2016),experimental,1,2026-07-16,2026-07-16
+epsilon-static,β-Ga₂O₃ (C2/m),300 K ⊥(100),10.2,0.2,J Solid State Sci Technol 8 Q3083 (2019) 10.1149/2.0201907jss,experimental,1,2026-07-16,2026-07-16
+epsilon-static,β-Ga₂O₃ (C2/m),300 K ⊥(010),10.87,0.08,JSST 8 Q3083 (2019),experimental,1,2026-07-16,2026-07-16
+epsilon-static,β-Ga₂O₃ (C2/m),300 K ⊥(001),12.4,0.4,JSST 8 Q3083 (2019),experimental,1,2026-07-16,2026-07-16
+ahc-zpr-gap-isochoric,β-Ga₂O₃ (C2/m),0 K,-0.20 eV,0.05 eV,Arabov et al. arXiv 2603.29484 (2026) clamped-cell harmonic sampling; Lee et al. APL Mater. 11 011106 (2023) -0.19±0.05; slope-kind isochoric (Wave-2 audit; composes with registry row 63),dft-mlip,1,2026-07-16,2026-07-16
+bandgap-shift-total-700K,β-Ga₂O₃ (C2/m),700 K vs 0 K,-0.45 eV,0.10 eV,Arabov 2026 — TOTAL incl. minor thermal-expansion term (NOT isochoric-only; do not compose with row 63),dft-mlip,1,2026-07-16,2026-07-16
+displacement-threshold-Ed,β-Ga₂O₃ (C2/m),—,25 eV,5 eV,literature (carried from non-equilibrium stratum H.1; arch-21 §21.3),literature-review,1,2026-07-16,2026-07-16

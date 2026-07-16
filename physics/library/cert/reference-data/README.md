@@ -36,10 +36,20 @@ mobilities, v_sat/β, and the Chynoweth pair), and σ-assignment passes valued e
 material-constants / elastic / phonon / polarization; the 6 transport Caughey–Thomas /
 best-exp cells on 2026-07-16). Remaining `—` cells are exactly the explicit GAP rows and
 the AlGaN interpolation-rule row (a rule, not a value — exempt by construction).
-Pending later waves: β-Ga₂O₃ (Wave 2 — seeding spec drafted 2026-07-08), c-BN / 4H-SiC
-(Wave 3), metals + substrates (Wave 4) and dielectrics (Wave 5) per the 2026-07 gap-audit,
-`interface-properties.csv`, `defect-formation-energies.csv`, `chemical-potentials.csv`, and the
-explicitly-flagged GAPs (AlN electron Caughey–Thomas quartet, AlN μ_p, AlN measured α_ii).
+**Wave 2 (β-Ga₂O₃ + III-N pyro rider) SEEDED 2026-07-16** after its two-auditor adversarial
+audit (`docs/audits/2026-07-16-wave2-beta-ga2o3-audit.md`; spec
+`docs/specs/2026-07-08-wave2-beta-ga2o3-seeding.md` carries the audited values): the full
+monoclinic package direction-tagged (all 13 RUS C_ij in the x∥a/y∥b/z∥c* frame; per-axis ε₀;
+per-direction κ, Chynoweth pairs and E_c on a/b/**c\*** axes), plus III-N pyroelectric
+coefficients (positive-p in the ZB-ref frame — sign guard on the rows). **B3 (AlGaN
+polarization-bowing b) is NOT seeded — gated** on reading the FB Erratum PRB 65 129903 +
+Ebert PRB 113 (2026) texts (gate row in `polarization-piezoelectric.csv`); κ(773/1100 K)
+anchors await the paywalled Klimm 2023 full text (G2). New `—`/GAP cells are exactly the
+declared GAP/gate rows (hole α_ii cert-refused; C–T quartet; κ high-T; bowing gate).
+Pending later waves: c-BN / 4H-SiC (Wave 3), metals + substrates (Wave 4) and dielectrics
+(Wave 5) per the 2026-07 gap-audit, `interface-properties.csv`,
+`defect-formation-energies.csv`, `chemical-potentials.csv`, and the explicitly-flagged GAPs
+(AlN electron Caughey–Thomas quartet, AlN μ_p, AlN measured α_ii).
 
 ## Schema discipline
 

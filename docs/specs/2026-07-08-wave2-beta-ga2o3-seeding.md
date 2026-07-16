@@ -1,12 +1,14 @@
 # Wave-2 seeding spec — β-Ga₂O₃ (+ III-N polarization riders)
 
-**Status: draft for adversarial audit — CSV seeding does NOT land until the audit pass clears it**
-(the Wave-1 gate: two adversarial auditors, one on convention traps, one on numbers/provenance/gaps;
-`docs/audits/2026-06-10-wave1-iii-n-audit.md` is the pattern). Web-verified sources are tagged
-**[verified]** (located and cross-checked 2026-07-08); values recorded from expert knowledge that the
-audit must pin to primary sources are tagged **[audit-pin]**. Scope: β-Ga₂O₃ per-material package on
-the Wave-1 schema, plus the two III-N riders the 2026-07 gap-audit opened (pyroelectric coefficients,
-B1; polarization bowing, B3). Diamond battery: landed (gap-audit Phase 3). c-BN / 4H-SiC: Wave 3.
+**Status: ADVERSARIALLY AUDITED 2026-07-16 — β-Ga₂O₃ package + III-N pyro rider (B1) CLEARED
+and seeded; III-N bowing rider (B3) GATED on two paywalled texts (FB Erratum PRB 65 129903;
+Ebert PRB 113 (2026)).** Audit register: `docs/audits/2026-07-16-wave2-beta-ga2o3-audit.md`
+(two auditors on the Wave-1 mandate; all value/provenance corrections applied **in place**
+below — the tables now carry the audited values). Historical note: drafted 2026-07-08 with
+**[verified]** / **[audit-pin]** tags; pins are resolved below except the two G1/G2
+acquisition items. Scope: β-Ga₂O₃ per-material package on the Wave-1 schema, plus the two
+III-N riders the 2026-07 gap-audit opened (pyroelectric coefficients, B1; polarization
+bowing, B3). Diamond battery: landed (gap-audit Phase 3). c-BN / 4H-SiC: Wave 3.
 
 ## §1 Conventions & traps (read before any value)
 
@@ -20,20 +22,25 @@ B1; polarization bowing, B3). Diamond battery: landed (gap-audit Phase 3). c-BN 
    normative in `arch-13-applicability`. **Wave-2 numbers must never be filtered through the old
    single-predicate assumption.**
 2. **Direction tags are mandatory on every anisotropic row.** Monoclinic anisotropy is large
-   (κ[010]/κ[100] ≈ 2.5; α_ii direction-resolved; polarized absorption onsets spread ~0.4 eV).
-   Every κ / α_ii / onset / ε row carries `[100]`, `[010]`, `[001]`, or a polarization tag in
-   `Environment` or `Material`. Cartesian frame for tensors: the RUS elastic frame (x∥a, y∥b,
-   z∥c*) — state it wherever a C_ij or ε tensor component is quoted.
+   (κ[010]/κ[100] ≈ 2.5; α_ii direction-resolved; polarized absorption onsets spread ~0.3 eV).
+   Every κ / α_ii / onset / ε row carries `[100]`, `[010]`, `[001]`/`c*`, or a polarization tag
+   in `Environment` or `Material`. Cartesian frame for tensors: the RUS elastic frame (x∥a,
+   y∥b, z∥c*) — state it wherever a C_ij or ε tensor component is quoted. **Audit finding:
+   the Ghosh–Singisetti high-field axes are a / b / c\* (c\* is 13.83° from [001]) — α_ii and
+   E_c rows are tagged c\*, never [001].** Klimm's κ tensor is reported in *principal* axes:
+   only λ₂₂ ≡ [010] is frame-shared with the crystallographic-direction rows.
 3. **Gap bookkeeping.** The fundamental gap is *indirect* by a few tens of meV with the direct gap
    at Γ almost degenerate ("quasi-direct"); the *measured absorption onset is
    polarization-dependent* (E∥c ≈ 4.5–4.6 eV, E∥b ≈ 4.8–4.9 eV). Seed the effective RT gap
    ≈ 4.85 eV **and** the polarized onsets as separate rows; never average them.
-4. **ZPR `slope-kind` (closes the ledger's ⚠).** The −200 meV ZPR entry was tagged
-   `total (⚠ Wave-2: verify)`. Preliminary verdict from the 2026 first-principles+MLIP study
-   **[verified — arXiv 2603.29484]**: ZPR ≈ −0.2 eV, gap shrinks ≈ −0.45 eV by 700 K, and **lattice
-   thermal expansion / anharmonicity contribute only minorly** over 0–900 K ⇒ the slope is
-   **e-ph-dominated → retag `isochoric`** (composes freely with row 63). The adversarial audit
-   must confirm against APL Mater. 11 011106 (2023) **[verified — exists]** before the ledger flips.
+4. **ZPR `slope-kind` (ledger ⚠ CLOSED at audit).** Audited verdict (Arabov et al. arXiv
+   2603.29484 read in full; cross-confirmed Lee et al. APL Mater. 11 011106 (2023),
+   −0.19±0.05 eV): the ZPR = −0.20±0.01 eV is a clamped-cell harmonic-sampling value —
+   genuinely **isochoric** e-ph (same class as the III-N Engel/Miglio entries); thermal
+   expansion contributes only minorly to the gap renormalization over 0–900 K. Ledger
+   retagged `isochoric`. **Refinement:** the −0.45 eV shift at 700 K is the *total*
+   (expansion included) — the isochoric tag rides the ZPR amplitude only, else row 63
+   double-counts the strain term.
 5. **Hole physics = polarons, by design refusal.** Valence bands are flat; holes self-trap (STH)
    with sub-band-gap UV luminescence (~3.2–3.6 eV) and no band-like p-transport. The existing
    cert-refuse stance (arch-17 "polaron localization beyond Fröhlich"; ledger: "holes never
@@ -41,9 +48,13 @@ B1; polarization bowing, B3). Diamond battery: landed (gap-audit Phase 3). c-BN 
    Caughey–Thomas set; cert-refuse instead.** PL channel note: row 134's B_rad applies to the STH
    emission, not band-edge PL (there is essentially none).
 6. **Fröhlich is multi-mode.** The interaction is dominated by *low-energy* polar modes (not the
-   highest LO): a single-α_F shorthand fits β-Ga₂O₃ poorly. The `KernelExt.Parametric` slot for
-   the Fröhlich channel should carry the multi-mode (Verdi–Giustino-form) parameter set — mode
-   energies + mode-resolved coupling — rather than one α_F **[audit-pin: mode table]**.
+   highest LO): a single-α_F shorthand fits β-Ga₂O₃ poorly for T-dependent transport
+   (Ghosh & Singisetti JAP 122 035702 (2017) / JAP 124 085707 (2018); Ma et al. 2016 used a
+   single effective α_F ≈ 1.68 at ℏω ≈ 44 meV for the 300 K ceiling only). The
+   `KernelExt.Parametric` slot for the Fröhlich channel carries the multi-mode
+   (Verdi–Giustino-form) parameter set — **pinned at audit: Mengle & Kioupakis, AIP Advances
+   9 015313 (2019), Table I** (12 IR-active modes, TO + directional LO along a/b/c; dominant
+   e-ph mode at 29 meV); assembly into the KernelExt remains research-side work.
 
 ## §2 β-Ga₂O₃ seed tables (value · σ · source · class)
 
@@ -51,21 +62,21 @@ B1; polarization bowing, B3). Diamond battery: landed (gap-audit Phase 3). c-BN 
 
 | Quantity | Value | σ | Source | Class |
 |---|---|---|---|---|
-| a; b; c | 12.214; 3.037; 5.798 Å | 0.005; 0.002; 0.002 | Åhman/Geller structure refinements **[audit-pin exact ref]** | experimental |
+| a; b; c | 12.214; 3.037; 5.798 Å | 0.005; 0.002; 0.002 | Åhman, Svensson & Albertsson, Acta Cryst. C52 1336 (1996), 10.1107/S0108270195016404 (pinned at audit; Geller 1960 is the older determination) | experimental |
 | β (monoclinic angle) | 103.83° | 0.05° | same | experimental |
-| ρ | 5.95 g/cm³ | 0.02 | standard | experimental |
+| ρ | 5.96 g/cm³ | 0.02 | crystallographic density from the Åhman cell (Z=4) — derived, not "standard" | derived-experimental |
 
 *Electronic:*
 
 | Quantity | Value | σ | Source | Class |
 |---|---|---|---|---|
-| E_g effective (RT) | 4.85 eV | 0.10 | absorption/ellipsometry consensus **[audit-pin]** | experimental-review |
-| onset E∥c / E∥b | ≈4.55 / ≈4.88 eV | 0.05 | polarized absorption **[audit-pin]** | experimental |
-| m*_e | 0.28 m₀ (near-isotropic) | 0.02 | DFT+ARPES consensus **[audit-pin]** | experimental-review |
-| ε_∞ | ≈3.6 | 0.1 | optical **[audit-pin per-axis]** | experimental |
-| ε_0 | ≈10–12 (direction-dependent) | per-axis | **[audit-pin per-axis]** | experimental |
-| ZPR (isochoric-dominant, §1.4) | −0.20 eV | 0.05 | arXiv 2603.29484 (2026) **[verified]**; APL Mater. 11 011106 (2023) **[verified]** | dft-mlip |
-| ΔE_g(700 K) − E_g(0) | −0.45 eV | 0.10 | arXiv 2603.29484 **[verified]** | dft-mlip |
+| E_g effective (RT) | 4.85 eV | 0.10 | absorption/ellipsometry consensus (Ricci et al. JPCM 28 224005 (2016) compilation) | experimental-review |
+| onset E∥c / E∥b | 4.55 / 4.80 eV | 0.08 / 0.12 | polarized absorption — audited spread: E∥c ∈ 4.50 (Matsumoto 1974) … 4.59 (Onuma APL 108 (2016)); E∥b ∈ 4.65 … 4.90 (Ueda 1997 gives 4.79); σ widened to cover the spread | experimental |
+| m*_e | 0.284 m₀ (near-isotropic) | 0.013 | mid-IR optical Hall — Knight et al. APL 112 012103 (2018) (audit corrected the "DFT+ARPES" label) | experimental |
+| ε_∞ | ≈3.6 | 0.1 | Schubert et al. PRB 93 125209 (2016), per-axis 3.5–3.7 | experimental |
+| ε_0 ⊥(100)/⊥(010)/⊥(001) | 10.2 / 10.87 / 12.4 | 0.2 / 0.08 / 0.4 | J. Solid State Sci. Technol. 8 Q3083 (2019), 10.1149/2.0201907jss (pinned at audit — moved out of the GAP register) | experimental |
+| ZPR (isochoric, §1.4) | −0.20 eV | 0.05 | Arabov et al. arXiv 2603.29484 (2026); Lee et al. APL Mater. 11 011106 (2023) −0.19±0.05 | dft-mlip |
+| ΔE_g(700 K) − E_g(0) (total, §1.4) | −0.45 eV | 0.10 | Arabov et al. arXiv 2603.29484 (2026) | dft-mlip |
 
 *Elastic (all 13 monoclinic constants — complete RUS determination; frame x∥a, y∥b, z∥c*):*
 
@@ -89,78 +100,96 @@ C₂₂/C₃₃; C₄₄ vs C₆₆ differ >50% — Born-stability check must us
 
 | Quantity | Value | σ | Source | Class |
 |---|---|---|---|---|
-| κ[010] (300 K) | 27.0 W/mK | 2.0 | Guo et al. APL 106 111909 (2015) **[verified]** | experimental (TDTR) |
-| κ[100] (300 K) | 10.9 W/mK | 1.0 | Guo 2015 **[verified]**; Handwerg 2015 concurs (29±2 / 11±1) **[verified]** | experimental |
-| κ[001] (300 K) | ≈15 W/mK | 1.5 | Guo 2015 **[audit-pin exact value]** | experimental |
-| κ(T) high-T | ~1/T (Umklapp) to ≥495 K; tensor to 1275 K exists | — | Guo 2015 **[verified]**; Cryst. Res. Technol. 2022 tensor study **[verified — audit extracts 773/1100 K anchors]** | experimental |
-| Θ_D | ≈740 K | 150 (literature spread 420–870) | **[audit-pin; spread is real — record the spread]** | mixed |
-| phonon modes | 30 branches (10-atom primitive cell); IR-active A_u/B_u set; dominant Fröhlich modes at low energy | — | Ma 2016 / phonon studies **[audit-pin mode table for the KernelExt]** | dft-dfpt |
+| κ[010] (300 K) | 27.0 W/mK | 2.0 | Guo et al. APL 106 111909 (2015), TDTR, 80–495 K, ~1/T^1.1–1.3; Klimm λ₂₂ = 24.26 (principal-axis, laser-flash) concurs ~10% | experimental (TDTR) |
+| κ[100] (300 K) | 10.9 W/mK | 1.0 | Guo 2015; Handwerg SST 30 024006 (2015), 3ω, measured [100] only: 13±1 (audit corrected the earlier "concurs (29/11)" parenthetical — those were not Handwerg values) | experimental |
+| κ[001] (300 K) | 14 W/mK | 1.5 | Guo 2015 Table-I fit (8140/300^1.12 ≈ 13.7; Fig. 2b reads ≈14) — audit corrected from ≈15 | experimental |
+| κ(T) high-T | ~1/T (Umklapp) to ≥495 K; tensor to 1275 K exists | — | Guo 2015; Klimm et al. Cryst. Res. Technol. **58** 2200204 (**2023**), 10.1002/crat.202200204 — 300 K principal-axis tensor pinned (λ₁₁ 12.13 / λ₂₂ 24.26 / λ₃₃ 14.09 / λ₁₃ −0.992); **773/1100 K components paywalled → acquisition item G2** | experimental |
+| Θ_D | 738 K | 150 (literature spread 420–870; central = Guo calorimetric Debye fit; upper endpoint = FP 872 K; lower endpoint unpinned) | Guo 2015; Mengle–Kioupakis 2019 concur ≈738 | mixed |
+| phonon modes | 30 branches (10-atom primitive cell); 12 IR-active modes, TO + directional LO (a/b/c); dominant e-ph (Fröhlich) mode at 29 meV | — | **Mengle & Kioupakis, AIP Advances 9 015313 (2019), Table I** (the KernelExt mode table — pinned at audit; attribution corrected from Ma 2016) | dft-dfpt |
 
 *Transport / high-field:*
 
 | Quantity | Value | σ | Source | Class |
 |---|---|---|---|---|
-| μ_n POP ceiling (300 K, n<10¹⁸) | <200 cm²/Vs | ×0.2 | Ma et al. APL 109 212101 (2016) **[verified]** | theory (POP-limited) |
-| μ_n BTE @ n=1.1×10¹⁷ | ≈115 cm²/Vs | ×0.25 | Ghosh & Singisetti (ab-initio BTE) **[verified]** | first-principles-bte |
-| μ_n best measured (300 K) | ≈130–180 cm²/Vs | range | **[audit-pin]** | experimental |
-| v_sat | 1–2×10⁷ cm/s (direction-dependent) | ×0.3 | full-band MC **[audit-pin per-direction]** | monte-carlo |
-| α_ii(E) electron, per direction | Chynoweth fits per [100]/[010]/[001], fields to 8 MV/cm | ×3 | Ghosh & Singisetti JAP 124 085707 (2018) **[verified — audit extracts the three (a,b) pairs]** | monte-carlo |
-| α_ii hole | **cert-refused** (never measured; STH) | unbounded | ledger residue | gap |
-| E_c theoretical | ≈8 MV/cm | ×0.15 | Ghosh–Singisetti 2018 **[verified]**; device-measured lower | monte-carlo |
-| C–T quartet (μ_max/μ_min/N_ref/α) | **GAP — no consensus fit**; derive from published μ(N_D) or acquire | — | acquisition item | gap |
+| μ_n POP ceiling (300 K, n<10¹⁸) | <200 cm²/Vs | ×0.2 | Ma et al. APL 109 212101 (2016), 10.1063/1.4968550 | theory (POP-limited) |
+| μ_n BTE intrinsic (300 K, phonon-limited) | ≈115 cm²/Vs | ×0.25 | Ghosh & Singisetti APL 109 072102 (2016), Rode ab-initio (audit re-cited; density tie dropped) | first-principles-bte |
+| μ_n best measured (300 K) | 150–200 cm²/Vs | range | bulk CZ 152 / MOCVD 176–~200 / 2DEG 180 (pinned at audit; upper end has crept to ~200) | experimental |
+| v_sat | 1–1.5×10⁷ cm/s sat; peak ~2×10⁷ at ~200 kV/cm (direction-dependent) | ×0.3 | Ghosh & Singisetti JAP 122 035702 (2017), full-band MC | monte-carlo |
+| α_ii(E) electron, per direction | Chynoweth (a, b): **a-axis 0.79×10⁶ /cm, 2.92×10⁷ V/cm · b-axis 2.16×10⁶, 1.77×10⁷ · c\*-axis 0.706×10⁶, 2.10×10⁷** (E_g = 4.9 eV; fields to 8 MV/cm; c\* is 13.83° from [001]) | ×3 | Ghosh & Singisetti JAP 124 085707 (2018), 10.1063/1.5034120, Table 1 (extracted at audit) | monte-carlo |
+| α_ii hole | **cert-refused** (never measured; STH) | unbounded | ledger residue; Varley PRB 85 081109(R) (2012) | gap |
+| E_c (ionization-integral, per direction) | **10.2 [a] / 4.8 [b] / 7.6 [c\*] MV/cm** at E_g = 4.9 eV (audit REFUTED the earlier scalar "≈8, Ghosh–Singisetti" — no such value in-paper; ≈8 is Higashiwaki SST 31 034001 (2016) bandgap-scaling / the max simulated field; device-measured lower) | ×0.3 | Ghosh–Singisetti 2018 Table 1 | monte-carlo |
+| C–T quartet (μ_max/μ_min/N_ref/α) | **GAP — no consensus fit** (audit confirmed genuine); derive from published μ(N_D) or acquire | — | acquisition item | gap |
 | E_d (radiation) | ≈25 eV | ±5 | non-eq H.1 (already carried) | literature |
 
 *Defect inventory pointers (for the future defect-formation-energies.csv; host row already in
 `arch-21 §21.2.1`):* V_O(I/II/III) are **deep donors** (~1 eV+) — *not* the n-type source (Si/Sn
-shallow donors are); V_Ga deep acceptors (multiple charge states); STH self-trapping energy
-~0.5 eV **[audit-pin: Varley et al. — V_O deep-donor APL 2010-class + STH PRB 85 081109(R)
-(2012)-class citations]**.
+shallow donors are); V_Ga deep acceptors (multiple charge states); STH self-trapping energies
+−0.39/−0.46 eV (O_I/O_II sites). Pinned at audit: **Varley, Weber, Janotti & Van de Walle,
+APL 97 142106 (2010), 10.1063/1.3499306 (+ Erratum APL 108 039901 (2016))** for V_O;
+**Varley, Janotti, Franchini & Van de Walle, PRB 85 081109(R) (2012),
+10.1103/PhysRevB.85.081109** for the STH.
 
 ## §3 III-N riders (gap-audit B1/B3 coefficients)
 
-*Pyroelectric coefficients (row 128; sign convention: record `p = dP_sp/dT` in the same
-ZB-proper frame as rows 113–114 — the measured pyro response has |P_sp| decreasing toward zero
-with rising T; the audit must fix the sign in the ZB-reference frame before seeding):*
+*Pyroelectric coefficients (row 128; sign FIXED AT AUDIT: the seeded ZB-ref P_sp values are
+NEGATIVE and |P_sp| decreases toward zero with rising T ⇒ **p = dP_sp/dT is POSITIVE in the
+seeded frame**. Trap: raw literature quotes p negative under the positive-P_s convention —
+seed the positive value; a sign-guard note rides the CSV rows):*
 
-| Material | p (μC/m²K) | σ | Source | Class |
+| Material | p (μC/m²K, ZB-ref frame) | σ | Source | Class |
 |---|---|---|---|---|
-| AlN | ≈3.0 (measured, 6–12 μm epilayers); reports up to ~6–8 | ×0.5 | Temperature dependence of the pyroelectric coefficient of AlN **[verified — exists; audit-pin exact ref]** | experimental |
-| GaN | ≈4–5 (first-principles + heterostructure measurements; thinner data) | ×0.5 | first-principles pyroelectricity studies **[audit-pin]** | dft |
+| AlN | +3.0 (6–12 μm epilayers / Debye analysis); thin-film reports 6–8 | ×2 (covers the 3→6–8 spread; the drafted "×0.5" was malformed under the σ convention) | Yan et al. APL 90 212102 (2007), 10.1063/1.2742589 (epilayer/Debye analysis; T³ primary regime) **+** Fuflyigin et al. APL 77 3075 (2000), 10.1063/1.1324726 (thin-film 6–8) — source split at audit | experimental |
+| GaN | +4.5 (first-principles + heterostructure measurements; thinner data) | ×2 | first-principles pyroelectricity studies (data thin — stays dft-class per §4) | dft |
 | impact | ΔP over ΔT≈750 K ≈ 2–4×10⁻³ C/m² vs n_s·q ≈ 1.6×10⁻² ⇒ **~15–25% n_s(T) drift** | — | vs the ±5% ΔP target | — |
 
-Secondary (thermal-expansion-mediated) pyroelectricity grows above ~100 K and dominates at the
-operating point — the seeded `p` must be the **total (primary+secondary) coefficient at fixed
-stress**, which is what the epilayer measurements give **[verified — T³ primary → secondary
-crossover ~100 K for AlN]**.
+Secondary-crossover physics confirmed at audit: primary (T³) → secondary transition ≈100 K for
+AlN (GaN 70 K, InN 60 K, tied to AlN's <100 K negative thermal expansion); the epilayer
+measurement gives the **total (primary+secondary) coefficient at fixed stress** — the correct
+seed for the operating point.
 
-*Polarization bowing (B3; rows 113–114 interpolation rule in `accuracy-ledger`):*
+
+*Polarization bowing (B3; rows 113–114 interpolation rule in `accuracy-ledger`) —
+**SEEDING GATED (audit finding G1):** neither the FB Erratum (PRB 65 129903, 2002) nor the
+Ebert holography paper (PRB 113, 2026) is readable from open sources; the mandated
+"read the erratum before seeding" is unmet. Physics risk judged LOW (the sign trap is
+navigated: FB01's Eq-4/5 define `−b·x(1−x)` with b negative — "bowing always upward" — so
+the `+b, b positive` form below is the same physics via double-negative; post-erratum
+citing sources carry the upward bowing), but B3 does not seed until both texts are read
+directly. A gate row rides in `polarization-piezoelectric.csv`.*
 
 | Quantity | Form / value | Source |
 |---|---|---|
-| P_sp(Al_xGa₁₋ₓN) | `x·P_AlN + (1−x)·P_GaN + b·x(1−x)`, b ≈ +0.019…0.021 C/m² **[audit-pin exact b + sign convention against the ZB-proper frame]** | Fiorentini & Bernardini PRB 64 085207 (2001) **[verified]** — **plus the published Erratum PRB 65 129903 (2002); the audit MUST read the erratum before seeding** |
-| deviations from parabolic | ≲10% (worst case AlInN; smaller for AlGaN) | PRB 64 085207 **[verified]** |
-| e_ij(x) piezo | nonlinear in *strain* (bulk response), disorder-independent — parameterize e(x, ε) per FB's prescription | PRB 64 085207 **[verified]** |
-| modern cross-check | off-axis electron-holography quantification of polarization bowing (PRB, recent) **[verified — exists; audit-pin]** | — |
+| P_sp(Al_xGa₁₋ₓN) | `x·P_AlN + (1−x)·P_GaN + b·x(1−x)`, b ≈ +0.019…0.021 C/m² — exact b pins to FBA APL 80 1204 (2002) / Ambacher JPCM 14 3399 (2002) at the gated seeding (FB01's preprint gives only the ideal-structure AlInN chemical-only value) | Fiorentini & Bernardini PRB 64 085207 (2001), 10.1103/PhysRevB.64.085207 + **Erratum PRB 65 129903 (2002), 10.1103/PhysRevB.65.129903 — text acquisition = gate G1** |
+| deviations from parabolic | ≲10% (worst case AlInN; smaller for AlGaN) | PRB 64 085207 |
+| e_ij(x) piezo | nonlinear in *strain* (bulk response), disorder-independent — parameterize e(x, ε) per FB's prescription | PRB 64 085207 |
+| modern cross-check | off-axis electron-holography quantification of polarization bowing — **Ebert et al., PRB 113 (2026), 10.1103/4rsc-ysk8** (uses a layered-hexagonal reference = Dreyer's recommended frame; converts cleanly — bowing is a curvature, ~reference-invariant, and interface charge is reference-independent. Import their b only as a curvature on ZB-ref endpoints, never their absolute endpoints; the AlGaN/GaN-only cancellation guard stays; numeric b unread → part of gate G1) | — |
 
-## §4 GAP register (genuine; carried, not hidden)
+## §4 GAP register (post-audit; genuine, carried, not hidden)
 
 AlGaN-analog alloying ((Al_xGa₁₋ₓ)₂O₃) — out of Wave-2 scope, note for a later wave; hole
-transport / hole α_ii — cert-refused (STH), by design; C–T quartet — no consensus fit
-(acquisition or fit-from-published-μ(N_D)); per-axis ε₀ — pin; Θ_D — genuine literature spread,
-record as spread; κ(773/1100 K) anchors — extract from the 2022 tensor study; Fröhlich mode
-table for the multi-mode KernelExt — assemble from DFPT phonon studies; pyro-GaN measured value —
-thin data, may stay `dft`-class; e_ij(x) bowing numbers — from FB01 + erratum.
+transport / hole α_ii — cert-refused (STH), by design; C–T quartet — no consensus fit,
+audit-confirmed genuine (acquisition or fit-from-published-μ(N_D)); Θ_D — genuine literature
+spread, recorded as spread (central 738 K pinned); κ(773/1100 K) anchors — Klimm 2023 covers
+300–1275 K but full text paywalled (**acquisition G2**); Fröhlich multi-mode KernelExt —
+source pinned (Mengle–Kioupakis 2019 Table I), assembly remains research-side; pyro-GaN
+measured value — thin data, stays `dft`-class; e_ij(x) + P_sp bowing numbers — **gated G1**
+(FB erratum + Ebert texts). *Removed from the register at audit:* per-axis ε₀ (pinned to
+JSST 8 Q3083 (2019) and seeded).
 
-## §5 Landing plan
+## §5 Landing plan — EXECUTED 2026-07-16
 
-1. Adversarial audit (two auditors, Wave-1 mandate: refute). Special attention: the FB **erratum**,
-   the ZPR slope-kind retag, the pyro sign convention in the ZB-proper frame, per-direction α_ii
-   extraction, and every **[audit-pin]** tag above.
-2. On clear: seed `material-constants` / `elastic-tensors` / `phonon-frequencies` /
-   `transport-coefficients` rows for β-Ga₂O₃ (direction-tagged), the III-N pyro/bowing
-   coefficients, retag the ledger's Ga₂O₃ ZPR row, and update the ledger κ(T)/high-field tables.
-3. Registry: no new rows needed — Wave 2 is coefficients + gates (the predicate split landed with
+1. ✔ Adversarial audit (two auditors, Wave-1 mandate: refute) —
+   `docs/audits/2026-07-16-wave2-beta-ga2o3-audit.md`. Conventions: CLEAR-WITH-PINS;
+   numbers: BLOCK→fixed at adjudication (E_c triple + c* labels + six fixes, applied above).
+2. ✔ Seeded: `material-constants` / `elastic-tensors` / `phonon-frequencies` /
+   `transport-coefficients` β-Ga₂O₃ rows (direction-tagged, monoclinic frame stated), the
+   III-N **pyro** coefficients (positive-p, sign-guarded); ledger Ga₂O₃ ZPR row retagged
+   `isochoric`; ledger κ(T)/high-field tables updated. **NOT seeded: the B3 bowing rider —
+   gated G1** (a gate row rides in `polarization-piezoelectric.csv`).
+3. ✔ Registry: no new rows — Wave 2 is coefficients + gates (the predicate split landed with
    this spec: `arch-13`, `arch-09 §9.3`, row 128's note).
+4. Open acquisitions (user): **G1** FB Erratum PRB 65 129903 + Ebert PRB 113 (2026) full
+   texts (gates B3); **G2** Klimm CRT 58 2200204 (2023) full text (κ 773/1100 K anchors).
 
 ## §6 Sources (verified this pass)
 

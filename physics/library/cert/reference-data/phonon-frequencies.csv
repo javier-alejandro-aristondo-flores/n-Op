@@ -15,3 +15,5 @@ gruneisen-mode-TA,AlN (wz),—,0.16,0.1,first-principles QHA arXiv 2211.03960,df
 gruneisen-mode-LA,AlN (wz),—,1.04,0.2,first-principles QHA arXiv 2211.03960,dft-qha,2,2026-06-10,2026-07-08
 phonon-max-energy,diamond,300 K,165 meV,0.5 meV,curated MVP anchor (see accuracy-ledger.md),experimental,2,2026-06-10,2026-07-08
 debye-temperature,diamond,—,2200 K,50 K,curated MVP anchor (see accuracy-ledger.md),experimental,2,2026-06-10,2026-07-08
+debye-temperature,β-Ga₂O₃ (C2/m),—,738 K,150 K,"Guo APL 106 111909 (2015) calorimetric Debye fit; literature spread 420-870 (FP 872, He et al. 2006); Mengle-Kioupakis 2019 concur",mixed,1,2026-07-16,2026-07-16
+phonon-frohlich-dominant-mode,β-Ga₂O₃ (C2/m),300 K,29 meV,2 meV,Mengle & Kioupakis AIP Advances 9 015313 (2019) 10.1063/1.5055238 Table I — 12 IR-active modes TO + directional LO (a/b/c); the multi-mode KernelExt source,dft-dfpt,1,2026-07-16,2026-07-16

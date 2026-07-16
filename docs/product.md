@@ -216,10 +216,16 @@ same function with file handles. Nothing interactive, nothing stateful, no daemo
 Recorded here in the manner of `arch-18-open-decisions`; none blocks the v1 verbs
 (screening, reconciliation):
 
-1. **Time-evolution verbs (rollout; endpoint/lifetime queries) — deliberately
-   unclaimed.** Pending the independent scorer↔stepper duality research
-   (`docs/specs/2026-07-16-evolver-duality-research-brief.md`). Nothing in this document
-   depends on its outcome.
+1. **Time-evolution verbs (rollout; endpoint/lifetime queries) — still unclaimed; the
+   underlying principle is now decided.** The scorer↔stepper duality research
+   (`docs/specs/2026-07-16-evolver-duality-research.md`) resolved *survives with
+   restrictions*: the evolver is a flag-gated Stage-4 sibling artifact — an
+   "evolver-file" sharing the scorer's content-addressed RHS forests — whose integrator
+   stays consumer-side (the closed integrator-interface decision,
+   `arch-18-open-decisions`). §8 is preserved verbatim: the hand-off is tendencies,
+   never trajectories. The verbs remain unclaimed until that lowering is specified and
+   built as its own named wave (slow tier first); when trajectories exist, the scorer
+   audits them under the same slot keys.
 2. **Loading convention / ABI.** How a non-native program loads and calls an oracle-file
    (native module vs. a flat-array C-style ABI vs. both). The abstract contract — one
    self-describing file, flat arrays at the boundary — is fixed; the container is not.

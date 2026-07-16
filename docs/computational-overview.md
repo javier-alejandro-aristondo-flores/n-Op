@@ -562,9 +562,11 @@ device-scale bridge) and normalizing the GENERIC degeneracy layer (`arch-05`). W
   error tracking, materialization policy, long-trajectory rank drift, rank-dependent applicability.
   These are the only *open CS problems* in the design.
 - **Deferred engineering decisions** (`arch-18`, open list) — surrogate-net build-vs-adopt, the
-  PDE-mesh **adjoint scheme** (the mesh *format* is now committed in `arch-21`), the integrator
-  interface signature, the `γ̂` open questions (arch-15 §15.4), and the Layer-1.75 (GW / DMFT) onramp. Each resolves just-in-time as the build
-  reaches it; none blocks the substrate or the MVP.
+  PDE-mesh **adjoint scheme** (the mesh *format* is now committed in `arch-21`), the `γ̂` open
+  questions (arch-15 §15.4), and the Layer-1.75 (GW / DMFT) onramp. Each resolves just-in-time
+  as the build reaches it; none blocks the substrate or the MVP. (The integrator-interface
+  signature closed 2026-07-16 — a per-tier tangent + steppable-form-manifest hand-off with the
+  integrator consumer-side; `arch-18-open-decisions`.)
 
 A validator should treat §§1–12 as claims that **should be valid** against the cited atomic
 docs, and §13 as the catalog of what is **intentionally open**.

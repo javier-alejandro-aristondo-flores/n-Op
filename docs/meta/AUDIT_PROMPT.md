@@ -55,7 +55,7 @@ docs/
     12-cert (10 obligations)                13-applicability (predicates)
     14-topology (symmetry/topology atlas)   15-gamma-hat (the γ̂ data structure + open problems)
     16-pino-bridge (the output boundary)    17-out-of-scope
-    18-open-decisions (5 open, incl. resolved impl-language)
+    18-open-decisions (4 open + a closed ledger incl. impl-language, integrator interface)
     19-coupling-structure (the coupling generator — the keystone of cross-regime physics)
     20-representations (the substrate — the "canonical structure")
     21-multiscale-state (slow + macro tiers: aging kinetics, device-mesh continuum, homogenization)

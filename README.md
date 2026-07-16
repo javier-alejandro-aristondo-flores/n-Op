@@ -96,10 +96,11 @@ polyglot of domain-specific DSLs joined at the Stage-4→Stage-5 codegen seam �
 **Haskell** hosts the Stage-1–4 symbolic compiler and the `arch-20` substrate,
 **Julia** is the Stage-5 runtime (Stage 4 emits Julia source), with **GAP**
 (offline group theory) and **Lean 4** (offline proofs) as sidecars. Everything
-in `docs/` remains language-neutral. Five decisions remain open — surrogate-net
-build vs adopt, the PDE-mesh adjoint scheme, the γ̂ §15.4 questions, the
-Layer-1.75 V2 spec, and the integrator interface — see
-`docs/architecture/18-open-decisions.md`.
+in `docs/` remains language-neutral. Four decisions remain open — surrogate-net
+build vs adopt, the PDE-mesh adjoint scheme, the γ̂ §15.4 questions, and the
+Layer-1.75 V2 spec — see `docs/architecture/18-open-decisions.md` (the
+integrator interface closed 2026-07-16: a per-tier tangent + manifest hand-off,
+integrator consumer-side).
 
 No code has been written yet. `physics/library/` is a code-free scaffold whose
 directory names match the architecture; its two populated corners are the

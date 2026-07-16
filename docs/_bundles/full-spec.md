@@ -1952,8 +1952,7 @@ The architecture above is committed. These remain to be decided.
    applicability of the LowRank slot).
 4. Layer-1.75 minimum spec sufficient for a V2 contributor to implement
    self-consistent GW / DMFT.
-5. The integrator interface — the exact signature `dynamics` exposes to
-   `/informed-operator` for handing off the assembled GENERIC right-hand side.
+
 ## Closed decisions
 
 - **Multiscale state (slow + macro tiers) & the device scale-bridge** =
@@ -1994,6 +1993,29 @@ The architecture above is committed. These remain to be decided.
   single-host fallback is Julia-only or Haskell-only. Rust (the single-language
   winner) is excluded by preference; Python+JAX is disqualified — its tracer owns
   differentiation, which conflicts with bring-your-own adjoint synthesis.
+- **Integrator interface (`dynamics`)** = the **per-tier evolver hand-off — a
+  causalized tangent kernel plus a steppable-form manifest — not an integrator**
+  (decided 2026-07-16 on the scorer↔stepper duality research,
+  `docs/specs/2026-07-16-evolver-duality-research.md`; verdict: survives with
+  restrictions). `dynamics(tier)` exposes: the pure tangent map
+  `(state_tier, env, adiabatic-params) → tangent_tier`; separately addressable
+  generator sub-entries (`E`, `S`, `δE/δx`, `δS/δx`, and the `L·`/`M·`
+  contraction blocks — required by degeneracy-respecting / discrete-gradient
+  integrators); the algebraic subsystem with per-step solve plans and an
+  index-≤1 witness; per-block generator tags with preservation grades; the
+  obligation map (`ResidualKey → conserve | bound | monotone`); the tier
+  cadence/coupling contract; declared per-step cost; and the sibling
+  fingerprint + certificate reference. `/physics` guarantees exactness against
+  the scorer sibling, tag totality, structural witnesses, and refusal
+  accounting; the consumer — `/informed-operator`, an integration harness in
+  `/interface`, or a user program — owns scheme choice, step-size control, and
+  the loop. Score-not-solve is preserved: the hand-off is a per-call readout of
+  the instantaneous lawful tendency, never a trajectory (`docs/product.md`).
+  Realized as a flag-gated Stage-4 sibling emission sharing the scorer's
+  content-addressed RHS forests (one Stage-3 extraction, two lowerings).
+  Residue: the full lowering spec (manifest record, refusal enum, the
+  scorer–evolver exactness obligation) lands as its own named wave — slow tier
+  first — and no time-evolution product verb is claimed until it does.
 - **ReferenceCache backend** = `SqliteReferenceCache` (`arch-12-cert §12.1`).
 - **Coverage-mask format** = `RoaringCoverageMask` (`arch-16-pino-bridge §16.2.1`).
 - **Curriculum schedule** = `0.10 / 0.60 / 0.90` cumulative fractions, last

@@ -412,7 +412,9 @@ nothing here is on a runtime hot path.
 The emitted kernel's single entry point:
 
 ```
-evaluate(state, env, request : all|{ResidualKey}|{ObservableRef}, gradient : Skip|Compute)
+Validate(state, env, request : all|{ResidualKey}|{ObservableRef}, gradient : Skip|Compute)
+-- the pino-bridge surface (arch-16 §16.1); it wraps the raw kernel primitive
+-- `evaluate : (State, Environment) → (residuals, gradient, …)` of arch-11 §11.4
   → ( residuals : Map<ResidualKey, Scalar>
     , values    : Map<ObservableRef, Value>
     , cograds   : Optional<Map<ResidualKey, Cotangent>>
@@ -431,7 +433,7 @@ evaluate(state, env, request : all|{ResidualKey}|{ObservableRef}, gradient : Ski
   `O(output size)`. Granularity adds only that leaves are individually addressable; upstream
   sharing is already deduplicated by Stage-3 hash-consing.
 - **`request` / `gradient`** prune the evaluated subgraph and toggle the adjoint.
-- **`Import`** injects external ground truth `(value, σ, provenance, coverage-mask) →
+- **`Import`** injects external ground truth `(named-target : ObservableRef, value, σ, provenance, coverage-mask) →
   GroundTruthBridgeGenerator`; it inserts a pinned `Input` + a cert-only `ResidualLeaf`, is **not
   differentiated through**, and feeds cert obligation 4.
 - **`RoaringCoverageMask`**: a serialized Roaring bitmap over `enumerate(product(axes))` (lexicographic
@@ -450,19 +452,21 @@ solver on the cert path.**
 
 | # | Obligation | Computational check | Complexity |
 |---|---|---|---|
-| 1 | symmetry equivariance | sample form, apply trivial-irrep projector, residual `< ε` | `O(1)` per invariant |
-| 2 | bounds / positivity | ROBDD applicability eval + scalar range test | `O(path)` |
+| 1 | symmetry equivariance | sample form, apply trivial-irrep projector, residual `< δ_sym` | `O(1)` per invariant |
+| 2 | bounds / positivity | ROBDD applicability eval + scalar range test; PSD of `M` via `λ_min(M_block) ≥ −δ_PSD` on the assembled per-mechanism dissipative super-block (`arch-12 §12.0.1`) | `O(path)` + `O(block)` |
 | 3 | analytic limits | compare to closed-form reference, `\|pred−exact\|/σ < 3` | `O(1)` per formula |
 | 4 | reference battery | `SqliteReferenceCache` lookup, trip at `σ > 3` | `O(log n)` B-tree |
-| 5 | conservation (antisymmetry of `L`, PSD of `M`) | project emitted form onto antisymmetric / PSD cone, residual `< ε` | `O(1)` per invariant |
-| 6 | GENERIC degeneracy + method equivalence | for equivalent compositions, compare formula trees / coefficients within tol | `O(\|G\|)` per equivalence |
+| 5 | conservation (antisymmetry of `L`) | project emitted form onto the antisymmetric component, residual `< δ_sym` | `O(1)` per invariant |
+| 6 | GENERIC degeneracy + named-formula consistency (method equivalence) | for equivalent compositions, compare formula trees / coefficients within tol | `O(\|G\|)` per equivalence |
 | 7 | bulk–boundary correspondence | EBR-table lookup + multiplicity enumeration | `O(1)` + `O(#Wyckoff)` |
 | 8 | reference-battery versioned | obligation 4 + `schema_version` check | `O(log n)` + `O(1)` |
 | 9 | surrogate-net validity (D4 only) | surrogate vs held-out validation set | forward-pass |
 | 10 | adjoint existence (D2, build-time) | DAG walk: every upstream node has a registered adjoint | `O(#nodes)` memoized |
 
 **`SqliteReferenceCache`** (`arch-12 §12.1`): a content-addressed table keyed by the §2.2 hash
-over `(observable, value, σ, provenance, coverage_mask, schema_version)`; **write-once** (updates
+over the payload `(observable, value, σ, provenance, coverage_mask)` (the type-level
+`schema_version(D)` enters every `Address` per §2.2; the per-row `schema_version` column is
+compared by the obligation-8 reader, never keyed); **write-once** (updates
 = new row, deletes disallowed); WAL mode for concurrent reads; `O(log n)` B-tree lookup,
 `n ≈ 10–10⁴` rows. The five **runtime gates** (`impl-11 §15.2`) — registration sanity (all 132
 formulas instantiate, D2 pass the τ_adj gate), an end-to-end worked example (the L3↔non-eq fixed

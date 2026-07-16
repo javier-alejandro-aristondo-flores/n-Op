@@ -98,13 +98,15 @@ composes into the per-observable error budget (`arch-11-residuals §11.7`).
 | `τ_SCF,strict` | SCF / minimization gradient-norm convergence (reference / compile side) | `1e-8` Ha |
 | `τ_SCF,train` | SCF convergence on the runtime / training path (looser) | `1e-4` Ha |
 | `τ_L3L4` | L3↔non-equilibrium same-pass fixed-point residual (≤ 5 iters) | `1e-4` |
-| `τ_method` | `Algebraic/MethodEquivalence` relative-error envelope (obligation 6) | `10–20%`, declared per formula pair |
+| `τ_equiv` | `Algebraic/MethodEquivalence` **equivalence-pair** agreement (theorem-backed pairs, obligation 6) | `1e-4` relative |
+| `τ_method` | `Algebraic/MethodEquivalence` **consistency-pair** model-gap envelope (obligation 6) | `10–20%`, declared per formula pair |
+| `δ_meta` | T,P-hull metastability band (`arch-11 §11.1` item 17, registry row 124) | `50 meV/atom`, per-material overridable (diamond +25 reads R=0) |
 | `τ_adj` | registration adjoint vJp-vs-JvP gate (`impl-07-residual-factory §7.5`) | `1e-4` relative |
 | `δ_surrogate` | D4 surrogate / relaxation validity (obligation 9), measured on a dev set | per-formula |
 
 ## 12.0.3 Composition-validity refusals (machine-checkable, not reviewer caveats)
 
-Three compose-time refusals are decided by tag/field comparison on the active `CouplingSpec` +
+Four compose-time refusals are decided by tag/field comparison on the active `CouplingSpec` +
 `ProvenanceLedger`, emitted as obligation leaves rather than left to documentation. Each is a
 `Failed` verdict with a witness (the offending coefficient / row pair).
 

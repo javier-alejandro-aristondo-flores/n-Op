@@ -33,7 +33,9 @@ Validate(state    : UnifiedState,           -- the 7-tuple of arch-04-state
          gradient : Skip | Compute)
        → ( residuals : Map<ResidualKey, Scalar>           -- granular per arch-11-residuals
          , values    : Map<ObservableRef, Value>          -- bundled observable outputs
-         , cograds   : Optional<Map<ResidualKey, Cotangent>>
+         , cograds   : Optional<Map<ResidualKey, Cotangent>>  -- the kernel's
+                                                              -- `gradient` map
+                                                              -- (arch-11 §11.4)
          , cert      : CertEvidence )
 ```
 

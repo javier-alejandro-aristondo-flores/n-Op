@@ -894,7 +894,8 @@ split by analytic kind):
      same observable agree on their shared domain (BTE-σ ≡ Kubo-σ in
      linear response, etc.). Two sub-kinds (an annotation, not a new tag): an
      **equivalence pair** binds two formulas that share an *agreement theorem* and
-     trips on any disagreement beyond `δ_sym`/`τ_adj` (BTE-σ ≡ Kubo-σ); a
+     trips on any disagreement beyond `τ_equiv` (numerical-agreement grade,
+     `arch-12 §12.0.2`; BTE-σ ≡ Kubo-σ); a
      **consistency pair** binds a cheap model to a microscopic reference that have
      **no** agreement theorem — Callaway/Slack κ vs iterative-LBTE κ, cheap-Chynoweth
      vs BTE/MC α — and trips only on *excess beyond a declared model-gap tolerance*
@@ -1056,7 +1057,8 @@ The MVP headline design-grade targets (gap ±0.15 eV post-G₀W₀, C_ij ±5%, �
 ±20%, E_form ±0.2 eV, μ factor-2) and the full 52-observable ledger live in
 `docs/accuracy-ledger.md`; the reference battery (cert obligation 4, `arch-12 §12.1`)
 checks them at the MVP anchors. Every numeric tolerance named across `/physics`
-(`τ_adj`, `δ_sym`, `δ_PSD`, `τ_SCF,*`, `τ_method`, `δ_surrogate`) is valued once in the
+(`τ_adj`, `δ_sym`, `δ_PSD`, `τ_SCF,*`, `τ_L3L4`, `τ_equiv`, `τ_method`, `δ_meta`,
+`δ_surrogate`) is valued once in the
 **tolerance ledger** (`arch-12 §12.0.2`).
 
 
@@ -1077,7 +1079,9 @@ Validate(state    : UnifiedState,           -- the 7-tuple of arch-04-state
          gradient : Skip | Compute)
        → ( residuals : Map<ResidualKey, Scalar>           -- granular per arch-11-residuals
          , values    : Map<ObservableRef, Value>          -- bundled observable outputs
-         , cograds   : Optional<Map<ResidualKey, Cotangent>>
+         , cograds   : Optional<Map<ResidualKey, Cotangent>>  -- the kernel's
+                                                              -- `gradient` map
+                                                              -- (arch-11 §11.4)
          , cert      : CertEvidence )
 ```
 

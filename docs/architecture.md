@@ -1142,7 +1142,8 @@ split by analytic kind):
      same observable agree on their shared domain (BTE-σ ≡ Kubo-σ in
      linear response, etc.). Two sub-kinds (an annotation, not a new tag): an
      **equivalence pair** binds two formulas that share an *agreement theorem* and
-     trips on any disagreement beyond `δ_sym`/`τ_adj` (BTE-σ ≡ Kubo-σ); a
+     trips on any disagreement beyond `τ_equiv` (numerical-agreement grade,
+     `arch-12 §12.0.2`; BTE-σ ≡ Kubo-σ); a
      **consistency pair** binds a cheap model to a microscopic reference that have
      **no** agreement theorem — Callaway/Slack κ vs iterative-LBTE κ, cheap-Chynoweth
      vs BTE/MC α — and trips only on *excess beyond a declared model-gap tolerance*
@@ -1304,7 +1305,8 @@ The MVP headline design-grade targets (gap ±0.15 eV post-G₀W₀, C_ij ±5%, �
 ±20%, E_form ±0.2 eV, μ factor-2) and the full 52-observable ledger live in
 `docs/accuracy-ledger.md`; the reference battery (cert obligation 4, `arch-12 §12.1`)
 checks them at the MVP anchors. Every numeric tolerance named across `/physics`
-(`τ_adj`, `δ_sym`, `δ_PSD`, `τ_SCF,*`, `τ_method`, `δ_surrogate`) is valued once in the
+(`τ_adj`, `δ_sym`, `δ_PSD`, `τ_SCF,*`, `τ_L3L4`, `τ_equiv`, `τ_method`, `δ_meta`,
+`δ_surrogate`) is valued once in the
 **tolerance ledger** (`arch-12 §12.0.2`).
 
 
@@ -1394,13 +1396,15 @@ composes into the per-observable error budget (`arch-11-residuals §11.7`).
 | `τ_SCF,strict` | SCF / minimization gradient-norm convergence (reference / compile side) | `1e-8` Ha |
 | `τ_SCF,train` | SCF convergence on the runtime / training path (looser) | `1e-4` Ha |
 | `τ_L3L4` | L3↔non-equilibrium same-pass fixed-point residual (≤ 5 iters) | `1e-4` |
-| `τ_method` | `Algebraic/MethodEquivalence` relative-error envelope (obligation 6) | `10–20%`, declared per formula pair |
+| `τ_equiv` | `Algebraic/MethodEquivalence` **equivalence-pair** agreement (theorem-backed pairs, obligation 6) | `1e-4` relative |
+| `τ_method` | `Algebraic/MethodEquivalence` **consistency-pair** model-gap envelope (obligation 6) | `10–20%`, declared per formula pair |
+| `δ_meta` | T,P-hull metastability band (`arch-11 §11.1` item 17, registry row 124) | `50 meV/atom`, per-material overridable (diamond +25 reads R=0) |
 | `τ_adj` | registration adjoint vJp-vs-JvP gate (`impl-07-residual-factory §7.5`) | `1e-4` relative |
 | `δ_surrogate` | D4 surrogate / relaxation validity (obligation 9), measured on a dev set | per-formula |
 
 ## 12.0.3 Composition-validity refusals (machine-checkable, not reviewer caveats)
 
-Three compose-time refusals are decided by tag/field comparison on the active `CouplingSpec` +
+Four compose-time refusals are decided by tag/field comparison on the active `CouplingSpec` +
 `ProvenanceLedger`, emitted as obligation leaves rather than left to documentation. Each is a
 `Failed` verdict with a witness (the offending coefficient / row pair).
 
@@ -1727,7 +1731,9 @@ Validate(state    : UnifiedState,           -- the 7-tuple of arch-04-state
          gradient : Skip | Compute)
        → ( residuals : Map<ResidualKey, Scalar>           -- granular per arch-11-residuals
          , values    : Map<ObservableRef, Value>          -- bundled observable outputs
-         , cograds   : Optional<Map<ResidualKey, Cotangent>>
+         , cograds   : Optional<Map<ResidualKey, Cotangent>>  -- the kernel's
+                                                              -- `gradient` map
+                                                              -- (arch-11 §11.4)
          , cert      : CertEvidence )
 ```
 
@@ -2422,7 +2428,7 @@ physical claims.
 The principled template set (~15 rows) is the `mechanism_range` table of
 §19.10 — which now includes the **piezoelectric acoustic** channel
 (`LongRangeStatic(1)`, `1/q` pole) alongside the Fröhlich (`1/q²`) one, the second
-long-range e-ph mechanism the polar III-N members carry (`is-polar-material`-gated;
+long-range e-ph mechanism the wurtzite III-N members carry (`is-noncentrosymmetric`-gated — piezoelectric scattering needs a piezoelectric class, the arch-13 split;
 inert for diamond). This **closed the former arch-18 coupling-channel coverage-policy item** (now recorded under `[arch-18-open-decisions]` Closed decisions).
 
 ## 19.10 Mechanism range and polynomial sufficiency
@@ -2471,7 +2477,7 @@ this crystal." They are orthogonal: a Fröhlich channel is long-range by
 mechanism yet inert in a non-polar crystal (diamond, zero Born charges)
 via `applicability`.
 
-The coverage-policy template table (the ~14 principled channels;
+The coverage-policy template table (the 15 principled channels;
 all `ShortRange`/polynomial-sufficient except where noted):
 
 | Channel template | `mechanism_range` | `polynomial_sufficient` |
@@ -2581,7 +2587,8 @@ basis of `G`-invariant *symmetric* tensors, but membership in that linear
 subspace does not by itself guarantee any combination is PSD (a linear
 condition vs. a convex-cone condition).
 
-For all three MVP `PSDSymmForm` channels, PSD is **structurally
+For the MVP `PSDSymmForm` channels (e-ph and ph-ph dissipation) plus the
+near-term radiative-damping channel, PSD is **structurally
 guaranteed by physics** — it is a documented assumption, not a runtime
 search:
 

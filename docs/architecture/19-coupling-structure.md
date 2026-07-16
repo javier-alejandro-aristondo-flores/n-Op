@@ -444,7 +444,7 @@ physical claims.
 The principled template set (~15 rows) is the `mechanism_range` table of
 §19.10 — which now includes the **piezoelectric acoustic** channel
 (`LongRangeStatic(1)`, `1/q` pole) alongside the Fröhlich (`1/q²`) one, the second
-long-range e-ph mechanism the polar III-N members carry (`is-polar-material`-gated;
+long-range e-ph mechanism the wurtzite III-N members carry (`is-noncentrosymmetric`-gated — piezoelectric scattering needs a piezoelectric class, the arch-13 split;
 inert for diamond). This **closed the former arch-18 coupling-channel coverage-policy item** (now recorded under `[arch-18-open-decisions]` Closed decisions).
 
 ## 19.10 Mechanism range and polynomial sufficiency
@@ -493,7 +493,7 @@ this crystal." They are orthogonal: a Fröhlich channel is long-range by
 mechanism yet inert in a non-polar crystal (diamond, zero Born charges)
 via `applicability`.
 
-The coverage-policy template table (the ~14 principled channels;
+The coverage-policy template table (the 15 principled channels;
 all `ShortRange`/polynomial-sufficient except where noted):
 
 | Channel template | `mechanism_range` | `polynomial_sufficient` |
@@ -603,7 +603,8 @@ basis of `G`-invariant *symmetric* tensors, but membership in that linear
 subspace does not by itself guarantee any combination is PSD (a linear
 condition vs. a convex-cone condition).
 
-For all three MVP `PSDSymmForm` channels, PSD is **structurally
+For the MVP `PSDSymmForm` channels (e-ph and ph-ph dissipation) plus the
+near-term radiative-damping channel, PSD is **structurally
 guaranteed by physics** — it is a documented assumption, not a runtime
 search:
 

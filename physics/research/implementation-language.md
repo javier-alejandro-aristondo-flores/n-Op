@@ -1,5 +1,7 @@
 # Implementation-language decision (`arch-18 §1`)
 
+> **Status.** This decision CLOSED 2026-06 — recorded in [arch-18-open-decisions] Closed decisions (polyglot Haskell / Julia / GAP / Lean 4). This file is the research record behind it.
+
 Research basis for closing the single blocking open decision: **which language(s) to
 build `/physics` in.** Four web-verified Round-1 axes (compute/hardware, substrate
 type-system fit, compiler/staging fit, in-house dependency + build-cost), one adversarial
@@ -208,3 +210,12 @@ soundness bugs, JAX custom-derivatives JEPs (`custom_vjp` limits), Julia `GPUCom
 Lean 4 → C (4.22/4.23 codegen), ModelingToolkit.jl releases/FAQ (churn + undocumented
 internals), batched-BLAS small-block launch overhead, TT-cross (sequential build-once),
 Ewald/PME GPU 10–100×.
+
+---
+
+## Changelog
+
+- **2026-07-16 (strata rewrite):** status header note added; no other changes.
+- **2026-06 (decision closed):** the recommendation here was adopted (commit ec52314-era) —
+  polyglot Haskell / Julia / GAP / Lean 4, joined at the Stage-4→Stage-5 codegen seam. Recorded
+  in arch-18 "Closed decisions"; this file remains the research record behind it.

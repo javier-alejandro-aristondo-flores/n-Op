@@ -2,7 +2,10 @@
 
 This is a methodology survey of crystal-structure-prediction and heterostructure residuals, grounded in the project architecture (GENERIC dynamics dx/dt = L·δE/δx + M·δS/δx, the 4-level Born–Oppenheimer hierarchy, and the closed method / template / formula registries), proposing where new residuals plug in.
 
-> **Status note (2026-07 gap-audit).** The misfit convention here is normalized to `(a_film − a_sub)/a_sub` to match `defects-surfaces-interfaces.md` Part H, and the contact-table values (Pt barrier, carbide onsets) are harmonized with that file's F.4/F.5 — reconcile both against pinned provenance at the metals wave. χ is termination-tagged (defects file Part E is canonical). Fixes recorded in `docs/audits/2026-07-07-gap-audit.md`.
+> **Conventions.** Misfit convention: `(a_film − a_sub)/a_sub`, matching
+> `defects-surfaces-interfaces.md` Part H. χ is termination-tagged (defects file Part E is
+> canonical). Contact-table values (Pt barrier, carbide onsets) are survey-grade — pin
+> provenance at the metals wave. History: `## Changelog` at the end of this file.
 
 All "typed signatures" below use the convention `name : (input-types) -> output-type [cost-tier, differentiability]`, with cost tiers `T0` (closed-form, ~µs), `T1` (small linear algebra / sums, ~ms), `T2` (ML-potential single-point, ~10ms–1s), `T3` (DFT-single-point, minutes–hours), `T4` (full self-consistent loop, hours–days). Differentiability ratings: `D+` (smooth analytic), `D0` (piecewise smooth, subgradient OK), `D-` (combinatorial; needs surrogate / softening).
 
@@ -302,3 +305,17 @@ Total cheap-path cost: ~50 ms. This is the inner-compute residual vector consume
 ---
 
 **Summary recommendation to the conductor.** The minimum viable expansion of `/physics` for UWBG-chip CSP support is: **+3 methods, +4 templates, +15 named formulas, +4 observable bundles, +2 residual categories**, plus a `reference-phase-cache` primitive. All net additions preserve the GENERIC dx/dt structure (validity/thermo residuals are static constraints on the state x, not modifications to L or M). Cheap-compute paths for all proposed residuals stay in T0/T1 and are end-to-end differentiable, suitable for direct inclusion in the PINO physics loss. Diamond-metal interface chemistry (Part C.3 table) is the most domain-specific content and should be encoded as a learned-feature table inside the PINO with `R_InterfaceReactivity` as the supervising residual.
+
+---
+
+## Changelog
+
+- **2026-07-16 (strata rewrite):** status banner converted to this changelog; the header note
+  retains only the still-load-bearing conventions (misfit denominator, termination-tagged χ,
+  survey-grade contact values). No value changes.
+- **2026-07-07 (gap-audit B8):** corrections applied in place, per
+  `docs/audits/2026-07-07-gap-audit.md` B8 — misfit denominators normalized to `/a_sub`
+  (diamond-on-Si read 52% under the old `/a_film` denominator, now −34% under `/a_sub`);
+  Pt/H-diamond φ_B and the W/Mo carbide onsets harmonized to ranges consistent with
+  `defects-surfaces-interfaces.md` F.4/F.5; Σ3 twin-boundary γ_TB corrected from "≈0" to
+  "tens of mJ/m², effectively 0".

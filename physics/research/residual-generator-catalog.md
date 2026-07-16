@@ -1,6 +1,9 @@
 # Cheap-Residual Catalog & Residual-Generator Factory Specification
 
-> **Status note (2026-07 gap-audit).** This catalog is the S1–S5 reconciliation **snapshot** (87 entries). The canonical registry has since grown to 125+ substantive rows: the enumeration holes of this snapshot — polarization/piezo/2DEG, oxidation and H-desorption rates, radiation displacement — are **closed** by registry rows 105–127. Row numbers cited here (`#N`) are snapshot-local, not current registry numbers. The `ResidualGenerator` record shown in §3 predates the `applicability` slot every registered generator now carries (arch-13). The diamond–W worked example (§6) was corrected in place by the gap-audit (p-type barrier in the leakage chain, non-polar scattering channels, image-force and κ anchors) — `docs/audits/2026-07-07-gap-audit.md`.
+> **Scope.** Historical S1–S5 reconciliation **snapshot** (87 entries). Row numbers `#N` are
+> snapshot-local, NOT current registry numbers; the registry has since grown to 132 substantive
+> rows (`docs/formula-registry.md` has the band map). The §3 `ResidualGenerator` record predates
+> the `applicability` slot every registered generator now carries (arch-13). History: `## Changelog` at end.
 
 ## Preface
 
@@ -551,3 +554,18 @@ Concrete architecture amendments S7 should incorporate, in priority order:
 16. **Honest scope envelope:** the 12 limits from S1 (flexoelectricity, magneto-thermal, non-Markovian deep defects, polaron localization, etc.) plus the 4 architecture-level gaps from §5 (4-phonon, NEGF, multiphonon-capture full, SCPH full) constitute v1's documented frontier. S7 should publish this as the explicit scope statement.
 
 The catalog is now executable. The factory is now typed. The DAG is now layered. The cycles are now closed. S7 has the substrate it needs.
+
+---
+
+## Changelog
+
+- **2026-07-16 (strata rewrite):** status banner converted to this changelog; the header note
+  retains only the snapshot-scope conventions (snapshot-local `#N` row numbers; 132-row current
+  registry with the band map in `docs/formula-registry.md`; pre-`applicability` §3 record).
+  No value changes.
+- **2026-07-07 (gap-audit):** corrections applied in place, per
+  `docs/audits/2026-07-07-gap-audit.md` — the §6 diamond–W worked example corrected (p-type
+  barrier in the leakage chain; non-polar diamond scattering channels via the `is-polar-material`
+  mask; image-force lowering 0.16 eV; κ(773 K) = 620 W/m·K pinned to the curated battery anchor;
+  χ termination-tagged); §5's stale 4-phonon "not catalogued" disposition superseded by registry
+  rows 121–122 (the §5 row records the supersession).

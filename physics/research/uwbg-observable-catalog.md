@@ -1,6 +1,9 @@
 # UWBG Diamond-Centric Observable Catalog for n-Op `/physics`
 
-> **Status note (2026-07 gap-audit).** (1) Superseded numbers: AlN Θ_D ≈ 1000 K (not ~1150; Wave-1 ledger A10); the GaN displacement threshold is carried as ~20 eV in `non-equilibrium-high-field.md` H.1 vs ~25 eV here — resolve against primary sources when E_d seeds a `ProvenanceLedger`. (2) The 8-group organization of Part C is the pre-canon **data-shape** view; the canonical residual-driving grouping is the 11 physics-domain bundles of arch-09 §9.4. (3) Most "OUTSIDE registry" flags below were **closed** by registry rows 88–127 (linear-response/topology, slow-tier degradation incl. oxidation #46 → row 109 and H-desorption #47 → row 110, polarization/2DEG rows 113–119, per-material accuracy rows 120–127) — see `docs/formula-registry.md` for the row-band map; the flags are kept as historical record.
+> **Conventions.** Part C's 8 groups are the pre-canon **data-shape** view; the canonical
+> residual-driving grouping is the 11 physics-domain bundles (arch-09 §9.4). Row-#s here are
+> catalog-observable numbers (glossary: "catalog observables", 52), not registry rows.
+> History: `## Changelog` at the end of this file.
 
 ## Part A — Material Scope Review
 
@@ -87,7 +90,7 @@ I'll flag observables where the requirement falls **OUTSIDE** that registry.
 | 9 | `phonon_dispersion ω_λ(q)` | BZ | DFPT ∘ linear-response | `D(q) e_λ = ω²_λ e_λ`, D = dynamical matrix | (a) Force-constant Taylor from 3 displacement amplitudes; (b) Tersoff/Brenner classical for diamond | `r_ph = ‖D(q) e − ω² e‖²` | ±2% on acoustic, ±5% on optical | Anharmonic shift Δω ∝ T grows; for diamond ~1–2% at 1500 K | 10, 11, 12, 13 |
 | 10 | `phonon_DOS F(ω)` | EN | from 9 | `F(ω) = (1/N) Σ_qλ δ(ω − ω_λ(q))` | direct from 9 | per 9 | ±5% | per 9 | 9 |
 | 11 | `mode_grueneisen γ_λ(q)` | BZ | finite-difference of 9 vs volume | `γ_λ = −(V/ω_λ) ∂ω_λ/∂V` | (a) Single γ_avg constant; (b) Slater approximation | `r_γ = γ_λ − [−(V/ω_λ)(ω_λ(V+) − ω_λ(V−))/(2ΔV)]` | ±15% | dominant control on thermal expansion | 9, 13, 14 |
-| 12 | `phonon_lifetimes τ_λ(q,T)` | TR | 3-phonon scattering matrix elements — **OUTSIDE** current registry if registry lacks 3-phonon vertex; needs `template: phonon-Boltzmann + ShengBTE-style`| `1/τ_λ = (π/ℏ²) Σ |V³_{λ,λ',λ''}|² ·[occupation factors]` | (a) Slack-formula: `κ ≈ A · M̄·δ·Θ³_D / (γ²·T·n^{2/3})`; (b) Allen-Feldman diffuson approximation | `r_τ = 1/τ_predicted − 3-ph collision integral evaluated on predicted modes` | ±20% acceptable for κ within 10% | 4-phonon needed above 1000 K — esp diamond | 9, 11, 13 |
+| 12 | `phonon_lifetimes τ_λ(q,T)` | TR | 3-phonon scattering matrix elements — **OUTSIDE** current registry if registry lacks 3-phonon vertex; needs `template: phonon-Boltzmann + ShengBTE-style` → landed: registry rows 121–122 (4-phonon high-T correction + iterative-LBTE sibling) | `1/τ_λ = (π/ℏ²) Σ |V³_{λ,λ',λ''}|² ·[occupation factors]` | (a) Slack-formula: `κ ≈ A · M̄·δ·Θ³_D / (γ²·T·n^{2/3})`; (b) Allen-Feldman diffuson approximation | `r_τ = 1/τ_predicted − 3-ph collision integral evaluated on predicted modes` | ±20% acceptable for κ within 10% | 4-phonon needed above 1000 K — esp diamond | 9, 11, 13 |
 | 13 | `thermal_conductivity κ(T)` (tensor) | TR/TN | BTE-iterative on 12 | `κ_αβ = Σ_λ c_v,λ v_α v_β τ_λ` | (a) Slack formula; (b) Cahill minimum-κ for amorphous limit | `r_κ = κ_predicted − Σ_λ c_v,λ v_α v_β τ_λ` | ±10% diamond, ±20% III-N | Diamond κ ∝ T⁻¹·² above 200 K; drops from 2000 to ~600 W/mK at 800 K | 9, 11, 12, FoMs |
 | 14 | `thermal_expansion_tensor α_αβ(T)` | TR/TN | QHA on 9, 11 | `α = (1/B) Σ_λ γ_λ c_v,λ` (Grüneisen-Mie) | (a) Constant γ_avg in QHA; (b) Empirical Debye fit | `r_α = α − (1/B(T)) Σ_λ γ_λ c_v,λ(T)` | ±10% | QHA breaks above ~Θ_D/2; diamond Θ_D ≈ 2200 K → QHA still valid at 800 K, but **GaN Θ_D ≈ 600 K → QHA fails at 500°C** | 9, 11, 13, FoM mismatch |
 | 15 | `electron_phonon_self_energy Σ_ep(k,ω,T)` | BZ/EN | DFPT + Migdal | `Σ_ep = Σ_qλ |g_{nm,λ}(k,q)|² · [propagator]` | (a) Allen-Heine-Cardona scalar shift; (b) constant Eliashberg α²F(ω) fit | `r_Σep = Σ_predicted − Σ_qλ |g|² · G₀ · D₀ on predicted bands` | ±20% on T-shift of gap | dominant gap renorm > 1000 K | 1, 9, 16 |
@@ -114,16 +117,16 @@ I'll flag observables where the requirement falls **OUTSIDE** that registry.
 | 26 | `defect_ionization_energy E_a(defect)` | AT | transition level from 25 | `E_a(q/q') = [E_f(q,E_F=0) − E_f(q',E_F=0)]/(q'−q)` | (a) Hydrogenic effective-mass `E_a = 13.6 eV · (m*/m_e)/ε_r²`; (b) Empirical chemical-trend | `r_Ea = E_a − transition-level from predicted E_f(q)` | ±50 meV | B in diamond: 0.37 eV → strongly ionizes only above ~400 K | 25, 5, 27 |
 | 27 | `dopant_solubility c_sol(T)` | TR | equilibrium from 25 + chemical potential | `c_sol = N_sites · exp(−E_f/k_BT)` | (a) Arrhenius with measured E_sol | `r_sol = c_sol − N · exp(−E_f_predicted/k_BT)` | ±factor 2 | strongly T-dependent — sets *achievable* doping | 25, 5 |
 | 28 | `defect_level_in_gap E_t (relative to E_v)` | EN | hybrid-DFT or GW supercell | `E_t = E_def^q occupied KS level w/ correction` | (a) DFT + scissor; (b) Tabulated | `r_Et = E_t − corrected Kohn-Sham level of defect orbital` | ±0.1 eV | governs trap-assisted leakage | 1, 25 |
-| 29 | `capture_cross_section σ_n,p(defect, T)` | TR | SRH-Lang from 28 + phonon coupling — **OUTSIDE registry**: needs multiphonon-emission formalism (Huang-Rhys) | `σ = σ_∞ exp(−E_b/k_BT)` with `E_b` from Marcus crossing | (a) Constant σ ≈ 10⁻¹⁵ cm²; (b) Tabulated by defect family | `r_σ = σ − Huang-Rhys-MPE-rate / v_th` | factor 3 acceptable | controls SRH lifetime under operating bias | 9, 15, 28 |
+| 29 | `capture_cross_section σ_n,p(defect, T)` | TR | SRH-Lang from 28 + phonon coupling — **OUTSIDE registry**: needs multiphonon-emission formalism (Huang-Rhys) → landed: registry rows 40–41 (multiphonon-emission-capture, huang-rhys-factor; faithful tier) | `σ = σ_∞ exp(−E_b/k_BT)` with `E_b` from Marcus crossing | (a) Constant σ ≈ 10⁻¹⁵ cm²; (b) Tabulated by defect family | `r_σ = σ − Huang-Rhys-MPE-rate / v_th` | factor 3 acceptable | controls SRH lifetime under operating bias | 9, 15, 28 |
 
 ### Group 5 — Surfaces, interfaces, contacts
 
 | # | Observable | Bundle | Native composition | Governing equation | Cheap-path | Faithful residual | Accuracy regime | High-T notes | Couples to |
 |---|---|---|---|---|---|---|---|---|---|
 | 30 | `surface_dipole_moment p_s(termination)` | AT/RS | slab DFT + planar-averaged potential | `Δφ = (4π/A) p_s` | (a) Tabulated by termination | `r_p = p_s − (A/4π)·(V_vac − V_bulk)` | ±0.1 D | H-, O-, F-, OH- terminations all drift > 600°C | 8, 31 |
-| 31 | `schottky_barrier_height φ_B(metal/semi, T)` | SC | NEGF or DFT slab + alignment; **interface-MIGS calc may be OUTSIDE registry if NEGF not present** | `φ_B = φ_M − χ_S − S(φ_M − φ_CNL)` (Cowley-Sze interpolation between Bardeen MIGS and Schottky-Mott) | (a) Schottky-Mott `φ_B = φ_M − χ`; (b) Cowley-Sze with tabulated S | `r_φB = φ_B − [φ_CNL + S(φ_M − φ_CNL) − χ ± dipole correction]` from slab | ±0.1 eV (critical: 100 meV → ×e^4 contact resistance at 500°C) | Interface chemistry (carbide formation) shifts φ_B with thermal soak | 7, 8, 30, FoM ρ_c |
+| 31 | `schottky_barrier_height φ_B(metal/semi, T)` | SC | NEGF or DFT slab + alignment; **interface-MIGS calc may be OUTSIDE registry if NEGF not present** → landed: registry row 80 (NEGF-transmission) | `φ_B = φ_M − χ_S − S(φ_M − φ_CNL)` (Cowley-Sze interpolation between Bardeen MIGS and Schottky-Mott) | (a) Schottky-Mott `φ_B = φ_M − χ`; (b) Cowley-Sze with tabulated S | `r_φB = φ_B − [φ_CNL + S(φ_M − φ_CNL) − χ ± dipole correction]` from slab | ±0.1 eV (critical: 100 meV → ×e^4 contact resistance at 500°C) | Interface chemistry (carbide formation) shifts φ_B with thermal soak | 7, 8, 30, FoM ρ_c |
 | 32 | `specific_contact_resistivity ρ_c(T)` | TR | thermionic emission + tunneling integrals | `ρ_c = (k_BT/qJ_s)`, `J_s = A*T² exp(−qφ_B/k_BT) + WKB tunneling term` | (a) Pure thermionic; (b) Padovani-Stratton TFE | `r_ρc = ρ_c − analytic-integral from predicted φ_B,N_d,m*` | ±50% (orders of magnitude span possible) | Dominated by predicted φ_B — see 31 | 31, 3, 5 |
-| 33 | `interface_trap_density D_it(E)` | EN | dangling-bond and bond-strain density from slab — practical workflow may be **OUTSIDE registry** | empirical/structural; `D_it ~ ρ_DB · g(E−E_DB)` | (a) Tabulated by interface; (b) Bond-counting from slab | `r_Dit = D_it − Σ_DB δ_Gauss(E−E_DB^predicted)` | factor 2 acceptable | grows under hot-carrier injection at high T | 31, FoM SS |
+| 33 | `interface_trap_density D_it(E)` | EN | dangling-bond and bond-strain density from slab — practical workflow may be **OUTSIDE registry** → landed: registry row 116 (interface-trap-density) | empirical/structural; `D_it ~ ρ_DB · g(E−E_DB)` | (a) Tabulated by interface; (b) Bond-counting from slab | `r_Dit = D_it − Σ_DB δ_Gauss(E−E_DB^predicted)` | factor 2 acceptable | grows under hot-carrier injection at high T | 31, FoM SS |
 | 34 | `tunneling_transmission T_WKB(E, V_bias)` | EN | WKB or Fowler-Nordheim on predicted barrier shape | `T = exp(−2∫√(2m*(V−E))/ℏ dx)` | (a) F-N closed form for triangular barrier | `r_T = T − exp(−2 WKB-integral on predicted V(x))` | ±20% in log | governs gate leakage; rises fast with T | 31, 23 |
 | 35 | `polarization_spontaneous P_sp + piezoelectric P_pz` | TN | Berry-phase modern theory of polarization (DFPT) | `P = (e/Ω)·Σ ∫_BZ ⟨u|i∂_k|u⟩ dk + ionic` | (a) Tabulated for AlN/GaN/AlGaN; (b) Linear interpolation in alloy | `r_P = P − Berry-phase-integral on predicted Bloch states` | ±5% | T-drift of P via thermal expansion — relevant if AlN dielectric on diamond | 14, 35 self |
 
@@ -137,7 +140,7 @@ I'll flag observables where the requirement falls **OUTSIDE** that registry.
 | 39 | `cohesive_energy / surface_energy γ_s` | AT | slab vs bulk DFT | `γ_s = (E_slab − N_b·E_bulk)/(2A)` | (a) Tabulated by face; (b) Broken-bond counting | `r_γ = γ_s − (E_slab − N·E_bulk)/(2A)` | ±0.1 J/m² | proxy for fracture toughness | 36, 40 |
 | 40 | `fracture_toughness_proxy K_IC` | SC | Griffith: `K_IC = sqrt(2 γ_s E)` | `K_IC = sqrt(2γ_s E_young)` | (a) Griffith with 39 + Young from 36; (b) Empirical Pugh ratio G/B | `r_KIC = K_IC − sqrt(2γ_s E_y)` | ±20% — fracture is statistical | grain boundary effects dominate; diamond grain boundaries critical | 36, 39 |
 | 41 | `vibrational_resonant_modes ω_n(geometry)` | EN | continuum-elastic eigenproblem on macroscopic device geometry; **device-scale, OUTSIDE atomic registry** | `ρ ∂²u/∂t² = ∇·(C:∇u)` | (a) Analytical beam/plate modes | `r_ω = ω − eigenvalue of continuum elastic op on device CAD` | ±10% | T-drift via 36 | 36, 38 |
-| 42 | `displacement_threshold_energy E_d (radiation)` | AT | MD or NEB on Frenkel pair | `E_d` = minimum recoil energy for stable defect | (a) Tabulated (~37 eV C in diamond, ~25 eV Ga in GaN) | `r_Ed = E_d − NEB-barrier of Frenkel-pair formation` | ±5 eV | per material | 25 |
+| 42 | `displacement_threshold_energy E_d (radiation)` | AT | MD or NEB on Frenkel pair | `E_d` = minimum recoil energy for stable defect | (a) Tabulated (~37 eV C in diamond, ~20 eV Ga-sublattice in GaN (N-sublattice ~25 eV)) | `r_Ed = E_d − NEB-barrier of Frenkel-pair formation` | ±5 eV | per material | 25 |
 
 ### Group 7 — Thermodynamic / equilibrium statistical
 
@@ -146,18 +149,18 @@ I'll flag observables where the requirement falls **OUTSIDE** that registry.
 | 43 | `gibbs_free_energy G(T, P, composition)` | SC | QHA: `G = E_DFT + F_vib(T) + PV` | `F_vib = Σ_λ [ℏω_λ/2 + k_BT ln(1−e^−ℏω_λ/kT)]` | (a) Debye-Grüneisen | `r_G = G − E_DFT − Σ_λ F_vib(ω_λ,T) − PV` | ±10 meV/atom | QHA degrades with anharmonicity (see 14 caveat) | 9, 14 |
 | 44 | `phase_diagram_boundary (e.g., diamond–graphite, sp³–sp²)` | SC | Δ_G crossing | `G_phase1(T,P) = G_phase2(T,P)` | (a) CALPHAD fit; (b) Tabulated | `r_pd = G_A − G_B` evaluated on predicted G | ±5% in P–T | controls graphitization timeline | 43 |
 | 45 | `specific_heat c_v(T), c_p(T)` | TR | from 9 | `c_v = Σ_λ k_B (ℏω_λ/k_BT)² · e^x/(e^x−1)²` | (a) Debye | `r_cv = c_v − sum over predicted ω_λ` | ±3% | electronic c_v negligible for wide-gap | 9 |
-| 46 | `oxidation_rate r_ox(T, p_O2)` | RC | Eyring + reaction-rate theory on transition state — **OUTSIDE registry** unless reaction-rate template present | `r_ox = ν · exp(−ΔG‡/k_BT)` | (a) Arrhenius with measured A,E_a | `r_rox = r_ox − ν exp(−ΔG‡_predicted/k_BT)` | factor 3 | diamond air-oxidation > 600°C is *the* lifetime limiter | 43, 44 |
-| 47 | `hydrogen_desorption_rate r_H(T)` (diamond surface) | RC | Eyring on H-C bond breaking | `r_H = ν · exp(−E_des/k_BT)` | (a) Tabulated E_des ≈ 3.8 eV | `r_rH = r_H − ν exp(−E_des_predicted/k_BT)` | factor 2 | irreversibly drives χ shift — see 8 | 8, 30 |
+| 46 | `oxidation_rate r_ox(T, p_O2)` | RC | Eyring + reaction-rate theory on transition state — **OUTSIDE registry** unless reaction-rate template present → landed: registry row 109 | `r_ox = ν · exp(−ΔG‡/k_BT)` | (a) Arrhenius with measured A,E_a | `r_rox = r_ox − ν exp(−ΔG‡_predicted/k_BT)` | factor 3 | diamond air-oxidation > 600°C is *the* lifetime limiter | 43, 44 |
+| 47 | `hydrogen_desorption_rate r_H(T)` (diamond surface) | RC | Eyring on H-C bond breaking → landed: registry row 110 | `r_H = ν · exp(−E_des/k_BT)` | (a) Tabulated E_des ≈ 3.8 eV | `r_rH = r_H − ν exp(−E_des_predicted/k_BT)` | factor 2 | irreversibly drives χ shift — see 8 | 8, 30 |
 
 ### Group 8 — Operating-condition non-equilibrium
 
 | # | Observable | Bundle | Native composition | Governing equation | Cheap-path | Faithful residual | Accuracy regime | High-T notes | Couples to |
 |---|---|---|---|---|---|---|---|---|---|
-| 48 | `self_heating_temperature T_op(P_diss, geometry)` | SC | continuum heat eq with predicted κ(T); **device-scale, OUTSIDE registry** | `−∇·(κ(T)∇T) = P_diss(x)` | (a) 1D thermal-resistance network | `r_T = ∇·(κ(T)∇T) + P_diss` | ±10 K | self-consistent with κ(T)→13 | 13 |
+| 48 | `self_heating_temperature T_op(P_diss, geometry)` | SC | continuum heat eq with predicted κ(T); **device-scale, OUTSIDE registry** → landed: registry rows 70–71 | `−∇·(κ(T)∇T) = P_diss(x)` | (a) 1D thermal-resistance network | `r_T = ∇·(κ(T)∇T) + P_diss` | ±10 K | self-consistent with κ(T)→13 | 13 |
 | 49 | `hot_carrier_distribution f(E, F)` | EN | full-band MC at high field — **OUTSIDE registry** (no MC-transport) | `df/dt = Σ S_in − S_out` Boltzmann collision integral | (a) Shifted-Maxwellian with T_e fit; (b) constant-energy-gain heated Fermi-Dirac | `r_f = ∂f/∂t − [drift + collision] on predicted bands & phonons` | shape ±20%; high-E tail decisive for breakdown | hot-carrier tail injects into 33, accelerates degradation | 2, 9, 15, 19 |
 | 50 | `electromigration_activation_energy E_a^EM (interface)` | AT/RC | NEB on metal-atom hop along interface | `D = D_0 exp(−E_a/k_BT)` | (a) Tabulated by metal (W ~1.2 eV) | `r_EaEM = E_a − NEB-barrier on predicted metal/diamond interface` | ±0.1 eV | dominant interface failure mode for ohmic contacts under DC bias | 31, 50 itself |
-| 51 | `defect_evolution_kinetics dN/dt(T, bias)` | TR/RC | rate-equation network; **OUTSIDE registry** if master-equation template not present | `dN_i/dt = Σ_j (k_{j→i} N_j − k_{i→j} N_i)` | (a) Single Arrhenius for fastest channel | `r_dN = dN/dt − Σ (k_in N − k_out N)` evaluated on predicted barriers | factor 2 | governs lifetime/reliability extrapolation | 25, 29, 50 |
-| 52 | `2DEG_sheet_density n_s(structure, T)` | SC | from 7, 35, 33 | `n_s = (P_pol−P_trap)/q − (ε/qd)(φ_B+E_F−ΔE_C)` | (a) Constant-polarization analytic | `r_ns = n_s − analytic-formula on predicted P,φ_B,ΔE_C,D_it` | ±10% | mainly for AlN/GaN companion devices | 7, 31, 33, 35 |
+| 51 | `defect_evolution_kinetics dN/dt(T, bias)` | TR/RC | rate-equation network; **OUTSIDE registry** if master-equation template not present → landed: registry rows 105–108 | `dN_i/dt = Σ_j (k_{j→i} N_j − k_{i→j} N_i)` | (a) Single Arrhenius for fastest channel | `r_dN = dN/dt − Σ (k_in N − k_out N)` evaluated on predicted barriers | factor 2 | governs lifetime/reliability extrapolation | 25, 29, 50 |
+| 52 | `2DEG_sheet_density n_s(structure, T)` | SC | from 7, 35, 33 → landed: registry row 115 | `n_s = (P_pol−P_trap)/q − (ε/qd)(φ_B+E_F−ΔE_C)` | (a) Constant-polarization analytic | `r_ns = n_s − analytic-formula on predicted P,φ_B,ΔE_C,D_it` | ±10% | mainly for AlN/GaN companion devices | 7, 31, 33, 35 |
 
 ---
 
@@ -210,14 +213,14 @@ These seven get the most careful faithful-residual formulations.
 | **KS gap underestimation** (LDA/GGA) | every UWBG; diamond DFT-PBE gives ~4.2 eV vs 5.47 eV true (-23%); β-Ga₂O₃ underestimated ~40% | 30–100% | hybrid-DFT (HSE06 typically 0.1 eV of diamond gap), GW for transport-critical pieces; scissor + Allen-Heine-Cardona for residual |
 | **Charged defect formation energies** without proper alignment + image-charge correction | all defects in supercell; B in diamond, V_Ga in GaN | 0.3–1 eV systematic | Freysoldt-Neugebauer-VandeWalle (FNV) or Kumagai-Oba; hybrid functional or GW band edges |
 | **BTE-RTA misses hot-electron tail** | diamond and any wide-gap under E > 1 MV/cm | shape error → factor-2+ error in α_ii | full-band Monte Carlo (template missing in registry — flag) |
-| **QHA breakdown at high T** | GaN (Θ_D ≈ 600 K) fails near 500°C; AlN (~1150 K) marginal; diamond (~2200 K) safe through 800°C | 10–30% error in α, c_v | self-consistent phonon (SCPH) or stochastic-self-consistent harmonic (SSCHA) — outside current registry |
+| **QHA breakdown at high T** | GaN (Θ_D ≈ 600 K) fails near 500°C; AlN (~1000 K [Wave-1 A10]) also fails at 500°C (773 K > Θ_D/2 — the III-N no-design-grade-path hole, arch-17); diamond (~2200 K) safe through 800°C | 10–30% error in α, c_v | self-consistent phonon (SCPH) or stochastic-self-consistent harmonic (SSCHA) — outside current registry → landed: registry row 13 (live solve V2 per arch-17) |
 | **Bardeen MIGS vs Schottky-Mott** for φ_B | every metal/UWBG contact; especially W/diamond, Mo/diamond | 0.3–1 eV uncertainty between extremes | NEGF slab with chemical interface; Cowley-Sze interpolation as analytic residual |
-| **3-phonon only vs 4-phonon** for κ at high T | diamond above 800 K; B-N above 600 K | 10–20% κ error | 4-phonon scattering — **outside registry**, document as known gap |
+| **3-phonon only vs 4-phonon** for κ at high T | diamond above 800 K; B-N above 600 K | 10–20% κ error | 4-phonon scattering — **outside registry**, document as known gap → landed: registry row 121 |
 | **Polaron / Frohlich electron-phonon in polar materials** | III-N, β-Ga₂O₃, c-BN; not diamond | order-of-unity μ error at low T, less at 500°C | Frohlich coupling + Feynman polaron formula as analytic residual |
 | **Spin-orbit in valence band** | GaN/AlN holes; not critical for diamond | 10–30 meV warping → m* error | DFT+SOC supercells |
 | **Surface termination chemistry** drift | every diamond surface above 700°C | governs χ, φ_B, D_it; first-principles must include realistic termination ensemble | thermodynamic surface-phase diagram (template = MaxEnt-statistics + reaction-rate) |
-| **Multiphonon nonradiative capture** (#29) | every deep defect | factor 10+ uncertainty in σ_n,p | Huang-Rhys + Marcus crossing — **outside registry** |
-| **Hot-carrier-induced defect generation** under operating bias | every gate dielectric interface | hard to predict; usually empirical | rate-equation network on hot-f tail × bond-breaking barrier — **outside registry** |
+| **Multiphonon nonradiative capture** (#29) | every deep defect | factor 10+ uncertainty in σ_n,p | Huang-Rhys + Marcus crossing — **outside registry** → landed: registry rows 40–41 (faithful tier) |
+| **Hot-carrier-induced defect generation** under operating bias | every gate dielectric interface | hard to predict; usually empirical | rate-equation network on hot-f tail × bond-breaking barrier — **outside registry** → generation kinetics landed as rows 105–108; the hot-f-tail *driver* remains outside (the #49 EDF-tail corner, cert-refused) |
 
 ---
 
@@ -244,7 +247,7 @@ The user already confirmed strongly-correlated systems are out. Beyond that, the
 
 Observables/residuals that the current closed registry (12 methods × 12 templates × 24 formulas) does **not** appear to cover and that subsequent streams must decide to add or document-as-skipped:
 
-- **MC-transport / full-band Monte Carlo template** — needed for 18, 19, 49.
+- **MC-transport / full-band Monte Carlo template** — needed for 18 and 49; for 19 the cheap Chynoweth/avalanche path landed (registry rows 74–75, 123) and MC remains the *faithful anchor source* for α_ii (ledger σ ≥×3; EDF-tail anchors absent).
 - **Multiphonon emission / Huang-Rhys / Marcus-crossing formula** — needed for 29 (capture cross-section).
 - **Reaction-rate / Eyring template** with finite-T transition-state — needed for 46, 47, possibly 50.
 - **Master-equation / kinetic network template** — needed for 51, hot-carrier-driven degradation.
@@ -252,11 +255,34 @@ Observables/residuals that the current closed registry (12 methods × 12 templat
 - **NEGF template** for 31, 34 (interface barriers, tunneling) — Bardeen-MIGS alone is insufficient.
 - **4-phonon scattering vertex** — needed for κ in diamond above ~800 K.
 - **Self-consistent phonon / SSCHA** for non-diamond materials at ≥500°C where QHA fails.
-- **Berry-phase polarization** template for 35 (likely already present implicitly via DFPT; flag for confirmation).
+- **Berry-phase polarization** template for 35 (likely already present implicitly via DFPT; flag for confirmation → landed: registry rows 113–119 (+128 pyroelectric)).
 - **Surface thermodynamic-ensemble** machinery for terminations (combination of MaxEnt-statistics + reaction-rate).
 
 These gaps are the most important input for Streams S2–S5: each gap represents a decision point of "add this machinery / accept reduced accuracy in this observable / mark this observable as cheap-only with no faithful residual."
 
 ---
 
-**Catalog total: 52 observables across 8 data-shape bundles.** Diamond-relevant observables flagged in Part A; centrality ranking in Part D; honest-limits and registry-gap flags in Parts E & F together form the scoping handoff to downstream streams.
+**Catalog total: 52 catalog observables across the 8 data-shape groups above** (canonical bundle grouping: the 11 physics-domain bundles, arch-09 §9.4). Diamond-relevant observables flagged in Part A; centrality ranking in Part D; honest-limits and registry-gap flags in Parts E & F together form the scoping handoff to downstream streams.
+
+---
+
+## Changelog
+
+- **2026-07-16 (strata rewrite):** status banner converted to this changelog and its content
+  applied inline:
+  - Part E QHA row: AlN Θ_D **~1150 K → ~1000 K** `[Wave-1 A10]`
+    (`docs/specs/2026-06-10-wave1-iii-n-seeding.md` §3; the seeded CSV carries 1000 K).
+  - Row #42 displacement threshold: **"~25 eV Ga in GaN" → "~20 eV Ga-sublattice in GaN
+    (N-sublattice ~25 eV)"** (the 2026-06-10 re-audit verified E_d(GaN) ~20 eV —
+    `docs/audits/2026-06-10-reaudit-addendum.md` §1; arch-21 §21.3 F-H1 carries ~20 eV).
+  - Stale "OUTSIDE registry" flags annotated in place with their landing rows (flag text kept as
+    history): #12 → rows 121–122; #29 → rows 40–41; #31 → row 80; #33 → row 116; #35 → rows
+    113–119 (+128 pyroelectric); #46 → row 109; #47 → row 110; #48 → rows 70–71; #51 → rows
+    105–108; #52 → row 115; Part E SCPH → row 13 (live solve V2 per arch-17); Part E 4-phonon
+    → row 121. Still genuinely outside and left unchanged: #18 and #49 (full-band MC / hot-carrier
+    EDF tail), #41 (device-scale resonant modes), full cascade dynamics.
+  - Closing line reworded to the catalog-observable vocabulary (52 catalog observables across the
+    8 data-shape groups; canonical grouping = the 11 physics-domain bundles, arch-09 §9.4).
+- **2026-07-07 (gap-audit):** status banner added carrying the superseded-number warnings
+  (AlN Θ_D, GaN E_d) and the landed-row map for the closed "OUTSIDE registry" flags — all now
+  applied inline (2026-07-16) and the banner retired.

@@ -2,7 +2,10 @@
 
 Survey of defect, doping, surface, and interface physics for diamond-centric UWBG semiconductors under harsh-environment (≥500°C, vibration, high-j) conditions. Read-only research; formulas typed in `/physics` registry style with two-tier (cheap/faithful) parameterizations.
 
-> **Status note (2026-07 gap-audit).** Electron affinity χ is always **termination-tagged** (Part E is the canonical per-termination table). The F.4 barrier heights and carbide onsets are literature-survey grade — pin provenance before any value seeds a `ProvenanceLedger` at the metals wave. The charge-balance formula (B.3), the P-diamond worked example (B.4), the misfit convention (H.1: `(a_film − a_sub)/a_sub`), the diamond CTE anchor (G.6), and the Freysoldt symbol were corrected in place by the gap-audit (`docs/audits/2026-07-07-gap-audit.md`).
+> **Conventions.** Electron affinity χ is always **termination-tagged** (Part E is the canonical
+> per-termination table). The F.4 barrier heights and carbide onsets are literature-survey grade —
+> pin provenance before any value seeds a `ProvenanceLedger` (metals wave). History: `## Changelog`
+> at the end of this file.
 
 ---
 
@@ -622,3 +625,17 @@ Existing bundles likely cover scalars, atom-indexed, T-resolved. **New bundle ne
 - **H diffusion** (G.2) couples Part-S3 surface termination to Part-G long-time bulk evolution AND to dopant activation (Mg–H in GaN) — this is a three-way coupling that needs one stream to own it; flagging as cross-cutting.
 
 End of report.
+
+---
+
+## Changelog
+
+- **2026-07-16 (strata rewrite):** status banner converted to this changelog; the header note
+  retains only the still-load-bearing conventions (termination-tagged χ; survey-grade F.4/F.5
+  values pending provenance pinning at the metals wave). No value changes.
+- **2026-07-07 (gap-audit B7):** corrections applied in place, per
+  `docs/audits/2026-07-07-gap-audit.md` B7 — the B.3 charge-balance exact form and the B.4
+  P-diamond worked example corrected (the superseded numbers carried ~100× and ~3× errors,
+  respectively); misfit convention normalized to `(a_film − a_sub)/a_sub` (H.1); diamond CTE
+  anchor corrected (G.6, ≈3×10⁻⁶/K at 773 K); Freysoldt correction symbol renamed `E_corr^FNV`
+  (C.3); the D.3 "radiative branch" mislabel fixed (I.1).

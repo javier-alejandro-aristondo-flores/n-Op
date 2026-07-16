@@ -38,7 +38,7 @@ docs/
                                      ← GENERATED monoliths/bundles (assembled from the atomic files
                                        below); read a monolith only if you prefer one big file.
   _bundles/                        ← generated LLM-context bundles (full-spec, arch-only, mvp-build)
-  meta/                            ← tooling: lint.py, assemble.py, carve.py, manifest.yaml,
+  meta/                            ← tooling: lint.py, assemble.py, manifest.yaml,
                                        conventions.md, glossary.md  (read glossary.md for vocabulary)
 
   architecture/   (the canonical spec — 21 atomic files; READ THESE for depth)

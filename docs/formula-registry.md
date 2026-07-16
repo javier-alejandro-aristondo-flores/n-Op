@@ -67,7 +67,7 @@ The manifest is a CSV with one row per formula:
 | `#` | Row number (stable identifier). |
 | `Name` | Behavior-named identifier (person-attribution names appear only as parenthetical literature pointers). |
 | `Signature` | Typed `(inputs) → output`, with units. |
-| `Bundle` | Observable bundle membership, `B1`–`B11` (see `architecture.md §8.4`). |
+| `Bundle` | Observable bundle membership, `B1`–`B11` or the `L1` primitive tag (`arch-09-vocabularies §9.4`, `impl-04-formulas`). |
 | `Tier` | Cost tier `T0`–`T3`. |
 | `Diff` | Differentiability tag `D0`–`D4`. |
 | `Path` | **Retired column.** Under the always-cheap pipeline (see `architecture/07-pipeline.md`), every formula is on the single residual surface; the `cheap`/`faithful` distinction has been collapsed. The column survives in the CSV for historical row identity only. |

@@ -766,7 +766,7 @@ Layer 1.25   One-shot closed-form dressing — pure functions, no iteration.
              Cert: OneShotCert (impl-07-residual-factory §7.7).
 Layer 1.75   Iterative fixed-point dressing — DEFERRED to V2 in code,
              SPECIFIED for forward compatibility. Members: self-
-             consistent GW, full SCPH/SSCHA, DMFT, BSE iterative
+             consistent GW, full SCPH/SSCHA, TDEP, DMFT, BSE iterative
              variants, self-consistent polaron.
              Cert: IterativeResult (impl-07-residual-factory §7.7).
              Each member gets a bespoke Stage-4 lowering, NOT a shared
@@ -849,7 +849,7 @@ argument tuples." Detailed signatures in `impl-03-templates`.
 
 | Template | Produces / notes |
 |---|---|
-| `SelfConsistentRenormalizationOf` | fixed-point dressing; method selector ∈ {SCP, SSCHA, GW, BSE-iterated, polaron}; emits `IterativeResult` |
+| `SelfConsistentRenormalizationOf` | fixed-point dressing; method selector ∈ {SCP, SSCHA, TDEP, GW, BSE-iterated, polaron}; emits `IterativeResult` |
 | `ConfigurationalFreeEnergyOf` | composition-dependent free energy; parameterizations {ClusterExpansion (discrete, T=0), Redlich–Kister (continuous, finite-T excess Gibbs), Bragg–Williams} — **distinct, not instances of each other** |
 | `SymmetryAdaptedHamiltonianOf` | constructive emission of the most general symmetry-allowed `H(k)` from (space group, Wyckoff orbits, orbital basis, neighbor shells); the substrate every composed material is classified against (§14) |
 
@@ -908,7 +908,10 @@ Organized by physics domain (the `B1..B11` labels used in the registry):
 | B10 | static-validity | L2 |
 | B11 | degradation | L4 |
 
-(A file tree may additionally group observable *modules* by output data-shape —
+(The four linear-response primitive rows 91–94 — Z*, ε∞, χ∞, α_M — carry the
+`L1` tag instead of a B-bundle: they are level-1 primitives feeding multiple
+bundles, per `impl-04-formulas`. A file tree may additionally group observable
+*modules* by output data-shape —
 BZ-resolved, energy-resolved, real-space, tensor-indexed, etc. — but the
 canonical, residual-driving grouping is the eleven physics-domain bundles above.)
 
@@ -970,7 +973,7 @@ The four axes of `TheoryContext` (`arch-19-coupling-structure §19.11`) —
 the global theory frame a `CouplingSpec` is interpreted in — are built
 from ten closed C1 vocabularies. They are genuinely new (no existing
 arch-09 vocabulary covers them; the closest neighbour, the
-`{SCP, SSCHA, GW, BSE-iterated, polaron}` selector inside the §9.2
+`{SCP, SSCHA, TDEP, GW, BSE-iterated, polaron}` selector inside the §9.2
 `SelfConsistentRenormalizationOf` template, is a *per-observable dressing
 method*, a different axis from the composition-global theory frame). Each
 is a `Universe[T]` instance with `carrier_kind = Closed` and dense `u32`

@@ -214,7 +214,7 @@ constructs the graph in level order.
 
 **Order-of-operations consequence:** an L2 force evaluation contains a *converged L1 inner
 solve*; the adjoint must thread the implicit-diff chain through both. The
-L3↔non-equilibrium cycle closes by a same-pass fixed point (`impl-11 §15.2`: ≤ 5 iterations in
+L3↔non-equilibrium cycle closes by a same-pass fixed point (`impl-11 §11.2`: ≤ 5 iterations in
 the worked example).
 
 ### 3.4 Dressing tiers (`arch-08 §8.1`) — an implementation-scoped layering, not a runtime hierarchy
@@ -475,7 +475,7 @@ over the payload `(observable, value, σ, provenance, coverage_mask)` (the type-
 `schema_version(D)` enters every `Address` per §2.2; the per-row `schema_version` column is
 compared by the obligation-8 reader, never keyed); **write-once** (updates
 = new row, deletes disallowed); WAL mode for concurrent reads; `O(log n)` B-tree lookup,
-`n ≈ 10–10⁴` rows. The five **runtime gates** (`impl-11 §15.2`) — registration sanity (all 132
+`n ≈ 10–10⁴` rows. The five **runtime gates** (`impl-11 §11.2`) — registration sanity (all 132
 formulas instantiate, D2 pass the τ_adj gate), an end-to-end worked example (the L3↔non-eq fixed
 point closes in ≤ 5 iterations), curriculum sanity, cross-regime obligation firing, and a
 consumer smoke test — are the acceptance battery.

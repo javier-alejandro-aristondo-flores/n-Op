@@ -54,7 +54,7 @@ SelfConsistentRenormalizationOf(bare: BareSubstrate,
                                 T: Temperature,
                                 convergence: ConvergenceCriterion) → DressedQuantity
         (fixed-point structure shared across SCPH/SSCHA, GW self-energy, BSE
-         iteration, polaron; emits IterativeResult cert evidence — §9)
+         iteration, polaron; emits IterativeResult cert evidence — impl-07 §7.7)
 
 ConfigurationalFreeEnergyOf(parameterization: {ClusterExpansion(ECI),
                                                RedlichKister(L_ν, order),

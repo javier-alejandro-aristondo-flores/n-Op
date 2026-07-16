@@ -205,12 +205,16 @@ metadata the runtime kernel uses for its outputs.
 record ResidualGenerator {
   name              : Symbol
   observable        : ObservableRef
-  bundle            : BundleId                 -- B1..B11 (facet, not identity)
+  bundle            : BundleId                 -- B1..B11 or the L1 primitive tag
+                                               --   (impl-04-formulas; facet, not identity)
   category          : CategoryTag              -- 19 named tags (arch-11-residuals §11.1)
-  layer             : 1..7                     -- compose-time DAG layer
+  layer             : 1..7                     -- compose-time DAG layer (the 7-layer
+                                               --   compute DAG of residual-generator-catalog §2)
   cost-tier         : T0 | T1 | T2 | T3
   diff-tag          : D0 | D1 | D2 | D3 | D4
-  dressing-tag      : bare | dressed(scheme: G0W0|SCP|LO-TO|Born-charge|epsilon-infinity)
+  dressing-tag      : bare | dressed(scheme: G0W0|SCP-perturbative|LO-TO-NA-correction
+                                             |Born-charge|epsilon-infinity
+                                             |electronic-susceptibility)   -- = the §7.7 OneShotCert schemes
                       -- provenance label only; not a loss-weighting axis
   axes              : List<AxisLabel>          -- the dimensions this generator unfolds over
                                                   (k-point, frequency, atomic pair, shell, …)

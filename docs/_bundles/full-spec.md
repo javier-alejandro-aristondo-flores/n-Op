@@ -783,7 +783,7 @@ Layer 1.25   One-shot closed-form dressing — pure functions, no iteration.
              Cert: OneShotCert (impl-07-residual-factory §7.7).
 Layer 1.75   Iterative fixed-point dressing — DEFERRED to V2 in code,
              SPECIFIED for forward compatibility. Members: self-
-             consistent GW, full SCPH/SSCHA, DMFT, BSE iterative
+             consistent GW, full SCPH/SSCHA, TDEP, DMFT, BSE iterative
              variants, self-consistent polaron.
              Cert: IterativeResult (impl-07-residual-factory §7.7).
              Each member gets a bespoke Stage-4 lowering, NOT a shared
@@ -866,7 +866,7 @@ argument tuples." Detailed signatures in `impl-03-templates`.
 
 | Template | Produces / notes |
 |---|---|
-| `SelfConsistentRenormalizationOf` | fixed-point dressing; method selector ∈ {SCP, SSCHA, GW, BSE-iterated, polaron}; emits `IterativeResult` |
+| `SelfConsistentRenormalizationOf` | fixed-point dressing; method selector ∈ {SCP, SSCHA, TDEP, GW, BSE-iterated, polaron}; emits `IterativeResult` |
 | `ConfigurationalFreeEnergyOf` | composition-dependent free energy; parameterizations {ClusterExpansion (discrete, T=0), Redlich–Kister (continuous, finite-T excess Gibbs), Bragg–Williams} — **distinct, not instances of each other** |
 | `SymmetryAdaptedHamiltonianOf` | constructive emission of the most general symmetry-allowed `H(k)` from (space group, Wyckoff orbits, orbital basis, neighbor shells); the substrate every composed material is classified against (§14) |
 
@@ -925,7 +925,10 @@ Organized by physics domain (the `B1..B11` labels used in the registry):
 | B10 | static-validity | L2 |
 | B11 | degradation | L4 |
 
-(A file tree may additionally group observable *modules* by output data-shape —
+(The four linear-response primitive rows 91–94 — Z*, ε∞, χ∞, α_M — carry the
+`L1` tag instead of a B-bundle: they are level-1 primitives feeding multiple
+bundles, per `impl-04-formulas`. A file tree may additionally group observable
+*modules* by output data-shape —
 BZ-resolved, energy-resolved, real-space, tensor-indexed, etc. — but the
 canonical, residual-driving grouping is the eleven physics-domain bundles above.)
 
@@ -987,7 +990,7 @@ The four axes of `TheoryContext` (`arch-19-coupling-structure §19.11`) —
 the global theory frame a `CouplingSpec` is interpreted in — are built
 from ten closed C1 vocabularies. They are genuinely new (no existing
 arch-09 vocabulary covers them; the closest neighbour, the
-`{SCP, SSCHA, GW, BSE-iterated, polaron}` selector inside the §9.2
+`{SCP, SSCHA, TDEP, GW, BSE-iterated, polaron}` selector inside the §9.2
 `SelfConsistentRenormalizationOf` template, is a *per-observable dressing
 method*, a different axis from the composition-global theory frame). Each
 is a `Universe[T]` instance with `carrier_kind = Closed` and dense `u32`
@@ -3458,6 +3461,7 @@ kinetic-evolution        KineticEvolution(distribution: Distribution, collisions
                                            gradient: AppliedGradient, method: KineticMethod,
                                            truncation: Int) → SteadyState
                          sub: BTE-RTA, BTE-full, master-equation, drift-diffusion,
+                              mesh-interpolation†,
                               Cahn-Hilliard, Allen-Cahn
 
 statistical-sampling     StatisticalSampling(distribution: Distribution, method: Sampler,
@@ -3470,8 +3474,9 @@ symmetry-projection      SymmetryProjection(target: Tensor, group: SymmetryGroup
                               time-reversal-symmetrize
 ```
 
-† `interface-tunneling` and `field-line-integral` are the two registered
-sub-methods added for the UWBG scope. Sub-methods extend a method's dispatch
+† `interface-tunneling`, `field-line-integral`, and `mesh-interpolation` (the
+compile-time band / e-ph interpolator under `kinetic-evolution`, `arch-09 §9.1`)
+are the three registered sub-methods added for the UWBG scope. Sub-methods extend a method's dispatch
 table without changing its typed signature; each requires a sub-method test and
 a regression-freeze entry.
 
@@ -3525,7 +3530,7 @@ SelfConsistentRenormalizationOf(bare: BareSubstrate,
                                 T: Temperature,
                                 convergence: ConvergenceCriterion) → DressedQuantity
         (fixed-point structure shared across SCPH/SSCHA, GW self-energy, BSE
-         iteration, polaron; emits IterativeResult cert evidence — §9)
+         iteration, polaron; emits IterativeResult cert evidence — impl-07 §7.7)
 
 ConfigurationalFreeEnergyOf(parameterization: {ClusterExpansion(ECI),
                                                RedlichKister(L_ν, order),
@@ -3596,7 +3601,10 @@ Each formula record carries:
 record FormulaRecord {
   name               : Symbol                  -- behavior-named (e.g. defect-formation-energy)
   signature          : (Inputs) → Output       -- typed, with units
-  bundle             : {BundleId}              -- one or more of B1..B11
+  bundle             : {BundleId}              -- one or more of B1..B11, or the
+                                               --   L1 primitive tag (linear-response
+                                               --   primitives Z*/ε∞/χ∞/α_M, rows 91–94,
+                                               --   feed multiple bundles)
   cost-tier          : T0 | T1 | T2 | T3
   diff-tag           : D0 | D1 | D2 | D3 | D4
   source             : provenance pointer (research file / literature DOI)
@@ -3844,12 +3852,16 @@ metadata the runtime kernel uses for its outputs.
 record ResidualGenerator {
   name              : Symbol
   observable        : ObservableRef
-  bundle            : BundleId                 -- B1..B11 (facet, not identity)
+  bundle            : BundleId                 -- B1..B11 or the L1 primitive tag
+                                               --   (impl-04-formulas; facet, not identity)
   category          : CategoryTag              -- 19 named tags (arch-11-residuals §11.1)
-  layer             : 1..7                     -- compose-time DAG layer
+  layer             : 1..7                     -- compose-time DAG layer (the 7-layer
+                                               --   compute DAG of residual-generator-catalog §2)
   cost-tier         : T0 | T1 | T2 | T3
   diff-tag          : D0 | D1 | D2 | D3 | D4
-  dressing-tag      : bare | dressed(scheme: G0W0|SCP|LO-TO|Born-charge|epsilon-infinity)
+  dressing-tag      : bare | dressed(scheme: G0W0|SCP-perturbative|LO-TO-NA-correction
+                                             |Born-charge|epsilon-infinity
+                                             |electronic-susceptibility)   -- = the §7.7 OneShotCert schemes
                       -- provenance label only; not a loss-weighting axis
   axes              : List<AxisLabel>          -- the dimensions this generator unfolds over
                                                   (k-point, frequency, atomic pair, shell, …)
@@ -4013,7 +4025,7 @@ Layer-0 axis, so its checker is a generic function over a typeclass:
 | 3 analytic limits | `HasAnalyticStructure`: evaluate the limit, check the witness predicate |
 | 4 reference battery | content-side: read `cert/reference-data/*.csv`, compare under `approxEq` |
 | 5 conservation | `Integrable`: `integrate(measure) = declared-invariant` to tolerance |
-| 6 degeneracy / named-formula consistency | `Sampleable` + `approxEq`: two formulas claiming one quantity agree on the shared domain (Algebraic/MethodEquivalence category, `arch-11-residuals`) |
+| 6 GENERIC degeneracy + named-formula consistency | `Sampleable` + `approxEq`: two formulas claiming one quantity agree on the shared domain (Algebraic/MethodEquivalence), plus the cert-only Degeneracy tripwire `‖L δS/δx‖² + ‖M δE/δx‖²` ≈ 0 per tier (generator-construction bug detector, `arch-05-generic` category, `arch-11-residuals`) |
 | 7 boundary correspondence | `DiscreteStructure` morphism: observed boundary-band count matches `(X_BS_generator, orientation) → multiplicity` |
 | 8 reference-battery-versioned | versioning discipline on obligation 4; per-entry provenance; trips at >3σ |
 | 9 surrogate-net validity | for D4: declared input domain contains the query, surrogate uncertainty below tolerance, refresh up to date |
@@ -4081,7 +4093,7 @@ with multiple handlers.
 
 Elements that *compose into a pipeline with a type change between
 stages* — the γ̂ encoding pipeline (`arch-15-gamma-hat`), the 4 BO
-levels (`arch-08-bo-levels`), the 5-stage compose-time pipeline
+levels (`arch-08-bo-levels`), the compose-time pipeline (stages 1–4 + the 2.5 sub-stage)
 (`arch-07-pipeline`), the synthesis → property → PINO layering — stay
 explicit multi-stage structures.
 
@@ -4090,11 +4102,11 @@ between stages ⇒ keep the stages.
 
 ## 9.3 Provenance tags are not weighting axes
 
-`ContributionFacets` (`arch-11-residuals §11.5`) attaches `(category,
+`ContributionFacets` (`arch-11-residuals §11.2`) attaches `(category,
 bundle, dressing)` to every `ResidualLeaf` as a sidecar — purely
 queryable provenance, never part of `ResidualKey` identity and never
 the basis for a per-residual loss weight. Loss weighting lives in
-`/informed-operator`'s curriculum schedule (`arch-11-residuals §11.4`),
+`/informed-operator`'s curriculum schedule (`arch-11-residuals §11.4.1`),
 keyed by `CategoryTag` participation gates only. A facet field exists
 to answer "which residuals belong to bundle B?", not "what is the
 weight of residual r?".
@@ -4155,7 +4167,7 @@ then GENERIC/canonicals/observables (Phases 8–10), then residuals/cert/dynamic
 
 # Verification
 
-### 15.1 Internal consistency (static)
+### 11.1 Internal consistency (static)
 
 The spec is internally consistent when:
 
@@ -4177,7 +4189,7 @@ The spec is internally consistent when:
 Once the Phase-0 skeleton exists, items 1–7 are checkable mechanically by walking
 the tree and the registry manifest.
 
-### 15.2 Runtime gates
+### 11.2 Runtime gates
 
 Five sequential gates validate the built system:
 
@@ -4208,7 +4220,7 @@ Five sequential gates validate the built system:
    Skip` populates label values for ~10 Si observables; `Validate` with
    `gradient = Compute` returns finite per-residual scalars and finite
    cotangents of the declared shape on a randomly-initialized state; `Import`
-   accepts a synthetic VASP-formatted payload and returns `TargetEntry` records
+   accepts a synthetic VASP-formatted payload and returns `GroundTruthBridgeGenerator`s
    with coverage masks. All return within their typed contracts.
 
 

@@ -67,6 +67,7 @@ kinetic-evolution        KineticEvolution(distribution: Distribution, collisions
                                            gradient: AppliedGradient, method: KineticMethod,
                                            truncation: Int) → SteadyState
                          sub: BTE-RTA, BTE-full, master-equation, drift-diffusion,
+                              mesh-interpolation†,
                               Cahn-Hilliard, Allen-Cahn
 
 statistical-sampling     StatisticalSampling(distribution: Distribution, method: Sampler,
@@ -79,8 +80,9 @@ symmetry-projection      SymmetryProjection(target: Tensor, group: SymmetryGroup
                               time-reversal-symmetrize
 ```
 
-† `interface-tunneling` and `field-line-integral` are the two registered
-sub-methods added for the UWBG scope. Sub-methods extend a method's dispatch
+† `interface-tunneling`, `field-line-integral`, and `mesh-interpolation` (the
+compile-time band / e-ph interpolator under `kinetic-evolution`, `arch-09 §9.1`)
+are the three registered sub-methods added for the UWBG scope. Sub-methods extend a method's dispatch
 table without changing its typed signature; each requires a sub-method test and
 a regression-freeze entry.
 

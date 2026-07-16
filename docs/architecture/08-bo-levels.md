@@ -86,7 +86,7 @@ Layer 1.25   One-shot closed-form dressing — pure functions, no iteration.
              Cert: OneShotCert (impl-07-residual-factory §7.7).
 Layer 1.75   Iterative fixed-point dressing — DEFERRED to V2 in code,
              SPECIFIED for forward compatibility. Members: self-
-             consistent GW, full SCPH/SSCHA, DMFT, BSE iterative
+             consistent GW, full SCPH/SSCHA, TDEP, DMFT, BSE iterative
              variants, self-consistent polaron.
              Cert: IterativeResult (impl-07-residual-factory §7.7).
              Each member gets a bespoke Stage-4 lowering, NOT a shared

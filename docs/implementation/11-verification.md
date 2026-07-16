@@ -11,7 +11,7 @@ research-sources: []
 ---
 # Verification
 
-### 15.1 Internal consistency (static)
+### 11.1 Internal consistency (static)
 
 The spec is internally consistent when:
 
@@ -33,7 +33,7 @@ The spec is internally consistent when:
 Once the Phase-0 skeleton exists, items 1–7 are checkable mechanically by walking
 the tree and the registry manifest.
 
-### 15.2 Runtime gates
+### 11.2 Runtime gates
 
 Five sequential gates validate the built system:
 
@@ -64,5 +64,5 @@ Five sequential gates validate the built system:
    Skip` populates label values for ~10 Si observables; `Validate` with
    `gradient = Compute` returns finite per-residual scalars and finite
    cotangents of the declared shape on a randomly-initialized state; `Import`
-   accepts a synthetic VASP-formatted payload and returns `TargetEntry` records
+   accepts a synthetic VASP-formatted payload and returns `GroundTruthBridgeGenerator`s
    with coverage masks. All return within their typed contracts.

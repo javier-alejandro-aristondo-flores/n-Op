@@ -25,7 +25,10 @@ Each formula record carries:
 record FormulaRecord {
   name               : Symbol                  -- behavior-named (e.g. defect-formation-energy)
   signature          : (Inputs) → Output       -- typed, with units
-  bundle             : {BundleId}              -- one or more of B1..B11
+  bundle             : {BundleId}              -- one or more of B1..B11, or the
+                                               --   L1 primitive tag (linear-response
+                                               --   primitives Z*/ε∞/χ∞/α_M, rows 91–94,
+                                               --   feed multiple bundles)
   cost-tier          : T0 | T1 | T2 | T3
   diff-tag           : D0 | D1 | D2 | D3 | D4
   source             : provenance pointer (research file / literature DOI)

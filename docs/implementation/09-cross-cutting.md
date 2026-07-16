@@ -68,7 +68,7 @@ with multiple handlers.
 
 Elements that *compose into a pipeline with a type change between
 stages* — the γ̂ encoding pipeline (`arch-15-gamma-hat`), the 4 BO
-levels (`arch-08-bo-levels`), the 5-stage compose-time pipeline
+levels (`arch-08-bo-levels`), the compose-time pipeline (stages 1–4 + the 2.5 sub-stage)
 (`arch-07-pipeline`), the synthesis → property → PINO layering — stay
 explicit multi-stage structures.
 
@@ -77,11 +77,11 @@ between stages ⇒ keep the stages.
 
 ## 9.3 Provenance tags are not weighting axes
 
-`ContributionFacets` (`arch-11-residuals §11.5`) attaches `(category,
+`ContributionFacets` (`arch-11-residuals §11.2`) attaches `(category,
 bundle, dressing)` to every `ResidualLeaf` as a sidecar — purely
 queryable provenance, never part of `ResidualKey` identity and never
 the basis for a per-residual loss weight. Loss weighting lives in
-`/informed-operator`'s curriculum schedule (`arch-11-residuals §11.4`),
+`/informed-operator`'s curriculum schedule (`arch-11-residuals §11.4.1`),
 keyed by `CategoryTag` participation gates only. A facet field exists
 to answer "which residuals belong to bundle B?", not "what is the
 weight of residual r?".

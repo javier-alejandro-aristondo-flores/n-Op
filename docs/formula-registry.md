@@ -83,7 +83,9 @@ self-consistent loop or PDE solve (≤10 min).
 **Differentiability** — `D0` no autodiff needed (pure read) · `D1` analytic
 forward derivative · `D2` adjoint required (validated at registration) · `D3`
 implicit-function adjoint via fixed-point linearization · `D4` autodiff relaxed
-(surrogate-net bridge or finite-difference fallback, approved at registration).
+(surrogate-net bridge / soft-hull / Gumbel-Softmax relaxation, approved at
+registration; a finite-difference surrogate *without* a fixed point is **D3**,
+per `impl-04-formulas` — the CSV agrees: row 12 is D3, all D4 rows are relaxations).
 
 ## How a formula becomes a residual
 

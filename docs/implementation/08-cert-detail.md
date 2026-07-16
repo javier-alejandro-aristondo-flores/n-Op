@@ -21,7 +21,7 @@ Layer-0 axis, so its checker is a generic function over a typeclass:
 | 3 analytic limits | `HasAnalyticStructure`: evaluate the limit, check the witness predicate |
 | 4 reference battery | content-side: read `cert/reference-data/*.csv`, compare under `approxEq` |
 | 5 conservation | `Integrable`: `integrate(measure) = declared-invariant` to tolerance |
-| 6 degeneracy / named-formula consistency | `Sampleable` + `approxEq`: two formulas claiming one quantity agree on the shared domain (Algebraic/MethodEquivalence category, `arch-11-residuals`) |
+| 6 GENERIC degeneracy + named-formula consistency | `Sampleable` + `approxEq`: two formulas claiming one quantity agree on the shared domain (Algebraic/MethodEquivalence), plus the cert-only Degeneracy tripwire `‖L δS/δx‖² + ‖M δE/δx‖²` ≈ 0 per tier (generator-construction bug detector, `arch-05-generic` category, `arch-11-residuals`) |
 | 7 boundary correspondence | `DiscreteStructure` morphism: observed boundary-band count matches `(X_BS_generator, orientation) → multiplicity` |
 | 8 reference-battery-versioned | versioning discipline on obligation 4; per-entry provenance; trips at >3σ |
 | 9 surrogate-net validity | for D4: declared input domain contains the query, surrogate uncertainty below tolerance, refresh up to date |

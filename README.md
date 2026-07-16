@@ -70,7 +70,10 @@ n-Op/
 │   ├── implementation/            atomic build-plan files (11 sections)
 │   ├── mvp/                       atomic diamond-MVP files (6 sections)
 │   ├── meta/                      manifest.yaml, conventions.md, glossary.md,
-│   │                              assemble.py, lint.py
+│   │                              assemble.py, lint.py, AUDIT_PROMPT.md
+│   ├── audits/                    frozen audit records (never edited)
+│   ├── specs/                     wave / pass design specs
+│   ├── presentation/              decks (dated snapshots) + build tooling
 │   ├── architecture.md            regenerated monolith
 │   ├── implementation-plan.md     regenerated monolith
 │   ├── mvp-slice.md               regenerated monolith

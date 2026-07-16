@@ -24,7 +24,7 @@ reference-data/
 **Population status (2026-06-10, Wave 1).** `material-constants`, `elastic-tensors`,
 `phonon-frequencies`, `transport-coefficients`, and `polarization-piezoelectric` are seeded with
 the **III-N flagships (GaN, AlN, AlGaN)** — fully sourced and adversarially audited
-(`docs/superpowers/specs/2026-06-10-wave1-iii-n-seeding.md`,
+(`docs/specs/2026-06-10-wave1-iii-n-seeding.md`,
 `docs/audits/2026-06-10-wave1-iii-n-audit.md`) — plus the diamond anchors already in
 `docs/accuracy-ledger.md`. **Polarization e₃₁ is the PROPER constant, paired with the ZB-reference
 P_sp** (the self-consistent convention enforced by `arch-12 §12.0.3`; never mix with improper e₃₁).

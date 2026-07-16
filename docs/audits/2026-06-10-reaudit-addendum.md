@@ -2,7 +2,7 @@
 
 **Date:** 2026-06-10 · **Scope:** verification of the remediation commits (`68b61cd`, `e826668`,
 `0078157`) against `docs/audits/2026-06-09-physics-audit.md`, plus a physics audit of the
-pre-landing Pass C design (`docs/superpowers/specs/2026-06-10-pass-c-accuracy-design.md`).
+pre-landing Pass C design (`docs/specs/2026-06-10-pass-c-accuracy-design.md`).
 Format follows the original audit: verdict (defect / risk / open / verified-ok), severity
 S1–S4, scope tag. Items the original audit marked verified-ok were not re-read (commissioner
 instruction).

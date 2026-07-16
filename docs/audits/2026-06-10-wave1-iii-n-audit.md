@@ -3,7 +3,7 @@
 Two adversarial auditors verified the Wave-1 deep-dive findings against primary sources, each
 mandated to **refute**. One covered the convention traps (where silent errors hide); one covered
 numbers / provenance / gaps. Verdicts below. Seeded values + sources:
-`docs/superpowers/specs/2026-06-10-wave1-iii-n-seeding.md`.
+`docs/specs/2026-06-10-wave1-iii-n-seeding.md`.
 
 ## Auditor 1 — convention traps
 

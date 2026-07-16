@@ -102,7 +102,7 @@ The per-material values the Pass-C rows (120–127) consume, recorded here as th
 curated-coefficient seed. Each is a `ProvenanceLedger` entry `(value, σ, source, cost-class)`
 (`arch-19-coupling-structure §19.8`); for the MVP diamond they are `curated`, other materials
 `per-material-DFPT` (the gating data-acquisition task before that material is claimed). Values are
-literature-anchored (full citations in `docs/superpowers/specs/2026-06-10-pass-c-accuracy-design.md`).
+literature-anchored (full citations in `docs/specs/2026-06-10-pass-c-accuracy-design.md`).
 
 **AHC ZPR / gap T-slope (row 120; `slope-kind` tagged — the `coth` amplitude is the *isochoric*
 electron-phonon ZPR; zero-point lattice expansion is row 63's job, `arch-19 §19.8`):**
@@ -141,7 +141,7 @@ quarantined — different valley — Antonius 2014.)
 | β-Ga₂O₃ | e (anisotropic) | E_c 10.2/4.8/7.6 MV/cm | ×3 | — | — | Ghosh–Singisetti JAP 124 (2018); **holes never measured** |
 
 **Per-material III-N seed (Wave 1: GaN / AlN / Al_xGa_{1-x}N). Full tables + per-value sources in
-`docs/superpowers/specs/2026-06-10-wave1-iii-n-seeding.md`; adversarial audit in
+`docs/specs/2026-06-10-wave1-iii-n-seeding.md`; adversarial audit in
 `docs/audits/2026-06-10-wave1-iii-n-audit.md`.**
 
 *Electronic baseline + deformation potentials (rows 1–6, 63):*

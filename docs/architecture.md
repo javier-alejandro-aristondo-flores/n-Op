@@ -1828,7 +1828,7 @@ Stated and held, so the architecture is honest about what it does not cover:
   L59 (2002); no hole), no measured bulk hole mobility (deep Mg acceptor, holes `< 10¹⁰ cm⁻³`), and
   no single-crystal `κ` measurement above ~500 K. V1 **cert-refuses** measured-AlN avalanche and
   p-AlN transport claims, and flags AlN high-T `κ` as theory-only (`docs/accuracy-ledger.md`;
-  `docs/superpowers/specs/2026-06-10-wave1-iii-n-seeding.md`). The AlN electron Caughey–Thomas
+  `docs/specs/2026-06-10-wave1-iii-n-seeding.md`). The AlN electron Caughey–Thomas
   mobility quartet exists but is paywalled (Farahmand IEEE TED 48 535 (2001) Tbl II / Wang arXiv
   2506.09240 (2025) Tbl SIII) — a targeted acquisition follow-up, not a V2 deferral.
 - Absolute Berry-phase / Wannier-center polarization (the λ-path `P_sp` evaluator) —

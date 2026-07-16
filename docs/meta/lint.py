@@ -14,6 +14,10 @@ non-zero exit code):
      the arch-09 canon and the registry CSV (formulas, categories, methods,
      templates, bundles, obligations, and the overview's tier/diff tallies).
      A line may opt out with the literal marker `lint:ignore-counts`.
+     Required scan files (README, docs/meta/AUDIT_PROMPT.md) must exist —
+     a missing one is a failure, never a silent skip.
+  9. No tracked text file references a retired path (docs/superpowers/,
+     docs/_archive/) — the reorg-sweep completeness tripwire.
 
 The lint is read-only and pure; it never modifies the tree.
 '''
@@ -243,8 +247,12 @@ REGISTRY_CSV_PATH: Path = REPO_ROOT / 'physics' / 'library' / 'formulas' / 'regi
 VOCAB_CANON_PATH: Path = DOCS_ROOT / 'architecture' / '09-vocabularies.md'
 OVERVIEW_PATH: Path = DOCS_ROOT / 'computational-overview.md'
 COUNT_SCAN_EXCLUDED_DIRS: frozenset[str] = frozenset(
-    {'audits', '_archive', 'superpowers', 'presentation', '_bundles'}
+    {'audits', 'specs', 'presentation', '_bundles'}
 )
+
+# Paths retired by the 2026-07 reconciliation reorg; their appearance anywhere
+# in tracked text means an incomplete sweep or a regression.
+RETIRED_PATH_STRINGS: tuple[str, ...] = ('docs/superpowers/', 'docs/_archive/')
 COUNT_IGNORE_MARKER: str = 'lint:ignore-counts'
 
 # (pattern, canon key) — a number matched by the pattern must equal the arch-09
@@ -306,14 +314,31 @@ def _Arch09_Canon() -> tuple[dict[str, int], list[str]]:
     return canon_values, parse_failures
 
 
-def _Count_Scan_Files() -> list[Path]:
-    scan_files: list[Path] = [REPO_ROOT / 'README.md', REPO_ROOT / 'AUDIT_PROMPT.md']
+# Files that MUST exist and be count-scanned; a missing entry is a lint
+# failure, never a silent skip (AUDIT_PROMPT lives under docs/meta/ and is
+# therefore also covered by the rglob — listed here so its absence errors).
+REQUIRED_SCAN_FILES: tuple[Path, ...] = (
+    REPO_ROOT / 'README.md',
+    DOCS_ROOT / 'meta' / 'AUDIT_PROMPT.md',
+)
+
+
+def _Count_Scan_Files() -> tuple[list[Path], list[str]]:
+    scan_files: list[Path] = []
+    missing_failures: list[str] = []
+    for required_path in REQUIRED_SCAN_FILES:
+        if not required_path.exists():
+            missing_failures.append(
+                f'counts: required scan file missing: {required_path.relative_to(REPO_ROOT)}'
+            )
+        elif required_path.parent == REPO_ROOT:
+            scan_files.append(required_path)  # docs/-resident entries arrive via the rglob
     for markdown_path in sorted(DOCS_ROOT.rglob('*.md')):
         relative_parts: tuple[str, ...] = markdown_path.relative_to(DOCS_ROOT).parts
         if relative_parts[0] in COUNT_SCAN_EXCLUDED_DIRS:
             continue
         scan_files.append(markdown_path)
-    return scan_files
+    return scan_files, missing_failures
 
 
 def Check_Vocabulary_Counts(records: tuple[FileRecord, ...]) -> list[str]:
@@ -333,9 +358,9 @@ def Check_Vocabulary_Counts(records: tuple[FileRecord, ...]) -> list[str]:
             f'registry CSV has {marker_count}'
         )
     canon_values['formulas'] = substantive_count  # CSV is ground truth for the scan
-    for scan_path in _Count_Scan_Files():
-        if not scan_path.exists():
-            continue
+    scan_files, missing_failures = _Count_Scan_Files()
+    failures.extend(missing_failures)
+    for scan_path in scan_files:
         for line_number, line_text in enumerate(
             scan_path.read_text(encoding='utf-8').splitlines(), start=1
         ):
@@ -373,6 +398,24 @@ def Check_Vocabulary_Counts(records: tuple[FileRecord, ...]) -> list[str]:
     return failures
 
 
+def Check_Retired_Paths(records: tuple[FileRecord, ...]) -> list[str]:
+    del records
+    failures: list[str] = []
+    for text_path in sorted(REPO_ROOT.rglob('*')):
+        if text_path.suffix not in {'.md', '.yaml', '.csv'} or '.git' in text_path.parts:
+            continue
+        for line_number, line_text in enumerate(
+            text_path.read_text(encoding='utf-8').splitlines(), start=1
+        ):
+            for retired_string in RETIRED_PATH_STRINGS:
+                if retired_string in line_text:
+                    failures.append(
+                        f'retired-path: {text_path.relative_to(REPO_ROOT)}:{line_number}: '
+                        f'references {retired_string!r}'
+                    )
+    return failures
+
+
 def Run_Checks(records: tuple[FileRecord, ...]) -> tuple[Iterable[str], ...]:
     checks: tuple[object, ...] = (
         Check_Frontmatter_Shape,
@@ -383,6 +426,7 @@ def Run_Checks(records: tuple[FileRecord, ...]) -> tuple[Iterable[str], ...]:
         Check_Research_Sources_Exist,
         Check_Manifest_Coverage,
         Check_Vocabulary_Counts,
+        Check_Retired_Paths,
     )
     with ThreadPoolExecutor(max_workers=len(checks)) as worker_pool:
         results: list[Iterable[str]] = list(

@@ -21,7 +21,7 @@ A focused subset of the phases in `impl-10-build-sequence`:
 2. `shared` — Ewald; the tight-binding (3NN sp³d⁵) carbon Hamiltonian builder.
 3. `inputs` — the diamond `PeriodicityStructure` + `SiteDecoration` + `Environment`.
 4. `state` — `γ̂` as k-blocked orbitals (§2); `(R, P, h)`.
-5. methods (the 9) and formulas (the ~30, incl. the κ high-T siblings 121–122) of §3.
+5. methods (the 10) and formulas (the ~34, incl. the κ high-T siblings 121–122) of §3.
 6. canonicals — `E_BO` (DFT, with TB 3NN sp³d⁵ as SCF warm-start) and the phonon Hessian.
 7. the three capability residuals (Cap 1/2/3 rows above).
 8. cert obligations 1–6 and 10 (the registration adjoint gate stays in the MVP,

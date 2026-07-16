@@ -105,8 +105,12 @@ Layer 3      PINO — lives in /informed-operator.
 ```
 
 The diamond MVP runs entirely against Layer 1.25, preserving the
-closed-form discipline. Diamond needs only two dressings:
+closed-form discipline. Diamond needs only one dressing wired:
 
-- **G₀W₀** — Kohn–Sham underestimates the diamond gap by ~30%; G₀W₀
-  corrects to ~5.5 eV vs measured 5.47 eV.
-- **First-order SCP** — marginal at 773 K, growing above 1500 K.
+- **G₀W₀** — Kohn–Sham (PBE) underestimates the diamond indirect gap by
+  ~23% (~4.2 eV vs measured 5.47 eV); G₀W₀ corrects to ~5.5 eV.
+- **First-order SCP (`SCP-perturbative`)** is judged and *not* wired:
+  marginal at 773 K, growing above 1500 K — the MVP covers vibrational
+  T-dependence with QHA (registry row 12; "QHA suffices ≤800 °C",
+  `mvp-03-capabilities`), and the full self-consistent SCPH (row 13)
+  defers with Layer 1.75.

@@ -98,7 +98,7 @@ Anchors (electrons):
 | Material | ω_LO (meV) | ε₀ | ε∞ | m*/m_e | α |
 |---|---|---|---|---|---|
 | GaN | 92 | 8.9 | 5.35 | 0.20 | ~0.40 [Wave-1 A12] |
-| AlN | 111–114 [Wave-1 A9] | 8.5 | 4.77 | 0.32 | ~0.58 [Wave-1 A12] |
+| AlN | 110–114 [Wave-1 A9] | 8.5 | 4.77 | 0.32 | ~0.58 [Wave-1 A12] |
 | β-Ga₂O₃ | 44 (avg) | 10.2 | 3.6 | 0.28 | ~1.7 |
 | c-BN | 161 | 6.8 | 4.5 | 0.35 | ~0.34 |
 | Diamond | 165 (TO) | 5.7 | 5.7 | 0.36 | 0 (non-polar) |
@@ -564,6 +564,10 @@ Related documents:
 
 ## Changelog
 
+- **2026-07-16 (cert round 1):** AlN ω_LO range re-rounded 111–114 → 110–114 meV to match
+  the canonical enclosing-round of the Davydov anchors A₁(LO) 110.7 / E₁(LO) 113.6
+  (reference-data transport CSV + accuracy ledger; the Wave-1 spec §3 table concurs).
+  Within σ; no anchor value changed.
 - **2026-07-16 (reconciliation pass):** superseded III-N anchors rewritten to the
   Wave-1-audited values in place, each tagged `[Wave-1 A#]`
   (`docs/specs/2026-06-10-wave1-iii-n-seeding.md` §3). Old values, for the record:

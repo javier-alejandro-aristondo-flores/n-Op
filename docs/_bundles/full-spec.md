@@ -793,11 +793,15 @@ Layer 3      PINO — lives in /informed-operator.
 ```
 
 The diamond MVP runs entirely against Layer 1.25, preserving the
-closed-form discipline. Diamond needs only two dressings:
+closed-form discipline. Diamond needs only one dressing wired:
 
-- **G₀W₀** — Kohn–Sham underestimates the diamond gap by ~30%; G₀W₀
-  corrects to ~5.5 eV vs measured 5.47 eV.
-- **First-order SCP** — marginal at 773 K, growing above 1500 K.
+- **G₀W₀** — Kohn–Sham (PBE) underestimates the diamond indirect gap by
+  ~23% (~4.2 eV vs measured 5.47 eV); G₀W₀ corrects to ~5.5 eV.
+- **First-order SCP (`SCP-perturbative`)** is judged and *not* wired:
+  marginal at 773 K, growing above 1500 K — the MVP covers vibrational
+  T-dependence with QHA (registry row 12; "QHA suffices ≤800 °C",
+  `mvp-03-capabilities`), and the full self-consistent SCPH (row 13)
+  defers with Layer 1.75.
 
 
 <a id="arch-09-vocabularies"></a>
@@ -4298,11 +4302,11 @@ stability; one heterostructure check (c-BN on diamond) via lattice matching.*
 |---|---|
 | State used | `h`, `R_I`, `Z_I`; `γ̂` (T=0, for `E_BO`) |
 | BO levels | L1 (`E_BO = min_γ̂ E`) → L2 (relaxation on (R, h)) |
-| Methods | variational-minimization · functional-differentiation · algebraic-combination · symmetry-projection · spectral-decomposition |
+| Methods | variational-minimization · functional-differentiation · algebraic-combination · symmetry-projection · spectral-decomposition · convex-optimization (hull check only) |
 | Templates | `SymmetryAdaptedHamiltonianOf` · `SecondDerivativeOf` · `ClassifyOf` · `StateReadoutOf` · `AlgebraicOf` |
-| Formulas | **57** born-stability-criteria · **60** elastic-constants-Cij · **61** bulk-modulus · **62** sound-velocity-isotropic · **85** structure-uniqueness-CSP · **30** defect-formation-energy-zhang-northrup · **44** surface-grand-potential-γ (B5) · **52** vegard-correction · **54** matthews-blakeslee-critical-thickness (c-BN/diamond hetero) |
-| Bundles | B10 static-validity · B7 mechanics · B4 defect (row 30) · B6 interface (rows 52/54; row 54 also B11) · (B5 surface for row 44) |
-| Residuals | static-validity (Born stability, dynamical stability, space-group equivariance) · structural EOM (`∇_R E_BO = 0`, stress matches) · thermodynamic-consistency (diamond–graphite hull) |
+| Formulas | **57** born-stability-criteria · **60** elastic-constants-Cij · **61** bulk-modulus · **62** sound-velocity-isotropic · **85** structure-uniqueness-CSP · **30** defect-formation-energy-zhang-northrup · **44** surface-grand-potential-γ (B5) · **52** vegard-correction · **54** matthews-blakeslee-critical-thickness (c-BN/diamond hetero) · **67** phase-diagram-convex-hull · **124** tp-aware-hull (δ_meta metastability band — metastable diamond reads R_hull = 0) |
+| Bundles | B10 static-validity · B7 mechanics · B4 defect (row 30) · B6 interface (rows 52/54; row 54 also B11) · (B5 surface for row 44) · B8 thermodynamics (rows 67/124, the diamond–graphite hull) |
+| Residuals | static-validity (Born stability, dynamical stability, space-group equivariance) · structural EOM (`∇_R E_BO = 0`, stress matches) · thermodynamic-consistency (diamond–graphite hull, rows 67/124) |
 | Cert | 1 symmetry · 2 bounds · 3 analytic limits · 5 conservation |
 | Implementation | DFT `E_BO` + DFPT-stress `C_ij`; TB 3NN sp³d⁵ as SCF warm-start initializer (`mvp-05-decisions-forced`) |
 
@@ -4348,13 +4352,15 @@ stability; one heterostructure check (c-BN on diamond) via lattice matching.*
 # In-MVP vs deferred
 
 **In the MVP**
-- ~30 named formulas (the rows above, incl. the κ high-T siblings 121–122) of the 132.
+- ~34 named formulas (the rows above, incl. the κ high-T siblings 121–122 and the
+  hull pair 67/124) of the 132.
 - 10 of the 12 methods (all but `path-search` and `statistical-sampling`, with
   `convex-optimization` used only for the hull check — chemical/MC machinery is
   not on the diamond path).
 - ~10 templates of the 20.
 - Bundles B1, B2, B3, B7, B10 as primaries, with per-row touches of B4 (row 30),
-  B5 (row 44), B6 (rows 52/54), B9 (row 70), B11 (row 54) — ~9 of the 11 touched.
+  B5 (row 44), B6 (rows 52/54), B8 (rows 67/124), B9 (row 70), B11 (row 54) —
+  all 11 touched, five as primaries.
 - Residual families exercised: micro EOM-violation, Conservation, Positivity,
   Algebraic-identities, Static-snapshot, Static-thermodynamic. `Degeneracy` is
   cert-only (`arch-05`, `arch-11 §11.1`); the slow/macro EOM siblings
@@ -4365,7 +4371,7 @@ stability; one heterostructure check (c-BN on diamond) via lattice matching.*
 - Layers 1 + 1.25 (G₀W₀, QHA, DFPT) wired.
 
 **Deferred (the other ~⅔ of the spec)**
-- The remaining ~90 formulas: the defect zoo beyond row 30, surface chemistry,
+- The remaining ~100 formulas: the defect zoo beyond row 30, surface chemistry,
   interface/Schottky physics (no metal contact in the pure-diamond MVP), high-
   field / hot-carrier / breakdown, degradation, most of the topology atlas (rows
   96–102) beyond basic symmetry classification.
@@ -4426,7 +4432,7 @@ A focused subset of the phases in `impl-10-build-sequence`:
 2. `shared` — Ewald; the tight-binding (3NN sp³d⁵) carbon Hamiltonian builder.
 3. `inputs` — the diamond `PeriodicityStructure` + `SiteDecoration` + `Environment`.
 4. `state` — `γ̂` as k-blocked orbitals (§2); `(R, P, h)`.
-5. methods (the 9) and formulas (the ~30, incl. the κ high-T siblings 121–122) of §3.
+5. methods (the 10) and formulas (the ~34, incl. the κ high-T siblings 121–122) of §3.
 6. canonicals — `E_BO` (DFT, with TB 3NN sp³d⁵ as SCF warm-start) and the phonon Hessian.
 7. the three capability residuals (Cap 1/2/3 rows above).
 8. cert obligations 1–6 and 10 (the registration adjoint gate stays in the MVP,

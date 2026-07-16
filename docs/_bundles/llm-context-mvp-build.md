@@ -80,11 +80,11 @@ stability; one heterostructure check (c-BN on diamond) via lattice matching.*
 |---|---|
 | State used | `h`, `R_I`, `Z_I`; `γ̂` (T=0, for `E_BO`) |
 | BO levels | L1 (`E_BO = min_γ̂ E`) → L2 (relaxation on (R, h)) |
-| Methods | variational-minimization · functional-differentiation · algebraic-combination · symmetry-projection · spectral-decomposition |
+| Methods | variational-minimization · functional-differentiation · algebraic-combination · symmetry-projection · spectral-decomposition · convex-optimization (hull check only) |
 | Templates | `SymmetryAdaptedHamiltonianOf` · `SecondDerivativeOf` · `ClassifyOf` · `StateReadoutOf` · `AlgebraicOf` |
-| Formulas | **57** born-stability-criteria · **60** elastic-constants-Cij · **61** bulk-modulus · **62** sound-velocity-isotropic · **85** structure-uniqueness-CSP · **30** defect-formation-energy-zhang-northrup · **44** surface-grand-potential-γ (B5) · **52** vegard-correction · **54** matthews-blakeslee-critical-thickness (c-BN/diamond hetero) |
-| Bundles | B10 static-validity · B7 mechanics · B4 defect (row 30) · B6 interface (rows 52/54; row 54 also B11) · (B5 surface for row 44) |
-| Residuals | static-validity (Born stability, dynamical stability, space-group equivariance) · structural EOM (`∇_R E_BO = 0`, stress matches) · thermodynamic-consistency (diamond–graphite hull) |
+| Formulas | **57** born-stability-criteria · **60** elastic-constants-Cij · **61** bulk-modulus · **62** sound-velocity-isotropic · **85** structure-uniqueness-CSP · **30** defect-formation-energy-zhang-northrup · **44** surface-grand-potential-γ (B5) · **52** vegard-correction · **54** matthews-blakeslee-critical-thickness (c-BN/diamond hetero) · **67** phase-diagram-convex-hull · **124** tp-aware-hull (δ_meta metastability band — metastable diamond reads R_hull = 0) |
+| Bundles | B10 static-validity · B7 mechanics · B4 defect (row 30) · B6 interface (rows 52/54; row 54 also B11) · (B5 surface for row 44) · B8 thermodynamics (rows 67/124, the diamond–graphite hull) |
+| Residuals | static-validity (Born stability, dynamical stability, space-group equivariance) · structural EOM (`∇_R E_BO = 0`, stress matches) · thermodynamic-consistency (diamond–graphite hull, rows 67/124) |
 | Cert | 1 symmetry · 2 bounds · 3 analytic limits · 5 conservation |
 | Implementation | DFT `E_BO` + DFPT-stress `C_ij`; TB 3NN sp³d⁵ as SCF warm-start initializer (`mvp-05-decisions-forced`) |
 
@@ -172,7 +172,7 @@ A focused subset of the phases in `impl-10-build-sequence`:
 2. `shared` — Ewald; the tight-binding (3NN sp³d⁵) carbon Hamiltonian builder.
 3. `inputs` — the diamond `PeriodicityStructure` + `SiteDecoration` + `Environment`.
 4. `state` — `γ̂` as k-blocked orbitals (§2); `(R, P, h)`.
-5. methods (the 9) and formulas (the ~30, incl. the κ high-T siblings 121–122) of §3.
+5. methods (the 10) and formulas (the ~34, incl. the κ high-T siblings 121–122) of §3.
 6. canonicals — `E_BO` (DFT, with TB 3NN sp³d⁵ as SCF warm-start) and the phonon Hessian.
 7. the three capability residuals (Cap 1/2/3 rows above).
 8. cert obligations 1–6 and 10 (the registration adjoint gate stays in the MVP,

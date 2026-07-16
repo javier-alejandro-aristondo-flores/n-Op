@@ -44,8 +44,9 @@ per-direction κ, Chynoweth pairs and E_c on a/b/**c\*** axes), plus III-N pyroe
 coefficients (positive-p in the ZB-ref frame — sign guard on the rows). **B3 (AlGaN
 polarization-bowing b) is NOT seeded — gated** on reading the FB Erratum PRB 65 129903 +
 Ebert PRB 113 (2026) texts (gate row in `polarization-piezoelectric.csv`); κ(773/1100 K)
-anchors await the paywalled Klimm 2023 full text (G2). New `—`/GAP cells are exactly the
-declared GAP/gate rows (hole α_ii cert-refused; C–T quartet; κ high-T; bowing gate).
+[010] anchors seeded 2026-07-16 as derived values from the open-access Klimm 2023 main text
+(G2 closed; exact SI tables optional). New `—`/GAP cells are exactly the
+declared GAP/gate rows (hole α_ii cert-refused; C–T quartet; bowing gate).
 Pending later waves: c-BN / 4H-SiC (Wave 3), metals + substrates (Wave 4) and dielectrics
 (Wave 5) per the 2026-07 gap-audit, `interface-properties.csv`,
 `defect-formation-energies.csv`, `chemical-potentials.csv`, and the explicitly-flagged GAPs

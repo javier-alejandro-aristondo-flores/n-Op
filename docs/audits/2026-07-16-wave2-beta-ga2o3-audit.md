@@ -120,15 +120,23 @@ Mengle–Kioupakis Table I — assembly remains research-side work); GaN pyro me
 (stays dft-class); AlGaN-analog (Al_xGa₁₋ₓ)₂O₃ alloying (later wave). Removed from GAP:
 per-axis ε₀ (pinned + seeded).
 
-## 4. Acquisition items (the only open ends — user action)
+## 4. Acquisition items (one open end — user action)
 
 - **G1 (gates B3):** obtain full texts of the **FB Erratum, PRB 65 129903 (2002)** and
   **Ebert et al., PRB 113 (2026)** (both APS-paywalled). The B3 bowing rider does not
   seed until both are read directly (physics risk judged LOW — post-erratum citing
   sources carry the upward bowing — but the spec's own mandate requires the read).
   A gate row rides in `polarization-piezoelectric.csv`.
-- **G2:** obtain full text of **Klimm et al., Cryst. Res. Technol. 58 2200204 (2023)**
-  for the κ(773 K)/κ(1100 K) per-component anchors (300 K tensor already pinned).
+- **G2 — CLOSED same day.** The Klimm paper turned out **open access** (Projekt DEAL;
+  archival copy at d-nb.info/1274779782/34) — the auditor's 403s were bot-blocks, not a
+  paywall. Full main text read 2026-07-16. Frame corrected from the auditor's caution:
+  the tensor is in the **crystal-physical frame** (e₂∥b, e₃∥c, e₁ = a\*), so λ₂₂ ≡ [010]
+  *and* λ₃₃ ≡ [001] are crystallographic-direction components (λ₃₃ = 14.09 independently
+  confirms the audit's κ[001] ≈ 14 correction); the direct plane-normal measurements
+  λ₍₁₀₀₎ = 12.13 / λ₍₀₀₁₎ = 13.53 are along a\*/c\* (never relabel as [100]/[001]).
+  Derived high-T anchors seeded: κ[010](773 K) ≈ 9 ± 2, κ[010](1100 K) ≈ 6 ± 1.5 W/mK
+  (λ₂₂(300) = 24.26 direct × the paper's own T^−m law, m ≈ 1.0–1.2, consistent with its
+  Figs. 2–3). Residual (optional): the SI's exact per-temperature tables.
 
 ## 5. Disposition
 

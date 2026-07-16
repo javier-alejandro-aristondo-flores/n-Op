@@ -134,7 +134,7 @@ quarantined — different valley — Antonius 2014.)
 | diamond | 2200 (exp 2000–2500) | 620 | 450 | Feng–Lindsay–Ruan PRB 96 161201 (2017); Broido APL 91 231922 (2007) |
 | GaN (a) | 240 (3-ph) / ~200 (exp) | 3-ph 100 / **meas. ~60** | 3-ph 70 / **meas. ~35–40** | 3-ph almaBTE; meas. Zheng PRMat 3 014601 (2019), κ∝T^−1.2→−1.5 |
 | AlN (c) | 339 (exp+FP) | ~140 (theory-only) | ~95 (theory-only) | Rounds/Slack APEX 11 071001 (2018) + Slack JPCS 48 641 (1987); **no >500 K single-crystal measurement** |
-| β-Ga₂O₃ | [010] 27.0, [100] 10.9, [001] ≈14 (~2.5× anisotropy; Klimm principal-axis λ₂₂ 24.26 concurs) | — (773/1100 K = acquisition G2: Klimm CRT 58 2200204 (2023) paywalled) | — | Guo APL 106 111909 (2015); Wave-2 audit 2026-07-16 |
+| β-Ga₂O₃ | [010] 27.0, [100] 10.9, [001] ≈14 (~2.5× anisotropy; Klimm λ₂₂≡[010] 24.26 and λ₃₃≡[001] 14.09 concur, crystal-physical frame) | [010] ≈9 @773 K, ≈6 @1100 K (derived: Klimm 300 K tensor × its own T^−m, m≈1.0–1.2; ±~20%) | — | Guo APL 106 111909 (2015); Klimm CRT 58 2200204 (2023) open access; Wave-2 audit 2026-07-16 |
 
 **High-field Chynoweth `α_ii=a·exp(−b/E)` + Caughey–Thomas + `κ_BR` (rows 123, 74):**
 

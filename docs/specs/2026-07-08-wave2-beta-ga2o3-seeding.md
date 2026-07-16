@@ -27,8 +27,11 @@ bowing, B3). Diamond battery: landed (gap-audit Phase 3). c-BN / 4H-SiC: Wave 3.
    in `Environment` or `Material`. Cartesian frame for tensors: the RUS elastic frame (x∥a,
    y∥b, z∥c*) — state it wherever a C_ij or ε tensor component is quoted. **Audit finding:
    the Ghosh–Singisetti high-field axes are a / b / c\* (c\* is 13.83° from [001]) — α_ii and
-   E_c rows are tagged c\*, never [001].** Klimm's κ tensor is reported in *principal* axes:
-   only λ₂₂ ≡ [010] is frame-shared with the crystallographic-direction rows.
+   E_c rows are tagged c\*, never [001].** Klimm's κ tensor (full text read post-audit — open
+   access) is in the crystal-physical frame **e₂∥b, e₃∥c, e₁ = a\*** (⊥ c in the ac-plane):
+   λ₂₂ ≡ [010] *and* λ₃₃ ≡ [001] coincide with crystallographic-direction rows; λ₁₁ is along
+   a\* (13.83° from [100]), and the direct plane-normal measurements λ₍₁₀₀₎/λ₍₀₀₁₎ are along
+   a\*/c\* — never relabel those as [100]/[001].
 3. **Gap bookkeeping.** The fundamental gap is *indirect* by a few tens of meV with the direct gap
    at Γ almost degenerate ("quasi-direct"); the *measured absorption onset is
    polarization-dependent* (E∥c ≈ 4.5–4.6 eV, E∥b ≈ 4.8–4.9 eV). Seed the effective RT gap
@@ -103,7 +106,7 @@ C₂₂/C₃₃; C₄₄ vs C₆₆ differ >50% — Born-stability check must us
 | κ[010] (300 K) | 27.0 W/mK | 2.0 | Guo et al. APL 106 111909 (2015), TDTR, 80–495 K, ~1/T^1.1–1.3; Klimm λ₂₂ = 24.26 (principal-axis, laser-flash) concurs ~10% | experimental (TDTR) |
 | κ[100] (300 K) | 10.9 W/mK | 1.0 | Guo 2015; Handwerg SST 30 024006 (2015), 3ω, measured [100] only: 13±1 (audit corrected the earlier "concurs (29/11)" parenthetical — those were not Handwerg values) | experimental |
 | κ[001] (300 K) | 14 W/mK | 1.5 | Guo 2015 Table-I fit (8140/300^1.12 ≈ 13.7; Fig. 2b reads ≈14) — audit corrected from ≈15 | experimental |
-| κ(T) high-T | ~1/T (Umklapp) to ≥495 K; tensor to 1275 K exists | — | Guo 2015; Klimm et al. Cryst. Res. Technol. **58** 2200204 (**2023**), 10.1002/crat.202200204 — 300 K principal-axis tensor pinned (λ₁₁ 12.13 / λ₂₂ 24.26 / λ₃₃ 14.09 / λ₁₃ −0.992); **773/1100 K components paywalled → acquisition item G2** | experimental |
+| κ(T) high-T | ~1/T^m (m≈1.0–1.2) to 1200 K; **derived anchors seeded: κ[010](773 K) ≈ 9 ± 2, κ[010](1100 K) ≈ 6 ± 1.5 W/mK** (λ₂₂(300)=24.26 direct × the paper's own T^−m law) | 2 / 1.5 | Guo 2015; Klimm et al. Cryst. Res. Technol. **58** 2200204 (**2023**), 10.1002/crat.202200204 — **open access (Projekt DEAL; archival copy d-nb.info/1274779782/34), full main text read 2026-07-16 → G2 closed**; 300 K tensor: λ₁₁ 12.13 (a\*) / λ₂₂ 24.26 (b) / λ₃₃ 14.09 (c) / λ₁₃ −0.992; λ₍₀₀₁₎ 13.53 (c\*), λ₍₂̄₀₁₎ 14.33; min ≈11.73 near a; exact per-T SI tables = optional refinement | experimental + derived |
 | Θ_D | 738 K | 150 (literature spread 420–870; central = Guo calorimetric Debye fit; upper endpoint = FP 872 K; lower endpoint unpinned) | Guo 2015; Mengle–Kioupakis 2019 concur ≈738 | mixed |
 | phonon modes | 30 branches (10-atom primitive cell); 12 IR-active modes, TO + directional LO (a/b/c); dominant e-ph (Fröhlich) mode at 29 meV | — | **Mengle & Kioupakis, AIP Advances 9 015313 (2019), Table I** (the KernelExt mode table — pinned at audit; attribution corrected from Ma 2016) | dft-dfpt |
 
@@ -169,8 +172,10 @@ directly. A gate row rides in `polarization-piezoelectric.csv`.*
 AlGaN-analog alloying ((Al_xGa₁₋ₓ)₂O₃) — out of Wave-2 scope, note for a later wave; hole
 transport / hole α_ii — cert-refused (STH), by design; C–T quartet — no consensus fit,
 audit-confirmed genuine (acquisition or fit-from-published-μ(N_D)); Θ_D — genuine literature
-spread, recorded as spread (central 738 K pinned); κ(773/1100 K) anchors — Klimm 2023 covers
-300–1275 K but full text paywalled (**acquisition G2**); Fröhlich multi-mode KernelExt —
+spread, recorded as spread (central 738 K pinned); κ(773/1100 K) anchors — **G2 CLOSED
+2026-07-16** (Klimm 2023 turned out open access via Projekt DEAL; derived [010] anchors
+seeded from its direct 300 K tensor + its own T^−m law; exact SI tables optional); Fröhlich
+multi-mode KernelExt —
 source pinned (Mengle–Kioupakis 2019 Table I), assembly remains research-side; pyro-GaN
 measured value — thin data, stays `dft`-class; e_ij(x) + P_sp bowing numbers — **gated G1**
 (FB erratum + Ebert texts). *Removed from the register at audit:* per-axis ε₀ (pinned to
@@ -189,7 +194,9 @@ JSST 8 Q3083 (2019) and seeded).
 3. ✔ Registry: no new rows — Wave 2 is coefficients + gates (the predicate split landed with
    this spec: `arch-13`, `arch-09 §9.3`, row 128's note).
 4. Open acquisitions (user): **G1** FB Erratum PRB 65 129903 + Ebert PRB 113 (2026) full
-   texts (gates B3); **G2** Klimm CRT 58 2200204 (2023) full text (κ 773/1100 K anchors).
+   texts (gates B3) — both APS-paywalled, no arXiv versions exist (checked 2026-07-16).
+   ~~G2~~ **closed 2026-07-16**: Klimm 2023 is open access (Projekt DEAL; d-nb archival
+   copy); derived κ[010] anchors seeded; exact SI tables remain an optional refinement.
 
 ## §6 Sources (verified this pass)
 

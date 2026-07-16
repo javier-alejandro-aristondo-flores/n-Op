@@ -56,7 +56,8 @@ verdicts plus numeric witnesses for failures.
    `(Property, Material, Environment)`, trips at `|predicted − reference|/σ > 3`
    with the row's provenance).
 9. Surrogate-net validity (for D4 surrogate formulas).
-10. Adjoint-existence at registration (the gate of §11).
+10. Adjoint-existence at registration (the registration-time adjoint gate,
+    `impl-07-residual-factory §7.5`).
 
 Each obligation maps onto a Layer-0 axis (§10), making the cert checkers generic
 functions over the typeclasses.

@@ -203,33 +203,39 @@ metadata the runtime kernel uses for its outputs.
 
 ```
 record ResidualGenerator {
-  name              : Symbol
-  observable        : ObservableRef
-  bundle            : BundleId                 -- B1..B11 or the L1 primitive tag
-                                               --   (impl-04-formulas; facet, not identity)
-  category          : CategoryTag              -- 19 named tags (arch-11-residuals §11.1)
-  layer             : 1..7                     -- compose-time DAG layer (the 7-layer
-                                               --   compute DAG of residual-generator-catalog §2)
-  cost-tier         : T0 | T1 | T2 | T3
-  diff-tag          : D0 | D1 | D2 | D3 | D4
-  dressing-tag      : bare | dressed(scheme: G0W0|SCP-perturbative|LO-TO-NA-correction
-                                             |Born-charge|epsilon-infinity
-                                             |electronic-susceptibility)   -- = the §7.7 OneShotCert schemes
-                      -- provenance label only; not a loss-weighting axis
-  axes              : List<AxisLabel>          -- the dimensions this generator unfolds over
-                                                  (k-point, frequency, atomic pair, shell, …)
-  applicability     : (Crystal, Environment) → Bool
-  input-contract    : {TypedSlot}
-  output-contract   : TypedSlot
-  forward           : Inputs → Output
-  loss-projection   : Output → Map<ResidualKey, Scalar>
-                      -- emits one entry per axis tuple; key is content-addressed (arch-11-residuals)
-  weight-policy     : ConsumedBy(/informed-operator)
-                      -- /physics declares the granularity; aggregation lives downstream
-  sampling-policy   : UniformBatch | RAD(τ) | Importance | ValidationOnly
-  dependencies      : {Symbol}                 -- same-pass fixed-point co-convergence
-  adjoint-cert      : Passed | Failed(witness) | NotApplicable | Relaxed(rationale)
-  registration-hash : ContentAddress           -- cert-tripwire detection
+  name                 : Symbol
+  observable           : ObservableRef
+  bundle               : BundleId                 -- B1..B11 or the L1 primitive tag
+                                                  --   (impl-04-formulas; facet, not identity)
+  category             : CategoryTag              -- 19 named tags (arch-11-residuals §11.1)
+  layer                : 1..7                     -- compose-time DAG layer (the 7-layer
+                                                  --   compute DAG of residual-generator-catalog §2)
+  cost-tier            : T0 | T1 | T2 | T3
+  diff-tag             : D0 | D1 | D2 | D3 | D4
+  dressing-tag         : bare | dressed(scheme: G0W0|SCP-perturbative|LO-TO-NA-correction
+                                                |Born-charge|epsilon-infinity
+                                                |electronic-susceptibility)   -- = the §7.7 OneShotCert schemes
+                         -- provenance label only; not a loss-weighting axis
+  characteristic-scale : σ                        -- declared accuracy scale of the observable
+                                                  --   (a Quantity in its units), seeded from the
+                                                  --   accuracy ledger (arch-11-residuals §11.7,
+                                                  --   docs/accuracy-ledger.md); the error-model
+                                                  --   input to Quantity.combineTol — never a
+                                                  --   fitted weight
+  axes                 : List<AxisLabel>          -- the dimensions this generator unfolds over
+                                                     (k-point, frequency, atomic pair, shell, …)
+  applicability        : (Crystal, Environment) → Bool
+  input-contract       : {TypedSlot}
+  output-contract      : TypedSlot
+  forward              : Inputs → Output
+  loss-projection      : Output → Map<ResidualKey, Scalar>
+                         -- emits one entry per axis tuple; key is content-addressed (arch-11-residuals)
+  weight-policy        : ConsumedBy(/informed-operator)
+                         -- /physics declares the granularity; aggregation lives downstream
+  sampling-policy      : UniformBatch | RAD(τ) | Importance | ValidationOnly
+  dependencies         : {Symbol}                 -- same-pass fixed-point co-convergence
+  adjoint-cert         : Passed | Failed(witness) | NotApplicable | Relaxed(rationale)
+  registration-hash    : ContentAddress           -- cert-tripwire detection
 }
 ```
 

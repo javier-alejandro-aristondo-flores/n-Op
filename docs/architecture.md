@@ -1315,8 +1315,8 @@ closed-form choice accurate enough?" is answerable *by the system*, not only by
 external judgment.
 
 The MVP headline design-grade targets (gap ±0.15 eV post-G₀W₀, C_ij ±5%, κ(300 K)
-±20%, E_form ±0.2 eV, μ factor-2) and the full 52-observable ledger live in
-`docs/accuracy-ledger.md`; the reference battery (cert obligation 4, `arch-12 §12.1`)
+±20%, E_form ±0.2 eV, μ factor-2) and the full ledger (59 ledger-tracked
+observables) live in `docs/accuracy-ledger.md`; the reference battery (cert obligation 4, `arch-12 §12.1`)
 checks them at the MVP anchors. Every numeric tolerance named across `/physics`
 (`τ_adj`, `δ_sym`, `δ_PSD`, `τ_SCF,*`, `τ_L3L4`, `τ_equiv`, `τ_method`, `δ_meta`,
 `δ_surrogate`) is valued once in the
@@ -1348,7 +1348,8 @@ verdicts plus numeric witnesses for failures.
    `(Property, Material, Environment)`, trips at `|predicted − reference|/σ > 3`
    with the row's provenance).
 9. Surrogate-net validity (for D4 surrogate formulas).
-10. Adjoint-existence at registration (the gate of §11).
+10. Adjoint-existence at registration (the registration-time adjoint gate,
+    `impl-07-residual-factory §7.5`).
 
 Each obligation maps onto a Layer-0 axis (§10), making the cert checkers generic
 functions over the typeclasses.

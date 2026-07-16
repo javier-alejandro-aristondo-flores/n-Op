@@ -130,7 +130,7 @@ stability; one heterostructure check (c-BN on diamond) via lattice matching.*
 
 **In the MVP**
 - ~30 named formulas (the rows above, incl. the κ high-T siblings 121–122) of the 132.
-- 9 of the 12 methods (all but `path-search` and `statistical-sampling`, with
+- 10 of the 12 methods (all but `path-search` and `statistical-sampling`, with
   `convex-optimization` used only for the hull check — chemical/MC machinery is
   not on the diamond path).
 - ~10 templates of the 20.

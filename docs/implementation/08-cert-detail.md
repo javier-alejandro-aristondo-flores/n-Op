@@ -28,7 +28,7 @@ Layer-0 axis, so its checker is a generic function over a typeclass:
 | 7 boundary correspondence | `DiscreteStructure` morphism: observed boundary-band count matches `(X_BS_generator, orientation) → multiplicity` |
 | 8 reference-battery-versioned | versioning discipline on obligation 4; per-entry provenance; trips at >3σ |
 | 9 surrogate-net validity | for D4: declared input domain contains the query, surrogate uncertainty below tolerance, refresh up to date |
-| 10 adjoint-existence at registration | the §8 gate; enforced at registration, not prediction |
+| 10 adjoint-existence at registration | the `impl-07-residual-factory §7.5` gate; enforced at registration, not prediction |
 
 The certificate is an inert s-expression carrying scalar verdicts plus numeric
 witnesses for failures; its schema is the cross-workstream contract, with a

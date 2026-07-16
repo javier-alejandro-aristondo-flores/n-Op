@@ -1332,8 +1332,8 @@ closed-form choice accurate enough?" is answerable *by the system*, not only by
 external judgment.
 
 The MVP headline design-grade targets (gap ±0.15 eV post-G₀W₀, C_ij ±5%, κ(300 K)
-±20%, E_form ±0.2 eV, μ factor-2) and the full 52-observable ledger live in
-`docs/accuracy-ledger.md`; the reference battery (cert obligation 4, `arch-12 §12.1`)
+±20%, E_form ±0.2 eV, μ factor-2) and the full ledger (59 ledger-tracked
+observables) live in `docs/accuracy-ledger.md`; the reference battery (cert obligation 4, `arch-12 §12.1`)
 checks them at the MVP anchors. Every numeric tolerance named across `/physics`
 (`τ_adj`, `δ_sym`, `δ_PSD`, `τ_SCF,*`, `τ_L3L4`, `τ_equiv`, `τ_method`, `δ_meta`,
 `δ_surrogate`) is valued once in the
@@ -1365,7 +1365,8 @@ verdicts plus numeric witnesses for failures.
    `(Property, Material, Environment)`, trips at `|predicted − reference|/σ > 3`
    with the row's provenance).
 9. Surrogate-net validity (for D4 surrogate formulas).
-10. Adjoint-existence at registration (the gate of §11).
+10. Adjoint-existence at registration (the registration-time adjoint gate,
+    `impl-07-residual-factory §7.5`).
 
 Each obligation maps onto a Layer-0 axis (§10), making the cert checkers generic
 functions over the typeclasses.
@@ -3850,33 +3851,39 @@ metadata the runtime kernel uses for its outputs.
 
 ```
 record ResidualGenerator {
-  name              : Symbol
-  observable        : ObservableRef
-  bundle            : BundleId                 -- B1..B11 or the L1 primitive tag
-                                               --   (impl-04-formulas; facet, not identity)
-  category          : CategoryTag              -- 19 named tags (arch-11-residuals §11.1)
-  layer             : 1..7                     -- compose-time DAG layer (the 7-layer
-                                               --   compute DAG of residual-generator-catalog §2)
-  cost-tier         : T0 | T1 | T2 | T3
-  diff-tag          : D0 | D1 | D2 | D3 | D4
-  dressing-tag      : bare | dressed(scheme: G0W0|SCP-perturbative|LO-TO-NA-correction
-                                             |Born-charge|epsilon-infinity
-                                             |electronic-susceptibility)   -- = the §7.7 OneShotCert schemes
-                      -- provenance label only; not a loss-weighting axis
-  axes              : List<AxisLabel>          -- the dimensions this generator unfolds over
-                                                  (k-point, frequency, atomic pair, shell, …)
-  applicability     : (Crystal, Environment) → Bool
-  input-contract    : {TypedSlot}
-  output-contract   : TypedSlot
-  forward           : Inputs → Output
-  loss-projection   : Output → Map<ResidualKey, Scalar>
-                      -- emits one entry per axis tuple; key is content-addressed (arch-11-residuals)
-  weight-policy     : ConsumedBy(/informed-operator)
-                      -- /physics declares the granularity; aggregation lives downstream
-  sampling-policy   : UniformBatch | RAD(τ) | Importance | ValidationOnly
-  dependencies      : {Symbol}                 -- same-pass fixed-point co-convergence
-  adjoint-cert      : Passed | Failed(witness) | NotApplicable | Relaxed(rationale)
-  registration-hash : ContentAddress           -- cert-tripwire detection
+  name                 : Symbol
+  observable           : ObservableRef
+  bundle               : BundleId                 -- B1..B11 or the L1 primitive tag
+                                                  --   (impl-04-formulas; facet, not identity)
+  category             : CategoryTag              -- 19 named tags (arch-11-residuals §11.1)
+  layer                : 1..7                     -- compose-time DAG layer (the 7-layer
+                                                  --   compute DAG of residual-generator-catalog §2)
+  cost-tier            : T0 | T1 | T2 | T3
+  diff-tag             : D0 | D1 | D2 | D3 | D4
+  dressing-tag         : bare | dressed(scheme: G0W0|SCP-perturbative|LO-TO-NA-correction
+                                                |Born-charge|epsilon-infinity
+                                                |electronic-susceptibility)   -- = the §7.7 OneShotCert schemes
+                         -- provenance label only; not a loss-weighting axis
+  characteristic-scale : σ                        -- declared accuracy scale of the observable
+                                                  --   (a Quantity in its units), seeded from the
+                                                  --   accuracy ledger (arch-11-residuals §11.7,
+                                                  --   docs/accuracy-ledger.md); the error-model
+                                                  --   input to Quantity.combineTol — never a
+                                                  --   fitted weight
+  axes                 : List<AxisLabel>          -- the dimensions this generator unfolds over
+                                                     (k-point, frequency, atomic pair, shell, …)
+  applicability        : (Crystal, Environment) → Bool
+  input-contract       : {TypedSlot}
+  output-contract      : TypedSlot
+  forward              : Inputs → Output
+  loss-projection      : Output → Map<ResidualKey, Scalar>
+                         -- emits one entry per axis tuple; key is content-addressed (arch-11-residuals)
+  weight-policy        : ConsumedBy(/informed-operator)
+                         -- /physics declares the granularity; aggregation lives downstream
+  sampling-policy      : UniformBatch | RAD(τ) | Importance | ValidationOnly
+  dependencies         : {Symbol}                 -- same-pass fixed-point co-convergence
+  adjoint-cert         : Passed | Failed(witness) | NotApplicable | Relaxed(rationale)
+  registration-hash    : ContentAddress           -- cert-tripwire detection
 }
 ```
 
@@ -4029,7 +4036,7 @@ Layer-0 axis, so its checker is a generic function over a typeclass:
 | 7 boundary correspondence | `DiscreteStructure` morphism: observed boundary-band count matches `(X_BS_generator, orientation) → multiplicity` |
 | 8 reference-battery-versioned | versioning discipline on obligation 4; per-entry provenance; trips at >3σ |
 | 9 surrogate-net validity | for D4: declared input domain contains the query, surrogate uncertainty below tolerance, refresh up to date |
-| 10 adjoint-existence at registration | the §8 gate; enforced at registration, not prediction |
+| 10 adjoint-existence at registration | the `impl-07-residual-factory §7.5` gate; enforced at registration, not prediction |
 
 The certificate is an inert s-expression carrying scalar verdicts plus numeric
 witnesses for failures; its schema is the cross-workstream contract, with a
@@ -4342,7 +4349,7 @@ stability; one heterostructure check (c-BN on diamond) via lattice matching.*
 
 **In the MVP**
 - ~30 named formulas (the rows above, incl. the κ high-T siblings 121–122) of the 132.
-- 9 of the 12 methods (all but `path-search` and `statistical-sampling`, with
+- 10 of the 12 methods (all but `path-search` and `statistical-sampling`, with
   `convex-optimization` used only for the hull check — chemical/MC machinery is
   not on the diamond path).
 - ~10 templates of the 20.

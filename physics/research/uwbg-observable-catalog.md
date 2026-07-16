@@ -245,20 +245,20 @@ The user already confirmed strongly-correlated systems are out. Beyond that, the
 
 ## Summary of registry gaps flagged for architecture amendment
 
-Observables/residuals that the current closed registry (12 methods × 12 templates × 24 formulas) does **not** appear to cover and that subsequent streams must decide to add or document-as-skipped:
+Observables/residuals that the closed registry as of this catalog's first draft (then 12 methods × 12 templates × 24 formulas; since grown to 12 methods + 3 sub-methods, 20 templates, and 132 substantive formulas — `arch-09-vocabularies §9.3`) did **not** cover, and that downstream streams had to add or document-as-skipped. Kept as the scoping record; each bullet carries its disposition:
 
 - **MC-transport / full-band Monte Carlo template** — needed for 18 and 49; for 19 the cheap Chynoweth/avalanche path landed (registry rows 74–75, 123) and MC remains the *faithful anchor source* for α_ii (ledger σ ≥×3; EDF-tail anchors absent).
-- **Multiphonon emission / Huang-Rhys / Marcus-crossing formula** — needed for 29 (capture cross-section).
-- **Reaction-rate / Eyring template** with finite-T transition-state — needed for 46, 47, possibly 50.
-- **Master-equation / kinetic network template** — needed for 51, hot-carrier-driven degradation.
-- **Continuum-PDE template** (heat equation, elastic eigenproblem) for device-scale 41, 48 — currently the registry is atomic-scale; bridging to device-scale is its own decision.
-- **NEGF template** for 31, 34 (interface barriers, tunneling) — Bardeen-MIGS alone is insufficient.
-- **4-phonon scattering vertex** — needed for κ in diamond above ~800 K.
-- **Self-consistent phonon / SSCHA** for non-diamond materials at ≥500°C where QHA fails.
+- **Multiphonon emission / Huang-Rhys / Marcus-crossing formula** — needed for 29 (capture cross-section) → landed: registry rows 40–41 (multiphonon-emission-capture, huang-rhys-factor).
+- **Reaction-rate / Eyring template** with finite-T transition-state — needed for 46, 47, possibly 50 → landed: registry rows 109–110 (air-oxidation-rate-eyring, hydrogen-desorption-rate-eyring).
+- **Master-equation / kinetic network template** — needed for 51, hot-carrier-driven degradation → landed: registry rows 105–108 (the slow-tier kinetic network); the hot-f-tail *driver* remains outside (the #49 EDF-tail corner, cert-refused).
+- **Continuum-PDE template** (heat equation, elastic eigenproblem) for device-scale 41, 48 — the registry was then purely atomic-scale → 48 landed: registry rows 70–71 (self-heating-T_op, coupled-em-thermal-pde-residual); 41 (device-scale resonant modes) remains outside.
+- **NEGF template** for 31, 34 (interface barriers, tunneling) — Bardeen-MIGS alone is insufficient → landed: registry row 80 (NEGF-transmission); the direct tunneling-current family landed as rows 76–79 (kane-zener, fowler-nordheim, richardson-dushman, padovani-stratton).
+- **4-phonon scattering vertex** — needed for κ in diamond above ~800 K → landed: registry row 121 (kappa-4phonon-high-t-correction).
+- **Self-consistent phonon / SSCHA** for non-diamond materials at ≥500°C where QHA fails → landed: registry row 13 (SCPH-self-consistent-phonons; live solve V2 per arch-17).
 - **Berry-phase polarization** template for 35 (likely already present implicitly via DFPT; flag for confirmation → landed: registry rows 113–119 (+128 pyroelectric)).
-- **Surface thermodynamic-ensemble** machinery for terminations (combination of MaxEnt-statistics + reaction-rate).
+- **Surface thermodynamic-ensemble** machinery for terminations (combination of MaxEnt-statistics + reaction-rate) → landed: registry rows 44, 46 (surface-grand-potential-γ, termination-stability-window).
 
-These gaps are the most important input for Streams S2–S5: each gap represents a decision point of "add this machinery / accept reduced accuracy in this observable / mark this observable as cheap-only with no faithful residual."
+These gaps were the primary scoping input for the amendment streams; each represented a decision point of "add this machinery / accept reduced accuracy in this observable / mark this observable as cheap-only with no faithful residual." All have since been dispositioned as annotated above — added to the registry, V2-deferred, or documented as remaining outside (#18/#49 full-band MC and the hot-carrier EDF tail, #41 device-scale resonant modes, full cascade dynamics).
 
 ---
 
@@ -268,6 +268,12 @@ These gaps are the most important input for Streams S2–S5: each gap represents
 
 ## Changelog
 
+- **2026-07-16 (cert round 1):** Part-F gap-summary brought to current truth: the live-tense
+  framing line ("the current closed registry (12 methods × 12 templates × 24 formulas)") became
+  a dated scoping record carrying the current counts, and the summary bullets received the same
+  landing-row dispositions the Part A–E flags already carry (rows 40–41, 109–110, 105–108,
+  70–71, 76–80, 121, 13, 44/46); closing line reworded past-tense with the still-outside list
+  (#18/#49, #41, cascade dynamics).
 - **2026-07-16 (strata rewrite):** status banner converted to this changelog and its content
   applied inline:
   - Part E QHA row: AlN Θ_D **~1150 K → ~1000 K** `[Wave-1 A10]`

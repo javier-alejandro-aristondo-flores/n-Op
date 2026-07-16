@@ -2402,7 +2402,7 @@ The principled template set (~15 rows) is the `mechanism_range` table of
 §19.10 — which now includes the **piezoelectric acoustic** channel
 (`LongRangeStatic(1)`, `1/q` pole) alongside the Fröhlich (`1/q²`) one, the second
 long-range e-ph mechanism the polar III-N members carry (`is-polar-material`-gated;
-inert for diamond). This **closes `arch-18-open-decisions §7`**.
+inert for diamond). This **closed the former arch-18 coupling-channel coverage-policy item** (now recorded under `[arch-18-open-decisions]` Closed decisions).
 
 ## 19.10 Mechanism range and polynomial sufficiency
 
@@ -2875,7 +2875,7 @@ re-canonicalization at migration boundaries.
 `arch-04-state` lists *defect populations* and *distributions* among quantities that are
 "emergent — coarse-grainings of `x(t)`" and therefore forbidden from the state, justified by a
 constraint-manifold / integration pathology. That classification is too strong: it
-contradicts `arch-08-bo-levels:47` ("each level introduces its own irreducible state; L4 =
+contradicts `[arch-08-bo-levels]` (L4) ("each level introduces its own irreducible state; L4 =
 distributions over phase space"), and it forbids exactly the physics the project exists to
 predict — aging and device-scale operation.
 
@@ -2889,9 +2889,9 @@ function of the micro 7-tuple within the micro relaxation time. Two classes of q
 - **Slow / history-dependent** (different *timescale*): defect-population concentrations,
   charge-state distributions, H content, oxidation/carbide fronts — at the micro timescale they
   are *frozen* (they evolve over hours–years, set by Arrhenius barriers of 2–7 eV) and carry the
-  integrated thermal/irradiation history (`defects-surfaces-interfaces.md:54`:
+  integrated thermal/irradiation history (`defects-surfaces-interfaces.md` Part A.4:
   "treat `[V_C]` as a state variable … evolving by generation–annihilation kinetics, not an
-  equilibrium quantity"; `csp-heterostructure.md:206` E.1 requires distinguishing equilibrium
+  equilibrium quantity"; `csp-heterostructure.md` Part E.1/E.2 requires distinguishing equilibrium
   from frozen-in populations — meaningful only if frozen-in is stored).
 - **Homogenized / device-scale** (different *scale*): the continuum fields `T_L(r), φ(r),
   n(r), p(r), j(r)` on a device mesh — not derivable from a single unit cell.
@@ -2917,8 +2917,8 @@ drifts under *time-averaged* micro quantities `⟨micro⟩_τ` (slow, §21.5) or
 *homogenized coefficients* the micro tier supplies (macro, §21.8). In `arch-08-bo-levels`
 terms: the slow tier is a configurational layer above L4; the macro tier is **L4's spatial
 fluid-limit reduction** (the drift-diffusion / Poisson system as the BTE fluid limit,
-`group-C…md:92-104`) lifted from one cell to a device mesh — which is the "irreducible state"
-`arch-08:47` already attributes to L4. `/physics` **scores** each tier's law-violation; the PINO
+`group-C-transport-thermo-chemical.md` §1.1) lifted from one cell to a device mesh — which is the "irreducible state"
+`[arch-08-bo-levels]` already attributes to L4. `/physics` **scores** each tier's law-violation; the PINO
 supplies each tier's trajectory (score-not-solve, `arch-16-pino-bridge`, preserved at every
 scale). No new computational *method* is introduced: the slow tier reuses `kinetic-evolution`
 (`arch-09 §9.1`); the macro tier reuses the device-PDE residual pattern (row 71).
@@ -2931,7 +2931,7 @@ scale). No new computational *method* is introduced: the slow tier reuses `kinet
 
 A closed C1 vocabulary `DefectSpecies` as a `Universe[T]` instance (`arch-20 §20.1, §20.3`;
 `carrier_kind = Closed`, `ordinal_policy = DenseU32`). Its enumerator is the per-host native
-defect inventory of `defects-surfaces-interfaces.md:9–18` (Part A.1):
+defect inventory of `defects-surfaces-interfaces.md` Part A.1:
 
 | Host | `DefectSpecies` members | charge states `q` |
 |---|---|---|
@@ -2942,7 +2942,7 @@ defect inventory of `defects-surfaces-interfaces.md:9–18` (Part A.1):
 | β-Ga₂O₃ | `V_O(I/II/III)`, `V_Ga(1/2)`, `Ga_i`, `V_Ga–Ga_i–V_Ga`, `V_O–H`, `V_Ga–nH` | `V_O` deep |
 
 Element type carries the Part-A.2 record `{name, site : LatticeSite, charge_states : List[Int],
-spin}` (`defects…md:24–27`). Adding a member is a versioned `schema_version` bump
+spin}` (`defects-surfaces-interfaces.md` Part A.2). Adding a member is a versioned `schema_version` bump
 (`arch-20 §20.9`), exactly like the theory-context vocabularies (`arch-09 §9.7`).
 
 ### 21.2.2 The slow-state value (fiber over `DefectSpecies`)
@@ -2952,19 +2952,19 @@ branching 32, stage-visible; `arch-20 §20.3`), **not** part of `ResidualKey` id
 
 | Field | Type / units | Index | Source |
 |---|---|---|---|
-| `conc[D,q]` ≔ `[D]^q` | `Concentration` (cm⁻³) ≥ 0 | `DefectSpecies × ChargeState` | A.3 `defects…md:38–48` |
-| `charge_dist[D]` ≔ `{f_q}` | `Simplex` over `q`, `Σ_q f_q = 1` | `DefectSpecies → Simplex` | A.3 `defects…md:44–48` |
-| `H_content` ≔ `[H]` | `Concentration` (cm⁻³) ≥ 0 | scalar / region | G.2 `defects…md:408–421` |
-| `oxide_front` ≔ `x_ox` | `Length` (nm) ≥ 0 | scalar / facet | #46 `catalog…md:147` |
-| `carbide_thickness` ≔ `x_carbide` | `Length` (nm) ≥ 0 | `MetalContact` | F.5 `defects…md:364–376` |
-| `dislocation_density` ≔ `ρ_dis` | `Length⁻²` (cm⁻²) ≥ 0 | scalar / region | G.7 `defects…md:460–468` |
+| `conc[D,q]` ≔ `[D]^q` | `Concentration` (cm⁻³) ≥ 0 | `DefectSpecies × ChargeState` | `defects-surfaces-interfaces.md` Part A.3 |
+| `charge_dist[D]` ≔ `{f_q}` | `Simplex` over `q`, `Σ_q f_q = 1` | `DefectSpecies → Simplex` | `defects-surfaces-interfaces.md` Part A.3 |
+| `H_content` ≔ `[H]` | `Concentration` (cm⁻³) ≥ 0 | scalar / region | `defects-surfaces-interfaces.md` Part G.2 |
+| `oxide_front` ≔ `x_ox` | `Length` (nm) ≥ 0 | scalar / facet | `uwbg-observable-catalog.md` #46 |
+| `carbide_thickness` ≔ `x_carbide` | `Length` (nm) ≥ 0 | `MetalContact` | `defects-surfaces-interfaces.md` Part F.5 |
+| `dislocation_density` ≔ `ρ_dis` | `Length⁻²` (cm⁻²) ≥ 0 | scalar / region | `defects-surfaces-interfaces.md` Part G.7 |
 
 `ChargeState` reuses the existing `SubDofTag = charge` already allowed on `Z_I`
 (`arch-09 §9.6`); `charge_dist[D]` is its dynamic refinement.
 
 **Relation to `SiteDecoration.occupancy` and `Z_I` (decision).** The slow fiber is a **new C3
 fiber that is the dynamic promotion of `SiteDecoration.occupancy`**, **not** a mutation of `Z_I`:
-(1) `Z_I` stays immutable (`arch-04-state:26`); atomic-number identity does not change as a
+(1) `Z_I` stays immutable (`[arch-04-state]`); atomic-number identity does not change as a
 vacancy forms. (2) `occupancy` is the right physical quantity (a vacancy is `occupancy→0`); the
 static `SiteDecoration.occupancy` becomes the **initial condition** `s(t=0)` (the as-synthesized
 / frozen-in population). (3) Tier hygiene: as a separate adiabatic-parameter fiber at a different
@@ -2975,50 +2975,50 @@ no-emergent-state rule was protecting, now satisfied honestly. The slow fiber dr
 ## 21.3 Slow-kinetic formulas (Part-G / Part-H → registry)
 
 Every process is a new `FormulaRecord`; all Arrhenius rates use `rate = ν₀·exp(−E_a/kT)`
-(`defects…md:392`); each names the `kinetic-evolution` sub-method it instantiates. CSV rows in
+(`defects-surfaces-interfaces.md` Part G); each names the `kinetic-evolution` sub-method it instantiates. CSV rows in
 §21.13. **No new method or sub-method is introduced.**
 
 - **F-G1 `vacancy-generation-arrhenius`** — `([V]^q,T,μ,j,x_ox',ρ_dis,k_ann) → d[V]^q/dt`
-  (cm⁻³s⁻¹), `defects…md:399–406`:
+  (cm⁻³s⁻¹), `defects-surfaces-interfaces.md` Part G.1:
   `d[V]/dt = G_total − [V]·k_ann`, `G_total = G_thermal + G_irradiation + G_interface`;
   `G_thermal = ν₀ exp(−E_form^V/kT)·N_site`; `G_interface = ξ_int·(dx_ox/dt + dx_carbide/dt)·N_site,int`;
   `G_irradiation` from F-H2; `k_ann = ν₀ exp(−E_migr^V/kT)`. Diamond `V_C`: `E_form≈7.2 eV`
   (HSE06), so `G_thermal(773 K)` is negligible — **the 500 °C generation budget is dominated by
-  `G_interface` + `G_irradiation`**. Annihilation barriers (`defects…md:58–66`): `V_C^0` 2.3 eV,
+  `G_interface` + `G_irradiation`**. Annihilation barriers (`defects-surfaces-interfaces.md` Part A.5): `V_C^0` 2.3 eV,
   `V_C^−` 2.8 eV, `C_i` 1.6–1.7 eV, `V_N(GaN)` 2.6 eV, `V_Ga(GaN)` 1.9 eV, `V_O(Ga₂O₃)` 1.9–2.4 eV,
   `V_Al(AlN)` 3.4 eV. T0/D1; sub-method `master-equation`; B11/B4.
 - **F-G2 `hydrogen-redistribution-drift-diffusion`** — `([H](r),T,E,μ_drift) → ∂[H]/∂t`,
-  `defects…md:410–412`: `∂C/∂t = ∇·(D(T)∇C) − ∇·(μ_drift C E)`, `D(T)=D₀exp(−E_diff/kT)`. Diamond
+  `defects-surfaces-interfaces.md` Part G.2: `∂C/∂t = ∇·(D(T)∇C) − ∇·(μ_drift C E)`, `D(T)=D₀exp(−E_diff/kT)`. Diamond
   H interstitial `E_diff=1.7 eV`, `D(500 °C)≈1e−13 cm²/s` (~1 mm profile shift in 1000 h). T3/D3;
   `drift-diffusion`; B11/B5.
 - **F-G3 `platelet-nucleation-allen-cahn`** — `([platelet],[N_s],T) → d[platelet]/dt`,
-  `defects…md:425–428`: `k_nuc[N_s]² − k_dis[platelet]`, `k_nuc=ν₀exp(−E_nuc/kT)`, `E_nuc≈3.5 eV`.
+  `defects-surfaces-interfaces.md` Part G.3: `k_nuc[N_s]² − k_dis[platelet]`, `k_nuc=ν₀exp(−E_nuc/kT)`, `E_nuc≈3.5 eV`.
   Half-life `N_s→N₂A` ≈ years@500 °C, hours@1000 °C. T1/D2; `Allen-Cahn`; B11/B4.
 - **F-G4 `vibration-induced-vacancy-generation`** — `(ρ_dis,σ_stress,f_vib,v_dis,b) →
-  (dρ_dis/dt, G_V)`, `defects…md:462–468`: `dρ_dis/dt = κ_vib(σ_stress/σ_yield)^m f_vib`, `m≈4–6`;
+  (dρ_dis/dt, G_V)`, `defects-surfaces-interfaces.md` Part G.7: `dρ_dis/dt = κ_vib(σ_stress/σ_yield)^m f_vib`, `m≈4–6`;
   `G_V = ξ·ρ_dis·v_dis·b`. T1/D1; `master-equation`; B11; `G_V` feeds F-G1's source.
 - **F-F5 `carbide-growth-parabolic`** — **exists (row 81)**; re-tagged so its output `x_carbide`
   is a slow-state field. `x_carbide=√(2 k_carb(T) t)`, `k_carb=k₀exp(−E_carb/kT)`
-  (`defects…md:367–369`): Ti 1.4 eV (~600 nm/1000 h@500 °C, severe), W 2.4 eV (~3 nm), Mo 2.1 eV
+  (`defects-surfaces-interfaces.md` Part F.5): Ti 1.4 eV (~600 nm/1000 h@500 °C, severe), W 2.4 eV (~3 nm), Mo 2.1 eV
   (~15 nm), Pt none. `master-equation` front-advance `dx/dt = k_carb/x`. B11/B6.
-- **F-46 `air-oxidation-rate-eyring`** — `(T,p_O2,ΔG‡,ν) → dx_ox/dt`, `catalog…md:147` (#46):
+- **F-46 `air-oxidation-rate-eyring`** — `(T,p_O2,ΔG‡,ν) → dx_ox/dt`, `uwbg-observable-catalog.md` #46:
   `r_ox = ν·exp(−ΔG‡/kT)` (Eyring; cheap = Arrhenius). Diamond onset **>600 °C, "the lifetime
   limiter"**; accuracy factor ~3. T0/D1; `master-equation`; B11/B5. *(Research-flagged: #46 marked
   "OUTSIDE registry unless reaction-rate template present"; satisfied by `kinetic-evolution`.)*
-- **F-47 `hydrogen-desorption-rate-eyring`** — `(T,E_des,ν) → r_H`, `catalog…md:148` (#47):
+- **F-47 `hydrogen-desorption-rate-eyring`** — `(T,E_des,ν) → r_H`, `uwbg-observable-catalog.md` #47:
   `r_H = ν·exp(−E_des/kT)`, `E_des≈3.8 eV` (H–C bond). Drives the irreversible χ shift
   (NEA→PEA); desorbs 700–900 °C; accuracy factor ~2. T0/D1; `master-equation`; B11/B5.
-- **F-H1 `nrt-displacements`** — `(T_dam,E_d) → N_d`, `non-eq…md:367` (H.1):
+- **F-H1 `nrt-displacements`** — `(T_dam,E_d) → N_d`, `non-equilibrium-high-field.md` Part H.1:
   `N_d = 0.8·T_dam/(2·E_d)`. `E_d`: diamond ~37–50 eV, GaN ~20 eV, Ga₂O₃ ~25 eV, AlN ~35 eV.
   T0/D1; `algebraic-of`; B11/B4; feeds F-H2.
-- **F-H2 `frenkel-pair-yield`** — `(N_d,Σ_d,Φ_dose,η_recomb) → DefectDensity`, `non-eq…md:371`:
+- **F-H2 `frenkel-pair-yield`** — `(N_d,Σ_d,Φ_dose,η_recomb) → DefectDensity`, `non-equilibrium-high-field.md` Part H.2:
   `[V]_irr = Φ_dose·Σ_d·N_d·(1−η_recomb)` (cm⁻³), where the **macroscopic displacement cross-section**
   `Σ_d = N_atom·σ_d` (cm⁻¹) supplies the missing length⁻¹ so the product of `N_d` (displacements
   per PKA, dimensionless), `Σ_d` (cm⁻¹) and the fluence `Φ_dose` (cm⁻²) is a `Concentration`
   (cm⁻³) — without `Σ_d` the bare `N_d·(1−η)·Φ_dose` is cm⁻² (a fluence), not a density. `σ_d` is
   the per-`(host, particle-type, energy)` NIEL-derived displacement cross-section, one curated
   `ProvenanceLedger` coefficient (`arch-19-coupling-structure §19.8`). T0/D1; `master-equation`;
-  B11/B4; this is `G_irradiation` of F-G1. *(Research-flagged: `non-eq…md:361`/`catalog…md:232`
+  B11/B4; this is `G_irradiation` of F-G1. *(Research-flagged: `non-equilibrium-high-field.md` Part H / `uwbg-observable-catalog.md` Part F
   mark full cascade dynamics out-of-scope; `η_recomb(T_L)` and `σ_d` have **no closed form in the
   corpus** — only the coupling structure + the curated-coefficient slot are specified, not
   invented.)*
@@ -3042,7 +3042,7 @@ weightable `ResidualLeaf` per `(species, charge, site)` (`arch-11 §11.2–§11.
 preaggregation. `ResidualKey = (Method(kinetic-evolution), axes)`; facets `(EOM/DefectPopulation,
 B11, bare)`. The PINO predicts the aging trajectory `{s(t_0),s(t_1),…}`; `/physics` scores the
 finite-difference `ds/dt` against the §21.3 RHS at each step — a consistent aging curve drives
-the residual → 0. This is `csp…md:195` `R_ThermalCycleStability`'s population-drift residual
+the residual → 0. This is `csp-heterostructure.md` Part E.1 `R_ThermalCycleStability`'s population-drift residual
 promoted to first-class. Curriculum: **Refine** `[0.10, 0.60)` with the other `EOM/*`.
 
 ## 21.5 The adiabatic driving contract (slow ← ⟨micro⟩)
@@ -3051,11 +3051,11 @@ Each slow rate is parameterized by **time-averaged** micro quantities `⟨·⟩_
 
 | Slow rate | Driven by `⟨micro⟩_τ` | Cite |
 |---|---|---|
-| `G_irradiation` (F-G1, F-H2) | carrier/ion flux `⟨j⟩` | `defects…md:403–406` |
-| all Arrhenius rates | lattice temperature `⟨T_L⟩` in every `exp(−E_a/kT)` | `defects…md:392`; self-heating from micro |
-| `G_interface` (F-G1) | oxidation/carbide front velocity `dx_ox/dt`, `dx_carbide/dt` | `defects…md:404` |
-| `G_V` (F-G4)→F-G1 | dislocation density/velocity `⟨ρ_dis⟩`, `v_dis` | `defects…md:467` |
-| `[H]` drift (F-G2) | internal field `⟨E⟩` | `defects…md:412` |
+| `G_irradiation` (F-G1, F-H2) | carrier/ion flux `⟨j⟩` | `defects-surfaces-interfaces.md` Part G.1 |
+| all Arrhenius rates | lattice temperature `⟨T_L⟩` in every `exp(−E_a/kT)` | `defects-surfaces-interfaces.md` Part G; self-heating from micro |
+| `G_interface` (F-G1) | oxidation/carbide front velocity `dx_ox/dt`, `dx_carbide/dt` | `defects-surfaces-interfaces.md` Part G.1 |
+| `G_V` (F-G4)→F-G1 | dislocation density/velocity `⟨ρ_dis⟩`, `v_dis` | `defects-surfaces-interfaces.md` Part G.7 |
+| `[H]` drift (F-G2) | internal field `⟨E⟩` | `defects-surfaces-interfaces.md` Part G.2 |
 
 ```
 d s/dt = Φ_kinetic( s ; ⟨T_L⟩_τ, ⟨j⟩_τ, ⟨E⟩_τ, ⟨ρ_dis⟩_τ, dx_ox/dt, dx_carbide/dt ; Environment )
@@ -3064,7 +3064,7 @@ d s/dt = Φ_kinetic( s ; ⟨T_L⟩_τ, ⟨j⟩_τ, ⟨E⟩_τ, ⟨ρ_dis⟩_τ, 
 The reverse coupling (slow → micro) is the adiabatic-parameter dependence: micro
 `E_form^q(E_F(T))`, trap density `N_T = [D]`, χ(T,t), and gap/mobility read the *current* `s` as
 a fixed parameter — the `SelfConsistentChargeBalanceOf` closure (`arch-09 §9.2`) consuming the
-slow defect list (SRH `τ_n = 1/(σ_n v_th N_T)`, `defects…md:201,248`).
+slow defect list (SRH `τ_n = 1/(σ_n v_th N_T)`, `defects-surfaces-interfaces.md` Part D.1/D.4).
 
 ---
 
@@ -3084,7 +3084,7 @@ share unchanged cells by address (`MerkleDAG diff = O(changed frontier)`).
 coefficients (§21.8). The mesh is **conservative** (face flux out of `c` = flux into its
 neighbor) so the `Conservation` residual (`arch-11 §11.1` cat. 9) holds discretely.
 
-**Relation to `arch-18 §2`.** The macro tier **subsumes and narrows** the deferred "PDE-mesh
+**Relation to the `[arch-18-open-decisions]` PDE-mesh item (open item 2).** The macro tier **subsumes and narrows** the deferred "PDE-mesh
 format + adjoint library": the *mesh format* is now committed (a `DeviceMesh` finite-volume
 universe, fields as fibers, conservative fluxes — a substrate fiber, not a new container). What
 remains open is only the *mesh-adjoint scheme* (discrete- vs continuous-adjoint of the
@@ -3098,11 +3098,11 @@ MacroState = ( T_L : Field[DeviceMesh → ℝ₊]   [K],   φ : Field[DeviceMesh
 ```
 
 - `T_L(r)` — macro state (the spatial coarse-graining of the micro `S_vib` per-cell value onto
-  the device profile; `non-eq…md:517,194`).
+  the device profile; `non-equilibrium-high-field.md` Part J.5 / Part D.1).
 - `φ(r)` — macro state, **Poisson-constrained** `∇·(ε∇φ)=−ρ` (carried so the constraint is
-  *scored*, not free; `group-C…md:116`).
+  *scored*, not free; `group-C-transport-thermo-chemical.md` §1.2).
 - `n(r), p(r)` — macro state; the **0th moments** of `f_n` over a device cell (densities, not the
-  distribution; `group-C…md:96–100,161`).
+  distribution; `group-C-transport-thermo-chemical.md` §1.1, §1.5).
 - `j(r)` — macro state via a **closed-form 1st-moment closure** (§21.7.2); carried so
   current-continuity `∇·j + ∂ρ/∂t = 0` is a scorable balance.
 
@@ -3115,19 +3115,19 @@ new **scale** (device-mesh fibers), **not** a new **distribution**.
 
 ### 21.7.1 Energy closure — `T_e` (2nd moment)
 
-Two-temperature energy balance (`non-eq…md:258–273`): steady state `T_e − T_L =
+Two-temperature energy balance (`non-equilibrium-high-field.md` Part E.1): steady state `T_e − T_L =
 (2/3)(j·E)τ_E/(n k_B)`; transient `(3/2)n k_B ∂_t T_e = j·E − (3/2)n k_B (T_e−T_L)/τ_E`. `τ_E`
 per-composition: `tau-energy-pop(ℏω_LO,T_L)` (polar) / `tau-energy-acoustic(v_s,m*,T_L)`
 (diamond). `T_e` is **never state** — reconstructed from `(n,j,T_L)` + supplied `τ_E`
-(`non-eq…md:295–296`). Validity: Ohmic `≲10⁴ V/cm` (`T_e≈T_L`); warm `10⁴–10⁵`; hot `10⁵–10⁶`
+(`non-equilibrium-high-field.md` Part E.4). Validity: Ohmic `≲10⁴ V/cm` (`T_e≈T_L`); warm `10⁴–10⁵`; hot `10⁵–10⁶`
 (needs §21.7.2 for `μ(E)` collapse); saturated `≳ few×10⁵` (`j≈qnv_sat`). Positivity bound
-`T_e ≥ T_L` scored as a `Positivity` residual (`non-eq…md:491`).
+`T_e ≥ T_L` scored as a `Positivity` residual (`non-equilibrium-high-field.md` Part J.4).
 
 ### 21.7.2 Momentum closure — `j` (1st moment)
 
 Drift-diffusion `j = qμ(E,T)nE − qD∇n` (holes: sign-flip), Einstein `D = μk_BT/q`
-(`group-C…md:98,103`); field-dependent mobility Caughey–Thomas `μ(E)=μ₀[1+(μ₀E/v_sat)^β]^(−1/β)`
-(`non-eq…md:47`). Saturated regime collapses to `j≈qnv_sat`. No `f` required; `μ₀(T,N_D), v_sat,
+(`group-C-transport-thermo-chemical.md` §1.1); field-dependent mobility Caughey–Thomas `μ(E)=μ₀[1+(μ₀E/v_sat)^β]^(−1/β)`
+(`non-equilibrium-high-field.md` Part A.2). Saturated regime collapses to `j≈qnv_sat`. No `f` required; `μ₀(T,N_D), v_sat,
 β` are micro-supplied (§21.8). Faithful tier verifies vs BTE-`j(E)` as an
 `Algebraic/MethodEquivalence` residual.
 
@@ -3143,7 +3143,7 @@ plasmon–phonon / LST exclusion (`arch-17-out-of-scope`).
 
 ## 21.8 THE HOMOGENIZATION MAP (the micro→device coefficient bridge)
 
-The three macro balance PDEs (`non-eq…md:230–232`, `group-C…md:96–100`):
+The three macro balance PDEs (`non-equilibrium-high-field.md` Part D.4; `group-C-transport-thermo-chemical.md` §1.1):
 ```
 (P)  ∇·(ε∇φ) = −ρ,  ρ = q(p − n + N_D⁺ − N_A⁻)
 (DD) ∂_t n + ∇·j = G − R,   j = qμnE − qD∇n
@@ -3213,7 +3213,7 @@ instance. Scoring is score-not-solve: the PINO supplies the `MacroState` traject
 
 ## 21.10 The unified three-tier residual contract
 
-Resolving `group-C…md:608–614` ("three distinct state schemas + a *common* residual contract")
+Resolving `group-C-transport-thermo-chemical.md` §4.3 ("three distinct state schemas + a *common* residual contract")
 into concrete types. The three schemas are **not unifiable into one tensor** (three distinct
 discretizations) — hence *stratified*, not flattened:
 
@@ -3224,9 +3224,9 @@ discretizations) — hence *stratified*, not flattened:
 | Macro | `(T_L,φ,n,p,j)` | (MeshCell, MacroField) | `EOM/Continuum` | quasi-static (constraints `φ`,`j`) | parabolic diffusion + sources |
 
 All three share **one residual shape** `‖∂_t x − (L δE/δx + M δS/δx)‖²` (`arch-11 §11.1`,
-`group-C…md:543,664–668`), instantiated three ways, plus the common Conservation / Positivity /
+`group-C-transport-thermo-chemical.md` §4.2, §4.5), instantiated three ways, plus the common Conservation / Positivity /
 Algebraic-identity residuals. The macro `L` is quasi-static (no reversible bracket between
-continuum fields), so its EOM is dominantly the dissipative branch — exactly `group-C…md:567`'s
+continuum fields), so its EOM is dominantly the dissipative branch — exactly `group-C-transport-thermo-chemical.md` §4.2's
 "pure dissipative `M δS/δx`" fluid limit, consistent with the macro tier being the
 spatial-L4 reduction. One `ResidualKey = (producer, axes)` space spans all tiers over tier-typed
 axis universes; `CategoryTag` gains the two EOM-family siblings `EOM/DefectPopulation`,
@@ -3253,7 +3253,7 @@ decidable on field presence, `impl-04`).
 
 ## 21.12 New consistency residuals (thermodynamic identities)
 
-`Static/Thermodynamic` residuals (`arch-11 §11.1` item 17), from `defects…md:574` (I.4):
+`Static/Thermodynamic` residuals (`arch-11 §11.1` item 17), from `defects-surfaces-interfaces.md` Part I.4:
 
 - **R-T1 Gibbs adsorption** — `‖dγ/dμ + Γ‖²` (`dγ/dμ = −Γ`): ties surface free energy `γ(term,μ)`
   (row 44) to slow `[H]`/`x_ox`. T0/D1.
@@ -3287,7 +3287,7 @@ not a silent gap:
 
 1. **Mesh-adjoint scheme** — the mesh *format* is committed; the discrete- vs continuous-adjoint
    choice for differentiating `EOM/Continuum` through the finite-volume operator is the live
-   residue of `arch-18 §2` (inherits the Stage-4→Stage-5 AD seam).
+   residue of `[arch-18-open-decisions]` open item 2 (inherits the Stage-4→Stage-5 AD seam).
 2. **Mesh generation/refinement policy** — committed as structured-tensor for V1
    (`enumerate(product(axes))`); adaptive hot-spot refinement deferred to V2.
 3. **Hole-transport coefficients** — `μ_p, α_p, v_sat,p` are anchored for few materials; the `p`
@@ -3303,7 +3303,8 @@ not a silent gap:
 
 ## 21.15 Landing edits to existing docs
 
-`arch-04` emergence axiom refined (§21.0); `arch-05` per-tier generators (`arch-05 §5.x–§5.z`);
+`arch-04` emergence axiom refined (§21.0); `arch-05` per-tier generators (`[arch-05-generic]`,
+"Generator structure is per-tier");
 `arch-08` L4 = macro tier (contradiction removed); `arch-11` adds `EOM/DefectPopulation` +
 `EOM/Continuum` (17→19) and R-T1/R-T2/R-T3; `arch-03` adds the §21.11 `Environment` fields;
 `arch-09` notes `DefectSpecies` (no new method); `arch-18` Closed-decision entry + §2 narrowed;

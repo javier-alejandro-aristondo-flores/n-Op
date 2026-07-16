@@ -1,5 +1,8 @@
 # Catch-Up Slides — `/physics`
 
+> **Historical snapshot — counts and vocabulary as of 2026-06-04.** Decks are dated
+> artifacts and are never updated against later spec changes; the atomic tree is canonical.
+
 Conventions:
 
 - `CONSTANT_NAME` for values and variables.

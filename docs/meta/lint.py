@@ -266,6 +266,8 @@ COUNT_PATTERNS: tuple[tuple[re.Pattern[str], str], ...] = (
     (re.compile(r'(?<![~\d.])(\d+)\s+residual\s+categor'), 'categories'),
     (re.compile(r'(?<![~\d.])(\d+)\s+named\s+tags\b'), 'categories'),
     (re.compile(r'(?<![~\d.])(\d+)\s+CategoryTags\b'), 'categories'),
+    (re.compile(r'\bthe\s+(\d+)\s+categories\b'), 'categories'),
+    (re.compile(r'(?<![~\d.])(\d+)\s+symbolic\s+tags\b'), 'categories'),
     (re.compile(r'(?<!Stage )(?<![~\d.–-])(\d+)\s+methods\b'), 'methods'),
     (re.compile(r'(?<![~\d.–-])(\d+)\s+templates\b'), 'templates'),
     (re.compile(r'(?<![~\d.–-])(\d+)\s+(?:observable\s+)?bundles\b'), 'bundles'),
@@ -398,6 +400,138 @@ def Check_Vocabulary_Counts(records: tuple[FileRecord, ...]) -> list[str]:
     return failures
 
 
+# Line-number citations rot on every edit; the editable surface must cite by
+# id + § coordinate (atomic files) or path + Part/§ heading anchor (id-less
+# targets). Frozen records (docs/audits, docs/specs) keep theirs as history.
+LINE_REF_PATTERN: re.Pattern[str] = re.compile(
+    r'(?:\.md|…md):[0-9]|\b(?:arch|impl|mvp)-[0-9a-z][\w-]*:[0-9]'
+)
+LINE_REF_EXEMPT_DIRS: frozenset[str] = frozenset({'audits', 'specs', '_bundles', 'presentation'})
+
+# §-coordinate citations into atomic files: `arch-07-pipeline §7.4`, `arch-11 §11.1`.
+SECTION_CITE_PATTERN: re.Pattern[str] = re.compile(
+    r'\b(arch|impl|mvp)-(\d{2})(?:-[a-z0-9-]+)?\s+§(\d+(?:\.\d+)*)'
+)
+# Path+anchor citations into research strata: `defects-…md` Part G.2 / §1.1 / #46.
+RESEARCH_ANCHOR_PATTERN: re.Pattern[str] = re.compile(
+    r'`([\w-]+\.md)`\s+(?:Part\s+([A-J])(?:\.(\d+))?|§(\d+(?:\.\d+)*)|#(\d+))'
+)
+RESEARCH_DIR: Path = REPO_ROOT / 'physics' / 'research'
+
+
+def _Editable_Text_Files() -> list[Path]:
+    '''The lint-enforced editable surface: atomic trees + companions + meta + README.'''
+    editable_files: list[Path] = [REPO_ROOT / 'README.md']
+    for markdown_path in sorted(DOCS_ROOT.rglob('*.md')):
+        relative_parts: tuple[str, ...] = markdown_path.relative_to(DOCS_ROOT).parts
+        if relative_parts[0] in LINE_REF_EXEMPT_DIRS:
+            continue
+        if markdown_path.name in {'architecture.md', 'implementation-plan.md', 'mvp-slice.md'}:
+            continue  # generated monoliths mirror the atomic files
+        editable_files.append(markdown_path)
+    return editable_files
+
+
+def Check_No_Line_References(records: tuple[FileRecord, ...]) -> list[str]:
+    del records
+    failures: list[str] = []
+    for text_path in _Editable_Text_Files():
+        for line_number, line_text in enumerate(
+            text_path.read_text(encoding='utf-8').splitlines(), start=1
+        ):
+            if LINE_REF_PATTERN.search(line_text):
+                failures.append(
+                    f'line-ref: {text_path.relative_to(REPO_ROOT)}:{line_number}: '
+                    'cite by §/Part anchor, not line number (conventions.md)'
+                )
+    return failures
+
+
+def _Heading_Coordinates(target_path: Path) -> set[str]:
+    '''All section coordinates a file's ATX headings define (e.g. {"7.1", "7.2.5"}).'''
+    coordinates: set[str] = set()
+    for heading_line in re.findall(
+        r'^#{1,6}\s+(.*)$', target_path.read_text(encoding='utf-8'), flags=re.MULTILINE
+    ):
+        coordinate_match = re.match(r'(\d+(?:\.\d+)*)\b', heading_line)
+        if coordinate_match:
+            coordinates.add(coordinate_match.group(1))
+    return coordinates
+
+
+def _Research_Anchors(target_path: Path) -> tuple[set[str], set[str], set[str]]:
+    '''(part letters+subsections, § coordinates, catalog #N row ids) defined by a research file.'''
+    text: str = target_path.read_text(encoding='utf-8')
+    part_anchors: set[str] = set()
+    for part_match in re.finditer(
+        r'^#{2,4}\s+(?:Part\s+([A-J])\b|([A-J])\.(\d+)\b)', text, flags=re.MULTILINE
+    ):
+        if part_match.group(1):
+            part_anchors.add(part_match.group(1))
+        else:
+            part_anchors.add(f'{part_match.group(2)}.{part_match.group(3)}')
+    section_anchors: set[str] = {
+        section_match.group(1)
+        for section_match in re.finditer(r'^#{2,4}\s+(\d+(?:\.\d+)*)\b', text, flags=re.MULTILINE)
+    }
+    row_anchors: set[str] = {
+        row_match.group(1) for row_match in re.finditer(r'^\|\s*(\d+)\s*\|', text, flags=re.MULTILINE)
+    }
+    return part_anchors, section_anchors, row_anchors
+
+
+def Check_Section_Citations_Resolve(records: tuple[FileRecord, ...]) -> list[str]:
+    id_to_path: dict[tuple[str, str], Path] = {}
+    for record in records:
+        tree_prefix: str = record.tree_prefix
+        ordinal: str = record.path.name[:2]
+        id_to_path[(tree_prefix, ordinal)] = record.path
+    failures: list[str] = []
+    research_anchor_cache: dict[Path, tuple[set[str], set[str], set[str]]] = {}
+    for text_path in _Editable_Text_Files():
+        file_text: str = text_path.read_text(encoding='utf-8')
+        for line_number, line_text in enumerate(file_text.splitlines(), start=1):
+            for cite_match in SECTION_CITE_PATTERN.finditer(line_text):
+                tree_name, ordinal, coordinate = cite_match.groups()
+                target_path = id_to_path.get((tree_name, ordinal))
+                if target_path is None:
+                    failures.append(
+                        f'§-cite: {text_path.relative_to(REPO_ROOT)}:{line_number}: '
+                        f'no atomic file {tree_name}-{ordinal}'
+                    )
+                    continue
+                if coordinate == str(int(ordinal)):
+                    continue  # bare §NN = the whole file; always valid
+                if coordinate not in _Heading_Coordinates(target_path):
+                    failures.append(
+                        f'§-cite: {text_path.relative_to(REPO_ROOT)}:{line_number}: '
+                        f'{tree_name}-{ordinal} has no heading §{coordinate}'
+                    )
+            for anchor_match in RESEARCH_ANCHOR_PATTERN.finditer(line_text):
+                file_name, part_letter, part_sub, section_coord, row_id = anchor_match.groups()
+                target_path = RESEARCH_DIR / file_name
+                if not target_path.exists():
+                    continue  # non-research .md mention; not this check's contract
+                if target_path not in research_anchor_cache:
+                    research_anchor_cache[target_path] = _Research_Anchors(target_path)
+                part_anchors, section_anchors, row_anchors = research_anchor_cache[target_path]
+                wanted: str
+                have: set[str]
+                if part_letter:
+                    wanted = f'{part_letter}.{part_sub}' if part_sub else part_letter
+                    have = part_anchors
+                elif section_coord:
+                    wanted, have = section_coord, section_anchors
+                else:
+                    wanted, have = row_id, row_anchors
+                if wanted not in have:
+                    failures.append(
+                        f'§-cite: {text_path.relative_to(REPO_ROOT)}:{line_number}: '
+                        f'{file_name} has no anchor {wanted!r}'
+                    )
+    return failures
+
+
 def Check_Retired_Paths(records: tuple[FileRecord, ...]) -> list[str]:
     del records
     failures: list[str] = []
@@ -416,6 +550,95 @@ def Check_Retired_Paths(records: tuple[FileRecord, ...]) -> list[str]:
     return failures
 
 
+def Check_Directory_Counts(records: tuple[FileRecord, ...]) -> list[str]:
+    del records
+    tree_counts: dict[str, int] = {
+        tree_dir: len(list((DOCS_ROOT / tree_dir).glob('*.md')))
+        for tree_dir in ('architecture', 'implementation', 'mvp')
+    }
+    failures: list[str] = []
+    claim_pattern = re.compile(
+        r'(architecture|implementation|mvp)/?\S*\s+.*?(?<![~\d.])(\d+)\s+'
+        r'(?:atomic\s+(?:spec\s+|build-plan\s+|diamond-MVP\s+)?files|sections)\b'
+    )
+    for claim_path in (REPO_ROOT / 'README.md', DOCS_ROOT / 'meta' / 'AUDIT_PROMPT.md'):
+        if not claim_path.exists():
+            continue  # absence already failed via REQUIRED_SCAN_FILES
+        for line_number, line_text in enumerate(
+            claim_path.read_text(encoding='utf-8').splitlines(), start=1
+        ):
+            for claim_match in claim_pattern.finditer(line_text):
+                tree_name, claimed = claim_match.group(1), int(claim_match.group(2))
+                if claimed != tree_counts[tree_name]:
+                    failures.append(
+                        f'dir-counts: {claim_path.relative_to(REPO_ROOT)}:{line_number}: '
+                        f'says {claimed} files in {tree_name}/, filesystem has {tree_counts[tree_name]}'
+                    )
+    return failures
+
+
+def Check_Bundle_Coverage(records: tuple[FileRecord, ...]) -> list[str]:
+    '''full-spec must contain every architecture/implementation/mvp file; all sources exist.'''
+    del records
+    with MANIFEST_PATH.open(encoding='utf-8') as manifest_handle:
+        manifest_data: object = yaml.safe_load(manifest_handle)
+    if not isinstance(manifest_data, dict):
+        return ['bundle-coverage: manifest.yaml root must be a mapping']
+    failures: list[str] = []
+    bundles_section: object = manifest_data.get('bundles', {})
+    if not isinstance(bundles_section, dict):
+        return ['bundle-coverage: manifest `bundles` must be a mapping']
+    for bundle_name, bundle_spec in bundles_section.items():
+        if not isinstance(bundle_spec, dict):
+            continue
+        for source_relative in bundle_spec.get('sources', []):
+            if not (DOCS_ROOT / str(source_relative)).exists():
+                failures.append(
+                    f'bundle-coverage: {bundle_name}: missing source {source_relative}'
+                )
+    full_spec_sources: set[str] = {
+        str(source_relative)
+        for source_relative in bundles_section.get('full-spec', {}).get('sources', [])
+    }
+    for tree_dir in ('architecture', 'implementation', 'mvp'):
+        for atomic_path in sorted((DOCS_ROOT / tree_dir).glob('*.md')):
+            relative_name: str = f'{tree_dir}/{atomic_path.name}'
+            if relative_name not in full_spec_sources:
+                failures.append(
+                    f'bundle-coverage: full-spec omits {relative_name} '
+                    '("Full Specification" must cover every atomic file)'
+                )
+    return failures
+
+
+def Check_Ledger_Arithmetic(records: tuple[FileRecord, ...]) -> list[str]:
+    '''accuracy-ledger: numbered observable rows must be contiguous from 1 and match any
+    headline "N observables"-style claim (ledger-internal arithmetic, no repo-wide pin).'''
+    del records
+    ledger_path: Path = DOCS_ROOT / 'accuracy-ledger.md'
+    if not ledger_path.exists():
+        return ['ledger: docs/accuracy-ledger.md missing']
+    ledger_text: str = ledger_path.read_text(encoding='utf-8')
+    row_ids: list[int] = [
+        int(row_match.group(1))
+        for row_match in re.finditer(r'^\|\s*(\d+)\s*\|', ledger_text, flags=re.MULTILINE)
+    ]
+    failures: list[str] = []
+    if not row_ids:
+        return ['ledger: no numbered observable rows found']
+    expected_ids = list(range(1, max(row_ids) + 1))
+    if sorted(set(row_ids)) != expected_ids:
+        missing = sorted(set(expected_ids) - set(row_ids))
+        failures.append(f'ledger: observable row ids not contiguous; missing {missing}')
+    headline_match = re.search(r'(\d+)\s+ledger-tracked observables', ledger_text)
+    if headline_match and int(headline_match.group(1)) != max(row_ids):
+        failures.append(
+            f'ledger: headline claims {headline_match.group(1)} ledger-tracked observables; '
+            f'table max row is {max(row_ids)}'
+        )
+    return failures
+
+
 def Run_Checks(records: tuple[FileRecord, ...]) -> tuple[Iterable[str], ...]:
     checks: tuple[object, ...] = (
         Check_Frontmatter_Shape,
@@ -427,6 +650,11 @@ def Run_Checks(records: tuple[FileRecord, ...]) -> tuple[Iterable[str], ...]:
         Check_Manifest_Coverage,
         Check_Vocabulary_Counts,
         Check_Retired_Paths,
+        Check_No_Line_References,
+        Check_Section_Citations_Resolve,
+        Check_Directory_Counts,
+        Check_Bundle_Coverage,
+        Check_Ledger_Arithmetic,
     )
     with ThreadPoolExecutor(max_workers=len(checks)) as worker_pool:
         results: list[Iterable[str]] = list(

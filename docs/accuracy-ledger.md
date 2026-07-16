@@ -13,7 +13,13 @@ the lint-enforced atomic tree; the canonical per-formula `Bundle`/`Tier`/`Diff` 
 field)** — not ab-initio-converged. Where the closed-form path cannot meet design-grade, the
 gap is named (and tracked in the audit's P2 list).
 
-## The 52 observables (+ 16 FoMs)
+## The 59 ledger-tracked observables (+ 16 FoMs)
+
+Two counts, two terms (glossary): the **catalog observables** are the 52 rows of
+`physics/research/uwbg-observable-catalog.md` Part C — a frozen historical stratum; the
+**ledger-tracked observables** are everything this ledger carries an accuracy regime for —
+currently 59: the 52 catalog rows (#1–52 below) plus the 2026-07 gap-audit additions
+(#53–59, second table). "52" in older documents refers to the catalog sense.
 
 | # | Observable | Accuracy regime | Cheap vs faithful |
 |---|---|---|---|

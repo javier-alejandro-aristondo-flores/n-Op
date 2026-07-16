@@ -49,6 +49,13 @@ Field rules:
 - **`status`** — `draft` until reviewed; `review` while a rewrite is
   in flight; `stable` once accepted.
 - **`revision`** — incremented on every substantive content change.
+  Metadata-only edits (populating `depends-on` / `referenced-by` /
+  `research-sources`) do **not** bump `revision` — revisions track
+  content drift, not graph housekeeping.
+- **`depends-on` edge criterion** — `A depends-on B` iff A's body
+  references B's id, **or** A uses a term whose `canonical-for` owner
+  is B. Nothing else creates an edge; the graph is derivable and
+  auditable, not vibes.
 - **`research-sources`** — paths under `physics/research/` only;
   other docs go under `depends-on`.
 
@@ -56,12 +63,25 @@ Field rules:
 
 - Cross-references use the `id`, written either inline as
   `[arch-06-physics-graph]` or with section coordinate as
-  `arch-07-pipeline §7.4`.
+  `arch-07-pipeline §7.4`. Section coordinates must resolve against a
+  real heading in the target file (lint check 11).
 - Section numbers inside a file match the original monolith section
   for continuity (e.g. `arch-11-residuals` uses §11.x). New keystone
   files use whatever numbering reads cleanly.
 - Never link by file path. Links go through `id`s so file moves don't
   rot references.
+- **Id-less targets** (research strata, audits, specs — files outside
+  the atomic tree) are cited by **path + stable heading anchor**:
+  `defects-surfaces-interfaces.md Part G.2`,
+  `docs/audits/2026-07-07-gap-audit.md §B7`. **Never by line number**
+  — line references rot on every edit and are forbidden in the
+  editable surface (lint check 10; frozen audit records are exempt as
+  historical text).
+- **Count phrasing is canonical** so the count-lint has a contract:
+  whole-vocabulary counts are always written `N substantive formulas`,
+  `N residual categories`, `N methods`, `N templates`, `N observable
+  bundles`, `N cert obligations`. Subset phrasings ("~35 formulas",
+  "5–7 bundles") stay un-linted by construction.
 
 ## Style
 
@@ -87,6 +107,15 @@ Field rules:
 6. Every `[arch-NN-…]` / `[impl-NN-…]` / `[mvp-NN-…]` reference in
    prose resolves to an existing file.
 7. `research-sources` paths exist on disk.
+8. Vocabulary counts quoted in README / AUDIT_PROMPT / docs match the
+   arch-09 canon + registry CSV (opt-out marker `lint:ignore-counts`).
+9. No retired path (the pre-reorg superpowers / archive directories)
+   appears in tracked text.
+10. No line-number citations (`file.md:N`, `id:N`) in the editable
+    surface (frozen audits exempt).
+11. Every section-coordinate citation (`arch-NN §X.Y`; research
+    `Part X` / `§X.Y` path-anchors) resolves against a real heading
+    in its target.
 
 ## Assembly
 

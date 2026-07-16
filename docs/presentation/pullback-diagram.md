@@ -1,5 +1,8 @@
 # The Pullback Diagram (CS Pseudocode Style)
 
+> **Historical snapshot — companion to the 2026-06-04 catch-up deck.** Never updated
+> against later spec changes; the atomic tree is canonical.
+
 One picture, two readings. No math symbols — everything as algorithm names,
 function calls, and assignments.
 

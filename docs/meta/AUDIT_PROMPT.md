@@ -14,7 +14,7 @@ Computationally, `/physics` is **a compiler that emits a numerical kernel**, org
 - A **representation substrate** (the "canonical structure"): every object is a *fiber* over five primitives (content-addressed `Address`, typed indexed `Universe`, `SparseSet`, `PersistentMap`, hash-consed `MerkleDAG`) with four op-signatures.
 - The state is a **7-tuple** `x = (h, R_I, P_I, Π_h, Z_I, γ̂, A)`; the electronic object `γ̂` is the feasibility-critical data structure (encoded, never densified).
 
-**Read `docs/computational-overview.md` FIRST** — it is a 538-line computational-lens reference (data structures, algorithms, complexity, data layouts, numerical behavior) written specifically to orient you efficiently, with every claim cited to an atomic doc. Its **§13** distinguishes what is *intended to be valid* (treat §§1–12 as claims to verify) from what is *intentionally open* (do not flag intentional deferrals as defects).
+**Read `docs/computational-overview.md` FIRST** — it is the computational-lens reference (data structures, algorithms, complexity, data layouts, numerical behavior) written specifically to orient you efficiently, with every claim cited to an atomic doc. Its **§13** distinguishes what is *intended to be valid* (treat §§1–12 as claims to verify) from what is *intentionally open* (do not flag intentional deferrals as defects).
 
 ## 2. The core objective and the design philosophy (internalize these — the audit is judged against them)
 
@@ -33,13 +33,18 @@ Repository root: `/home/javier/Projects/Physics/Programs/n-Op`. Everything is **
 
 ```
 docs/
-  computational-overview.md        ← READ FIRST (computational-lens reference, 538 ln)
-  architecture.md / implementation-plan.md / mvp-slice.md / formula-registry.md / properties.md
-                                     ← GENERATED monoliths/bundles (assembled from the atomic files
-                                       below); read a monolith only if you prefer one big file.
+  computational-overview.md        ← READ FIRST (computational-lens reference)
+  architecture.md / implementation-plan.md / mvp-slice.md
+                                     ← GENERATED monoliths (assembled from the atomic files below);
+                                       read a monolith only if you prefer one big file.
+  formula-registry.md / properties.md / accuracy-ledger.md
+                                     ← hand-maintained companion docs (NOT generated): registry
+                                       narrative index, property→bundle map, accuracy ledger.
   _bundles/                        ← generated LLM-context bundles (full-spec, arch-only, mvp-build)
-  meta/                            ← tooling: lint.py, assemble.py, manifest.yaml,
-                                       conventions.md, glossary.md  (read glossary.md for vocabulary)
+  meta/                            ← tooling: lint.py, assemble.py, manifest.yaml, conventions.md,
+                                       glossary.md, this briefing  (read glossary.md for vocabulary)
+  audits/                          ← frozen audit records (historical; never edited)
+  specs/                           ← wave / pass design specs
 
   architecture/   (the canonical spec — 21 atomic files; READ THESE for depth)
     01-purpose          02-libraries        03-inputs           04-state
@@ -51,8 +56,8 @@ docs/
     14-topology (symmetry/topology atlas)   15-gamma-hat (the γ̂ data structure + open problems)
     16-pino-bridge (the output boundary)    17-out-of-scope
     18-open-decisions (5 open, incl. resolved impl-language)
-    19-coupling-structure (the coupling generator — 580 ln, the keystone of cross-regime physics)
-    20-representations (the substrate — the "canonical structure", 283 ln)
+    19-coupling-structure (the coupling generator — the keystone of cross-regime physics)
+    20-representations (the substrate — the "canonical structure")
     21-multiscale-state (slow + macro tiers: aging kinetics, device-mesh continuum, homogenization)
 
   implementation/ (how it gets built — 11 atomic files)
@@ -63,16 +68,16 @@ docs/
     01-system  02-gamma-budget  03-capabilities  04-in-mvp-vs-deferred  05-decisions-forced  06-build-order
 
 physics/research/   (the PRIMARY-SOURCE physics research the spec was synthesized from)
-  group-A-ion-dynamics.md            (719 ln) — structural/mechanical/vibrational/ionic regime physics
-  group-C-transport-thermo-chemical.md (688) — transport, thermal, thermodynamic, chemical/surface physics
-  defects-surfaces-interfaces.md     (620) — per-host defect inventories, surface & interface physics
-  non-equilibrium-high-field.md      (558) — impact ionization, avalanche, hot carriers, self-heating, leakage
-  residual-generator-catalog.md      (551) — the catalog of residual generators
-  group-B-electronic-magnetic-optical.md (505) — electronic-structure, magnetic, optical regime physics
-  csp-heterostructure.md             (302) — crystal-structure-prediction validity & heterostructure residuals
-  uwbg-observable-catalog.md         (260) — the 52 (+16 FoM) target observables the PINO must predict
-  applicability-classifiers.md        (72) — per-property applicability predicates
-  implementation-language.md         (210) — (the resolved language decision; context only, not physics)
+  group-A-ion-dynamics.md — structural/mechanical/vibrational/ionic regime physics
+  group-C-transport-thermo-chemical.md — transport, thermal, thermodynamic, chemical/surface physics
+  defects-surfaces-interfaces.md — per-host defect inventories, surface & interface physics
+  non-equilibrium-high-field.md — impact ionization, avalanche, hot carriers, self-heating, leakage
+  residual-generator-catalog.md — the catalog of residual generators
+  group-B-electronic-magnetic-optical.md — electronic-structure, magnetic, optical regime physics
+  csp-heterostructure.md — crystal-structure-prediction validity & heterostructure residuals
+  uwbg-observable-catalog.md — the 52 (+16 FoM) target observables the PINO must predict
+  applicability-classifiers.md — per-property applicability predicates
+  implementation-language.md — (the resolved language decision; context only, not physics)
 
 physics/library/    ← EMPTY SCAFFOLD (directory tree of .gitkeep placeholders) + populated data:
   formulas/registry-manifest.csv     ← the 132 named formulas, indexed (signatures, bundles, cost/diff tiers)
@@ -110,7 +115,7 @@ Beyond Parts 1–2, investigate whatever you judge important. To seed that, here
 1. **An end-to-end accuracy / error model.** Compression (LowRank/HODLR/TT truncation), surrogate (D4) formulas, one-shot dressings (Layer 1.25), symmetry reduction (exact?), and the `γ̂` approximate-equality question all introduce error. Is there a *composed* error budget from inputs to emitted residual? Are truncation tolerances principled? Is error *tracked* anywhere, or silently dropped? (See the `γ̂` §15.4 ε-equality open problem and whether it generalizes to a systemic gap.)
 2. **The closed-form discipline's true boundary.** Classify the 12 methods and the 132 formulas by *genuine* computational character: which are truly closed-form, which hide an eigensolve / SCF loop / Boltzmann solve / PDE timestepper. Where is an iterative numerical method *unavoidable*, and is the "expensive at compile-time, cheap at runtime" amortization real for it (e.g., does an SCF inner loop or a BTE solve actually collapse to a precomputed structured apply at Stage 5, or does it recur per state sample)?
 3. **Differentiability completeness.** Every residual must be differentiable for the PINO. Assess coverage across the differentiability tiers (D0–D4), the exception sets (band crossings, phase transitions, level crossings), and the implicit-differentiation adjoints for fixed-point methods. Are the synthesized adjoints accurate (the spec gates them at `τ_adj = 1e-4`)? Where does differentiability break or degrade, and does that matter for training?
-4. **Residual sufficiency for *learning*.** Do the 17 categories + the formula/coupling set give the PINO *enough* constraints — all relevant conservation laws, sum rules, symmetry/equivariance conditions, analytic-structure (Kramers–Kronig) constraints, detailed-balance/Onsager relations — to learn correct dynamics, not just locally-consistent ones? What residuals are missing?
+4. **Residual sufficiency for *learning*.** Do the 19 residual categories + the formula/coupling set give the PINO *enough* constraints — all relevant conservation laws, sum rules, symmetry/equivariance conditions, analytic-structure (Kramers–Kronig) constraints, detailed-balance/Onsager relations — to learn correct dynamics, not just locally-consistent ones? What residuals are missing?
 5. **GENERIC structural guarantees.** Are the structural conditions actually enforceable by construction: `L` antisymmetric, `M` PSD, and the degeneracy conditions `L·δS/δx = 0`, `M·δE/δx = 0`? Does the symmetry-generated coupling machinery *preserve* these (the spec routes `AntisymmForm`/`PSDSymmForm` targets and claims PSD-by-construction) — verify, don't assume.
 6. **Numerical stability of the elegant structures.** Content-addressing depends on canonical float normalization, yet physics is continuous and approximate — does ε-tolerance vs exact content-addressed identity create cache incoherence, instability, or silent staleness? Are the stabilization techniques (log-sum-exp, broadening η near resonances, acoustic-sum-rule enforcement, IBZ orbit weights, PSD/antisymmetric projection) sufficient and correctly placed?
 7. **The formalization gaps (already known) — judge their *physics* severity.** A prior pass found four researched-but-not-yet-formalized registries: the ~80 observable catalog, the per-host defect inventory, the crystal-structure-validity residuals, and the detailed non-equilibrium (B9) bundle. These are enumeration gaps — but assess whether any of them hides a *physics* incompleteness (a missing observable, defect channel, or constraint that the design target actually requires), not merely a transcription debt.

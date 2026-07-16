@@ -5,6 +5,11 @@ under each monolith / bundle in order, strips per-file YAML
 frontmatter, prepends a TOC, and writes the regenerated output to
 disk. Designed to be idempotent: re-running over a clean tree
 produces byte-identical output.
+
+`--check` renders every target in memory and byte-diffs it against
+the file on disk, exiting non-zero (and writing nothing) if any
+generated output has drifted from its sources — the freshness gate
+run before every commit.
 '''
 
 from __future__ import annotations
@@ -129,9 +134,32 @@ def Write_Target(target: AssemblyTarget) -> Path:
     return target.output_path
 
 
+def Check_Target(target: AssemblyTarget) -> str | None:
+    '''Return a drift message if the on-disk output differs from a fresh render.'''
+    rendered_text: str = Assemble_Target(target)
+    if not target.output_path.exists():
+        return f'stale: {target.output_path.relative_to(DOCS_ROOT)} missing'
+    on_disk_text: str = target.output_path.read_text(encoding='utf-8')
+    if on_disk_text != rendered_text:
+        return f'stale: {target.output_path.relative_to(DOCS_ROOT)} differs from sources'
+    return None
+
+
 def Main() -> int:
+    check_only: bool = '--check' in sys.argv[1:]
     monoliths, bundles = Read_Manifest(MANIFEST_PATH)
     all_targets: tuple[AssemblyTarget, ...] = monoliths + bundles
+    if check_only:
+        with ThreadPoolExecutor(max_workers=max(1, len(all_targets))) as worker_pool:
+            drift_messages: list[str | None] = list(worker_pool.map(Check_Target, all_targets))
+        real_drift: list[str] = [message for message in drift_messages if message]
+        for drift_message in real_drift:
+            print(drift_message, file=sys.stderr)
+        if real_drift:
+            print(f'assemble --check FAILED — {len(real_drift)} stale outputs', file=sys.stderr)
+            return 1
+        print(f'assemble --check OK — {len(all_targets)} outputs fresh')
+        return 0
     with ThreadPoolExecutor(max_workers=max(1, len(all_targets))) as worker_pool:
         written_paths: list[Path] = list(worker_pool.map(Write_Target, all_targets))
     for written_path in written_paths:

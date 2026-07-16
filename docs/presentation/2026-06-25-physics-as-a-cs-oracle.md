@@ -1,5 +1,9 @@
 # Scoring, Not Solving — a verification oracle for materials physics
 
+> **Historical snapshot — counts and row numbers as of 2026-06-25.** Decks are dated
+> artifacts and are never updated against later spec changes (the registry has since
+> grown past the figures quoted here); the atomic tree is canonical.
+>
 > **Slide-deck outline.** One block per slide: title, on-slide content, and a speaker note.
 > Ready to drop into Beamer / reveal.js / PowerPoint. This is a **presentation artifact**, a
 > hand-written companion to the spec — **not** part of the lint-enforced atomic tree (like

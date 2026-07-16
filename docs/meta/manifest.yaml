@@ -89,6 +89,7 @@ bundles:
       - architecture/18-open-decisions.md
       - architecture/19-coupling-structure.md
       - architecture/20-representations.md
+      - architecture/21-multiscale-state.md
       - implementation/01-principles.md
       - implementation/02-methods.md
       - implementation/03-templates.md

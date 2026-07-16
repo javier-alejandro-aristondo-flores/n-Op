@@ -445,7 +445,7 @@ The principled template set (~15 rows) is the `mechanism_range` table of
 §19.10 — which now includes the **piezoelectric acoustic** channel
 (`LongRangeStatic(1)`, `1/q` pole) alongside the Fröhlich (`1/q²`) one, the second
 long-range e-ph mechanism the polar III-N members carry (`is-polar-material`-gated;
-inert for diamond). This **closes `arch-18-open-decisions §7`**.
+inert for diamond). This **closed the former arch-18 coupling-channel coverage-policy item** (now recorded under `[arch-18-open-decisions]` Closed decisions).
 
 ## 19.10 Mechanism range and polynomial sufficiency
 

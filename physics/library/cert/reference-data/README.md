@@ -31,8 +31,11 @@ P_sp** (the self-consistent convention enforced by `arch-12 §12.0.3`; never mix
 **Population status (2026-07-08, gap-audit Phase 3).** The **full diamond MVP battery is
 seeded** (`mvp-05 §H4`: lattice a, indirect gap, C₁₁/C₁₂/C₄₄ + bulk modulus + density, Θ_D,
 phonon-max, κ(300/773/1100 K), cohesive energy, diamond–graphite boundary, plus ε_r, ToF
-mobilities, v_sat/β, and the Chynoweth pair), and a σ-assignment pass valued every previously
-`—` uncertainty cell (39 cells; see the Uncertainty convention below).
+mobilities, v_sat/β, and the Chynoweth pair), and σ-assignment passes valued every previously
+`—` uncertainty cell that carries a numeric value (39 cells on 2026-07-08 across
+material-constants / elastic / phonon / polarization; the 6 transport Caughey–Thomas /
+best-exp cells on 2026-07-16). Remaining `—` cells are exactly the explicit GAP rows and
+the AlGaN interpolation-rule row (a rule, not a value — exempt by construction).
 Pending later waves: β-Ga₂O₃ (Wave 2 — seeding spec drafted 2026-07-08), c-BN / 4H-SiC
 (Wave 3), metals + substrates (Wave 4) and dielectrics (Wave 5) per the 2026-07 gap-audit,
 `interface-properties.csv`, `defect-formation-energies.csv`, `chemical-potentials.csv`, and the

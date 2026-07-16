@@ -1,16 +1,16 @@
 Property,Material,Environment,Value,Uncertainty,Source,Source class,Version,Added,Modified
 caughey-thomas-mu-n-max,GaN (wz),300 K,1460.7 cm2/Vs,×0.1,Farahmand et al. IEEE TED 48 535 (2001) 10.1109/16.906448,monte-carlo-fit,1,2026-06-10,2026-06-10
-caughey-thomas-mu-n-min,GaN (wz),300 K,295 cm2/Vs,—,Farahmand et al. 2001,monte-carlo-fit,1,2026-06-10,2026-06-10
-caughey-thomas-mu-n-Nref,GaN (wz),300 K,1e17 cm-3,—,Farahmand et al. 2001,monte-carlo-fit,1,2026-06-10,2026-06-10
-caughey-thomas-mu-n-alpha,GaN (wz),300 K,0.66,—,Farahmand et al. 2001,monte-carlo-fit,1,2026-06-10,2026-06-10
-caughey-thomas-mu-p-max,GaN (wz),300 K,170 cm2/Vs,—,Mnatsakanov et al. SSE 47 111 (2003) 10.1016/S0038-1101(02)00256-3,analytic-fit,1,2026-06-10,2026-06-10
-caughey-thomas-mu-p-min,GaN (wz),300 K,10 cm2/Vs,—,Mnatsakanov et al. 2003,analytic-fit,1,2026-06-10,2026-06-10
+caughey-thomas-mu-n-min,GaN (wz),300 K,295 cm2/Vs,×0.2,Farahmand et al. 2001,monte-carlo-fit,2,2026-06-10,2026-07-16
+caughey-thomas-mu-n-Nref,GaN (wz),300 K,1e17 cm-3,×0.5,Farahmand et al. 2001,monte-carlo-fit,2,2026-06-10,2026-07-16
+caughey-thomas-mu-n-alpha,GaN (wz),300 K,0.66,0.1,Farahmand et al. 2001,monte-carlo-fit,2,2026-06-10,2026-07-16
+caughey-thomas-mu-p-max,GaN (wz),300 K,170 cm2/Vs,×0.3,Mnatsakanov et al. SSE 47 111 (2003) 10.1016/S0038-1101(02)00256-3,analytic-fit,2,2026-06-10,2026-07-16
+caughey-thomas-mu-p-min,GaN (wz),300 K,10 cm2/Vs,×0.5,Mnatsakanov et al. 2003,analytic-fit,2,2026-06-10,2026-07-16
 caughey-thomas-mu-n-set,AlN (wz),300 K,GAP — paywalled (Farahmand 2001 Tbl II / Wang 2025 Tbl SIII),—,one targeted follow-up,gap,1,2026-06-10,2026-06-10
 mobility-electron-fp-ceiling,GaN (wz),300 K,1034 cm2/Vs,×0.15,Ponce Jena Giustino PRB 100 085204 (2019),first-principles-bte,1,2026-06-10,2026-06-10
 mobility-hole-fp-ceiling,GaN (wz),300 K,52 cm2/Vs,×0.15,Ponce et al. 2019,first-principles-bte,1,2026-06-10,2026-06-10
 mobility-electron-intrinsic-perp,AlN (wz),300 K,871 cm2/Vs,×0.25,Wang et al. arXiv 2506.09240 (2025),first-principles-bte,1,2026-06-10,2026-06-10
 mobility-electron-intrinsic-para,AlN (wz),300 K,619 cm2/Vs,×0.25,Wang et al. 2025,first-principles-bte,1,2026-06-10,2026-06-10
-mobility-electron-best-exp,AlN (wz),300 K,426 cm2/Vs,—,Taniyasu Kasu Makimoto APL 89 182112 (2006) 10.1063/1.2378726,experimental,1,2026-06-10,2026-06-10
+mobility-electron-best-exp,AlN (wz),300 K,426 cm2/Vs,×0.15,Taniyasu Kasu Makimoto APL 89 182112 (2006) 10.1063/1.2378726,experimental,2,2026-06-10,2026-07-16
 mobility-hole,AlN (wz),300 K,GAP — deep Mg acceptor; holes < 1e10 cm-3,—,genuine gap,gap,1,2026-06-10,2026-06-10
 saturation-velocity,GaN (wz),high field,1.4e7 cm/s,×0.15,Foutz JAP 85 7727 (1999); O'Leary JMSE 17 87 (2006),monte-carlo,1,2026-06-10,2026-06-10
 peak-velocity,GaN (wz),~150 kV/cm,2.85e7 cm/s,×0.15,Foutz 1999; O'Leary 2006,monte-carlo,1,2026-06-10,2026-06-10
@@ -39,3 +39,7 @@ saturation-velocity,diamond (holes),high field,1.5e7 cm/s,×0.2,accuracy-ledger 
 caughey-thomas-beta,diamond,high field,1,0.5,Pass C / accuracy-ledger (β=1); supersedes non-eq Part A β≈2 (2026-07 gap-audit B8 resolution),experimental-review,1,2026-07-08,2026-07-08
 impact-ionization-a,diamond,high field,1.93e5 cm-1,×2.5,Hiraiwa & Kawarada JAP 114 034506 (2013); electron/hole never separated (ledger residue — cert treats as both),experimental,1,2026-07-08,2026-07-08
 impact-ionization-b,diamond,high field,7.59e6 V/cm,×2.5,Hiraiwa & Kawarada JAP 114 034506 (2013),experimental,1,2026-07-08,2026-07-08
+impact-ionization-bn,AlN (wz),high field,3.759e8 V/cm,unbounded,Bulutay SST 17 L59 (2002) Monte-Carlo electron-only; pairs with the seeded a; measured = GAP,monte-carlo,1,2026-07-16,2026-07-16
+thermal-conductivity,AlN (wz c-axis),1100 K,95 W/mK,×0.4,3-ph BTE / Slack extrapolation (theory-only; no >500 K single-crystal measurement),first-principles-bte,1,2026-07-16,2026-07-16
+caughey-thomas-mu-p-Nref,GaN (wz),—,2.5e17 cm-3,×0.5,Mnatsakanov SSE 47 111 (2003),experimental-review,1,2026-07-16,2026-07-16
+caughey-thomas-mu-p-gamma,GaN (wz),—,1.5,0.3,Mnatsakanov SSE 47 111 (2003),experimental-review,1,2026-07-16,2026-07-16

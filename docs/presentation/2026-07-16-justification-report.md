@@ -1,0 +1,216 @@
+# n-Op — Justification Report
+
+> **Historical snapshot — claims, counts, and status as of 2026-07-16.** Presentation
+> artifacts are dated and are never updated against later spec changes; the atomic tree
+> (`docs/architecture/`, `docs/implementation/`, `docs/mvp/`) is canonical. Every claim
+> below cites its canonical `arch-xx` / `impl-xx` / audit source so a skeptic can verify
+> rather than take it on faith. This is a **presentation companion**, not part of the
+> lint-enforced atomic tree.
+
+**Purpose of this report.** A plain statement of what the n-Op program is, why it is
+shaped the way it is, what has actually been built and verified to date, and what it
+enables next — written to justify the line of work to a technical audience that has not
+lived inside it.
+
+---
+
+## 1. The one-paragraph version
+
+We are building a **verification oracle for crystalline matter** and training a **neural
+operator against it**. The oracle is a program that, handed any candidate state of a
+crystal under stated operating conditions, returns a granular, itemized account of how
+badly that candidate violates each law it is supposed to satisfy — thousands of
+independent named checks, each a number, each traceable to a published formula. The
+neural operator is the fast learner that proposes states; the oracle is the incorruptible
+grader that scores them. The end goal is **property-targeted crystal design** for
+ultra-wide-bandgap semiconductors in harsh environments — devices that must survive
+inside a jet turbine: >500 °C, thermal cycling, vibration, high field, radiation
+(`arch-01-purpose`). You state the properties you need; the system searches for crystals
+that are simultaneously physically real and fit for purpose — and it can *show its work*
+for every candidate it accepts or rejects.
+
+## 2. The load-bearing idea: verifying is cheaper than solving
+
+Direct simulation of these materials at device-relevant conditions is prohibitively
+expensive, and machine-learned surrogates are fast but untrustworthy precisely where it
+matters — extrapolation into harsh corners. The program's answer is an old one from
+computer science: **checking a proposed solution is far cheaper than producing one**. We
+do not build a faster solver. We build a *grader* so cheap and so complete that a learned
+proposer can be disciplined by it at every step ("score-not-solve", `arch-01-purpose`,
+`arch-16-pino-bridge`). The oracle never solves for anything — the proposer supplies the
+complete candidate state, including the parts no database carries — and the oracle's only
+job is to measure disagreement with the laws. That division of labor is what makes the
+learned half safe to use: its known weakness (drift under long rollouts and
+extrapolation) is exactly the thing the oracle exists to expose, cheaply, at every step.
+
+## 3. What the program is, behaviorally
+
+`/physics` is **a compiler paired with the pure functions it emits**
+(`computational-overview`, `arch-07-pipeline`):
+
+- **Compose time** (seconds–minutes, once per crystal identity): build a typed dataflow
+  graph of every applicable check from a fixed grammar, prune what does not apply, exploit
+  the instance's structural repetition, synthesize the derivative program, and lower it
+  all into a kernel.
+- **Runtime** (microseconds–milliseconds, millions of calls): the kernel is a closed,
+  straight-line numeric function `(state, environment) → keyed floats`. No symbolic work,
+  no solver invocations, no branching on structure — everything expensive was spent once
+  at compile time. That is what makes it callable inside someone else's training loop
+  without ceremony.
+
+Three properties give the design its rigor:
+
+- **The grammar is closed.** Every computation is composed from finite, versioned
+  vocabularies — as of today: 132 substantive named formulas (+2 architectural markers),
+  12 computational methods (+3 sub-methods), 20 property templates, 11 observable
+  bundles, 19 residual categories, 10 certification obligations (`arch-09-vocabularies`,
+  `physics/library/formulas/registry-manifest.csv`). No free-form expressions, ever.
+  Consequences: everything is *enumerable* (a compiled oracle can list every check it
+  contains), everything is *traceable* (every emitted number leads back to a numbered,
+  literature-cited registry row), and requests are *decidable* (they compile or are
+  rejected — nothing fails ambiguously at runtime).
+- **Identity is content-addressed.** Every object — graph nodes, compiled kernels,
+  imported data, certificates — is named by the hash of its canonical bytes
+  (`arch-20-representations`). Same inputs, bit-identical kernel; every result is
+  permanently attributable to the exact kernel that produced it. Reproducibility is a
+  structural property, not a policy.
+- **The output is evidence, never a verdict.** A call returns a map of named slots to
+  raw residual values, plus any requested derived quantities — and nothing else. The
+  oracle never aggregates, weights, thresholds, or judges (`arch-11-residuals`). Checks
+  it cannot stand behind are simply *absent*, and the reason is recorded as machine data
+  — enum codes and numeric witnesses in an inert certificate, no natural language
+  anywhere (`arch-12-cert`). Judgment belongs to the consumer looking at the evidence.
+  For a scientific instrument, this is the honest contract: it measures; it does not
+  editorialize.
+
+## 4. The interfaces
+
+**In (identity, compiled once):** the crystal's discrete description — what repeats, how
+it is decorated, the operating conditions. Semantically this is *CIF content plus an
+environment record*: the interchange format every materials database and simulation code
+already speaks, extended with the operating-condition fields no crystallographic format
+carries (`arch-03-inputs`).
+
+**In (state, scored millions of times):** the full state object — geometry, sites and
+momenta, species, the electronic degrees of freedom, fields (`arch-04-state`). This is
+deliberately a superset of any standard format: the missing pieces are precisely what the
+neural operator learns to supply.
+
+**Out:** the residual map (named slots → floats), the values map (requested quantities →
+numbers), optionally the gradient map, and the kernel hash (`arch-16-pino-bridge`). Four
+things, all machine data.
+
+## 5. One framework, two loops: training and design
+
+The design goal — *properties in, structures out* — looks like the inverse of everything
+above. The unification is already in the architecture, and it is the part of this program
+easiest to underestimate:
+
+**A measured datum and a desired property are the same object.** The bridge's `Import`
+verb pins an external value into the graph as a first-class check: "distance between what
+this candidate does and this pinned value" (`arch-16-pino-bridge`). During training we pin
+*measurements*, and the slot reads "disagrees with reality by this much." During design we
+pin *aspirations*, and the identical slot reads "misses the spec by this much." The oracle
+cannot tell the difference and does not need to. Law-consistency slots (is this a real
+crystal?) and target slots (is it the crystal you asked for?) sit side by side in one
+differentiable objective.
+
+The two loops are then mirror images: **training** proposes states and lets the gradient
+flow into the *operator's weights*; **design** proposes candidates and lets the same
+gradient flow into the *candidate itself*. One oracle, one call surface, two gradient
+sinks. Within a compiled kernel, the continuous design variables (cell, positions, and
+composition fraction — already a continuous axis in the registry) are directly
+optimizable; the discrete variables (species, symmetry family) are the compiler's
+specialization axis and are searched by enumerate-and-compile under content-addressed
+kernel caching, or handed to a generative proposer. Static, instantaneous-property design
+is available on today's framework. *Lifetime* design — "properties after N hours at
+conditions" — additionally needs a time-evolution capability, which is deliberately
+unclaimed until a dedicated research question resolves (§8).
+
+## 6. Is a neural operator the right learner?
+
+Yes — and unusually cleanly, with honest caveats:
+
+- **The domain is periodic.** The crystal cell with periodic boundaries is the native
+  habitat of spectral neural operators; half the machinery already lives in the
+  reciprocal domain. **The state really is function channels** — including matrix-valued
+  functions over the reciprocal domain and coarse fields at the device tier — which is
+  exactly the data type neural operators exist to map.
+- **Discretization invariance is a requirement here, not a luxury**: one operator must
+  transfer across meshes and supercell sizes.
+- **The supervision is native.** Our residuals unfold pointwise along the same domains
+  the channels live on (`arch-11-residuals`, `impl-07-residual-factory`) — a per-point,
+  physics-informed loss at full granularity, with analytically synthesized gradients
+  (`arch-07-pipeline`). This program is, by construction, the loss half of a
+  physics-informed neural operator.
+- **Caveats, stated plainly:** not everything is a field — sites are a point set and
+  species are discrete conditioning, so the realistic architecture is a *hybrid*
+  (spectral trunk, equivariant point branch, discrete conditioning). Sharply localized
+  features (defects, interfaces) strain global spectral bases. And long-horizon rollout
+  drift is the known failure mode of every learned propagator — which is precisely the
+  weakness this oracle was built to police. There is also a synergy in reserve: the
+  compiler's symmetry analysis produces the exact block structure an equivariant network
+  needs, so the oracle can *hand the operator its equivariance* rather than have it
+  rediscovered from data.
+
+The operator-side substrate is its own workstream: **`Learnable_Structure`**, a kernel
+for compiling arbitrary learnable structures — the hybridization-capable counterpart to
+the oracle's compiler. The two are mirror-image designs: each takes a declarative
+description of structure and compiles it into a fast numeric object; one grades, one
+learns. Together they close the loop the program needs.
+
+## 7. Current status — what exists and what has been verified
+
+- **A certified specification base.** 38 atomic spec documents with explicit topic
+  ownership and a derived 208-edge dependency graph; closed vocabularies as counted in
+  §3; a valued tolerance ledger; 10 certification obligations with four explicit refusal
+  modes (`arch-09`, `arch-12`). On 2026-07-16 the entire base passed a **reconciliation
+  campaign**: ~88 verified defects found and fixed across staged sweeps, then an
+  adversarial multi-agent certification — auditors were calibration-gated (5/5 planted
+  contradictions detected before their reports were trusted), ran two independent rounds
+  (by document family, then re-sliced by invariant class), and produced evidence
+  transcripts, not just verdicts. Terminal state: certified, one recorded waiver
+  (`docs/audits/2026-07-16-reconciliation-pass.md`). The base is held there by standing
+  machine checks — a 14-check linter (count consistency against canon, citation
+  resolution, stale-path tripwires), a generated-output freshness gate, and mechanical
+  seam sweeps — run after every edit.
+- **Seeded, σ-disciplined reference data.** Curated coefficient batteries for diamond and
+  the III-nitrides with per-value provenance and uncertainty; genuine gaps are marked
+  `GAP` and refused by the certification layer rather than filled by guesswork
+  (`physics/library/cert/reference-data/`, `docs/audits/2026-07-07-gap-audit.md`).
+- **Training feedstock in hand.** A recovered ~877-point hybrid-level (HSE06, gap-tuned
+  exact exchange) strain hypersurface of diamond — six lattice-distortion families to
+  ±10%, with stress tensors — salvaged, health-audited, and documented down to
+  worked extraction recipes mapped onto the oracle's import interface. This is
+  ready-made ground-truth feedstock for the diamond MVP's mechanics, energetics, and
+  gap-versus-strain channels.
+- **A concrete first build.** The MVP is diamond-first and carved out precisely: three
+  capabilities, ~34 registry formulas, 10 of 12 methods, obligations 1–6 and 10, with a
+  written build order (`docs/mvp/`, `mvp-06-build-order`).
+
+## 8. Open fronts — deliberately open
+
+- **The evolver question.** The oracle scores; it does not step. Whether the *same*
+  compiled structure can be re-arranged, by algebra on the graph, into a numerically
+  integrable form — one shared structure, two lowerings (scorer ↔ stepper) — is a live
+  research question we are commissioning as an independent deep-dive. Until it resolves,
+  time-evolution product verbs stay unclaimed. Not claiming them yet is a feature of the
+  program's honesty, not a gap in it.
+- **The wave program.** Per-material data acquisition proceeds in audited waves: next is
+  the β-Ga₂O₃ wave, whose seeding spec is drafted and **frozen pending its adversarial
+  audit** (`docs/specs/2026-07-08-wave2-beta-ga2o3-seeding.md`); then c-BN/4H-SiC,
+  contact metals and substrates, and gate dielectrics.
+- **Known unknowns, kept visible.** The remaining data gaps (measured impact ionization
+  for AlN, hole transport, hot-carrier tail anchors, and peers) are recorded as
+  cert-refused domains — the system will say "cannot certify" there rather than
+  extrapolate silently.
+
+## 9. The close
+
+The claim this program makes is narrow and defensible: **every number it emits is
+traceable to a named, literature-cited rule; every capability it lacks is recorded as a
+refusal rather than papered over; and the entire specification has survived an
+adversarial, machine-checked audit designed to break it.** On that substrate, a learned
+proposer becomes something rare in machine-learned materials work — a model whose every
+suggestion arrives with itemized, checkable evidence. Verifying is cheaper than solving;
+we built the verifier first, and built it so it can be trusted.

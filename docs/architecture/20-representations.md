@@ -114,17 +114,17 @@ substrate fibers.
 
 | Cluster | Shape | Backend / signature |
 |---|---|---|
-| C1 vocabularies (`StateComponent`, `SubDofTag`, `IrrepLabel`, `OutputRole`, `NodeKind`, `InputKind`, `CategoryTag`, `AxisLabel`, `BundleId`, `RegimeTag`) | `Universe[T]` instances with dense ordinals | Closed = `DenseU32`; Open = `DenseU64` with append-only registry |
+| C1 vocabularies (`StateComponent`, `SubDofTag`, `IrrepLabel`, `OutputRole`, `NodeKind`, `InputKind`, `CategoryTag`, `AxisLabel`, `BundleId`, `Layer0Type`) | `Universe[T]` instances with dense ordinals | Closed = `DenseU32`; Open = `DenseU64` with append-only registry |
 | C2 registered generators (`FormulaRecord`, `ResidualGenerator`, `CouplingChannel`) | `Element[RegistryUniverse[k]]` | Kind-indexed dispatch; payload canonicalized by C5 rule |
 | C5 content addressing (`ContentAddress`, `ResidualKey`, `generator-hash`, cache keys, sidecar fingerprints) | `Address[D]` | SHA-256, domain-separated |
 | C6 selected subsets (`CouplingSpec`, active-residual / formula / bundle subsets) | `SparseSet[RegistryUniverse]` in Boolean lattice | HAMT / Roaring; subset identity = root |
 | C7 sparse masks (`RoaringCoverageMask`, axis sets, subgraph node sets, irrep-block indices) | `SparseSet[Universe]` | Density-derived per universe |
 | C3 sidecars (Stage 1 / 2 / 2.5 / 4 sidecars) | `PersistentMap[TypedKey, EvidenceBearing[V]]` | HAMT, branching 32; stage-visible |
-| C4 evidence (`Witness`, `OneShotCert`, `IterativeResult`, ten obligation outputs) | `MerkleDAG[EvidenceOps, EvidencePayload]` | Persistent attestation DAG |
+| C4 evidence — the **EvidenceDAG** (`Witness`, `OneShotCert`, `IterativeResult`, ten obligation outputs) | `MerkleDAG[EvidenceOps, EvidencePayload]` | Persistent attestation DAG |
 | `InvariantTerm` / `FormulaApply` symbolic form | `MerkleDAG[SymbolicTensorOps, TypedLeaf]` | Hash-consed tensor-algebra DAG |
 | Applicability predicates | `MerkleDAG[PredicateOps, C1Atom]` | Versioned ROBDD over C1 atoms |
 | `CrystalSymmetryGroup` | Graded composite atlas (sui generis) + `MerkleDAG[GroupOps, …]` derived caches | See `arch-09-vocabularies §9.5` |
-| `PhysicsGraph` | Closure of output `Address[Node]` set under children-pointers | Identity is the multiset of output-root addresses |
+| `PhysicsGraph` | Closure of output `Address[GraphNode]` multiset under children-pointers | Identity is the multiset of output-root addresses |
 
 ## 20.4 Canonical serialization rule
 
@@ -169,7 +169,9 @@ One rule, used everywhere `Address[D]` is computed:
 
 ## 20.5 Hot-path commitments
 
-No hot path is worse than `O(log n)`. No hot path requires a solver
+No **runtime per-sample** hot path is worse than `O(log n)` (the two
+super-logarithmic rows below — symmetry projector, evidence aggregation —
+are compile-time / cached / cert-side, not per-sample). No hot path requires a solver
 call. No hot path requires duplicate serialization.
 
 | Op | Asymptotic | Constant factor |

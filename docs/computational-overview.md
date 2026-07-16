@@ -106,7 +106,8 @@ Four op-signatures specialize the Merkle DAG:
 | C1 | 10 closed/open vocabularies (`StateComponent`, `NodeKind`, `BundleId`, `AxisLabel`, `CategoryTag`, …) | `Universe[T]` + dense ordinals | ordinal compare |
 | C2 | registered generators (`FormulaRecord`, `ResidualGenerator`, `CouplingChannel`) | registry-universe element, kind-indexed dispatch | `Address[Element]` |
 | C3 | sidecars (Stage 1/2/2.5/4) | `PersistentMap[TypedKey, EvidenceBearing[V]]`, HAMT-32, stage-visible | root address |
-| C4 | evidence + symbolic forms | `MerkleDAG[EvidenceOps,…]` / `MerkleDAG[SymbolicTensorOps,…]`, hash-consed | root address |
+| C4 | evidence (the EvidenceDAG) | `MerkleDAG[EvidenceOps, EvidencePayload]`, persistent | root address |
+| — | symbolic forms (`InvariantTerm` / `FormulaApply`) — a separate fiber, not C4 | `MerkleDAG[SymbolicTensorOps, TypedLeaf]`, hash-consed | root address |
 | C5 | all content addresses (node id, `ResidualKey`, generator-hash, cache keys) | SHA-256 domain-separated (§2.2) | 256-bit digest |
 | C6 | selected subsets (`CouplingSpec`, active residual/formula/bundle subsets) | `SparseSet[RegistryUniverse]` (Boolean lattice) | subset root |
 | C7 | sparse masks (`RoaringCoverageMask`, axis sets, irrep-block indices) | `SparseSet[Universe]`, density-derived | root |
@@ -117,7 +118,9 @@ is the closure of output addresses under children-pointers — no separate edge 
 
 ### 2.5 Hot-path complexity commitments (`arch-20 §20.5`)
 
-**No hot path exceeds `O(log n)`; none calls a solver; none serializes twice.**
+**No runtime per-sample hot path exceeds `O(log n)`; none calls a solver; none serializes
+twice.** (The super-logarithmic rows below — symmetry projector, evidence aggregation — are
+compile-time / cached / cert-side, per `arch-20 §20.5`.)
 
 | Operation | Asymptotic | Constant |
 |---|---|---|
@@ -165,7 +168,7 @@ encoding grid** `(Basis ∈ {Real, Reciprocal, Wannier, NaturalOrbital, Symmetry
 (Form ∈ {Dense, Sparse, BlockDiag, LowRank})`. Stage 4 selects exactly one slot per
 density-matrix node.
 
-**Selection decision procedure** (by `(PeriodicityStructure, SiteDecoration)`, `arch-15 §15.2`):
+**Selection decision procedure** (by `(PeriodicityStructure, SiteDecoration)`, `arch-15 §15.1`):
 - periodic bulk → `(Reciprocal, BlockDiag)` (MVP default)
 - defect / surface / amorphous → `(Real, Sparse)`
 - interface layers / dangling bonds → `(Wannier, Sparse)`
@@ -183,7 +186,7 @@ optimization.** Warm-start seed: a tight-binding `~18×18` Hamiltonian per k (ki
 the SCF inner loop. Beyond MVP, supercells grow `N_PW` linearly; orbital storage stays linear
 in `N_atoms × N_b` *provided the encoding is never densified*.
 
-**Read/write asymmetry** (`arch-15 §15.3`) — optimize for read:
+**Read/write asymmetry** (`arch-15 §15.2`) — optimize for read:
 - **Read path (dominant, every trajectory step):** lazy materialization via destructor methods —
   apply operator (`matmat` against the `N_PW × N_b` factors), extract density (outer products),
   trace (inner products), eigendecomposition. Costs are set by `N_b` (the rank), not `N_PW²`.
@@ -234,10 +237,10 @@ Node = ( id   : Address[GraphNode]          -- hash-cons identity
        , type : Layer0Type                  -- the 4 typeclasses (arch-10)
        , kind : NodeKind , role : OutputRole )
 
-NodeKind   = Input(StateSlot | EnvScalar)
+NodeKind   = Input(InputKind)            -- InputKind = StateSlot(StateComponent) | EnvScalar(EnvField)
            | FormulaApply(formula : NamedFormula, args : [NodeId])     -- 132 formulas
            | MethodInvoke(method  : NamedMethod,  args : [NodeId])     -- 12 methods
-OutputRole = Internal | Observable(bundle : 1..11) | ResidualLeaf(ResidualKey)
+OutputRole = Internal | Observable(bundle : BundleId) | ResidualLeaf(ResidualKey)
 ```
 
 - **Edges are the `args` lists** inside apply/invoke nodes — there is no separate edge table;
@@ -245,10 +248,12 @@ OutputRole = Internal | Observable(bundle : 1..11) | ResidualLeaf(ResidualKey)
 - **Identity / hash-consing:** identical subgraphs collapse to one address (`O(1)` amortized
   via the address table). Two graphs are equal iff their output-root multisets match.
 - **Per-stage sidecars** (`arch-06 §6.4`): ephemeral `Map<NodeId, T>` produced by one stage and
-  consumed by the next, **not** hash-consed, erased before runtime. Stage-visibility poset
+  visible to later stages per the poset, **not** hash-consed, erased before runtime. Stage-visibility poset
   `1 < 2 < 2.5 < 3 < 4 < 5`. Backed by HAMT-32 (C3).
   - `Stage1Sidecar.applicability : Map<NodeId, Predicate>` (discarded after pruning)
+  - `Stage1Sidecar.coupling-channels : List<CouplingChannel>` (consumed by Stage 2.5)
   - `Stage2Sidecar.symmetry : Map<NodeId, IrrepBlock>` (consumed by Stage 4)
+  - `Stage2_5Sidecar.invariants : Map<CouplingChannel, GeneratorOutput>` (consumed by Stage 3)
   - `Stage4Sidecar.compression : Map<NodeId, CompressionPlan>`, `.adjoint : Map<FixedPointNodeId, AdjointSolver>` (erased after codegen)
 
 **`CompressionPlan` family (`arch-06 §6.4`) and its Stage-4 decision procedure:**
@@ -298,8 +303,10 @@ the work Stage 5 will do*:
 3. If non-empty, apply the **Reynolds (trivial-irrep) projector** `P = (1/|G|) Σ_g ρ(g)` to the
    target tensor `T` (`O(|G|·dim(T)²)`, ≤ ~12 M ops worst case). Result cached on
    `Address[CrystalSymmetryGroup] × Address[CouplingChannel]`.
-   Bounds enforced: `|G| ≤ 192`, `dim(T) ≤ 250`, ≤ 12 M ops. Output: `InvariantTerm`s as
-   `MerkleDAG[SymbolicTensorOps, …]`, lowered in Stage 3 into `FormulaApply` nodes on the
+   Bounds enforced: `|G| ≤ 192`, `dim(T) ≤ 250`, ≤ 12 M ops. Output: one `GeneratorOutput`
+   per channel (`arch-19 §19.3` — the `InvariantTerm` basis as
+   `MerkleDAG[SymbolicTensorOps, …]` plus the `polynomial_sufficient` echo and any
+   `kernel_extension`), lowered in Stage 3 into `FormulaApply` nodes on the
    `E_coupling` / `L_assembly` / `M_assembly` aggregators (`arch-05`).
 
 **Stage 3 — algebraic simplification.** Hash-consing (intern identical subexpressions, `O(1)`

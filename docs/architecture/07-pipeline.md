@@ -31,7 +31,8 @@ fidelity. Runtime cost is bounded by compose-time specialization, symmetry
 quotienting, compression, and structural sharing — every kernel emerging from
 the pipeline below is fast by construction.
 
-The pipeline runs in five stages. The first four execute **once per
+The pipeline runs in five stages plus the Stage-2.5 invariant-synthesis
+sub-stage. Everything before Stage 5 executes **once per
 `(PeriodicityStructure, SiteDecoration, Environment)` tuple**, producing
 a compiled kernel. The fifth applies that kernel to dense state vectors
 millions of times per training run.
@@ -93,7 +94,9 @@ irrep-block decomposition: same machinery as §7.2, used to *build*
 invariants rather than *decompose* operators.
 
 **Sidecar produced.** `Stage2_5Sidecar.invariants : Map<CouplingChannel,
-List<InvariantTerm>>`. Consumed by Stage 3 when the invariants are
+GeneratorOutput>` (the full generator contract of `arch-19 §19.3` — the
+polynomial basis plus the `polynomial_sufficient` echo and any
+`kernel_extension`). Consumed by Stage 3 when the invariants are
 lowered into `FormulaApply` nodes attached to the `E_coupling`,
 `L_assembly`, and `M_assembly` aggregator methods.
 
@@ -173,6 +176,7 @@ how to reduce it.
 |---|---|---|---|
 | 1 Symbolic lift | once per composition | seconds | pruned graph |
 | 2 Symmetry quotient | once per composition | seconds | reduced graph + symmetry sidecar |
+| 2.5 Invariant synthesis | once per composition | seconds | invariant sidecar (`GeneratorOutput` per channel) |
 | 3 Algebraic simplification | once per composition | seconds | shared, sparse graph |
 | 4 Lower + adjoint synthesis | once per composition | seconds–minutes | compiled kernel |
 | 5 Runtime kernel application | per state sample | microseconds–milliseconds | residual + gradient |

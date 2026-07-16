@@ -381,8 +381,9 @@ their keep; one (`type`) reuses the existing Layer-0 typeclass alphabet;
 one (`id`) is the hash-cons identity. Per-node decorations —
 applicability predicates, symmetry annotations, compression plans,
 adjoint strategies, cert hooks, provenance tags — live instead in
-per-stage sidecars (§6.4), produced by one stage and consumed by the
-next, never carried into the runtime kernel.
+per-stage sidecars (§6.4), produced by one stage and visible to later
+stages per the stage poset (`arch-20 §20.6`), never carried into the
+runtime kernel.
 
 `NodeKind` (§6.2) is the closed C1 vocabulary that discriminates the
 typed payload sum; this is the substrate's primary closed-polymorphism
@@ -432,7 +433,7 @@ What about constructs that look like they might be additional node kinds?
 ```
 OutputRole =
   | Internal
-  | Observable(bundle : 1..11)
+  | Observable(bundle : BundleId)         -- the C1 universe (B1..B11)
   | ResidualLeaf(key : ResidualKey)
 ```
 
@@ -444,14 +445,19 @@ granularity-keyed `ResidualVector` defined in `arch-11-residuals`.
 
 ## 6.4 Per-stage sidecars
 
-Information that stages decide *about* nodes lives in maps keyed by
-`NodeId`. Each map is produced by one stage and consumed by the next;
-sidecars are not part of the node's identity, are not hash-consed, and
-do not survive past their consumer.
+Information that stages decide *about* nodes (or channels) lives in maps
+keyed by a typed sidecar key — `NodeId` for per-node decorations,
+`CouplingChannel` for the invariant sidecar (`arch-20 §20.3` cluster C3
+uses the generic `TypedKey`). Each map is produced by one stage and
+visible to any later stage per the visibility poset `1 < 2 < 2.5 < 3 <
+4 < 5` (`arch-20 §20.6`); sidecars are not part of the node's identity,
+are not hash-consed, and do not survive past their last consumer.
 
 ```
-Stage1Sidecar.applicability  : Map<NodeId, Predicate>      -- consumed and discarded
-Stage2Sidecar.symmetry       : Map<NodeId, IrrepBlock>     -- consumed by Stage 4
+Stage1Sidecar.applicability     : Map<NodeId, Predicate>      -- consumed and discarded
+Stage1Sidecar.coupling-channels : List<CouplingChannel>        -- consumed by Stage 2.5
+Stage2Sidecar.symmetry          : Map<NodeId, IrrepBlock>      -- consumed by Stage 4
+Stage2_5Sidecar.invariants      : Map<CouplingChannel, GeneratorOutput>  -- consumed by Stage 3
 Stage4Sidecar.compression    : Map<NodeId, CompressionPlan>
 Stage4Sidecar.adjoint        : Map<FixedPointNodeId, AdjointSolver>
 
@@ -521,7 +527,8 @@ fidelity. Runtime cost is bounded by compose-time specialization, symmetry
 quotienting, compression, and structural sharing — every kernel emerging from
 the pipeline below is fast by construction.
 
-The pipeline runs in five stages. The first four execute **once per
+The pipeline runs in five stages plus the Stage-2.5 invariant-synthesis
+sub-stage. Everything before Stage 5 executes **once per
 `(PeriodicityStructure, SiteDecoration, Environment)` tuple**, producing
 a compiled kernel. The fifth applies that kernel to dense state vectors
 millions of times per training run.
@@ -583,7 +590,9 @@ irrep-block decomposition: same machinery as §7.2, used to *build*
 invariants rather than *decompose* operators.
 
 **Sidecar produced.** `Stage2_5Sidecar.invariants : Map<CouplingChannel,
-List<InvariantTerm>>`. Consumed by Stage 3 when the invariants are
+GeneratorOutput>` (the full generator contract of `arch-19 §19.3` — the
+polynomial basis plus the `polynomial_sufficient` echo and any
+`kernel_extension`). Consumed by Stage 3 when the invariants are
 lowered into `FormulaApply` nodes attached to the `E_coupling`,
 `L_assembly`, and `M_assembly` aggregator methods.
 
@@ -663,6 +672,7 @@ how to reduce it.
 |---|---|---|---|
 | 1 Symbolic lift | once per composition | seconds | pruned graph |
 | 2 Symmetry quotient | once per composition | seconds | reduced graph + symmetry sidecar |
+| 2.5 Invariant synthesis | once per composition | seconds | invariant sidecar (`GeneratorOutput` per channel) |
 | 3 Algebraic simplification | once per composition | seconds | shared, sparse graph |
 | 4 Lower + adjoint synthesis | once per composition | seconds–minutes | compiled kernel |
 | 5 Runtime kernel application | per state sample | microseconds–milliseconds | residual + gradient |
@@ -2723,17 +2733,17 @@ substrate fibers.
 
 | Cluster | Shape | Backend / signature |
 |---|---|---|
-| C1 vocabularies (`StateComponent`, `SubDofTag`, `IrrepLabel`, `OutputRole`, `NodeKind`, `InputKind`, `CategoryTag`, `AxisLabel`, `BundleId`, `RegimeTag`) | `Universe[T]` instances with dense ordinals | Closed = `DenseU32`; Open = `DenseU64` with append-only registry |
+| C1 vocabularies (`StateComponent`, `SubDofTag`, `IrrepLabel`, `OutputRole`, `NodeKind`, `InputKind`, `CategoryTag`, `AxisLabel`, `BundleId`, `Layer0Type`) | `Universe[T]` instances with dense ordinals | Closed = `DenseU32`; Open = `DenseU64` with append-only registry |
 | C2 registered generators (`FormulaRecord`, `ResidualGenerator`, `CouplingChannel`) | `Element[RegistryUniverse[k]]` | Kind-indexed dispatch; payload canonicalized by C5 rule |
 | C5 content addressing (`ContentAddress`, `ResidualKey`, `generator-hash`, cache keys, sidecar fingerprints) | `Address[D]` | SHA-256, domain-separated |
 | C6 selected subsets (`CouplingSpec`, active-residual / formula / bundle subsets) | `SparseSet[RegistryUniverse]` in Boolean lattice | HAMT / Roaring; subset identity = root |
 | C7 sparse masks (`RoaringCoverageMask`, axis sets, subgraph node sets, irrep-block indices) | `SparseSet[Universe]` | Density-derived per universe |
 | C3 sidecars (Stage 1 / 2 / 2.5 / 4 sidecars) | `PersistentMap[TypedKey, EvidenceBearing[V]]` | HAMT, branching 32; stage-visible |
-| C4 evidence (`Witness`, `OneShotCert`, `IterativeResult`, ten obligation outputs) | `MerkleDAG[EvidenceOps, EvidencePayload]` | Persistent attestation DAG |
+| C4 evidence — the **EvidenceDAG** (`Witness`, `OneShotCert`, `IterativeResult`, ten obligation outputs) | `MerkleDAG[EvidenceOps, EvidencePayload]` | Persistent attestation DAG |
 | `InvariantTerm` / `FormulaApply` symbolic form | `MerkleDAG[SymbolicTensorOps, TypedLeaf]` | Hash-consed tensor-algebra DAG |
 | Applicability predicates | `MerkleDAG[PredicateOps, C1Atom]` | Versioned ROBDD over C1 atoms |
 | `CrystalSymmetryGroup` | Graded composite atlas (sui generis) + `MerkleDAG[GroupOps, …]` derived caches | See `arch-09-vocabularies §9.5` |
-| `PhysicsGraph` | Closure of output `Address[Node]` set under children-pointers | Identity is the multiset of output-root addresses |
+| `PhysicsGraph` | Closure of output `Address[GraphNode]` multiset under children-pointers | Identity is the multiset of output-root addresses |
 
 ## 20.4 Canonical serialization rule
 
@@ -2778,7 +2788,9 @@ One rule, used everywhere `Address[D]` is computed:
 
 ## 20.5 Hot-path commitments
 
-No hot path is worse than `O(log n)`. No hot path requires a solver
+No **runtime per-sample** hot path is worse than `O(log n)` (the two
+super-logarithmic rows below — symmetry projector, evidence aggregation —
+are compile-time / cached / cert-side, not per-sample). No hot path requires a solver
 call. No hot path requires duplicate serialization.
 
 | Op | Asymptotic | Constant factor |

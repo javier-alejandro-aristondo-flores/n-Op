@@ -25,9 +25,9 @@ the file that owns its full definition (`canonical-for`).
 | **GroundTruthBridgeGenerator** | The `ResidualGenerator` subtype produced by `pino-bridge.Import`; loss is σ-scaled Huber against the imported target. | `arch-16-pino-bridge` |
 | **ResidualVector** | The runtime kernel's residual output: `Map<ResidualKey, Scalar>`. Aggregation lives in `/informed-operator`. | `arch-11-residuals` |
 | **ResidualGenerator** | The factory record that lifts a named formula into a `ResidualLeaf`-emitting generator. | `impl-07-residual-factory` |
-| **CompressionPlan** | Stage-4 codegen choice for compressed operator forms (HODLR, TT) and density-matrix encodings (`Basis × Form`). | `arch-15-gamma-hat` |
+| **CompressionPlan** | Stage-4 codegen choice for compressed operator forms (HODLR, TT) and density-matrix encodings (`Basis × Form`). (general enum owned by `arch-06 §6.4`; `arch-15` owns the density-matrix `Basis × Form` subspace) | `arch-06-physics-graph` |
 | **Stage 1** | Symbolic lift: `PhysicsGraph` construction from named formulas + methods. | `arch-07-pipeline` |
-| **Stage 2** | Symmetry quotient: IBZ + irreps reduction (up to 48× cubic, 96× with time reversal). | `arch-07-pipeline` |
+| **Stage 2** | Symmetry quotient: IBZ + irreps reduction (up to 48× fewer k-points in cubic systems). | `arch-07-pipeline` |
 | **Stage 3** | Algebraic simplification: hash-consing, structural-simplify, common-subexpression elimination. | `arch-07-pipeline` |
 | **Stage 4** | Lowering + adjoint synthesis: codegen, compression-plan instantiation, implicit-diff adjoint via Blondel 2022. | `arch-07-pipeline` |
 | **Stage 5** | Runtime kernel application (no graph mutation; pure evaluation). | `arch-07-pipeline` |
@@ -63,9 +63,9 @@ the file that owns its full definition (`canonical-for`).
 | **Universe** | Typed indexed registry of elements with optional dense ordinals and a density-derived backend policy; every C1 vocabulary, generator registry, and indexed leaf set is a `Universe` instance. | `arch-20-representations` |
 | **SparseSet** | Subset of a `Universe` with backend chosen by density (sorted tuple ≤ 8, bitset for dense small, Roaring for sparse large, HAMT/Merkle for persistent diffable); set identity is a Merkle root. | `arch-20-representations` |
 | **PersistentMap** | Stage-visible HAMT (branching 32) keyed by a typed `ContentAddress`; the storage shape of every sidecar and every value annotation in `/physics`. | `arch-20-representations` |
-| **TypedMerkleDAG** | Hash-consed Merkle DAG parametric over an op signature `S` and leaf type `L`; one substrate covering symbolic forms (`SymbolicTensorOps`), applicability (`PredicateOps` ROBDD), and evidence (`EvidenceOps`). | `arch-20-representations` |
+| **MerkleDAG[S, L]** | Hash-consed Merkle DAG parametric over an op signature `S` and leaf type `L`; one substrate covering symbolic forms (`SymbolicTensorOps`), applicability (`PredicateOps` ROBDD), evidence (`EvidenceOps`), and group algebra (`GroupOps`). | `arch-20-representations` |
 | **EvidenceBearing** | Sidecar value wrapper `(value, evidence : Optional<EvidenceId>, status_cache?)` — the attachment interface that fuses the C3 sidecar layer with the C4 persistent evidence DAG without merging their lifecycles. | `arch-20-representations` |
-| **EvidenceDAG** | Persistent `TypedMerkleDAG[EvidenceOps, EvidencePayload]` covering `Witness`, `OneShotCert`, `IterativeResult`, and the ten cert-obligation outputs as one indexed family with verdict-semilattice aggregation. | `arch-20-representations` |
+| **EvidenceDAG** | Persistent `MerkleDAG[EvidenceOps, EvidencePayload]` covering `Witness`, `OneShotCert`, `IterativeResult`, and the ten cert-obligation outputs as one indexed family with verdict-semilattice aggregation. | `arch-20-representations` |
 | **SymbolicTensorOps** | Op signature derived from the target shapes (`Scalar`, `AntisymmForm`, `PSDSymmForm`) of `arch-19-coupling-structure`; presented as a colored-operad / free symmetric monoidal category whose terms are stored as a hash-consed Merkle DAG. | `arch-20-representations` |
 | **PredicateOps** | ROBDD op signature over typed parameterized C1 atoms with a versioned atom order; the storage shape of every `applicability` predicate. | `arch-20-representations` |
 | **GroupOps** | Op signature for `CrystalSymmetryGroup` finite-quotient algebra (multiplication, inversion, restriction, antipode/TR-twist, character, projector); derived outputs (irrep tables, Fourier projectors, BZ stalks) are ordinary substrate fibers. | `arch-20-representations` |

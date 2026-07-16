@@ -7,6 +7,7 @@ canonical-for:
   - topology atlas
 depends-on: []
 referenced-by:
+  - arch-06-physics-graph
   - arch-07-pipeline
 research-sources: []
 ---

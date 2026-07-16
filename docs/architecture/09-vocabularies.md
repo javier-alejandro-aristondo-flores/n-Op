@@ -6,15 +6,31 @@ revision: 1
 canonical-for:
   - vocabulary counts
   - theory-context vocabularies
-depends-on: []
+depends-on:
+  - arch-01-purpose
+  - arch-07-pipeline
+  - arch-12-cert
+  - arch-13-applicability
+  - arch-19-coupling-structure
+  - arch-20-representations
+  - arch-21-multiscale-state
+  - impl-03-templates
+  - impl-04-formulas
+  - impl-07-residual-factory
 referenced-by:
   - arch-06-physics-graph
   - arch-07-pipeline
   - arch-11-residuals
-  - impl-09-cross-cutting
+  - arch-15-gamma-hat
   - arch-19-coupling-structure
   - arch-20-representations
   - arch-21-multiscale-state
+  - impl-02-methods
+  - impl-03-templates
+  - impl-05-bundles
+  - impl-07-residual-factory
+  - impl-11-verification
+  - mvp-03-capabilities
 research-sources: []
 ---
 # Canonical vocabularies and counts

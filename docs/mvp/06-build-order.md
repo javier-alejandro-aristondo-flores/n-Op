@@ -5,8 +5,12 @@ status: draft
 revision: 1
 canonical-for:
   - MVP build order
-depends-on: []
-referenced-by: []
+depends-on:
+  - impl-10-build-sequence
+  - mvp-04-in-mvp-vs-deferred
+  - mvp-05-decisions-forced
+referenced-by:
+  - arch-01-purpose
 research-sources: []
 ---
 # MVP build order

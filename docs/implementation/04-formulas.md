@@ -5,9 +5,15 @@ status: draft
 revision: 1
 canonical-for:
   - formula registry signatures
-depends-on: []
+depends-on:
+  - impl-10-build-sequence
 referenced-by:
+  - arch-09-vocabularies
+  - arch-18-open-decisions
+  - arch-19-coupling-structure
+  - arch-21-multiscale-state
   - impl-07-residual-factory
+  - impl-10-build-sequence
 research-sources: []
 ---
 # The named-formula registry

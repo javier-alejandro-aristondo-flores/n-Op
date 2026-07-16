@@ -5,7 +5,12 @@ status: draft
 revision: 1
 canonical-for:
   - MVP capabilities
-depends-on: []
+depends-on:
+  - arch-08-bo-levels
+  - arch-09-vocabularies
+  - arch-11-residuals
+  - arch-12-cert
+  - mvp-05-decisions-forced
 referenced-by: []
 research-sources: []
 ---

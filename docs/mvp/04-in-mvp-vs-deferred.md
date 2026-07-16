@@ -5,8 +5,11 @@ status: draft
 revision: 1
 canonical-for:
   - MVP scope
-depends-on: []
-referenced-by: []
+depends-on:
+  - arch-05-generic
+  - arch-11-residuals
+referenced-by:
+  - mvp-06-build-order
 research-sources: []
 ---
 # In-MVP vs deferred

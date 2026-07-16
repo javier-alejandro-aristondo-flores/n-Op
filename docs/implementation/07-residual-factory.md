@@ -11,12 +11,25 @@ depends-on:
   - arch-06-physics-graph
   - arch-07-pipeline
   - arch-08-bo-levels
+  - arch-09-vocabularies
   - arch-11-residuals
+  - arch-12-cert
+  - arch-16-pino-bridge
+  - arch-20-representations
   - impl-04-formulas
 referenced-by:
-  - impl-09-cross-cutting
+  - arch-07-pipeline
+  - arch-08-bo-levels
+  - arch-09-vocabularies
+  - arch-11-residuals
+  - arch-12-cert
+  - arch-16-pino-bridge
   - arch-19-coupling-structure
   - arch-20-representations
+  - impl-03-templates
+  - impl-09-cross-cutting
+  - impl-10-build-sequence
+  - impl-11-verification
 research-sources: []
 ---
 

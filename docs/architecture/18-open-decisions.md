@@ -5,9 +5,28 @@ status: draft
 revision: 1
 canonical-for:
   - open decisions
-depends-on: []
-referenced-by:
+depends-on:
+  - arch-01-purpose
+  - arch-04-state
+  - arch-05-generic
+  - arch-06-physics-graph
+  - arch-07-pipeline
+  - arch-08-bo-levels
+  - arch-11-residuals
+  - arch-12-cert
+  - arch-15-gamma-hat
+  - arch-16-pino-bridge
+  - arch-19-coupling-structure
+  - arch-20-representations
   - arch-21-multiscale-state
+  - impl-04-formulas
+  - impl-10-build-sequence
+referenced-by:
+  - arch-06-physics-graph
+  - arch-19-coupling-structure
+  - arch-21-multiscale-state
+  - impl-10-build-sequence
+  - mvp-05-decisions-forced
 research-sources:
   - physics/research/implementation-language.md
 ---

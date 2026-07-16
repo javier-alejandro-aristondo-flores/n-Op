@@ -5,8 +5,11 @@ status: draft
 revision: 1
 canonical-for:
   - top-level inputs
-depends-on: []
+depends-on:
+  - arch-21-multiscale-state
 referenced-by:
+  - arch-06-physics-graph
+  - arch-07-pipeline
   - arch-21-multiscale-state
 research-sources: []
 ---

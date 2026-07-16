@@ -5,8 +5,12 @@ status: draft
 revision: 1
 canonical-for:
   - template signatures
-depends-on: []
-referenced-by: []
+depends-on:
+  - arch-09-vocabularies
+  - arch-21-multiscale-state
+  - impl-07-residual-factory
+referenced-by:
+  - arch-09-vocabularies
 research-sources: []
 ---
 # The 20 abstract-property templates

@@ -6,10 +6,13 @@ revision: 2
 canonical-for:
   - cross-cutting rules
 depends-on:
+  - arch-06-physics-graph
+  - arch-07-pipeline
   - arch-08-bo-levels
-  - arch-09-vocabularies
   - arch-11-residuals
   - arch-12-cert
+  - arch-13-applicability
+  - arch-15-gamma-hat
   - arch-16-pino-bridge
   - arch-19-coupling-structure
   - impl-07-residual-factory

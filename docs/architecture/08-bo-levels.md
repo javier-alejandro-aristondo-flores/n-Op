@@ -10,10 +10,19 @@ depends-on:
   - arch-04-state
   - arch-05-generic
   - arch-06-physics-graph
+  - arch-07-pipeline
+  - arch-11-residuals
+  - arch-21-multiscale-state
+  - impl-07-residual-factory
 referenced-by:
+  - arch-04-state
+  - arch-05-generic
+  - arch-06-physics-graph
+  - arch-18-open-decisions
+  - arch-21-multiscale-state
   - impl-07-residual-factory
   - impl-09-cross-cutting
-  - arch-21-multiscale-state
+  - mvp-03-capabilities
 research-sources:
   - physics/research/group-A-ion-dynamics.md
   - physics/research/group-B-electronic-magnetic-optical.md

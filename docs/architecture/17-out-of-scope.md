@@ -5,9 +5,16 @@ status: draft
 revision: 1
 canonical-for:
   - scope exclusions
-depends-on: []
-referenced-by: []
-research-sources: []
+depends-on:
+  - arch-01-purpose
+  - arch-11-residuals
+  - arch-12-cert
+  - arch-19-coupling-structure
+  - arch-21-multiscale-state
+referenced-by:
+  - arch-21-multiscale-state
+research-sources:
+  - physics/research/non-equilibrium-high-field.md
 ---
 # Out of scope
 

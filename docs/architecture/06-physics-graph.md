@@ -8,19 +8,34 @@ canonical-for:
   - NodeKind, OutputRole, ResidualKey
   - per-stage sidecars
 depends-on:
+  - arch-03-inputs
   - arch-04-state
   - arch-05-generic
+  - arch-07-pipeline
+  - arch-08-bo-levels
   - arch-09-vocabularies
   - arch-10-typeclasses
+  - arch-11-residuals
+  - arch-12-cert
+  - arch-13-applicability
+  - arch-14-topology
+  - arch-15-gamma-hat
+  - arch-16-pino-bridge
+  - arch-18-open-decisions
+  - arch-19-coupling-structure
+  - arch-20-representations
 referenced-by:
   - arch-07-pipeline
   - arch-08-bo-levels
   - arch-11-residuals
   - arch-15-gamma-hat
   - arch-16-pino-bridge
-  - impl-07-residual-factory
+  - arch-18-open-decisions
   - arch-19-coupling-structure
   - arch-20-representations
+  - arch-21-multiscale-state
+  - impl-07-residual-factory
+  - impl-09-cross-cutting
 research-sources: []
 ---
 

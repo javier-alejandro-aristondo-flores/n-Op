@@ -8,13 +8,23 @@ canonical-for:
   - Validate signature
   - Import signature
 depends-on:
+  - arch-04-state
   - arch-06-physics-graph
   - arch-07-pipeline
   - arch-11-residuals
   - arch-12-cert
+  - impl-07-residual-factory
 referenced-by:
-  - impl-09-cross-cutting
+  - arch-06-physics-graph
+  - arch-12-cert
+  - arch-13-applicability
+  - arch-18-open-decisions
+  - arch-20-representations
   - arch-21-multiscale-state
+  - impl-07-residual-factory
+  - impl-09-cross-cutting
+  - impl-10-build-sequence
+  - impl-11-verification
 research-sources:
   - informed-operator/design/residual-loss-methodology.md
 ---

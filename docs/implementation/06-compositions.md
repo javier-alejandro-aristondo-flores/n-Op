@@ -5,8 +5,12 @@ status: draft
 revision: 1
 canonical-for:
   - per-regime compositions
-depends-on: []
-referenced-by: []
+depends-on:
+  - arch-11-residuals
+  - arch-12-cert
+referenced-by:
+  - arch-05-generic
+  - impl-11-verification
 research-sources: []
 ---
 # Target observables as typed compositions

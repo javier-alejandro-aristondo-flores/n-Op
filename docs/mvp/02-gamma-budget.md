@@ -5,8 +5,10 @@ status: draft
 revision: 1
 canonical-for:
   - γ̂ MVP budget
-depends-on: []
-referenced-by: []
+depends-on:
+  - mvp-05-decisions-forced
+referenced-by:
+  - arch-15-gamma-hat
 research-sources: []
 ---
 # γ̂ budget at MVP scale

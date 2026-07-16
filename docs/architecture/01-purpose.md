@@ -6,8 +6,13 @@ revision: 1
 canonical-for:
   - purpose
   - mvp scope
-depends-on: []
-referenced-by: []
+depends-on:
+  - mvp-01-system
+  - mvp-06-build-order
+referenced-by:
+  - arch-09-vocabularies
+  - arch-17-out-of-scope
+  - arch-18-open-decisions
 research-sources: []
 ---
 # Purpose and scope

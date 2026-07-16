@@ -6,12 +6,31 @@ revision: 1
 canonical-for:
   - ten cert obligations
   - reference-cache backend
-depends-on: []
-referenced-by:
+depends-on:
+  - arch-05-generic
+  - arch-07-pipeline
+  - arch-10-typeclasses
+  - arch-11-residuals
   - arch-16-pino-bridge
-  - impl-09-cross-cutting
   - arch-19-coupling-structure
   - arch-20-representations
+  - impl-07-residual-factory
+referenced-by:
+  - arch-06-physics-graph
+  - arch-07-pipeline
+  - arch-09-vocabularies
+  - arch-11-residuals
+  - arch-13-applicability
+  - arch-16-pino-bridge
+  - arch-17-out-of-scope
+  - arch-18-open-decisions
+  - arch-19-coupling-structure
+  - arch-20-representations
+  - impl-06-compositions
+  - impl-07-residual-factory
+  - impl-08-cert-detail
+  - impl-09-cross-cutting
+  - mvp-03-capabilities
 research-sources: []
 ---
 # Cert obligations

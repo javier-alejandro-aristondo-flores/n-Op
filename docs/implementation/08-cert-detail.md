@@ -5,7 +5,10 @@ status: draft
 revision: 1
 canonical-for:
   - cert obligation detail
-depends-on: []
+depends-on:
+  - arch-05-generic
+  - arch-11-residuals
+  - arch-12-cert
 referenced-by: []
 research-sources: []
 ---

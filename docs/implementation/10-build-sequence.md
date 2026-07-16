@@ -6,9 +6,19 @@ revision: 1
 canonical-for:
   - build sequence
 depends-on:
+  - arch-05-generic
+  - arch-16-pino-bridge
+  - arch-18-open-decisions
   - arch-19-coupling-structure
-referenced-by: []
-research-sources: []
+  - impl-04-formulas
+  - impl-07-residual-factory
+referenced-by:
+  - arch-05-generic
+  - arch-18-open-decisions
+  - impl-04-formulas
+  - mvp-06-build-order
+research-sources:
+  - physics/research/implementation-language.md
 ---
 # Build sequence
 

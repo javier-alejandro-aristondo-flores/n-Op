@@ -8,17 +8,31 @@ canonical-for:
   - always-cheap discipline
   - stage boundaries
 depends-on:
+  - arch-03-inputs
+  - arch-04-state
   - arch-06-physics-graph
   - arch-09-vocabularies
+  - arch-11-residuals
+  - arch-12-cert
   - arch-13-applicability
   - arch-14-topology
+  - arch-19-coupling-structure
+  - impl-07-residual-factory
 referenced-by:
+  - arch-06-physics-graph
+  - arch-08-bo-levels
+  - arch-09-vocabularies
   - arch-11-residuals
+  - arch-12-cert
+  - arch-13-applicability
   - arch-15-gamma-hat
   - arch-16-pino-bridge
-  - impl-07-residual-factory
+  - arch-18-open-decisions
   - arch-19-coupling-structure
   - arch-20-representations
+  - arch-21-multiscale-state
+  - impl-07-residual-factory
+  - impl-09-cross-cutting
 research-sources:
   - physics/research/applicability-classifiers.md
   - informed-operator/design/residual-loss-methodology.md

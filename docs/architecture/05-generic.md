@@ -6,13 +6,29 @@ revision: 1
 canonical-for:
   - GENERIC equation
   - nine regimes as extractions
-depends-on: []
+depends-on:
+  - arch-04-state
+  - arch-08-bo-levels
+  - arch-11-residuals
+  - arch-19-coupling-structure
+  - arch-21-multiscale-state
+  - impl-06-compositions
+  - impl-10-build-sequence
 referenced-by:
+  - arch-04-state
   - arch-06-physics-graph
   - arch-08-bo-levels
+  - arch-11-residuals
+  - arch-12-cert
+  - arch-13-applicability
+  - arch-18-open-decisions
   - arch-19-coupling-structure
   - arch-20-representations
   - arch-21-multiscale-state
+  - impl-08-cert-detail
+  - impl-10-build-sequence
+  - impl-11-verification
+  - mvp-04-in-mvp-vs-deferred
 research-sources: []
 ---
 # Dynamics — GENERIC

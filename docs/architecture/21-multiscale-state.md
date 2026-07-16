@@ -19,14 +19,29 @@ depends-on:
   - arch-03-inputs
   - arch-04-state
   - arch-05-generic
+  - arch-06-physics-graph
+  - arch-07-pipeline
   - arch-08-bo-levels
   - arch-09-vocabularies
   - arch-11-residuals
   - arch-16-pino-bridge
+  - arch-17-out-of-scope
   - arch-18-open-decisions
   - arch-19-coupling-structure
   - arch-20-representations
-referenced-by: []
+  - impl-04-formulas
+referenced-by:
+  - arch-03-inputs
+  - arch-04-state
+  - arch-05-generic
+  - arch-08-bo-levels
+  - arch-09-vocabularies
+  - arch-11-residuals
+  - arch-13-applicability
+  - arch-17-out-of-scope
+  - arch-18-open-decisions
+  - impl-03-templates
+  - mvp-01-system
 research-sources:
   - physics/research/defects-surfaces-interfaces.md
   - physics/research/non-equilibrium-high-field.md

@@ -9,6 +9,8 @@ depends-on: []
 referenced-by:
   - arch-06-physics-graph
   - arch-11-residuals
+  - arch-12-cert
+  - arch-13-applicability
   - arch-20-representations
 research-sources: []
 ---

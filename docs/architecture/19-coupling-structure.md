@@ -19,15 +19,26 @@ depends-on:
   - arch-06-physics-graph
   - arch-07-pipeline
   - arch-09-vocabularies
+  - arch-12-cert
+  - arch-13-applicability
+  - arch-18-open-decisions
+  - arch-20-representations
+  - impl-04-formulas
+  - impl-07-residual-factory
+referenced-by:
+  - arch-05-generic
+  - arch-06-physics-graph
+  - arch-07-pipeline
+  - arch-09-vocabularies
   - arch-11-residuals
   - arch-12-cert
   - arch-13-applicability
-  - impl-07-residual-factory
-referenced-by:
-  - impl-09-cross-cutting
-  - impl-10-build-sequence
+  - arch-17-out-of-scope
+  - arch-18-open-decisions
   - arch-20-representations
   - arch-21-multiscale-state
+  - impl-09-cross-cutting
+  - impl-10-build-sequence
 research-sources: []
 ---
 # Coupling structure

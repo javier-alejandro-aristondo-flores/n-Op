@@ -5,9 +5,15 @@ status: draft
 revision: 1
 canonical-for:
   - MVP-forced decisions
-depends-on: []
-referenced-by: []
-research-sources: []
+depends-on:
+  - arch-11-residuals
+  - arch-18-open-decisions
+referenced-by:
+  - mvp-02-gamma-budget
+  - mvp-03-capabilities
+  - mvp-06-build-order
+research-sources:
+  - physics/research/implementation-language.md
 ---
 # Decisions this slice forces
 

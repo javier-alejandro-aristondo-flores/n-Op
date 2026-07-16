@@ -21,10 +21,20 @@ depends-on:
   - arch-11-residuals
   - arch-12-cert
   - arch-13-applicability
+  - arch-16-pino-bridge
   - arch-19-coupling-structure
   - impl-07-residual-factory
 referenced-by:
+  - arch-04-state
+  - arch-06-physics-graph
+  - arch-09-vocabularies
+  - arch-11-residuals
+  - arch-12-cert
+  - arch-13-applicability
+  - arch-18-open-decisions
+  - arch-19-coupling-structure
   - arch-21-multiscale-state
+  - impl-07-residual-factory
 research-sources: []
 ---
 # Representation substrate

@@ -5,7 +5,8 @@ status: draft
 revision: 1
 canonical-for:
   - bundle signatures
-depends-on: []
+depends-on:
+  - arch-09-vocabularies
 referenced-by: []
 research-sources: []
 ---

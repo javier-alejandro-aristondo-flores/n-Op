@@ -5,8 +5,10 @@ status: draft
 revision: 1
 canonical-for:
   - diamond MVP system
-depends-on: []
-referenced-by: []
+depends-on:
+  - arch-21-multiscale-state
+referenced-by:
+  - arch-01-purpose
 research-sources: []
 ---
 # The system

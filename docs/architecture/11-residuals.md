@@ -9,17 +9,36 @@ canonical-for:
   - the nineteen residual categories
   - per-residual error composition
 depends-on:
+  - arch-04-state
+  - arch-05-generic
   - arch-06-physics-graph
   - arch-07-pipeline
   - arch-09-vocabularies
   - arch-10-typeclasses
-referenced-by:
-  - arch-16-pino-bridge
-  - impl-07-residual-factory
-  - impl-09-cross-cutting
+  - arch-12-cert
+  - arch-15-gamma-hat
   - arch-19-coupling-structure
   - arch-20-representations
   - arch-21-multiscale-state
+  - impl-07-residual-factory
+referenced-by:
+  - arch-05-generic
+  - arch-06-physics-graph
+  - arch-07-pipeline
+  - arch-08-bo-levels
+  - arch-12-cert
+  - arch-16-pino-bridge
+  - arch-17-out-of-scope
+  - arch-18-open-decisions
+  - arch-20-representations
+  - arch-21-multiscale-state
+  - impl-06-compositions
+  - impl-07-residual-factory
+  - impl-08-cert-detail
+  - impl-09-cross-cutting
+  - mvp-03-capabilities
+  - mvp-04-in-mvp-vs-deferred
+  - mvp-05-decisions-forced
 research-sources:
   - physics/research/residual-generator-catalog.md
 ---

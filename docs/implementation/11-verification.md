@@ -5,7 +5,12 @@ status: draft
 revision: 1
 canonical-for:
   - verification gates
-depends-on: []
+depends-on:
+  - arch-05-generic
+  - arch-09-vocabularies
+  - arch-16-pino-bridge
+  - impl-06-compositions
+  - impl-07-residual-factory
 referenced-by: []
 research-sources: []
 ---

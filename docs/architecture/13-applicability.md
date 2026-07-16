@@ -5,12 +5,24 @@ status: draft
 revision: 1
 canonical-for:
   - applicability discipline
-depends-on: []
-referenced-by:
+depends-on:
+  - arch-05-generic
   - arch-07-pipeline
+  - arch-10-typeclasses
+  - arch-12-cert
+  - arch-16-pino-bridge
   - arch-19-coupling-structure
   - arch-20-representations
-research-sources: []
+  - arch-21-multiscale-state
+referenced-by:
+  - arch-06-physics-graph
+  - arch-07-pipeline
+  - arch-09-vocabularies
+  - arch-19-coupling-structure
+  - arch-20-representations
+  - impl-09-cross-cutting
+research-sources:
+  - physics/research/applicability-classifiers.md
 ---
 # Applicability classifiers
 

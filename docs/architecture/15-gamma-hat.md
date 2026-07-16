@@ -10,7 +10,13 @@ depends-on:
   - arch-04-state
   - arch-06-physics-graph
   - arch-07-pipeline
-referenced-by: []
+  - arch-09-vocabularies
+  - mvp-02-gamma-budget
+referenced-by:
+  - arch-06-physics-graph
+  - arch-11-residuals
+  - arch-18-open-decisions
+  - impl-09-cross-cutting
 research-sources: []
 ---
 

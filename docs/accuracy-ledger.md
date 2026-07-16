@@ -64,7 +64,7 @@ currently 59: the 52 catalog rows (#1–52 below) plus the 2026-07 gap-audit add
 | 39 | cohesive/surface energy γ_s | ±0.1 J/m² | slab DFT |
 | 40 | fracture_toughness K_IC | ±20% (statistical) | Griffith+Young |
 | 41 | resonant_modes ω_n | ±10% | **device-scale (continuum elastic)** |
-| 42 | displacement_threshold E_d | ±5 eV | tabulated (~37 eV C, ~25 eV Ga) |
+| 42 | displacement_threshold E_d | ±5 eV | tabulated (~37 eV C, ~20 eV Ga-sublattice; N ~25 eV) |
 | 43 | gibbs_free_energy G | ±10 meV/atom | QHA: E_DFT+F_vib+PV |
 | 44 | phase_boundary | ±5% in P–T | ΔG crossing |
 | 45 | specific_heat c_v,c_p | ±3% | Debye cheap |

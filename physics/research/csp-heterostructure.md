@@ -76,7 +76,7 @@ For diamond (C, Fd-3m, a = 3.567 Å, 8 atoms/conventional cell):
 - `R_ChargeBalance` = 0 (covalent, formal charges 0).
 - `R_Pauling`: radius ratio inapplicable (single species). Reduces to coordination check: CN=4 for all → `R_CoordinationConsistency = 0`.
 - `R_SymmetryConsistency`: Fd-3m generators are 48 ops; with frac_coords at (1/8, 1/8, 1/8) and (7/8, 7/8, 7/8) for the two-atom basis, residual is ~10⁻³⁰ (numerical floor).
-- `R_BornStab` (cubic): with C₁₁=1080, C₁₂=125, C₄₄=576 GPa → all three conditions satisfied → R = 0.
+- `R_BornStab` (cubic): with C₁₁=1079, C₁₂=124, C₄₄=578 GPa → all three conditions satisfied → R = 0.
 - `R_DynamicStab` cheap form: harmonic spring constants from Tersoff parameters; no soft modes.
 - `R_HullDistance`: diamond is metastable vs graphite by ~25 meV/atom at T=0 — this is the famous "diamond is not on the convex hull" gotcha. The residual must use a **temperature-and-pressure-aware hull**, not the T=0 hull. Cheap fix: add `ΔG = ΔE − T·ΔS_config − P·ΔV` term with tabulated S_config and ΔV.
 
@@ -310,6 +310,9 @@ Total cheap-path cost: ~50 ms. This is the inner-compute residual vector consume
 
 ## Changelog
 
+- **2026-07-16 (cert round 2):** Born-stability worked example C_ij normalized to the seeded
+  reference battery (1080/125/576 → 1079/124/578 GPa, `elastic-tensors.csv`); the three Born
+  conditions and the conclusion (R = 0) are unchanged.
 - **2026-07-16 (strata rewrite):** status banner converted to this changelog; the header note
   retains only the still-load-bearing conventions (misfit denominator, termination-tagged χ,
   survey-grade contact values). No value changes.

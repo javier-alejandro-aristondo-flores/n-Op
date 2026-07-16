@@ -149,11 +149,15 @@ Material anchors:
 
 | Material | a_n (cm⁻¹) | b_n (V/cm) | a_p (cm⁻¹) | b_p (V/cm) |
 |---|---|---|---|---|
-| Diamond | 1.93×10⁵ | 7.59×10⁶ | 1.93×10⁵ | 7.59×10⁶ |
-| GaN | 2.9×10⁸ | 3.4×10⁷ | 1.34×10⁸ | 2.03×10⁷ |
-| AlN | ~2.0×10⁸ | ~4×10⁷ | similar | similar |
-| β-Ga₂O₃ | ~2.5×10⁶ | ~2.0×10⁷ | ~ | ~ |
-| 4H-SiC (ref) | 1.07×10⁸ | 1.65×10⁷ | 6.3×10⁶ | 1.43×10⁷ |
+| Diamond | 1.93×10⁵ | 7.59×10⁶ | 1.93×10⁵ (e/h never separated) | 7.59×10⁶ |
+| GaN | 4.48×10⁸ [Wave-1 A14] | 3.39×10⁷ | 7.13×10⁶ | 1.46×10⁷ |
+| AlN | 8.875×10⁶ (Bulutay MC, electron-only) | 3.759×10⁸ | measured = GAP (cert-refused) | — |
+| β-Ga₂O₃ | anisotropic — quoted as E_c 10.2/4.8/7.6 MV/cm (Ghosh–Singisetti) | — | holes never measured | — |
+| 4H-SiC (ref) | 1.88×10⁶ | 9.13×10⁶ | — (per-carrier split lands with Wave 3) | — |
+
+(Mirrors the audited canonical set — the `impact-ionization-*` rows of
+`physics/library/cert/reference-data/transport-coefficients.csv` and the accuracy-ledger
+Chynoweth table. AlN measured α_ii and the 4H-SiC per-carrier split are GAP.)
 
 ### C.2 Avalanche multiplication and breakdown condition
 
@@ -564,6 +568,14 @@ Related documents:
 
 ## Changelog
 
+- **2026-07-16 (cert round 2):** §C.1 impact-ionization anchor table reconciled to the audited
+  canonical set (the `impact-ionization-*` transport-CSV rows / accuracy-ledger Chynoweth
+  table): GaN → Cao-2018 e 4.48×10⁸ / 3.39×10⁷, h 7.13×10⁶ / 1.46×10⁷ `[Wave-1 A14]`;
+  AlN → Bulutay MC electron-only 8.875×10⁶ / 3.759×10⁸ (measured = GAP, cert-refused);
+  β-Ga₂O₃ → anisotropic E_c presentation (holes never measured); 4H-SiC → ledger (ref)
+  pair 1.88×10⁶ / 9.13×10⁶. Old values, for the record: GaN 2.9×10⁸/3.4×10⁷ &
+  1.34×10⁸/2.03×10⁷; AlN ~2.0×10⁸/~4×10⁷; β-Ga₂O₃ ~2.5×10⁶/~2.0×10⁷; 4H-SiC
+  1.07×10⁸/1.65×10⁷ & 6.3×10⁶/1.43×10⁷.
 - **2026-07-16 (cert round 1):** AlN ω_LO range re-rounded 111–114 → 110–114 meV to match
   the canonical enclosing-round of the Davydov anchors A₁(LO) 110.7 / E₁(LO) 113.6
   (reference-data transport CSV + accuracy ledger; the Wave-1 spec §3 table concurs).

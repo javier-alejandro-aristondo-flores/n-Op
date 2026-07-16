@@ -378,7 +378,7 @@ def Check_Vocabulary_Counts(records: tuple[FileRecord, ...]) -> list[str]:
                             f'says {quoted_value} {canon_key}, canon is {expected_value}'
                         )
     if OVERVIEW_PATH.exists():
-        # The §6.3 tally lines write "T0 … (69 formulas) · T1 … (40) · …" — parse
+        # The §6.3 tally lines write "T0 … (75 formulas) · T1 … (40) · …" — parse
         # each "T<n>/D<n> … (<count>)" segment on the cost-tier / diff-tag lines.
         for overview_line in OVERVIEW_PATH.read_text(encoding='utf-8').splitlines():
             if '**cost-tier:**' in overview_line:

@@ -22,9 +22,10 @@ This is what makes the architecture **compositional across crystal types**: the
 same interface accepts diamond, GaN, AlN, c-BN, refractory metals — each
 property's classifier decides whether it is a meaningful question for that
 crystal (band gap iff insulator/semiconductor; Schottky barrier iff
-metal-semiconductor interface; polar-optical scattering iff polar — false for
-diamond; carbide-formation iff the interface includes a carbide former — false
-for Pt/diamond, true for Ti/diamond).
+metal-semiconductor interface; polar-optical scattering iff polar-phonon-active
+(`is-polar-material`) — false for diamond; carbide-formation iff the interface
+includes a carbide former — false for Pt/diamond, true for Ti/diamond).
+The example table in §13.1 collects the standard predicates.
 
 **Two distinct "polar" predicates (normative; 2026-07 gap-audit / Wave-2).**
 "Polar" conflates two independent crystal properties and the registry gates on
@@ -46,6 +47,25 @@ limiter).** Gating rows 113–119/128 on the Fröhlich-sense predicate would
 wrongly activate spontaneous polarization for β-Ga₂O₃; gating Fröhlich on the
 piezo-sense predicate would wrongly *deactivate* its dominant scattering
 channel.
+
+### 13.1 Applicability examples (illustrative; every registry entry carries its own field)
+
+Migrated from the research stratum (`applicability-classifiers.md`), reconciled
+with the two-predicate polar split above.
+
+| Property | Applicability predicate | Notes |
+|---|---|---|
+| Band gap | `is-insulator-or-semiconductor(Crystal)` | Metals have no gap; the quantity is undefined, not zero. |
+| Magnetic moment per site | `has-magnetic-order(Crystal)` | Non-magnetic systems have zero / fluctuating moments, not an observable. |
+| Schottky barrier height | `has-metal-semiconductor-interface(Crystal)` | Meaningful only for heterostructures with adjacent metal + semiconductor. |
+| Defect formation energy for species X | `defect-species-meaningful(X, Crystal)` | A boron substitutional in copper is not the "defect" it is in diamond. |
+| Superconducting T_c | `is-superconductor(Crystal)` | A finite predicted T_c for most materials is wrong, not noisy. |
+| Polar-optical (Fröhlich / POP) scattering | `is-polar-material(Crystal)` | Nonzero Born charges / LO–TO splitting — a bond property, not point group. False for diamond; **true for centrosymmetric β-Ga₂O₃** (its dominant mobility limiter). |
+| Polarization package (P_sp, e_ij, 2DEG n_s, pyro — rows 113–119, 128) | `is-noncentrosymmetric(Crystal)` | Piezoelectric classes (no inversion center). True for wurtzite III-N; **false for β-Ga₂O₃ (C2/m) and diamond**. Independent of `is-polar-material`. |
+| Carbide formation rate at interface | `interface-includes-carbide-former(Crystal)` | Pt/diamond never forms a carbide; Ti/diamond does. |
+| Bulk modulus (scalar) | `is-three-dimensional-solid(Crystal)` | Layered materials (h-BN, graphene) have direction-dependent moduli; the scalar is ill-defined. |
+| Carrier mobility | `is-conductor-or-semiconductor(Crystal)` | Wide-gap insulators at low T have effectively zero free carriers. |
+| Thermal expansion (isotropic scalar) | `has-cubic-or-isotropic-symmetry(Crystal)` | Anisotropic crystals need the tensor form; the scalar is wrong. |
 
 V1 commitment: every registry entry gets an explicit `applicability` field;
 always-true stubs are acceptable for V1.0 and refined incrementally. Open

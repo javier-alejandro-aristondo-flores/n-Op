@@ -334,7 +334,7 @@ optional adjoint pass is reverse-mode by structural projection, `O(residual-vect
 
 ### 6.1 The 12 methods → numerical kernels (with selection criteria, complexity, stability)
 
-| # | Method (sub-methods) | Kernel | Complexity (constants/notes) | Selection / numerical notes |
+| # | Method (solver / algorithm variants; the **3 registered sub-methods** of arch-09 §9.1 are `field-line-integral`, `interface-tunneling`, `mesh-interpolation`) | Kernel | Complexity (constants/notes) | Selection / numerical notes |
 |---|---|---|---|---|
 | 1 | state-readout (distance-PBC, sphere-integral, diagonal-trace, cell-metric, extremum, occupation-sum) | array traces / reductions | `O(n)`; distance-PBC `O(N)` with cell lists vs `O(N²)` naive | minimum-image convention; reductions are bandwidth-bound |
 | 2 | algebraic-combination | registry-dispatched formula eval | `O(#inputs)` | no inline math; pure leaf evaluation |

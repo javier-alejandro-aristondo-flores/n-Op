@@ -21,7 +21,9 @@ process; the registry is a contract, not a convenience.
 - **132 substantive formulas** (rows 1–102 + 105–134). Rows 105–112 are the
   slow-tier degradation / radiation formulas (`arch-21-multiscale-state §21.13`);
   rows 113–119 are the polarization / piezoelectric / 2DEG package
-  (`is-polar-material`-gated; GaN/AlN/AlGaN HEMTs); rows 120–127 are the
+  (`is-noncentrosymmetric`-gated — the piezo-class predicate of the arch-13
+  two-predicate split, not the Fröhlich `is-polar-material` gate; GaN/AlN/AlGaN
+  HEMTs); rows 120–127 are the
   **per-material accuracy package**: `ahc-gap-renormalization` (Layer-1.25 one-shot
   gap(T) dressing), `kappa-4phonon-high-t-correction` + `iterative-lbte-kappa`
   (the κ(T) high-temperature siblings of row 25), `breakdown-field-temperature-slope`

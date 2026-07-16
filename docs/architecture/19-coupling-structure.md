@@ -575,7 +575,8 @@ record TheoryContext {
 }
 ```
 
-The four vocabularies are defined in `arch-09-vocabularies §9.7`. The
+The vocabularies backing these four fields (ten closed C1 vocabularies) are
+defined in `arch-09-vocabularies §9.7`. The
 theory context does **not** enter the `generate-invariants` cache key
 (the polynomial basis is symmetry-only; the relativistic treatment's
 one effect — spin-orbit — enters through the symmetry group's double

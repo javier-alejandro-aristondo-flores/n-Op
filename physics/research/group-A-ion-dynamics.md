@@ -1,6 +1,6 @@
 # Group A — Ion Dynamics: Structural, Mechanical, Thermal
 
-> **Status note (2026-07 gap-audit).** Notation: the phonon branch index `s` here ≡ `ν` (e-ph passages here and in group-B) ≡ `λ` (group-C) — one object, three historical symbols. κ in this file is the **phonon (lattice)** part only; the observable-level total is `κ_total = κ_el + κ_ph` (spec: arch-10 `combineTol` example). The thermal-expansion row and the e-ph mass convention were corrected in place by the gap-audit (`docs/audits/2026-07-07-gap-audit.md`).
+> **Notation.** Phonon branch index: `s` in this file ≡ `ν` (e-ph passages here and in group-B) ≡ `λ` (group-C) — one object, three historical symbols. κ here is the **phonon (lattice)** part only; the observable-level total is `κ_total = κ_el + κ_ph` (arch-10 `combineTol` example).
 
 Deep mathematical research for the n-Op `/physics` library. Scope: the three
 regimes whose primary degrees of freedom are the **ions** (nuclei) and the
@@ -722,3 +722,14 @@ the operator must respect.
 - Durham CMT note on the acoustic sum rule.
 - arXiv preprints: THERMACOND, AFLOW-AAPL, Allen–Heine–Cardona theory
   (1504.05992).
+
+## Changelog
+
+- **2026-07-16 (reconciliation pass):** status banner converted to this changelog; content
+  restated to current truth per the campaign policy (`docs/audits/` reconciliation record).
+- **2026-07-07 (gap-audit, `docs/audits/2026-07-07-gap-audit.md` B7):** §3.5
+  thermal-expansion row corrected — was `α_IJ = (S⁻¹)·Σγ·c_v` (compliance/stiffness
+  inversion, tensorial Grüneisen undefined, 1/V missing); now
+  `α_IJ = (1/V)·S_IJKL·Σγ^{(KL)}_{qs}·c_v` with `S = C⁻¹` and the strain-Grüneisen tensor
+  defined. §3.6 e-ph vertex annotated with the multi-species mass-weighted
+  eigenvector-normalization convention (the bare `√(2Mω)` is single-species shorthand).

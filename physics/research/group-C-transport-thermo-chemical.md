@@ -1,6 +1,6 @@
 # Group C — Transport, Thermodynamic, Chemical/Surface
 
-> **Status note (2026-07 gap-audit).** The "regime N" numbers in §4.4's cross-references are a legacy global scheme that matches neither this file's local 1–3 numbering nor the canonical arch-05 nine-regime table — read §4.4's cross-references **by regime name, not number**. The transport-Lyapunov direction was corrected in place by the gap-audit (`docs/audits/2026-07-07-gap-audit.md`). κ here appears in both Green–Kubo (total) and electronic (Kubo second-moment) forms; the observable-level decomposition is `κ_total = κ_el + κ_ph` (arch-10).
+> **Conventions.** κ appears here in both Green–Kubo (total) and electronic (Kubo second-moment) forms; the observable-level decomposition is `κ_total = κ_el + κ_ph` (arch-10). Regimes are referred to by name (the canonical nine-regime table is arch-05's).
 
 Deep mathematical research for the n-Op `/physics` library. Scope: three
 regimes that share statistical-mechanical and non-equilibrium structure
@@ -630,22 +630,22 @@ balance, BEP).
 
 **Out of group:**
 
-- **To electronic (regime 2)**: every regime depends on it. Transport reads
+- **To electronic**: every regime depends on it. Transport reads
   band structure and velocities. Thermodynamic reads $E_0$ and electronic
   free energy. Chemical reads bonding energies, work functions, Marcus
   reorganization energies.
-- **To structural (regime 1)**: thermodynamic phase stability defined
+- **To structural**: thermodynamic phase stability defined
   relative to candidate crystals; chemical reactions are atom permutations;
   PES on which NEB runs is a structural-coordinate manifold.
-- **To thermal (regime 5)**: $T$ is the basic intensive parameter; phonon
+- **To thermal**: $T$ is the basic intensive parameter; phonon
   free energy $F_{\rm vib}$ largest finite-T correction; e-ph scattering
   dominant resistive mechanism.
-- **To mechanical (regime 4)**: stress $\sigma_{\alpha\beta}$ as derivative
+- **To mechanical**: stress $\sigma_{\alpha\beta}$ as derivative
   of $F$ couples thermodynamic to mechanical; strain modifies PES; deformation-
   potential scattering for transport.
-- **To magnetic (regime 6)**: $\mathbf{B}$ in Lorentz force; magnetic order
+- **To magnetic**: $\mathbf{B}$ in Lorentz force; magnetic order
   $F_{\rm mag}$; spin-state-resolved reaction barriers.
-- **To optical (regime 3)**: $\sigma_{\alpha\beta}(\omega)$ same Kubo–Greenwood
+- **To optical**: $\sigma_{\alpha\beta}(\omega)$ same Kubo–Greenwood
   object — transport IS the optical regime in dynamical-response form.
 
 ### 4.5 Summary: shape of a unified residual contract
@@ -688,3 +688,13 @@ $E$, $S$, $L$, $M$.
 - BEP / Sabatier / volcano plots.
 - Langmuir adsorption from grand canonical.
 - Campbell degree of rate control (ACS Catalysis).
+
+## Changelog
+
+- **2026-07-16 (reconciliation pass):** status banner converted to this changelog; §4.4's
+  legacy global "regime N" numbers (which matched neither this file's local numbering nor
+  the arch-05 table) replaced by regime names.
+- **2026-07-07 (gap-audit, `docs/audits/2026-07-07-gap-audit.md` B7):** §4.1 Lyapunov
+  table's transport row said `−S[f]` is "non-decreasing (H-theorem)" — wrong direction
+  (H-theorem: `dS/dt ≥ 0` ⇒ `−S` non-increasing; contradicted this file's own §1.4/§5) —
+  fixed in place.

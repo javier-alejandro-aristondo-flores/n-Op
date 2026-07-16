@@ -1,6 +1,6 @@
 # Group B — Electronic, Magnetic, Optical
 
-> **Status note (2026-07 gap-audit).** Units in this file are **Gaussian** unless marked (the `4π` factors in the f-sum, dielectric, and Maxwell-source expressions); the spec-side `Quantity.unitsOf` (arch-10) is canonical for any implementation. The Vignale–Rasolt attribution, the Dirac/SOC double-count, and the Maxwell source prefactor were corrected in place by the gap-audit (`docs/audits/2026-07-07-gap-audit.md`). Two response objects are used: the density–density `χ` (Dyson section) and the polarization–polarization `χ^{PP}` (observables table) — related but not identical; a residual implementer should derive from the Dyson-section definitions.
+> **Conventions.** Units are **Gaussian** unless marked (the `4π` factors in the f-sum, dielectric, and Maxwell-source expressions); the spec-side `Quantity.unitsOf` (arch-10) is canonical for implementation. Two response objects appear: the density–density `χ` (Dyson section) and the polarization–polarization `χ^{PP}` (observables table) — related, not identical; derive from the Dyson-section definitions.
 
 Deep mathematical research for the n-Op `/physics` library. Scope: the three
 regimes whose primary degrees of freedom are the **electrons** (with spin) and
@@ -508,3 +508,14 @@ structure n-Op's PINO loss can be anchored on.
   (textbook references).
 - Semiconductor Bloch / Maxwell–Bloch equations (textbook references).
 - Wannier-function Berry-connection formulation of optical matrix elements.
+
+## Changelog
+
+- **2026-07-16 (reconciliation pass):** status banner converted to this changelog.
+- **2026-07-07 (gap-audit, `docs/audits/2026-07-07-gap-audit.md` B7):** the non-collinear
+  spin-DFT construction was mislabeled "Vignale–Rasolt" (that is current-DFT; the correct
+  attribution is von Barth–Hedin / Kübler) — fixed in place; the relativistic Hamiltonian
+  carried an explicit spin-orbit term on top of the Dirac operator (double count — SOC
+  emerges in the reduction) — term removed; the Maxwell source term was missing its `4π`
+  (Gaussian) — restored; the e-ph vertex's single-mass `√(2Mω)` annotated with the
+  multi-species convention.

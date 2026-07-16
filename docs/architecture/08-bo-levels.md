@@ -101,6 +101,3 @@ closed-form discipline. Diamond needs only two dressings:
 - **G₀W₀** — Kohn–Sham underestimates the diamond gap by ~30%; G₀W₀
   corrects to ~5.5 eV vs measured 5.47 eV.
 - **First-order SCP** — marginal at 773 K, growing above 1500 K.
-
-Comprehensiveness is preserved via the V1 specification of Layer 1.75
-even though no V1 code implements it.

@@ -37,23 +37,25 @@ paragraph in `arch-05-generic`.)
 These are the **irreducible degrees of freedom of the micro tier**. Quantities
 recoverable from the 7-tuple by coarse-graining **on the micro timescale and
 scale** — phonon distributions `n_{q,s}`, the carrier distribution `f_n(k,r)`,
-surface coverages `θ_i`, electron/lattice temperatures, current density, internal
-fields — are **emergent** and stay out of the micro state: adding such a
-*same-timescale* coarse-graining would create a constraint manifold tying it
-back to the irreducible DOFs and reintroduce the integration pathology the
-formulation avoids.
+surface coverages `θ_i`, electron/lattice temperatures, micro-scale current
+density and internal fields — are **emergent** and stay out of the micro state:
+adding such a *same-timescale* coarse-graining would create a constraint
+manifold tying it back to the irreducible DOFs and reintroduce the integration
+pathology the formulation avoids.
 
 Quantities that are **not** recoverable on the micro timescale or scale are
 **first-class state in their own tier**, not emergent: slow, history-dependent
 **defect populations** and **composition vectors** (hours–years), and
-**homogenized device-scale fields** (lattice-temperature, potential, and
-carrier-density profiles on a device mesh). They couple to the micro tier only
+**homogenized device-scale fields** (lattice-temperature, potential,
+carrier-density, and current-density profiles on a device mesh — the macro
+`(T_L, φ, n, p, j)` of `arch-21 §21.6.2`). They couple to the micro tier only
 parametrically — adiabatic driving (slow) or homogenization (macro) — so they
 introduce *no* constraint manifold. See `arch-21-multiscale-state` for the
 refined emergence axiom and the slow / macro tiers. (This is also the
 reconciliation of the earlier "distributions are emergent" wording with
-`arch-08-bo-levels`, which correctly states L4 introduces its own irreducible
-distribution state.)
+`arch-08-bo-levels`: L4 introduces its own irreducible state — concretely the
+continuum-field / moment tier; the full distribution itself stays emergent by
+moment closure.)
 
 `x(t)` is a **type** that the PINO's predictions instantiate at each time step.
 `/physics` does not hold values of `x(t)`; it defines what `x(t)` is and how to

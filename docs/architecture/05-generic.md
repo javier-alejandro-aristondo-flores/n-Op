@@ -50,7 +50,9 @@ The two functionals decompose as:
 E[x] = E_kin(ions)      Σ_I |P_I|²/2M_I + tr(Π_hᵀΠ_h)/2W
      + E_BO(R, h)       min_γ̂ ⟨Ĥ_electronic⟩[γ̂; R, h]
      + E_KS[γ̂]          kinetic + Hartree + exchange-correlation on γ̂
-     + E_EM[A]          (1/8π) ∫ (|E|² + |B|²) dr
+     + E_EM[A]          (1/8π) ∫ (|E_⊥|² + |B|²) dr   — transverse sector only;
+                        the longitudinal/electrostatic energy lives in the
+                        matter functionals (normative gauge paragraph below)
      + E_coupling       Σ_{c ∈ CouplingSpec, v ∈ realize(c) | v.target = Scalar} v
                         — channels declared per arch-19-coupling-structure;
                           MVP set: electron-phonon, minimal coupling,
@@ -81,7 +83,7 @@ M (symmetric, positive semidefinite):
                                   scattering kernels)
 ```
 
-These pieces are assembled across the four levels of §6; each level contributes
+These pieces are assembled across the four levels of `arch-08-bo-levels`; each level contributes
 the `E`, `S`, `L`, and `M` terms that act on its irreducible state.
 
 ### The nine regimes as extractions

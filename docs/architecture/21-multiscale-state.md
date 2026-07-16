@@ -74,7 +74,7 @@ document adds the two tiers and reconciles `arch-04` ⊥ `arch-08`.
 | Tier | Members | Equilibration timescale / scale | Index geometry | Dynamics |
 |---|---|---|---|---|
 | **Micro** | the 7-tuple `(h, R_I, P_I, Π_h, Z_I, γ̂, A)` (`arch-04-state`), **unchanged** | fs–ns, unit cell | continuous BZ × cell | full GENERIC `L+M` |
-| **Slow / configurational** | defect concentrations `[D]^q`, `[H]`, `x_ox`, `x_carbide`, `ρ_dis` | hours–years, unit cell→mesh | discrete species × sites | ODE / master-equation |
+| **Slow / configurational** | defect concentrations `[D]^q` + charge distributions `charge_dist[D]`, `[H]`, `x_ox`, `x_carbide`, `ρ_dis` | hours–years, unit cell→mesh | discrete species × sites | ODE / master-equation |
 | **Macro / continuum** | `T_L(r), φ(r), n(r), p(r), j(r)` on a device mesh | device scale | fields on real-space cells | parabolic + constraint PDEs |
 
 The slow and macro tiers are **adiabatic parameters** of the micro tier: the micro 7-tuple
@@ -141,8 +141,11 @@ no-emergent-state rule was protecting, now satisfied honestly. The slow fiber dr
 ## 21.3 Slow-kinetic formulas (Part-G / Part-H → registry)
 
 Every process is a new `FormulaRecord`; all Arrhenius rates use `rate = ν₀·exp(−E_a/kT)`
-(`defects-surfaces-interfaces.md` Part G); each names the `kinetic-evolution` sub-method it instantiates. CSV rows in
-§21.13. **No new method or sub-method is introduced.**
+(`defects-surfaces-interfaces.md` Part G); each names the **instantiation form** of the
+`kinetic-evolution` method it uses (master-equation, drift–diffusion, Allen–Cahn — solver
+shapes of the one method, *not* registered sub-methods; the closed alphabet's three registered
+sub-methods are unchanged, `arch-09 §9.1`). Canonical rows: `registry-manifest.csv` 105–112
+(see §21.13). **No new method or sub-method is introduced.**
 
 - **F-G1 `vacancy-generation-arrhenius`** — `([V]^q,T,μ,j,x_ox',ρ_dis,k_ann) → d[V]^q/dt`
   (cm⁻³s⁻¹), `defects-surfaces-interfaces.md` Part G.1:
@@ -152,7 +155,7 @@ Every process is a new `FormulaRecord`; all Arrhenius rates use `rate = ν₀·e
   (HSE06), so `G_thermal(773 K)` is negligible — **the 500 °C generation budget is dominated by
   `G_interface` + `G_irradiation`**. Annihilation barriers (`defects-surfaces-interfaces.md` Part A.5): `V_C^0` 2.3 eV,
   `V_C^−` 2.8 eV, `C_i` 1.6–1.7 eV, `V_N(GaN)` 2.6 eV, `V_Ga(GaN)` 1.9 eV, `V_O(Ga₂O₃)` 1.9–2.4 eV,
-  `V_Al(AlN)` 3.4 eV. T0/D1; sub-method `master-equation`; B11/B4.
+  `V_Al(AlN)` 3.4 eV. T0/D1; form `master-equation`; B11/B4.
 - **F-G2 `hydrogen-redistribution-drift-diffusion`** — `([H](r),T,E,μ_drift) → ∂[H]/∂t`,
   `defects-surfaces-interfaces.md` Part G.2: `∂C/∂t = ∇·(D(T)∇C) − ∇·(μ_drift C E)`, `D(T)=D₀exp(−E_diff/kT)`. Diamond
   H interstitial `E_diff=1.7 eV`, `D(500 °C)≈1e−13 cm²/s` (~1 mm profile shift in 1000 h). T3/D3;
@@ -176,7 +179,7 @@ Every process is a new `FormulaRecord`; all Arrhenius rates use `rate = ν₀·e
   (NEA→PEA); desorbs 700–900 °C; accuracy factor ~2. T0/D1; `master-equation`; B11/B5.
 - **F-H1 `nrt-displacements`** — `(T_dam,E_d) → N_d`, `non-equilibrium-high-field.md` Part H.1:
   `N_d = 0.8·T_dam/(2·E_d)`. `E_d`: diamond ~37–50 eV, GaN ~20 eV, Ga₂O₃ ~25 eV, AlN ~35 eV.
-  T0/D1; `algebraic-of`; B11/B4; feeds F-H2.
+  T0/D1; form `algebraic-combination` (the method, arch-09 §9.1 — not the `AlgebraicOf` template); B11/B4; feeds F-H2.
 - **F-H2 `frenkel-pair-yield`** — `(N_d,Σ_d,Φ_dose,η_recomb) → DefectDensity`, `non-equilibrium-high-field.md` Part H.2:
   `[V]_irr = Φ_dose·Σ_d·N_d·(1−η_recomb)` (cm⁻³), where the **macroscopic displacement cross-section**
   `Σ_d = N_atom·σ_d` (cm⁻¹) supplies the missing length⁻¹ so the product of `N_d` (displacements
@@ -200,8 +203,10 @@ sibling of the seven micro `EOM/x_i` (`arch-11 §11.1`):
 EOM/DefectPopulation[D,q,site] = ‖ d[D]^q/dt|_predicted − ( G^q_total[D] − [D]^q·k_ann^q[D] ) ‖²
 ```
 
-the slow-tier specialization of `‖dx_i/dt − (L δE/δx_i + M δS/δx_i)‖²` (generation = dissipative
-`M δS` branch; annihilation = restoring `L δE` branch toward `[D]_eq`). Each slow field
+the slow-tier specialization of `‖dx_i/dt − (L δE/δx_i + M δS/δx_i)‖²` — generation and
+annihilation are both branches of the single dissipative master-equation generator (`M` = rate
+matrix, per `arch-05-generic`'s chemical/surface extraction; the slow tier has no reversible
+bracket, §21.10). Each slow field
 substitutes its §21.3 RHS (`[H]`→F-G2; `x_ox`→F-46; `x_carbide`→F-F5; `ρ_dis`→F-G4). **Axes**
 `(DefectSpecies, ChargeState, SiteClass)` (+ spatial bin for field-valued `[H]`/`x_ox`); one
 weightable `ResidualLeaf` per `(species, charge, site)` (`arch-11 §11.2–§11.3`), no
@@ -430,21 +435,16 @@ decidable on field presence, `impl-04`).
 
 Curriculum: **Polish** `[0.60, 0.90)` with the other `Static/Thermodynamic` residuals.
 
-## 21.13 New registry rows (`registry-manifest.csv` format)
+## 21.13 New registry rows
 
-Rows 105–112 (rows 103–104 are the existing rejected markers; F-F5 =
-`carbide-growth-parabolic`, existing row 81, not re-added):
-
-```csv
-105,vacancy-generation-arrhenius,"`(c_V^q, T, μ, j, x_ox', ρ_dis, k_ann) → dc_V/dt`",B11/B4,T0,D1,cheap,S3 (defects G.1),"E_form, T, k_ann"
-106,hydrogen-redistribution-drift-diffusion,"`(c_H(r), T, E, μ_drift) → ∂c_H/∂t`",B11/B5,T3,D3,cheap,S3 (defects G.2),"D_0, E_diff, E-field"
-107,platelet-nucleation-allen-cahn,"`(c_platelet, c_Ns, T) → dc_platelet/dt`",B11/B4,T1,D2,cheap,S3 (defects G.3),"c_Ns, k_nuc(E_nuc=3.5eV)"
-108,vibration-induced-vacancy-generation,"`(ρ_dis, σ_stress, f_vib, v_dis, b) → (dρ_dis/dt, G_V)`",B11,T1,D1,cheap,S3 (defects G.7),"ρ_dis, σ_stress"
-109,air-oxidation-rate-eyring,"`(T, p_O2, ΔG‡, ν) → dx_ox/dt`",B11/B5,T0,D1,cheap,"S3 (catalog #46, Eyring)","T, p_O2"
-110,hydrogen-desorption-rate-eyring,"`(T, E_des, ν) → r_H`",B11/B5,T0,D1,cheap,"S3 (catalog #47, E_des=3.8eV)","T, surface c_H"
-111,nrt-displacements,"`(T_dam, E_d) → N_d`",B11/B4,T0,D1,cheap,"S4 (non-eq H.1)","T_dam, E_d(host)"
-112,frenkel-pair-yield,"`(N_d, Σ_d, Φ_dose, η_recomb) → DefectDensity`",B11/B4,T0,D1,cheap,"S4 (non-eq H.2; [V]_irr=Φ·Σ_d·N_d·(1−η_recomb), Σ_d=N_atom·σ_d NIEL)","nrt-displacements, σ_d(host,particle)"
-```
+Rows **105–112** of `physics/library/formulas/registry-manifest.csv` (the
+canonical, sole source for row content — an embedded copy here drifted and was
+removed by the 2026-07 reconciliation): `vacancy-generation-arrhenius` (105),
+`hydrogen-redistribution-drift-diffusion` (106), `platelet-nucleation-allen-cahn`
+(107), `vibration-induced-vacancy-generation` (108), `air-oxidation-rate-eyring`
+(109), `hydrogen-desorption-rate-eyring` (110), `nrt-displacements` (111),
+`frenkel-pair-yield` (112). Rows 103–104 are the two architectural markers;
+F-F5 = `carbide-growth-parabolic` is the existing row 81, not re-added.
 
 ## 21.14 Open sub-decisions (flagged, not silent)
 

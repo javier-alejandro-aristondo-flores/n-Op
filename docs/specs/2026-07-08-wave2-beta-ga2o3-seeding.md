@@ -1,8 +1,10 @@
 # Wave-2 seeding spec — β-Ga₂O₃ (+ III-N polarization riders)
 
 **Status: ADVERSARIALLY AUDITED 2026-07-16 — β-Ga₂O₃ package + III-N pyro rider (B1) CLEARED
-and seeded; III-N bowing rider (B3) GATED on two paywalled texts (FB Erratum PRB 65 129903;
-Ebert PRB 113 (2026)).** Audit register: `docs/audits/2026-07-16-wave2-beta-ga2o3-audit.md`
+and seeded; III-N bowing rider (B3): gate texts READ 2026-07-16 (FB Erratum: P_sp bowing
+untouched; "Ebert" = Lan et al. PRB 113 155302, CC-BY, InGaN-only) — seeding pends the
+mandated FBA APL 80 1204 (2002) / Ambacher JPCM 14 3399 (2002) pin-read.** Audit register:
+`docs/audits/2026-07-16-wave2-beta-ga2o3-audit.md`
 (two auditors on the Wave-1 mandate; all value/provenance corrections applied **in place**
 below — the tables now carry the audited values). Historical note: drafted 2026-07-08 with
 **[verified]** / **[audit-pin]** tags; pins are resolved below except the two G1/G2
@@ -152,20 +154,25 @@ seed for the operating point.
 
 
 *Polarization bowing (B3; rows 113–114 interpolation rule in `accuracy-ledger`) —
-**SEEDING GATED (audit finding G1):** neither the FB Erratum (PRB 65 129903, 2002) nor the
-Ebert holography paper (PRB 113, 2026) is readable from open sources; the mandated
-"read the erratum before seeding" is unmet. Physics risk judged LOW (the sign trap is
+**GATE TEXTS READ 2026-07-16; seeding pends one pin** (audit finding G1; closure
+dispositions in the audit register's §4): the FB Erratum corrects only the CuPt-ordered
+In-alloy **piezoelectric** polarization — the P_sp bowing (FB01 Eq. 4–5 / Fig. 7) is
+untouched, and CuPt-ordered AlGaN is Vegard-within-error; the holography paper is
+**Lan et al. (Ebert group), PRB 113, 155302 (2026), CC-BY** and is **InGaN-only** —
+nothing imports for AlGaN (corrected cross-check row below). The sign trap stands as
 navigated: FB01's Eq-4/5 define `−b·x(1−x)` with b negative — "bowing always upward" — so
-the `+b, b positive` form below is the same physics via double-negative; post-erratum
-citing sources carry the upward bowing), but B3 does not seed until both texts are read
-directly. A gate row rides in `polarization-piezoelectric.csv`.*
+the `+b, b positive` form below is the same physics via double-negative. **B3 seeds on
+the mandated primary read of FBA APL 80 1204 (2002) / Ambacher JPCM 14 3399 (2002)**
+(the exact b: +0.019 vs +0.021 both circulate, and secondary quotes are demonstrably
+corrupted — a 2026-07-16 web check surfaced the InGaN bowing misattributed to AlGaN).
+The gate row rides in `polarization-piezoelectric.csv` until then.*
 
 | Quantity | Form / value | Source |
 |---|---|---|
-| P_sp(Al_xGa₁₋ₓN) | `x·P_AlN + (1−x)·P_GaN + b·x(1−x)`, b ≈ +0.019…0.021 C/m² — exact b pins to FBA APL 80 1204 (2002) / Ambacher JPCM 14 3399 (2002) at the gated seeding (FB01's preprint gives only the ideal-structure AlInN chemical-only value) | Fiorentini & Bernardini PRB 64 085207 (2001), 10.1103/PhysRevB.64.085207 + **Erratum PRB 65 129903 (2002), 10.1103/PhysRevB.65.129903 — text acquisition = gate G1** |
+| P_sp(Al_xGa₁₋ₓN) | `x·P_AlN + (1−x)·P_GaN + b·x(1−x)`, b ≈ +0.019…0.021 C/m² — exact b pins to FBA APL 80 1204 (2002) / Ambacher JPCM 14 3399 (2002) at the gated seeding (FB01's preprint gives only the ideal-structure AlInN chemical-only value) | Fiorentini & Bernardini PRB 64 085207 (2001), 10.1103/PhysRevB.64.085207 + **Erratum PRB 65 129903 (2002), 10.1103/PhysRevB.65.129903 — read in full 2026-07-16: corrects only CuPt-ordered In-alloy piezo (Fig.-6 k-mesh error); P_sp bowing untouched** |
 | deviations from parabolic | ≲10% (worst case AlInN; smaller for AlGaN) | PRB 64 085207 |
 | e_ij(x) piezo | nonlinear in *strain* (bulk response), disorder-independent — parameterize e(x, ε) per FB's prescription | PRB 64 085207 |
-| modern cross-check | off-axis electron-holography quantification of polarization bowing — **Ebert et al., PRB 113 (2026), 10.1103/4rsc-ysk8** (uses a layered-hexagonal reference = Dreyer's recommended frame; converts cleanly — bowing is a curvature, ~reference-invariant, and interface charge is reference-independent. Import their b only as a curvature on ZB-ref endpoints, never their absolute endpoints; the AlGaN/GaN-only cancellation guard stays; numeric b unread → part of gate G1) | — |
+| modern cross-check | **Lan, Schnedler, Ji, Carlin, Butté, Grandjean, Dunin-Borkowski, Ebert — PRB 113, 155302 (2026), 10.1103/4rsc-ysk8, CC-BY (read in full 2026-07-16)** — off-axis electron holography, **InGaN-only** (x = 0.030–0.132 on GaN; ΔP_total = −0.00091±0.00034 … −0.0077±0.00135 C/m²). P_spon(InGaN) strongly nonlinear; **only the layered-hexagonal (Dreyer) reference matches the measured curvature — ZB-frame theory bows with the OPPOSITE curvature sign** (their Figs. 5–6), so curvature is **NOT** reference-invariant and the pre-read "import their b as a curvature on ZB-ref endpoints" path is moot for AlGaN (bowing also does not transfer across alloy systems) and unsound in general. LH-frame b(InGaN, x<0.25) = 0.382 ± 0.075 C/m²; full-range cubic b(x) = 0.105 − 0.238x; LH endpoints 1.299 (GaN) / 1.032 (InN). Contributes to B3 as a **guard**: experimentally confirms the ledger row-35 high-In InGaN/GaN cert-refusal (ZB curvature refuted for InGaN); AlGaN stays inside the ZB-consistent proper-e₃₁ family (2DEG-validated; AlGaN/GaN-only cancellation guard stays). In-hand primary source for a future In-wave. | — |
 
 ## §4 GAP register (post-audit; genuine, carried, not hidden)
 
@@ -177,8 +184,9 @@ spread, recorded as spread (central 738 K pinned); κ(773/1100 K) anchors — **
 seeded from its direct 300 K tensor + its own T^−m law; exact SI tables optional); Fröhlich
 multi-mode KernelExt —
 source pinned (Mengle–Kioupakis 2019 Table I), assembly remains research-side; pyro-GaN
-measured value — thin data, stays `dft`-class; e_ij(x) + P_sp bowing numbers — **gated G1**
-(FB erratum + Ebert texts). *Removed from the register at audit:* per-axis ε₀ (pinned to
+measured value — thin data, stays `dft`-class; e_ij(x) + P_sp bowing numbers — **G1 gate
+texts read 2026-07-16; residual = the FBA APL 80 1204 / Ambacher JPCM 14 3399 pin-read**
+(then B3 seeds). *Removed from the register at audit:* per-axis ε₀ (pinned to
 JSST 8 Q3083 (2019) and seeded).
 
 ## §5 Landing plan — EXECUTED 2026-07-16
@@ -189,12 +197,17 @@ JSST 8 Q3083 (2019) and seeded).
 2. ✔ Seeded: `material-constants` / `elastic-tensors` / `phonon-frequencies` /
    `transport-coefficients` β-Ga₂O₃ rows (direction-tagged, monoclinic frame stated), the
    III-N **pyro** coefficients (positive-p, sign-guarded); ledger Ga₂O₃ ZPR row retagged
-   `isochoric`; ledger κ(T)/high-field tables updated. **NOT seeded: the B3 bowing rider —
-   gated G1** (a gate row rides in `polarization-piezoelectric.csv`).
+   `isochoric`; ledger κ(T)/high-field tables updated. **NOT YET seeded: the B3 bowing
+   rider — G1 gate texts read 2026-07-16; pin-read residual** (the gate row rides in
+   `polarization-piezoelectric.csv` until the FBA/Ambacher read).
 3. ✔ Registry: no new rows — Wave 2 is coefficients + gates (the predicate split landed with
    this spec: `arch-13`, `arch-09 §9.3`, row 128's note).
-4. Open acquisitions (user): **G1** FB Erratum PRB 65 129903 + Ebert PRB 113 (2026) full
-   texts (gates B3) — both APS-paywalled, no arXiv versions exist (checked 2026-07-16).
+4. Open acquisitions (user): **G1 gate texts read 2026-07-16** (user-acquired FB Erratum;
+   the "Ebert" paper — Lan et al., PRB 113, 155302 (2026) — turned out CC-BY, the
+   audit-time 403 was a bot-block). Dispositions in the audit register's §4. **Residual:
+   FBA APL 80 1204 (2002) / Ambacher JPCM 14 3399 (2002) full text** for the exact AlGaN
+   b — no open copies exist (Semantic Scholar / OpenAlex / arXiv / UNICA-IRIS checked
+   2026-07-16); user acquiring; B3 seeds on that read.
    ~~G2~~ **closed 2026-07-16**: Klimm 2023 is open access (Projekt DEAL; d-nb archival
    copy); derived κ[010] anchors seeded; exact SI tables remain an optional refinement.
 
@@ -215,6 +228,12 @@ JSST 8 Q3083 (2019) and seeded).
 - arXiv 2603.29484 (2026) — ZPR ≈ −0.2 eV; −0.45 eV by 700 K; thermal-expansion contribution minor
   (slope-kind evidence).
 - Fiorentini & Bernardini, "Nonlinear macroscopic polarization in III-V nitride alloys", PRB 64
-  085207 (2001) + **Erratum PRB 65 129903 (2002)**.
+  085207 (2001) + **Erratum PRB 65 129903 (2002) — erratum read in full 2026-07-16** (CuPt-ordered
+  In-alloy piezo only; P_sp bowing untouched).
+- Lan, Schnedler, Ji, Carlin, Butté, Grandjean, Dunin-Borkowski & Ebert, "Quantification of
+  polarization bowing in III-nitrides by off-axis electron holography and impact on the
+  polarization controversy", PRB 113, 155302 (2026), 10.1103/4rsc-ysk8 (CC-BY) — **read in full
+  2026-07-16**; InGaN-only; LH-frame bowing b = 0.382 ± 0.075 C/m² (x < 0.25); ZB-frame curvature
+  experimentally refuted for InGaN.
 - AlN pyroelectric-coefficient measurement (6–12 μm epilayers, p≈3.0 μC/m²K; primary→secondary
   crossover ~100 K) — exact reference pinned at audit.

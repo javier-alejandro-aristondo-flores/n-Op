@@ -5,7 +5,8 @@ landing plan: **Auditor 1 — conventions & physics traps** (verdict: CLEAR-WITH
 **Auditor 2 — numbers / provenance / gaps / extractions** (verdict: BLOCK pending fixes,
 all fixes applied at adjudication). **Adjudicated outcome: β-Ga₂O₃ package + III-N
 pyroelectric rider (B1) CLEARED and seeded; III-N polarization-bowing rider (B3) GATED on
-two paywalled primary texts.** Target: `docs/specs/2026-07-08-wave2-beta-ga2o3-seeding.md`
+two paywalled primary texts** (gate texts read 2026-07-16 — see §4 G1; residual = the
+FBA/Ambacher pin-read). Target: `docs/specs/2026-07-08-wave2-beta-ga2o3-seeding.md`
 (corrections applied in place, status line updated).
 
 ## 1. Convention verdicts (Auditor 1)
@@ -127,6 +128,41 @@ per-axis ε₀ (pinned + seeded).
   seed until both are read directly (physics risk judged LOW — post-erratum citing
   sources carry the upward bowing — but the spec's own mandate requires the read).
   A gate row rides in `polarization-piezoelectric.csv`.
+  **Gate texts READ 2026-07-16** (erratum user-acquired via Texas State; the second
+  paper turned out CC-BY open access — the audit-time 403 was a bot-block). Dispositions:
+  1. **Erratum — benign for B3, as anticipated.** It corrects only the **piezoelectric**
+     polarization of **CuPt-ordered In₀.₅Ga₀.₅N and Al₀.₅In₀.₅N** (a k-point-mesh
+     subtraction error in FB01's Fig. 6; corrected Table I, % deviation from Vegard
+     piezo: random −2/+4, chalcopyrite −3/−10, CuPt-ordered **−13/−38** for
+     InGaN/AlInN). Verbatim: for CuPt-ordered Al₀.₅Ga₀.₅N "Vegard's law holds within
+     the error bar"; "all the conclusions drawn in Ref. 2 about polarization in nitride
+     alloys remain unchanged, except those on the piezoelectric polarization of
+     In₀.₅Ga₀.₅N and Al₀.₅In₀.₅N CuPt-ordered alloys." **The spontaneous-polarization
+     bowing (FB01 Eq. 4–5 / Fig. 7) is untouched**; the AlGaN piezo linear-interpolation
+     stance is strengthened (CuPt-ordered AlGaN is Vegard-within-error).
+  2. **"Ebert et al." = Lan, Schnedler, Ji, Carlin, Butté, Grandjean, Dunin-Borkowski,
+     Ebert — PRB 113, 155302 (2026)**, off-axis electron holography with
+     surface-potential calibration + self-consistent electrostatics, and it is
+     **InGaN-only**: four In_xGa₁₋ₓN/GaN pairs, x = 0.030/0.062/0.102/0.132 (±0.005);
+     ΔP_total = −0.00091±0.00034 / −0.00442±0.00107 / −0.00622±0.00089 /
+     −0.0077±0.00135 C/m². **There is no AlGaN data in the paper**, so the §1
+     cross-flag's "import Ebert's b only as a curvature" path is **moot** (bowing does
+     not transfer across alloy systems) — and its "~invariant under reference choice"
+     premise is **unsound**: the paper's own Figs. 5–6 show ZB-frame theory bowing with
+     the *opposite* curvature sign to LH-frame theory and experiment (the ZB reference
+     procedure injects spurious composition dependence — Dreyer's original criticism).
+     Their LH-frame result: b(InGaN, x < 0.25) = 0.382 ± 0.075 C/m² on P_spon,LH
+     endpoints 1.299 (GaN) / 1.032 (InN); full-range cubic b(x) = 0.105 − 0.238x.
+     **Net contribution: experimentally refutes the ZB-reference bowing curvature for
+     InGaN and validates the LH frame** — upgrading the accuracy-ledger row-35 high-In
+     InGaN/GaN cert-refusal from theoretical to experimental. In-hand primary source
+     for a future In-wave; nothing seeds from it for AlGaN.
+  **Residual (last pin before B3 seeds):** the mandated primary read of **FBA APL 80
+  1204 (2002)** / **Ambacher JPCM 14 3399 (2002)** for the exact AlGaN b — +0.019 and
+  +0.021 C/m² both circulate, and secondary quotes are demonstrably corrupted (a
+  2026-07-16 web check surfaced "−0.032(1−x) + 0.039x(1−x)": wrong GaN endpoint and the
+  InGaN bowing misattributed to AlGaN). No open copies exist (Semantic Scholar, OpenAlex,
+  arXiv, UNICA-IRIS all checked 2026-07-16); user acquiring via Texas State.
 - **G2 — CLOSED same day.** The Klimm paper turned out **open access** (Projekt DEAL;
   archival copy at d-nb.info/1274779782/34) — the auditor's 403s were bot-blocks, not a
   paywall. Full main text read 2026-07-16. Frame corrected from the auditor's caution:
@@ -144,4 +180,5 @@ Spec corrected in place (status line records this audit); β-Ga₂O₃ rows seed
 four reference CSVs (direction-tagged; monoclinic frame stated); III-N pyroelectric
 coefficients seeded (positive-p in the ZB-ref frame, sign-guard noted); accuracy-ledger
 β-Ga₂O₃ ZPR row retagged `isochoric`, κ row completed ([001] ≈14), Chynoweth/E_c row
-direction-tagged; reference-data README population status updated. B3 held behind G1.
+direction-tagged; reference-data README population status updated. B3 held behind G1
+(gate texts read 2026-07-16; residual = the FBA/Ambacher pin-read, then B3 seeds).

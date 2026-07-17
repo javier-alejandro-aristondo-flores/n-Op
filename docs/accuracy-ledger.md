@@ -57,7 +57,7 @@ currently 59: the 52 catalog rows (#1–52 below) plus the 2026-07 gap-audit add
 | 32 | contact_resistivity ρ_c | ±50% (orders span) | dominated by φ_B |
 | 33 | interface_trap_density D_it | factor-2 | dangling-bond + strain |
 | 34 | tunneling_transmission T_WKB | ±20% in log | Fowler–Nordheim closed form |
-| 35 | spontaneous + piezo polarization P_sp/P_pz | ±5% on interface ΔP (**AlGaN/GaN only**); ±10–20% on absolute P_sp | landed: Z*-composition (rows 113–114). The ±5% on ΔP holds by an **accidental cancellation** (Dreyer PRX 6 021038 2016 §V.D–E): the spurious ZB-reference term and the proper/improper-e₃₁ error are large, opposite-sign, and nearly cancel — **not** generic reference-cancellation. Requires **ZB-ref P_sp + PROPER e₃₁ + no ZB-correction** (pairing cert `arch-12 §12.0.3`); **fails for high-In InGaN/GaN** (cert-refused). Absolute Berry-phase λ-path deferred V2 |
+| 35 | spontaneous + piezo polarization P_sp/P_pz | ±5% on interface ΔP (**AlGaN/GaN only**); ±10–20% on absolute P_sp | landed: Z*-composition (rows 113–114). The ±5% on ΔP holds by an **accidental cancellation** (Dreyer PRX 6 021038 2016 §V.D–E): the spurious ZB-reference term and the proper/improper-e₃₁ error are large, opposite-sign, and nearly cancel — **not** generic reference-cancellation. Requires **ZB-ref P_sp + PROPER e₃₁ + no ZB-correction** (pairing cert `arch-12 §12.0.3`); **fails for high-In InGaN/GaN** (cert-refused — and experimentally confirmed 2026-07-16: off-axis holography refutes the ZB-reference bowing curvature for InGaN and validates the LH frame, Lan–Ebert PRB 113 155302 (2026); the ±5% AlGaN/GaN ΔP anchor itself is untouched). Absolute Berry-phase λ-path deferred V2 |
 | 36 | elastic_tensor C_ijkl | ±5% | DFT stress-strain / DFPT |
 | 37 | bulk/shear modulus B,G | ±5% | Voigt average |
 | 38 | sound_velocity v_s | ±5% | Christoffel |
@@ -179,8 +179,10 @@ quarantined — different valley — Antonius 2014.)
   (nonlinear-polarization) form `P_sp(x) = x·P_AlN + (1−x)·P_GaN − b_P·x(1−x)` (and the analogous
   form per e_ij component): the nonlinearity exceeds the ±5% ΔP target at mid-to-high x
   (Fiorentini–Bernardini nonlinear macroscopic polarization). `b_P` and the e_ij bowings are a
-  **Wave-2 acquisition** (primary sources; adversarial audit before seeding); until seeded,
-  mid-x AlGaN ΔP claims carry a widened σ in `combineTol`.
+  **Wave-2 acquisition** (primary sources; adversarial audit before seeding — gate G1's two
+  texts read 2026-07-16: the FB Erratum leaves the P_sp bowing untouched; seeding pends the
+  FBA APL 80 1204 / Ambacher JPCM 14 3399 pin-read); until seeded, mid-x AlGaN ΔP claims
+  carry a widened σ in `combineTol`.
 - **P_sp(T) — pyroelectric drift (registry row 128):** `P_sp(T) = P_sp(T₀) + p·(T−T₀)` with `p`
   the primary+secondary pyroelectric coefficient at fixed stress, O(−(4–7)×10⁻⁶ C/m²K) for
   GaN/AlN — i.e. **~20–30% of n_s·q over ΔT ≈ 750 K**, larger than the ±5% ΔP budget at the

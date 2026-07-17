@@ -42,11 +42,13 @@ audit (`docs/audits/2026-07-16-wave2-beta-ga2o3-audit.md`; spec
 monoclinic package direction-tagged (all 13 RUS C_ij in the x∥a/y∥b/z∥c* frame; per-axis ε₀;
 per-direction κ, Chynoweth pairs and E_c on a/b/**c\*** axes), plus III-N pyroelectric
 coefficients (positive-p in the ZB-ref frame — sign guard on the rows). **B3 (AlGaN
-polarization-bowing b) is NOT seeded — gated** on reading the FB Erratum PRB 65 129903 +
-Ebert PRB 113 (2026) texts (gate row in `polarization-piezoelectric.csv`); κ(773/1100 K)
+polarization-bowing b) is NOT YET seeded** — gate G1's two texts were read 2026-07-16
+(FB Erratum: P_sp bowing untouched; "Ebert" = Lan et al. PRB 113 155302, InGaN-only);
+seeding pends the mandated FBA APL 80 1204 (2002) / Ambacher JPCM 14 3399 (2002)
+pin-read (gate row in `polarization-piezoelectric.csv`); κ(773/1100 K)
 [010] anchors seeded 2026-07-16 as derived values from the open-access Klimm 2023 main text
 (G2 closed; exact SI tables optional). New `—`/GAP cells are exactly the
-declared GAP/gate rows (hole α_ii cert-refused; C–T quartet; bowing gate).
+declared GAP/gate rows (hole α_ii cert-refused; C–T quartet; bowing pin-pending).
 Pending later waves: c-BN / 4H-SiC (Wave 3), metals + substrates (Wave 4) and dielectrics
 (Wave 5) per the 2026-07 gap-audit, `interface-properties.csv`,
 `defect-formation-energies.csv`, `chemical-potentials.csv`, and the explicitly-flagged GAPs

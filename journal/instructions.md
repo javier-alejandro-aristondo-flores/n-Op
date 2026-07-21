@@ -142,7 +142,10 @@ mechanically. Do not produce one.
 8. a line-number citation (`file.md:42`) — line refs rot on every edit
 9. a registry count claim that disagrees with the CSV, including a per-tag
    diff tally quoted in prose
-10. a stale `content-hash`
+10. a duplicated or skipped trap number, or a `[traps] §N` citing one that
+    does not exist
+11. an out-of-vocabulary `status` or `authority`
+12. a stale `content-hash`
 
 `python journal/tools/seams.py` fails on: row-band claims whose endpoints are not
 in the CSV; backticked formula names that are not registry rows; `formula =`

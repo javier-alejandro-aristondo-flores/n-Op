@@ -352,6 +352,25 @@ def check_citations(pages: list[dict]) -> list[str]:
                             f"({len(heads)} entries share that date) -- "
                             f"add the disambiguating parenthetical")
 
+    # `[traps] §N` is the corpus's most-cited coordinate and the traps page is a
+    # bare numbered list, so a duplicated or skipped number silently repoints
+    # every citation to it. Neither the numeric-heading harvester above nor the
+    # dated-anchor one sees a list item.
+    traps = next((r for r in pages if r["id"] == "traps"), None)
+    if traps is not None:
+        nums = [int(n) for n in re.findall(r"^(\d+)\. \*\*", traps["body"], re.M)]
+        dupes = sorted({n for n in nums if nums.count(n) > 1})
+        gaps = sorted(set(range(1, max(nums) + 1)) - set(nums)) if nums else []
+        if dupes:
+            errs.append(f"{traps['rel']}: duplicate trap numbers {dupes}")
+        if gaps:
+            errs.append(f"{traps['rel']}: missing trap numbers {gaps}")
+        have = set(nums)
+        for r in pages:
+            for n in re.findall(r"traps\]?`?\s*§\s*(\d+)", r["body"]):
+                if int(n) not in have:
+                    errs.append(f"{r['rel']}: cites `traps` §{n}, which does not exist")
+
     lineref = re.compile(r"\b[\w./-]+\.md:\d+\b")
     for r in pages:
         for hit in set(lineref.findall(r["body"])):

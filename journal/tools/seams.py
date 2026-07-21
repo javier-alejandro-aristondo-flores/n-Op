@@ -10,6 +10,7 @@
 (g) D2/D4 rows whose `source` cell names no relaxation / no gate rationale
 (h) `unregistered-formulas` declarations that the body no longer invokes
 (i) glossary rows whose canonical pointer names no page
+(j) registry `name (row N)` pointers that name the wrong row
 Read-only; prints findings, exit code = number of finding classes that fired.
 """
 from __future__ import annotations
@@ -215,6 +216,18 @@ for path in EDITABLE:
             if hit and hit not in line:
                 findings['near-miss'].append(
                     f'{path.relative_to(REPO)}:{ln}: `{name}` — case variant of `{hit}`')
+
+# (j) registry `name (row N)` pointers ------------------------------------
+# The Depends-on column is the machine-readable edge list a code generator would
+# build the DAG from. A pointer naming the wrong row builds the wrong DAG, and a
+# rename leaves it naming nothing.
+row_by_num = {r[0]: r[1] for r in rows}
+for r in rows:
+    for nm, num in re.findall(r'([A-Za-z0-9][\w\-*]*)\s*\(row (\d+)', r[8] or ''):
+        if row_by_num.get(num) != nm:
+            findings['row-pointer'].append(
+                f'registry row {r[0]} ({r[1]}): depends-on says `{nm} (row {num})` '
+                f'but row {num} is `{row_by_num.get(num, "MISSING")}`')
 
 # (g) D2/D4 rows must carry their gate/relaxation rationale in `source` -----
 # A D4 row with no named relaxation is un-gateable (impl-04-formulas); the

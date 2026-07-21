@@ -162,6 +162,17 @@ def check(pages: list[dict]) -> list[str]:
             elif r["id"] not in t["referenced-by"]:
                 errs.append(
                     f"asymmetry: {r['id']} depends-on {dep}, but {dep} does not list it")
+        # ...and the reverse. Only one direction was checked, so a stale
+        # `referenced-by` entry left by a deleted citation survived silently --
+        # and `referenced-by` is what a reader follows to find consumers.
+        for back in r["referenced-by"]:
+            t = by_id.get(back)
+            if t is None:
+                errs.append(f"{r['rel']}: referenced-by unknown id `{back}`")
+            elif r["id"] not in t["depends-on"]:
+                errs.append(
+                    f"asymmetry: {r['id']} is referenced-by {back}, "
+                    f"but {back} does not depends-on it")
 
     # Every bracketed lowercase token is checked, not just the arch/impl/mvp/deriv
     # families: the old prefix filter skipped `[instructions]`, `[product]`,

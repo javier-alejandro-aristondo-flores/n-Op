@@ -27,6 +27,10 @@ CSV_PATH = REPO / 'physics/library/formulas/registry-manifest.csv'
 # costs the most — and it sits outside pages/, where nothing was checking it.
 EDITABLE = [REPO / 'README.md', REPO / 'journal' / 'instructions.md']
 EDITABLE += sorted((REPO / 'journal' / 'pages').rglob('*.md'))
+# The reference CSVs carry prose in their Source column and name formulas there.
+# The registry itself is excluded: its source cells narrate their own retag
+# history, so a retired name there is the record, not a dangling reference.
+EDITABLE += sorted((REPO / 'physics/library/cert/reference-data').glob('*.csv'))
 
 rows = list(csv.reader(CSV_PATH.open(encoding='utf-8')))[1:]
 row_ids = {int(r[0]) for r in rows}

@@ -36,6 +36,29 @@ REQUIRED = ("id", "title", "chapter", "tag", "authority", "content-hash")
 FM_RE = re.compile(r"\A---\n(.*?)\n---\n", re.DOTALL)
 REF_RE = re.compile(r"\[([a-z0-9][a-z0-9-]{2,})\]")
 
+# Bracketed tokens that are physics notation, not page ids: species and defect
+# concentrations. Miller indices are excluded by the leading-alpha test.
+NOT_IDS = frozenset({"platelet", "defect", "carrier", "host", "propagator"})
+
+# Every page may cite these without taking a structural dependency: they are
+# indexes over the corpus, not upstream sources. An edge to them from all 58
+# pages would say nothing and would make the graph a hairball.
+INDEX_PAGES = frozenset({"timeline", "traps"})
+
+FENCE_RE = re.compile(r"^```.*?^```", re.DOTALL | re.MULTILINE)
+CHANGELOG_RE = re.compile(r"^#+ Changelog\b.*", re.DOTALL | re.MULTILINE)
+
+
+def citable(body: str) -> str:
+    """Body text that can create a graph edge.
+
+    A changelog entry, a supersession banner, or an example inside a code fence
+    mentions a page without depending on it; promoting those to edges is what
+    turns a dependency graph into a mention graph."""
+    body = FENCE_RE.sub("", body)
+    body = CHANGELOG_RE.sub("", body)
+    return "\n".join(ln for ln in body.splitlines() if not ln.lstrip().startswith(">"))
+
 
 def parse(path: pathlib.Path) -> dict | None:
     text = path.read_text(encoding="utf-8")
@@ -130,12 +153,36 @@ def check(pages: list[dict]) -> list[str]:
                 errs.append(
                     f"asymmetry: {r['id']} depends-on {dep}, but {dep} does not list it")
 
+    # Every bracketed lowercase token is checked, not just the arch/impl/mvp/deriv
+    # families: the old prefix filter skipped `[instructions]`, `[product]`,
+    # `[traps]` and every other unprefixed id, which is most of the corpus.
+    # Non-id brackets in this domain are concentrations and Miller indices; they
+    # are listed rather than pattern-guessed, so a new one forces a decision.
     for r in pages:
         for ref in set(REF_RE.findall(r["body"])):
-            if ref in by_id or "-" not in ref:
+            if ref in by_id or ref in NOT_IDS or not ref[0].isalpha():
                 continue
-            if re.match(r"^(arch|impl|mvp|deriv)-", ref):
-                errs.append(f"{r['rel']}: reference [{ref}] resolves to no page")
+            errs.append(f"{r['rel']}: reference [{ref}] resolves to no page "
+                        f"(add it to NOT_IDS if it is a concentration or index)")
+
+    # An `[id]` in the body is what creates a depends-on edge (conventions,
+    # "depends-on edge criterion"). Derived mechanically so the graph is
+    # auditable rather than asserted. Excluded: fenced code, changelog entries,
+    # blockquote banners, and the two index pages every page may cite freely.
+    for r in pages:
+        for ref in sorted(set(REF_RE.findall(citable(r["body"])))):
+            if ref not in by_id or ref == r["id"] or ref in INDEX_PAGES:
+                continue
+            if ref not in r["depends-on"]:
+                errs.append(f"{r['rel']}: body cites [{ref}] but does not "
+                            f"depends-on it (conventions, edge criterion)")
+
+    # No acyclicity check, deliberately. `depends-on` is a reference relation
+    # between explanations, not a build order: arch-04-state and arch-05-generic
+    # each explain the other, and the corpus is one large strongly-connected
+    # component by design. A cycle check here would fire forty times and mean
+    # nothing. Nothing may compute a transitive closure over this graph and read
+    # it as layering — see [conventions].
 
     for r in pages:
         actual = hashlib.sha256(r["body"].encode()).hexdigest()[:12]

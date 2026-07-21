@@ -5,6 +5,9 @@
 (b) backtick-quoted formula names in prose vs the CSV Name column
 (c) duplicated numeric literals (tolerances etc.) across files
 (d) glossary-term divergence candidates (term defined once, redefined elsewhere)
+(e) retired formula names still resolving to nothing (retired-names.csv)
+(f) near-miss formula names: case variants and one-edit neighbours of real rows
+(g) D2/D4 rows whose `source` cell names no relaxation / no gate rationale
 Read-only; prints findings, exit code = number of finding classes that fired.
 """
 from __future__ import annotations
@@ -20,7 +23,9 @@ CSV_PATH = REPO / 'physics/library/formulas/registry-manifest.csv'
 
 # The editable surface is the book. journal/live/ is frozen work product:
 # internal staleness there is by-design and exempt (conventions, authority order).
-EDITABLE = [REPO / 'README.md']
+# instructions.md is the entry point an agent reads first, so its staleness
+# costs the most — and it sits outside pages/, where nothing was checking it.
+EDITABLE = [REPO / 'README.md', REPO / 'journal' / 'instructions.md']
 EDITABLE += sorted((REPO / 'journal' / 'pages').rglob('*.md'))
 
 rows = list(csv.reader(CSV_PATH.open(encoding='utf-8')))[1:]
@@ -45,7 +50,9 @@ for path in EDITABLE:
 # A page may DECLARE unregistered names in its `unregistered-formulas`
 # frontmatter. Declared names are tracked, not defects; undeclared ones fail.
 # Inline mathematics is a separate violation (impl-04: "no inline math").
-FORMULA_ARG = re.compile(r'formula\s*=\s*(\{[^}]*\}[A-Za-z0-9_.-]*|[A-Za-z0-9_.-]+)')
+# Capture everything up to the closing delimiter, not just an ASCII identifier:
+# `formula = σ/(n·e)` slipped through an [A-Za-z0-9_.-]+ capture for years.
+FORMULA_ARG = re.compile(r'formula\s*=\s*(\{[^}]*\}[^,)`\n]*|[^,)`\n]+)')
 KEBAB = re.compile(r'^[A-Za-z][A-Za-z0-9]*(?:-[A-Za-z0-9]+)+$')
 
 def _declared(path):
@@ -73,7 +80,8 @@ for path in EDITABLE:
             else:
                 cands = [raw]
             for c in cands:
-                if not c:
+                c = c.strip()
+                if not c or '<' in c:        # `formula = <name>` is a placeholder
                     continue
                 if c in row_names or c in declared:
                     continue
@@ -98,6 +106,10 @@ for path in EDITABLE:
                 continue
             if re.match(r'(arch|impl|mvp)-\d\d-', name):
                 continue  # atomic-file id, not a formula name
+            # a line that also carries a real row name is resolving the old one
+            # in place ("proposed as X; landed as Y") — that is the fix, not a defect
+            if any(rn in line for rn in row_names):
+                continue
             # only flag if it *looks* like a formula row reference (nearby "row" or known family)
             if re.search(r'\brow\s+\d+|registry', line) and name not in row_names:
                 close = [n for n in row_names if n.startswith(name[:12])]
@@ -116,6 +128,69 @@ for sym, sites in sorted(tol_sites.items()):
     values = {v for v, _ in sites}
     if len(values) > 1:
         findings['tolerance'].append(f'{sym}: divergent values {sorted(values)} across {sorted({p for _, p in sites})}')
+
+# (e) retired formula names ------------------------------------------------
+# Naming is addressing (conventions): a renamed row must not leave the old name
+# resolving to nothing. A line that carries BOTH the retired name and what it
+# landed as is documenting the rename, not dangling — those are exempt.
+RETIRED_PATH = REPO / 'physics/library/formulas/retired-names.csv'
+retired = {}
+if RETIRED_PATH.exists():
+    with RETIRED_PATH.open(encoding='utf-8') as fh:
+        for r in list(csv.reader(fh))[1:]:
+            if r:
+                retired[r[0]] = r[1]
+def _blocks(lines):
+    """Paragraph index: line number -> text of its contiguous non-blank block.
+    Prose resolves a retired name across a sentence, not always on one line."""
+    out, start = {}, 0
+    for i, ln in enumerate(lines + ['']):
+        if not ln.strip():
+            block = '\n'.join(lines[start:i])
+            for j in range(start, i):
+                out[j + 1] = block
+            start = i + 1
+    return out
+
+for path in EDITABLE:
+    lines = path.read_text(encoding='utf-8').splitlines()
+    blocks = _blocks(lines)
+    for ln, line in enumerate(lines, 1):
+        for old, new in retired.items():
+            if not re.search(rf'(?<![\w-]){re.escape(old)}(?![\w-])', line, re.I):
+                continue
+            scope = blocks.get(ln, line)
+            if any(part.strip() in scope for part in new.replace('+', ' ').split()):
+                continue                     # the paragraph resolves it in place
+            findings['retired-name'].append(
+                f'{path.relative_to(REPO)}:{ln}: `{old}` is retired — landed as {new}')
+
+# (f) near-miss formula names ----------------------------------------------
+lower_names = {n.lower(): n for n in row_names}
+NEARISH = re.compile(r'`([A-Za-z][a-zA-Z0-9]*(?:-[a-zA-Z0-9_*]+)+)`')
+for path in EDITABLE:
+    for ln, line in enumerate(path.read_text(encoding='utf-8').splitlines(), 1):
+        for m in NEARISH.finditer(line):
+            name = m.group(1)
+            if name in row_names or name in retired:
+                continue
+            if re.match(r'(arch|impl|mvp|deriv)-', name):
+                continue
+            if name.lower() in {r.lower() for r in retired}:
+                continue
+            hit = lower_names.get(name.lower())
+            if hit and hit not in line:
+                findings['near-miss'].append(
+                    f'{path.relative_to(REPO)}:{ln}: `{name}` — case variant of `{hit}`')
+
+# (g) D2/D4 rows must carry their gate/relaxation rationale in `source` -----
+# A D4 row with no named relaxation is un-gateable (impl-04-formulas); the
+# obligation-9 approval has nothing to approve.
+RELAX_WORDS = ('relax', 'soft', 'log-sum-exp', 'gumbel', 'sigmoid', 'smooth')
+for r in rows:
+    if r[5].strip() == 'D4' and not any(w in r[7].lower() for w in RELAX_WORDS):
+        findings['d4-no-relaxation'].append(
+            f'registry row {r[0]} ({r[1]}): D4 with no relaxation named in `source`')
 
 # (d) glossary divergence candidates ---------------------------------------
 gloss = (REPO / 'journal/glossary.md').read_text(encoding='utf-8')

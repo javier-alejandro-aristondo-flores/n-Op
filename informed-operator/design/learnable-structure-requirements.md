@@ -1,8 +1,8 @@
 # Learnable_Structure × `/physics` — the seam contract
 
 > Hand-written cross-workstream contract, dated **2026-07-16**. Not part of the
-> lint-enforced atomic tree; the atomic tree (`docs/architecture/*`,
-> `docs/implementation/*`) is canonical for every shape, convention, and count
+> lint-enforced atomic tree; the atomic tree (`the canon chapters*`,
+> `the canon chapters*`) is canonical for every shape, convention, and count
 > cited here. Scope: the **minimum observable behavior `/physics` requires of
 > `Learnable_Structure` at their shared boundary** — and nothing about its
 > interior.

@@ -215,9 +215,14 @@ def check_citations(pages: list[dict]) -> list[str]:
         found = set()
         for line in r["body"].splitlines():
             if line.startswith("#"):
+                # numeric section coordinates (4.2, 12.0.3)
                 for tok in re.findall(r"\b\d+(?:\.\d+)+\b", line):
                     found.add(tok)
                     found.add(tok.split(".")[0])
+                # dated headings: pages like [timeline] are cited by date, and a
+                # dot-requiring pattern silently skipped every one of them
+                for tok in re.findall(r"\b\d{4}-\d{2}-\d{2}\b", line):
+                    found.add(tok)
         coords[r["id"]] = found
 
     # the corpus cites both full ids (`arch-12-cert §12.0.3`) and the historical
@@ -228,7 +233,7 @@ def check_citations(pages: list[dict]) -> list[str]:
         if m:
             prefix.setdefault(m.group(1), pid)
 
-    cite = re.compile(r"\[?([a-z][a-z0-9-]{3,})\]?[`\s]*§(\d+(?:\.\d+)*)")
+    cite = re.compile(r"\[?([a-z][a-z0-9-]{3,})\]?[`\s]*§(\d{4}-\d{2}-\d{2}|\d+(?:\.\d+)*)")
     for r in pages:
         for pid, coord in cite.findall(r["body"]):
             pid = pid if pid in coords else prefix.get(pid, pid)

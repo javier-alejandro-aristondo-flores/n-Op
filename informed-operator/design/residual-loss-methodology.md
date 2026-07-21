@@ -116,7 +116,7 @@ For a residual to participate in gradient training, `∂L_res/∂θ` must exist 
 | **D3 — Finite-difference fallback** | Black-box residual, no adjoint available | Legacy VASP-wrapper observable | O(P × forward) where P = #params perturbed |
 | **D4 — Non-differentiable** | Discrete decisions, classifications | "is direct-gap?", phase label | Requires relaxation |
 
-> **Superseded legend (2026-07 note).** This proposal's D3/D4 semantics are **not** the ones that shipped. The canonical registry legend (`docs/formula-registry.md`) defines **D3 = implicit-function adjoint via fixed-point linearization** and **D4 = autodiff-relaxed (surrogate-net bridge / finite-difference fallback)**; discrete-label outputs live at **D0** ("no useful derivative"). This file is kept as the origin survey; use the registry legend for anything load-bearing.
+> **Superseded legend (2026-07 note).** This proposal's D3/D4 semantics are **not** the ones that shipped. The canonical registry legend ([formula-registry]) defines **D3 = implicit-function adjoint via fixed-point linearization** and **D4 = autodiff-relaxed (surrogate-net bridge / finite-difference fallback)**; discrete-label outputs live at **D0** ("no useful derivative"). This file is kept as the origin survey; use the registry legend for anything load-bearing.
 
 **Handling D4**:
 - *Gumbel-Softmax / concrete distribution* (Jang, Maddison 2017) for categorical outputs

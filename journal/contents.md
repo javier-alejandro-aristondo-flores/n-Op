@@ -8,7 +8,7 @@ The `tag` (e.g. `4.2`) is a **display label**: regenerated freely, never cited. 
 ## 1 — purpose and product
 
 - **1.1** [Purpose and scope](pages/01-purpose-and-product/1.1-purpose.md) · `arch-01-purpose`
-  <br/>canonical for: purpose, mvp scope
+  <br/>canonical for: purpose
 - **1.2** [n-Op — Product Behavior (`/physics` as a deliverable)](pages/01-purpose-and-product/1.2-product.md) · `product`
   <br/>canonical for: product
 - **1.3** [Library landscape](pages/01-purpose-and-product/1.3-libraries.md) · `arch-02-libraries`

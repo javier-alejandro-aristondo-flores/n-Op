@@ -165,7 +165,7 @@ silently skip whole classes of citation. Before citing a clean run as evidence,
 plant a defect of exactly the class you claim is absent and confirm the checker
 fails (`10.4-traps` §58). That is now a script:
 `python journal/tools/calibrate.py` plants one defect per check in a temporary
-copy and asserts each one fires — 28 probes. A **missed** probe is a hole in the
+copy and asserts each one fires — 29 probes. A **missed** probe is a hole in the
 checker; a **stale** probe is a hole in the probe list. **Run it whenever you
 change a checker**, and cite its result rather than a bare green.
 

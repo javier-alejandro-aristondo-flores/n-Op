@@ -145,13 +145,21 @@ def check(pages: list[dict]) -> list[str]:
             errs.append(f"duplicate id `{pid}`: {seen[pid]} and {r['rel']}")
         seen[pid] = r["rel"]
 
-    owner: dict[str, str] = {}
+    # Case- and whitespace-insensitive: `mvp scope` and `MVP scope` were two
+    # pages claiming the same topic, and the anti-drift invariant -- the one
+    # check the corpus calls load-bearing -- did not see it.
+    owner: dict[str, tuple[str, str]] = {}
     for r in pages:
         for topic in r["canonical-for"]:
-            if topic in owner:
+            key = " ".join(topic.lower().split())
+            if key in owner:
+                prev_topic, prev_rel = owner[key]
+                same = " identically" if prev_topic == topic else \
+                    f" ({prev_topic!r} vs {topic!r} -- same topic, different casing)"
                 errs.append(
-                    f"canonical-for `{topic}` claimed twice: {owner[topic]} and {r['rel']}")
-            owner[topic] = r["rel"]
+                    f"canonical-for `{topic}` claimed twice: {prev_rel} and "
+                    f"{r['rel']}{same}")
+            owner[key] = (topic, r["rel"])
 
     by_id = {r["id"]: r for r in pages}
     for r in pages:

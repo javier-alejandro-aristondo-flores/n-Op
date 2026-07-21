@@ -55,7 +55,6 @@ Every canonical topic and the single page that owns it. If a topic is not here, 
 | moment-closure (emergent T_e, j) | 2.4 [Multiscale state — slow and macro tiers](pages/02-inputs-and-state/2.4-multiscale-state.md) | `arch-21-multiscale-state` |
 | MVP build order | 8.5 [MVP build order](pages/08-mvp-and-build/8.5-build-order.md) | `mvp-06-build-order` |
 | MVP capabilities | 8.2 [The three capability slices](pages/08-mvp-and-build/8.2-capabilities.md) | `mvp-03-capabilities` |
-| mvp scope | 1.1 [Purpose and scope](pages/01-purpose-and-product/1.1-purpose.md) | `arch-01-purpose` |
 | MVP scope | 8.3 [In-MVP vs deferred](pages/08-mvp-and-build/8.3-in-mvp-vs-deferred.md) | `mvp-04-in-mvp-vs-deferred` |
 | MVP-forced decisions | 8.4 [Decisions this slice forces](pages/08-mvp-and-build/8.4-decisions-forced.md) | `mvp-05-decisions-forced` |
 | nine regimes as extractions | 3.1 [Dynamics — GENERIC](pages/03-laws-and-residuals/3.1-generic.md) | `arch-05-generic` |
@@ -106,4 +105,4 @@ Every canonical topic and the single page that owns it. If a topic is not here, 
 | γ̂ encoding vocabulary | 2.3 [γ̂ as a Stage-4 lowering choice](pages/02-inputs-and-state/2.3-gamma-hat.md) | `arch-15-gamma-hat` |
 | γ̂ MVP budget | 2.6 [γ̂ budget at MVP scale](pages/02-inputs-and-state/2.6-gamma-budget.md) | `mvp-02-gamma-budget` |
 
-*99 canonical topics across 58 pages.*
+*98 canonical topics across 58 pages.*

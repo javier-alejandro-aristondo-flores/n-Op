@@ -66,7 +66,7 @@
 65,gibbs-free-energy-phase,"`(E_0, ω(q), T, P) → G(T,P)`",B8,T1,D2,cheap,S1,"E_0, phonons"
 66,chemical-potential-ref-table,"`(species, T, P) → μ_i`",B8,T0,D1,cheap,"S2+S3 (smooth in T and P — the species key is a pure read of row 87, but μ_i(T,P) is the thermodynamic function built on it. Was D0: that zeroed ∂μ_i/∂T and made row 69's Maxwell residual vacuously satisfied)","reference-phase-energy-cache (row 87), T, P"
 67,phase-diagram-convex-hull,"`(G_phases(μ,T)) → hull`",B8,T1,D4,faithful,S1 (soft-min hull log-sum-exp),G
-68,phase-boundary-slope,"`(ΔH, ΔV) → dP/dT`",B8,T0,D1,cheap,S1 (a.k.a. Clausius–Clapeyron),thermo
+68,phase-boundary-slope,"`(ΔH, ΔV, T) → dP/dT`",B8,T0,D1,cheap,"S1 (dP/dT = ΔH/(T·ΔV) = ΔS/ΔV; T is required — ΔH/ΔV alone has units of pressure, not pressure per kelvin, so the earlier `(ΔH, ΔV)` signature was dimensionally incomplete. a.k.a. Clausius–Clapeyron)",thermo
 69,thermodynamic-cross-derivative-residual,"`(∂μ_i/∂T, ∂S/∂N_i) → ‖Δ‖`",B8,T0,D1,cheap,S5 (a.k.a. Maxwell),thermo derivatives
 70,self-heating-T_op,"`(P_diss, R_th, T_amb) → T_op`",B9,T0,D1,cheap,S1,"dissipation, R_th"
 71,coupled-em-thermal-pde-residual,"`(j, E, T_L, σ(T), κ(T)) → ‖PDE‖`",B9,T1,D2,cheap,S4,"σ, κ, field"

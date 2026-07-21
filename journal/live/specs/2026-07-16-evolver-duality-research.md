@@ -2,11 +2,11 @@
 
 > **Deliverable of** `[timeline] §2026-07-16 (Wave 2 / evolver)` (independent
 > deep-research commission, 2026-07-16). Per the commissioning note this memo **commits to
-> nothing**: no atomic-tree edit, no `docs/product.md` edit, no vocabulary change may follow
+> nothing**: no atomic-tree edit, no [product] edit, no vocabulary change may follow
 > before joint review. Structure follows brief §4 exactly: §1 verdict, §2 the algebra, §3 the
 > shape of a steppable lowering, §4 refusal cases, §5 integrator-interface proposal, §6 sources.
 > Arch citations are by doc id; external claims are grounded in §6. Signature blocks below are
-> behavioral contracts in the house idiom (`arch-16-pino-bridge`, `docs/product.md`), not code.
+> behavioral contracts in the house idiom (`arch-16-pino-bridge`, [product]), not code.
 
 ---
 
@@ -81,7 +81,7 @@ Verification of the brief's four seed observations (brief §2 demanded verify-do
 |---|---|
 | Residuals are structurally `r = LHS(ẋ) − RHS`; causalization is a mechanized pass | **Verified, sharpened**: `LHS` is the identity on an *input* rate estimate for all micro and slow EOM rows; two macro rows carry no `∂_t` at all (algebraic constraints). Causalization is mechanized (§6.A), with named complexity: matching/BLT low-polynomial, tearing NP-complete, structural index analysis cheap but generic-values-only (§4.3). |
 | Structured generators are tagged in the IR | **Verified, one caveat**: the reversible/dissipative split, per-tier degeneracy, and target shapes (`AntisymmForm`/`PSDSymmForm`) are IR-visible (`arch-05-generic`, `arch-19-coupling-structure`). Caveat: the Jacobi property of *generated* antisymmetric cross-blocks is only cert-checked numerically, which grades (not blocks) geometric-integrator dispatch (§2.6, §3.4). |
-| The pipeline already performs exact rewrites and emits a second program (adjoint); a stepper is a third emission; sibling-artifact identity per `arch-20-representations §20.4` | **Verified**: Stage-3 equality saturation and Stage-4 adjoint synthesis confirmed (`arch-07-pipeline`); `docs/product.md` (landed 2026-07-16) fixes the artifact model — immutable, self-describing, hash-identified oracle-files — and deliberately leaves every time-evolution verb unclaimed pending this memo (its §9). |
+| The pipeline already performs exact rewrites and emits a second program (adjoint); a stepper is a third emission; sibling-artifact identity per `arch-20-representations §20.4` | **Verified**: Stage-3 equality saturation and Stage-4 adjoint synthesis confirmed (`arch-07-pipeline`); [product] (landed 2026-07-16) fixes the artifact model — immutable, self-describing, hash-identified oracle-files — and deliberately leaves every time-evolution verb unclaimed pending this memo (its §9). |
 | Tiered state ⇒ "steppable" means multi-rate steppable | **Verified, strengthened**: the `arch-21-multiscale-state` adiabatic contract (slow tier driven by time-averaged micro quantities; macro by homogenized coefficient closures) is precisely the heterogeneous-multiscale-method pattern, and the tier design's "no cross-tier constraint manifold" decision means no monolithic cross-tier DAE ever needs to be formed (§3.4). |
 
 ---
@@ -278,7 +278,7 @@ E-graphs remain the right Stage-3 substrate under a two-lowering regime, with tw
   Stage-3 boundary (consistent with the V1 rule that e-graphs stay off the runtime path,
   `arch-15-gamma-hat §15.4`). The evolver artifact then shares the scorer's RHS addresses by
   construction, and the sibling relationship is a filesystem-level fact
-  (`docs/product.md` identity model; `arch-20-representations §20.4` domain separation for the
+  ([product] identity model; `arch-20-representations §20.4` domain separation for the
   new artifact family).
 
 AD-safety interacts once more: the adjoint of the *evolver* (sensitivities of trajectories)
@@ -339,7 +339,7 @@ nothing.
 ### 3.2 Artifacts
 
 One **evolver-file** per composition, the sibling of the oracle-file, mirroring the product's
-four-part artifact anatomy (`docs/product.md`):
+four-part artifact anatomy ([product]):
 
 1. **The callable(s)** — per steppable tier: a pure tangent map
    `(state_tier, env, adiabatic-params) → tangent_tier`, plus separately addressable
@@ -372,7 +372,7 @@ four-part artifact anatomy (`docs/product.md`):
   (`arch-18-open-decisions`). This is the new cert obligation: **the evolver never introduces
   a second truth**; it re-exposes the scorer's RHS.
 - **Score-not-solve is preserved where it lives.** The product still never fills in state,
-  never owns a loop, never evolves anything (`docs/product.md` §8; `arch-01-purpose`). The
+  never owns a loop, never evolves anything ([product] §8; `arch-01-purpose`). The
   tangent map is a per-call pure readout — "the instantaneous lawful tendency at the supplied
   state" — not a trajectory. Integration is the consumer's (§5).
 - **Cost classes are declared, not inherited.** The scorer's `O(log n)`-hot-path/no-solver
@@ -424,7 +424,7 @@ manifest requirements rather than method choices:
 
 The value-to-cost ordering is unambiguous from the research: **slow tier first** (its RHS rows
 are T0/T1 closed forms; stiffness is handled by standard implicit/exponential steppers; it is
-the product's lifetime/degradation story — the capability `docs/product.md` §6 explicitly
+the product's lifetime/degradation story — the capability [product] §6 explicitly
 could not claim), **macro tier second** (index-1, committed discretization, one embedded
 solve per step), **micro tier last and restricted** (Born–Oppenheimer reading = solve-per-step
 cost; pure-L1 reading = femtosecond stiffness; both honest but expensive; the learned operator
@@ -443,7 +443,7 @@ remains the product's fast-evolution answer).
 > accounted for: a closed-enum refusal mode plus a numeric or structural witness in the
 > manifest's refusal ledger — no prose, no runtime error, no partial dynamics.
 
-This is the product's existing refusal semantics (`docs/product.md` §4 "refusal is absence";
+This is the product's existing refusal semantics ([product] §4 "refusal is absence";
 `arch-12-cert`) applied to a second artifact: refusal modes are enum codes; witnesses are
 machine data (the deficient matching's unmatched rows, the offending node address, the
 singular-Jacobian sample, the surrogate-bias magnitude).
@@ -515,7 +515,7 @@ dynamics(tier) →
 `/physics` guarantees: exactness against the scorer sibling (§3.3), tag totality, index
 witnesses, declared costs, refusal accounting. The consumer — `/informed-operator`, a
 classical-integration harness in `/interface`, or a person's program — owns step-size control,
-scheme choice, and the loop. This keeps every `docs/product.md` §1/§8 principle intact
+scheme choice, and the loop. This keeps every [product] §1/§8 principle intact
 (score-not-solve; no loop ownership; evidence-never-verdicts extends to "tendencies, never
 trajectories") while making the hand-off *sufficient for structure preservation*, which an
 opaque RHS closure is not: the research is unambiguous that degeneracy-respecting,
@@ -525,12 +525,12 @@ the obligations — precisely the fields above (§3.4, §6.D).
 **Rejected alternatives.** (a) *Opaque RHS closure only*: discards the structure tags and
 obligations; a consumer integrator can then silently violate the invariants the scorer will
 later flag — the one outcome the product's evidence discipline exists to prevent. (b)
-*`/physics` ships the integrator / a rollout verb*: contradicts `docs/product.md` §8 ("never
+*`/physics` ships the integrator / a rollout verb*: contradicts [product] §8 ("never
 evolves anything, owns no loop") and would import step-size policy — a judgment — into a
 product that renders none. If the product ever claims time-evolution *verbs* (its §9 item 1),
 they belong in `/interface` as compositions over this hand-off, with the scorer auditing the
 produced trajectories (§2.8). (c) *Defer entirely*: the interface is the one committed
-consumer of this research (`docs/product.md` §9 names it), and the manifest fields above are
+consumer of this research ([product] §9 names it), and the manifest fields above are
 exactly what §2–§4 showed to be necessary and compile-time available; deferral would buy no
 information.
 
@@ -542,7 +542,7 @@ no arch edit accompanies this memo.
 ## 6. Sources
 
 Primary papers and canonical tool documentation only; grouped by coverage area. Repo documents
-cited throughout by id (`arch-xx`, `impl-xx`, `docs/product.md`, `docs/computational-overview.md`).
+cited throughout by id (`arch-xx`, `impl-xx`, [product], [computational-overview]).
 
 **A. Acausal model compilation, causalization, and DAE structural analysis**
 

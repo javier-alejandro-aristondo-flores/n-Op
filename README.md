@@ -19,10 +19,10 @@ apparatus exists so you do not have to.
 
 | | |
 |---|---|
-| **[instructions.md](instructions.md)** | **Read this first.** How to go from the book to a working understanding, and how to get an edit back into the right page. |
-| [contents.md](contents.md) | Chapters → pages, in reading order. *Generated.* |
-| [index.md](index.md) | Every canonical topic → the single page that owns it. *Generated.* |
-| [glossary.md](glossary.md) | One-line definitions for the load-bearing terms. |
+| **[instructions.md](journal/instructions.md)** | **Read this first.** How to go from the book to a working understanding, and how to get an edit back into the right page. |
+| [contents.md](journal/contents.md) | Chapters → pages, in reading order. *Generated.* |
+| [index.md](journal/index.md) | Every canonical topic → the single page that owns it. *Generated.* |
+| [glossary.md](journal/glossary.md) | One-line definitions for the load-bearing terms. |
 
 Chapters are **by concern**, and chapters **2–6 are the contiguous `/physics`
 oracle block** — for oracle-internal work that range is usually sufficient.
@@ -62,23 +62,21 @@ load-bearing concepts:
 
 ```
 n-Op/
-├── contents.md · index.md · glossary.md · instructions.md   the apparatus
-├── pages/                    the book — 47 canon pages
-│   └── appendix/             derivations (authority: supporting)
-├── tools/
-│   ├── apparatus.py          regenerate the apparatus + check invariants
-│   ├── build_book.py         the migration that produced pages/
-│   └── lint.py · seams.py    older checkers, pending retarget
+├── journal/                  the specification, as a book
+│   ├── contents.md · index.md · glossary.md · instructions.md    the apparatus
+│   ├── pages/                47 canon pages
+│   │   └── appendix/         derivations (authority: supporting)
+│   ├── live/                 work products still executing
+│   └── tools/apparatus.py    regenerate the apparatus + check invariants
 ├── physics/
 │   └── library/              code scaffold (no code yet)
 │       ├── formulas/registry-manifest.csv    the canonical formula registry
 │       └── cert/reference-data/              machine-readable cert battery
-├── docs/                     live work products only (audits/specs still executing)
 ├── informed-operator/design/ PINO seam contract + loss methodology
 └── interface/                placeholder
 ```
 
-Run `python tools/apparatus.py` after editing any page: it restamps content
+Run `python journal/tools/apparatus.py` after editing any page: it restamps content
 hashes and regenerates `contents.md` / `index.md`. `--check` verifies without
 writing, and is the gate — it fails on a duplicate `canonical-for` topic, an
 asymmetric dependency edge, an unresolvable `[id]` reference, or a stale hash.

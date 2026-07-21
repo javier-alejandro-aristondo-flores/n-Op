@@ -6,7 +6,7 @@ landing plan: **Auditor 1 — conventions & physics traps** (verdict: CLEAR-WITH
 all fixes applied at adjudication). **Adjudicated outcome: β-Ga₂O₃ package + III-N
 pyroelectric rider (B1) CLEARED and seeded; III-N polarization-bowing rider (B3) GATED on
 two paywalled primary texts** (gate texts read 2026-07-16 — see §4 G1; residual = the
-FBA/Ambacher pin-read). Target: `docs/specs/2026-07-08-wave2-beta-ga2o3-seeding.md`
+FBA/Ambacher pin-read). Target: `live/specs/2026-07-08-wave2-beta-ga2o3-seeding.md`
 (corrections applied in place, status line updated).
 
 ## 1. Convention verdicts (Auditor 1)

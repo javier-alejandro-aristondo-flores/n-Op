@@ -4,7 +4,7 @@
 and seeded; III-N bowing rider (B3): gate texts READ 2026-07-16 (FB Erratum: P_sp bowing
 untouched; "Ebert" = Lan et al. PRB 113 155302, CC-BY, InGaN-only) — seeding pends the
 mandated FBA APL 80 1204 (2002) / Ambacher JPCM 14 3399 (2002) pin-read.** Audit register:
-`docs/audits/2026-07-16-wave2-beta-ga2o3-audit.md`
+`live/audits/2026-07-16-wave2-beta-ga2o3-audit.md`
 (two auditors on the Wave-1 mandate; all value/provenance corrections applied **in place**
 below — the tables now carry the audited values). Historical note: drafted 2026-07-08 with
 **[verified]** / **[audit-pin]** tags; pins are resolved below except the two G1/G2
@@ -192,7 +192,7 @@ JSST 8 Q3083 (2019) and seeded).
 ## §5 Landing plan — EXECUTED 2026-07-16
 
 1. ✔ Adversarial audit (two auditors, Wave-1 mandate: refute) —
-   `docs/audits/2026-07-16-wave2-beta-ga2o3-audit.md`. Conventions: CLEAR-WITH-PINS;
+   `live/audits/2026-07-16-wave2-beta-ga2o3-audit.md`. Conventions: CLEAR-WITH-PINS;
    numbers: BLOCK→fixed at adjudication (E_c triple + c* labels + six fixes, applied above).
 2. ✔ Seeded: `material-constants` / `elastic-tensors` / `phonon-frequencies` /
    `transport-coefficients` β-Ga₂O₃ rows (direction-tagged, monoclinic frame stated), the

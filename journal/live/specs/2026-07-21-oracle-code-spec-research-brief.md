@@ -63,7 +63,7 @@ The contract must guarantee all six, so a learned proposer can be trained/certif
 6. **One shared namespace** across state channels ↔ observable keys ↔ residual keys, so proposer and oracle compose.
 
 ### 3.5 The diamond MVP acceptance test (the first end-to-end validation target)
-The MVP code spec must be validated by this test (also recorded in `docs/mvp/03-capabilities.md`, Cap 1):
+The MVP code spec must be validated by this test (also recorded in [mvp-03-capabilities], Cap 1):
 - **Null:** grade a ground-truth, relaxed pure-diamond state → every residual slot ≈ 0 within σ (the oracle certifies truth as lawful).
 - **Sensitivity:** perturb the state (displace an atom, distort the cell off the energy minimum, wrong lattice constant) → non-zero residual, **and the specific keys that fire name the violated law** (`∇_R E_BO = 0` for a bad relaxation, space-group equivariance for a broken symmetry, Born stability for an over-stretch).
 - **Data-backed sensitivity:** perturb *along* the existing diamond strain-hypersurface dataset (~1,179 DFT points, PBE/HSE) and confirm the residual tracks the DFT energy rise off the minimum — a quantitative curve-match, not just a sign check.
@@ -136,7 +136,7 @@ Format per unit: **objective** → *specifies* / **internal** sources / **extern
 
 ### G10 — Formalization gaps
 
-- **R10.1 — Machine-readable catalogs.** Objective: bring the observable catalog (52 observables + 16 figures-of-merit), the crystal-structure-validity residual catalog, and the remaining non-equilibrium bundle to full machine-readability, aligned to registry rows. **Internal:** `docs/computational-overview.md` (the formalization-gap list); the research catalogs. **Done:** registry-aligned machine-readable catalogs. *Deps: R1.0.*
+- **R10.1 — Machine-readable catalogs.** Objective: bring the observable catalog (52 observables + 16 figures-of-merit), the crystal-structure-validity residual catalog, and the remaining non-equilibrium bundle to full machine-readability, aligned to registry rows. **Internal:** [computational-overview] (the formalization-gap list); the research catalogs. **Done:** registry-aligned machine-readable catalogs. *Deps: R1.0.*
 
 ---
 
@@ -176,7 +176,7 @@ Each section is "code-spec complete" when an engineer can implement it with no f
 ## 7. Source index
 
 **Internal canon (atomic tree):** `arch-01-purpose`, `arch-03-inputs`, `arch-04-state`, `arch-05-generic`, `arch-06-physics-graph`, `arch-07-pipeline`, `arch-08-bo-levels`, `arch-09-vocabularies`, `arch-10-typeclasses`, `arch-11-residuals`, `arch-12-cert`, `arch-13-applicability`, `arch-14-topology`, `arch-15-gamma-hat`, `arch-16-pino-bridge`, `arch-17-out-of-scope`, `arch-18-open-decisions`, `arch-19` (invariant synthesis), `arch-20-representations`, `arch-21-multiscale-state`; `impl-02-methods`, `impl-03-templates`, `impl-04-formulas`, `impl-07-residual-factory`, `impl-08-cert-detail`; `mvp-03-capabilities`.
-**Internal (standalone / research strata):** `docs/product.md`; `docs/computational-overview.md`; `[deriv-language-study]`, `uwbg-observable-catalog.md`, `residual-generator-catalog.md`, `csp-heterostructure.md`; `physics/library/formulas/registry-manifest.csv`; `physics/library/cert/reference-data/*.csv`; the diamond strain-hypersurface dataset.
+**Internal (standalone / research strata):** [product]; [computational-overview]; `[deriv-language-study]`, `uwbg-observable-catalog.md`, `residual-generator-catalog.md`, `csp-heterostructure.md`; `physics/library/formulas/registry-manifest.csv`; `physics/library/cert/reference-data/*.csv`; the diamond strain-hypersurface dataset.
 **External research themes (each consulted as needed, once):** computational group theory & irrep decomposition; Smith Normal Form; invariant-theory projectors; equality saturation / e-graphs and error-tracked rewriting; randomized numerical linear algebra, HODLR, tensor-train; reverse-mode AD design; implicit-differentiation / adjoint methods for fixed points; PDE discrete-vs-continuous adjoint; descriptor-distance methods and their hyperparameters; DFT/DFPT/GW/BTE reference-solve protocols and reproducibility; low-rank / natural-orbital density-matrix representations; embedded SQL/content-addressed caching; ABI/FFI and serialization; language/AD/e-graph/codegen ecosystems per candidate toolchain.
 
 ---

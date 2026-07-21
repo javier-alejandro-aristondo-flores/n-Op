@@ -148,7 +148,8 @@ mechanically. Do not produce one.
 in the CSV; backticked formula names that are not registry rows; `formula =`
 arguments carrying inline mathematics or an undeclared name; divergent tolerance
 literals; duplicate glossary entries; retired formula names left unresolved;
-case-variant near-misses; and `D4` rows whose `source` cell names no relaxation.
+case-variant near-misses; `D4` rows whose `source` cell names no relaxation; and
+`unregistered-formulas` declarations the body no longer invokes.
 
 **Green means the corpus is internally consistent. It does not mean the physics
 is right** — that is what the audit protocol in `10.3-audit-prompt` is for. And

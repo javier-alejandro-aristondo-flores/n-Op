@@ -8,6 +8,7 @@
 (e) retired formula names still resolving to nothing (retired-names.csv)
 (f) near-miss formula names: case variants and one-edit neighbours of real rows
 (g) D2/D4 rows whose `source` cell names no relaxation / no gate rationale
+(h) `unregistered-formulas` declarations that the body no longer invokes
 Read-only; prints findings, exit code = number of finding classes that fired.
 """
 from __future__ import annotations
@@ -132,6 +133,29 @@ for sym, sites in sorted(tol_sites.items()):
     values = {v for v, _ in sites}
     if len(values) > 1:
         findings['tolerance'].append(f'{sym}: divergent values {sorted(values)} across {sorted({p for _, p in sites})}')
+
+# (h) declared-gap list must match what is actually invoked ----------------
+# A declaration that has drifted from the body is worse than none: it reports a
+# gap that has moved. Both directions are defects -- a name declared but no
+# longer invoked, and a name invoked but not declared (which (b2) also catches).
+for path in EDITABLE:
+    declared = _declared(path)
+    if not declared:
+        continue
+    invoked = set()
+    for line in path.read_text(encoding='utf-8').splitlines():
+        for m in FORMULA_ARG.finditer(line):
+            raw = m.group(1).strip('`').strip()
+            if raw.startswith('{'):
+                head, _, suffix = raw.partition('}')
+                invoked |= {f"{c.strip()}{suffix}" for c in head.strip('{').split('|')}
+            elif raw and '<' not in raw:
+                invoked.add(raw)
+    stale = sorted(n for n in declared if n not in invoked)
+    if stale:
+        findings['stale-declaration'].append(
+            f'{path.relative_to(REPO)}: declares {stale} in `unregistered-formulas` '
+            f'but the body no longer invokes them')
 
 # (e) retired formula names ------------------------------------------------
 # Naming is addressing (conventions): a renamed row must not leave the old name

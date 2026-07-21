@@ -3,7 +3,7 @@
 2,bandgap-indirect,"`(BandStruct, k-grid) → Scalar`",B1,T0,D1,cheap,S1,bands
 3,effective-mass-tensor,"`(BandStruct, k0) → Tensor[3,3]`",B1,T0,D1,cheap,S1,bands
 4,DOS-tetrahedron,"`(BandStruct, k-mesh) → ε↦Scalar`",B1,T1,D2,cheap,S1,bands
-5,fermi-level-charge-neutral,"`(DOS, T, dopants) → Scalar`",B1/B4,T1,D2,cheap,S1+S3,"DOS-tetrahedron (row 4), defect-boltzmann-population (row 35)"
+5,fermi-level-charge-neutral,"`(DOS, T, dopants) → Scalar`",B1/B4,T1,D3,cheap,"S1+S3 (E_F is the root of charge neutrality, not a closed form: dE_F/dp = −(∂F/∂p)/(∂F/∂E_F). ∂F/∂E_F is the conditioning, and it is smallest exactly where this corpus operates — a wide-gap intrinsic semiconductor with a nearly flat neutrality curve)","DOS-tetrahedron (row 4), defect-boltzmann-population (row 35)"
 6,quasi-particle-shift-G0W0-surrogate,"`(bands, screening) → bands'`",B1,T2,D2,faithful,S1,bands
 7,acoustic-sum-rule,`(D(q→0)) → ‖residual‖`,B2,T0,D1,cheap,S1+S2,D(q) from the DFPT reference solve (unregistered input)
 8,dynamical-matrix-hermiticity,`(D(q)) → ‖D - D†‖`,B2,T0,D1,cheap,S2,D(q) from the DFPT reference solve (unregistered input)
@@ -11,7 +11,7 @@
 10,phonon-DOS,"`(ω_λ(q), q-mesh) → ε↦Scalar`",B2,T1,D2,cheap,S1,phonon-dispersion (row 9)
 11,phonon-group-velocity,`(ω_λ(q)) → ∂ω/∂q`,B2,T1,D1,cheap,S1,phonon-dispersion (row 9)
 12,grueneisen-mode,"`(ω_λ(q,V)) → γ_λ`",B2,T2,D1,cheap,S1 (γ_λ=−(V/ω_λ)(∂ω_λ/∂V); smooth in the input frequencies — exception set at mode crossings under volume change and at degeneracies),phonon-dispersion (row 9)
-13,SCPH-self-consistent-phonons,"`(D(q), T) → ω_renorm`",B2,T2,D2,faithful,S1,"phonon-dispersion (row 9), T"
+13,SCPH-self-consistent-phonons,"`(D(q), T) → ω_renorm`",B2,T2,D3,faithful,"S1 (ω_renorm is the converged fixed point of the self-consistent phonon equations; conditioning degrades near soft modes, which is where SCPH is invoked in the first place)","phonon-dispersion (row 9), T"
 14,drude-conductivity,"`(μ, n, e) → σ`",B3,T0,D1,cheap,S1,"μ, n"
 15,matthiessen-mobility,"`(μ_imp, μ_ph, μ_grain) → μ`",B3,T0,D1,cheap,S4,μ-channels
 16,field-dependent-mobility,"`(μ0, E, v_sat, β) → μ(E)`",B3/B9,T0,D1,cheap,S4 (a.k.a. Caughey–Thomas),"μ0, v_sat, E"
@@ -34,7 +34,7 @@
 33,charged-supercell-extrapolation-image-charge,"`(q, ε, L, ξ) → ΔE_image`",B4,T0,D1,cheap,S3 (a.k.a. Lany-Zunger),"q, ε"
 34,charge-transition-level,"`(E_form(q1), E_form(q2)) → ε(q1/q2)`",B4,T0,D1,cheap,S1+S3,E_form
 35,defect-boltzmann-population,"`(E_form, T, μ_i) → c_def`",B4,T0,D1,cheap,S2+S3,"E_form, T"
-36,self-consistent-charge-balance,"`(c_def(E_F), n(E_F), p(E_F)) → E_F*`",B4/B1,T1,D2,cheap,S3,"populations, n,p"
+36,self-consistent-charge-balance,"`(c_def(E_F), n(E_F), p(E_F)) → E_F*`",B4/B1,T1,D3,cheap,"S3 (E_F* is a converged fixed point over coupled defect and carrier populations; same near-singular-Jacobian failure mode as row 5, with more channels to flatten it)","populations, n,p"
 37,defect-configurational-entropy,"`(c_def, sites) → S_conf`",B4,T0,D1,cheap,S3,populations
 38,SRH-recombination,"`(n, p, τ_n, τ_p, n_i) → R_SRH`",B4/B9,T0,D1,cheap,S3,"n, p, τ"
 39,auger-recombination,"`(n, p, C_n, C_p) → R_Aug`",B4/B9,T0,D1,cheap,S3,"n, p"

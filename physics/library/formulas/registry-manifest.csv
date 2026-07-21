@@ -11,7 +11,7 @@
 10,phonon-DOS,"`(ω_λ(q), q-mesh) → ε↦Scalar`",B2,T1,D2,cheap,S1,phonon-dispersion (row 9)
 11,phonon-group-velocity,`(ω_λ(q)) → ∂ω/∂q`,B2,T1,D1,cheap,S1,phonon-dispersion (row 9)
 12,grueneisen-mode,"`(ω_λ(q,V)) → γ_λ`",B2,T2,D1,cheap,S1 (γ_λ=−(V/ω_λ)(∂ω_λ/∂V); smooth in the input frequencies — exception set at mode crossings under volume change and at degeneracies),phonon-dispersion (row 9)
-13,SCPH-self-consistent-phonons,"`(D(q), T) → ω_renorm`",B2,T2,D3,faithful,"S1 (ω_renorm is the converged fixed point of the self-consistent phonon equations; conditioning degrades near soft modes, which is where SCPH is invoked in the first place)","phonon-dispersion (row 9), T"
+13,SCPH-self-consistent-phonons,"`(D(q), T) → ω_renorm`",B2,T3,D3,faithful,"S1 (ω_renorm is the converged fixed point of the self-consistent phonon equations; conditioning degrades near soft modes, which is where SCPH is invoked in the first place)","phonon-dispersion (row 9), T"
 14,drude-conductivity,"`(μ, n, e) → σ`",B3,T0,D1,cheap,S1,"μ, n"
 15,matthiessen-mobility,"`(μ_imp, μ_ph, μ_grain) → μ`",B3,T0,D1,cheap,S4,μ-channels
 16,field-dependent-mobility,"`(μ0, E, v_sat, β) → μ(E)`",B3/B9,T0,D1,cheap,S4 (a.k.a. Caughey–Thomas),"μ0, v_sat, E"
@@ -70,7 +70,7 @@
 69,thermodynamic-cross-derivative-residual,"`(∂μ_i/∂T, ∂S/∂N_i) → ‖Δ‖`",B8,T0,D1,cheap,S5 (a.k.a. Maxwell),thermo derivatives
 70,self-heating-T_op,"`(P_diss, R_th, T_amb) → T_op`",B9,T0,D1,cheap,S1,"dissipation, R_th"
 71,coupled-em-thermal-pde-residual,"`(j, E, T_L, σ(T), κ(T)) → ‖PDE‖`",B9,T1,D2,cheap,S4,"σ, κ, field"
-72,hot-carrier-temperature-balance,"`(j·E, τ_E, T_L) → T_e`",B9,T0,D1,cheap,S4,"j, E, τ_E"
+72,hot-carrier-temperature-balance,"`(j·E, τ_E, n, T_L) → T_e`",B9,T0,D1,cheap,"S4 (T_e = T_L + (2/3)(j·E)τ_E/(n k_B); without the carrier density the declared output cannot be formed — (j·E)·τ_E is J·m⁻³ and only division by n·k_B yields a temperature)","j, E, τ_E, n"
 73,tau-energy-POP-acoustic,"`(α_F, v_s, ρ, Ξ, T) → τ_E`",B9,T0,D1,cheap,S4,"α_F, mech"
 74,impact-ionization-coefficient,"`(α0, β/E) → α(E)`",B9,T0,D1,cheap,"S4 (α is ionizing collisions per unit length travelled — cm⁻¹, not a rate in s⁻¹; α(E)=α0·exp(−β/E). a.k.a. Chynoweth)",E_field
 75,avalanche-multiplication,"`(α(E), L) → M`",B9,T1,D2,cheap,S4,α(E)
@@ -131,5 +131,5 @@
 130,tddb-thermochemical-e-model,"`(E_ox, T, ΔH0‡, p_eff) → t_BD`",B11,T0,D1,cheap,extension (2026-07 gap-audit B2; thermochemical E-model t_BD=t0·exp((ΔH0‡ − p_eff·E_ox)/kT); the canonical gate-dielectric lifetime limiter; is-dielectric-layer-gated; per-material ΔH0‡/p_eff at the dielectric wave),"E_ox, T"
 131,dielectric-crystallization-jmak,"`(T, t, E_a_cryst, n_avrami) → X_cryst`",B11,T0,D1,cheap,"extension (2026-07 gap-audit B2; JMAK X=1−exp(−(k(T)·t)^n), k=k0·exp(−E_a/kT); ALD Al₂O₃ crystallizes >700°C → leakage spike (catalog Part A); slow-tier front field alongside x_ox (arch-21); is-dielectric-layer-gated)","T, t"
 132,xrd-structure-factor,"`(h, R_I, Z_I, ⟨u²⟩, (hkl)) → |F_hkl|²`",B10,T0,D1,cheap,extension (2026-07 gap-audit B4; kinematic F_hkl=Σ_I f_I(q)·e^{iq·R_I}·e^{−W_I} with Debye-Waller W from ⟨u²⟩ (SpectralAggregateOf over row 10); the primary experimental structure channel for pino-bridge Import),"phonon-DOS (row 10) via ⟨u²⟩, lattice"
-133,raman-activity,"`(∂χ/∂u_ν|_Γ, e_ν) → I_ν^Raman`",B2/B1,T2,D1,cheap,extension (2026-07 gap-audit B4; Raman tensor from the linear-response sub-stage (rows 92–94 family); shifts are row 9's Γ-phonons — this row adds activities/intensities so measured Raman spectra become an Import channel),"phonon-dispersion (row 9), electronic-linear-response-tensor (row 94)"
+133,raman-activity,"`(∂χ/∂u_ν|_Γ, e_ν) → I_ν^Raman`",B2/B1,T0,D1,cheap,extension (2026-07 gap-audit B4; Raman tensor from the linear-response sub-stage (rows 92–94 family); shifts are row 9's Γ-phonons — this row adds activities/intensities so measured Raman spectra become an Import channel),"phonon-dispersion (row 9), electronic-linear-response-tensor (row 94)"
 134,radiative-recombination-rate,"`(n, p, n_i(T), B_rad) → R_rad`",B9/B4,T0,D1,cheap,extension (2026-07 gap-audit B6; a.k.a. van Roosbroeck-Shockley detailed-balance R=B_rad·(np−n_i²); backs RadiativeEmissionOf/photoluminescence (impl-06) and completes HM-5's G−R source; negligible in UWBG device balance (tiny n_i) — carried for PL/validation channels) (a.k.a. van Roosbroeck–Shockley),"n, p, n_i(T)"

@@ -43,9 +43,12 @@ PROBES: list[tuple[str, str, str, str, str, str]] = [
      "journal/pages/01-purpose-and-product/1.4-principles.md",
      "# Architectural principles", "# Architectural principles\n\nSee [arch-13-applicability].",
      "does not depends-on"),
+    # Mutates an existing list rather than an empty one: a probe keyed on
+    # `referenced-by: []` goes STALE the moment that page gains a consumer,
+    # which is exactly what happened to its first version.
     ("asymmetric edge (reverse)", "apparatus",
      "journal/pages/01-purpose-and-product/1.4-principles.md",
-     "referenced-by: []", "referenced-by:\n  - product",
+     "referenced-by:", "referenced-by:\n  - product",
      "is referenced-by"),
     ("dated anchor that does not resolve", "apparatus",
      "journal/pages/01-purpose-and-product/1.4-principles.md",

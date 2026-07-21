@@ -33,6 +33,10 @@ EDITABLE += sorted((REPO / 'journal' / 'pages').rglob('*.md'))
 # The registry itself is excluded: its source cells narrate their own retag
 # history, so a retired name there is the record, not a dangling reference.
 EDITABLE += sorted((REPO / 'physics/library/cert/reference-data').glob('*.csv'))
+# The /informed-operator design docs consume this vocabulary and cite page ids.
+# Nothing was sweeping them, and the note in residual-loss-methodology.md warning
+# about a stale D-tag legend had itself gone stale.
+EDITABLE += sorted((REPO / 'informed-operator/design').glob('*.md'))
 
 rows = list(csv.reader(CSV_PATH.open(encoding='utf-8')))[1:]
 row_ids = {int(r[0]) for r in rows}

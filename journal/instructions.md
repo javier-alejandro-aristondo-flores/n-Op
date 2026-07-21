@@ -150,7 +150,8 @@ arguments carrying inline mathematics or an undeclared name; divergent tolerance
 literals; duplicate glossary entries; retired formula names left unresolved;
 case-variant near-misses; `D4` rows whose `source` cell names no relaxation; and
 `unregistered-formulas` declarations the body no longer invokes; and glossary
-rows whose canonical pointer names no page.
+rows whose canonical pointer names no page. Its sweep covers the book, the
+README, this file, the reference-data CSVs, and `informed-operator/design/`.
 
 **Green means the corpus is internally consistent. It does not mean the physics
 is right** — that is what the audit protocol in `10.3-audit-prompt` is for. And

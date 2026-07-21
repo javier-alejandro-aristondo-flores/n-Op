@@ -18,14 +18,10 @@ from pathlib import Path
 REPO = Path(__file__).resolve().parents[2]
 CSV_PATH = REPO / 'physics/library/formulas/registry-manifest.csv'
 
+# The editable surface is the book. journal/live/ is frozen work product:
+# internal staleness there is by-design and exempt (conventions, authority order).
 EDITABLE = [REPO / 'README.md']
-for p in sorted((REPO / 'docs').rglob('*.md')):
-    parts = p.relative_to(REPO / 'docs').parts
-    if parts[0] in {'audits', 'specs', '_bundles', 'presentation'}:
-        continue
-    if p.name in {'architecture.md', 'implementation-plan.md', 'mvp-slice.md'}:
-        continue
-    EDITABLE.append(p)
+EDITABLE += sorted((REPO / 'journal' / 'pages').rglob('*.md'))
 
 rows = list(csv.reader(CSV_PATH.open(encoding='utf-8')))[1:]
 row_ids = {int(r[0]) for r in rows}
@@ -44,6 +40,21 @@ for path in EDITABLE:
                 continue
             if not ({lo, hi} <= row_ids):
                 findings['row-band'].append(f'{path.relative_to(REPO)}:{ln}: rows {lo}-{hi} — endpoint not in CSV')
+
+# (b2) `formula = <name>` arguments ---------------------------------------
+FORMULA_ARG = re.compile(r'formula\s*=\s*([A-Za-z0-9_.{|}-]+)')
+for path in EDITABLE:
+    for ln, line in enumerate(path.read_text(encoding='utf-8').splitlines(), 1):
+        for m in FORMULA_ARG.finditer(line):
+            arg = m.group(1).strip('`')
+            if arg.startswith('{'):          # {a | b | c} alternation
+                cands = [c.strip() for c in arg.strip('{}').split('|')]
+            else:
+                cands = [arg]
+            for c in cands:
+                if c and c not in row_names:
+                    findings['formula-arg'].append(
+                        f'{path.relative_to(REPO)}:{ln}: formula = {c} — not a registry name')
 
 # (b) formula names in prose ----------------------------------------------
 NAMEISH = re.compile(r'`([a-z][a-z0-9]*(?:-[a-zA-Z0-9_*]+){2,})`')
@@ -77,7 +88,7 @@ for sym, sites in sorted(tol_sites.items()):
         findings['tolerance'].append(f'{sym}: divergent values {sorted(values)} across {sorted({p for _, p in sites})}')
 
 # (d) glossary divergence candidates ---------------------------------------
-gloss = (REPO / 'docs/meta/glossary.md').read_text(encoding='utf-8')
+gloss = (REPO / 'journal/glossary.md').read_text(encoding='utf-8')
 gloss_terms = re.findall(r'^\|\s*\*\*([^*|]+)\*\*', gloss, re.M)
 dup = [t for t in gloss_terms if gloss_terms.count(t) > 1]
 if dup:

@@ -252,6 +252,21 @@ def check_counts(pages: list[dict]) -> list[str]:
                 errs.append(f"{r['rel']}: says {n} substantive formulas; "
                             f"registry CSV has {substantive}")
 
+    # The other five canonical whole-vocabulary phrasings (conventions, "count
+    # phrasing is canonical"). Only "N substantive formulas" was ever checked, so
+    # the rest drifted freely -- and the template count had three values in force.
+    # Subset claims must use a different phrasing by construction, which is what
+    # makes a strict check safe here. Changelogs are excluded: they quote
+    # superseded counts on purpose.
+    VOCAB = {"residual categories": 19, "methods": 12, "templates": 20,
+             "observable bundles": 11, "cert obligations": 10}
+    for r in pages:
+        body = CHANGELOG_RE.sub("", r["body"])
+        for phrase, want in VOCAB.items():
+            for n in re.findall(rf"(?<!Stage )(?<!stage )(\d+)\s+{re.escape(phrase)}\b", body):
+                if int(n) != want:
+                    errs.append(f"{r['rel']}: says {n} {phrase}; canon is {want}")
+
     # Per-tag diff tallies quoted in prose, e.g. "`D2` adjoint-required (23)".
     # This tally was computed here and compared against nothing for as long as it
     # has existed, so it drifted every time a row was retagged -- and a retag is

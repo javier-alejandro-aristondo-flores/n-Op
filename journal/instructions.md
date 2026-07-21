@@ -153,7 +153,9 @@ arguments carrying inline mathematics or an undeclared name; divergent tolerance
 literals; duplicate glossary entries; retired formula names left unresolved;
 case-variant near-misses; `D4` rows whose `source` cell names no relaxation; and
 `unregistered-formulas` declarations the body no longer invokes; and glossary
-rows whose canonical pointer names no page. Its sweep covers the book, the
+rows whose canonical pointer names no page; registry `name (row N)` pointers
+naming the wrong row; and reference-data rows with no uncertainty or no source.
+Its sweep covers the book, the
 README, this file, the reference-data CSVs, and `informed-operator/design/`.
 
 **Green means the corpus is internally consistent. It does not mean the physics

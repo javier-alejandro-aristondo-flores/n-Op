@@ -11,6 +11,7 @@
 (h) `unregistered-formulas` declarations that the body no longer invokes
 (i) glossary rows whose canonical pointer names no page
 (j) registry `name (row N)` pointers that name the wrong row
+(k) reference-data rows with no uncertainty or no source
 Read-only; prints findings, exit code = number of finding classes that fired.
 """
 from __future__ import annotations
@@ -228,6 +229,22 @@ for r in rows:
             findings['row-pointer'].append(
                 f'registry row {r[0]} ({r[1]}): depends-on says `{nm} (row {num})` '
                 f'but row {num} is `{row_by_num.get(num, "MISSING")}`')
+
+# (k) reference-data rows must carry a sigma and a source ------------------
+# arch-19 §19.8: an unprovenanced coefficient refuses the composition, and a
+# sigma-column hole makes that refusal un-checkable. The rule was asserted in
+# canon and verified once by hand during a 2026-07 audit; nothing kept it true.
+import csv as _csv
+for _p in sorted((REPO / 'physics/library/cert/reference-data').glob('*.csv')):
+    for _r in _csv.DictReader(_p.open(encoding='utf-8')):
+        _v = (_r.get('Value') or '').strip()
+        _label = f"{_r.get('Property')}/{_r.get('Material')}"
+        if 'GAP' not in _v.upper() and not (_r.get('Uncertainty') or '').strip():
+            findings['refdata-sigma'].append(
+                f'{_p.name}: {_label} has no uncertainty (arch-19 §19.8)')
+        if not (_r.get('Source') or '').strip():
+            findings['refdata-source'].append(
+                f'{_p.name}: {_label} has no source (unprovenanced coefficient)')
 
 # (g) D2/D4 rows must carry their gate/relaxation rationale in `source` -----
 # A D4 row with no named relaxation is un-gateable (impl-04-formulas); the

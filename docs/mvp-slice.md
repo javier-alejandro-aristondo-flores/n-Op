@@ -87,6 +87,17 @@ stability; one heterostructure check (c-BN on diamond) via lattice matching.*
 | Cert | 1 symmetry · 2 bounds · 3 analytic limits · 5 conservation |
 | Implementation | DFT `E_BO` + DFPT-stress `C_ij`; TB 3NN sp³d⁵ as SCF warm-start initializer (`mvp-05-decisions-forced`) |
 
+**Acceptance test (first end-to-end gate).** *Null:* grading a ground-truth, relaxed
+pure-diamond state returns every residual slot ≈ 0 within σ — the oracle certifies a lawful
+structure as lawful. *Sensitivity:* perturbing the state (an atomic displacement, a cell
+distortion off the `E_BO` minimum, or a wrong lattice constant) returns a non-zero residual
+**and the specific keys that fire name the violated law** — `∇_R E_BO = 0` for a broken
+relaxation, space-group equivariance for a broken symmetry, Born stability for an over-stretch.
+Because residuals are keyed and never aggregated, "the right law fired" is directly checkable.
+*Data-backed sensitivity:* perturbing along the diamond strain-hypersurface reference dataset,
+the residual tracks the reference energy rise off the minimum — a quantitative match, not only a
+sign check.
+
 ### Cap 2 — Electron-cloud (carrier) diffusion
 
 *Electronic-structure substrate + carrier transport through the lattice.*

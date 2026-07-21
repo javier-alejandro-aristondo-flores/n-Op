@@ -103,7 +103,7 @@ I'll flag observables where the requirement falls **OUTSIDE** that registry.
 | 17 | `carrier_mobility_hole μ_p(T, N_imp, E)` | TR | as 16, valence band | same | same | same | ±20%; critical for diamond (p-type is dominant) | per 16 | 3, 12, 18 |
 | 18 | `saturation_velocity v_sat(T)` | TR | high-field Monte Carlo or BTE; **OUTSIDE registry if MC-transport not present** | `v_sat ≈ sqrt(8 ℏω_op / 3π m*)` (Shockley) — refined by full MC | (a) Shockley formula; (b) Empirical Caughey-Thomas extension | `r_vsat = v_sat − ⟨v⟩(E→∞)` from MC on predicted bands & phonons | ±15% | Drops ~10–20% from 300 K to 800 K | 3, 9, 15 |
 | 19 | `impact_ionization_coefficient α_ii(E, T)` | EN | high-field rate from above-threshold electrons | `α_ii = (1/v_d) ∫ S_ii(E_k) f(E_k) dE_k` (Keldysh) | (a) Chynoweth: `α = a·exp(−b/E)` with fitted a,b; (b) Okuto-Crowell | `r_αii = α_predicted − Keldysh-rate-integral over predicted f(E)` | factor-of-2 acceptable | Threshold ~1.5 × E_gap; T-shift via gap | 1, 20 |
-| 20 | `breakdown_field E_b(T, geometry)` | SC | integrated impact ionization to unity | `∫₀^W α_ii(E(x)) dx = 1` | (a) E_b ≈ k · E_gap^n with n≈2.5; (b) Empirical scaling vs ε_r | `r_Eb = ∫α_ii(E(x;E_b)) dx − 1` | ±15% — critical for BFOM | Drops ~20% from 300 K to 800 K due to phonon scattering relief | 1, 19 |
+| 20 | `breakdown_field E_b(T, geometry)` | SC | integrated impact ionization to unity | `∫₀^W α_ii(E(x)) dx = 1` | (a) E_b ≈ k · E_gap^n with n≈2.5; (b) Empirical scaling vs ε_r | `r_Eb = ∫α_ii(E(x;E_b)) dx − 1` | ±15% — critical for BFOM | **RISES with T** (`κ_BR>0`: +5×10⁻⁴/K diamond, +7×10⁻⁴/K 4H-SiC; registry row 123) — UWBG breakdown *hardens* with T | 1, 19 |
 | 21 | `hall_factor r_H(T)` | SC | BTE averages | `r_H = ⟨τ²⟩/⟨τ⟩²` | (a) Constant r_H = 1.18 acoustic | `r_rH = r_H − ⟨τ²⟩/⟨τ⟩² ` on predicted τ(E) | ±10% | per 16 | 16 |
 | 22 | `seebeck_coefficient S(T)` | TR | Mott formula | `S = (π²k_B²T/3e)·(d ln σ/dE)_{E_F}` | (a) Mott on parabolic; (b) constant-τ Boltzmann | `r_S = S − Mott-integral on predicted σ(E)` | ±15% | needed for self-heating diagnostics | 4, 5, 16 |
 | 23 | `dielectric_constant_static ε_r(T,ω→0)` | TN | LST relation + ionic contribution from 9 | `ε_0/ε_∞ = Π(ω_LO/ω_TO)²` (LST) | (a) Tabulated; (b) LST from 9 | `r_ε = ε_predicted − ε_∞ − Σ_λ (ω_λ → ε contribution)` | ±5% | weakly T-dep | 9 |
@@ -268,6 +268,13 @@ These gaps were the primary scoping input for the amendment streams; each repres
 
 ## Changelog
 
+- **2026-07-21 (corpus reconciliation):** Row 20 `breakdown_field E_b` High-T note corrected —
+  "Drops ~20% from 300 K to 800 K due to phonon scattering relief" → **E_b RISES with T**
+  (`κ_BR>0`, +5×10⁻⁴/K diamond, +7×10⁻⁴/K 4H-SiC; registry row 123). The prior statement was a
+  **sign error**, conflating breakdown with the mobility/velocity collapse that row 18 correctly
+  reports. `docs/accuracy-ledger.md` #20 has carried the correction since Pass C landed
+  (Hiraiwa–Kawarada JAP 114 034506 (2013)); this stratum was missed by the 2026-07-16 rewrite,
+  leaving a live physics sign error in a file named as a source for downstream formula research.
 - **2026-07-16 (cert round 1):** Part-F gap-summary brought to current truth: the live-tense
   framing line ("the current closed registry (12 methods × 12 templates × 24 formulas)") became
   a dated scoping record carrying the current counts, and the summary bullets received the same

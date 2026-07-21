@@ -4,6 +4,39 @@ Rules for the atomic-file tree under `docs/architecture/`,
 `docs/implementation/`, `docs/mvp/`. The tree is the source of truth;
 the monoliths are regenerated.
 
+The **authority order** and the corpus-wide rules immediately below
+govern the whole base, not only the atomic tree.
+
+## Authority order
+
+When two files disagree, the higher-ranked source wins:
+
+frontmatter `canonical-for` topic owner >
+`physics/library/formulas/registry-manifest.csv` (formula rows/tags) >
+`docs/architecture/` > `docs/implementation/` > `docs/mvp/` >
+companion indexes (computational-overview, formula-registry,
+properties, accuracy-ledger) > README + AUDIT_PROMPT >
+`physics/research/` strata > `docs/presentation/`.
+
+- **Reference-data CSVs are canonical for seeded coefficient values.**
+- **Seed from the ledger and the reference CSVs, never from the
+  research tables.** `physics/research/` is the lowest-authority
+  stratum and carries superseded values behind per-file changelogs;
+  reseeding from it silently reverts a landed fix.
+- **Generated outputs are never edited or audited.** `assemble.py
+  --check` gates their freshness.
+- **Frozen dirs** (`docs/audits/`, `docs/specs/`,
+  `docs/presentation/`) are dated artifacts: internal staleness is
+  by-design and exempt. Only a *live* file citing them incorrectly is
+  a defect.
+
+## Naming is addressing
+
+Registry formula names are hash-consed into content addresses. A
+post-landing rename is a substrate-wide rekey, not an edit — every
+cached kernel, certificate, and address keyed on the old name breaks.
+**Fix names before they land, never after.**
+
 ## File layout
 
 - One concept per file. Filename: `NN-slug.md` where `NN` is a

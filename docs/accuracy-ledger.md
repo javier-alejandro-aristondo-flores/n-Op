@@ -136,6 +136,15 @@ quarantined — different valley — Antonius 2014.)
 | AlN (c) | 339 (exp+FP) | ~140 (theory-only) | ~95 (theory-only) | Rounds/Slack APEX 11 071001 (2018) + Slack JPCS 48 641 (1987); **no >500 K single-crystal measurement** |
 | β-Ga₂O₃ | [010] 27.0, [100] 10.9, [001] ≈14 (~2.5× anisotropy; Klimm λ₂₂≡[010] 24.26 and λ₃₃≡[001] 14.09 concur, crystal-physical frame) | [010] ≈9 @773 K, ≈6 @1100 K (derived: Klimm 300 K tensor × its own T^−m, m≈1.0–1.2; ±~20%) | — | Guo APL 106 111909 (2015); Klimm CRT 58 2200204 (2023) open access; Wave-2 audit 2026-07-16 |
 
+**Monoclinic frame guard (β-Ga₂O₃ — never relabel).** Three distinct axis systems are in play
+and must never be interchanged. The crystal-physical frame is `e₂∥b`, `e₃∥c`, `e₁ = a*`, so
+Klimm's tensor components are `λ₂₂ ≡ [010]` and `λ₃₃ ≡ [001]`. But his **plane-normal**
+measurements `λ₍₁₀₀₎` and `λ₍₀₀₁₎` lie along **a\*** and **c\*** and must **never** be
+relabelled `[100]`/`[001]`. Likewise the Ghosh–Singisetti high-field third axis is **c\***
+(≈13.8° off `[001]`) — which is why the `E_c` / `α_ii` entries below are tagged `c*`, not
+`[001]`. In a ~2.5×-anisotropic material a relabel silently attaches a value to the wrong
+crystallographic direction.
+
 **High-field Chynoweth `α_ii=a·exp(−b/E)` + Caughey–Thomas + `κ_BR` (rows 123, 74):**
 
 | Material | a (cm⁻¹) | b (V/cm) | σ (×a) | v_sat (cm/s), β | κ_BR (K⁻¹) | source |
@@ -178,16 +187,25 @@ quarantined — different valley — Antonius 2014.)
 - **P_sp(x), e_ij(x) for Al_xGa₁₋ₓN are NOT linear-Vegard.** Use the quadratic-bowing
   (nonlinear-polarization) form `P_sp(x) = x·P_AlN + (1−x)·P_GaN − b_P·x(1−x)` (and the analogous
   form per e_ij component): the nonlinearity exceeds the ±5% ΔP target at mid-to-high x
-  (Fiorentini–Bernardini nonlinear macroscopic polarization). `b_P` and the e_ij bowings are a
+  (Fiorentini–Bernardini nonlinear macroscopic polarization). **SIGN GUARD — in this `−b_P`
+  form, `b_P` is NEGATIVE** (FB01 Eq. 4–5: "bowing always upward"). The reference CSV states
+  the same physics in the opposite convention, `+b·x(1−x)` with **b positive** (expected
+  `b ≈ +0.019–0.021 C/m²`). The two are equivalent through the double negative — lifting the
+  CSV's `+b` straight into this `−b_P` form flips the bowing and corrupts interface charge at
+  mid-to-high Al. `b_P` and the e_ij bowings are a
   **Wave-2 acquisition** (primary sources; adversarial audit before seeding — gate G1's two
   texts read 2026-07-16: the FB Erratum leaves the P_sp bowing untouched; seeding pends the
   FBA APL 80 1204 / Ambacher JPCM 14 3399 pin-read); until seeded, mid-x AlGaN ΔP claims
   carry a widened σ in `combineTol`.
 - **P_sp(T) — pyroelectric drift (registry row 128):** `P_sp(T) = P_sp(T₀) + p·(T−T₀)` with `p`
-  the primary+secondary pyroelectric coefficient at fixed stress, O(−(4–7)×10⁻⁶ C/m²K) for
-  GaN/AlN — i.e. **~20–30% of n_s·q over ΔT ≈ 750 K**, larger than the ±5% ΔP budget at the
-  harsh-env operating point. Per-material `p` is a **Wave-2 acquisition**; until seeded,
-  n_s(T ≫ 300 K) claims carry the pyro term as a declared model-form error in `combineTol`.
+  the primary+secondary pyroelectric coefficient at fixed stress. **SIGN GUARD — `p` is
+  POSITIVE in the seeded ZB-reference frame:** the ZB-ref `P_sp` values are negative and
+  `|P_sp|` decreases toward zero with rising T, so `dP_sp/dT > 0`. Raw literature quotes `p`
+  as negative under the opposite (positive-`P_s`) convention — lifting a published value
+  without flipping it inverts the n_s(T) drift. **Seeded 2026-07-16** (Wave 2): AlN
+  `+3.0×10⁻⁶`, GaN `+4.5×10⁻⁶` C/m²K, both σ = ×2 — `polarization-piezoelectric.csv` is
+  canonical for these values. The drift is **~20–30% of n_s·q over ΔT ≈ 750 K**, larger than
+  the ±5% ΔP budget at the harsh-env operating point.
 
 *Elastic constants (GPa; pin GaN→Polian, AlN→McNeil; **exclude superseded AlN SAW set**):*
 

@@ -16,8 +16,9 @@ contents.md      chapters -> pages, in reading order          (generated)
 index.md         canonical topic -> the one page that owns it (generated)
 glossary.md      vocabulary
 instructions.md  this file
-pages/           the corpus: pages/<chapter>.<n>-<slug>.md
-pages/appendix/  derivations — supporting material, ranks below canon
+pages/NN-chapter-name/   the corpus, one folder per chapter
+                         page files are <chapter>.<n>-<slug>.md
+pages/11-appendix-derivations/   supporting material, ranks below canon
 tools/           apparatus.py (regenerate + check), build_book.py (migration)
 ```
 

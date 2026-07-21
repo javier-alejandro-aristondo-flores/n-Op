@@ -64,8 +64,8 @@ load-bearing concepts:
 n-Op/
 ├── journal/                  the specification, as a book
 │   ├── contents.md · index.md · glossary.md · instructions.md    the apparatus
-│   ├── pages/                47 canon pages
-│   │   └── appendix/         derivations (authority: supporting)
+│   ├── pages/NN-chapter/     one folder per chapter, 47 canon pages
+│   │   └── 11-appendix-derivations/   supporting material
 │   ├── live/                 work products still executing
 │   └── tools/apparatus.py    regenerate the apparatus + check invariants
 ├── physics/

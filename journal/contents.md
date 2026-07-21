@@ -7,149 +7,149 @@ The `tag` (e.g. `4.2`) is a **display label**: regenerated freely, never cited. 
 
 ## 1 — purpose and product
 
-- **1.1** [Purpose and scope](pages/1.1-purpose.md) · `arch-01-purpose`
+- **1.1** [Purpose and scope](pages/01-purpose-and-product/1.1-purpose.md) · `arch-01-purpose`
   <br/>canonical for: purpose, mvp scope
-- **1.2** [n-Op — Product Behavior (`/physics` as a deliverable)](pages/1.2-product.md) · `product`
+- **1.2** [n-Op — Product Behavior (`/physics` as a deliverable)](pages/01-purpose-and-product/1.2-product.md) · `product`
   <br/>canonical for: product
-- **1.3** [Library landscape](pages/1.3-libraries.md) · `arch-02-libraries`
+- **1.3** [Library landscape](pages/01-purpose-and-product/1.3-libraries.md) · `arch-02-libraries`
   <br/>canonical for: library partitioning
-- **1.4** [Architectural principles](pages/1.4-principles.md) · `impl-01-principles`
+- **1.4** [Architectural principles](pages/01-purpose-and-product/1.4-principles.md) · `impl-01-principles`
   <br/>canonical for: architectural principles
-- **1.5** [n-Op — Justification Report](pages/1.5-rationale.md) · `rationale`
+- **1.5** [n-Op — Justification Report](pages/01-purpose-and-product/1.5-rationale.md) · `rationale`
   <br/>canonical for: rationale
 
 ## 2 — inputs and state
 
-- **2.1** [Inputs](pages/2.1-inputs.md) · `arch-03-inputs`
+- **2.1** [Inputs](pages/02-inputs-and-state/2.1-inputs.md) · `arch-03-inputs`
   <br/>canonical for: top-level inputs
-- **2.2** [The unified state](pages/2.2-state.md) · `arch-04-state`
+- **2.2** [The unified state](pages/02-inputs-and-state/2.2-state.md) · `arch-04-state`
   <br/>canonical for: state 7-tuple
-- **2.3** [γ̂ as a Stage-4 lowering choice](pages/2.3-gamma-hat.md) · `arch-15-gamma-hat`
+- **2.3** [γ̂ as a Stage-4 lowering choice](pages/02-inputs-and-state/2.3-gamma-hat.md) · `arch-15-gamma-hat`
   <br/>canonical for: γ̂ encoding vocabulary, density-matrix CompressionPlan space
-- **2.4** [Multiscale state — slow and macro tiers](pages/2.4-multiscale-state.md) · `arch-21-multiscale-state`
+- **2.4** [Multiscale state — slow and macro tiers](pages/02-inputs-and-state/2.4-multiscale-state.md) · `arch-21-multiscale-state`
   <br/>canonical for: three-tier state stratification, the refined emergence axiom (same timescale and scale), slow / configurational state schema
-- **2.5** [The 4-level Born–Oppenheimer hierarchy](pages/2.5-bo-levels.md) · `arch-08-bo-levels`
+- **2.5** [The 4-level Born–Oppenheimer hierarchy](pages/02-inputs-and-state/2.5-bo-levels.md) · `arch-08-bo-levels`
   <br/>canonical for: 4-level BO hierarchy, dressing tiers (V1 vs V2 scope)
-- **2.6** [γ̂ budget at MVP scale](pages/2.6-gamma-budget.md) · `mvp-02-gamma-budget`
+- **2.6** [γ̂ budget at MVP scale](pages/02-inputs-and-state/2.6-gamma-budget.md) · `mvp-02-gamma-budget`
   <br/>canonical for: γ̂ MVP budget
 
 ## 3 — laws and residuals
 
-- **3.1** [Dynamics — GENERIC](pages/3.1-generic.md) · `arch-05-generic`
+- **3.1** [Dynamics — GENERIC](pages/03-laws-and-residuals/3.1-generic.md) · `arch-05-generic`
   <br/>canonical for: GENERIC equation, nine regimes as extractions
-- **3.2** [Residuals](pages/3.2-residuals.md) · `arch-11-residuals`
+- **3.2** [Residuals](pages/03-laws-and-residuals/3.2-residuals.md) · `arch-11-residuals`
   <br/>canonical for: residual granularity discipline, ResidualKey / ContributionFacets schema, the nineteen residual categories
-- **3.3** [Coupling structure](pages/3.3-coupling-structure.md) · `arch-19-coupling-structure`
+- **3.3** [Coupling structure](pages/03-laws-and-residuals/3.3-coupling-structure.md) · `arch-19-coupling-structure`
   <br/>canonical for: CouplingChannel record, invariant-generator routine, coupling target shapes (Scalar | AntisymmForm | PSDSymmForm)
 
 ## 4 — pipeline and compilation
 
-- **4.1** [The PhysicsGraph](pages/4.1-physics-graph.md) · `arch-06-physics-graph`
+- **4.1** [The PhysicsGraph](pages/04-pipeline-and-compilation/4.1-physics-graph.md) · `arch-06-physics-graph`
   <br/>canonical for: PhysicsGraph schema, NodeKind, OutputRole, ResidualKey, per-stage sidecars
-- **4.2** [The compose-time pipeline](pages/4.2-pipeline.md) · `arch-07-pipeline`
+- **4.2** [The compose-time pipeline](pages/04-pipeline-and-compilation/4.2-pipeline.md) · `arch-07-pipeline`
   <br/>canonical for: 4+1 stage compose-time pipeline, always-cheap discipline, stage boundaries
-- **4.3** [Representation substrate](pages/4.3-representations.md) · `arch-20-representations`
+- **4.3** [Representation substrate](pages/04-pipeline-and-compilation/4.3-representations.md) · `arch-20-representations`
   <br/>canonical for: representation substrate, content-addressed identity discipline, typed indexed universe
-- **4.4** [`/physics` — Computational Architecture Reference](pages/4.4-computational-overview.md) · `computational-overview`
+- **4.4** [`/physics` — Computational Architecture Reference](pages/04-pipeline-and-compilation/4.4-computational-overview.md) · `computational-overview`
   <br/>canonical for: computational-overview
 
 ## 5 — certification and applicability
 
-- **5.1** [Cert obligations](pages/5.1-cert.md) · `arch-12-cert`
+- **5.1** [Cert obligations](pages/05-certification-and-applicability/5.1-cert.md) · `arch-12-cert`
   <br/>canonical for: ten cert obligations, reference-cache backend
-- **5.2** [Applicability classifiers](pages/5.2-applicability.md) · `arch-13-applicability`
+- **5.2** [Applicability classifiers](pages/05-certification-and-applicability/5.2-applicability.md) · `arch-13-applicability`
   <br/>canonical for: applicability discipline
-- **5.3** [Out of scope](pages/5.3-out-of-scope.md) · `arch-17-out-of-scope`
+- **5.3** [Out of scope](pages/05-certification-and-applicability/5.3-out-of-scope.md) · `arch-17-out-of-scope`
   <br/>canonical for: scope exclusions
-- **5.4** [Cert obligations — detail and axis mapping](pages/5.4-cert-detail.md) · `impl-08-cert-detail`
+- **5.4** [Cert obligations — detail and axis mapping](pages/05-certification-and-applicability/5.4-cert-detail.md) · `impl-08-cert-detail`
   <br/>canonical for: cert obligation detail
 
 ## 6 — vocabularies and registry
 
-- **6.1** [Canonical vocabularies and counts](pages/6.1-vocabularies.md) · `arch-09-vocabularies`
+- **6.1** [Canonical vocabularies and counts](pages/06-vocabularies-and-registry/6.1-vocabularies.md) · `arch-09-vocabularies`
   <br/>canonical for: vocabulary counts, theory-context vocabularies
-- **6.2** [Layer-0 typeclass alphabet](pages/6.2-typeclasses.md) · `arch-10-typeclasses`
+- **6.2** [Layer-0 typeclass alphabet](pages/06-vocabularies-and-registry/6.2-typeclasses.md) · `arch-10-typeclasses`
   <br/>canonical for: Layer-0 typeclasses
-- **6.3** [Topology atlas](pages/6.3-topology.md) · `arch-14-topology`
+- **6.3** [Topology atlas](pages/06-vocabularies-and-registry/6.3-topology.md) · `arch-14-topology`
   <br/>canonical for: topology atlas
-- **6.4** [The 12 computational methods](pages/6.4-methods.md) · `impl-02-methods`
+- **6.4** [The 12 computational methods](pages/06-vocabularies-and-registry/6.4-methods.md) · `impl-02-methods`
   <br/>canonical for: method signatures
-- **6.5** [The 20 abstract-property templates](pages/6.5-templates.md) · `impl-03-templates`
+- **6.5** [The 20 abstract-property templates](pages/06-vocabularies-and-registry/6.5-templates.md) · `impl-03-templates`
   <br/>canonical for: template signatures
-- **6.6** [The named-formula registry](pages/6.6-formulas.md) · `impl-04-formulas`
+- **6.6** [The named-formula registry](pages/06-vocabularies-and-registry/6.6-formulas.md) · `impl-04-formulas`
   <br/>canonical for: formula registry signatures
-- **6.7** [The 11 observable bundles](pages/6.7-bundles.md) · `impl-05-bundles`
+- **6.7** [The 11 observable bundles](pages/06-vocabularies-and-registry/6.7-bundles.md) · `impl-05-bundles`
   <br/>canonical for: bundle signatures
-- **6.8** [Target observables as typed compositions](pages/6.8-compositions.md) · `impl-06-compositions`
+- **6.8** [Target observables as typed compositions](pages/06-vocabularies-and-registry/6.8-compositions.md) · `impl-06-compositions`
   <br/>canonical for: per-regime compositions
-- **6.9** [n-Op — Formula Registry (index)](pages/6.9-formula-registry.md) · `formula-registry`
+- **6.9** [n-Op — Formula Registry (index)](pages/06-vocabularies-and-registry/6.9-formula-registry.md) · `formula-registry`
   <br/>canonical for: formula-registry
-- **6.10** [Materials Properties](pages/6.10-properties.md) · `properties`
+- **6.10** [Materials Properties](pages/06-vocabularies-and-registry/6.10-properties.md) · `properties`
   <br/>canonical for: properties
 
 ## 7 — consumers and seams
 
-- **7.1** [The pino-bridge exports](pages/7.1-pino-bridge.md) · `arch-16-pino-bridge`
+- **7.1** [The pino-bridge exports](pages/07-consumers-and-seams/7.1-pino-bridge.md) · `arch-16-pino-bridge`
   <br/>canonical for: pino-bridge surface contract, Validate signature, Import signature
-- **7.2** [Residual machinery](pages/7.2-residual-factory.md) · `impl-07-residual-factory`
+- **7.2** [Residual machinery](pages/07-consumers-and-seams/7.2-residual-factory.md) · `impl-07-residual-factory`
   <br/>canonical for: ResidualGenerator record, residual factory, registration-time adjoint gate
-- **7.3** [Cross-cutting design rules](pages/7.3-cross-cutting.md) · `impl-09-cross-cutting`
+- **7.3** [Cross-cutting design rules](pages/07-consumers-and-seams/7.3-cross-cutting.md) · `impl-09-cross-cutting`
   <br/>canonical for: cross-cutting rules
 
 ## 8 — mvp and build
 
-- **8.1** [The system](pages/8.1-system.md) · `mvp-01-system`
+- **8.1** [The system](pages/08-mvp-and-build/8.1-system.md) · `mvp-01-system`
   <br/>canonical for: diamond MVP system
-- **8.2** [The three capability slices](pages/8.2-capabilities.md) · `mvp-03-capabilities`
+- **8.2** [The three capability slices](pages/08-mvp-and-build/8.2-capabilities.md) · `mvp-03-capabilities`
   <br/>canonical for: MVP capabilities
-- **8.3** [In-MVP vs deferred](pages/8.3-in-mvp-vs-deferred.md) · `mvp-04-in-mvp-vs-deferred`
+- **8.3** [In-MVP vs deferred](pages/08-mvp-and-build/8.3-in-mvp-vs-deferred.md) · `mvp-04-in-mvp-vs-deferred`
   <br/>canonical for: MVP scope
-- **8.4** [Decisions this slice forces](pages/8.4-decisions-forced.md) · `mvp-05-decisions-forced`
+- **8.4** [Decisions this slice forces](pages/08-mvp-and-build/8.4-decisions-forced.md) · `mvp-05-decisions-forced`
   <br/>canonical for: MVP-forced decisions
-- **8.5** [MVP build order](pages/8.5-build-order.md) · `mvp-06-build-order`
+- **8.5** [MVP build order](pages/08-mvp-and-build/8.5-build-order.md) · `mvp-06-build-order`
   <br/>canonical for: MVP build order
-- **8.6** [Build sequence](pages/8.6-build-sequence.md) · `impl-10-build-sequence`
+- **8.6** [Build sequence](pages/08-mvp-and-build/8.6-build-sequence.md) · `impl-10-build-sequence`
   <br/>canonical for: build sequence
-- **8.7** [Verification](pages/8.7-verification.md) · `impl-11-verification`
+- **8.7** [Verification](pages/08-mvp-and-build/8.7-verification.md) · `impl-11-verification`
   <br/>canonical for: verification gates
 
 ## 9 — reference data and accuracy
 
-- **9.1** [Per-observable accuracy ledger](pages/9.1-accuracy-ledger.md) · `accuracy-ledger`
+- **9.1** [Per-observable accuracy ledger](pages/09-reference-data-and-accuracy/9.1-accuracy-ledger.md) · `accuracy-ledger`
   <br/>canonical for: accuracy-ledger
-- **9.2** [`reference-data/` — Machine-Readable Cert Reference Battery](pages/9.2-reference-battery.md) · `reference-battery`
+- **9.2** [`reference-data/` — Machine-Readable Cert Reference Battery](pages/09-reference-data-and-accuracy/9.2-reference-battery.md) · `reference-battery`
   <br/>canonical for: reference-battery
 
 ## 10 — process and governance
 
-- **10.1** [Doc-tree conventions](pages/10.1-conventions.md) · `conventions`
+- **10.1** [Doc-tree conventions](pages/10-process-and-governance/10.1-conventions.md) · `conventions`
   <br/>canonical for: conventions
-- **10.2** [Open decisions](pages/10.2-open-decisions.md) · `arch-18-open-decisions`
+- **10.2** [Open decisions](pages/10-process-and-governance/10.2-open-decisions.md) · `arch-18-open-decisions`
   <br/>canonical for: open decisions
-- **10.3** [AUDIT PROMPT — `/physics` module of n-Op](pages/10.3-audit-prompt.md) · `audit-prompt`
+- **10.3** [AUDIT PROMPT — `/physics` module of n-Op](pages/10-process-and-governance/10.3-audit-prompt.md) · `audit-prompt`
   <br/>canonical for: audit-prompt
-- **10.4** [Standing traps register](pages/10.4-traps.md) · `traps`
+- **10.4** [Standing traps register](pages/10-process-and-governance/10.4-traps.md) · `traps`
   <br/>canonical for: standing traps register
-- **10.5** [Development timeline](pages/10.5-timeline.md) · `timeline`
+- **10.5** [Development timeline](pages/10-process-and-governance/10.5-timeline.md) · `timeline`
   <br/>canonical for: development timeline
 
 ## 11 — appendix derivations
 
-- **11.1** [Group A — Ion Dynamics: Structural, Mechanical, Thermal](pages/appendix/11.1-deriv-ion-dynamics.md) · `deriv-ion-dynamics` *(supporting)*
+- **11.1** [Group A — Ion Dynamics: Structural, Mechanical, Thermal](pages/11-appendix-derivations/11.1-deriv-ion-dynamics.md) · `deriv-ion-dynamics` *(supporting)*
   <br/>canonical for: deriv-ion-dynamics
-- **11.2** [Group B — Electronic, Magnetic, Optical](pages/appendix/11.2-deriv-electronic.md) · `deriv-electronic` *(supporting)*
+- **11.2** [Group B — Electronic, Magnetic, Optical](pages/11-appendix-derivations/11.2-deriv-electronic.md) · `deriv-electronic` *(supporting)*
   <br/>canonical for: deriv-electronic
-- **11.3** [Group C — Transport, Thermodynamic, Chemical/Surface](pages/appendix/11.3-deriv-transport.md) · `deriv-transport` *(supporting)*
+- **11.3** [Group C — Transport, Thermodynamic, Chemical/Surface](pages/11-appendix-derivations/11.3-deriv-transport.md) · `deriv-transport` *(supporting)*
   <br/>canonical for: deriv-transport
-- **11.4** [Defects, Doping, Surfaces, and Interfaces for the UWBG-Semiconductor PINO](pages/appendix/11.4-deriv-defects.md) · `deriv-defects` *(supporting)*
+- **11.4** [Defects, Doping, Surfaces, and Interfaces for the UWBG-Semiconductor PINO](pages/11-appendix-derivations/11.4-deriv-defects.md) · `deriv-defects` *(supporting)*
   <br/>canonical for: deriv-defects
-- **11.5** [Non-Equilibrium, High-Field, Hot-Carrier Physics for UWBG Chips](pages/appendix/11.5-deriv-high-field.md) · `deriv-high-field` *(supporting)*
+- **11.5** [Non-Equilibrium, High-Field, Hot-Carrier Physics for UWBG Chips](pages/11-appendix-derivations/11.5-deriv-high-field.md) · `deriv-high-field` *(supporting)*
   <br/>canonical for: deriv-high-field
-- **11.6** [Crystal-Structure-Prediction & Heterostructure-Prediction Residuals for `/physics`](pages/appendix/11.6-deriv-csp.md) · `deriv-csp` *(supporting)*
+- **11.6** [Crystal-Structure-Prediction & Heterostructure-Prediction Residuals for `/physics`](pages/11-appendix-derivations/11.6-deriv-csp.md) · `deriv-csp` *(supporting)*
   <br/>canonical for: deriv-csp
-- **11.7** [UWBG Diamond-Centric Observable Catalog for n-Op `/physics`](pages/appendix/11.7-deriv-observable-catalog.md) · `deriv-observable-catalog` *(supporting)*
+- **11.7** [UWBG Diamond-Centric Observable Catalog for n-Op `/physics`](pages/11-appendix-derivations/11.7-deriv-observable-catalog.md) · `deriv-observable-catalog` *(supporting)*
   <br/>canonical for: deriv-observable-catalog
-- **11.8** [Cheap-Residual Catalog & Residual-Generator Factory Specification](pages/appendix/11.8-deriv-generator-catalog.md) · `deriv-generator-catalog` *(supporting)*
+- **11.8** [Cheap-Residual Catalog & Residual-Generator Factory Specification](pages/11-appendix-derivations/11.8-deriv-generator-catalog.md) · `deriv-generator-catalog` *(supporting)*
   <br/>canonical for: deriv-generator-catalog
-- **11.9** [Implementation-language decision (`arch-18 §1`)](pages/appendix/11.9-deriv-language-study.md) · `deriv-language-study` *(supporting)*
+- **11.9** [Implementation-language decision (`arch-18 §1`)](pages/11-appendix-derivations/11.9-deriv-language-study.md) · `deriv-language-study` *(supporting)*
   <br/>canonical for: deriv-language-study

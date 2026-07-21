@@ -98,6 +98,13 @@ def check(pages: list[dict]) -> list[str]:
             if not r.get(f):
                 errs.append(f"{r['rel']}: missing frontmatter field `{f}`")
 
+    for r in pages:
+        want = f"{int(r['chapter']):02d}-{r.get('chapter-name','')}"
+        got = r["path"].parent.name
+        if got != want:
+            errs.append(f"{r['rel']}: filed under {got}/ but frontmatter says "
+                        f"chapter {r['chapter']} ({want}/)")
+
     seen: dict[str, str] = {}
     for r in pages:
         pid = r.get("id")

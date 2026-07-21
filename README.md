@@ -64,10 +64,10 @@ load-bearing concepts:
 n-Op/
 ├── journal/                  the specification, as a book
 │   ├── contents.md · index.md · glossary.md · instructions.md    the apparatus
-│   ├── pages/NN-chapter/     one folder per chapter, 47 canon pages
-│   │   └── 11-appendix-derivations/   supporting material
+│   ├── pages/NN-chapter/     one folder per chapter; 58 pages, 49 canon
+│   │   └── 11-appendix-derivations/   9 supporting derivations
 │   ├── live/                 work products still executing
-│   └── tools/apparatus.py    regenerate the apparatus + check invariants
+│   └── tools/                apparatus.py (regenerate + check) · seams.py (sweeps)
 ├── physics/
 │   └── library/              code scaffold (no code yet)
 │       ├── formulas/registry-manifest.csv    the canonical formula registry
@@ -77,9 +77,17 @@ n-Op/
 ```
 
 Run `python journal/tools/apparatus.py` after editing any page: it restamps content
-hashes and regenerates `contents.md` / `index.md`. `--check` verifies without
-writing, and is the gate — it fails on a duplicate `canonical-for` topic, an
-asymmetric dependency edge, an unresolvable `[id]` reference, or a stale hash.
+hashes and regenerates `contents.md` / `index.md`. `--check` verifies without writing
+and is the gate, alongside `python journal/tools/seams.py`. Between them they fail on
+a duplicate `canonical-for` topic, an asymmetric or missing dependency edge, an
+unresolvable `[id]`, a section coordinate or dated anchor that resolves to nothing, a
+line-number citation, a registry count or per-tag tally that disagrees with the CSV, a
+retired formula name left unresolved, a `D4` row with no named relaxation, and a stale
+hash.
+
+**Green is not evidence a check ran.** Both checkers have shipped holes that made them
+skip whole classes of citation silently. Before citing a clean run, plant a defect of
+the class you are claiming is absent and confirm the checker fails (`[traps]` §58).
 
 ## Open decisions
 
@@ -91,9 +99,10 @@ Tracked in `[arch-18-open-decisions]`. The load-bearing ones:
   not a commitment. Everything in the book stays language-neutral.
 - Surrogate-net build vs adopt; the PDE-mesh adjoint scheme; the γ̂ open
   questions; the Layer-1.75 spec.
-- The **differentiability tag scheme is being redesigned** — three incompatible
-  definitions are currently in force and eleven smooth registry rows are
-  mis-tagged in a way that would ship them without adjoints.
+- Three named **verifier-soundness gaps**: no post-registration adjoint-drift
+  monitoring, no Stage-3 rewrite-soundness contract, and no declared validity
+  radius for frozen Layer-1.25 dressings. Named rather than left absent, because
+  an absent check reads exactly like a passing one.
 
 The integrator interface closed 2026-07-16: a per-tier tangent kernel plus a
 steppable-form manifest, with the integrator staying consumer-side.

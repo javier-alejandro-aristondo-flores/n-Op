@@ -9,6 +9,7 @@
 (f) near-miss formula names: case variants and one-edit neighbours of real rows
 (g) D2/D4 rows whose `source` cell names no relaxation / no gate rationale
 (h) `unregistered-formulas` declarations that the body no longer invokes
+(i) glossary rows whose canonical pointer names no page
 Read-only; prints findings, exit code = number of finding classes that fired.
 """
 from __future__ import annotations
@@ -219,6 +220,28 @@ for r in rows:
     if r[5].strip() == 'D4' and not any(w in r[7].lower() for w in RELAX_WORDS):
         findings['d4-no-relaxation'].append(
             f'registry row {r[0]} ({r[1]}): D4 with no relaxation named in `source`')
+
+# (i) glossary canonical pointers ------------------------------------------
+# Every glossary row names the page that owns the term. Nothing checked that the
+# page exists, so a rename or a deletion would leave the glossary -- the file a
+# reader consults FIRST -- pointing at nothing.
+_ids = set()
+for _p in sorted((REPO / 'journal' / 'pages').rglob('*.md')):
+    _m = re.match(r'\A---\n(.*?)\n---\n', _p.read_text(encoding='utf-8'), re.DOTALL)
+    if _m:
+        _id = re.search(r'^id:\s*(\S+)', _m.group(1), re.M)
+        if _id:
+            _ids.add(_id.group(1))
+_gloss_rows = re.findall(r'^\|\s*\*\*([^*|]+)\*\*\s*\|.*?\|([^|]*)\|\s*$',
+                         (REPO / 'journal/glossary.md').read_text(encoding='utf-8'), re.M)
+for _term, _canon in _gloss_rows:
+    for _tok in re.findall(r'[a-z][a-z0-9-]{3,}', _canon):
+        if _tok in _ids or _tok in {'traps', 'conventions', 'timeline', 'product'}:
+            break
+    else:
+        if _canon.strip():
+            findings['glossary-pointer'].append(
+                f'glossary.md: **{_term.strip()}** -> `{_canon.strip()}` names no page id')
 
 # (d) glossary divergence candidates ---------------------------------------
 gloss = (REPO / 'journal/glossary.md').read_text(encoding='utf-8')

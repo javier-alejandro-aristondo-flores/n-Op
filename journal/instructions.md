@@ -140,7 +140,8 @@ mechanically. Do not produce one.
 6. a body citing an `[id]` without the corresponding `depends-on` edge
 7. a section coordinate that resolves to no heading in the target
 8. a line-number citation (`file.md:42`) — line refs rot on every edit
-9. a registry count claim that disagrees with the CSV
+9. a registry count claim that disagrees with the CSV, including a per-tag
+   diff tally quoted in prose
 10. a stale `content-hash`
 
 `python journal/tools/seams.py` fails on: row-band claims whose endpoints are not

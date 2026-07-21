@@ -251,6 +251,19 @@ def check_counts(pages: list[dict]) -> list[str]:
             if int(n) != substantive:
                 errs.append(f"{r['rel']}: says {n} substantive formulas; "
                             f"registry CSV has {substantive}")
+
+    # Per-tag diff tallies quoted in prose, e.g. "`D2` adjoint-required (23)".
+    # This tally was computed here and compared against nothing for as long as it
+    # has existed, so it drifted every time a row was retagged -- and a retag is
+    # exactly when it matters. Only backticked tags count, per the conventions'
+    # backtick rule: `D1` is a diff tag, D1 unbacked is a deformation potential.
+    TAG_COUNT = re.compile(r"`(D[0-9N])`[^`(]{0,90}?\((\d+)\)")
+    for r in pages:
+        for tag, n in TAG_COUNT.findall(r["body"]):
+            want = _diff.get(tag, 0)
+            if int(n) != want:
+                errs.append(f"{r['rel']}: says {n} rows tagged `{tag}`; "
+                            f"registry CSV has {want}")
     return errs
 
 

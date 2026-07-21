@@ -258,8 +258,12 @@ def check_citations(pages: list[dict]) -> list[str]:
     """Section coordinates must resolve, and nothing may cite a line number."""
     errs: list[str] = []
     coords: dict[str, set[str]] = {}
+    # date -> [heading text], per page: three timeline entries share 2026-06-10,
+    # so a bare date is ambiguous and the parenthetical is load-bearing.
+    dated: dict[str, dict[str, list[str]]] = {}
     for r in pages:
         found = set()
+        by_date: dict[str, list[str]] = {}
         for line in r["body"].splitlines():
             if line.startswith("#"):
                 # numeric section coordinates (4.2, 12.0.3)
@@ -270,7 +274,9 @@ def check_citations(pages: list[dict]) -> list[str]:
                 # dot-requiring pattern silently skipped every one of them
                 for tok in re.findall(r"\b\d{4}-\d{2}-\d{2}\b", line):
                     found.add(tok)
+                    by_date.setdefault(tok, []).append(line.lower())
         coords[r["id"]] = found
+        dated[r["id"]] = by_date
 
     # the corpus cites both full ids (`arch-12-cert §12.0.3`) and the historical
     # short form (`arch-12 §12.0.3`); resolve the short form by unique prefix
@@ -280,14 +286,33 @@ def check_citations(pages: list[dict]) -> list[str]:
         if m:
             prefix.setdefault(m.group(1), pid)
 
-    cite = re.compile(r"\[?([a-z][a-z0-9-]{3,})\]?[`\s]*§(\d{4}-\d{2}-\d{2}|\d+(?:\.\d+)*)")
+    cite = re.compile(
+        r"\[?([a-z][a-z0-9-]{3,})\]?[`\s]*§(\d{4}-\d{2}-\d{2}|\d+(?:\.\d+)*)"
+        r"(?:\s*\(([^)]{1,60})\))?")
     for r in pages:
-        for pid, coord in cite.findall(r["body"]):
+        for pid, coord, paren in cite.findall(r["body"]):
             pid = pid if pid in coords else prefix.get(pid, pid)
             if pid not in coords or not coords[pid]:
                 continue          # unknown target or a page with no numbered headings
             if coord not in coords[pid] and coord.split(".")[0] not in coords[pid]:
                 errs.append(f"{r['rel']}: §{coord} does not resolve in `{pid}`")
+                continue
+            # A dated anchor may be ambiguous. `[timeline]` has three entries on
+            # 2026-06-10 and two on 2026-07-16, so the parenthetical is part of
+            # the address -- and it was never validated: any parenthetical passed.
+            heads = dated.get(pid, {}).get(coord)
+            if not heads:
+                continue
+            if paren:
+                key = paren.strip().lower()
+                if not any(key in h for h in heads):
+                    errs.append(f"{r['rel']}: §{coord} ({paren}) matches no heading "
+                                f"in `{pid}` (dated entries there: "
+                                f"{len(heads)} on that date)")
+            elif len(heads) > 1:
+                errs.append(f"{r['rel']}: §{coord} is ambiguous in `{pid}` "
+                            f"({len(heads)} entries share that date) -- "
+                            f"add the disambiguating parenthetical")
 
     lineref = re.compile(r"\b[\w./-]+\.md:\d+\b")
     for r in pages:

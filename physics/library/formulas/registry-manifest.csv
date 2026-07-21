@@ -14,24 +14,24 @@
 13,SCPH-self-consistent-phonons,"`(D(q), T) → ω_renorm`",B2,T2,D2,faithful,S1,"phonon-disp, T"
 14,drude-conductivity,"`(μ, n, e) → σ`",B3,T0,D1,cheap,S1,"μ, n"
 15,matthiessen-mobility,"`(μ_imp, μ_ph, μ_grain) → μ`",B3,T0,D1,cheap,S4,μ-channels
-16,caughey-thomas-mobility,"`(μ0, E, v_sat, β) → μ(E)`",B3/B9,T0,D1,cheap,S4,"μ0, v_sat, E"
+16,field-dependent-mobility,"`(μ0, E, v_sat, β) → μ(E)`",B3/B9,T0,D1,cheap,S4 (a.k.a. Caughey–Thomas),"μ0, v_sat, E"
 17,v-sat-POP-limit,"`(ω_LO, m*, ε∞, ε0) → v_sat`",B3,T0,D1,cheap,S4,"ω_LO, m*"
 18,v-sat-intervalley,"`(Δ_valley, m*_valleys) → v_sat`",B3,T0,D1,cheap,S4,bands
 19,hall-mobility-from-σ,"`(σ_xx, σ_xy, B) → μ_H`",B3,T0,D1,cheap,S1,σ
 20,mobility-impurity-phonon,"`(N_imp, T, m*) → μ_imp, μ_ph`",B3,T0,D1,cheap,S4,"N_imp, T"
-21,frohlich-coupling,"`(ω_LO, ε∞, ε0, m*) → α_F`",B2/B3,T0,D1,cheap,S4,"ω_LO, dielectric"
-22,frohlich-scattering-rate,"`(α_F, T, ε_k) → τ⁻¹`",B3,T1,D1,cheap,S4,"α_F, bands"
-23,seebeck-mott,"`(σ(ε), E_F, T) → S`",B3,T1,D2,cheap,S1,"σ, E_F"
-24,wiedemann-franz-electronic-kappa,"`(σ, T) → κ_e`",B3,T0,D1,cheap,S1,σ
-25,callaway-lattice-kappa,"`(ω_λ(q), τ_λ) → κ_L`",B3/B2,T2,D2,cheap,S1,"phonon-disp, τ"
+21,polar-coupling-constant,"`(ω_LO, ε∞, ε0, m*) → α_F`",B2/B3,T0,D1,cheap,S4 (a.k.a. Fröhlich),"ω_LO, dielectric"
+22,polar-optical-scattering-rate,"`(α_F, T, ε_k) → τ⁻¹`",B3,T1,D1,cheap,S4 (a.k.a. Fröhlich),"α_F, bands"
+23,seebeck-from-conductivity-derivative,"`(σ(ε), E_F, T) → S`",B3,T1,D2,cheap,S1 (a.k.a. Mott),"σ, E_F"
+24,electronic-kappa-from-conductivity,"`(σ, T) → κ_e`",B3,T0,D1,cheap,S1 (a.k.a. Wiedemann–Franz),σ
+25,single-mode-rta-lattice-kappa,"`(ω_λ(q), τ_λ) → κ_L`",B3/B2,T2,D2,cheap,S1 (a.k.a. Callaway/Slack),"phonon-disp, τ"
 26,phonon-poiseuille-length,"`(τ_N, v_g) → L_Pois`",B3,T0,D1,cheap,S4,"τ_N, v_g"
 27,second-sound-speed,"`(v_g_LA, T, τ_R/τ_N) → c_ss`",B3,T0,D1,cheap,S4,"v_g, τ ratios"
 28,acoustic-mismatch-TBR,"`(ρ_1,v_1,ρ_2,v_2) → R_K`",B6,T0,D1,cheap,S4,mechanics ×2
 29,diffuse-mismatch-TBR,"`(DOS_ph_1, DOS_ph_2) → R_K`",B6,T1,D2,cheap,S4,phonon-DOS ×2
-30,defect-formation-energy-zhang-northrup,"`(E_def, E_host, μ_i, q, E_F) → E_form`",B4,T0,D1,cheap,S1+S2+S3,"E_def, μ_i, E_F"
-31,charged-supercell-extrapolation-isotropic-cubic,"`(q, ε, L_cell) → ΔE_iso`",B4,T0,D0,cheap,"S3 (a.k.a. Makov-Payne)","q, ε"
-32,charged-supercell-extrapolation-planar-aligned,"`(q, ε, V_q-V_0, L) → ΔE_planar`",B4,T0,D0,cheap,"S1+S2+S3 (a.k.a. Freysoldt / FNV)","q, ε, potential"
-33,charged-supercell-extrapolation-image-charge,"`(q, ε, L, ξ) → ΔE_image`",B4,T0,D0,cheap,"S3 (a.k.a. Lany-Zunger)","q, ε"
+30,defect-formation-energy,"`(E_def, E_host, μ_i, q, E_F) → E_form`",B4,T0,D1,cheap,S1+S2+S3 (a.k.a. Zhang–Northrup),"E_def, μ_i, E_F"
+31,charged-supercell-extrapolation-isotropic-cubic,"`(q, ε, L_cell) → ΔE_iso`",B4,T0,D0,cheap,S3 (a.k.a. Makov-Payne),"q, ε"
+32,charged-supercell-extrapolation-planar-aligned,"`(q, ε, V_q-V_0, L) → ΔE_planar`",B4,T0,D0,cheap,S1+S2+S3 (a.k.a. Freysoldt / FNV),"q, ε, potential"
+33,charged-supercell-extrapolation-image-charge,"`(q, ε, L, ξ) → ΔE_image`",B4,T0,D0,cheap,S3 (a.k.a. Lany-Zunger),"q, ε"
 34,charge-transition-level,"`(E_form(q1), E_form(q2)) → ε(q1/q2)`",B4,T0,D1,cheap,S1+S3,E_form
 35,defect-boltzmann-population,"`(E_form, T, μ_i) → c_def`",B4,T0,D1,cheap,S2+S3,"E_form, T"
 36,self-consistent-charge-balance,"`(c_def(E_F), n(E_F), p(E_F)) → E_F*`",B4/B1,T1,D2,cheap,S3,"populations, n,p"
@@ -39,23 +39,23 @@
 38,SRH-recombination,"`(n, p, τ_n, τ_p, n_i) → R_SRH`",B4/B9,T0,D1,cheap,S3,"n, p, τ"
 39,auger-recombination,"`(n, p, C_n, C_p) → R_Aug`",B4/B9,T0,D1,cheap,S3,"n, p"
 40,multiphonon-emission-capture,"`(ΔE, ω_LO, S_HR, T) → C_p`",B4,T2,D2,faithful,S1+S3,"ΔE, ω_LO, Huang-Rhys"
-41,huang-rhys-factor,"`(Q_def, ω_λ) → S_HR`",B4/B2,T2,D2,faithful,S1,"Q_def, phonons"
+41,vibronic-coupling-factor,"`(Q_def, ω_λ) → S_HR`",B4/B2,T2,D2,faithful,S1 (a.k.a. Huang–Rhys),"Q_def, phonons"
 42,mass-action-defect-complex,"`(c_A, c_B, K_eq(T)) → c_AB`",B4,T0,D1,cheap,S2,"populations, K_eq"
 43,debye-screening-defect-defect,"`(c_def, T, ε) → λ_D`",B4,T0,D1,cheap,S3,"c_def, T, ε"
 44,surface-grand-potential-γ,"`(E_slab, μ_env, area) → γ(term,μ)`",B5,T1,D2,cheap,S2+S3,"slab energy, μ_env"
 45,wulff-shape,`(γ(hkl)) → polyhedron`,B5,T1,D4,faithful,S1 (soft-hull log-sum-exp),γ
 46,termination-stability-window,"`(γ(term, μ_H,μ_O)) → phase-diagram`",B5,T1,D2,cheap,S3,γ family
-47,schottky-mott-alignment,"`(W_m, χ_s) → φ_B`",B6,T0,D1,cheap,S2+S3,"work-fn, affinity"
+47,barrier-from-workfunction-affinity,"`(W_m, χ_s) → φ_B`",B6,T0,D1,cheap,S2+S3 (a.k.a. Schottky–Mott),"work-fn, affinity"
 48,MIGS-corrected-barrier,"`(W_m, χ_s, S, φ_CNL) → φ_B_eff`",B6,T0,D1,cheap,S3,"Schottky-Mott, S, φ_CNL"
 49,image-force-barrier-lowering,"`(E, ε) → Δφ_IF`",B6/B9,T0,D0,cheap,S4,E_field
 50,interface-bond-counting,"`(slab_pair, cutoff) → bond-vec`",B6,T1,D1,cheap,S2,slabs
 51,interface-stacking-energy,"`(slab_A, slab_B, registry) → E_stack`",B6,T1,D1,cheap,S2,"slabs, registry"
-52,vegard-correction,"`(a_A, a_B, x) → a_alloy`",B6/B10,T0,D0,cheap,S2,lattice consts
-53,hume-rothery-mismatch,"`(r_A, r_B, χ_A, χ_B, valence) → score`",B6/B10,T0,D0,cheap,S2,"radii, χ"
-54,matthews-blakeslee-critical-thickness,"`(a_film, a_sub, ν, b) → h_c`",B6/B11,T0,D0,cheap,S3,"lattice, elastic"
+52,alloy-lattice-interpolation,"`(a_A, a_B, x) → a_alloy`",B6/B10,T0,D0,cheap,S2 (a.k.a. Vegard),lattice consts
+53,substitution-compatibility-score,"`(r_A, r_B, χ_A, χ_B, valence) → score`",B6/B10,T0,D0,cheap,S2 (a.k.a. Hume-Rothery),"radii, χ"
+54,critical-thickness-force-balance,"`(a_film, a_sub, ν, b) → h_c`",B6/B11,T0,D0,cheap,S3 (a.k.a. Matthews–Blakeslee),"lattice, elastic"
 55,bond-valence-sum,"`(R_I, R0, b) → BVS_atom`",B10,T0,D1,cheap,S2,"R_I, R0-table"
-56,pauling-radius-ratio,"`(r_cation, r_anion) → ratio + class`",B10,T0,D0,cheap,S2,radii
-57,born-stability-criteria,`(C_ij) → bool-vec + slack`,B10/B7,T0,D1,cheap,S2,elastic
+56,radius-ratio-coordination-class,"`(r_cation, r_anion) → ratio + class`",B10,T0,D0,cheap,S2 (a.k.a. Pauling),radii
+57,elastic-stability-criteria,`(C_ij) → bool-vec + slack`,B10/B7,T0,D1,cheap,S2 (a.k.a. Born),elastic
 58,generalized-stacking-fault-energy,"`(slab, shift) → γ_GSF`",B10,T1,D1,cheap,S2,slab
 59,twin-boundary-energy,"`(slab_twin, slab_bulk) → γ_TB`",B10,T1,D1,cheap,S2,slabs
 60,elastic-constants-Cij,`(stress(strain)) → C_ij`,B7,T1,D1,cheap,S1,"h, strain"
@@ -66,41 +66,41 @@
 65,gibbs-free-energy-phase,"`(E_0, ω(q), T, P) → G(T,P)`",B8,T1,D2,cheap,S1,"E_0, phonons"
 66,chemical-potential-ref-table,"`(species, T, P) → μ_i`",B8,T0,D0,cheap,S2+S3,ref-cache lookup
 67,phase-diagram-convex-hull,"`(G_phases(μ,T)) → hull`",B8,T1,D4,faithful,S1 (soft-min hull log-sum-exp),G
-68,clausius-clapeyron-boundary,"`(ΔH, ΔV) → dP/dT`",B8,T0,D1,cheap,S1,thermo
-69,maxwell-relation-residual,"`(∂μ_i/∂T, ∂S/∂N_i) → ‖Δ‖`",B8,T0,D1,cheap,S5,thermo derivatives
+68,phase-boundary-slope,"`(ΔH, ΔV) → dP/dT`",B8,T0,D1,cheap,S1 (a.k.a. Clausius–Clapeyron),thermo
+69,thermodynamic-cross-derivative-residual,"`(∂μ_i/∂T, ∂S/∂N_i) → ‖Δ‖`",B8,T0,D1,cheap,S5 (a.k.a. Maxwell),thermo derivatives
 70,self-heating-T_op,"`(P_diss, R_th, T_amb) → T_op`",B9,T0,D1,cheap,S1,"dissipation, R_th"
 71,coupled-em-thermal-pde-residual,"`(j, E, T_L, σ(T), κ(T)) → ‖PDE‖`",B9,T1,D2,cheap,S4,"σ, κ, field"
 72,hot-carrier-temperature-balance,"`(j·E, τ_E, T_L) → T_e`",B9,T0,D1,cheap,S4,"j, E, τ_E"
 73,tau-energy-POP-acoustic,"`(α_F, v_s, ρ, Ξ, T) → τ_E`",B9,T0,D1,cheap,S4,"α_F, mech"
-74,chynoweth-impact-ionization,"`(α0, β/E) → α(E)`",B9,T0,D1,cheap,S4,E_field
+74,field-activated-ionization-rate,"`(α0, β/E) → α(E)`",B9,T0,D1,cheap,S4 (a.k.a. Chynoweth),E_field
 75,avalanche-multiplication,"`(α(E), L) → M`",B9,T1,D2,cheap,S4,α(E)
-76,kane-zener-tunneling-rate,"`(E_g, m*, E) → Γ_KZ`",B9,T0,D1,cheap,S4,"E_g, m*, E"
-77,fowler-nordheim-current,"`(φ_B, E, m*) → J_FN`",B6/B9,T0,D1,cheap,S4,"φ_B, E"
-78,richardson-dushman-thermionic,"`(φ_B, T, A*) → J_TE`",B6/B9,T0,D1,cheap,S4,"φ_B, T"
-79,padovani-stratton-TFE,"`(φ_B, N_d, T, m*) → J_TFE`",B6/B9,T0,D1,cheap,S4,"φ_B, N_d, T"
+76,interband-tunneling-rate,"`(E_g, m*, E) → Γ_KZ`",B9,T0,D1,cheap,S4 (a.k.a. Kane–Zener),"E_g, m*, E"
+77,field-emission-current,"`(φ_B, E, m*) → J_FN`",B6/B9,T0,D1,cheap,S4 (a.k.a. Fowler–Nordheim),"φ_B, E"
+78,thermionic-emission-current,"`(φ_B, T, A*) → J_TE`",B6/B9,T0,D1,cheap,S4 (a.k.a. Richardson–Dushman),"φ_B, T"
+79,thermionic-field-emission-current,"`(φ_B, N_d, T, m*) → J_TFE`",B6/B9,T0,D1,cheap,S4 (a.k.a. Padovani–Stratton),"φ_B, N_d, T"
 80,NEGF-transmission,"`(H_device, Σ_L, Σ_R, E) → T(E)`",B6/B9,T3,D2,faithful,S1+S4,"H, self-energies"
 81,carbide-growth-parabolic,"`(D_0, E_a, T, t) → x²(t)`",B11/B6,T0,D1,cheap,S2+S3,"D_0, E_a, T"
-82,black-electromigration-MTTF,"`(j, E_a, T, n) → MTTF`",B11,T0,D1,cheap,S3,"j, T"
-83,coffin-manson-fatigue,"`(Δε_p, c) → N_f`",B11,T0,D1,cheap,S3,thermal cycling
+82,electromigration-mttf,"`(j, E_a, T, n) → MTTF`",B11,T0,D1,cheap,S3 (a.k.a. Black),"j, T"
+83,plastic-strain-fatigue-life,"`(Δε_p, c) → N_f`",B11,T0,D1,cheap,S3 (a.k.a. Coffin–Manson),thermal cycling
 84,cluster-expansion-energy,"`(ECI, σ-config) → E_CE`",B4/B8,T1,D4,cheap,S2,"ECI cache, config"
 85,structure-uniqueness-CSP,"`(structure, set) → bool + d`",B10,T1,D0,cheap,S2 (discrete metric; exception-set everywhere),structure set
 86,bi-slab-grand-potential,"`(slab_A, slab_B, μ_env) → Ω`",B5/B6,T1,D2,cheap,S2,"slabs, μ"
 87,reference-phase-energy-cache,`(phase-id) → E_ref`,B8,T3,D0,faithful,S2+S3,DFT battery
-88,long-range-coulomb-directional-limit-correction,"`(D(q), q̂, Z*, ε∞, Ω) → D_NA(q)`",B2,T1,D2,faithful,"extension (a.k.a. Pick-Cochran-Martin / Gonze-Lee)","Z*, ε∞ (L1 primitives)"
-89,charged-supercell-extrapolation-isotropic-general,"`(q, ε, L, α_M) → ΔE_iso`",B4,T0,D0,cheap,"extension (lattice-general; α_M explicit)","q, ε, Madelung"
-90,charged-supercell-extrapolation-atomic-site-averaged,"`(q, ε, V_atomic, L) → ΔE_atomic`",B4,T0,D0,cheap,"extension (a.k.a. Kumagai-Oba)","q, ε, atomic-site potential"
-91,lattice-coulomb-summation-scalar,`(lattice) → α_M`,L1,T1,D0,cheap,"extension (a.k.a. Madelung constant)",lattice
-92,operator-position-derivative-tensor,"`(γ̂, R, h) → Z*[I,α,β]`",L1,T2,D2,faithful,"extension (a.k.a. Born effective charges Z*)",linear-response sub-stage
-93,high-frequency-response-tensor,"`(γ̂, h) → ε∞[α,β]`",L1,T2,D2,faithful,"extension (a.k.a. high-frequency dielectric ε∞)",linear-response sub-stage
-94,electronic-linear-response-tensor,"`(γ̂, h) → χ∞[α,β]`",L1,T2,D2,faithful,"extension (a.k.a. electronic susceptibility χ∞)",linear-response sub-stage
-95,composition-dependent-excess-free-energy-basis,"`(x, T, {L_ν}) → G_ex`",B8,T0,D1,cheap,"extension (a.k.a. Redlich-Kister)","composition, basis parameters"
-96,symmetry-classification-group-via-snf,"`(SG_number, AZ_class) → AbelianGroup`",B1/B11,T1,D0,cheap,"topology atlas (X_BS; SNF on orbit-rep matrix)","SG, AZ class"
-97,symmetry-orbit-representation-matrix,"`(SG, [site-orbit], [orbital]) → IntMatrix`",B1,T1,D0,cheap,"topology atlas (a.k.a. EBR / band-representation matrix)","SG, orbits, orbital basis"
-98,irrep-compatibility-matrix,"`(SG, high-sym-momenta) → IntMatrix`",B1,T0,D0,cheap,"topology atlas (compatibility relations)",SG
-99,first-band-invariant-from-eigenstate-grid,"`(eigenstates_on_grid) → Integer`",B1,T2,D0,faithful,"topology atlas (a.k.a. Chern number; integer, no derivative)",eigenstate grid
+88,long-range-coulomb-directional-limit-correction,"`(D(q), q̂, Z*, ε∞, Ω) → D_NA(q)`",B2,T1,D2,faithful,extension (a.k.a. Pick-Cochran-Martin / Gonze-Lee),"Z*, ε∞ (L1 primitives)"
+89,charged-supercell-extrapolation-isotropic-general,"`(q, ε, L, α_M) → ΔE_iso`",B4,T0,D0,cheap,extension (lattice-general; α_M explicit),"q, ε, Madelung"
+90,charged-supercell-extrapolation-atomic-site-averaged,"`(q, ε, V_atomic, L) → ΔE_atomic`",B4,T0,D0,cheap,extension (a.k.a. Kumagai-Oba),"q, ε, atomic-site potential"
+91,lattice-coulomb-summation-scalar,`(lattice) → α_M`,L1,T1,D0,cheap,extension (a.k.a. Madelung constant),lattice
+92,operator-position-derivative-tensor,"`(γ̂, R, h) → Z*[I,α,β]`",L1,T2,D2,faithful,extension (a.k.a. Born effective charges Z*),linear-response sub-stage
+93,high-frequency-response-tensor,"`(γ̂, h) → ε∞[α,β]`",L1,T2,D2,faithful,extension (a.k.a. high-frequency dielectric ε∞),linear-response sub-stage
+94,electronic-linear-response-tensor,"`(γ̂, h) → χ∞[α,β]`",L1,T2,D2,faithful,extension (a.k.a. electronic susceptibility χ∞),linear-response sub-stage
+95,composition-dependent-excess-free-energy-basis,"`(x, T, {L_ν}) → G_ex`",B8,T0,D1,cheap,extension (a.k.a. Redlich-Kister),"composition, basis parameters"
+96,symmetry-classification-group-via-snf,"`(SG_number, AZ_class) → AbelianGroup`",B1/B11,T1,D0,cheap,topology atlas (X_BS; SNF on orbit-rep matrix),"SG, AZ class"
+97,symmetry-orbit-representation-matrix,"`(SG, [site-orbit], [orbital]) → IntMatrix`",B1,T1,D0,cheap,topology atlas (a.k.a. EBR / band-representation matrix),"SG, orbits, orbital basis"
+98,irrep-compatibility-matrix,"`(SG, high-sym-momenta) → IntMatrix`",B1,T0,D0,cheap,topology atlas (compatibility relations),SG
+99,first-band-invariant-from-eigenstate-grid,`(eigenstates_on_grid) → Integer`,B1,T2,D0,faithful,"topology atlas (a.k.a. Chern number; integer, no derivative)",eigenstate grid
 100,binary-invariant-with-symmetry-from-eigenstate-grid,"`(eigenstates_on_grid, antiunitary_op) → ℤ₂`",B1,T2,D0,faithful,"topology atlas (a.k.a. Z₂ invariant; integer, no derivative)","eigenstates, antiunitary"
-101,holonomy-spectrum-on-loop,"`(eigenstates_on_loop) → [phase]`",B1,T2,D0,faithful,"topology atlas (a.k.a. Wilson loop spectrum; phases, no useful gradient)",eigenstates on loop
-102,boundary-mode-multiplicity-from-classification,"`(X_BS_element, boundary_orientation) → Integer`",B5,T1,D0,cheap,"topology atlas (indicator-factor → boundary-state lookup)","X_BS element, boundary orientation"
+101,holonomy-spectrum-on-loop,`(eigenstates_on_loop) → [phase]`,B1,T2,D0,faithful,"topology atlas (a.k.a. Wilson loop spectrum; phases, no useful gradient)",eigenstates on loop
+102,boundary-mode-multiplicity-from-classification,"`(X_BS_element, boundary_orientation) → Integer`",B5,T1,D0,cheap,topology atlas (indicator-factor → boundary-state lookup),"X_BS element, boundary orientation"
 103,F-equals-minus-grad-E,"(architectural — autodiff, NOT residualized)",—,—,—,—,S5,(rejected per S5)
 104,equivariance,"(architectural — by construction, NOT residualized)",—,—,—,—,S5,(rejected per S5)
 105,vacancy-generation-arrhenius,"`(c_V^q, T, μ, j, x_ox', ρ_dis, k_ann) → dc_V/dt`",B11/B4,T0,D1,cheap,S3 (defects G.1),"E_form, T, k_ann"
@@ -109,27 +109,27 @@
 108,vibration-induced-vacancy-generation,"`(ρ_dis, σ_stress, f_vib, v_dis, b) → (dρ_dis/dt, G_V)`",B11,T1,D1,cheap,S3 (defects G.7),"ρ_dis, σ_stress"
 109,air-oxidation-rate-eyring,"`(T, p_O2, ΔG‡, ν) → dx_ox/dt`",B11/B5,T0,D1,cheap,"S3 (catalog #46, Eyring)","T, p_O2"
 110,hydrogen-desorption-rate-eyring,"`(T, E_des, ν) → r_H`",B11/B5,T0,D1,cheap,"S3 (catalog #47, E_des=3.8eV)","T, surface c_H"
-111,nrt-displacements,"`(T_dam, E_d) → N_d`",B11/B4,T0,D1,cheap,"S4 (non-eq H.1)","T_dam, E_d(host)"
+111,nrt-displacements,"`(T_dam, E_d) → N_d`",B11/B4,T0,D1,cheap,S4 (non-eq H.1),"T_dam, E_d(host)"
 112,frenkel-pair-yield,"`(N_d, Σ_d, Φ_dose, η_recomb) → DefectDensity`",B11/B4,T0,D1,cheap,"S4 (non-eq H.2; [V]_irr=Φ·Σ_d·N_d·(1−η_recomb), Σ_d=N_atom·σ_d NIEL displacement cross-section)","nrt-displacements, σ_d(host,particle)"
 113,spontaneous-polarization,"`(Z*[I,α,β], Δw[I], Ω) → P_sp[α]`",B6/B7,T0,D1,cheap,"S1+S2 (catalog #35; Z*-composition, a.k.a. Bernardini-Fiorentini-Vanderbilt)","Z* (row 92), Ω"
 114,piezoelectric-tensor,"`(Z*[I,α,β], du/dε[κ,J], Ω, e_clamped) → e[i,J]`",B7/B6,T1,D1,cheap,"S1+S2 (catalog #35; clamped-ion + Z*·du/dε, a.k.a. King-Smith-Vanderbilt)","Z* (row 92), elastic-Cij (row 60), Ω"
-115,2DEG-sheet-density,"`(ΔP_sp, P_pz(ε), φ_b, ΔE_C, E_F, ε_b, d_b, D_it, E_trap) → n_s`",B6,T1,D2,cheap,"S1+S2 (catalog #52 + FoM table; a.k.a. Ambacher polarization-doping)","113, 114, 116, schottky-mott (47), band-offset, fermi-level (5)"
-116,interface-trap-density,"`(ρ_DB, E_DB, σ_t, κ_strain, ε_mismatch) → D_it(E)`",B6,T1,D1,cheap,"S2 (catalog #33 dangling-bond + strain; SS FoM #55)","interface-bond-counting (row 50), strain"
-117,piezoelectric-polarization-from-strain,"`(e[i,J], ε[J]) → P_pz[i]`",B6/B7,T0,D1,cheap,"S2 (catalog #35; helper for n_s)","piezoelectric-tensor (114), strain"
-118,polarization-bound-sheet-charge,"`(P_top, P_bottom, n̂) → σ_pol`",B6,T0,D1,cheap,"S2 (catalog #52; (P_above−P_below)·n̂ interface discontinuity)","113, 117"
-119,subthreshold-swing-Dit,"`(D_it, C_ox, C_dep, T) → SS`",B6/B9,T0,D1,cheap,"S2 (catalog #55 SS FoM; C_it = q²·D_it)","interface-trap-density (116), C_ox"
+115,2DEG-sheet-density,"`(ΔP_sp, P_pz(ε), φ_b, ΔE_C, E_F, ε_b, d_b, D_it, E_trap) → n_s`",B6,T1,D2,cheap,S1+S2 (catalog #52 + FoM table; a.k.a. Ambacher polarization-doping),"113, 114, 116, schottky-mott (47), band-offset, fermi-level (5)"
+116,interface-trap-density,"`(ρ_DB, E_DB, σ_t, κ_strain, ε_mismatch) → D_it(E)`",B6,T1,D1,cheap,S2 (catalog #33 dangling-bond + strain; SS FoM #55),"interface-bond-counting (row 50), strain"
+117,piezoelectric-polarization-from-strain,"`(e[i,J], ε[J]) → P_pz[i]`",B6/B7,T0,D1,cheap,S2 (catalog #35; helper for n_s),"piezoelectric-tensor (114), strain"
+118,polarization-bound-sheet-charge,"`(P_top, P_bottom, n̂) → σ_pol`",B6,T0,D1,cheap,S2 (catalog #52; (P_above−P_below)·n̂ interface discontinuity),"113, 117"
+119,subthreshold-swing-Dit,"`(D_it, C_ox, C_dep, T) → SS`",B6/B9,T0,D1,cheap,S2 (catalog #55 SS FoM; C_it = q²·D_it),"interface-trap-density (116), C_ox"
 120,ahc-gap-renormalization,"`(ZPR, Θ, T, ε) → ΔE_g(T)`",B1,T1,D1,cheap,"S1+S2 (adiabatic Allen-Heine one-shot; ΔE_g=ZPR·coth(Θ/2T); slope-kind∈{isochoric,total} per ProvenanceLedger; a.k.a. Giustino RMP 2017 / Antonius PRL 112 215501)","bandgap (row 6), DFPT phonons/g_qν"
-121,kappa-4phonon-high-t-correction,"`(κ_3ph, T, Θ_D) → κ`",B3/B2,T1,D1,cheap,"S1 (Slack-like 4-phonon multiplicative factor, valid T≳0.4Θ_D; Feng-Lindsay-Ruan PRB 96 161201)","callaway-lattice-kappa (row 25)"
-122,iterative-lbte-kappa,"`(collision-matrix, ω_λ(q), τ_λ) → κ_iter`",B3/B2,T3,D3,cheap,"S1 (iterative-LBTE off-diagonal normal-process redistribution; dormant/anchored to published κ_iter in V1, live solve V2; a.k.a. Omini-Sparavigna)","callaway-lattice-kappa (row 25), phonon-disp"
-123,breakdown-field-temperature-slope,"`(E_b0, κ_BR, T) → E_b(T)`",B9,T0,D1,cheap,"S4 (E_b(T)=E_b0[1+κ_BR(T−300)], κ_BR>0 ⇒ E_b rises with T; Hiraiwa-Kawarada JAP 114 034506 / 4H-SiC +7e−4/K)","chynoweth-impact-ionization (row 74), avalanche-multiplication (row 75)"
+121,kappa-4phonon-high-t-correction,"`(κ_3ph, T, Θ_D) → κ`",B3/B2,T1,D1,cheap,"S1 (Slack-like 4-phonon multiplicative factor, valid T≳0.4Θ_D; Feng-Lindsay-Ruan PRB 96 161201)",single-mode-rta-lattice-kappa (row 25)
+122,iterative-lbte-kappa,"`(collision-matrix, ω_λ(q), τ_λ) → κ_iter`",B3/B2,T3,D3,cheap,"S1 (iterative-LBTE off-diagonal normal-process redistribution; dormant/anchored to published κ_iter in V1, live solve V2; a.k.a. Omini-Sparavigna)","single-mode-rta-lattice-kappa (row 25), phonon-disp"
+123,breakdown-field-temperature-slope,"`(E_b0, κ_BR, T) → E_b(T)`",B9,T0,D1,cheap,"S4 (E_b(T)=E_b0[1+κ_BR(T−300)], κ_BR>0 ⇒ E_b rises with T; Hiraiwa-Kawarada JAP 114 034506 / 4H-SiC +7e−4/K)","field-activated-ionization-rate (row 74), avalanche-multiplication (row 75)"
 124,tp-aware-hull,"`(ΔG_form(T,P), ΔG_hull(T,P), δ_meta) → R_hull`",B8,T1,D1,cheap,"S1 (T,P-aware metastability band; R_hull=max(0,ΔG_form−ΔG_hull−δ_meta)²; diamond +25 meV/atom reads R=0)","defect-formation-energy (row 30), phase-diagram-convex-hull (row 67)"
-125,wegscheider-cycle,"`({σ_r}, {K_r(T)}) → R_cycle`",B8,T0,D1,cheap,"S2 (reaction-cycle thermodynamic consistency; (Σ_r σ_r ln K_r)²)","mass-action-defect-complex (row 42)"
-126,rotational-sum-rule,"`(Φ[I,α,J,β], R_I) → R_rot`",B2,T0,D1,cheap,"S2 (Born-Huang/Gazis-Wallis rotational invariance of force constants; complements acoustic sum rule)","dynamical-matrix-hermiticity (row 8), phonon-disp"
-127,alloy-disorder-scattering,"`(x, ΔU, g(E), Ω) → τ_alloy⁻¹`",B3,T1,D1,cheap,"S4 (Harrison-type alloy-disorder mobility limiter; τ⁻¹∝x(1−x)ΔU²g(E); is-alloy-gated; dominant for AlGaN channel)","matthiessen-mobility (row 15), vegard-correction (row 52)"
+125,detailed-balance-cycle-residual,"`({σ_r}, {K_r(T)}) → R_cycle`",B8,T0,D1,cheap,S2 (reaction-cycle thermodynamic consistency; (Σ_r σ_r ln K_r)²) (a.k.a. Wegscheider),mass-action-defect-complex (row 42)
+126,rotational-sum-rule,"`(Φ[I,α,J,β], R_I) → R_rot`",B2,T0,D1,cheap,S2 (Born-Huang/Gazis-Wallis rotational invariance of force constants; complements acoustic sum rule),"dynamical-matrix-hermiticity (row 8), phonon-disp"
+127,alloy-disorder-scattering,"`(x, ΔU, g(E), Ω) → τ_alloy⁻¹`",B3,T1,D1,cheap,S4 (Harrison-type alloy-disorder mobility limiter; τ⁻¹∝x(1−x)ΔU²g(E); is-alloy-gated; dominant for AlGaN channel),"matthiessen-mobility (row 15), alloy-lattice-interpolation (row 52)"
 128,pyroelectric-coefficient,"`(P_sp0[α], p[α], T, T0) → P_sp[α](T)`",B6/B9,T0,D1,cheap,"extension (2026-07 gap-audit B1; P_sp(T)=P_sp(T0)+p·(T−T0) with p the primary+secondary pyroelectric coefficient at fixed stress; is-noncentrosymmetric-gated (pyro/piezo classes — NOT the Fröhlich is-polar-material gate; β-Ga₂O₃ splits them, arch-13); feeds n_s(T) through rows 115/118 — ~20–30% over ΔT≈750 K vs the ±5% ΔP target; per-material p seeded at Wave 2)","spontaneous-polarization (row 113), 2DEG-sheet-density (row 115)"
 129,poole-frenkel-current,"`(N_t, φ_t, E, ε_opt, T) → J_PF`",B6/B9,T0,D1,cheap,"extension (2026-07 gap-audit B2; trap-assisted dielectric leakage J∝E·exp(−(φ_t−β_PF√E)/kT), β_PF=√(q³/(π ε_opt ε0)); dominant high-T gate-leakage channel, complements FN row 77; is-dielectric-layer-gated)","φ_t, E, T"
-130,tddb-thermochemical-e-model,"`(E_ox, T, ΔH0‡, p_eff) → t_BD`",B11,T0,D1,cheap,"extension (2026-07 gap-audit B2; thermochemical E-model t_BD=t0·exp((ΔH0‡ − p_eff·E_ox)/kT); the canonical gate-dielectric lifetime limiter; is-dielectric-layer-gated; per-material ΔH0‡/p_eff at the dielectric wave)","E_ox, T"
+130,tddb-thermochemical-e-model,"`(E_ox, T, ΔH0‡, p_eff) → t_BD`",B11,T0,D1,cheap,extension (2026-07 gap-audit B2; thermochemical E-model t_BD=t0·exp((ΔH0‡ − p_eff·E_ox)/kT); the canonical gate-dielectric lifetime limiter; is-dielectric-layer-gated; per-material ΔH0‡/p_eff at the dielectric wave),"E_ox, T"
 131,dielectric-crystallization-jmak,"`(T, t, E_a_cryst, n_avrami) → X_cryst`",B11,T0,D1,cheap,"extension (2026-07 gap-audit B2; JMAK X=1−exp(−(k(T)·t)^n), k=k0·exp(−E_a/kT); ALD Al₂O₃ crystallizes >700°C → leakage spike (catalog Part A); slow-tier front field alongside x_ox (arch-21); is-dielectric-layer-gated)","T, t"
-132,xrd-structure-factor,"`(h, R_I, Z_I, ⟨u²⟩, (hkl)) → |F_hkl|²`",B10,T0,D1,cheap,"extension (2026-07 gap-audit B4; kinematic F_hkl=Σ_I f_I(q)·e^{iq·R_I}·e^{−W_I} with Debye-Waller W from ⟨u²⟩ (SpectralAggregateOf over row 10); the primary experimental structure channel for pino-bridge Import)","phonon-DOS (row 10) via ⟨u²⟩, lattice"
-133,raman-activity,"`(∂χ/∂u_ν|_Γ, e_ν) → I_ν^Raman`",B2/B1,T2,D1,cheap,"extension (2026-07 gap-audit B4; Raman tensor from the linear-response sub-stage (rows 92–94 family); shifts are row 9's Γ-phonons — this row adds activities/intensities so measured Raman spectra become an Import channel)","phonon-dispersion (row 9), electronic-linear-response-tensor (row 94)"
-134,radiative-recombination-vrs,"`(n, p, n_i(T), B_rad) → R_rad`",B9/B4,T0,D1,cheap,"extension (2026-07 gap-audit B6; a.k.a. van Roosbroeck-Shockley detailed-balance R=B_rad·(np−n_i²); backs RadiativeEmissionOf/photoluminescence (impl-06) and completes HM-5's G−R source; negligible in UWBG device balance (tiny n_i) — carried for PL/validation channels)","n, p, n_i(T)"
+132,xrd-structure-factor,"`(h, R_I, Z_I, ⟨u²⟩, (hkl)) → |F_hkl|²`",B10,T0,D1,cheap,extension (2026-07 gap-audit B4; kinematic F_hkl=Σ_I f_I(q)·e^{iq·R_I}·e^{−W_I} with Debye-Waller W from ⟨u²⟩ (SpectralAggregateOf over row 10); the primary experimental structure channel for pino-bridge Import),"phonon-DOS (row 10) via ⟨u²⟩, lattice"
+133,raman-activity,"`(∂χ/∂u_ν|_Γ, e_ν) → I_ν^Raman`",B2/B1,T2,D1,cheap,extension (2026-07 gap-audit B4; Raman tensor from the linear-response sub-stage (rows 92–94 family); shifts are row 9's Γ-phonons — this row adds activities/intensities so measured Raman spectra become an Import channel),"phonon-dispersion (row 9), electronic-linear-response-tensor (row 94)"
+134,radiative-recombination-rate,"`(n, p, n_i(T), B_rad) → R_rad`",B9/B4,T0,D1,cheap,extension (2026-07 gap-audit B6; a.k.a. van Roosbroeck-Shockley detailed-balance R=B_rad·(np−n_i²); backs RadiativeEmissionOf/photoluminescence (impl-06) and completes HM-5's G−R source; negligible in UWBG device balance (tiny n_i) — carried for PL/validation channels) (a.k.a. van Roosbroeck–Shockley),"n, p, n_i(T)"

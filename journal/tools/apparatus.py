@@ -121,6 +121,16 @@ def check(pages: list[dict]) -> list[str]:
             if not r.get(f):
                 errs.append(f"{r['rel']}: missing frontmatter field `{f}`")
 
+    # `status` and `authority` are closed vocabularies; a typo would otherwise
+    # invent a state nothing handles.
+    for r in pages:
+        if r.get("status") and r["status"] not in ("draft", "review", "stable"):
+            errs.append(f"{r['rel']}: status `{r['status']}` is not "
+                        f"draft | review | stable")
+        if r.get("authority") not in ("canon", "supporting"):
+            errs.append(f"{r['rel']}: authority `{r.get('authority')}` is not "
+                        f"canon | supporting")
+
     for r in pages:
         want = f"{int(r['chapter']):02d}-{r.get('chapter-name','')}"
         got = r["path"].parent.name

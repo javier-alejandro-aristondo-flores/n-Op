@@ -1,6 +1,6 @@
 # 2026-07-16 — Research memo: the scorer ↔ stepper duality ("evolver duality")
 
-> **Deliverable of** `docs/specs/2026-07-16-evolver-duality-research-brief.md` (independent
+> **Deliverable of** `[timeline] §2026-07-16 (Wave 2 / evolver)` (independent
 > deep-research commission, 2026-07-16). Per the commissioning note this memo **commits to
 > nothing**: no atomic-tree edit, no `docs/product.md` edit, no vocabulary change may follow
 > before joint review. Structure follows brief §4 exactly: §1 verdict, §2 the algebra, §3 the

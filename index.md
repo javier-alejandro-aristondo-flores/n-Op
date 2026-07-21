@@ -37,6 +37,7 @@ Every canonical topic and the single page that owns it. If a topic is not here, 
 | deriv-language-study | 11.9 [Implementation-language decision (`arch-18 §1`)](pages/appendix/11.9-deriv-language-study.md) | `deriv-language-study` |
 | deriv-observable-catalog | 11.7 [UWBG Diamond-Centric Observable Catalog for n-Op `/physics`](pages/appendix/11.7-deriv-observable-catalog.md) | `deriv-observable-catalog` |
 | deriv-transport | 11.3 [Group C — Transport, Thermodynamic, Chemical/Surface](pages/appendix/11.3-deriv-transport.md) | `deriv-transport` |
+| development timeline | 10.5 [Development timeline](pages/10.5-timeline.md) | `timeline` |
 | device-mesh Universe | 2.4 [Multiscale state — slow and macro tiers](pages/2.4-multiscale-state.md) | `arch-21-multiscale-state` |
 | diamond MVP system | 8.1 [The system](pages/8.1-system.md) | `mvp-01-system` |
 | dressing tiers (V1 vs V2 scope) | 2.5 [The 4-level Born–Oppenheimer hierarchy](pages/2.5-bo-levels.md) | `arch-08-bo-levels` |
@@ -83,6 +84,7 @@ Every canonical topic and the single page that owns it. If a topic is not here, 
 | slow / configurational state schema | 2.4 [Multiscale state — slow and macro tiers](pages/2.4-multiscale-state.md) | `arch-21-multiscale-state` |
 | sparse-set backend policy | 4.3 [Representation substrate](pages/4.3-representations.md) | `arch-20-representations` |
 | stage boundaries | 4.2 [The compose-time pipeline](pages/4.2-pipeline.md) | `arch-07-pipeline` |
+| standing traps register | 10.4 [Standing traps register](pages/10.4-traps.md) | `traps` |
 | state 7-tuple | 2.2 [The unified state](pages/2.2-state.md) | `arch-04-state` |
 | template signatures | 6.5 [The 20 abstract-property templates](pages/6.5-templates.md) | `impl-03-templates` |
 | ten cert obligations | 5.1 [Cert obligations](pages/5.1-cert.md) | `arch-12-cert` |
@@ -104,4 +106,4 @@ Every canonical topic and the single page that owns it. If a topic is not here, 
 | γ̂ encoding vocabulary | 2.3 [γ̂ as a Stage-4 lowering choice](pages/2.3-gamma-hat.md) | `arch-15-gamma-hat` |
 | γ̂ MVP budget | 2.6 [γ̂ budget at MVP scale](pages/2.6-gamma-budget.md) | `mvp-02-gamma-budget` |
 
-*97 canonical topics across 56 pages.*
+*99 canonical topics across 58 pages.*

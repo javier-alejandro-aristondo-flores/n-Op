@@ -3,106 +3,105 @@
 n-Op trains a **physically-informed neural operator (PINO)** that predicts how
 the multiphysics state of a crystalline material evolves in time, in service of
 designing **durable ultra-wide-bandgap (UWBG) semiconductor chips for harsh
-environments** (jet-turbine-class: high temperature (>500 °C), thermal cycling,
-mechanical vibration, high field, high current density, possibly radiation).
+environments** (jet-turbine-class: >500 °C, thermal cycling, mechanical
+vibration, high field, high current density, possibly radiation).
 
 The minimum viable demonstration is **diamond**, with three capabilities:
 crystal-structure prediction, electron-cloud diffusion, and heat diffusion. The
 spec is comprehensive; the build is diamond-first.
 
+**No code has been written yet.** This repository is specification and research.
+
+## Start here
+
+The specification is a **book**. Do not go spelunking through directories — the
+apparatus exists so you do not have to.
+
+| | |
+|---|---|
+| **[instructions.md](instructions.md)** | **Read this first.** How to go from the book to a working understanding, and how to get an edit back into the right page. |
+| [contents.md](contents.md) | Chapters → pages, in reading order. *Generated.* |
+| [index.md](index.md) | Every canonical topic → the single page that owns it. *Generated.* |
+| [glossary.md](glossary.md) | One-line definitions for the load-bearing terms. |
+
+Chapters are **by concern**, and chapters **2–6 are the contiguous `/physics`
+oracle block** — for oracle-internal work that range is usually sufficient.
+
+Pages are addressed by their `id` (`arch-07-pipeline`, `accuracy-ledger`), never
+by filename or by the display tag. That is why the corpus could be restructured
+wholesale without breaking a cross-reference.
+
 ## The three libraries
 
-`n-Op` is partitioned into three sibling libraries:
-
-- **`physics/`** — a substrate-agnostic reference oracle. It encodes the laws:
-  state structure, GENERIC dynamics, observable definitions, residual
-  definitions, and certification obligations. It does **not** hold time-varying
-  state values, train networks, integrate trajectories, or wrap external DFT
-  codes at runtime. This is the current focus.
+- **`physics/`** — the reference oracle. It encodes the laws: state structure,
+  GENERIC dynamics, observable definitions, residual definitions, and
+  certification obligations. It does **not** hold time-varying state values,
+  train networks, integrate trajectories, or wrap external DFT codes at runtime.
+  This is the current focus.
+  *Numerics-agnostic at its seam* (flat arrays, no framework tensors) while
+  internally committed to the representation substrate of `[arch-20-representations]`.
 - **`informed-operator/`** — the PINO itself; consumes `physics/` and learns the
   time-evolution operator.
-- **`interface/`** — the user-facing surface (not yet designed).
+- **`interface/`** — where every driving loop lives (training, design search,
+  active learning). Not yet designed.
 
 ## Architectural framing
 
-`/physics` is structured around two load-bearing concepts:
+`/physics` is a compiler that emits a numerical kernel, structured around two
+load-bearing concepts:
 
-- **The `PhysicsGraph`** (`docs/architecture/06-physics-graph.md`) — the
-  canonical compose-time data structure. Three node kinds (`Input`,
-  `FormulaApply`, `MethodInvoke`); typed dataflow edges; per-stage sidecars.
+- **The `PhysicsGraph`** (`[arch-06-physics-graph]`) — the canonical compose-time
+  data structure. Three node kinds, typed dataflow edges, per-stage sidecars.
   Every observable, every residual, every certificate is a node.
-- **The 4+1 stage compose-time pipeline** (`docs/architecture/07-pipeline.md`)
-  — symbolic lift → symmetry quotient → invariant synthesis (Stage 2.5) →
-  algebraic simplification → lowering + adjoint synthesis → runtime kernel. The earlier cheap/faithful split is
-  retired; every kernel emerging from Stage 4 is fast by construction
-  ("always-cheap" discipline).
+- **The 4+1 stage compose-time pipeline** (`[arch-07-pipeline]`) — symbolic lift
+  → symmetry quotient → invariant synthesis → algebraic simplification →
+  lowering + adjoint synthesis → runtime kernel. Stages 1–4 run once per crystal
+  identity; Stage 5 runs millions of times.
 
-## Where to start
-
-The spec lives in an atomic-file tree under `docs/`. The three legacy
-monoliths are regenerated from the tree by `docs/meta/assemble.py`.
-
-| Path | What it is |
-|---|---|
-| `docs/architecture/` | The conceptual specification, one concept per file. Start at `01-purpose.md` and `06-physics-graph.md`. **Single source of truth for vocabularies and category/bundle counts** (the formula count is owned by the registry CSV below). |
-| `docs/mvp/` | The diamond MVP projected onto the spec: γ̂ budget, three capabilities, decisions forced, build order. Start here for the build. |
-| `docs/implementation/` | Typed signatures, observable compositions, residual/cert machinery, phased build sequence. |
-| `docs/meta/conventions.md` | Atomic-file rules (frontmatter, anchors, lint discipline). |
-| `docs/meta/glossary.md` | One-line definitions for the load-bearing terms. |
-| `docs/meta/manifest.yaml` | Assembly order + named LLM-context bundles. |
-| `docs/formula-registry.md` | Narrative index over the closed formula registry. |
-| `docs/properties.md` | The nine property categories with bundle/formula-row mapping. |
-| `physics/library/formulas/registry-manifest.csv` | The canonical, machine-readable formula list (132 entries + 2 markers). |
-| `physics/research/` | Mathematical grounding: per-regime derivations and UWBG catalogs. |
-| `informed-operator/design/residual-loss-methodology.md` | PINO multi-source training methodology. |
-
-The regenerated monoliths (`docs/architecture.md`,
-`docs/implementation-plan.md`, `docs/mvp-slice.md`) are convenience reads only;
-edits go to the atomic files.
-
-## Directory map
+## Layout
 
 ```
 n-Op/
-├── README.md
-├── docs/
-│   ├── architecture/              atomic spec files (21 sections)
-│   ├── implementation/            atomic build-plan files (11 sections)
-│   ├── mvp/                       atomic diamond-MVP files (6 sections)
-│   ├── meta/                      manifest.yaml, conventions.md, glossary.md,
-│   │                              assemble.py, lint.py, AUDIT_PROMPT.md
-│   ├── audits/                    frozen audit records (never edited)
-│   ├── specs/                     wave / pass design specs
-│   ├── presentation/              decks (dated snapshots) + build tooling
-│   ├── architecture.md            regenerated monolith
-│   ├── implementation-plan.md     regenerated monolith
-│   ├── mvp-slice.md               regenerated monolith
-│   ├── formula-registry.md
-│   └── properties.md
+├── contents.md · index.md · glossary.md · instructions.md   the apparatus
+├── pages/                    the book — 47 canon pages
+│   └── appendix/             derivations (authority: supporting)
+├── tools/
+│   ├── apparatus.py          regenerate the apparatus + check invariants
+│   ├── build_book.py         the migration that produced pages/
+│   └── lint.py · seams.py    older checkers, pending retarget
 ├── physics/
-│   ├── library/                   code scaffold (no code yet) + the registry CSV and cert battery
-│   │   ├── formulas/registry-manifest.csv
-│   │   └── cert/reference-data/    machine-readable cert reference battery
-│   └── research/                   mathematical grounding + UWBG domain catalogs
-├── informed-operator/
-│   └── design/                     PINO residual-loss methodology
-└── interface/                      placeholder
+│   └── library/              code scaffold (no code yet)
+│       ├── formulas/registry-manifest.csv    the canonical formula registry
+│       └── cert/reference-data/              machine-readable cert battery
+├── docs/                     live work products only (audits/specs still executing)
+├── informed-operator/design/ PINO seam contract + loss methodology
+└── interface/                placeholder
 ```
+
+Run `python tools/apparatus.py` after editing any page: it restamps content
+hashes and regenerates `contents.md` / `index.md`. `--check` verifies without
+writing, and is the gate — it fails on a duplicate `canonical-for` topic, an
+asymmetric dependency edge, an unresolvable `[id]` reference, or a stale hash.
 
 ## Open decisions
 
-The **implementation language is decided** (arch-18, closed 2026-06): a
-polyglot of domain-specific DSLs joined at the Stage-4→Stage-5 codegen seam —
-**Haskell** hosts the Stage-1–4 symbolic compiler and the `arch-20` substrate,
-**Julia** is the Stage-5 runtime (Stage 4 emits Julia source), with **GAP**
-(offline group theory) and **Lean 4** (offline proofs) as sidecars. Everything
-in `docs/` remains language-neutral. Four decisions remain open — surrogate-net
-build vs adopt, the PDE-mesh adjoint scheme, the γ̂ §15.4 questions, and the
-Layer-1.75 V2 spec — see `docs/architecture/18-open-decisions.md` (the
-integrator interface closed 2026-07-16: a per-tier tangent + manifest hand-off,
-integrator consumer-side).
+Tracked in `[arch-18-open-decisions]`. The load-bearing ones:
 
-No code has been written yet. `physics/library/` is a code-free scaffold whose
-directory names match the architecture; its two populated corners are the
-canonical formula registry (`formulas/registry-manifest.csv`) and the cert
-reference battery (`cert/reference-data/`).
+- **Implementation language — open.** A polyglot proposal (a typed functional
+  compiler host with its own AD, a separate numeric runtime, offline computer
+  algebra and proof assistants) is one candidate configuration under evaluation,
+  not a commitment. Everything in the book stays language-neutral.
+- Surrogate-net build vs adopt; the PDE-mesh adjoint scheme; the γ̂ open
+  questions; the Layer-1.75 spec.
+- The **differentiability tag scheme is being redesigned** — three incompatible
+  definitions are currently in force and eleven smooth registry rows are
+  mis-tagged in a way that would ship them without adjoints.
+
+The integrator interface closed 2026-07-16: a per-tier tangent kernel plus a
+steppable-form manifest, with the integrator staying consumer-side.
+
+## Before changing anything physical
+
+Read `[traps]` — the standing traps register. Sign, unit, and reference-frame
+errors in this corpus have historically survived ordinary review and inverted
+real physics.

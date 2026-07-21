@@ -128,6 +128,10 @@ The `tag` (e.g. `4.2`) is a **display label**: regenerated freely, never cited. 
   <br/>canonical for: open decisions
 - **10.3** [AUDIT PROMPT — `/physics` module of n-Op](pages/10.3-audit-prompt.md) · `audit-prompt`
   <br/>canonical for: audit-prompt
+- **10.4** [Standing traps register](pages/10.4-traps.md) · `traps`
+  <br/>canonical for: standing traps register
+- **10.5** [Development timeline](pages/10.5-timeline.md) · `timeline`
+  <br/>canonical for: development timeline
 
 ## 11 — appendix derivations
 

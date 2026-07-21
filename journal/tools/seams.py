@@ -42,19 +42,49 @@ for path in EDITABLE:
                 findings['row-band'].append(f'{path.relative_to(REPO)}:{ln}: rows {lo}-{hi} — endpoint not in CSV')
 
 # (b2) `formula = <name>` arguments ---------------------------------------
-FORMULA_ARG = re.compile(r'formula\s*=\s*([A-Za-z0-9_.{|}-]+)')
+# A page may DECLARE unregistered names in its `unregistered-formulas`
+# frontmatter. Declared names are tracked, not defects; undeclared ones fail.
+# Inline mathematics is a separate violation (impl-04: "no inline math").
+FORMULA_ARG = re.compile(r'formula\s*=\s*(\{[^}]*\}[A-Za-z0-9_.-]*|[A-Za-z0-9_.-]+)')
+KEBAB = re.compile(r'^[A-Za-z][A-Za-z0-9]*(?:-[A-Za-z0-9]+)+$')
+
+def _declared(path):
+    txt = path.read_text(encoding='utf-8')
+    if not txt.startswith('---'):
+        return set()
+    fm = txt.split('---', 2)[1]
+    out, on = set(), False
+    for line in fm.splitlines():
+        if line.startswith('unregistered-formulas:'):
+            on = True; continue
+        if on:
+            if line.startswith('  - '): out.add(line[4:].strip())
+            elif line and not line[0].isspace(): break
+    return out
+
 for path in EDITABLE:
+    declared = _declared(path)
     for ln, line in enumerate(path.read_text(encoding='utf-8').splitlines(), 1):
         for m in FORMULA_ARG.finditer(line):
-            arg = m.group(1).strip('`')
-            if arg.startswith('{'):          # {a | b | c} alternation
-                cands = [c.strip() for c in arg.strip('{}').split('|')]
+            raw = m.group(1).strip('`')
+            if raw.startswith('{'):                       # {a | b | c}-suffix
+                head, _, suffix = raw.partition('}')
+                cands = [f"{c.strip()}{suffix}" for c in head.strip('{').split('|')]
             else:
-                cands = [arg]
+                cands = [raw]
             for c in cands:
-                if c and c not in row_names:
+                if not c:
+                    continue
+                if c in row_names or c in declared:
+                    continue
+                if not KEBAB.match(c):
+                    findings['inline-math'].append(
+                        f'{path.relative_to(REPO)}:{ln}: formula = {c} — inline mathematics '
+                        f'(impl-04-formulas forbids it; register a named row)')
+                else:
                     findings['formula-arg'].append(
-                        f'{path.relative_to(REPO)}:{ln}: formula = {c} — not a registry name')
+                        f'{path.relative_to(REPO)}:{ln}: formula = {c} — not a registry name '
+                        f'and not declared in unregistered-formulas')
 
 # (b) formula names in prose ----------------------------------------------
 NAMEISH = re.compile(r'`([a-z][a-z0-9]*(?:-[a-zA-Z0-9_*]+){2,})`')

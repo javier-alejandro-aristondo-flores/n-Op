@@ -63,3 +63,5 @@ breakdown-field-critical,β-Ga₂O₃ (C2/m),300 K [a] (E_g=4.9 eV ionization in
 breakdown-field-critical,β-Ga₂O₃ (C2/m),300 K [b],4.8 MV/cm,×0.3,Ghosh-Singisetti 2018 Table 1,monte-carlo,1,2026-07-16,2026-07-16
 breakdown-field-critical,β-Ga₂O₃ (C2/m),300 K [c*],7.6 MV/cm,×0.3,Ghosh-Singisetti 2018 Table 1,monte-carlo,1,2026-07-16,2026-07-16
 caughey-thomas-mu-n-set,β-Ga₂O₃ (C2/m),300 K,GAP — no consensus published fit; derive from μ(N_D) or acquire,—,Wave-2 audit confirmed genuine,gap,1,2026-07-16,2026-07-16
+mobility-electron-best-exp,GaN (wz),300 K,1265 cm2/Vs,×0.15,Ponce Jena Giustino PRB 100 085204 (2019) 10.1103/PhysRevB.100.085204 — best experimental value the FP study benchmarks its 1034 against; sigma carried from the sibling AlN best-exp row pending its own pin,experimental,1,2026-07-21,2026-07-21
+breakdown-field-critical,AlN (wz),300 K,12–15.4 MV/cm,range (theory only),"Wave-1 seeding; THEORY ONLY — AlN has no measured avalanche, so the measured value stays cert-refused (see the AlN alpha_ii GAP row and traps 23). Recorded as a range, not a pick",monte-carlo,1,2026-07-21,2026-07-21

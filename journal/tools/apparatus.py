@@ -288,6 +288,23 @@ def check_counts(pages: list[dict]) -> list[str]:
                 if int(n) != want:
                     errs.append(f"{r['rel']}: says {n} {phrase}; canon is {want}")
 
+    # The ledger's headline count against its own table's max row id. The
+    # glossary has asserted "lint checks it equals the table's max row id" since
+    # before any such check existed -- a claim of enforcement with nothing behind
+    # it, which is the exact failure the corpus has a rule about.
+    ledger = next((r for r in pages if r["id"] == "accuracy-ledger"), None)
+    if ledger is not None:
+        ids = [int(n) for n in re.findall(r"^\| (\d+) \|", ledger["body"], re.M)]
+        if ids:
+            top = max(ids)
+            for n in re.findall(r"(\d+)\s+ledger-tracked observables", ledger["body"]):
+                if int(n) != top:
+                    errs.append(f"{ledger['rel']}: says {n} ledger-tracked "
+                                f"observables; the table's max row id is {top}")
+            missing = sorted(set(range(1, top + 1)) - set(ids))
+            if missing:
+                errs.append(f"{ledger['rel']}: ledger rows missing: {missing}")
+
     # Per-tag diff tallies quoted in prose, e.g. "`D2` adjoint-required (23)".
     # This tally was computed here and compared against nothing for as long as it
     # has existed, so it drifted every time a row was retagged -- and a retag is

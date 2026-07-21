@@ -34,7 +34,7 @@ Every canonical topic and the single page that owns it. If a topic is not here, 
 | deriv-generator-catalog | 11.8 [Cheap-Residual Catalog & Residual-Generator Factory Specification](pages/11-appendix-derivations/11.8-deriv-generator-catalog.md) | `deriv-generator-catalog` |
 | deriv-high-field | 11.5 [Non-Equilibrium, High-Field, Hot-Carrier Physics for UWBG Chips](pages/11-appendix-derivations/11.5-deriv-high-field.md) | `deriv-high-field` |
 | deriv-ion-dynamics | 11.1 [Group A — Ion Dynamics: Structural, Mechanical, Thermal](pages/11-appendix-derivations/11.1-deriv-ion-dynamics.md) | `deriv-ion-dynamics` |
-| deriv-language-study | 11.9 [Implementation-language decision (`arch-18 §1`)](pages/11-appendix-derivations/11.9-deriv-language-study.md) | `deriv-language-study` |
+| deriv-language-study | 11.9 [Implementation-language decision (`arch-18-open-decisions`, open item 5)](pages/11-appendix-derivations/11.9-deriv-language-study.md) | `deriv-language-study` |
 | deriv-observable-catalog | 11.7 [UWBG Diamond-Centric Observable Catalog for n-Op `/physics`](pages/11-appendix-derivations/11.7-deriv-observable-catalog.md) | `deriv-observable-catalog` |
 | deriv-transport | 11.3 [Group C — Transport, Thermodynamic, Chemical/Surface](pages/11-appendix-derivations/11.3-deriv-transport.md) | `deriv-transport` |
 | development timeline | 10.5 [Development timeline](pages/10-process-and-governance/10.5-timeline.md) | `timeline` |

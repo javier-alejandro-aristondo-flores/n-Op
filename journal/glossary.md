@@ -39,6 +39,7 @@ the file that owns its full definition (`canonical-for`).
 | **State component** | One of the seven 1st-class DOFs: `γ̂, A, R, P, h, Π_h, Z`. | `arch-04-state` |
 | **Bundle** | One of 11 observable bundles `B1..B11` grouping observables by physics domain (electronic-structure … degradation); the canonical, residual-driving grouping. | `arch-09-vocabularies` |
 | **Cost tier** | `T0..T3` from closed-form (≤10 µs) to self-consistent / PDE solve (≤10 min). | `impl-04-formulas` |
+| **GAP** | Three senses, always disambiguate: the **missing-data marker** in reference data (cert-refused, never guessed); GAP the computer-algebra system (a candidate for the offline group-theory role); GAP the Gaussian Approximation Potential (an ML potential, survey only). Lowercase `gap` is the band gap. | `traps` §59 |
 | **Diff tag** | `D0 \| DN \| D1..D4` differentiability classification; `D2` requires an adjoint validated at registration. Spelled `DN`, not `DX`, to keep it clear of the DX center. | `impl-04-formulas` |
 | **OneShotCert** | Schema attached to Layer-1.25 dressed `MethodInvoke` nodes (G₀W₀, SCP-perturbative, LO/TO, Born-charge, ε∞, χ∞). | `impl-07-residual-factory` |
 | **IterativeResult** | Schema attached to Layer-1.75 dressed `MethodInvoke` nodes (V2-deferred; specified for forward compatibility). | `impl-07-residual-factory` |

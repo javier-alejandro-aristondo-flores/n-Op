@@ -38,8 +38,8 @@ the file that owns its full definition (`canonical-for`).
 | **BO levels** | The 4-level Born–Oppenheimer hierarchy partitioning state-component space: L1 quantum substrate, L2 BO surface, L3 equilibrium statistics, L4 non-equilibrium kinetics. Derivable from a node's transitive inputs. | `arch-08-bo-levels` |
 | **State component** | One of the seven 1st-class DOFs: `γ̂, A, R, P, h, Π_h, Z`. | `arch-04-state` |
 | **Bundle** | One of 11 observable bundles `B1..B11` grouping observables by physics domain (electronic-structure … degradation); the canonical, residual-driving grouping. | `arch-09-vocabularies` |
-| **Cost tier** | `T0..T3` from closed-form (≤10 µs) to self-consistent / PDE solve (≤10 min). | `formula-registry` |
-| **Diff tag** | `D0..D4` differentiability classification; `D2` requires adjoint validated at registration time. | `formula-registry` |
+| **Cost tier** | `T0..T3` from closed-form (≤10 µs) to self-consistent / PDE solve (≤10 min). | `impl-04-formulas` |
+| **Diff tag** | `D0 \| DX \| D1..D4` differentiability classification; `D2` requires an adjoint validated at registration. | `impl-04-formulas` |
 | **OneShotCert** | Schema attached to Layer-1.25 dressed `MethodInvoke` nodes (G₀W₀, SCP-perturbative, LO/TO, Born-charge, ε∞, χ∞). | `impl-07-residual-factory` |
 | **IterativeResult** | Schema attached to Layer-1.75 dressed `MethodInvoke` nodes (V2-deferred; specified for forward compatibility). | `impl-07-residual-factory` |
 | **Always-cheap discipline** | Compose-time guarantee that every kernel emerging from Stage 4 of the pipeline is fast by construction: specialization, symmetry quotienting, compression, and structural sharing collectively bound runtime cost below the training budget. | `arch-07-pipeline` |

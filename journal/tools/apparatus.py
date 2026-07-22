@@ -302,6 +302,28 @@ def check_counts(pages: list[dict]) -> list[str]:
     # superseded counts on purpose.
     VOCAB = {"residual categories": 19, "methods": 12, "templates": 20,
              "observable bundles": 11, "cert obligations": 10}
+
+    # ...and the constants above are themselves anchored, so they cannot quietly
+    # disagree with the pages that own the vocabularies. The owning page states
+    # its size in its own title; if someone adds a method and retitles 6.4, this
+    # fires until the constant is updated deliberately. Verified 2026-07-22
+    # against the actual lists: 12 methods, 20 templates, 11 bundles, 10
+    # obligations, 4 typeclasses, and 9+3+5+2 = 19 categories.
+    TITLE_ANCHOR = {"impl-02-methods": ("methods", r"(\d+) computational methods"),
+                    "impl-03-templates": ("templates", r"(\d+) abstract-property templates"),
+                    "impl-05-bundles": ("observable bundles", r"(\d+) observable bundles")}
+    for r in pages:
+        anchor = TITLE_ANCHOR.get(r["id"])
+        if not anchor:
+            continue
+        key, pat = anchor
+        m2 = re.search(pat, r.get("title", ""))
+        if not m2:
+            errs.append(f"{r['rel']}: title no longer states its vocabulary size "
+                        f"(expected /{pat}/) — the {key} count anchor is broken")
+        elif int(m2.group(1)) != VOCAB[key]:
+            errs.append(f"{r['rel']}: title says {m2.group(1)} {key}; "
+                        f"apparatus.py's canon constant is {VOCAB[key]}")
     for r in pages:
         body = CHANGELOG_RE.sub("", r["body"])
         for phrase, want in VOCAB.items():

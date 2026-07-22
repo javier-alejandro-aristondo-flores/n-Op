@@ -28,8 +28,8 @@ the file that owns its full definition (`canonical-for`).
 | **CompressionPlan** | Stage-4 codegen choice for compressed operator forms (HODLR, TT) and density-matrix encodings (`Basis × Form`). (general enum owned by `arch-06 §6.4`; `arch-15` owns the density-matrix `Basis × Form` subspace) | `arch-06-physics-graph` |
 | **Stage 1** | Symbolic lift: `PhysicsGraph` construction from named formulas + methods. | `arch-07-pipeline` |
 | **Stage 2** | Symmetry quotient: IBZ + irreps reduction (up to 48× fewer k-points in cubic systems). | `arch-07-pipeline` |
-| **Stage 3** | Algebraic simplification: hash-consing, structural-simplify, common-subexpression elimination. | `arch-07-pipeline` |
-| **Stage 4** | Lowering + adjoint synthesis: codegen, compression-plan instantiation, implicit-diff adjoint via Blondel 2022. | `arch-07-pipeline` |
+| **Stage 3** | Algebraic simplification: hash-consing, cross-formula common-subexpression elimination, tearing and alias elimination. Admitting a fourth rewrite is governed by the rewrite-admission rule. | `arch-07-pipeline` |
+| **Stage 4** | Four concurrent decisions: compression-plan selection, implicit-diff adjoint synthesis, the adjoint-tape materialization schedule, and codegen. | `arch-07-pipeline` |
 | **Stage 5** | Runtime kernel application (no graph mutation; pure evaluation). | `arch-07-pipeline` |
 | **pino-bridge** | The narrow protocol surface between `/physics` and `/informed-operator`. Two exports: `Validate` (differentiated residual + observable surface) and `Import` (external ground-truth ingestion). | `arch-16-pino-bridge` |
 | **Applicability classifier** | Typed predicate `(Crystal, Environment) → Bool` carried by every property, observable, and residual; drives Stage-1 graph pruning and the per-sample PINO loss mask. | `arch-13-applicability` |
@@ -74,7 +74,7 @@ the file that owns its full definition (`canonical-for`).
 | **RoaringCoverageMask** | Serialized Roaring bitmap over a flat lexicographic index built from a generator's `axes`; declares which axis tuples an imported datum constrains. Sparse-from-start by design. | `arch-16-pino-bridge` |
 | **Curriculum gating defaults** | Normative default schedule on `CategoryTag` participation by training fraction: Warmup `[0.00, 0.10)`, Refine `[0.10, 0.60)`, Polish `[0.60, 0.90)`, Cooldown `[0.90, 1.00]`. Overridable by `/informed-operator`. | `arch-11-residuals` |
 | **Catalog observables** | The 52 observables of [deriv-observable-catalog] Part C — a frozen historical stratum count. "52 observables" in older documents means this. | `accuracy-ledger` |
-| **Ledger-tracked observables** | Everything [accuracy-ledger] carries an accuracy regime for: the 52 catalog observables (#1–52) plus later additions (#53–59, the 2026-07 gap-audit rows). The ledger headline count; lint checks it equals the table's max row id. | `accuracy-ledger` |
+| **Ledger-tracked observables** | Everything [accuracy-ledger] carries an accuracy regime for: the 52 catalog observables (#1–52) plus later additions (#53–59, the 2026-07 gap-audit rows). The ledger headline count; `apparatus.py` checks it equals the table's max row id, and that no row id is missing. | `accuracy-ledger` |
 | **UnifiedState** | The signature name `pino-bridge.Validate` uses for the micro 7-tuple `x = (h, R_I, P_I, Π_h, Z_I, γ̂, A)` of `arch-04-state` — same object, bridge-surface name. | `arch-16-pino-bridge` |
 | **GENERIC** | The two-generator dynamics form `dx/dt = L·δE/δx + M·δS/δx` (General Equation for the Non-Equilibrium Reversible–Irreversible Coupling): `E` energy functional, `S` entropy functional, `L` antisymmetric Poisson operator, `M` PSD friction operator, with per-tier degeneracy conditions. Every regime is an extraction of it. | `arch-05-generic` |
 | **PhysicsGraph pipeline stages (4+1)** | See Stage 1–5 entries; stages 1–4 (+2.5) are compose-time, Stage 5 is the runtime kernel. | `arch-07-pipeline` |

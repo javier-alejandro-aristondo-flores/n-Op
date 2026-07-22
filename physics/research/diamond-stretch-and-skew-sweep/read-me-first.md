@@ -2,8 +2,8 @@
 
 > **Copy — the dataset itself lives at `/Pool/Diamond_Stretch_And_Skew_Sweep/`.** This is a
 > research-stratum companion describing an external DFT dataset (diamond lattice-distortion
-> sweeps, VASP 6.2.0, PBE + HSE06(α=0.27)); it is **not** part of the lint-enforced atomic tree
-> (`docs/architecture/`, `docs/implementation/`, `docs/mvp/`), which stays canonical. `/Pool` is
+> sweeps, VASP 6.2.0, PBE + HSE06(α=0.27)); it is **not** part of the book's canon pages
+> (`journal/pages/`, checked by `journal/tools/apparatus.py`), which stay canonical. `/Pool` is
 > the source of truth for both these documents and the data; if they ever disagree, `/Pool`
 > wins. The data is **not** in this repository and must not be — every run directory holds a
 > VASP-licensed POTCAR and this remote is public. Cite this suite from a spec via

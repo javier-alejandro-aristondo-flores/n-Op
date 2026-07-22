@@ -100,9 +100,12 @@ PROBES: list[tuple[str, str, str, str, str, str]] = [
      "journal/pages/09-reference-data-and-accuracy/9.1-accuracy-ledger.md",
      "## The 59 ledger-tracked observables", "## The 42 ledger-tracked observables",
      "ledger-tracked"),
+    # Keyed on trap 1, not the tail: a probe pointing at the last trap number goes
+    # stale every time the register grows, which is the failure this file exists to
+    # report rather than commit.
     ("trap numbering gap", "apparatus",
      "journal/pages/10-process-and-governance/10.4-traps.md",
-     "\n60. **", "\n61. **", "missing trap numbers"),
+     "\n1. **", "\n0. **", "missing trap numbers"),
     ("citation of a trap that does not exist", "apparatus",
      "journal/pages/01-purpose-and-product/1.4-principles.md",
      "# Architectural principles", "# Architectural principles\n\nSee `[traps]` §99.",

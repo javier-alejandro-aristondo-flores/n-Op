@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Does the book agree with the data files it describes?
 
-`apparatus.py` checks the book's own structure. This checks the seams between
+`check_book_structure.py` checks the book's own structure. This checks the seams between
 the book and everything it points at: the registry CSV, the reference-data
 CSVs, the glossary, and the design docs that consume the same vocabulary.
 
@@ -260,10 +260,10 @@ for _p in sorted((REPO / 'physics/library/cert/reference-data').glob('*.csv')):
         _v = (_r.get('Value') or '').strip()
         _label = f"{_r.get('Property')}/{_r.get('Material')}"
         if 'GAP' not in _v.upper() and not (_r.get('Uncertainty') or '').strip():
-            findings['refdata-sigma'].append(
+            findings['missing-uncertainty'].append(
                 f'{_p.name}: {_label} has no uncertainty (coupling-structure §8)')
         if not (_r.get('Source') or '').strip():
-            findings['refdata-source'].append(
+            findings['missing-source'].append(
                 f'{_p.name}: {_label} has no source (unprovenanced coefficient)')
 
 # (l) reference-data row arity, and (m) date sanity ------------------------
@@ -279,7 +279,7 @@ for _p in sorted((REPO / 'physics/library/cert/reference-data').glob('*.csv')):
     _width = len(_raw[0])
     for _n, _row in enumerate(_raw[1:], 2):
         if _row and len(_row) != _width:
-            findings['refdata-arity'].append(
+            findings['wrong-field-count'].append(
                 f'{_p.name}:{_n}: {len(_row)} fields, header has {_width} — a cell '
                 f'with an unquoted comma shifts every column after it')
     for _r in _csv.DictReader(_p.open(encoding='utf-8')):
@@ -292,14 +292,14 @@ for _p in sorted((REPO / 'physics/library/cert/reference-data').glob('*.csv')):
             try:
                 _seen[_f] = _dt.date.fromisoformat(_v)
             except ValueError:
-                findings['refdata-date'].append(
+                findings['bad-date'].append(
                     f'{_p.name}: {_label} has {_f}={_v!r}, not an ISO date')
                 continue
             if _seen[_f] > _TODAY:
-                findings['refdata-date'].append(
+                findings['bad-date'].append(
                     f'{_p.name}: {_label} has {_f}={_v}, which is in the future')
         if len(_seen) == 2 and _seen['Modified'] < _seen['Added']:
-            findings['refdata-date'].append(
+            findings['bad-date'].append(
                 f"{_p.name}: {_label} was Modified {_seen['Modified']} before it "
                 f"was Added {_seen['Added']}")
 
@@ -309,7 +309,7 @@ for _p in sorted((REPO / 'physics/library/cert/reference-data').glob('*.csv')):
 RELAX_WORDS = ('relax', 'soft', 'log-sum-exp', 'gumbel', 'sigmoid', 'smooth')
 for r in rows:
     if r[5].strip() == 'D4' and not any(w in r[7].lower() for w in RELAX_WORDS):
-        findings['d4-no-relaxation'].append(
+        findings['ungateable-d4-row'].append(
             f'registry row {r[0]} ({r[1]}): D4 with no relaxation named in `source`')
 
 # (i) glossary canonical pointers ------------------------------------------

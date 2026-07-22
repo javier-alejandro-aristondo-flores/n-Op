@@ -27,7 +27,7 @@ SCRATCH_MARKERS = (".claude/worktrees", ".claude\\worktrees")
 def current_commit(root: pathlib.Path) -> str | None:
     """Short HEAD hash, or None outside a git repo.
 
-    `calibrate.py` runs the checkers against a temporary copy that has no git
+    `check_the_checkers.py` runs the checkers against a temporary copy that has no git
     metadata; that is legitimate, so a missing commit is not an error."""
     try:
         done = subprocess.run(

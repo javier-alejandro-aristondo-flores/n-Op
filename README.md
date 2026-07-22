@@ -67,8 +67,8 @@ n-Op/
 │   ├── pages/NN-chapter/     one folder per chapter; 58 pages, 49 canon
 │   │   └── 11-appendix-derivations/   9 supporting derivations
 │   ├── live/                 work products still executing
-│   └── tools/                apparatus.py (regenerate + check) · seams.py (sweeps)
-│                             · calibrate.py (plants defects; proves the other two look)
+│   └── tools/                check_book_structure.py (regenerate + check) · check_data_agreement.py (sweeps)
+│                             · check_the_checkers.py (plants defects; proves the other two look)
 ├── physics/
 │   └── library/              code scaffold (no code yet)
 │       ├── formulas/registry-manifest.csv    the canonical formula registry
@@ -77,9 +77,9 @@ n-Op/
 └── interface/                placeholder
 ```
 
-Run `python journal/tools/apparatus.py` after editing any page: it restamps content
+Run `python journal/tools/check_book_structure.py` after editing any page: it restamps content
 hashes and regenerates `contents.md` / `index.md`. `--check` verifies without writing
-and is the gate, alongside `python journal/tools/seams.py`. Between them they fail on
+and is the gate, alongside `python journal/tools/check_data_agreement.py`. Between them they fail on
 a duplicate `canonical-for` topic, an asymmetric or missing dependency edge, an
 unresolvable `[id]`, a section coordinate or dated anchor that resolves to nothing, a
 line-number citation, a registry count, per-tag tally or per-tier distribution that
@@ -89,7 +89,7 @@ named relaxation, and a stale hash.
 **Green is not evidence a check ran.** Both checkers have shipped holes that made them
 skip whole classes of citation silently. Before citing a clean run, plant a defect of
 the class you are claiming is absent and confirm the checker fails (`[traps]` §58).
-`python journal/tools/calibrate.py` does exactly that — 50 probes into a temporary
+`python journal/tools/check_the_checkers.py` does exactly that — 50 probes into a temporary
 copy — and additionally reports any check that *no* probe reaches, since a calibration
 with holes in it is the same failure one level up.
 

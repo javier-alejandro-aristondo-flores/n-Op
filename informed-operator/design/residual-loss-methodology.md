@@ -116,7 +116,7 @@ For a residual to participate in gradient training, `∂L_res/∂θ` must exist 
 | **D3 — Finite-difference fallback** | Black-box residual, no adjoint available | Legacy VASP-wrapper observable | O(P × forward) where P = #params perturbed |
 | **D4 — Non-differentiable** | Discrete decisions, classifications | "is direct-gap?", phase label | Requires relaxation |
 
-> **Superseded legend (updated 2026-07-21).** The D-tags in this file are this proposal's own and are **not** the ones that shipped. `[impl-04-formulas]` is canonical; the vocabulary is `D0 | DN | D1 | D2 | D3 | D4`, and every difference below matters:
+> **Superseded legend (updated 2026-07-21).** The D-tags in this file are this proposal's own and are **not** the ones that shipped. `[named-formulas]` is canonical; the vocabulary is `D0 | DN | D1 | D2 | D3 | D4`, and every difference below matters:
 >
 > | Here | Canon |
 > |---|---|

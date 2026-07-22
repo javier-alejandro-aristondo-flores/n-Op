@@ -22,8 +22,8 @@ pages/11-appendix-derivations/   supporting material, ranks below canon
 live/            work products still executing
                    live/specs/   tracks current truth
                    live/audits/  frozen dated records
-tools/           apparatus.py (regenerate + check), seams.py (mechanical sweeps),
-                 calibrate.py (plants defects; proves the other two are looking)
+tools/           check_book_structure.py (regenerate + check), check_data_agreement.py (mechanical sweeps),
+                 check_the_checkers.py (plants defects; proves the other two are looking)
 ```
 
 Everything else in the repo is data or code, not book: `physics/library/` (the
@@ -106,10 +106,10 @@ Three rules that bite in practice:
 5. If you cite another page's `[id]` in prose, add it to your `depends-on`. Do
    **not** touch the other page's `referenced-by` — that field is generated from
    every page's `depends-on` and restamped like `content-hash`.
-6. Run `python journal/tools/apparatus.py`. It restamps hashes and regenerates
+6. Run `python journal/tools/check_book_structure.py`. It restamps hashes and regenerates
    the apparatus. Then confirm both checkers are clean:
-   `python journal/tools/apparatus.py --check` and
-   `python journal/tools/seams.py`.
+   `python journal/tools/check_book_structure.py --check` and
+   `python journal/tools/check_data_agreement.py`.
 
 ## 6. Renaming a registry formula
 
@@ -119,7 +119,7 @@ Registry names are content addresses. Renaming one is a rekey, not an edit, so
 1. Change the `Name` cell in `registry-manifest.csv`.
 2. Add a row to `physics/library/formulas/retired-names.csv` mapping the old name
    to the new one.
-3. Sweep the prose. `seams.py` fails on any retired name a page mentions without
+3. Sweep the prose. `check_data_agreement.py` fails on any retired name a page mentions without
    resolving it in the same paragraph — an appendix may keep the historical name
    as long as the paragraph says what it landed as.
 
@@ -137,7 +137,7 @@ mechanically. Do not produce one.
 
 ## 8. What the checkers enforce
 
-`python journal/tools/apparatus.py --check` fails on:
+`python journal/tools/check_book_structure.py --check` fails on:
 
 1. missing or unparseable frontmatter, or a missing required field
 2. duplicate `id`
@@ -162,7 +162,7 @@ representable — only staleness, which is item 4. And `status` read `draft` on
 all 58 pages, a field shaped exactly like a signal that carried none.
 **An invariant held by construction beats one held by a checker.**
 
-`python journal/tools/seams.py` fails on sixteen classes: row-band claims whose
+`python journal/tools/check_data_agreement.py` fails on sixteen classes: row-band claims whose
 endpoints are not in the CSV; backticked formula names that are not registry rows;
 `formula =` arguments carrying inline mathematics, or an undeclared name; divergent
 tolerance literals; duplicate glossary entries; retired formula names left
@@ -187,11 +187,11 @@ green does not mean a check ran: both checkers have shipped holes that made them
 silently skip whole classes of citation. Before citing a clean run as evidence,
 plant a defect of exactly the class you claim is absent and confirm the checker
 fails (`10.4-traps` §58). That is now a script:
-`python journal/tools/calibrate.py` plants a defect in a temporary copy and
+`python journal/tools/check_the_checkers.py` plants a defect in a temporary copy and
 asserts it fires — 50 probes. It reports three failure modes, and all three are
 holes: a **missed** probe is a hole in the checker; a **stale** probe — one whose
 planted text no longer exists — is a hole in the probe list; an **uncovered**
-check is one no probe reaches at all, which the script derives from `seams.py`'s
+check is one no probe reaches at all, which the script derives from `check_data_agreement.py`'s
 source rather than from a list it could drift from. That last mode exists because
 for most of this file's life the sentence above read "one defect per check" and
 was false of four seams classes and nine apparatus ones, while a clean run was

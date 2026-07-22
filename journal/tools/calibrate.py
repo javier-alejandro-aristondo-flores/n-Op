@@ -49,13 +49,19 @@ PROBES: list[tuple[str, str, str, str, str, str]] = [
      "journal/pages/01-purpose-and-product/1.4-principles.md",
      "# Architectural principles", "# Architectural principles\n\nSee [arch-13-applicability].",
      "does not depends-on"),
+    # The three `referenced-by` probes below plant the three ways a generated
+    # field can disagree with its derivation: an entry too many, an entry naming
+    # nothing, and an entry missing because a forward edge was added. All three
+    # now surface as staleness -- the field is derived from `depends-on`, so
+    # asymmetry and dangling ids are not representable, only out-of-date.
+    #
     # Mutates an existing list rather than an empty one: a probe keyed on
     # `referenced-by: []` goes STALE the moment that page gains a consumer,
     # which is exactly what happened to its first version.
-    ("asymmetric edge (reverse)", "apparatus",
+    ("referenced-by with an entry too many", "apparatus",
      "journal/pages/01-purpose-and-product/1.4-principles.md",
      "referenced-by:", "referenced-by:\n  - product",
-     "is referenced-by"),
+     "stale referenced-by"),
     ("dated anchor that does not resolve", "apparatus",
      "journal/pages/01-purpose-and-product/1.4-principles.md",
      "# Architectural principles", "# Architectural principles\n\nSee [timeline] §1999-01-01.",
@@ -80,9 +86,6 @@ PROBES: list[tuple[str, str, str, str, str, str]] = [
      "journal/pages/01-purpose-and-product/1.4-principles.md",
      "  - architectural principles", "  - architectural principles\n  - PURPOSE",
      "different casing"),
-    ("out-of-vocabulary status", "apparatus",
-     "journal/pages/01-purpose-and-product/1.4-principles.md",
-     "status: draft", "status: drfat", "is not draft"),
     ("out-of-vocabulary authority", "apparatus",
      "journal/pages/01-purpose-and-product/1.4-principles.md",
      "authority: canon", "authority: cannon", "is not canon"),
@@ -139,22 +142,21 @@ PROBES: list[tuple[str, str, str, str, str, str]] = [
     ("duplicate id", "apparatus",
      "journal/pages/01-purpose-and-product/1.1-purpose.md",
      "id: arch-01-purpose", "id: impl-01-principles", "duplicate id"),
-    ("page filed under the wrong chapter folder", "apparatus",
-     "journal/pages/01-purpose-and-product/1.4-principles.md",
-     "chapter: 1\n", "chapter: 3\n", "filed under"),
     ("depends-on naming no page", "apparatus",
      "journal/pages/01-purpose-and-product/1.4-principles.md",
      "depends-on:\n", "depends-on:\n  - arch-99-nope\n", "depends-on unknown id"),
     ("referenced-by naming no page", "apparatus",
      "journal/pages/01-purpose-and-product/1.4-principles.md",
      "referenced-by:\n", "referenced-by:\n  - arch-99-nope\n",
-     "referenced-by unknown id"),
-    # The reverse direction has its own probe above. Both are needed: the forward
-    # check and the backward check are separate loops, and for most of this
-    # corpus's life only one of them existed.
-    ("asymmetric edge (forward)", "apparatus",
+     "stale referenced-by"),
+    # A new forward edge must show up on the other end. This is the direction
+    # that matters in practice: `referenced-by` is what a reader follows to find
+    # a page's consumers, and for most of this corpus's life adding a
+    # `depends-on` by hand left the far end silently incomplete.
+    ("referenced-by missing after a new forward edge", "apparatus",
      "journal/pages/01-purpose-and-product/1.4-principles.md",
-     "depends-on:\n", "depends-on:\n  - arch-14-topology\n", "does not list it"),
+     "depends-on:\n", "depends-on:\n  - arch-14-topology\n",
+     "stale referenced-by"),
     ("gap in the ledger's row numbering", "apparatus",
      "journal/pages/09-reference-data-and-accuracy/9.1-accuracy-ledger.md",
      "\n| 30 |", "\n| 31 |", "ledger rows missing"),

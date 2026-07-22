@@ -35,7 +35,7 @@ registry CSV, `retired-names.csv`, and the reference-data CSVs),
 | | what it is | use it for | stability |
 |---|---|---|---|
 | `id` | `arch-07-pipeline`, `accuracy-ledger` | **the address.** Every citation. | permanent |
-| `tag` | `4.2` | a display label for humans skimming | **disposable** — regenerated freely |
+| `tag` | `4.2` | a display label for humans skimming | **disposable** — read off the filename, never written |
 | `content-hash` | `73b6142e008f` | did this page change under my working copy? | changes on every edit |
 
 **Cite the `id`, never the tag and never the file path.** Filenames and tags are
@@ -97,9 +97,9 @@ Three rules that bite in practice:
    `canonical-for` is machine-checked; duplicating a fact will eventually be
    caught, but duplicating it *silently* is what rots a corpus.
 4. Edit the page body. Leave the `content-hash` alone.
-5. If you cite another page's `[id]` in prose, add it to `depends-on` and add
-   yourself to that page's `referenced-by`. The checker derives this and will
-   tell you if you forget.
+5. If you cite another page's `[id]` in prose, add it to your `depends-on`. Do
+   **not** touch the other page's `referenced-by` — that field is generated from
+   every page's `depends-on` and restamped like `content-hash`.
 6. Run `python journal/tools/apparatus.py`. It restamps hashes and regenerates
    the apparatus. Then confirm both checkers are clean:
    `python journal/tools/apparatus.py --check` and
@@ -134,19 +134,27 @@ mechanically. Do not produce one.
 `python journal/tools/apparatus.py --check` fails on:
 
 1. missing or unparseable frontmatter, or a missing required field
-2. duplicate `id`, or a page filed in a folder its `chapter` does not match
+2. duplicate `id`
 3. **duplicate `canonical-for` topic** — the anti-drift invariant
-4. asymmetric `depends-on` / `referenced-by`
+4. a `depends-on` naming no page, or a stale generated `referenced-by`
 5. an `[id]` reference in prose that resolves to no page
 6. a body citing an `[id]` without the corresponding `depends-on` edge
 7. a section coordinate that resolves to no heading in the target
 8. a line-number citation (`file.md:42`) — line refs rot on every edit
 9. a registry count claim that disagrees with the CSV, including a per-tag
-   diff tally and a per-tier cost distribution quoted in prose
+   diff tally, a per-tier cost distribution, and the probe count
 10. a duplicated or skipped trap number, or a `[traps] §N` citing one that
     does not exist
-11. an out-of-vocabulary `status` or `authority`
+11. an out-of-vocabulary `authority`
 12. a stale `content-hash`
+
+Three former checks are gone because what they policed is gone. `chapter`,
+`chapter-name` and `tag` are read off the path instead of restated in
+frontmatter, so they cannot disagree with it. `referenced-by` is derived from
+every page's `depends-on`, so asymmetry and dangling reverse entries are not
+representable — only staleness, which is item 4. And `status` read `draft` on
+all 58 pages, a field shaped exactly like a signal that carried none.
+**An invariant held by construction beats one held by a checker.**
 
 `python journal/tools/seams.py` fails on sixteen classes: row-band claims whose
 endpoints are not in the CSV; backticked formula names that are not registry rows;
@@ -174,7 +182,7 @@ silently skip whole classes of citation. Before citing a clean run as evidence,
 plant a defect of exactly the class you claim is absent and confirm the checker
 fails (`10.4-traps` §58). That is now a script:
 `python journal/tools/calibrate.py` plants a defect in a temporary copy and
-asserts it fires — 52 probes. It reports three failure modes, and all three are
+asserts it fires — 50 probes. It reports three failure modes, and all three are
 holes: a **missed** probe is a hole in the checker; a **stale** probe — one whose
 planted text no longer exists — is a hole in the probe list; an **uncovered**
 check is one no probe reaches at all, which the script derives from `seams.py`'s

@@ -47,7 +47,7 @@ ROOT = pathlib.Path(__file__).resolve().parent.parent
 PAGES = ROOT / "pages"
 REPO = ROOT.parent
 
-REQUIRED = ("id", "title", "chapter", "tag", "authority", "content-hash")
+REQUIRED = ("id", "title", "authority", "content-hash")
 FM_RE = re.compile(r"\A---\n(.*?)\n---\n", re.DOTALL)
 REF_RE = re.compile(r"\[([a-z0-9][a-z0-9-]{2,})\]")
 
@@ -90,7 +90,23 @@ def parse(path: pathlib.Path) -> dict | None:
             rec[sm.group(1)] = [] if sm.group(2).strip() == "[]" else None
     for name in ("canonical-for", "depends-on", "referenced-by"):
         rec[name] = list_field(fm, name)
+    rec.update(shelf_position(path))
     return rec
+
+
+def shelf_position(path: pathlib.Path) -> dict:
+    """Where the page sits, read off the path rather than restated in it.
+
+    `chapter`, `chapter-name` and `tag` used to be hand-written frontmatter
+    that duplicated the folder and the filename exactly -- 174 lines across 58
+    pages holding nothing the path did not already say, plus a checker whose
+    only job was confirming the two agreed. Deriving them makes the agreement
+    unbreakable and deletes the check with the redundancy that needed it."""
+    folder = path.parent.name                       # 04-pipeline-and-compilation
+    number, _, slug = folder.partition("-")
+    return {"chapter": number.lstrip("0") or "0",
+            "chapter-name": slug,
+            "tag": path.name.split("-", 1)[0]}      # 4.4-computational-overview.md
 
 
 def list_field(fm: str, name: str) -> list[str]:
@@ -128,6 +144,19 @@ def sort_key(r: dict) -> tuple:
     return (int(ch or 0), int(n or 0))
 
 
+def consumers(pages: list[dict]) -> dict[str, list[str]]:
+    """id -> the pages that depends-on it, sorted. The generated
+    `referenced-by`. Only ids that resolve are listed: a dangling `depends-on`
+    is reported by its own check rather than propagated into a second field."""
+    known = {r["id"] for r in pages}
+    out: dict[str, list[str]] = {r["id"]: [] for r in pages}
+    for r in pages:
+        for dep in r["depends-on"]:
+            if dep in known:
+                out[dep].append(r["id"])
+    return {k: sorted(set(v)) for k, v in out.items()}
+
+
 def check(pages: list[dict]) -> list[str]:
     errs: list[str] = []
 
@@ -136,22 +165,18 @@ def check(pages: list[dict]) -> list[str]:
             if not r.get(f):
                 errs.append(f"{r['rel']}: missing frontmatter field `{f}`")
 
-    # `status` and `authority` are closed vocabularies; a typo would otherwise
-    # invent a state nothing handles.
+    # `authority` is a closed vocabulary; a typo would otherwise invent a rank
+    # the authority order does not handle. (`status` was a closed vocabulary
+    # too, and was deleted: all 58 pages read `draft`, so the field carried no
+    # information while looking exactly like a signal.)
     for r in pages:
-        if r.get("status") and r["status"] not in ("draft", "review", "stable"):
-            errs.append(f"{r['rel']}: status `{r['status']}` is not "
-                        f"draft | review | stable")
         if r.get("authority") not in ("canon", "supporting"):
             errs.append(f"{r['rel']}: authority `{r.get('authority')}` is not "
                         f"canon | supporting")
 
-    for r in pages:
-        want = f"{int(r['chapter']):02d}-{r.get('chapter-name','')}"
-        got = r["path"].parent.name
-        if got != want:
-            errs.append(f"{r['rel']}: filed under {got}/ but frontmatter says "
-                        f"chapter {r['chapter']} ({want}/)")
+    # No chapter-versus-folder check: `chapter`, `chapter-name` and `tag` are
+    # now read off the path (`shelf_position`), so they cannot disagree with it.
+    # An invariant held by construction beats one held by a checker.
 
     seen: dict[str, str] = {}
     for r in pages:
@@ -179,23 +204,19 @@ def check(pages: list[dict]) -> list[str]:
     by_id = {r["id"]: r for r in pages}
     for r in pages:
         for dep in r["depends-on"]:
-            t = by_id.get(dep)
-            if t is None:
+            if dep not in by_id:
                 errs.append(f"{r['rel']}: depends-on unknown id `{dep}`")
-            elif r["id"] not in t["referenced-by"]:
-                errs.append(
-                    f"asymmetry: {r['id']} depends-on {dep}, but {dep} does not list it")
-        # ...and the reverse. Only one direction was checked, so a stale
-        # `referenced-by` entry left by a deleted citation survived silently --
-        # and `referenced-by` is what a reader follows to find consumers.
-        for back in r["referenced-by"]:
-            t = by_id.get(back)
-            if t is None:
-                errs.append(f"{r['rel']}: referenced-by unknown id `{back}`")
-            elif r["id"] not in t["depends-on"]:
-                errs.append(
-                    f"asymmetry: {r['id']} is referenced-by {back}, "
-                    f"but {back} does not depends-on it")
+
+    # `referenced-by` is generated, not authored. It was 381 hand-kept entries
+    # mirroring 381 `depends-on` entries exactly, guarded by a two-direction
+    # symmetry check that existed solely to police the duplication. Now it is
+    # derived and restamped like `content-hash`, so asymmetry and unknown-id
+    # entries are both unrepresentable. This check is the freshness gate.
+    want = consumers(pages)
+    for r in pages:
+        if r["referenced-by"] != want[r["id"]]:
+            errs.append(f"{r['rel']}: stale referenced-by; regenerate "
+                        f"(have {r['referenced-by']}, derived {want[r['id']]})")
 
     # Every bracketed lowercase token is checked, not just the arch/impl/mvp/deriv
     # families: the old prefix filter skipped `[instructions]`, `[product]`,
@@ -367,40 +388,19 @@ def check_counts(pages: list[dict]) -> list[str]:
     # "N probes" — the calibration's own size, quoted in four places. It drifted
     # the moment two probes were added, which is the same failure the calibration
     # exists to catch, one level up again. Counted from calibrate.py's source.
-    cal = ROOT / "tools" / "calibrate.py"
-    if cal.exists():
-        cal_src = cal.read_text(encoding="utf-8")
-        # PROBES rows plus the calibrated guards that are not PROBES rows.
-        # Counting only the rows published a number smaller than the number of
-        # things actually calibrated — the same drift, one level up again.
-        guards = re.search(r"^GUARD_PROBES\s*=\s*(\d+)", cal_src, re.M)
-        want = (len(re.findall(r'^\s{4}\("', cal_src, re.M))
-                + (int(guards.group(1)) if guards else 0))
-        if want:
-            # The probe count is quoted outside `pages/` too. `README.md` and
-            # `instructions.md` both carried it, and neither was ever checked --
-            # this loop only ever walked `pages`, so two of the five sites drifted
-            # with nothing looking. `instructions.md` is the file an agent reads
-            # first, which makes it the worst place to be wrong.
-            quoting = [(r["rel"], r["body"], r["id"]) for r in pages]
-            for extra in (ROOT / "instructions.md", ROOT.parent / "README.md"):
-                if extra.exists():
-                    quoting.append((extra.name, extra.read_text(encoding="utf-8"),
-                                    extra.stem))
-            for rel, body, pid in quoting:
-                # [timeline] is a dated record: its entries state what was true on
-                # a day, and rewriting them to today's number destroys the record.
-                if pid == "timeline":
-                    continue
-                # Allow up to two intervening words: the first version of this
-                # check required the number to abut "probes", and `[traps]` §58 --
-                # the trap about checkers that are not looking -- said "29 SUCH
-                # probes" and was skipped for exactly that reason.
-                for n, _ in re.findall(r"(\d+)((?:\s+\w+){0,2})\s+probes\b",
-                                       CHANGELOG_RE.sub("", body)):
-                    if int(n) != want:
-                        errs.append(f"{rel}: says {n} probes; calibrate.py "
-                                    f"defines {want}")
+    # The probe count is derived and restamped by `rewrite_probe_count`; this is
+    # the freshness gate for `--check`, which writes nothing. Allowing up to two
+    # intervening words matters: the first version required the number to abut
+    # "probes", and `[traps]` §58 -- the trap about checkers that are not looking
+    # -- says "29 SUCH probes" and was skipped for exactly that reason.
+    want = probe_count()
+    if want:
+        for label, _path, body in quoting_probe_count(pages):
+            for n, _mid, _tail in PROBE_COUNT_RE.findall(
+                    CHANGELOG_RE.sub("", body)):
+                if int(n) != want:
+                    errs.append(f"{label}: says {n} probes; calibrate.py "
+                                f"defines {want} — run apparatus.py to restamp")
 
     # Cost-tier distributions, the diff tally's twin. Only the diff tally was
     # checked, so the tier line beside it drifted to 75/40/13/4 against an actual
@@ -574,6 +574,84 @@ def render_index(pages: list[dict]) -> str:
     return "\n".join(out)
 
 
+PROBE_COUNT_RE = re.compile(r"(\d+)((?:\s+\w+){0,2})(\s+probes\b)")
+
+
+def probe_count() -> int | None:
+    """How many things `calibrate.py` actually calibrates: PROBES rows plus the
+    guards that cannot be PROBES rows."""
+    cal = ROOT / "tools" / "calibrate.py"
+    if not cal.exists():
+        return None
+    src = cal.read_text(encoding="utf-8")
+    guards = re.search(r"^GUARD_PROBES\s*=\s*(\d+)", src, re.M)
+    n = (len(re.findall(r'^\s{4}\("', src, re.M))
+         + (int(guards.group(1)) if guards else 0))
+    return n or None
+
+
+def quoting_probe_count(pages: list[dict]) -> list[tuple[str, pathlib.Path, str]]:
+    """(label, path, text) for every file that quotes the probe count.
+
+    `README.md` and `instructions.md` quote it and live outside `pages/`; the
+    check that compares it against prose only ever walked `pages`, so two of the
+    five sites drifted unwatched -- one of them the file an agent reads first.
+    `[timeline]` is excluded: its entries state what was true on a day."""
+    out = [(r["rel"], r["path"], r["body"]) for r in pages if r["id"] != "timeline"]
+    for extra in (ROOT / "instructions.md", ROOT.parent / "README.md"):
+        if extra.exists():
+            out.append((extra.name, extra, extra.read_text(encoding="utf-8")))
+    return out
+
+
+def rewrite_probe_count(pages: list[dict]) -> int:
+    """Restamp the probe count in prose, the way `content-hash` is restamped.
+
+    This number is a fact about a Python list, transcribed into English in five
+    places. It drifted 45 -> 47 -> 48 -> 49 -> 50 over one working pass, and
+    50 -> 52 -> 50 over the pass that wrote this function -- every move touching
+    four or five files. Checking it only converts the drift into a failing run
+    somebody then fixes by hand. Deriving it means nobody types it again."""
+    want = probe_count()
+    if want is None:
+        return 0
+    n = 0
+    for _label, path, _text in quoting_probe_count(pages):
+        text = path.read_text(encoding="utf-8")
+        head, sep, changelog = text.partition("\n## Changelog")
+        fixed = PROBE_COUNT_RE.sub(
+            lambda m: f"{want}{m.group(2)}{m.group(3)}"
+            if m.group(1) != str(want) else m.group(0), head)
+        if fixed != head:
+            path.write_text(fixed + sep + changelog, encoding="utf-8")
+            n += 1
+    return n
+
+
+def rewrite_consumers(pages: list[dict]) -> int:
+    """Write the derived `referenced-by` block into each page.
+
+    Runs before the hashes are restamped: `referenced-by` is frontmatter, so it
+    does not enter the body hash, but the file must settle before anything else
+    reads it."""
+    want = consumers(pages)
+    n = 0
+    for r in pages:
+        derived = want[r["id"]]
+        if r["referenced-by"] == derived:
+            continue
+        block = ("referenced-by: []" if not derived else
+                 "referenced-by:\n" + "\n".join(f"  - {c}" for c in derived))
+        text = r["path"].read_text(encoding="utf-8")
+        # Replace the whole field: the key line plus any `  - ` items under it.
+        text = re.sub(r"^referenced-by:(?:[^\n]*)(?:\n  - [^\n]*)*",
+                      lambda _m: block, text, count=1, flags=re.MULTILINE)
+        r["path"].write_text(text, encoding="utf-8")
+        r["referenced-by"] = derived
+        n += 1
+    return n
+
+
 def restamp(pages: list[dict]) -> int:
     """Rewrite stale content-hash values in place. The hash is tool-maintained:
     regenerating restamps it, --check verifies it."""
@@ -606,6 +684,14 @@ def main() -> int:
         return 1
 
     if not args.check:
+        c = rewrite_consumers(pages)
+        if c:
+            print(f"rewrote referenced-by on {c} page(s)")
+        # Before restamping: this rewrites bodies, which changes their hashes.
+        p = rewrite_probe_count(pages)
+        if p:
+            print(f"restamped the probe count in {p} file(s)")
+            pages = load()
         n = restamp(pages)
         if n:
             print(f"restamped {n} content-hash value(s)")

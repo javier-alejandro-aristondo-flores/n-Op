@@ -151,5 +151,5 @@ The `tag` (e.g. `4.2`) is a **display label**: regenerated freely, never cited. 
   <br/>canonical for: deriv-observable-catalog
 - **11.8** [Cheap-Residual Catalog & Residual-Generator Factory Specification](pages/11-appendix-derivations/11.8-deriv-generator-catalog.md) · `deriv-generator-catalog` *(supporting)*
   <br/>canonical for: deriv-generator-catalog
-- **11.9** [Implementation-language decision (`arch-18-open-decisions`, open item 4)](pages/11-appendix-derivations/11.9-deriv-language-study.md) · `deriv-language-study` *(supporting)*
+- **11.9** [Implementation-language decision (`arch-18-open-decisions`, open item 5)](pages/11-appendix-derivations/11.9-deriv-language-study.md) · `deriv-language-study` *(supporting)*
   <br/>canonical for: deriv-language-study

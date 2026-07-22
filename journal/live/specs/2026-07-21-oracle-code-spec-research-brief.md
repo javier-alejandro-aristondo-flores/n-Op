@@ -8,7 +8,7 @@
 
 **Terminal deliverable.** Executing the research program defined in this brief produces **one document that fully *specifies*, but does not *implement*, the code of the `/physics` oracle.** "Fully specifies" means: every module, data structure, algorithm, numerical method, type signature, contract, and tolerance is pinned to the point that implementation is a mechanical act — a competent engineer could type it out with no further research and no open design questions.
 
-**What the oracle is (why the spec matters).** The oracle is a compiler: it takes a material identity and emits an immutable, content-addressed *oracle-file* — a pure function that **scores** a complete candidate state against the laws of physics (keyed law-violation residuals + requested observables + optional cotangents + a certificate), and never solves, completes, or judges. It is the physics-informed loss term and the certifier for the program's end goal — **property-targeted crystal design** (desired properties in, structure out, produced by a learned proposer that the oracle disciplines). This brief specifies the **oracle**; the learned proposer and the driving loops are separate systems and are out of scope here (§2).
+**What the oracle is (why the spec matters).** The oracle is a compiler: it takes a material identity and emits an immutable, content-addressed *oracle-file* — a pure function that **scores** a complete candidate state against the laws of physics (keyed law-violation residuals + requested observables + optional cotangents + a certificate), and never solves, completes, or judges. It is the **physics-informed residual-loss term** — and the certifier — for training the neural operator (`/informed-operator`): the oracle scores an emitted candidate state and returns keyed residuals plus their cotangents, which enter that operator's training loss. This brief specifies the **oracle**; the operator and the driving loops are separate systems and are out of scope here (§2). The longer-range aim the corpus states — property-targeted crystal design — is a *direction*, not a mechanism assumed here: inverse design is explicitly out of scope for `/physics` (`arch-17-out-of-scope`), and no separate "proposer" component is specified anywhere in the corpus.
 
 **How this brief is used.** The research program (§4) is decomposed into independent, individually-dispatchable **research units (R#)**. Each names its objective, its internal sources, the external research it requires (academic literature or engineering/tooling references, each consulted once), and a concrete definition-of-done. Units are sized so that one agent can close one unit and return a self-contained specification fragment; the fragments assemble into the terminal code spec (§5). Correctness-critical units carry an adversarial-verification step.
 
@@ -27,7 +27,7 @@
 - The **consumer seams only**: the `Validate` / `Import` / dynamics-hand-off contracts, specified to honor the oracle-contract requirements in §3.4.
 
 **Out of scope (do not chase):**
-- The learned proposer (`/informed-operator`) and the driving loops (`/interface`) — their *internals*. Only their seams to the oracle are in scope.
+- The **neural operator** (`/informed-operator`) and the driving loops (`/interface`) — their *internals*. Only their seams to the oracle are in scope.
 - The **evolver / time-evolution lowering** — it is a decided-in-principle but deferred sibling and lands as its own named wave; this brief specifies only that the oracle contract does not foreclose it (§3.4, req. 5).
 - The **V2 physics upgrades and out-of-scope phenomena** enumerated in `arch-17-out-of-scope` (e.g. live NEGF / SCPH / 4-phonon BTE / non-adiabatic AHC / absolute Berry-phase polarization / strongly-correlated `γ̂`). The spec must preserve their refusal paths, not implement them.
 
@@ -44,8 +44,9 @@ Compile-once, call-many. The CLI compiles a `(PeriodicityStructure, SiteDecorati
 
 ### 3.2 Behavioral invariants
 - **Score, not solve.** The caller supplies complete candidate states; the oracle never fills in missing pieces, owns no loop, evolves nothing.
+- **Numerics-agnostic at the seam, committed within.** The emitted oracle assumes nothing about its caller — pure function, flat arrays at the boundary, no loop ownership. This is *not* substrate-agnosticism in general: internally `/physics` is committed to the representation substrate of `[arch-20-representations]` (`[impl-01-principles]` principle 8). The spec must keep these two facts separate — the boundary is portable, the interior is not.
 - **Evidence, never verdicts.** Keyed floats only — raw per-slot residuals; no normalization, weighting, summation, or judgment anywhere in the product.
-- **Refusal is absence.** A check the oracle cannot stand behind is simply not present in the compiled kernel; its key is absent from every map.
+- **Refusal is absence — with two distinct regimes.** A check the oracle cannot stand behind is simply not present in the compiled kernel; its key is absent from every map. The regimes must not be conflated (`[impl-01-principles]` principle 6): a degeneracy is caught **at compose time** and refused there *with a numeric witness*; it is never raised from the compiled kernel. **At runtime** there are no exceptions at all — failure surfaces as a `Failed` cert leaf carrying its witness. Consequence for the spec: the compile-time refusal path and the runtime `Failed`-leaf path are separate surfaces with separate enumerations.
 - **Trust travels with the file.** Each oracle-file carries a hash-pinned certificate reference.
 
 ### 3.3 The tractability spine (governs how targets and observables are organized)
@@ -53,14 +54,14 @@ Two facts keep the observable/target space finite and cross-coupling free of com
 - **Closed vocabulary.** A fixed grammar — 3 inputs, a 7-tuple state, 132 named formulas, 11 observable bundles, 19 residual categories, 10 cert obligations, 4 typeclasses. The channel space is enumerable, not open-ended.
 - **Generative-functional collapse.** The physics is one metriplectic law, `dx/dt = L·δE/δx + M·δS/δx` — two scalar functionals (energy E, entropy S) and two operators (reversible L, dissipative M) on one state. Every property, every parameter-axis dependence, and every cross-coupling (thermoelastic, piezoresistive, thermoelectric, piezoelectric …) is a derivative/projection of E and S — not an independently enumerated object. Consequence for the spec: expose only the **primitive** axes (temperature, frequency, field, strain, direction); axis *combinations* are cross-derivatives and must fall out for free, never be enumerated.
 
-### 3.4 The oracle-contract requirements (forward-compatibility with inverse design)
-The contract must guarantee all six, so a learned proposer can be trained/certified against the oracle without the contract being reopened later:
+### 3.4 The oracle-contract requirements (forward-compatibility for target-pinning)
+The contract must guarantee all six, so the neural operator can be trained and certified against the oracle — and targets pinned against it — without the contract being reopened later:
 1. **Granular, keyed, per-channel residuals + observables — never aggregated.** (Enables per-channel loss terms.)
 2. **Axis-keyed slots** (`ResidualKey = (producer, axis-tuple)`) with axis coordinates in the static schema. (Makes functional/curve targets representable as sets of per-axis-point slots.)
 3. **Every *targetable* observable is on the differentiable path** (baked adjoint → cotangents), carries a σ, and is pinnable as a target — not a forward-only readout. In the current differentiability vocabulary (`D0 | DN | D1 | D2 | D3 | D4`, owned by `impl-04-formulas`) this means **targetable ⇒ `D1`/`D2`/`D3`**; `DN` rows (no useful derivative — integer, categorical, boolean, set-valued) cannot be differentiable targets at all, and `D4` rows (relaxed: argmin / hull / sort / discrete) are targetable only through their declared relaxation.
 4. **The primitive targetable axes are exposed** (temperature, frequency, field, strain, direction); combinations are automatic (§3.3).
 5. **The scorer/evolver split is kept clean** so time-dependent targets can later attach via the evolver sibling; nothing is baked that forecloses it.
-6. **One shared namespace** across state channels ↔ observable keys ↔ residual keys, so proposer and oracle compose.
+6. **One shared namespace** across state channels ↔ observable keys ↔ residual keys, so the operator and the oracle compose.
 
 ### 3.5 The diamond MVP acceptance test (the first end-to-end validation target)
 The MVP code spec must be validated by this test (also recorded in [mvp-03-capabilities], Cap 1):

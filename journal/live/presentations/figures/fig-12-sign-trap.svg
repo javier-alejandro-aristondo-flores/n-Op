@@ -1,0 +1,39 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 560 300" font-family="Charter, Georgia, 'Times New Roman', serif">
+  <defs>
+    <marker id="a" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+      <path d="M0 0 L10 5 L0 10 z" fill="#000000"/>
+    </marker>
+    <pattern id="hatch" width="6" height="6" patternTransform="rotate(45)" patternUnits="userSpaceOnUse">
+      <line x1="0" y1="0" x2="0" y2="6" stroke="#999999" stroke-width="0.6"/>
+    </pattern>
+  </defs>
+
+  <!-- two conventions, bare -->
+  <text x="126" y="46" font-size="8" text-anchor="middle" font-style="italic">convention A</text>
+  <text x="126" y="74" font-size="11" text-anchor="middle">P = + b · x (1 − x)</text>
+  <text x="126" y="94" font-size="9" text-anchor="middle">b &gt; 0</text>
+  <text x="126" y="112" font-size="8" text-anchor="middle" font-style="italic">correct in its own frame</text>
+
+  <text x="434" y="46" font-size="8" text-anchor="middle" font-style="italic">convention B</text>
+  <text x="434" y="74" font-size="11" text-anchor="middle">P = − b · x (1 − x)</text>
+  <text x="434" y="94" font-size="9" text-anchor="middle">b &lt; 0</text>
+  <text x="434" y="112" font-size="8" text-anchor="middle" font-style="italic">correct in its own frame</text>
+
+  <!-- the lift -->
+  <path d="M 232 66 Q 280 38 328 66" fill="none" stroke="#000000" stroke-width="1.6" marker-end="url(#a)"/>
+  <text x="280" y="32" font-size="9" text-anchor="middle">lift b across</text>
+  <text x="280" y="96" font-size="8" text-anchor="middle" font-style="italic">looks reasonable · review doesn't catch it</text>
+
+  <path d="M 280 130 Q 294 146 280 160" fill="none" stroke="#000000" stroke-width="1.6" marker-end="url(#a)"/>
+
+  <!-- the consequence : a region, not a box -->
+  <ellipse cx="280" cy="196" rx="158" ry="32" fill="url(#hatch)" stroke="#000000" stroke-width="1.6"/>
+  <text x="280" y="192" font-size="10" text-anchor="middle">the bowing inverts</text>
+  <text x="280" y="210" font-size="8" text-anchor="middle">interface charge takes the wrong sign</text>
+
+  <!-- the fix : a rule, not a container -->
+  <line x1="60" y1="246" x2="500" y2="246" stroke="#000000" stroke-width="0.6"/>
+  <text x="280" y="264" font-size="9" text-anchor="middle">state the invariant once, canonically — and machine-check it</text>
+
+  <text x="24" y="292" font-size="8" font-style="italic">Figure 12. The wrong version is exactly as plausible as the right one. Care is not a mechanism.</text>
+</svg>

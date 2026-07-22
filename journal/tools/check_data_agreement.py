@@ -23,7 +23,30 @@ bundle, which this tool has nothing to do with. Retired 2026-07-22.)
 (k) reference-data rows with no uncertainty or no source
 (l) reference-data rows whose field count disagrees with the header
 (m) reference-data dates that are non-ISO, in the future, or modified-before-added
+(n) coded registry columns outside their vocabulary (Bundle / Tier / Diff / Path)
+(o) table rows whose pipe count differs from their header, and row bands whose
+    interior rows are absent
 Read-only; prints findings, exit code = number of finding classes that fired.
+
+WHAT THIS TOOL DELIBERATELY DOES NOT CHECK
+------------------------------------------
+Three checks were written, run against the corpus, and removed. They are listed
+so the next person does not rebuild them and read the noise as signal.
+
+  * Tolerance-ledger exhaustiveness. `τ` is not a reserved prefix: `τ_n`, `τ_p`
+    are carrier lifetimes, `τ_PO` a scattering time. Fired 48 times on correct
+    prose. Needs a namespace the corpus does not have (`[traps]` §69).
+  * Bare `§` self-references resolving in their own page. `Öttinger 2005 §5.3`
+    and `Jackson 1998 §17.2` are literature citations and are shaped
+    identically to corpus coordinates.
+  * Legend scoping — flagging `D0` used as a charge state where the registry
+    means a differentiability tag. The tokens are identical and the meaning is
+    contextual; a `D[+-]` pattern also matches the word "D-tag". `11.8` states
+    its retired legend in a banner instead, which is the available remedy.
+
+The shared lesson is `[traps]` §69: a checker inherits the soundness of the
+invariant it rests on, and one that cries wolf teaches the reader to skim.
+Green here means these classes are clean. It has never meant more than that.
 """
 from __future__ import annotations
 
@@ -454,6 +477,57 @@ for r in rows:
                 f'registry row {r[0]} ({r[1]}): {_name}={_cell!r} — '
                 f'{", ".join(repr(b) for b in _bad)} not in '
                 f'{{{", ".join(sorted(_allowed))}}}')
+
+# (o) markdown table shape, and row-band interiors -------------------------
+# Two checks against *shape* rather than content, which is where markdown and
+# CSV both fail silently. A single unescaped `|` -- an absolute value, `|E|`,
+# or a type union -- turns one cell into three and the table renders wrong with
+# nothing to notice. `index.md` shipped exactly this bug in a generated row.
+# GFM requires `\|` even inside a code span.
+_FENCE = re.compile(r'^\s*```')
+_DELIM = re.compile(r'^\|[\s:|-]+\|$')
+for path in EDITABLE:
+    if path.suffix != '.md':
+        continue
+    infence, hdr, hdrline = False, None, 0
+    for ln, line in enumerate(path.read_text(encoding='utf-8').splitlines(), 1):
+        if _FENCE.match(line):
+            infence = not infence
+            continue
+        if infence:
+            continue
+        s = line.strip()
+        if not s.startswith('|'):
+            hdr = None
+            continue
+        n = len(re.findall(r'(?<!\\)\|', s))
+        if hdr is None:
+            hdr, hdrline = n, ln
+        elif _DELIM.match(s):
+            pass
+        elif n != hdr:
+            findings['table-shape'].append(
+                f'{path.relative_to(REPO)}:{ln}: row has {n} unescaped pipes, '
+                f'header at :{hdrline} has {hdr} — escape a literal `|` as `\\|`')
+
+# A band asserts that a contiguous run of rows exists. Only its ENDPOINTS were
+# checked, so `rows 113–119` would pass with 116 deleted. Interior existence is
+# soundly checkable; interior *coherence* is not, and the reason is worth
+# recording: bands come in two kinds. `rows 113–119` is a semantic package (all
+# seven share `B6`), but `rows 1–102` and `rows 88–102` are structural claims
+# about the registry's layout and share nothing by design. Requiring a common
+# bundle would fire on seven correct bands, so it is not required.
+for path in EDITABLE:
+    for ln, line in enumerate(path.read_text(encoding='utf-8').splitlines(), 1):
+        for m in BAND.finditer(line):
+            lo, hi = int(m.group(1)), int(m.group(2))
+            if hi > 300 or lo >= hi:
+                continue
+            gap = sorted(set(range(lo, hi + 1)) - row_ids)
+            if gap and {lo, hi} <= row_ids:
+                findings['row-band'].append(
+                    f'{path.relative_to(REPO)}:{ln}: rows {lo}-{hi} — endpoints '
+                    f'exist but interior rows are absent: {gap}')
 
 # (g) D2/D4 rows must carry their gate/relaxation rationale in `source` -----
 # A D4 row with no named relaxation is un-gateable (named-formulas); the

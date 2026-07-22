@@ -1,5 +1,14 @@
 #!/usr/bin/env python3
-"""Mechanical seam checks (reconciliation-pass B9 tooling, kept as a standing machine check).
+"""Does the book agree with the data files it describes?
+
+`apparatus.py` checks the book's own structure. This checks the seams between
+the book and everything it points at: the registry CSV, the reference-data
+CSVs, the glossary, and the design docs that consume the same vocabulary.
+
+(Formerly announced itself as "reconciliation-pass B9 tooling" and printed
+"B9 seams clean". That B9 was a step label from a pass that finished months
+ago; the corpus's real `B9` is the non-equilibrium-operating observable
+bundle, which this tool has nothing to do with. Retired 2026-07-22.)
 
 (a) row-band claims `rows N–M` vs the registry CSV (existence)
 (b) backtick-quoted formula names in prose vs the CSV Name column
@@ -26,8 +35,13 @@ import sys
 from collections import defaultdict
 from pathlib import Path
 
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+import corpus_root  # noqa: E402
+
 REPO = Path(__file__).resolve().parents[2]
 CSV_PATH = REPO / 'physics/library/formulas/registry-manifest.csv'
+
+corpus_root.refuse_if_scratch_copy(REPO, allowed='--worktree' in sys.argv)
 
 # The editable surface is the book. journal/live/ is frozen work product:
 # internal staleness there is by-design and exempt (conventions, authority order).
@@ -327,10 +341,14 @@ dup = [t for t in gloss_terms if gloss_terms.count(t) > 1]
 if dup:
     findings['glossary'].append(f'duplicate glossary entries: {sorted(set(dup))}')
 
+_where = corpus_root.describe(REPO)
 for cls, items in findings.items():
     print(f'== {cls} ({len(items)}) ==')
     for item in items:
         print(f'  {item}')
-if not findings:
-    print('B9 seams clean')
+if findings:
+    print(f'data agreement FAILED @ {_where} — '
+          f'{len(findings)} finding class(es)')
+else:
+    print(f'data agreement clean @ {_where}')
 sys.exit(len(findings))

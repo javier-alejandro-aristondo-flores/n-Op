@@ -89,7 +89,7 @@ named relaxation, and a stale hash.
 **Green is not evidence a check ran.** Both checkers have shipped holes that made them
 skip whole classes of citation silently. Before citing a clean run, plant a defect of
 the class you are claiming is absent and confirm the checker fails (`[traps]` §58).
-`python journal/tools/calibrate.py` does exactly that — 50 probes into a temporary
+`python journal/tools/calibrate.py` does exactly that — 52 probes into a temporary
 copy — and additionally reports any check that *no* probe reaches, since a calibration
 with holes in it is the same failure one level up.
 

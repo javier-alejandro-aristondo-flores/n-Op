@@ -30,6 +30,12 @@ from pathlib import Path
 REPO = Path(__file__).resolve().parents[2]
 VERBOSE = "-v" in sys.argv
 
+# Calibrated checks that are not PROBES rows, because the fault they plant is
+# not a corpus defect: the two scratch-copy guards plant a *location*.
+# `apparatus.py` reads this constant when it checks the probe count quoted in
+# prose, so the published number stays the number actually calibrated.
+GUARD_PROBES = 2
+
 # (name, checker, relative path to mutate, find, replace, expected substring)
 # `find` is matched verbatim; a probe whose `find` no longer appears is reported
 # as STALE rather than silently skipped, because a stale probe is a hole too.
@@ -252,9 +258,40 @@ def seams_classes() -> set[str]:
     return set(re.findall(r"findings\['([A-Za-z0-9_-]+)'\]", src))
 
 
+def scratch_copy_refusal() -> list[str]:
+    """Both checkers must refuse to run inside a scratch worktree copy.
+
+    This one is not a corpus defect, so it cannot be a PROBES row: the planted
+    fault is the checker's *location*, not its input. It is calibrated all the
+    same, because the guard exists to stop precisely the failure that has
+    already happened once — two identical copies of the book on disk, both
+    reporting green, one of them stale."""
+    fired, errs = 0, []
+    with tempfile.TemporaryDirectory() as td:
+        fake = Path(td) / ".claude" / "worktrees" / "copy" / "journal" / "tools"
+        fake.mkdir(parents=True)
+        for f in ("apparatus.py", "seams.py", "corpus_root.py"):
+            shutil.copy(REPO / "journal" / "tools" / f, fake / f)
+        for checker in ("apparatus", "seams"):
+            p = subprocess.run([sys.executable, str(fake / f"{checker}.py")],
+                               capture_output=True, text=True)
+            if p.returncode != 2 or "REFUSED" not in (p.stdout + p.stderr):
+                errs.append(f"  MISSED  [{checker}] runs in a scratch worktree copy "
+                            f"without refusing (exit {p.returncode})")
+            else:
+                print(f"  FIRED   [{checker}] refuses to run in a scratch copy")
+                fired += 1
+    return fired, errs
+
+
 def main() -> int:
     fired = stale = missed = 0
     seams_seen: set[str] = set()
+    guard_fired, guard_errs = scratch_copy_refusal()
+    for e in guard_errs:
+        print(e)
+    fired += guard_fired
+    missed += len(guard_errs)
     with tempfile.TemporaryDirectory() as td:
         base = Path(td) / "corpus"
         for d in ("journal", "physics", "informed-operator"):
@@ -294,7 +331,10 @@ def main() -> int:
             if VERBOSE:
                 print("          " + out.strip().replace("\n", "\n          "))
 
-    total = len(PROBES)
+    # The guards are calibrated but are not PROBES rows. Counting the numerator
+    # without the denominator is how a tally reads as verified while being
+    # wrong (`[traps]` §67).
+    total = len(PROBES) + GUARD_PROBES
     print(f"\ncalibration: {fired}/{total} fired, {missed} missed, {stale} stale")
 
     # Coverage, not just pass rate. `10.1-conventions` and `instructions.md` both
@@ -311,11 +351,12 @@ def main() -> int:
     else:
         print(f"coverage: every seams check ({len(seams_seen)}) fired under some probe")
 
-    if missed or stale or uncovered:
+    if missed or stale or uncovered or guard_errs:
         print("A missed probe is a hole in the checker. A stale probe is a hole in "
               "this file — the corpus moved and the probe stopped testing anything. "
               "An uncovered check is a hole in this file that green cannot show you.")
-    return 0 if (missed == 0 and stale == 0 and not uncovered) else 1
+    return 0 if (missed == 0 and stale == 0 and not uncovered
+                 and not guard_errs) else 1
 
 
 if __name__ == "__main__":

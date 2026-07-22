@@ -41,8 +41,11 @@ import pathlib
 import re
 import sys
 
+import corpus_root
+
 ROOT = pathlib.Path(__file__).resolve().parent.parent
 PAGES = ROOT / "pages"
+REPO = ROOT.parent
 
 REQUIRED = ("id", "title", "chapter", "tag", "authority", "content-hash")
 FM_RE = re.compile(r"\A---\n(.*?)\n---\n", re.DOTALL)
@@ -366,21 +369,37 @@ def check_counts(pages: list[dict]) -> list[str]:
     # exists to catch, one level up again. Counted from calibrate.py's source.
     cal = ROOT / "tools" / "calibrate.py"
     if cal.exists():
-        want = len(re.findall(r'^\s{4}\("', cal.read_text(encoding="utf-8"), re.M))
+        cal_src = cal.read_text(encoding="utf-8")
+        # PROBES rows plus the calibrated guards that are not PROBES rows.
+        # Counting only the rows published a number smaller than the number of
+        # things actually calibrated — the same drift, one level up again.
+        guards = re.search(r"^GUARD_PROBES\s*=\s*(\d+)", cal_src, re.M)
+        want = (len(re.findall(r'^\s{4}\("', cal_src, re.M))
+                + (int(guards.group(1)) if guards else 0))
         if want:
-            for r in pages:
+            # The probe count is quoted outside `pages/` too. `README.md` and
+            # `instructions.md` both carried it, and neither was ever checked --
+            # this loop only ever walked `pages`, so two of the five sites drifted
+            # with nothing looking. `instructions.md` is the file an agent reads
+            # first, which makes it the worst place to be wrong.
+            quoting = [(r["rel"], r["body"], r["id"]) for r in pages]
+            for extra in (ROOT / "instructions.md", ROOT.parent / "README.md"):
+                if extra.exists():
+                    quoting.append((extra.name, extra.read_text(encoding="utf-8"),
+                                    extra.stem))
+            for rel, body, pid in quoting:
                 # [timeline] is a dated record: its entries state what was true on
                 # a day, and rewriting them to today's number destroys the record.
-                if r["id"] == "timeline":
+                if pid == "timeline":
                     continue
                 # Allow up to two intervening words: the first version of this
                 # check required the number to abut "probes", and `[traps]` §58 --
                 # the trap about checkers that are not looking -- said "29 SUCH
                 # probes" and was skipped for exactly that reason.
                 for n, _ in re.findall(r"(\d+)((?:\s+\w+){0,2})\s+probes\b",
-                                       CHANGELOG_RE.sub("", r["body"])):
+                                       CHANGELOG_RE.sub("", body)):
                     if int(n) != want:
-                        errs.append(f"{r['rel']}: says {n} probes; calibrate.py "
+                        errs.append(f"{rel}: says {n} probes; calibrate.py "
                                     f"defines {want}")
 
     # Cost-tier distributions, the diff tally's twin. Only the diff tally was
@@ -575,7 +594,11 @@ def restamp(pages: list[dict]) -> int:
 def main() -> int:
     ap = argparse.ArgumentParser()
     ap.add_argument("--check", action="store_true")
+    ap.add_argument("--worktree", action="store_true",
+                    help="permit running against a scratch worktree copy")
     args = ap.parse_args()
+
+    corpus_root.refuse_if_scratch_copy(REPO, allowed=args.worktree)
 
     pages = load()
     if not pages:
@@ -594,14 +617,17 @@ def main() -> int:
     errs += check_counts(pages)
     errs += check_citations(pages)
 
+    where = corpus_root.describe(REPO)
+
     if errs:
-        print(f"\napparatus FAILED — {len(errs)} problem(s):")
+        print(f"\napparatus FAILED @ {where} — {len(errs)} problem(s):")
         for e in errs:
             print(f"  {e}")
         return 1
 
     topics = sum(len(r["canonical-for"]) for r in pages)
-    print(f"apparatus OK — {len(pages)} pages, {topics} canonical topics, "
+    print(f"apparatus OK @ {where}")
+    print(f"  {len(pages)} pages, {topics} canonical topics, "
           f"graph symmetric, hashes fresh")
     return 0
 

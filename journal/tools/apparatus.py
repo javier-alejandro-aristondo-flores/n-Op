@@ -373,7 +373,12 @@ def check_counts(pages: list[dict]) -> list[str]:
                 # a day, and rewriting them to today's number destroys the record.
                 if r["id"] == "timeline":
                     continue
-                for n in re.findall(r"(\d+)\s+probes\b", CHANGELOG_RE.sub("", r["body"])):
+                # Allow up to two intervening words: the first version of this
+                # check required the number to abut "probes", and `[traps]` §58 --
+                # the trap about checkers that are not looking -- said "29 SUCH
+                # probes" and was skipped for exactly that reason.
+                for n, _ in re.findall(r"(\d+)((?:\s+\w+){0,2})\s+probes\b",
+                                       CHANGELOG_RE.sub("", r["body"])):
                     if int(n) != want:
                         errs.append(f"{r['rel']}: says {n} probes; calibrate.py "
                                     f"defines {want}")
@@ -475,6 +480,18 @@ def check_citations(pages: list[dict]) -> list[str]:
             for n in re.findall(r"traps\]?`?\s*§\s*(\d+)", r["body"]):
                 if int(n) not in have:
                     errs.append(f"{r['rel']}: cites `traps` §{n}, which does not exist")
+
+    # The open register is a numbered list like the trap register, and readers
+    # cite items by number ("arch-18 item 3"). Inserting an item without
+    # renumbering silently repoints every such citation. Found the hard way: an
+    # insertion on 2026-07-22 produced two items numbered 5, and nothing saw it.
+    opens = next((r for r in pages if r["id"] == "arch-18-open-decisions"), None)
+    if opens is not None:
+        head, _, _ = opens["body"].partition("**Verifier-soundness gaps")
+        nums = [int(n) for n in re.findall(r"^(\d+)\. ", head, re.M)]
+        if nums and nums != list(range(1, len(nums) + 1)):
+            errs.append(f"{opens['rel']}: open-decision list is numbered {nums}; "
+                        f"expected 1..{len(nums)} (items are cited by number)")
 
     lineref = re.compile(r"\b[\w./-]+\.md:\d+\b")
     for r in pages:

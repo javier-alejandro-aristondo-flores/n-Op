@@ -475,6 +475,14 @@ def check_citations(pages: list[dict]) -> list[str]:
             errs.append(f"{traps['rel']}: duplicate trap numbers {dupes}")
         if gaps:
             errs.append(f"{traps['rel']}: missing trap numbers {gaps}")
+        # ...and in order. The set being complete is not enough: inserting 68
+        # above 67 leaves no gap and no duplicate, so this check passed a
+        # register that read 66, 68, 67 top-to-bottom. Readers consume it in
+        # order and cite it by number.
+        if nums and nums != sorted(nums):
+            bad = next((i for i in range(1, len(nums)) if nums[i] < nums[i - 1]), None)
+            errs.append(f"{traps['rel']}: trap numbers out of order — "
+                        f"§{nums[bad]} appears after §{nums[bad - 1]}")
         have = set(nums)
         for r in pages:
             for n in re.findall(r"traps\]?`?\s*§\s*(\d+)", r["body"]):

@@ -29,7 +29,7 @@ the file that owns its full definition (`canonical-for`).
 | **Stage 1** | Symbolic lift: `PhysicsGraph` construction from named formulas + methods. | `arch-07-pipeline` |
 | **Stage 2** | Symmetry quotient: IBZ + irreps reduction (up to 48× fewer k-points in cubic systems). | `arch-07-pipeline` |
 | **Stage 3** | Algebraic simplification: hash-consing, cross-formula common-subexpression elimination, tearing and alias elimination. Admitting a fourth rewrite is governed by the rewrite-admission rule. | `arch-07-pipeline` |
-| **Stage 4** | Four concurrent decisions: compression-plan selection, implicit-diff adjoint synthesis, the adjoint-tape materialization schedule, and codegen. | `arch-07-pipeline` |
+| **Stage 4** | Four concurrent decisions: compression-plan selection, implicit-diff adjoint synthesis (Blondel et al., NeurIPS 2022), the adjoint-tape materialization schedule, and codegen. | `arch-07-pipeline` |
 | **Stage 5** | Runtime kernel application (no graph mutation; pure evaluation). | `arch-07-pipeline` |
 | **pino-bridge** | The narrow protocol surface between `/physics` and `/informed-operator`. Two exports: `Validate` (differentiated residual + observable surface) and `Import` (external ground-truth ingestion). | `arch-16-pino-bridge` |
 | **Applicability classifier** | Typed predicate `(Crystal, Environment) → Bool` carried by every property, observable, and residual; drives Stage-1 graph pruning and the per-sample PINO loss mask. | `arch-13-applicability` |

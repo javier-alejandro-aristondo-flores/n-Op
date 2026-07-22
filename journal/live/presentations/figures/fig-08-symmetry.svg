@@ -1,0 +1,66 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 560 340" font-family="Charter, Georgia, 'Times New Roman', serif">
+  <defs>
+    <marker id="a" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+      <path d="M0 0 L10 5 L0 10 z" fill="#000000"/>
+    </marker>
+    <pattern id="hatch" width="6" height="6" patternTransform="rotate(45)" patternUnits="userSpaceOnUse">
+      <line x1="0" y1="0" x2="0" y2="6" stroke="#999999" stroke-width="0.6"/>
+    </pattern>
+  </defs>
+
+  <!-- dense operator : soft fill + hairline grid, no enclosure -->
+  <rect x="48" y="56" width="144" height="144" fill="#cccccc" stroke="none"/>
+  <line x1="72"  y1="56" x2="72"  y2="200" stroke="#ffffff" stroke-width="0.6"/>
+  <line x1="96"  y1="56" x2="96"  y2="200" stroke="#ffffff" stroke-width="0.6"/>
+  <line x1="120" y1="56" x2="120" y2="200" stroke="#ffffff" stroke-width="0.6"/>
+  <line x1="144" y1="56" x2="144" y2="200" stroke="#ffffff" stroke-width="0.6"/>
+  <line x1="168" y1="56" x2="168" y2="200" stroke="#ffffff" stroke-width="0.6"/>
+  <line x1="48" y1="80"  x2="192" y2="80"  stroke="#ffffff" stroke-width="0.6"/>
+  <line x1="48" y1="104" x2="192" y2="104" stroke="#ffffff" stroke-width="0.6"/>
+  <line x1="48" y1="128" x2="192" y2="128" stroke="#ffffff" stroke-width="0.6"/>
+  <line x1="48" y1="152" x2="192" y2="152" stroke="#ffffff" stroke-width="0.6"/>
+  <line x1="48" y1="176" x2="192" y2="176" stroke="#ffffff" stroke-width="0.6"/>
+  <text x="120" y="222" font-size="8" text-anchor="middle" font-style="italic">every block computed</text>
+
+  <!-- the change of basis -->
+  <path d="M 206 128 Q 262 96 314 128" fill="none" stroke="#000000" stroke-width="1.6" marker-end="url(#a)"/>
+  <text x="261" y="90" font-size="9" text-anchor="middle">change of basis</text>
+  <text x="261" y="104" font-size="8" text-anchor="middle" font-style="italic">Schur</text>
+
+  <!-- block-diagonal -->
+  <rect x="330" y="56"  width="48" height="48" fill="#cccccc" stroke="none"/>
+  <rect x="378" y="104" width="48" height="48" fill="#cccccc" stroke="none"/>
+  <rect x="426" y="152" width="48" height="48" fill="#cccccc" stroke="none"/>
+  <line x1="354" y1="56" x2="354" y2="200" stroke="#cccccc" stroke-width="0.6"/>
+  <line x1="378" y1="56" x2="378" y2="200" stroke="#cccccc" stroke-width="0.6"/>
+  <line x1="402" y1="56" x2="402" y2="200" stroke="#cccccc" stroke-width="0.6"/>
+  <line x1="426" y1="56" x2="426" y2="200" stroke="#cccccc" stroke-width="0.6"/>
+  <line x1="450" y1="56" x2="450" y2="200" stroke="#cccccc" stroke-width="0.6"/>
+  <line x1="330" y1="80"  x2="474" y2="80"  stroke="#cccccc" stroke-width="0.6"/>
+  <line x1="330" y1="104" x2="474" y2="104" stroke="#cccccc" stroke-width="0.6"/>
+  <line x1="330" y1="128" x2="474" y2="128" stroke="#cccccc" stroke-width="0.6"/>
+  <line x1="330" y1="152" x2="474" y2="152" stroke="#cccccc" stroke-width="0.6"/>
+  <line x1="330" y1="176" x2="474" y2="176" stroke="#cccccc" stroke-width="0.6"/>
+  <text x="402" y="222" font-size="8" text-anchor="middle" font-style="italic">blank blocks:</text>
+  <text x="402" y="236" font-size="8" text-anchor="middle" font-style="italic">work avoided</text>
+
+  <!-- orbit collapse -->
+  <circle cx="60"  cy="272" r="3" fill="#999999"/>
+  <circle cx="82"  cy="272" r="3" fill="#999999"/>
+  <circle cx="104" cy="272" r="3" fill="#999999"/>
+  <circle cx="126" cy="272" r="3" fill="#999999"/>
+  <circle cx="148" cy="272" r="3" fill="#999999"/>
+  <circle cx="170" cy="272" r="3" fill="#999999"/>
+  <circle cx="192" cy="272" r="3" fill="#999999"/>
+  <circle cx="214" cy="272" r="3" fill="#999999"/>
+  <text x="137" y="294" font-size="8" text-anchor="middle" font-style="italic">sampling points</text>
+
+  <path d="M 232 272 Q 280 254 322 270" fill="none" stroke="#000000" stroke-width="1" marker-end="url(#a)"/>
+  <text x="278" y="250" font-size="8" text-anchor="middle">orbit collapse</text>
+
+  <circle cx="340" cy="272" r="5" fill="#000000"/>
+  <text x="404" y="276" font-size="8" font-style="italic">one representative per orbit</text>
+
+  <line x1="24" y1="312" x2="536" y2="312" stroke="#cccccc" stroke-width="0.6"/>
+  <text x="24" y="330" font-size="8" font-style="italic">Figure 8. Symmetry as an optimisation pass: cost scales with orbits, not points.</text>
+</svg>

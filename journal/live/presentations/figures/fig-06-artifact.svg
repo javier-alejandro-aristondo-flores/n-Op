@@ -1,0 +1,46 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 480 224" font-family="Charter, Georgia, 'Times New Roman', serif">
+  <defs>
+    <marker id="a" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+      <path d="M0 0 L10 5 L0 10 z" fill="#000000"/>
+    </marker>
+    <pattern id="hatch" width="6" height="6" patternTransform="rotate(45)" patternUnits="userSpaceOnUse">
+      <line x1="0" y1="0" x2="0" y2="6" stroke="#999999" stroke-width="0.6"/>
+    </pattern>
+  </defs>
+
+  <!-- the product object -->
+  <text x="240" y="32" font-size="12" text-anchor="middle">OracleFile</text>
+  <text x="240" y="44" font-size="8" text-anchor="middle" font-style="italic">one per identity · immutable</text>
+
+  <!-- projections -->
+  <path d="M 220 50 Q 122 66 76 106" fill="none" stroke="#000000" stroke-width="1" marker-end="url(#a)"/>
+  <text x="138" y="70" font-size="8" font-style="italic">π₁</text>
+
+  <path d="M 230 52 Q 194 76 180 106" fill="none" stroke="#000000" stroke-width="1.6" marker-end="url(#a)"/>
+  <text x="202" y="80" font-size="8" font-style="italic">π₂</text>
+
+  <path d="M 250 52 Q 288 76 300 106" fill="none" stroke="#000000" stroke-width="1" marker-end="url(#a)"/>
+  <text x="272" y="80" font-size="8" font-style="italic">π₃</text>
+
+  <path d="M 260 50 Q 360 66 406 106" fill="none" stroke="#000000" stroke-width="1" marker-end="url(#a)"/>
+  <text x="336" y="70" font-size="8" font-style="italic">π₄</text>
+
+  <!-- components -->
+  <text x="70" y="122" font-size="9" text-anchor="middle">Validate</text>
+  <text x="70" y="134" font-size="8" text-anchor="middle" font-style="italic">the callable</text>
+
+  <text x="180" y="122" font-size="9" text-anchor="middle">SlotSchema</text>
+  <text x="180" y="134" font-size="8" text-anchor="middle" font-style="italic">every check it holds</text>
+
+  <text x="302" y="122" font-size="9" text-anchor="middle">Address</text>
+  <text x="302" y="134" font-size="8" text-anchor="middle" font-style="italic">content hash = its name</text>
+
+  <text x="412" y="122" font-size="9" text-anchor="middle">CertRef</text>
+  <text x="412" y="134" font-size="8" text-anchor="middle" font-style="italic">hash-pinned evidence</text>
+
+  <line x1="24" y1="162" x2="456" y2="162" stroke="#cccccc" stroke-width="0.6"/>
+  <text x="240" y="178" font-size="8" text-anchor="middle" font-style="italic">π₂ is readable without running π₁ — that is what "self-describing" means</text>
+
+  <text x="24" y="204" font-size="8" font-style="italic">Figure 6. The emitted artifact is a product. Not a service, not a framework — an element you can</text>
+  <text x="24" y="216" font-size="8" font-style="italic">hand to anyone, whose components include the account of what it does and does not contain.</text>
+</svg>

@@ -1,0 +1,59 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 560 330" font-family="Charter, Georgia, 'Times New Roman', serif">
+  <defs>
+    <marker id="a" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+      <path d="M0 0 L10 5 L0 10 z" fill="#000000"/>
+    </marker>
+    <pattern id="hatch" width="6" height="6" patternTransform="rotate(45)" patternUnits="userSpaceOnUse">
+      <line x1="0" y1="0" x2="0" y2="6" stroke="#999999" stroke-width="0.6"/>
+    </pattern>
+  </defs>
+
+  <!-- (a) the verdict lattice : Hasse diagram, straight by convention -->
+  <text x="28" y="36" font-size="9" font-style="italic">(a)  the verdict lattice</text>
+
+  <circle cx="132" cy="80" r="4" fill="#000000"/>
+  <text x="150" y="84" font-size="9.5">Passed</text>
+
+  <circle cx="132" cy="158" r="4" fill="#000000"/>
+  <text x="150" y="162" font-size="9.5">Pending</text>
+
+  <circle cx="132" cy="236" r="4" fill="#000000"/>
+  <text x="150" y="240" font-size="9.5">Failed</text>
+
+  <line x1="132" y1="84" x2="132" y2="154" stroke="#000000" stroke-width="1"/>
+  <line x1="132" y1="162" x2="132" y2="232" stroke="#000000" stroke-width="1.6"/>
+
+  <text x="28" y="278" font-size="8" font-style="italic">meet: one Failed anywhere</text>
+  <text x="28" y="292" font-size="8" font-style="italic">⇒ the whole verdict reads</text>
+  <text x="28" y="306" font-size="8" font-style="italic">Failed</text>
+
+  <line x1="290" y1="28" x2="290" y2="300" stroke="#cccccc" stroke-width="0.6"/>
+
+  <!-- (b) content addressing : a Merkle DAG, straight by convention -->
+  <text x="320" y="36" font-size="9" font-style="italic">(b)  identity is the hash of the contents</text>
+
+  <circle cx="436" cy="84" r="5" fill="#000000"/>
+  <text x="436" y="70" font-size="9" text-anchor="middle">h = 73b6142e…</text>
+
+  <circle cx="384" cy="160" r="4" fill="#000000"/>
+  <circle cx="488" cy="160" r="4" fill="#000000"/>
+
+  <circle cx="352" cy="232" r="4" fill="#999999"/>
+  <circle cx="416" cy="232" r="4" fill="#999999"/>
+  <circle cx="460" cy="232" r="4" fill="#999999"/>
+  <circle cx="522" cy="232" r="4" fill="#999999"/>
+
+  <line x1="432" y1="88" x2="388" y2="156" stroke="#000000" stroke-width="1"/>
+  <line x1="440" y1="88" x2="484" y2="156" stroke="#000000" stroke-width="1"/>
+  <line x1="380" y1="164" x2="354" y2="228" stroke="#000000" stroke-width="0.6"/>
+  <line x1="388" y1="164" x2="414" y2="228" stroke="#000000" stroke-width="0.6"/>
+  <line x1="484" y1="164" x2="462" y2="228" stroke="#000000" stroke-width="0.6"/>
+  <line x1="492" y1="164" x2="520" y2="228" stroke="#000000" stroke-width="0.6"/>
+
+  <text x="436" y="262" font-size="8" text-anchor="middle" font-style="italic">same inputs ⇒ same bytes ⇒ same name</text>
+  <text x="436" y="278" font-size="8" text-anchor="middle" font-style="italic">reproducibility is structural,</text>
+  <text x="436" y="292" font-size="8" text-anchor="middle" font-style="italic">not procedural</text>
+
+  <line x1="24" y1="312" x2="536" y2="312" stroke="#cccccc" stroke-width="0.6"/>
+  <text x="24" y="328" font-size="8" font-style="italic">Figure 11. Cert and content-address: the grounds for belief travel with the result.</text>
+</svg>

@@ -1,0 +1,44 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 560 360" font-family="Charter, Georgia, 'Times New Roman', serif">
+  <defs>
+    <marker id="a" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+      <path d="M0 0 L10 5 L0 10 z" fill="#000000"/>
+    </marker>
+    <pattern id="hatch" width="6" height="6" patternTransform="rotate(45)" patternUnits="userSpaceOnUse">
+      <line x1="0" y1="0" x2="0" y2="6" stroke="#999999" stroke-width="0.6"/>
+    </pattern>
+  </defs>
+
+  <!-- ===== objects : bare labels, no enclosure ===== -->
+  <text x="280" y="62" font-size="12" text-anchor="middle">x</text>
+  <text x="280" y="80" font-size="8" text-anchor="middle" font-style="italic">candidate state</text>
+  <text x="280" y="93" font-size="8" text-anchor="middle" font-style="italic">every channel filled</text>
+
+  <text x="466" y="168" font-size="11" text-anchor="middle">r ,  ∇r</text>
+  <text x="466" y="186" font-size="8" text-anchor="middle" font-style="italic">residuals and gradients</text>
+  <text x="466" y="199" font-size="8" text-anchor="middle" font-style="italic">one slot per law × point</text>
+
+  <text x="280" y="276" font-size="12" text-anchor="middle">L</text>
+  <text x="280" y="294" font-size="8" text-anchor="middle" font-style="italic">training loss</text>
+
+  <text x="96" y="168" font-size="12" text-anchor="middle">θ</text>
+  <text x="96" y="186" font-size="8" text-anchor="middle" font-style="italic">weights</text>
+  <text x="96" y="199" font-size="8" text-anchor="middle" font-style="italic">what training changes</text>
+
+  <!-- ===== morphisms, clockwise ===== -->
+  <path d="M 124 150 Q 158 100 246 76" fill="none" stroke="#000000" stroke-width="1" marker-end="url(#a)"/>
+  <text x="150" y="96" font-size="9" text-anchor="middle">operator</text>
+
+  <path d="M 314 76 Q 402 100 436 150" fill="none" stroke="#000000" stroke-width="1.6" marker-end="url(#a)"/>
+  <text x="412" y="96" font-size="9" text-anchor="middle">oracle</text>
+
+  <path d="M 438 204 Q 404 254 314 272" fill="none" stroke="#000000" stroke-width="1" marker-end="url(#a)"/>
+  <text x="416" y="256" font-size="9" text-anchor="middle">aggregate</text>
+
+  <path d="M 246 272 Q 156 254 122 204" fill="none" stroke="#000000" stroke-width="1" marker-end="url(#a)"/>
+  <text x="146" y="256" font-size="9" text-anchor="middle">update</text>
+
+  <!-- ===== notes ===== -->
+  <line x1="28" y1="320" x2="532" y2="320" stroke="#cccccc" stroke-width="0.6"/>
+  <text x="28" y="336" font-size="8">The oracle is one arrow, not the system. It never solves, never proposes, owns no loop, returns no verdict.</text>
+  <text x="28" y="352" font-size="8" font-style="italic">Figure 5. Four objects, four maps.</text>
+</svg>

@@ -1,0 +1,25 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 420 212" font-family="Charter, Georgia, 'Times New Roman', serif">
+  <defs>
+    <pattern id="hatch" width="6" height="6" patternTransform="rotate(45)" patternUnits="userSpaceOnUse">
+      <line x1="0" y1="0" x2="0" y2="6" stroke="#999999" stroke-width="0.6"/>
+    </pattern>
+  </defs>
+
+  <ellipse cx="155" cy="88" rx="105" ry="56" fill="none" stroke="#000000" stroke-width="1"/>
+  <ellipse cx="255" cy="88" rx="105" ry="56" fill="none" stroke="#000000" stroke-width="1"/>
+
+  <text x="100" y="80" font-size="9" text-anchor="middle">A</text>
+  <text x="100" y="94" font-size="8" text-anchor="middle" font-style="italic">ML surrogates</text>
+
+  <text x="310" y="80" font-size="9" text-anchor="middle">B</text>
+  <text x="310" y="94" font-size="8" text-anchor="middle" font-style="italic">direct DFT</text>
+
+  <ellipse cx="205" cy="88" rx="46" ry="42" fill="none" stroke="#000000" stroke-width="1.6" stroke-dasharray="1 2"/>
+  <text x="205" y="93" font-size="13" text-anchor="middle">∅</text>
+
+  <text x="24" y="166" font-size="8"><tspan font-style="italic">A</tspan>  affordable at device conditions</text>
+  <text x="24" y="178" font-size="8"><tspan font-style="italic">B</tspan>  trustworthy under extrapolation</text>
+
+  <text x="24" y="198" font-size="8" font-style="italic">Figure 1. Over solvers, A ∩ B = ∅. The move is not to search that intersection — it is to change</text>
+  <text x="24" y="208" font-size="8" font-style="italic">the object, and build a checker instead.</text>
+</svg>

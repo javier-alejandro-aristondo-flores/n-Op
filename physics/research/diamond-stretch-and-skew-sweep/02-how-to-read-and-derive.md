@@ -3,7 +3,7 @@
 > **Copy — the dataset itself lives at `/Pool/Diamond_Stretch_And_Skew_Sweep/`.** This is a
 > research-stratum companion describing an external DFT dataset (diamond lattice-distortion
 > sweeps, VASP 6.2.0, PBE + HSE06(α=0.27)); it is **not** part of the book's canon pages
-> (`journal/pages/`, checked by `journal/tools/apparatus.py`), which stay canonical. `/Pool` is
+> (`journal/pages/`, checked by `journal/tools/check_book_structure.py`), which stay canonical. `/Pool` is
 > the source of truth for both these documents and the data; if they ever disagree, `/Pool`
 > wins. The data is **not** in this repository and must not be — every run directory holds a
 > VASP-licensed POTCAR and this remote is public. Cite this suite from a spec via
@@ -23,11 +23,11 @@ VASP-canonical names you will see in VASP's own documentation.
 
 ## Part A — the needs-map
 
-n-Op consumes external data through ground-truth-bridge records (`arch-16-pino-bridge`
-§16.2): `(value, σ, provenance, coverage-mask)` targets attached to observables, gated by
+n-Op consumes external data through ground-truth-bridge records (`pino-bridge`
+§2): `(value, σ, provenance, coverage-mask)` targets attached to observables, gated by
 applicability. This dataset is a *computed* provenance class (DFT), distinct from the
 experimental constants in the cert reference battery. It is a sweep over `h`, the cell-vector
-state component (`arch-04-state`) — at fixed composition, fixed everything else.
+state component (`unified-state`) — at fixed composition, fixed everything else.
 
 | Need (bundle / artifact) | Quantity | Recipe | Status |
 |---|---|---|---|

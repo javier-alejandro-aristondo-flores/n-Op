@@ -6,7 +6,7 @@
 > before joint review. Structure follows brief §4 exactly: §1 verdict, §2 the algebra, §3 the
 > shape of a steppable lowering, §4 refusal cases, §5 integrator-interface proposal, §6 sources.
 > Arch citations are by doc id; external claims are grounded in §6. Signature blocks below are
-> behavioral contracts in the house idiom (`arch-16-pino-bridge`, [product]), not code.
+> behavioral contracts in the house idiom (`pino-bridge`, [product]), not code.
 
 ---
 
@@ -26,7 +26,7 @@ wraps the RHS in a comparison, the evolver wraps it in a hand-off to time integr
 "shared state that can be reformed into either form" demanded by the original question is the
 RHS forest plus the generator-structure tags, and the sharing is literal: both artifacts
 reference the same node addresses under the substrate's identity discipline
-(`arch-20-representations §20.4`).
+(`representation-substrate §4`).
 
 The argument, compressed:
 
@@ -40,14 +40,14 @@ The argument, compressed:
    a feasibility, question. The brief's seed claim is verified.
 2. **On this IR the machinery mostly *verifies* rather than *repairs*.** The acausal world
    needs heavy causalization because users write arbitrary implicit equations. Here the
-   dynamical form is GENERIC (`arch-05-generic`): every EOM-family residual leaf is
+   dynamical form is GENERIC (`generic-dynamics`): every EOM-family residual leaf is
    structurally `‖ẋᵢ − (L·δE/δxᵢ + M·δS/δxᵢ)‖²` with the rate estimate an *input* (the
    consumer-supplied trajectory finite-difference — score-not-solve,
-   `arch-16-pino-bridge`, `arch-21-multiscale-state §21.4`) and the generator contraction an
+   `pino-bridge`, `multiscale-state §5`) and the generator contraction an
    ordinary evaluable sub-DAG the scorer already executes. The matching is forced (each EOM
    leaf to its own ẋᵢ), the mass operator is the identity, and the differentiation index of
    the micro and slow tiers is zero. The genuinely acausal remainder is small and known by
-   name: the macro tier's two algebraic rows (`φ`, `j` — `arch-21-multiscale-state §21.9`) and
+   name: the macro tier's two algebraic rows (`φ`, `j` — `multiscale-state §10`) and
    every fixed-point / nested-minimization node (§2.5, §2.6).
 3. **The strong duality dies exactly where the theory predicts.** Interpreters in the
    initial-algebra / tagless-final sense are compositional: one denotation per op symbol,
@@ -62,14 +62,14 @@ The argument, compressed:
 4. **The restrictions are the exceptions to step 2**, and each lands on machinery the
    architecture already has: fixed-point nodes step only via per-step solve plans whose
    regularity condition (nonsingular fixed-point Jacobian) is *the same condition* Stage-4
-   implicit-differentiation adjoint synthesis already gates on (`arch-07-pipeline §7.4`,
-   `impl-07-residual-factory §7.5`); the macro tier steps as a semi-explicit index-1 system
+   implicit-differentiation adjoint synthesis already gates on (`compose-time-pipeline §4`,
+   `residual-machinery §5`); the macro tier steps as a semi-explicit index-1 system
    given the same nonsingularity its committed Scharfetter–Gummel finite-volume discretization
    already assumes; and the non-EOM residual categories never become dynamics at all — they
    re-enter as the *preservation obligations* of structure-preserving integration, keyed by
    the identical `ResidualKey`s the scorer emits (§2.8).
 5. **Cost honesty.** A steppable lowering does not inherit the scorer's complexity class. "No
-   solver-call hot paths" (`arch-20-representations §20.5`, `arch-18-open-decisions`) is a
+   solver-call hot paths" (`representation-substrate §5`, `open-decisions`) is a
    scorer invariant; a stepper for the BO-constrained micro tier pays a T3-class solve per
    step (the classical cost of Born–Oppenheimer dynamics), and the macro tier pays an implicit
    linear solve per step. The evolver is therefore the *trusted-slow sibling* of the fast
@@ -80,9 +80,9 @@ Verification of the brief's four seed observations (brief §2 demanded verify-do
 | Seed claim | Status after research |
 |---|---|
 | Residuals are structurally `r = LHS(ẋ) − RHS`; causalization is a mechanized pass | **Verified, sharpened**: `LHS` is the identity on an *input* rate estimate for all micro and slow EOM rows; two macro rows carry no `∂_t` at all (algebraic constraints). Causalization is mechanized (§6.A), with named complexity: matching/BLT low-polynomial, tearing NP-complete, structural index analysis cheap but generic-values-only (§4.3). |
-| Structured generators are tagged in the IR | **Verified, one caveat**: the reversible/dissipative split, per-tier degeneracy, and target shapes (`AntisymmForm`/`PSDSymmForm`) are IR-visible (`arch-05-generic`, `arch-19-coupling-structure`). Caveat: the Jacobi property of *generated* antisymmetric cross-blocks is only cert-checked numerically, which grades (not blocks) geometric-integrator dispatch (§2.6, §3.4). |
-| The pipeline already performs exact rewrites and emits a second program (adjoint); a stepper is a third emission; sibling-artifact identity per `arch-20-representations §20.4` | **Verified**: Stage-3 equality saturation and Stage-4 adjoint synthesis confirmed (`arch-07-pipeline`); [product] (landed 2026-07-16) fixes the artifact model — immutable, self-describing, hash-identified oracle-files — and deliberately leaves every time-evolution verb unclaimed pending this memo (its §9). |
-| Tiered state ⇒ "steppable" means multi-rate steppable | **Verified, strengthened**: the `arch-21-multiscale-state` adiabatic contract (slow tier driven by time-averaged micro quantities; macro by homogenized coefficient closures) is precisely the heterogeneous-multiscale-method pattern, and the tier design's "no cross-tier constraint manifold" decision means no monolithic cross-tier DAE ever needs to be formed (§3.4). |
+| Structured generators are tagged in the IR | **Verified, one caveat**: the reversible/dissipative split, per-tier degeneracy, and target shapes (`AntisymmForm`/`PSDSymmForm`) are IR-visible (`generic-dynamics`, `coupling-structure`). Caveat: the Jacobi property of *generated* antisymmetric cross-blocks is only cert-checked numerically, which grades (not blocks) geometric-integrator dispatch (§2.6, §3.4). |
+| The pipeline already performs exact rewrites and emits a second program (adjoint); a stepper is a third emission; sibling-artifact identity per `representation-substrate §4` | **Verified**: Stage-3 equality saturation and Stage-4 adjoint synthesis confirmed (`compose-time-pipeline`); [product] (landed 2026-07-16) fixes the artifact model — immutable, self-describing, hash-identified oracle-files — and deliberately leaves every time-evolution verb unclaimed pending this memo (its §9). |
+| Tiered state ⇒ "steppable" means multi-rate steppable | **Verified, strengthened**: the `multiscale-state` adiabatic contract (slow tier driven by time-averaged micro quantities; macro by homogenized coefficient closures) is precisely the heterogeneous-multiscale-method pattern, and the tier design's "no cross-tier constraint manifold" decision means no monolithic cross-tier DAE ever needs to be formed (§3.4). |
 
 ---
 
@@ -95,7 +95,7 @@ three distinct layers, each with existing, citable theory. Nothing new needs inv
 needs deciding is where each layer acts in the pipeline.
 
 - **Term layer** — the op-signature. The IR is the free term structure over
-  `S = Input | FormulaApply(132) | MethodInvoke(12)` (`arch-06-physics-graph`), hash-consed
+  `S = Input | FormulaApply(132) | MethodInvoke(12)` (`physics-graph`), hash-consed
   into a Merkle DAG. An *interpretation* is an S-algebra: one denotation per op, meaning
   assembled by fold (catamorphism; §6.C). The scorer (numeric denotation), the adjoint
   (per-op vJp denotation, composed in reverse), and the cert traversals (evidence-semilattice
@@ -133,8 +133,8 @@ fixed-point facts.
 ### 2.3 The factorization that survives
 
 For every EOM-family category (9 of 19: the seven micro components plus
-`EOM/DefectPopulation`, `EOM/Continuum` — `arch-11-residuals §11.1`,
-`arch-21-multiscale-state §21.10`), the residual leaf has the shape
+`EOM/DefectPopulation`, `EOM/Continuum` — `residual-definitions §1`,
+`multiscale-state §11`), the residual leaf has the shape
 
 ```
 residual_i  =  ‖ ẋᵢ-input  ⊖  RHSᵢ(state, env, adiabatic-params) ‖²
@@ -163,28 +163,28 @@ to "the properties the op-signature must satisfy, stated precisely."
   exactly once, at the cut, and `tᵢ` is rate-free. Generalization admitted by the theory: a
   left operator on the rate that is linear, constant over the trajectory, and nonsingular
   (then `RHS := LHS⁻¹·t`, one compile-time factorization). On the current spec the identity
-  form holds for all micro and slow rows by construction (`arch-05-generic`,
-  `arch-21-multiscale-state §21.4`).
+  form holds for all micro and slow rows by construction (`generic-dynamics`,
+  `multiscale-state §5`).
 - **S2 — squareness and matching.** Over the tier, the bipartite incidence of
   `{EOM leaves} ∪ {algebraic-constraint leaves}` versus
   `{differential slots} ∪ {algebraic unknowns}` admits a perfect matching in which each EOM
   leaf matches its own slot (forced by S1) and the algebraic block's matched Jacobian is
   structurally nonsingular — i.e. the tier is a semi-explicit system of differentiation index
   ≤ 1, witnessed by the Σ-method / Pantelides check. The incidence structure needed is a
-  byproduct of Stage-3 sparsity inference (`arch-07-pipeline §7.3`); the check is cheap.
+  byproduct of Stage-3 sparsity inference (`compose-time-pipeline §3`); the check is cheap.
 - **S3 — solvable interior.** Every node inside the RHS forest is forward-evaluable within
   the evolver's *declared* per-step cost class: T0–T2 unconditionally; any node whose method
-  has fixed-point semantics (the Stage-4 lookup fact, `arch-06-physics-graph §6.2`) only via
+  has fixed-point semantics (the Stage-4 lookup fact, `physics-graph §2`) only via
   an attached per-step solve plan whose regularity condition — nonsingular fixed-point
   Jacobian — is identical to the condition Stage-4 adjoint synthesis already imposes
-  (`arch-07-pipeline §7.4`). Differentiability tags do **not** gate the forward lowering
+  (`compose-time-pipeline §4`). Differentiability tags do **not** gate the forward lowering
   (stepping needs no adjoint); they gate the evolver's optional tangent/sensitivity sibling.
 - **S4 — generator-tag totality.** Every additive block of every `tᵢ` carries one tag from
   the closed generator set the IR already has — canonical-symplectic pair, Lie–Poisson
   density-matrix block, Maxwell block, generated `AntisymmForm` cross-block (with recorded
   Jacobi grade), PSD diagonal / PSD cross dissipative block, master-equation rate generator,
-  parabolic finite-volume block (`arch-05-generic`, `arch-19-coupling-structure`,
-  `arch-21-multiscale-state`). The tags select the integrator class and the preservation
+  parabolic finite-volume block (`generic-dynamics`, `coupling-structure`,
+  `multiscale-state`). The tags select the integrator class and the preservation
   obligations (§3.4). An untagged block refuses (none exists in the current spec).
 - **S5 — cut stability under rewriting.** Stage-3 equality saturation must not lose the causal
   cut. Two facts make this cheap. (i) Saturation only *adds* nodes to e-classes; the
@@ -196,14 +196,14 @@ to "the properties the op-signature must satisfy, stated precisely."
   *trajectory-safety*: rewrites exact almost-everywhere but wrong on measure-zero sets (the
   `x/x → 1` family documented in the AD-correctness literature, §6.B) are tolerable for a
   pointwise scorer yet can matter for a flow that crosses or is attracted to the bad set. The
-  Stage-3 discipline ("all exact and AD-safe," `arch-07-pipeline §7.3`) already excludes
+  Stage-3 discipline ("all exact and AD-safe," `compose-time-pipeline §3`) already excludes
   these; the evolver adds motivation, not new machinery.
 - **S6 — single extraction, shared identity.** Both lowerings must consume **one** canonical
   Stage-3 extraction. Equality saturation deliberately forks identity inside the compile (an
   e-class holds many address-distinct equal terms); if the scorer and evolver extracted
   independently under different cost functions, the shared RHS would denote equal but
   address-distinct forests, silently breaking the sibling-artifact sharing and the kernel
-  cache (`arch-07-pipeline §7.6`, `arch-20-representations §20.4`). Rule: one extraction per
+  cache (`compose-time-pipeline §6`, `representation-substrate §4`). Rule: one extraction per
   compile; two lowerings of the extracted graph; the evolver artifact's own identity is a new
   domain-separated address family over the same composition fingerprint.
 
@@ -214,11 +214,11 @@ classical measure of how far a system is from steppable (§6.A). Per tier:
 
 - **Micro tier, dynamic reading (L1 clock):** index 0. All seven EOM rows are explicit; the
   admissibility conditions on the density-matrix slot (trace, spectral bounds —
-  `arch-11-residuals §11.1` Positivity/Conservation) are *invariants of the flow*, not
+  `residual-definitions §1` Positivity/Conservation) are *invariants of the flow*, not
   constraints coupled into it: the reversible block is an isospectral conjugation flow and
   the trace is conserved, so they are preservation obligations (§3.4), not index sources.
 - **Micro tier, Born–Oppenheimer reading (L2 clock):** the nested minimization
-  `E_BO = min over γ̂` (`arch-08-bo-levels`) makes the electronic slot a quasi-steady-state
+  `E_BO = min over γ̂` (`born-oppenheimer-levels`) makes the electronic slot a quasi-steady-state
   variable: the tier is a singularly perturbed system whose reduced form is a semi-explicit
   **index-1** DAE — differential slots `(R, P, h, Π_h)`, algebraic unknown `γ̂`, constraint
   "inner stationarity," regular exactly when the inner solve's Jacobian is nonsingular (the
@@ -226,7 +226,7 @@ classical measure of how far a system is from steppable (§6.A). Per tier:
   shared failure mode). The two readings are two *different matchings of the same graph* —
   causalization is not unique here, and the non-uniqueness is physical (timescale
   separation). A steppable lowering must record which matching it took (§3.2); the
-  architecture's adiabatic axiom (`arch-21-multiscale-state §21.0`) makes the reduced reading
+  architecture's adiabatic axiom (`multiscale-state §1`) makes the reduced reading
   the default.
 - **Slow tier:** index 0, stiff. The generator is a master-equation rate structure with
   Arrhenius rates spanning many decades — the stiffness class of exponential/implicit
@@ -250,17 +250,17 @@ coverage area 6):
 
 | Vocabulary / construction | Condition touched | Consequence |
 |---|---|---|
-| `Import`-pinned inputs + cert-only `ResidualLeaf` (`arch-16-pino-bridge §16.2`) | none — outside the EOM family | Constants/parameters to the evolver; their reference-check slots never become dynamics. Absent from the steppable form by construction. |
-| The 10 non-EOM residual categories (`arch-11-residuals §11.1`) | none — not equations of motion | Never candidates for causalization. `Conservation`/`Positivity`/`Degeneracy` re-enter as preservation obligations; `Algebraic/*`, `Static/*` at most as trajectory monitors (§2.8). |
+| `Import`-pinned inputs + cert-only `ResidualLeaf` (`pino-bridge §2`) | none — outside the EOM family | Constants/parameters to the evolver; their reference-check slots never become dynamics. Absent from the steppable form by construction. |
+| The 10 non-EOM residual categories (`residual-definitions §1`) | none — not equations of motion | Never candidates for causalization. `Conservation`/`Positivity`/`Degeneracy` re-enter as preservation obligations; `Algebraic/*`, `Static/*` at most as trajectory monitors (§2.8). |
 | `variational-minimization` fixed-point modes (SCF; the L2 nested min), `kinetic-evolution` steady-state modes (BTE-RTA), and the equilibrium/steady-state templates (`SelfConsistentChargeBalanceOf`, `SelfConsistentRenormalizationOf`, `MassActionEquilibriumOf`, `InterfaceEquilibriumOf`, `MicrokineticSteadyStateOf`) | S3 | Steppable **only** with a per-step solve plan (quasi-steady-state / index-1 reading); per-step cost enters the T3 class. Refused when the plan's regularity condition fails — the same failure the adjoint gate already reports. |
 | T3 rows generally (4 rows; e.g. the drift-diffusion hydrogen-redistribution row) | S3 | Same: solve-plan-or-absent. |
 | D4 relaxed rows (6 rows: 45, 46, 50, 67, 84, 85 — "surrogate" is the retired reading; the one actual learned surrogate, quasi-particle-shift-G0W0-surrogate, is D2) | S3/S4 | **Refused inside any RHS**: a surrogate's forward relaxation bias would become model error *of the vector field*, compounding along trajectories; their exact counterparts are nonsmooth/discrete. Witness: the surrogate-validity cert (obligation 9) magnitude. |
 | DN rows (6; integer/categorical — rows 96–100, 102) | none for the forward | Evaluable inside an RHS; excluded only from the evolver's optional tangent sibling. The diff-tag axis is orthogonal to steppability — a finding worth recording, since the brief conjectured otherwise. |
 | `path-search` method and template (NEB/dimer/string) | S1 | Boundary-value / saddle-search computations, not initial-value flows; no rate input exists. Refused as dynamics; they participate *parametrically* (their barrier outputs feed slow-tier Arrhenius rates). |
 | `statistical-sampling` (MC, MD-sampling, kMC) | S1/S4 | The method's semantics is distributional. The V1 evolver class is deterministic ODE/DAE flow; jump-process stepping (kMC) would be a distinct artifact class. Note the slow tier already uses the *mean-field* master-equation ODE, which is steppable. |
-| Macro `φ`/`j` algebraic rows (`arch-21-multiscale-state §21.9`) | S2 | Steppable via the index-1 witness; `j` alias-eliminated; `φ` needs one embedded elliptic solve per step (declared in the manifest). |
+| Macro `φ`/`j` algebraic rows (`multiscale-state §10`) | S2 | Steppable via the index-1 witness; `j` alias-eliminated; `φ` needs one embedded elliptic solve per step (declared in the manifest). |
 | `EOM/Z` (chemistry-inactive compositions) | S1 (degenerately) | Identically-zero generator: absent, with "null generator" as the recorded witness. |
-| Generated `AntisymmForm` cross-blocks with cert-graded Jacobi status (`arch-05-generic`) | S4 (grade, not violation) | Dispatchable to a Poisson/symplectic integrator only when the Jacobi grade is exact-by-construction; otherwise the block's preservation grade is downgraded in the manifest (the splitting still conserves energy by antisymmetry; the backward-error interpretation weakens). |
+| Generated `AntisymmForm` cross-blocks with cert-graded Jacobi status (`generic-dynamics`) | S4 (grade, not violation) | Dispatchable to a Poisson/symplectic integrator only when the Jacobi grade is exact-by-construction; otherwise the block's preservation grade is downgraded in the manifest (the splitting still conserves energy by antisymmetry; the backward-error interpretation weakens). |
 | `mesh-interpolation` sub-method and other compile-time interpolators | none | Compile-time table constructions; inside an RHS they are table reads. Unaffected. |
 
 ### 2.7 The rewriting substrate (coverage area 3, resolved)
@@ -276,9 +276,9 @@ E-graphs remain the right Stage-3 substrate under a two-lowering regime, with tw
   Saturation *inside* a compile may fork and re-canonicalize identities freely; the substrate's
   content-address discipline is preserved exactly because e-graph internals never cross the
   Stage-3 boundary (consistent with the V1 rule that e-graphs stay off the runtime path,
-  `arch-15-gamma-hat §15.4`). The evolver artifact then shares the scorer's RHS addresses by
+  `gamma-hat §4`). The evolver artifact then shares the scorer's RHS addresses by
   construction, and the sibling relationship is a filesystem-level fact
-  ([product] identity model; `arch-20-representations §20.4` domain separation for the
+  ([product] identity model; `representation-substrate §4` domain separation for the
   new artifact family).
 
 AD-safety interacts once more: the adjoint of the *evolver* (sensitivities of trajectories)
@@ -298,7 +298,7 @@ evolver story — they become its obligations, under the *same keys*.
   density-matrix spectral bounds exactly; concentrations and occupations need
   positivity-preserving schemes or projection; the closure bound `T_e ≥ T_L` is inherited from
   the closure form).
-- `Degeneracy` (cert-only, identically zero by construction, `arch-05-generic`) ↔ the
+- `Degeneracy` (cert-only, identically zero by construction, `generic-dynamics`) ↔ the
   *license* for reversible–irreversible splitting: because `L·δS = 0` and `M·δE = 0` per tier,
   the L-subflow conserves both generators' Lyapunov structure and the M-subflow conserves
   energy while producing entropy — each subflow inherits the full GENERIC structure, which is
@@ -313,7 +313,7 @@ downward (§2.3), shared obligation keys upward. This is the strongest architect
 that the two artifacts belong to one compile.
 
 One contract note: `CategoryTag` facets are deliberately non-semantic for the training
-consumer (`arch-11-residuals §11.2`). The evolver lowering must *read* the category facet at
+consumer (`residual-definitions §2`). The evolver lowering must *read* the category facet at
 compile time (to partition EOM vs obligation vs monitor). Facets are compile-visible sidecar
 data, so this is legal today; it should be recorded as a facet-consumer when the lowering is
 specified.
@@ -328,7 +328,7 @@ Stages 1–3 are shared verbatim — S6 *requires* it, and everything the loweri
 (pruned graph, symmetry sidecar, invariant sidecar, sparsity/incidence, category facets,
 fixed-point facts) already exists at Stage 4. Stage 4 gains one concurrent decision cluster
 beside compression-plan selection, adjoint synthesis, the adjoint-tape materialization
-schedule, and codegen (`arch-07-pipeline §7.4`):
+schedule, and codegen (`compose-time-pipeline §4`):
 
 - **causalization audit** — check S1–S4 per tier over the extracted graph; compute the
   matching, the alias eliminations, the index witness, and the per-block generator tags;
@@ -356,10 +356,10 @@ four-part artifact anatomy ([product]):
    preservation grades, the obligation map (`ResidualKey → conserve | bound | monotone`),
    embedded solve plans with their regularity conditions and per-step cost class, the cadence
    contract (tier clock; which time-averaged micro quantities and homogenized coefficient
-   closures it reads — the `arch-21-multiscale-state §21.5/§21.8` contracts, reified), and
+   closures it reads — the `multiscale-state §6/§21.8` contracts, reified), and
    the **refusal ledger** (§4).
 3. **Identity** — content hash in a new domain-separated address family
-   (`arch-20-representations §20.4`), stamped with the same composition fingerprint and
+   (`representation-substrate §4`), stamped with the same composition fingerprint and
    registry/spec versions as its scorer sibling; immutable, like every artifact.
 4. **Certificate reference** — hash-pinned evidence for the new obligation this artifact
    introduces (below).
@@ -370,10 +370,10 @@ four-part artifact anatomy ([product]):
   `residual(state, env, ẋ) = ‖ẋ − tangent(state, env, params)‖²` up to serializer/float
   normalization — testable mechanically by evaluating both siblings on sampled states,
   exactly the differential-golden-test pattern already guarding the Stage-4→Stage-5 seam
-  (`arch-18-open-decisions`). This is the new cert obligation: **the evolver never introduces
+  (`open-decisions`). This is the new cert obligation: **the evolver never introduces
   a second truth**; it re-exposes the scorer's RHS.
 - **Score-not-solve is preserved where it lives.** The product still never fills in state,
-  never owns a loop, never evolves anything ([product] §8; `arch-01-purpose`). The
+  never owns a loop, never evolves anything ([product] §8; `purpose-and-scope`). The
   tangent map is a per-call pure readout — "the instantaneous lawful tendency at the supplied
   state" — not a trajectory. Integration is the consumer's (§5).
 - **Cost classes are declared, not inherited.** The scorer's `O(log n)`-hot-path/no-solver
@@ -418,7 +418,7 @@ manifest requirements rather than method choices:
   closures, micro reads slow/macro as adiabatic parameters. So the evolver never forms one
   cross-tier system — it emits one steppable form per tier plus the coupling contract, and
   the multirate order theory (MRI-GARK class) applies when a consumer steps two tiers
-  numerically at once. This preserves the `arch-21-multiscale-state` no-cross-tier-DAE
+  numerically at once. This preserves the `multiscale-state` no-cross-tier-DAE
   design decision at the dynamics level.
 
 ### 3.5 Scope recommendation (V-ordering, not a commitment)
@@ -445,7 +445,7 @@ remains the product's fast-evolution answer).
 > manifest's refusal ledger — no prose, no runtime error, no partial dynamics.
 
 This is the product's existing refusal semantics ([product] §4 "refusal is absence";
-`arch-12-cert`) applied to a second artifact: refusal modes are enum codes; witnesses are
+`cert-obligations`) applied to a second artifact: refusal modes are enum codes; witnesses are
 machine data (the deficient matching's unmatched rows, the offending node address, the
 singular-Jacobian sample, the surrogate-bias magnitude).
 
@@ -465,7 +465,7 @@ singular-Jacobian sample, the surrogate-bias magnitude).
 4. **`solve-plan-unavailable`** — fixed-point interior node with no regular plan (singular or
    near-singular fixed-point Jacobian at sampled states — the adjoint gate's failure mode,
    shared). Witness: the sampled conditioning number, τ-thresholded like the existing
-   registration gates (`impl-07-residual-factory §7.5` pattern).
+   registration gates (`residual-machinery §5` pattern).
 5. **`surrogate-in-rhs`** — D4 rows inside a would-be RHS. Witness: the obligation-9
    validation error magnitude.
 6. **`structure-grade-degraded`** — not a refusal but a grade: generated `AntisymmForm`
@@ -494,7 +494,7 @@ failures refuse loudly (classes 3/4 above), never degrade silently.
 
 ## 5. Proposed resolution of the integrator-interface open decision
 
-`arch-18-open-decisions` item 5 asks for "the exact signature `dynamics` exposes to
+`open-decisions` item 5 asks for "the exact signature `dynamics` exposes to
 `/informed-operator` for handing off the assembled GENERIC right-hand side." Conditional on
 the §1 verdict, the research supports resolving it as follows.
 
@@ -629,7 +629,7 @@ cited throughout by id (`arch-xx`, `impl-xx`, [product], [computational-overview
   for coupled fast/slow stepping; §3.4.)
 - W. E, B. Engquist, "The heterogeneous multiscale methods," *Commun. Math. Sci.*
   1(1):87–132, 2003. (Macro-solver-with-micro-estimator; the pattern the
-  `arch-21-multiscale-state` adiabatic contract instantiates.)
+  `multiscale-state` adiabatic contract instantiates.)
 - M. Hochbruck, A. Ostermann, "Exponential integrators," *Acta Numerica* 19:209–286, 2010.
   (The stiffness class of the slow tier's Arrhenius rate structure.)
 - R. Car, M. Parrinello, "Unified approach for molecular dynamics and density-functional

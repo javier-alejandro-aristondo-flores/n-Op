@@ -21,7 +21,7 @@ bowing, B3). Diamond battery: landed (gap-audit Phase 3). c-BN / 4H-SiC: Wave 3.
    (μ < 200 cm²/Vs at 300 K despite a GaN-like m*; Ma 2016 **[verified]**). This splits the old
    `is-polar-material` conflation into two predicates — `is-polar-material` (Born charges / LO–TO;
    gates Fröhlich/POP) vs `is-noncentrosymmetric` (piezo classes; gates rows 113–119/128) — now
-   normative in `arch-13-applicability`. **Wave-2 numbers must never be filtered through the old
+   normative in `applicability-classifiers`. **Wave-2 numbers must never be filtered through the old
    single-predicate assumption.**
 2. **Direction tags are mandatory on every anisotropic row.** Monoclinic anisotropy is large
    (κ[010]/κ[100] ≈ 2.5; α_ii direction-resolved; polarized absorption onsets spread ~0.3 eV).
@@ -48,7 +48,7 @@ bowing, B3). Diamond battery: landed (gap-audit Phase 3). c-BN / 4H-SiC: Wave 3.
    double-counts the strain term.
 5. **Hole physics = polarons, by design refusal.** Valence bands are flat; holes self-trap (STH)
    with sub-band-gap UV luminescence (~3.2–3.6 eV) and no band-like p-transport. The existing
-   cert-refuse stance (arch-17 "polaron localization beyond Fröhlich"; ledger: "holes never
+   cert-refuse stance (out-of-scope "polaron localization beyond Fröhlich"; ledger: "holes never
    measured") is the correct disposition — **do not seed hole mobility, hole α_ii, or a p-type
    Caughey–Thomas set; cert-refuse instead.** PL channel note: row 134's B_rad applies to the STH
    emission, not band-edge PL (there is essentially none).
@@ -98,7 +98,8 @@ bowing, B3). Diamond battery: landed (gap-audit Phase 3). c-BN / 4H-SiC: Wave 3.
 
 Source: resonant ultrasound spectroscopy + laser-Doppler interferometry, "Unusual elasticity of
 monoclinic β-Ga₂O₃", JAP 124 085102 (2018) **[verified]**. Notable anisotropy: C₁₁ ≈ 30% below
-C₂₂/C₃₃; C₄₄ vs C₆₆ differ >50% — Born-stability check must use the full monoclinic criteria
+C₂₂/C₃₃; C₄₄ vs C₆₆ differ >50% — the Born-stability check (row 57,
+`elastic-stability-criteria`) must use the full monoclinic criteria
 (row 57 generalizes; **not** the cubic reduced set).
 
 *Phonon / thermal:*
@@ -127,7 +128,7 @@ C₂₂/C₃₃; C₄₄ vs C₆₆ differ >50% — Born-stability check must us
 | E_d (radiation) | ≈25 eV | ±5 | non-eq H.1 (already carried) | literature |
 
 *Defect inventory pointers (for the future defect-formation-energies.csv; host row already in
-`arch-21 §21.2.1`):* V_O(I/II/III) are **deep donors** (~1 eV+) — *not* the n-type source (Si/Sn
+`multiscale-state §3.1`):* V_O(I/II/III) are **deep donors** (~1 eV+) — *not* the n-type source (Si/Sn
 shallow donors are); V_Ga deep acceptors (multiple charge states); STH self-trapping energies
 −0.39/−0.46 eV (O_I/O_II sites). Pinned at audit: **Varley, Weber, Janotti & Van de Walle,
 APL 97 142106 (2010), 10.1063/1.3499306 (+ Erratum APL 108 039901 (2016))** for V_O;
@@ -201,7 +202,7 @@ JSST 8 Q3083 (2019) and seeded).
    rider — G1 gate texts read 2026-07-16; pin-read residual** (the gate row rides in
    `polarization-piezoelectric.csv` until the FBA/Ambacher read).
 3. ✔ Registry: no new rows — Wave 2 is coefficients + gates (the predicate split landed with
-   this spec: `arch-13`, `arch-09 §9.3`, row 128's note).
+   this spec: `applicability-classifiers`, `canonical-vocabularies §3`, row 128's note).
 4. Open acquisitions (user): **G1 gate texts read 2026-07-16** (user-acquired FB Erratum;
    the "Ebert" paper — Lan et al., PRB 113, 155302 (2026) — turned out CC-BY, the
    audit-time 403 was a bot-block). Dispositions in the audit register's §4. **Residual:

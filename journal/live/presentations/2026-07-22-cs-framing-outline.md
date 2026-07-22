@@ -27,7 +27,7 @@ compiles the laws into **keyed, differentiable residual terms and their gradient
 that loss. That is the entire relationship. There is **no proposer component** — the operator
 emits a state, the oracle scores it, the residuals are loss terms. "Properties in → structures
 out" is a stated long-run *direction*; inverse design is explicitly out of scope for `/physics`
-([arch-17-out-of-scope]) and must be presented that way.
+([out-of-scope]) and must be presented that way.
 
 ## The pain → concept → resolution table (the engine of the talk)
 
@@ -131,7 +131,7 @@ observable is a new sentence, not new code.* Consequences: enumerable, traceable
 
 **Beat 15 — the state, and a representation choice that buys an asymptotic class.** The state is a
 fixed-width record; the electronic slot is the expensive one. Dense it is **`O(N_r²)`**
-([mvp-02-gamma-budget]) — but it is **never densified**: reciprocal, block-diagonal, stored as
+([gamma-budget]) — but it is **never densified**: reciprocal, block-diagonal, stored as
 orbitals (low-rank in the band index). **~18 MB at MVP scale versus ~460 MB densified.** This is
 the clearest single case of a CS instinct paying a physics dividend.
 
@@ -144,7 +144,7 @@ saturation) → back-end (lowering, adjoint synthesis, codegen) → emitted kern
 **Beat 17 — Stage 1 is literally a front end, and the static semantics are decidable.**
 [computational-overview]'s stage table: *"Symbolic lift: request + descriptors → pruned IR"* via
 **macro expansion + Boolean decision diagrams**. Then the static check — the
-**applicability-decidability invariant** ([impl-04-formulas]): every predicate is *first-order
+**applicability-decidability invariant** ([named-formulas]): every predicate is *first-order
 decidable* on typeclass tags, and **non-decidable classifiers are rejected at registration.**
 Decidability here is enforced, not aspirational. Payoff for this audience ([rationale]): *requests
 are decidable — they compile or are rejected, nothing fails ambiguously at runtime* →
@@ -157,13 +157,13 @@ specialization so the runtime hot path stays cheap. That is amortized analysis a
 
 **Beat 19 — the complexity ledger.** The headline is a *stated architectural commitment*: **no
 runtime per-sample hot path exceeds `O(log n)`, and none calls a solver**
-([computational-overview] §2.5, [arch-20-representations] §20.5). This is the "better" claim in
+([computational-overview] §2.5, [representation-substrate] §5). This is the "better" claim in
 its most defensible form — a checkable invariant rather than a vibe. → **D19**
 
 **Beat 20 — symmetry as an optimization pass.** Representation theory deployed the way a compiler
 deploys strength reduction: block-diagonalize by irrep, collapse orbits, and the work falls to the
 number of *orbits* rather than points. Compile-time cost is bounded and paid once — the Reynolds
-projection is `O(|G|·dim(T)²)` ≤ ~12M ops ([arch-19-coupling-structure]); the runtime projector
+projection is `O(|G|·dim(T)²)` ≤ ~12M ops ([coupling-structure]); the runtime projector
 apply is `O(|G|/|H| · tensor rank)`, cached after first evaluation. → **D6**
 
 **Beat 21 — circuit-level optimization on the law graph.** Hash-consing (`O(1)` amortized, [computational-overview]) and
@@ -189,12 +189,12 @@ contract: *it measures; it does not editorialize.*
 
 **Beat 26.** **Refusal is absence** (totality): a check the oracle cannot stand behind is not in
 the kernel at all, and the absence is accounted for. Applicability is a decidable predicate,
-evaluated as a decision diagram in `O(decision-path length)` ([arch-20-representations] §20.5).
+evaluated as a decision diagram in `O(decision-path length)` ([representation-substrate] §5).
 → **D9**
 
 **Beat 27.** **Proof-carrying results.** Every kernel carries a certificate: verdicts plus numeric
 witnesses, no natural language. Aggregation is a **semilattice meet** over Passed/Pending/Failed,
-`O(children)` with early exit on `Failed` ([arch-20-representations] §20.5) — algebraic, not ad
+`O(children)` with early exit on `Failed` ([representation-substrate] §5) — algebraic, not ad
 hoc. → **D10**
 
 **Beat 28.** **Content addressing.** Every object named by the hash of its canonical bytes; file
@@ -356,12 +356,12 @@ theoretical, promote D13–D16; if it skews applied, promote D6, D8, D19.
 ## Sources
 
 By page `id`: [rationale] (narrative), [product] (behavioral contract; CIF-as-compile-request, the
-closed grammar), [arch-07-pipeline], [computational-overview] (§2.5 hot-path commitments, stage
-table), [arch-20-representations] (§20.5 asymptotics), [arch-09-vocabularies] (counts),
-[arch-11-residuals], [arch-12-cert], [arch-13-applicability], [impl-04-formulas]
-(differentiability lattice; applicability-decidability invariant), [arch-19-coupling-structure]
-(projection bounds), [arch-14-topology] (Smith Normal Form, polynomial time),
-[mvp-02-gamma-budget] (`O(N_r²)`, the 18 MB figure), [traps], [arch-17-out-of-scope].
+closed grammar), [compose-time-pipeline], [computational-overview] (§2.5 hot-path commitments, stage
+table), [representation-substrate] (§20.5 asymptotics), [canonical-vocabularies] (counts),
+[residual-definitions], [cert-obligations], [applicability-classifiers], [named-formulas]
+(differentiability lattice; applicability-decidability invariant), [coupling-structure]
+(projection bounds), [topology-atlas] (Smith Normal Form, polynomial time),
+[gamma-budget] (`O(N_r²)`, the 18 MB figure), [traps], [out-of-scope].
 Negative result: `journal/live/specs/2026-07-16-evolver-duality-research.md`.
 
 External (brought, cite as such): Barahona 1982; Kitaev, and Kempe–Kitaev–Regev; Baker–Gill–Solovay

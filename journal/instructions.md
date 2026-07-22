@@ -22,8 +22,8 @@ pages/11-appendix-derivations/   supporting material, ranks below canon
 live/            work products still executing
                    live/specs/   tracks current truth
                    live/audits/  frozen dated records
-tools/           apparatus.py (regenerate + check), seams.py (mechanical sweeps),
-                 calibrate.py (plants defects; proves the other two are looking)
+tools/           check_book_structure.py (regenerate + check), check_data_agreement.py (mechanical sweeps),
+                 check_the_checkers.py (plants defects; proves the other two are looking)
 ```
 
 Everything else in the repo is data or code, not book: `physics/library/` (the
@@ -34,17 +34,23 @@ registry CSV, `retired-names.csv`, and the reference-data CSVs),
 
 | | what it is | use it for | stability |
 |---|---|---|---|
-| `id` | `arch-07-pipeline`, `accuracy-ledger` | **the address.** Every citation. | permanent |
-| `tag` | `4.2` | a display label for humans skimming | **disposable** — regenerated freely |
+| `id` | `compose-time-pipeline`, `accuracy-ledger` | **the address.** Every citation. Descriptive phrase, never a serial. | permanent |
+| `tag` | `4.2` | a display label for humans skimming | **disposable** — read off the filename, never written |
 | `content-hash` | `73b6142e008f` | did this page change under my working copy? | changes on every edit |
 
 **Cite the `id`, never the tag and never the file path.** Filenames and tags are
 presentational; ids are the contract. This is why the corpus could be moved
 wholesale into `pages/` without breaking a single cross-reference.
 
-Section coordinates attach to the id: `arch-12 §12.0.3`, `arch-07-pipeline §7.4`,
-`[timeline] §2026-07-07`. Files that are *not* pages — this one, the CSVs — have
-no id and are cited by path.
+Section coordinates attach to the id and are **bare ordinals**, numbered from 1
+within the page: `cert-obligations §1.3`, `compose-time-pipeline §4`,
+`[timeline] §2026-07-07`. They are not derived from the tag — the tag is
+disposable and the coordinate is not. Files that are *not* pages — this one, the
+CSVs — have no id and are cited by path.
+
+Ids used to carry a serial (`arch-20-representations`, sections §20.x, at tag
+4.3 — three numbers per page, none agreeing). All 38 were renamed on 2026-07-22;
+`physics/library/formulas/retired-ids.csv` maps old to new.
 
 ## 3. Book -> graph (how to load context)
 
@@ -58,7 +64,7 @@ no id and are cited by path.
    `referenced-by` lists what rests on it. Follow `depends-on` outward until you
    have the neighbourhood you need.
 4. **`depends-on` is not a build order.** The graph is cyclic by design —
-   `arch-04-state` and `arch-05-generic` each explain the other, and the corpus
+   `unified-state` and `generic-dynamics` each explain the other, and the corpus
    is one large strongly-connected component. Follow edges to find what to read
    *alongside* a page; do not compute a closure and read it as layering.
 5. Do not read the whole corpus. The apparatus exists so a task-scoped subset is
@@ -97,13 +103,13 @@ Three rules that bite in practice:
    `canonical-for` is machine-checked; duplicating a fact will eventually be
    caught, but duplicating it *silently* is what rots a corpus.
 4. Edit the page body. Leave the `content-hash` alone.
-5. If you cite another page's `[id]` in prose, add it to `depends-on` and add
-   yourself to that page's `referenced-by`. The checker derives this and will
-   tell you if you forget.
-6. Run `python journal/tools/apparatus.py`. It restamps hashes and regenerates
+5. If you cite another page's `[id]` in prose, add it to your `depends-on`. Do
+   **not** touch the other page's `referenced-by` — that field is generated from
+   every page's `depends-on` and restamped like `content-hash`.
+6. Run `python journal/tools/check_book_structure.py`. It restamps hashes and regenerates
    the apparatus. Then confirm both checkers are clean:
-   `python journal/tools/apparatus.py --check` and
-   `python journal/tools/seams.py`.
+   `python journal/tools/check_book_structure.py --check` and
+   `python journal/tools/check_data_agreement.py`.
 
 ## 6. Renaming a registry formula
 
@@ -113,7 +119,7 @@ Registry names are content addresses. Renaming one is a rekey, not an edit, so
 1. Change the `Name` cell in `registry-manifest.csv`.
 2. Add a row to `physics/library/formulas/retired-names.csv` mapping the old name
    to the new one.
-3. Sweep the prose. `seams.py` fails on any retired name a page mentions without
+3. Sweep the prose. `check_data_agreement.py` fails on any retired name a page mentions without
    resolving it in the same paragraph — an appendix may keep the historical name
    as long as the paragraph says what it landed as.
 
@@ -131,24 +137,32 @@ mechanically. Do not produce one.
 
 ## 8. What the checkers enforce
 
-`python journal/tools/apparatus.py --check` fails on:
+`python journal/tools/check_book_structure.py --check` fails on:
 
 1. missing or unparseable frontmatter, or a missing required field
-2. duplicate `id`, or a page filed in a folder its `chapter` does not match
+2. duplicate `id`
 3. **duplicate `canonical-for` topic** — the anti-drift invariant
-4. asymmetric `depends-on` / `referenced-by`
+4. a `depends-on` naming no page, or a stale generated `referenced-by`
 5. an `[id]` reference in prose that resolves to no page
 6. a body citing an `[id]` without the corresponding `depends-on` edge
 7. a section coordinate that resolves to no heading in the target
 8. a line-number citation (`file.md:42`) — line refs rot on every edit
 9. a registry count claim that disagrees with the CSV, including a per-tag
-   diff tally and a per-tier cost distribution quoted in prose
+   diff tally, a per-tier cost distribution, and the probe count
 10. a duplicated or skipped trap number, or a `[traps] §N` citing one that
     does not exist
-11. an out-of-vocabulary `status` or `authority`
+11. an out-of-vocabulary `authority`
 12. a stale `content-hash`
 
-`python journal/tools/seams.py` fails on sixteen classes: row-band claims whose
+Three former checks are gone because what they policed is gone. `chapter`,
+`chapter-name` and `tag` are read off the path instead of restated in
+frontmatter, so they cannot disagree with it. `referenced-by` is derived from
+every page's `depends-on`, so asymmetry and dangling reverse entries are not
+representable — only staleness, which is item 4. And `status` read `draft` on
+all 58 pages, a field shaped exactly like a signal that carried none.
+**An invariant held by construction beats one held by a checker.**
+
+`python journal/tools/check_data_agreement.py` fails on sixteen classes: row-band claims whose
 endpoints are not in the CSV; backticked formula names that are not registry rows;
 `formula =` arguments carrying inline mathematics, or an undeclared name; divergent
 tolerance literals; duplicate glossary entries; retired formula names left
@@ -158,8 +172,13 @@ relaxation; registry `name (row N)` pointers naming the wrong row;
 whose canonical pointer names no page; and, in the reference-data CSVs, rows with
 no uncertainty or no source, rows whose **field count** disagrees with the header,
 and dates that are non-ISO, in the future, or modified-before-added. Its sweep
-covers the book, the README, this file, the reference-data CSVs, and
-`informed-operator/design/`.
+covers the book, the README, this file, the reference-data CSVs,
+`informed-operator/design/`, and `journal/live/specs/`. **`live/audits/` is
+excluded and `live/specs/` is not** — an audit is a frozen dated record, whereas
+a spec tracks current truth (§4), so a stale claim in one misdirects the next
+agent instead of preserving history. The sweep read all of `journal/live/` as
+frozen until 2026-07-22, which is how research specs — the stratum agents
+actually write into — went unchecked the longest.
 
 The arity check earns its place: a `Source` cell holding an unquoted comma splits
 into extra fields and shifts every column right of it. One such row sat in
@@ -173,11 +192,11 @@ green does not mean a check ran: both checkers have shipped holes that made them
 silently skip whole classes of citation. Before citing a clean run as evidence,
 plant a defect of exactly the class you claim is absent and confirm the checker
 fails (`10.4-traps` §58). That is now a script:
-`python journal/tools/calibrate.py` plants a defect in a temporary copy and
-asserts it fires — 50 probes. It reports three failure modes, and all three are
+`python journal/tools/check_the_checkers.py` plants a defect in a temporary copy and
+asserts it fires — 59 probes. It reports three failure modes, and all three are
 holes: a **missed** probe is a hole in the checker; a **stale** probe — one whose
 planted text no longer exists — is a hole in the probe list; an **uncovered**
-check is one no probe reaches at all, which the script derives from `seams.py`'s
+check is one no probe reaches at all, which the script derives from `check_data_agreement.py`'s
 source rather than from a list it could drift from. That last mode exists because
 for most of this file's life the sentence above read "one defect per check" and
 was false of four seams classes and nine apparatus ones, while a clean run was

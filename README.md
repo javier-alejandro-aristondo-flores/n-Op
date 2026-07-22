@@ -27,7 +27,7 @@ apparatus exists so you do not have to.
 Chapters are **by concern**, and chapters **2–6 are the contiguous `/physics`
 oracle block** — for oracle-internal work that range is usually sufficient.
 
-Pages are addressed by their `id` (`arch-07-pipeline`, `accuracy-ledger`), never
+Pages are addressed by their `id` (`compose-time-pipeline`, `accuracy-ledger`), never
 by filename or by the display tag. That is why the corpus could be restructured
 wholesale without breaking a cross-reference.
 
@@ -39,7 +39,7 @@ wholesale without breaking a cross-reference.
   train networks, integrate trajectories, or wrap external DFT codes at runtime.
   This is the current focus.
   *Numerics-agnostic at its seam* (flat arrays, no framework tensors) while
-  internally committed to the representation substrate of `[arch-20-representations]`.
+  internally committed to the representation substrate of `[representation-substrate]`.
 - **`informed-operator/`** — the PINO itself; consumes `physics/` and learns the
   time-evolution operator.
 - **`interface/`** — where every driving loop lives (training, design search,
@@ -50,10 +50,10 @@ wholesale without breaking a cross-reference.
 `/physics` is a compiler that emits a numerical kernel, structured around two
 load-bearing concepts:
 
-- **The `PhysicsGraph`** (`[arch-06-physics-graph]`) — the canonical compose-time
+- **The `PhysicsGraph`** (`[physics-graph]`) — the canonical compose-time
   data structure. Three node kinds, typed dataflow edges, per-stage sidecars.
   Every observable, every residual, every certificate is a node.
-- **The 4+1 stage compose-time pipeline** (`[arch-07-pipeline]`) — symbolic lift
+- **The 4+1 stage compose-time pipeline** (`[compose-time-pipeline]`) — symbolic lift
   → symmetry quotient → invariant synthesis → algebraic simplification →
   lowering + adjoint synthesis → runtime kernel. Stages 1–4 run once per crystal
   identity; Stage 5 runs millions of times.
@@ -67,8 +67,8 @@ n-Op/
 │   ├── pages/NN-chapter/     one folder per chapter; 58 pages, 49 canon
 │   │   └── 11-appendix-derivations/   9 supporting derivations
 │   ├── live/                 work products still executing
-│   └── tools/                apparatus.py (regenerate + check) · seams.py (sweeps)
-│                             · calibrate.py (plants defects; proves the other two look)
+│   └── tools/                check_book_structure.py (regenerate + check) · check_data_agreement.py (sweeps)
+│                             · check_the_checkers.py (plants defects; proves the other two look)
 ├── physics/
 │   └── library/              code scaffold (no code yet)
 │       ├── formulas/registry-manifest.csv    the canonical formula registry
@@ -77,9 +77,9 @@ n-Op/
 └── interface/                placeholder
 ```
 
-Run `python journal/tools/apparatus.py` after editing any page: it restamps content
+Run `python journal/tools/check_book_structure.py` after editing any page: it restamps content
 hashes and regenerates `contents.md` / `index.md`. `--check` verifies without writing
-and is the gate, alongside `python journal/tools/seams.py`. Between them they fail on
+and is the gate, alongside `python journal/tools/check_data_agreement.py`. Between them they fail on
 a duplicate `canonical-for` topic, an asymmetric or missing dependency edge, an
 unresolvable `[id]`, a section coordinate or dated anchor that resolves to nothing, a
 line-number citation, a registry count, per-tag tally or per-tier distribution that
@@ -89,13 +89,13 @@ named relaxation, and a stale hash.
 **Green is not evidence a check ran.** Both checkers have shipped holes that made them
 skip whole classes of citation silently. Before citing a clean run, plant a defect of
 the class you are claiming is absent and confirm the checker fails (`[traps]` §58).
-`python journal/tools/calibrate.py` does exactly that — 50 probes into a temporary
+`python journal/tools/check_the_checkers.py` does exactly that — 59 probes into a temporary
 copy — and additionally reports any check that *no* probe reaches, since a calibration
 with holes in it is the same failure one level up.
 
 ## Open decisions
 
-Tracked in `[arch-18-open-decisions]`. The load-bearing ones:
+Tracked in `[open-decisions]`. The load-bearing ones:
 
 - **Implementation language — open.** A polyglot proposal (a typed functional
   compiler host with its own AD, a separate numeric runtime, offline computer
@@ -103,12 +103,12 @@ Tracked in `[arch-18-open-decisions]`. The load-bearing ones:
   not a commitment. Everything in the book stays language-neutral.
 - Surrogate-net build vs adopt; the PDE-mesh adjoint scheme; the Layer-1.75 spec.
   (The four γ̂ data-structure questions closed 2026-07-21 — identity stays exact
-  and ε is estimated beside it; see `[arch-15-gamma-hat]` §15.4.)
+  and ε is estimated beside it; see `[gamma-hat]` §4.)
 - **One** open verifier-soundness gap: no post-registration adjoint-drift
   monitoring — the registration gate validates the *formula's* adjoint, Stage 4
   synthesizes the *composition's* adjoint later over a rewritten graph, and
   nothing revalidates the second. Three others were named and closed on
-  2026-07-21; all four stay listed in `[arch-18-open-decisions]` with their
+  2026-07-21; all four stay listed in `[open-decisions]` with their
   resolutions, because an absent check reads exactly like a passing one and a
   silently closed one reads like it was never there.
 

@@ -24,8 +24,8 @@ ahc-zpr-isochoric,AlN (wz),0 K,−399 meV,25 meV,Engel 2022; Miglio 2020,dft-dfp
 ahc-zpr-lattice-expansion,GaN (wz),—,−49 meV,15 meV,Miglio npj CM 6 167 (2020),dft-dfpt,2,2026-06-10,2026-07-08
 ahc-zpr-lattice-expansion,AlN (wz),—,−85 meV,25 meV,Miglio 2020,dft-dfpt,2,2026-06-10,2026-07-08
 ahc-zpr-isochoric,diamond,0 K,−345 meV,25 meV,Antonius PRL 112 215501 (2014); Engel −323,gw,1,2026-06-10,2026-06-10
-lattice-constant-a,diamond,300 K,3.567 Å,0.001 Å,curated MVP anchor (mvp-01; standard XRD value),experimental,1,2026-07-08,2026-07-08
-bandgap-indirect,diamond,300 K,5.47 eV,0.01 eV,curated MVP anchor (mvp-01); PBE −23% ⇒ G₀W₀/hybrid path (registry row 6),experimental,1,2026-07-08,2026-07-08
+lattice-constant-a,diamond,300 K,3.567 Å,0.001 Å,curated MVP anchor (mvp-system; standard XRD value),experimental,1,2026-07-08,2026-07-08
+bandgap-indirect,diamond,300 K,5.47 eV,0.01 eV,curated MVP anchor (mvp-system); PBE −23% ⇒ G₀W₀/hybrid path (registry row 6),experimental,1,2026-07-08,2026-07-08
 dielectric-static,diamond,300 K,5.7,0.05,standard value (feeds image-force lowering; Fröhlich inert — non-polar),experimental,1,2026-07-08,2026-07-08
 cohesive-energy,diamond,0 K,7.37 eV/atom,0.05 eV/atom,standard experimental atomization anchor,experimental,1,2026-07-08,2026-07-08
 formation-energy-vs-graphite,diamond,"300 K, 1 atm",+25 meV/atom,5 meV/atom,Berman–Simon boundary point; consistent with tp-aware-hull (registry row 124) reading R=0 inside δ_meta,experimental-review,1,2026-07-08,2026-07-08
@@ -39,6 +39,6 @@ epsilon-static,β-Ga₂O₃ (C2/m),300 K ⊥(010),10.87,0.08,JSST 8 Q3083 (2019)
 epsilon-static,β-Ga₂O₃ (C2/m),300 K ⊥(001),12.4,0.4,JSST 8 Q3083 (2019),experimental,1,2026-07-16,2026-07-16
 ahc-zpr-gap-isochoric,β-Ga₂O₃ (C2/m),0 K,-0.20 eV,0.05 eV,Arabov et al. arXiv 2603.29484 (2026) clamped-cell harmonic sampling; Lee et al. APL Mater. 11 011106 (2023) -0.19±0.05; slope-kind isochoric (Wave-2 audit; composes with registry row 63),dft-mlip,1,2026-07-16,2026-07-16
 bandgap-shift-total-700K,β-Ga₂O₃ (C2/m),700 K vs 0 K,-0.45 eV,0.10 eV,Arabov 2026 — TOTAL incl. minor thermal-expansion term (NOT isochoric-only; do not compose with row 63),dft-mlip,1,2026-07-16,2026-07-16
-displacement-threshold-Ed,β-Ga₂O₃ (C2/m),—,25 eV,5 eV,literature (carried from non-equilibrium stratum H.1; arch-21 §21.3),literature-review,1,2026-07-16,2026-07-16
+displacement-threshold-Ed,β-Ga₂O₃ (C2/m),—,25 eV,5 eV,literature (carried from non-equilibrium stratum H.1; multiscale-state §4),literature-review,1,2026-07-16,2026-07-16
 crystal-field-splitting-delta-cr,AlN (wz),—,negative (Δ_cr < 0),sign only — magnitude not pinned,"Rinke et al. PRB 77 075202 (2008) 10.1103/PhysRevB.77.075202 — AlN inverts the III-N valence ordering: the topmost valence band is CH-like (crystal-field split-off), not HH/LH as in GaN. CONSEQUENCE, and the reason this row exists: there is deliberately NO AlN A-band hole-mass row, because the GaN-shaped entry (m*_h A-band 1.88/0.33) is undefined for a CH-like top band — an absent row here is a refusal, not an oversight. AlN band-edge emission is polarized along c for the same reason. Sign only; no numeric Delta_cr has ever been recorded in this project and none should be invented",gw,1,2026-07-21,2026-07-21
 crystal-field-splitting-delta-cr,GaN (wz),—,positive (Δ_cr > 0),sign only — magnitude not pinned,Rinke et al. PRB 77 075202 (2008) — normal III-N ordering; recorded alongside AlN so the exception is visible as a contrast rather than as an isolated fact,gw,1,2026-07-21,2026-07-21

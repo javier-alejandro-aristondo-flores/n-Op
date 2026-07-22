@@ -78,7 +78,7 @@ for path in EDITABLE:
 # (b2) `formula = <name>` arguments ---------------------------------------
 # A page may DECLARE unregistered names in its `unregistered-formulas`
 # frontmatter. Declared names are tracked, not defects; undeclared ones fail.
-# Inline mathematics is a separate violation (impl-04: "no inline math").
+# Inline mathematics is a separate violation (named-formulas: "no inline math").
 # Capture everything up to the closing delimiter, not just an ASCII identifier:
 # `formula = σ/(n·e)` slipped through an [A-Za-z0-9_.-]+ capture for years.
 FORMULA_ARG = re.compile(r'formula\s*=\s*(\{[^}]*\}[^,)`\n]*|[^,)`\n]+)')
@@ -117,7 +117,7 @@ for path in EDITABLE:
                 if not KEBAB.match(c):
                     findings['inline-math'].append(
                         f'{path.relative_to(REPO)}:{ln}: formula = {c} — inline mathematics '
-                        f'(impl-04-formulas forbids it; register a named row)')
+                        f'(named-formulas forbids it; register a named row)')
                 else:
                     findings['formula-arg'].append(
                         f'{path.relative_to(REPO)}:{ln}: formula = {c} — not a registry name '
@@ -148,7 +148,7 @@ for path in EDITABLE:
 
 # (c) duplicated numeric literals ------------------------------------------
 # The symbol list below is HARD-CODED and covers 9 of the 17 tolerance symbols in
-# `arch-12-cert §12.0.2`. It compares known symbols for divergent values between
+# `cert-obligations §1.2`. It compares known symbols for divergent values between
 # sites; it does not discover a symbol introduced without a row there. That page
 # states the limitation; this comment is here so the limitation is visible from
 # the checker too, rather than only from the page it fails to cover.
@@ -252,7 +252,7 @@ for r in rows:
                 f'but row {num} is `{row_by_num.get(num, "MISSING")}`')
 
 # (k) reference-data rows must carry a sigma and a source ------------------
-# arch-19 §19.8: an unprovenanced coefficient refuses the composition, and a
+# coupling-structure §8: an unprovenanced coefficient refuses the composition, and a
 # sigma-column hole makes that refusal un-checkable. The rule was asserted in
 # canon and verified once by hand during a 2026-07 audit; nothing kept it true.
 for _p in sorted((REPO / 'physics/library/cert/reference-data').glob('*.csv')):
@@ -261,7 +261,7 @@ for _p in sorted((REPO / 'physics/library/cert/reference-data').glob('*.csv')):
         _label = f"{_r.get('Property')}/{_r.get('Material')}"
         if 'GAP' not in _v.upper() and not (_r.get('Uncertainty') or '').strip():
             findings['refdata-sigma'].append(
-                f'{_p.name}: {_label} has no uncertainty (arch-19 §19.8)')
+                f'{_p.name}: {_label} has no uncertainty (coupling-structure §8)')
         if not (_r.get('Source') or '').strip():
             findings['refdata-source'].append(
                 f'{_p.name}: {_label} has no source (unprovenanced coefficient)')
@@ -304,7 +304,7 @@ for _p in sorted((REPO / 'physics/library/cert/reference-data').glob('*.csv')):
                 f"was Added {_seen['Added']}")
 
 # (g) D2/D4 rows must carry their gate/relaxation rationale in `source` -----
-# A D4 row with no named relaxation is un-gateable (impl-04-formulas); the
+# A D4 row with no named relaxation is un-gateable (named-formulas); the
 # obligation-9 approval has nothing to approve.
 RELAX_WORDS = ('relax', 'soft', 'log-sum-exp', 'gumbel', 'sigmoid', 'smooth')
 for r in rows:

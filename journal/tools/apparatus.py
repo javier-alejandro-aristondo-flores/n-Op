@@ -5,21 +5,24 @@ Emits at the repo root:
     contents.md   chapters -> pages, in reading order (the table of contents)
     index.md      canonical topic -> owning page (the "one fact, one home" index)
 
+Restamps three tool-maintained things: `content-hash`, the derived
+`referenced-by`, and the probe count quoted in prose.
+
 Checks (exit 1 on any failure):
      1. every page has parseable frontmatter and the required fields
-     2. `id` globally unique; page filed in the folder its `chapter` names
+     2. `id` globally unique
      3. `canonical-for` topics globally unique   <- the anti-drift invariant
-     4. `depends-on` / `referenced-by` symmetric, both directions, no unknown ids
+     4. `depends-on` names a real page; `referenced-by` is not stale
      5. every [id] reference in prose resolves to a real page
      6. a body citing an [id] has the corresponding depends-on edge
-     7. section coordinates (`§12.0.3`, `§2026-06-10 (parenthetical)`) resolve,
+     7. section coordinates (`§1.3`, `§2026-06-10 (parenthetical)`) resolve,
         and an ambiguous dated anchor is rejected
      8. no line-number citations (`file.md:42` rots on every edit)
      9. registry counts: substantive/marker totals, the five other canonical
-        vocabulary phrasings, the ledger headline, the per-tag diff tally, and
-        the per-tier cost distribution
+        vocabulary phrasings, the ledger headline, the per-tag diff tally, the
+        per-tier cost distribution, and the probe count
     10. trap numbering contiguous, and `[traps] §N` resolves
-    11. `status` / `authority` in vocabulary
+    11. `authority` in vocabulary
     12. `content-hash` matches the body (stale hash = someone edited by hand
         without regenerating, which breaks working-copy staleness detection)
 
@@ -243,7 +246,7 @@ def check(pages: list[dict]) -> list[str]:
                             f"depends-on it (conventions, edge criterion)")
 
     # No acyclicity check, deliberately. `depends-on` is a reference relation
-    # between explanations, not a build order: arch-04-state and arch-05-generic
+    # between explanations, not a build order: unified-state and generic-dynamics
     # each explain the other, and the corpus is one large strongly-connected
     # component by design. A cycle check here would fire forty times and mean
     # nothing. Nothing may compute a transitive closure over this graph and read
@@ -292,7 +295,7 @@ def check_counts(pages: list[dict]) -> list[str]:
 
     canon = next((r for r in pages if "vocabulary counts" in r["canonical-for"]), None)
     if canon is None:
-        canon = next((r for r in pages if r["id"] == "arch-09-vocabularies"), None)
+        canon = next((r for r in pages if r["id"] == "canonical-vocabularies"), None)
     if canon is None:
         return ["no page claims `vocabulary counts` — cannot check counts"]
 
@@ -333,9 +336,9 @@ def check_counts(pages: list[dict]) -> list[str]:
     # fires until the constant is updated deliberately. Verified 2026-07-22
     # against the actual lists: 12 methods, 20 templates, 11 bundles, 10
     # obligations, 4 typeclasses, and 9+3+5+2 = 19 categories.
-    TITLE_ANCHOR = {"impl-02-methods": ("methods", r"(\d+) computational methods"),
-                    "impl-03-templates": ("templates", r"(\d+) abstract-property templates"),
-                    "impl-05-bundles": ("observable bundles", r"(\d+) observable bundles")}
+    TITLE_ANCHOR = {"computational-methods": ("methods", r"(\d+) computational methods"),
+                    "property-templates": ("templates", r"(\d+) abstract-property templates"),
+                    "observable-bundles": ("observable bundles", r"(\d+) observable bundles")}
     for r in pages:
         anchor = TITLE_ANCHOR.get(r["id"])
         if not anchor:
@@ -433,8 +436,14 @@ def check_citations(pages: list[dict]) -> list[str]:
         by_date: dict[str, list[str]] = {}
         for line in r["body"].splitlines():
             if line.startswith("#"):
-                # numeric section coordinates (4.2, 12.0.3)
-                for tok in re.findall(r"\b\d+(?:\.\d+)+\b", line):
+                # The section number is the leading token of the heading, and
+                # only that. Matching every number in the line would harvest
+                # "the 12 computational methods" as a coordinate; requiring a
+                # dot -- which this did, for the old `20.1` scheme -- misses the
+                # bare ordinals the corpus uses now (`## 3 Per-cluster table`).
+                lead = re.match(r"^#+\s+(\d+(?:\.\d+)*)(?!\S)", line)
+                if lead:
+                    tok = lead.group(1)
                     found.add(tok)
                     found.add(tok.split(".")[0])
                 # dated headings: pages like [timeline] are cited by date, and a
@@ -445,20 +454,17 @@ def check_citations(pages: list[dict]) -> list[str]:
         coords[r["id"]] = found
         dated[r["id"]] = by_date
 
-    # the corpus cites both full ids (`arch-12-cert §12.0.3`) and the historical
-    # short form (`arch-12 §12.0.3`); resolve the short form by unique prefix
-    prefix: dict[str, str] = {}
-    for pid in coords:
-        m = re.match(r"^((?:arch|impl|mvp)-\d+)-", pid)
-        if m:
-            prefix.setdefault(m.group(1), pid)
+    # No short-form resolution any more. The corpus used to cite `arch-12
+    # §12.0.3` alongside the full `arch-12-cert §12.0.3`, and this resolved the
+    # bare prefix to a page. Both forms are gone: ids no longer carry a serial
+    # number, and section coordinates are bare ordinals under the id
+    # (`cert-obligations §1.3`). One address, one spelling.
 
     cite = re.compile(
         r"\[?([a-z][a-z0-9-]{3,})\]?[`\s]*§(\d{4}-\d{2}-\d{2}|\d+(?:\.\d+)*)"
         r"(?:\s*\(([^)]{1,60})\))?")
     for r in pages:
         for pid, coord, paren in cite.findall(r["body"]):
-            pid = pid if pid in coords else prefix.get(pid, pid)
             if pid not in coords or not coords[pid]:
                 continue          # unknown target or a page with no numbered headings
             if coord not in coords[pid] and coord.split(".")[0] not in coords[pid]:
@@ -512,7 +518,7 @@ def check_citations(pages: list[dict]) -> list[str]:
     # cite items by number ("arch-18 item 3"). Inserting an item without
     # renumbering silently repoints every such citation. Found the hard way: an
     # insertion on 2026-07-22 produced two items numbered 5, and nothing saw it.
-    opens = next((r for r in pages if r["id"] == "arch-18-open-decisions"), None)
+    opens = next((r for r in pages if r["id"] == "open-decisions"), None)
     if opens is not None:
         head, _, _ = opens["body"].partition("**Verifier-soundness gaps")
         nums = [int(n) for n in re.findall(r"^(\d+)\. ", head, re.M)]

@@ -34,7 +34,7 @@ registry CSV, `retired-names.csv`, and the reference-data CSVs),
 
 | | what it is | use it for | stability |
 |---|---|---|---|
-| `id` | `arch-07-pipeline`, `accuracy-ledger` | **the address.** Every citation. | permanent |
+| `id` | `compose-time-pipeline`, `accuracy-ledger` | **the address.** Every citation. Descriptive phrase, never a serial. | permanent |
 | `tag` | `4.2` | a display label for humans skimming | **disposable** — read off the filename, never written |
 | `content-hash` | `73b6142e008f` | did this page change under my working copy? | changes on every edit |
 
@@ -42,9 +42,15 @@ registry CSV, `retired-names.csv`, and the reference-data CSVs),
 presentational; ids are the contract. This is why the corpus could be moved
 wholesale into `pages/` without breaking a single cross-reference.
 
-Section coordinates attach to the id: `arch-12 §12.0.3`, `arch-07-pipeline §7.4`,
-`[timeline] §2026-07-07`. Files that are *not* pages — this one, the CSVs — have
-no id and are cited by path.
+Section coordinates attach to the id and are **bare ordinals**, numbered from 1
+within the page: `cert-obligations §1.3`, `compose-time-pipeline §4`,
+`[timeline] §2026-07-07`. They are not derived from the tag — the tag is
+disposable and the coordinate is not. Files that are *not* pages — this one, the
+CSVs — have no id and are cited by path.
+
+Ids used to carry a serial (`arch-20-representations`, sections §20.x, at tag
+4.3 — three numbers per page, none agreeing). All 38 were renamed on 2026-07-22;
+`physics/library/formulas/retired-ids.csv` maps old to new.
 
 ## 3. Book -> graph (how to load context)
 
@@ -58,7 +64,7 @@ no id and are cited by path.
    `referenced-by` lists what rests on it. Follow `depends-on` outward until you
    have the neighbourhood you need.
 4. **`depends-on` is not a build order.** The graph is cyclic by design —
-   `arch-04-state` and `arch-05-generic` each explain the other, and the corpus
+   `unified-state` and `generic-dynamics` each explain the other, and the corpus
    is one large strongly-connected component. Follow edges to find what to read
    *alongside* a page; do not compute a closure and read it as layering.
 5. Do not read the whole corpus. The apparatus exists so a task-scoped subset is

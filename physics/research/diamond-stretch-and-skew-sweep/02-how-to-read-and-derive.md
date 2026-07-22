@@ -23,11 +23,11 @@ VASP-canonical names you will see in VASP's own documentation.
 
 ## Part A — the needs-map
 
-n-Op consumes external data through ground-truth-bridge records (`arch-16-pino-bridge`
-§16.2): `(value, σ, provenance, coverage-mask)` targets attached to observables, gated by
+n-Op consumes external data through ground-truth-bridge records (`pino-bridge`
+§2): `(value, σ, provenance, coverage-mask)` targets attached to observables, gated by
 applicability. This dataset is a *computed* provenance class (DFT), distinct from the
 experimental constants in the cert reference battery. It is a sweep over `h`, the cell-vector
-state component (`arch-04-state`) — at fixed composition, fixed everything else.
+state component (`unified-state`) — at fixed composition, fixed everything else.
 
 | Need (bundle / artifact) | Quantity | Recipe | Status |
 |---|---|---|---|

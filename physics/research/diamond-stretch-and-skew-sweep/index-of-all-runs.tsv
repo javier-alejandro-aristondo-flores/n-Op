@@ -1,0 +1,1211 @@
+# Diamond stretch-and-skew sweep — one row per computed cell shape. 1179 rows.
+#
+# WHAT THIS IS. Each row is one shape of a 2-carbon-atom box, computed twice by VASP:
+#   <run_directory_inside_archive>/1-cheap-pbe-atoms-relaxed/    fast approximation, atoms allowed to settle
+#   <run_directory_inside_archive>/2-accurate-hse06-atoms-fixed/ accurate hybrid, single shot at the above geometry
+# Reference shape: the experimental diamond cube edge a0 = 3.567 A. The 2-atom box uses the
+# vectors (0,a/2,a/2), (a/2,0,a/2), (a/2,a/2,0). Reference volume = a0^3/4 = 11.345 A^3.
+#
+# COLUMNS
+#   source_archive_file                    which .tar.gz in renamed-archives/ holds this run
+#   run_directory_inside_archive           path inside that archive. Opaque locator: hand it to tar,
+#                                          do not parse it. Filter on the numeric columns instead.
+#   kind_of_shape_change                   which sampling family this point belongs to
+#   target_cell_volume_in_cubic_angstroms  only for scale-all-axes-uniformly; blank elsewhere
+#   fractional_stretch_along_[xyz]_axis    fractional length change. 0.005 = 0.5% LONGER. blank = axis not stretched.
+#   skew_of_[a]_axis_toward_[b]_axis       skew amount. 0.05 means a shifts by 0.05 x b. blank = plane not skewed.
+#                                          These are simple skews: they carry a rotation, and they preserve
+#                                          volume exactly (det F = 1.000000 for every skew point).
+#   duplicate_group                        NON-EMPTY = this shape is computed more than once in this dataset.
+#                                          72 rows across 24 groups are duplicates: 24 single-skew shapes each
+#                                          appear once in skew-one-plane and twice in skew-two-planes (each plane
+#                                          belongs to 2 of the 3 plane-pairs). All copies are BIT-IDENTICAL.
+#                                          *** DE-DUPLICATE BEFORE ANY FIT OR TRAINING SET. *** Otherwise these
+#                                          24 shapes carry 3x weight. 1179 rows = 1131 distinct shapes.
+#   recovery_status                        complete for all 1179 rows. The 2026-07-16 re-download from the
+#                                          original source healed the earlier truncation; nothing is partial.
+#
+# TRAPS. Do not infer the deformation from the directory name — recompute it from the lattice.
+# Do not compare the deformation gradient F across families: the scale-all-axes-uniformly POSCARs use a
+# different lattice frame, so their F carries a rotation that is a frame artifact, not physics
+# (F^T F is isotropic to 1e-11). Compare Green-Lagrange strain or F^T F instead.
+source_archive_file	run_directory_inside_archive	kind_of_shape_change	target_cell_volume_in_cubic_angstroms	fractional_stretch_along_x_axis	fractional_stretch_along_y_axis	fractional_stretch_along_z_axis	skew_of_x_axis_toward_y_axis	skew_of_x_axis_toward_z_axis	skew_of_y_axis_toward_z_axis	duplicate_group	recovery_status
+1-scale-all-axes-uniformly.tar.gz	1-scale-all-axes-uniformly/cell-volume-10.05-cubic-angstroms	scale-all-axes-uniformly	10.0500								complete
+1-scale-all-axes-uniformly.tar.gz	1-scale-all-axes-uniformly/cell-volume-10.10-cubic-angstroms	scale-all-axes-uniformly	10.1000								complete
+1-scale-all-axes-uniformly.tar.gz	1-scale-all-axes-uniformly/cell-volume-10.15-cubic-angstroms	scale-all-axes-uniformly	10.1500								complete
+1-scale-all-axes-uniformly.tar.gz	1-scale-all-axes-uniformly/cell-volume-10.20-cubic-angstroms	scale-all-axes-uniformly	10.2000								complete
+1-scale-all-axes-uniformly.tar.gz	1-scale-all-axes-uniformly/cell-volume-10.25-cubic-angstroms	scale-all-axes-uniformly	10.2500								complete
+1-scale-all-axes-uniformly.tar.gz	1-scale-all-axes-uniformly/cell-volume-10.30-cubic-angstroms	scale-all-axes-uniformly	10.3000								complete
+1-scale-all-axes-uniformly.tar.gz	1-scale-all-axes-uniformly/cell-volume-10.35-cubic-angstroms	scale-all-axes-uniformly	10.3500								complete
+1-scale-all-axes-uniformly.tar.gz	1-scale-all-axes-uniformly/cell-volume-10.40-cubic-angstroms	scale-all-axes-uniformly	10.4000								complete
+1-scale-all-axes-uniformly.tar.gz	1-scale-all-axes-uniformly/cell-volume-10.45-cubic-angstroms	scale-all-axes-uniformly	10.4500								complete
+1-scale-all-axes-uniformly.tar.gz	1-scale-all-axes-uniformly/cell-volume-10.50-cubic-angstroms	scale-all-axes-uniformly	10.5000								complete
+1-scale-all-axes-uniformly.tar.gz	1-scale-all-axes-uniformly/cell-volume-10.55-cubic-angstroms	scale-all-axes-uniformly	10.5500								complete
+1-scale-all-axes-uniformly.tar.gz	1-scale-all-axes-uniformly/cell-volume-10.60-cubic-angstroms	scale-all-axes-uniformly	10.6000								complete
+1-scale-all-axes-uniformly.tar.gz	1-scale-all-axes-uniformly/cell-volume-10.65-cubic-angstroms	scale-all-axes-uniformly	10.6500								complete
+1-scale-all-axes-uniformly.tar.gz	1-scale-all-axes-uniformly/cell-volume-10.70-cubic-angstroms	scale-all-axes-uniformly	10.7000								complete
+1-scale-all-axes-uniformly.tar.gz	1-scale-all-axes-uniformly/cell-volume-10.75-cubic-angstroms	scale-all-axes-uniformly	10.7500								complete
+1-scale-all-axes-uniformly.tar.gz	1-scale-all-axes-uniformly/cell-volume-10.80-cubic-angstroms	scale-all-axes-uniformly	10.8000								complete
+1-scale-all-axes-uniformly.tar.gz	1-scale-all-axes-uniformly/cell-volume-10.85-cubic-angstroms	scale-all-axes-uniformly	10.8500								complete
+1-scale-all-axes-uniformly.tar.gz	1-scale-all-axes-uniformly/cell-volume-10.90-cubic-angstroms	scale-all-axes-uniformly	10.9000								complete
+1-scale-all-axes-uniformly.tar.gz	1-scale-all-axes-uniformly/cell-volume-10.95-cubic-angstroms	scale-all-axes-uniformly	10.9500								complete
+1-scale-all-axes-uniformly.tar.gz	1-scale-all-axes-uniformly/cell-volume-11.00-cubic-angstroms	scale-all-axes-uniformly	11.0000								complete
+1-scale-all-axes-uniformly.tar.gz	1-scale-all-axes-uniformly/cell-volume-11.05-cubic-angstroms	scale-all-axes-uniformly	11.0500								complete
+1-scale-all-axes-uniformly.tar.gz	1-scale-all-axes-uniformly/cell-volume-11.10-cubic-angstroms	scale-all-axes-uniformly	11.1000								complete
+1-scale-all-axes-uniformly.tar.gz	1-scale-all-axes-uniformly/cell-volume-11.15-cubic-angstroms	scale-all-axes-uniformly	11.1500								complete
+1-scale-all-axes-uniformly.tar.gz	1-scale-all-axes-uniformly/cell-volume-11.20-cubic-angstroms	scale-all-axes-uniformly	11.2000								complete
+1-scale-all-axes-uniformly.tar.gz	1-scale-all-axes-uniformly/cell-volume-11.25-cubic-angstroms	scale-all-axes-uniformly	11.2500								complete
+1-scale-all-axes-uniformly.tar.gz	1-scale-all-axes-uniformly/cell-volume-11.30-cubic-angstroms	scale-all-axes-uniformly	11.3000								complete
+1-scale-all-axes-uniformly.tar.gz	1-scale-all-axes-uniformly/cell-volume-11.35-cubic-angstroms	scale-all-axes-uniformly	11.3500								complete
+1-scale-all-axes-uniformly.tar.gz	1-scale-all-axes-uniformly/cell-volume-11.40-cubic-angstroms	scale-all-axes-uniformly	11.4000								complete
+1-scale-all-axes-uniformly.tar.gz	1-scale-all-axes-uniformly/cell-volume-11.45-cubic-angstroms	scale-all-axes-uniformly	11.4500								complete
+1-scale-all-axes-uniformly.tar.gz	1-scale-all-axes-uniformly/cell-volume-11.50-cubic-angstroms	scale-all-axes-uniformly	11.5000								complete
+1-scale-all-axes-uniformly.tar.gz	1-scale-all-axes-uniformly/cell-volume-11.55-cubic-angstroms	scale-all-axes-uniformly	11.5500								complete
+1-scale-all-axes-uniformly.tar.gz	1-scale-all-axes-uniformly/cell-volume-11.60-cubic-angstroms	scale-all-axes-uniformly	11.6000								complete
+1-scale-all-axes-uniformly.tar.gz	1-scale-all-axes-uniformly/cell-volume-11.65-cubic-angstroms	scale-all-axes-uniformly	11.6500								complete
+1-scale-all-axes-uniformly.tar.gz	1-scale-all-axes-uniformly/cell-volume-11.70-cubic-angstroms	scale-all-axes-uniformly	11.7000								complete
+1-scale-all-axes-uniformly.tar.gz	1-scale-all-axes-uniformly/cell-volume-11.75-cubic-angstroms	scale-all-axes-uniformly	11.7500								complete
+1-scale-all-axes-uniformly.tar.gz	1-scale-all-axes-uniformly/cell-volume-11.80-cubic-angstroms	scale-all-axes-uniformly	11.8000								complete
+1-scale-all-axes-uniformly.tar.gz	1-scale-all-axes-uniformly/cell-volume-11.85-cubic-angstroms	scale-all-axes-uniformly	11.8500								complete
+1-scale-all-axes-uniformly.tar.gz	1-scale-all-axes-uniformly/cell-volume-11.90-cubic-angstroms	scale-all-axes-uniformly	11.9000								complete
+1-scale-all-axes-uniformly.tar.gz	1-scale-all-axes-uniformly/cell-volume-11.95-cubic-angstroms	scale-all-axes-uniformly	11.9500								complete
+1-scale-all-axes-uniformly.tar.gz	1-scale-all-axes-uniformly/cell-volume-12.00-cubic-angstroms	scale-all-axes-uniformly	12.0000								complete
+1-scale-all-axes-uniformly.tar.gz	1-scale-all-axes-uniformly/cell-volume-12.05-cubic-angstroms	scale-all-axes-uniformly	12.0500								complete
+1-scale-all-axes-uniformly.tar.gz	1-scale-all-axes-uniformly/cell-volume-12.10-cubic-angstroms	scale-all-axes-uniformly	12.1000								complete
+1-scale-all-axes-uniformly.tar.gz	1-scale-all-axes-uniformly/cell-volume-12.15-cubic-angstroms	scale-all-axes-uniformly	12.1500								complete
+1-scale-all-axes-uniformly.tar.gz	1-scale-all-axes-uniformly/cell-volume-12.20-cubic-angstroms	scale-all-axes-uniformly	12.2000								complete
+1-scale-all-axes-uniformly.tar.gz	1-scale-all-axes-uniformly/cell-volume-12.25-cubic-angstroms	scale-all-axes-uniformly	12.2500								complete
+1-scale-all-axes-uniformly.tar.gz	1-scale-all-axes-uniformly/cell-volume-12.30-cubic-angstroms	scale-all-axes-uniformly	12.3000								complete
+1-scale-all-axes-uniformly.tar.gz	1-scale-all-axes-uniformly/cell-volume-12.35-cubic-angstroms	scale-all-axes-uniformly	12.3500								complete
+2-stretch-one-axis-or-two-axes.tar.gz	2-stretch-one-axis-or-two-axes/stretch-x-and-y-axes-by-minus-0.005	stretch-x-and-y-axes-equally		-0.005	-0.005						complete
+2-stretch-one-axis-or-two-axes.tar.gz	2-stretch-one-axis-or-two-axes/stretch-x-and-y-axes-by-minus-0.010	stretch-x-and-y-axes-equally		-0.010	-0.010						complete
+2-stretch-one-axis-or-two-axes.tar.gz	2-stretch-one-axis-or-two-axes/stretch-x-and-y-axes-by-minus-0.015	stretch-x-and-y-axes-equally		-0.015	-0.015						complete
+2-stretch-one-axis-or-two-axes.tar.gz	2-stretch-one-axis-or-two-axes/stretch-x-and-y-axes-by-minus-0.020	stretch-x-and-y-axes-equally		-0.020	-0.020						complete
+2-stretch-one-axis-or-two-axes.tar.gz	2-stretch-one-axis-or-two-axes/stretch-x-and-y-axes-by-minus-0.025	stretch-x-and-y-axes-equally		-0.025	-0.025						complete
+2-stretch-one-axis-or-two-axes.tar.gz	2-stretch-one-axis-or-two-axes/stretch-x-and-y-axes-by-minus-0.030	stretch-x-and-y-axes-equally		-0.030	-0.030						complete
+2-stretch-one-axis-or-two-axes.tar.gz	2-stretch-one-axis-or-two-axes/stretch-x-and-y-axes-by-minus-0.035	stretch-x-and-y-axes-equally		-0.035	-0.035						complete
+2-stretch-one-axis-or-two-axes.tar.gz	2-stretch-one-axis-or-two-axes/stretch-x-and-y-axes-by-minus-0.040	stretch-x-and-y-axes-equally		-0.040	-0.040						complete
+2-stretch-one-axis-or-two-axes.tar.gz	2-stretch-one-axis-or-two-axes/stretch-x-and-y-axes-by-minus-0.045	stretch-x-and-y-axes-equally		-0.045	-0.045						complete
+2-stretch-one-axis-or-two-axes.tar.gz	2-stretch-one-axis-or-two-axes/stretch-x-and-y-axes-by-minus-0.050	stretch-x-and-y-axes-equally		-0.050	-0.050						complete
+2-stretch-one-axis-or-two-axes.tar.gz	2-stretch-one-axis-or-two-axes/stretch-x-and-y-axes-by-minus-0.055	stretch-x-and-y-axes-equally		-0.055	-0.055						complete
+2-stretch-one-axis-or-two-axes.tar.gz	2-stretch-one-axis-or-two-axes/stretch-x-and-y-axes-by-minus-0.060	stretch-x-and-y-axes-equally		-0.060	-0.060						complete
+2-stretch-one-axis-or-two-axes.tar.gz	2-stretch-one-axis-or-two-axes/stretch-x-and-y-axes-by-minus-0.065	stretch-x-and-y-axes-equally		-0.065	-0.065						complete
+2-stretch-one-axis-or-two-axes.tar.gz	2-stretch-one-axis-or-two-axes/stretch-x-and-y-axes-by-minus-0.070	stretch-x-and-y-axes-equally		-0.070	-0.070						complete
+2-stretch-one-axis-or-two-axes.tar.gz	2-stretch-one-axis-or-two-axes/stretch-x-and-y-axes-by-minus-0.075	stretch-x-and-y-axes-equally		-0.075	-0.075						complete
+2-stretch-one-axis-or-two-axes.tar.gz	2-stretch-one-axis-or-two-axes/stretch-x-and-y-axes-by-minus-0.080	stretch-x-and-y-axes-equally		-0.080	-0.080						complete
+2-stretch-one-axis-or-two-axes.tar.gz	2-stretch-one-axis-or-two-axes/stretch-x-and-y-axes-by-minus-0.085	stretch-x-and-y-axes-equally		-0.085	-0.085						complete
+2-stretch-one-axis-or-two-axes.tar.gz	2-stretch-one-axis-or-two-axes/stretch-x-and-y-axes-by-minus-0.090	stretch-x-and-y-axes-equally		-0.090	-0.090						complete
+2-stretch-one-axis-or-two-axes.tar.gz	2-stretch-one-axis-or-two-axes/stretch-x-and-y-axes-by-minus-0.095	stretch-x-and-y-axes-equally		-0.095	-0.095						complete
+2-stretch-one-axis-or-two-axes.tar.gz	2-stretch-one-axis-or-two-axes/stretch-x-and-y-axes-by-minus-0.100	stretch-x-and-y-axes-equally		-0.100	-0.100						complete
+2-stretch-one-axis-or-two-axes.tar.gz	2-stretch-one-axis-or-two-axes/stretch-x-and-y-axes-by-plus-0.005	stretch-x-and-y-axes-equally		0.005	0.005						complete
+2-stretch-one-axis-or-two-axes.tar.gz	2-stretch-one-axis-or-two-axes/stretch-x-and-y-axes-by-plus-0.010	stretch-x-and-y-axes-equally		0.010	0.010						complete
+2-stretch-one-axis-or-two-axes.tar.gz	2-stretch-one-axis-or-two-axes/stretch-x-and-y-axes-by-plus-0.015	stretch-x-and-y-axes-equally		0.015	0.015						complete
+2-stretch-one-axis-or-two-axes.tar.gz	2-stretch-one-axis-or-two-axes/stretch-x-and-y-axes-by-plus-0.020	stretch-x-and-y-axes-equally		0.020	0.020						complete
+2-stretch-one-axis-or-two-axes.tar.gz	2-stretch-one-axis-or-two-axes/stretch-x-and-y-axes-by-plus-0.025	stretch-x-and-y-axes-equally		0.025	0.025						complete
+2-stretch-one-axis-or-two-axes.tar.gz	2-stretch-one-axis-or-two-axes/stretch-x-and-y-axes-by-plus-0.030	stretch-x-and-y-axes-equally		0.030	0.030						complete
+2-stretch-one-axis-or-two-axes.tar.gz	2-stretch-one-axis-or-two-axes/stretch-x-and-y-axes-by-plus-0.035	stretch-x-and-y-axes-equally		0.035	0.035						complete
+2-stretch-one-axis-or-two-axes.tar.gz	2-stretch-one-axis-or-two-axes/stretch-x-and-y-axes-by-plus-0.040	stretch-x-and-y-axes-equally		0.040	0.040						complete
+2-stretch-one-axis-or-two-axes.tar.gz	2-stretch-one-axis-or-two-axes/stretch-x-and-y-axes-by-plus-0.045	stretch-x-and-y-axes-equally		0.045	0.045						complete
+2-stretch-one-axis-or-two-axes.tar.gz	2-stretch-one-axis-or-two-axes/stretch-x-and-y-axes-by-plus-0.050	stretch-x-and-y-axes-equally		0.050	0.050						complete
+2-stretch-one-axis-or-two-axes.tar.gz	2-stretch-one-axis-or-two-axes/stretch-x-and-y-axes-by-plus-0.055	stretch-x-and-y-axes-equally		0.055	0.055						complete
+2-stretch-one-axis-or-two-axes.tar.gz	2-stretch-one-axis-or-two-axes/stretch-x-and-y-axes-by-plus-0.060	stretch-x-and-y-axes-equally		0.060	0.060						complete
+2-stretch-one-axis-or-two-axes.tar.gz	2-stretch-one-axis-or-two-axes/stretch-x-and-y-axes-by-plus-0.065	stretch-x-and-y-axes-equally		0.065	0.065						complete
+2-stretch-one-axis-or-two-axes.tar.gz	2-stretch-one-axis-or-two-axes/stretch-x-and-y-axes-by-plus-0.070	stretch-x-and-y-axes-equally		0.070	0.070						complete
+2-stretch-one-axis-or-two-axes.tar.gz	2-stretch-one-axis-or-two-axes/stretch-x-and-y-axes-by-plus-0.075	stretch-x-and-y-axes-equally		0.075	0.075						complete
+2-stretch-one-axis-or-two-axes.tar.gz	2-stretch-one-axis-or-two-axes/stretch-x-and-y-axes-by-plus-0.080	stretch-x-and-y-axes-equally		0.080	0.080						complete
+2-stretch-one-axis-or-two-axes.tar.gz	2-stretch-one-axis-or-two-axes/stretch-x-and-y-axes-by-plus-0.085	stretch-x-and-y-axes-equally		0.085	0.085						complete
+2-stretch-one-axis-or-two-axes.tar.gz	2-stretch-one-axis-or-two-axes/stretch-x-and-y-axes-by-plus-0.090	stretch-x-and-y-axes-equally		0.090	0.090						complete
+2-stretch-one-axis-or-two-axes.tar.gz	2-stretch-one-axis-or-two-axes/stretch-x-and-y-axes-by-plus-0.095	stretch-x-and-y-axes-equally		0.095	0.095						complete
+2-stretch-one-axis-or-two-axes.tar.gz	2-stretch-one-axis-or-two-axes/stretch-x-and-y-axes-by-plus-0.100	stretch-x-and-y-axes-equally		0.100	0.100						complete
+2-stretch-one-axis-or-two-axes.tar.gz	2-stretch-one-axis-or-two-axes/stretch-x-axis-by-minus-0.005	stretch-x-axis-only		-0.005							complete
+2-stretch-one-axis-or-two-axes.tar.gz	2-stretch-one-axis-or-two-axes/stretch-x-axis-by-minus-0.010	stretch-x-axis-only		-0.010							complete
+2-stretch-one-axis-or-two-axes.tar.gz	2-stretch-one-axis-or-two-axes/stretch-x-axis-by-minus-0.015	stretch-x-axis-only		-0.015							complete
+2-stretch-one-axis-or-two-axes.tar.gz	2-stretch-one-axis-or-two-axes/stretch-x-axis-by-minus-0.020	stretch-x-axis-only		-0.020							complete
+2-stretch-one-axis-or-two-axes.tar.gz	2-stretch-one-axis-or-two-axes/stretch-x-axis-by-minus-0.025	stretch-x-axis-only		-0.025							complete
+2-stretch-one-axis-or-two-axes.tar.gz	2-stretch-one-axis-or-two-axes/stretch-x-axis-by-minus-0.030	stretch-x-axis-only		-0.030							complete
+2-stretch-one-axis-or-two-axes.tar.gz	2-stretch-one-axis-or-two-axes/stretch-x-axis-by-minus-0.035	stretch-x-axis-only		-0.035							complete
+2-stretch-one-axis-or-two-axes.tar.gz	2-stretch-one-axis-or-two-axes/stretch-x-axis-by-minus-0.040	stretch-x-axis-only		-0.040							complete
+2-stretch-one-axis-or-two-axes.tar.gz	2-stretch-one-axis-or-two-axes/stretch-x-axis-by-minus-0.045	stretch-x-axis-only		-0.045							complete
+2-stretch-one-axis-or-two-axes.tar.gz	2-stretch-one-axis-or-two-axes/stretch-x-axis-by-minus-0.050	stretch-x-axis-only		-0.050							complete
+2-stretch-one-axis-or-two-axes.tar.gz	2-stretch-one-axis-or-two-axes/stretch-x-axis-by-minus-0.055	stretch-x-axis-only		-0.055							complete
+2-stretch-one-axis-or-two-axes.tar.gz	2-stretch-one-axis-or-two-axes/stretch-x-axis-by-minus-0.060	stretch-x-axis-only		-0.060							complete
+2-stretch-one-axis-or-two-axes.tar.gz	2-stretch-one-axis-or-two-axes/stretch-x-axis-by-minus-0.065	stretch-x-axis-only		-0.065							complete
+2-stretch-one-axis-or-two-axes.tar.gz	2-stretch-one-axis-or-two-axes/stretch-x-axis-by-minus-0.070	stretch-x-axis-only		-0.070							complete
+2-stretch-one-axis-or-two-axes.tar.gz	2-stretch-one-axis-or-two-axes/stretch-x-axis-by-minus-0.075	stretch-x-axis-only		-0.075							complete
+2-stretch-one-axis-or-two-axes.tar.gz	2-stretch-one-axis-or-two-axes/stretch-x-axis-by-minus-0.080	stretch-x-axis-only		-0.080							complete
+2-stretch-one-axis-or-two-axes.tar.gz	2-stretch-one-axis-or-two-axes/stretch-x-axis-by-minus-0.085	stretch-x-axis-only		-0.085							complete
+2-stretch-one-axis-or-two-axes.tar.gz	2-stretch-one-axis-or-two-axes/stretch-x-axis-by-minus-0.090	stretch-x-axis-only		-0.090							complete
+2-stretch-one-axis-or-two-axes.tar.gz	2-stretch-one-axis-or-two-axes/stretch-x-axis-by-minus-0.095	stretch-x-axis-only		-0.095							complete
+2-stretch-one-axis-or-two-axes.tar.gz	2-stretch-one-axis-or-two-axes/stretch-x-axis-by-minus-0.100	stretch-x-axis-only		-0.100							complete
+2-stretch-one-axis-or-two-axes.tar.gz	2-stretch-one-axis-or-two-axes/stretch-x-axis-by-plus-0.005	stretch-x-axis-only		0.005							complete
+2-stretch-one-axis-or-two-axes.tar.gz	2-stretch-one-axis-or-two-axes/stretch-x-axis-by-plus-0.010	stretch-x-axis-only		0.010							complete
+2-stretch-one-axis-or-two-axes.tar.gz	2-stretch-one-axis-or-two-axes/stretch-x-axis-by-plus-0.015	stretch-x-axis-only		0.015							complete
+2-stretch-one-axis-or-two-axes.tar.gz	2-stretch-one-axis-or-two-axes/stretch-x-axis-by-plus-0.020	stretch-x-axis-only		0.020							complete
+2-stretch-one-axis-or-two-axes.tar.gz	2-stretch-one-axis-or-two-axes/stretch-x-axis-by-plus-0.025	stretch-x-axis-only		0.025							complete
+2-stretch-one-axis-or-two-axes.tar.gz	2-stretch-one-axis-or-two-axes/stretch-x-axis-by-plus-0.030	stretch-x-axis-only		0.030							complete
+2-stretch-one-axis-or-two-axes.tar.gz	2-stretch-one-axis-or-two-axes/stretch-x-axis-by-plus-0.035	stretch-x-axis-only		0.035							complete
+2-stretch-one-axis-or-two-axes.tar.gz	2-stretch-one-axis-or-two-axes/stretch-x-axis-by-plus-0.040	stretch-x-axis-only		0.040							complete
+2-stretch-one-axis-or-two-axes.tar.gz	2-stretch-one-axis-or-two-axes/stretch-x-axis-by-plus-0.045	stretch-x-axis-only		0.045							complete
+2-stretch-one-axis-or-two-axes.tar.gz	2-stretch-one-axis-or-two-axes/stretch-x-axis-by-plus-0.050	stretch-x-axis-only		0.050							complete
+2-stretch-one-axis-or-two-axes.tar.gz	2-stretch-one-axis-or-two-axes/stretch-x-axis-by-plus-0.055	stretch-x-axis-only		0.055							complete
+2-stretch-one-axis-or-two-axes.tar.gz	2-stretch-one-axis-or-two-axes/stretch-x-axis-by-plus-0.060	stretch-x-axis-only		0.060							complete
+2-stretch-one-axis-or-two-axes.tar.gz	2-stretch-one-axis-or-two-axes/stretch-x-axis-by-plus-0.065	stretch-x-axis-only		0.065							complete
+2-stretch-one-axis-or-two-axes.tar.gz	2-stretch-one-axis-or-two-axes/stretch-x-axis-by-plus-0.070	stretch-x-axis-only		0.070							complete
+2-stretch-one-axis-or-two-axes.tar.gz	2-stretch-one-axis-or-two-axes/stretch-x-axis-by-plus-0.075	stretch-x-axis-only		0.075							complete
+2-stretch-one-axis-or-two-axes.tar.gz	2-stretch-one-axis-or-two-axes/stretch-x-axis-by-plus-0.080	stretch-x-axis-only		0.080							complete
+2-stretch-one-axis-or-two-axes.tar.gz	2-stretch-one-axis-or-two-axes/stretch-x-axis-by-plus-0.085	stretch-x-axis-only		0.085							complete
+2-stretch-one-axis-or-two-axes.tar.gz	2-stretch-one-axis-or-two-axes/stretch-x-axis-by-plus-0.090	stretch-x-axis-only		0.090							complete
+2-stretch-one-axis-or-two-axes.tar.gz	2-stretch-one-axis-or-two-axes/stretch-x-axis-by-plus-0.095	stretch-x-axis-only		0.095							complete
+2-stretch-one-axis-or-two-axes.tar.gz	2-stretch-one-axis-or-two-axes/stretch-x-axis-by-plus-0.100	stretch-x-axis-only		0.100							complete
+3-skew-one-plane.tar.gz	3-skew-one-plane/skew-x-toward-y-by-minus-0.005	skew-x-toward-y					-0.005				complete
+3-skew-one-plane.tar.gz	3-skew-one-plane/skew-x-toward-y-by-minus-0.010	skew-x-toward-y					-0.010				complete
+3-skew-one-plane.tar.gz	3-skew-one-plane/skew-x-toward-y-by-minus-0.015	skew-x-toward-y					-0.015				complete
+3-skew-one-plane.tar.gz	3-skew-one-plane/skew-x-toward-y-by-minus-0.020	skew-x-toward-y					-0.020				complete
+3-skew-one-plane.tar.gz	3-skew-one-plane/skew-x-toward-y-by-minus-0.025	skew-x-toward-y					-0.025			dup-group-01	complete
+3-skew-one-plane.tar.gz	3-skew-one-plane/skew-x-toward-y-by-minus-0.030	skew-x-toward-y					-0.030				complete
+3-skew-one-plane.tar.gz	3-skew-one-plane/skew-x-toward-y-by-minus-0.035	skew-x-toward-y					-0.035				complete
+3-skew-one-plane.tar.gz	3-skew-one-plane/skew-x-toward-y-by-minus-0.040	skew-x-toward-y					-0.040				complete
+3-skew-one-plane.tar.gz	3-skew-one-plane/skew-x-toward-y-by-minus-0.045	skew-x-toward-y					-0.045				complete
+3-skew-one-plane.tar.gz	3-skew-one-plane/skew-x-toward-y-by-minus-0.050	skew-x-toward-y					-0.050			dup-group-02	complete
+3-skew-one-plane.tar.gz	3-skew-one-plane/skew-x-toward-y-by-minus-0.055	skew-x-toward-y					-0.055				complete
+3-skew-one-plane.tar.gz	3-skew-one-plane/skew-x-toward-y-by-minus-0.060	skew-x-toward-y					-0.060				complete
+3-skew-one-plane.tar.gz	3-skew-one-plane/skew-x-toward-y-by-minus-0.065	skew-x-toward-y					-0.065				complete
+3-skew-one-plane.tar.gz	3-skew-one-plane/skew-x-toward-y-by-minus-0.070	skew-x-toward-y					-0.070				complete
+3-skew-one-plane.tar.gz	3-skew-one-plane/skew-x-toward-y-by-minus-0.075	skew-x-toward-y					-0.075			dup-group-03	complete
+3-skew-one-plane.tar.gz	3-skew-one-plane/skew-x-toward-y-by-minus-0.080	skew-x-toward-y					-0.080				complete
+3-skew-one-plane.tar.gz	3-skew-one-plane/skew-x-toward-y-by-minus-0.085	skew-x-toward-y					-0.085				complete
+3-skew-one-plane.tar.gz	3-skew-one-plane/skew-x-toward-y-by-minus-0.090	skew-x-toward-y					-0.090				complete
+3-skew-one-plane.tar.gz	3-skew-one-plane/skew-x-toward-y-by-minus-0.095	skew-x-toward-y					-0.095				complete
+3-skew-one-plane.tar.gz	3-skew-one-plane/skew-x-toward-y-by-minus-0.100	skew-x-toward-y					-0.100			dup-group-04	complete
+3-skew-one-plane.tar.gz	3-skew-one-plane/skew-x-toward-y-by-plus-0.005	skew-x-toward-y					0.005				complete
+3-skew-one-plane.tar.gz	3-skew-one-plane/skew-x-toward-y-by-plus-0.010	skew-x-toward-y					0.010				complete
+3-skew-one-plane.tar.gz	3-skew-one-plane/skew-x-toward-y-by-plus-0.015	skew-x-toward-y					0.015				complete
+3-skew-one-plane.tar.gz	3-skew-one-plane/skew-x-toward-y-by-plus-0.020	skew-x-toward-y					0.020				complete
+3-skew-one-plane.tar.gz	3-skew-one-plane/skew-x-toward-y-by-plus-0.025	skew-x-toward-y					0.025			dup-group-05	complete
+3-skew-one-plane.tar.gz	3-skew-one-plane/skew-x-toward-y-by-plus-0.030	skew-x-toward-y					0.030				complete
+3-skew-one-plane.tar.gz	3-skew-one-plane/skew-x-toward-y-by-plus-0.035	skew-x-toward-y					0.035				complete
+3-skew-one-plane.tar.gz	3-skew-one-plane/skew-x-toward-y-by-plus-0.040	skew-x-toward-y					0.040				complete
+3-skew-one-plane.tar.gz	3-skew-one-plane/skew-x-toward-y-by-plus-0.045	skew-x-toward-y					0.045				complete
+3-skew-one-plane.tar.gz	3-skew-one-plane/skew-x-toward-y-by-plus-0.050	skew-x-toward-y					0.050			dup-group-06	complete
+3-skew-one-plane.tar.gz	3-skew-one-plane/skew-x-toward-y-by-plus-0.055	skew-x-toward-y					0.055				complete
+3-skew-one-plane.tar.gz	3-skew-one-plane/skew-x-toward-y-by-plus-0.060	skew-x-toward-y					0.060				complete
+3-skew-one-plane.tar.gz	3-skew-one-plane/skew-x-toward-y-by-plus-0.065	skew-x-toward-y					0.065				complete
+3-skew-one-plane.tar.gz	3-skew-one-plane/skew-x-toward-y-by-plus-0.070	skew-x-toward-y					0.070				complete
+3-skew-one-plane.tar.gz	3-skew-one-plane/skew-x-toward-y-by-plus-0.075	skew-x-toward-y					0.075			dup-group-07	complete
+3-skew-one-plane.tar.gz	3-skew-one-plane/skew-x-toward-y-by-plus-0.080	skew-x-toward-y					0.080				complete
+3-skew-one-plane.tar.gz	3-skew-one-plane/skew-x-toward-y-by-plus-0.085	skew-x-toward-y					0.085				complete
+3-skew-one-plane.tar.gz	3-skew-one-plane/skew-x-toward-y-by-plus-0.090	skew-x-toward-y					0.090				complete
+3-skew-one-plane.tar.gz	3-skew-one-plane/skew-x-toward-y-by-plus-0.095	skew-x-toward-y					0.095				complete
+3-skew-one-plane.tar.gz	3-skew-one-plane/skew-x-toward-y-by-plus-0.100	skew-x-toward-y					0.100			dup-group-08	complete
+3-skew-one-plane.tar.gz	3-skew-one-plane/skew-x-toward-z-by-minus-0.005	skew-x-toward-z						-0.005			complete
+3-skew-one-plane.tar.gz	3-skew-one-plane/skew-x-toward-z-by-minus-0.010	skew-x-toward-z						-0.010			complete
+3-skew-one-plane.tar.gz	3-skew-one-plane/skew-x-toward-z-by-minus-0.015	skew-x-toward-z						-0.015			complete
+3-skew-one-plane.tar.gz	3-skew-one-plane/skew-x-toward-z-by-minus-0.020	skew-x-toward-z						-0.020			complete
+3-skew-one-plane.tar.gz	3-skew-one-plane/skew-x-toward-z-by-minus-0.025	skew-x-toward-z						-0.025		dup-group-09	complete
+3-skew-one-plane.tar.gz	3-skew-one-plane/skew-x-toward-z-by-minus-0.030	skew-x-toward-z						-0.030			complete
+3-skew-one-plane.tar.gz	3-skew-one-plane/skew-x-toward-z-by-minus-0.035	skew-x-toward-z						-0.035			complete
+3-skew-one-plane.tar.gz	3-skew-one-plane/skew-x-toward-z-by-minus-0.040	skew-x-toward-z						-0.040			complete
+3-skew-one-plane.tar.gz	3-skew-one-plane/skew-x-toward-z-by-minus-0.045	skew-x-toward-z						-0.045			complete
+3-skew-one-plane.tar.gz	3-skew-one-plane/skew-x-toward-z-by-minus-0.050	skew-x-toward-z						-0.050		dup-group-10	complete
+3-skew-one-plane.tar.gz	3-skew-one-plane/skew-x-toward-z-by-minus-0.055	skew-x-toward-z						-0.055			complete
+3-skew-one-plane.tar.gz	3-skew-one-plane/skew-x-toward-z-by-minus-0.060	skew-x-toward-z						-0.060			complete
+3-skew-one-plane.tar.gz	3-skew-one-plane/skew-x-toward-z-by-minus-0.065	skew-x-toward-z						-0.065			complete
+3-skew-one-plane.tar.gz	3-skew-one-plane/skew-x-toward-z-by-minus-0.070	skew-x-toward-z						-0.070			complete
+3-skew-one-plane.tar.gz	3-skew-one-plane/skew-x-toward-z-by-minus-0.075	skew-x-toward-z						-0.075		dup-group-11	complete
+3-skew-one-plane.tar.gz	3-skew-one-plane/skew-x-toward-z-by-minus-0.080	skew-x-toward-z						-0.080			complete
+3-skew-one-plane.tar.gz	3-skew-one-plane/skew-x-toward-z-by-minus-0.085	skew-x-toward-z						-0.085			complete
+3-skew-one-plane.tar.gz	3-skew-one-plane/skew-x-toward-z-by-minus-0.090	skew-x-toward-z						-0.090			complete
+3-skew-one-plane.tar.gz	3-skew-one-plane/skew-x-toward-z-by-minus-0.095	skew-x-toward-z						-0.095			complete
+3-skew-one-plane.tar.gz	3-skew-one-plane/skew-x-toward-z-by-minus-0.100	skew-x-toward-z						-0.100		dup-group-12	complete
+3-skew-one-plane.tar.gz	3-skew-one-plane/skew-x-toward-z-by-plus-0.005	skew-x-toward-z						0.005			complete
+3-skew-one-plane.tar.gz	3-skew-one-plane/skew-x-toward-z-by-plus-0.010	skew-x-toward-z						0.010			complete
+3-skew-one-plane.tar.gz	3-skew-one-plane/skew-x-toward-z-by-plus-0.015	skew-x-toward-z						0.015			complete
+3-skew-one-plane.tar.gz	3-skew-one-plane/skew-x-toward-z-by-plus-0.020	skew-x-toward-z						0.020			complete
+3-skew-one-plane.tar.gz	3-skew-one-plane/skew-x-toward-z-by-plus-0.025	skew-x-toward-z						0.025		dup-group-13	complete
+3-skew-one-plane.tar.gz	3-skew-one-plane/skew-x-toward-z-by-plus-0.030	skew-x-toward-z						0.030			complete
+3-skew-one-plane.tar.gz	3-skew-one-plane/skew-x-toward-z-by-plus-0.035	skew-x-toward-z						0.035			complete
+3-skew-one-plane.tar.gz	3-skew-one-plane/skew-x-toward-z-by-plus-0.040	skew-x-toward-z						0.040			complete
+3-skew-one-plane.tar.gz	3-skew-one-plane/skew-x-toward-z-by-plus-0.045	skew-x-toward-z						0.045			complete
+3-skew-one-plane.tar.gz	3-skew-one-plane/skew-x-toward-z-by-plus-0.050	skew-x-toward-z						0.050		dup-group-14	complete
+3-skew-one-plane.tar.gz	3-skew-one-plane/skew-x-toward-z-by-plus-0.055	skew-x-toward-z						0.055			complete
+3-skew-one-plane.tar.gz	3-skew-one-plane/skew-x-toward-z-by-plus-0.060	skew-x-toward-z						0.060			complete
+3-skew-one-plane.tar.gz	3-skew-one-plane/skew-x-toward-z-by-plus-0.065	skew-x-toward-z						0.065			complete
+3-skew-one-plane.tar.gz	3-skew-one-plane/skew-x-toward-z-by-plus-0.070	skew-x-toward-z						0.070			complete
+3-skew-one-plane.tar.gz	3-skew-one-plane/skew-x-toward-z-by-plus-0.075	skew-x-toward-z						0.075		dup-group-15	complete
+3-skew-one-plane.tar.gz	3-skew-one-plane/skew-x-toward-z-by-plus-0.080	skew-x-toward-z						0.080			complete
+3-skew-one-plane.tar.gz	3-skew-one-plane/skew-x-toward-z-by-plus-0.085	skew-x-toward-z						0.085			complete
+3-skew-one-plane.tar.gz	3-skew-one-plane/skew-x-toward-z-by-plus-0.090	skew-x-toward-z						0.090			complete
+3-skew-one-plane.tar.gz	3-skew-one-plane/skew-x-toward-z-by-plus-0.095	skew-x-toward-z						0.095			complete
+3-skew-one-plane.tar.gz	3-skew-one-plane/skew-x-toward-z-by-plus-0.100	skew-x-toward-z						0.100		dup-group-16	complete
+3-skew-one-plane.tar.gz	3-skew-one-plane/skew-y-toward-z-by-minus-0.005	skew-y-toward-z							-0.005		complete
+3-skew-one-plane.tar.gz	3-skew-one-plane/skew-y-toward-z-by-minus-0.010	skew-y-toward-z							-0.010		complete
+3-skew-one-plane.tar.gz	3-skew-one-plane/skew-y-toward-z-by-minus-0.015	skew-y-toward-z							-0.015		complete
+3-skew-one-plane.tar.gz	3-skew-one-plane/skew-y-toward-z-by-minus-0.020	skew-y-toward-z							-0.020		complete
+3-skew-one-plane.tar.gz	3-skew-one-plane/skew-y-toward-z-by-minus-0.025	skew-y-toward-z							-0.025	dup-group-17	complete
+3-skew-one-plane.tar.gz	3-skew-one-plane/skew-y-toward-z-by-minus-0.030	skew-y-toward-z							-0.030		complete
+3-skew-one-plane.tar.gz	3-skew-one-plane/skew-y-toward-z-by-minus-0.035	skew-y-toward-z							-0.035		complete
+3-skew-one-plane.tar.gz	3-skew-one-plane/skew-y-toward-z-by-minus-0.040	skew-y-toward-z							-0.040		complete
+3-skew-one-plane.tar.gz	3-skew-one-plane/skew-y-toward-z-by-minus-0.045	skew-y-toward-z							-0.045		complete
+3-skew-one-plane.tar.gz	3-skew-one-plane/skew-y-toward-z-by-minus-0.050	skew-y-toward-z							-0.050	dup-group-18	complete
+3-skew-one-plane.tar.gz	3-skew-one-plane/skew-y-toward-z-by-minus-0.055	skew-y-toward-z							-0.055		complete
+3-skew-one-plane.tar.gz	3-skew-one-plane/skew-y-toward-z-by-minus-0.060	skew-y-toward-z							-0.060		complete
+3-skew-one-plane.tar.gz	3-skew-one-plane/skew-y-toward-z-by-minus-0.065	skew-y-toward-z							-0.065		complete
+3-skew-one-plane.tar.gz	3-skew-one-plane/skew-y-toward-z-by-minus-0.070	skew-y-toward-z							-0.070		complete
+3-skew-one-plane.tar.gz	3-skew-one-plane/skew-y-toward-z-by-minus-0.075	skew-y-toward-z							-0.075	dup-group-19	complete
+3-skew-one-plane.tar.gz	3-skew-one-plane/skew-y-toward-z-by-minus-0.080	skew-y-toward-z							-0.080		complete
+3-skew-one-plane.tar.gz	3-skew-one-plane/skew-y-toward-z-by-minus-0.085	skew-y-toward-z							-0.085		complete
+3-skew-one-plane.tar.gz	3-skew-one-plane/skew-y-toward-z-by-minus-0.090	skew-y-toward-z							-0.090		complete
+3-skew-one-plane.tar.gz	3-skew-one-plane/skew-y-toward-z-by-minus-0.095	skew-y-toward-z							-0.095		complete
+3-skew-one-plane.tar.gz	3-skew-one-plane/skew-y-toward-z-by-minus-0.100	skew-y-toward-z							-0.100	dup-group-20	complete
+3-skew-one-plane.tar.gz	3-skew-one-plane/skew-y-toward-z-by-plus-0.005	skew-y-toward-z							0.005		complete
+3-skew-one-plane.tar.gz	3-skew-one-plane/skew-y-toward-z-by-plus-0.010	skew-y-toward-z							0.010		complete
+3-skew-one-plane.tar.gz	3-skew-one-plane/skew-y-toward-z-by-plus-0.015	skew-y-toward-z							0.015		complete
+3-skew-one-plane.tar.gz	3-skew-one-plane/skew-y-toward-z-by-plus-0.020	skew-y-toward-z							0.020		complete
+3-skew-one-plane.tar.gz	3-skew-one-plane/skew-y-toward-z-by-plus-0.025	skew-y-toward-z							0.025	dup-group-21	complete
+3-skew-one-plane.tar.gz	3-skew-one-plane/skew-y-toward-z-by-plus-0.030	skew-y-toward-z							0.030		complete
+3-skew-one-plane.tar.gz	3-skew-one-plane/skew-y-toward-z-by-plus-0.035	skew-y-toward-z							0.035		complete
+3-skew-one-plane.tar.gz	3-skew-one-plane/skew-y-toward-z-by-plus-0.040	skew-y-toward-z							0.040		complete
+3-skew-one-plane.tar.gz	3-skew-one-plane/skew-y-toward-z-by-plus-0.045	skew-y-toward-z							0.045		complete
+3-skew-one-plane.tar.gz	3-skew-one-plane/skew-y-toward-z-by-plus-0.050	skew-y-toward-z							0.050	dup-group-22	complete
+3-skew-one-plane.tar.gz	3-skew-one-plane/skew-y-toward-z-by-plus-0.055	skew-y-toward-z							0.055		complete
+3-skew-one-plane.tar.gz	3-skew-one-plane/skew-y-toward-z-by-plus-0.060	skew-y-toward-z							0.060		complete
+3-skew-one-plane.tar.gz	3-skew-one-plane/skew-y-toward-z-by-plus-0.065	skew-y-toward-z							0.065		complete
+3-skew-one-plane.tar.gz	3-skew-one-plane/skew-y-toward-z-by-plus-0.070	skew-y-toward-z							0.070		complete
+3-skew-one-plane.tar.gz	3-skew-one-plane/skew-y-toward-z-by-plus-0.075	skew-y-toward-z							0.075	dup-group-23	complete
+3-skew-one-plane.tar.gz	3-skew-one-plane/skew-y-toward-z-by-plus-0.080	skew-y-toward-z							0.080		complete
+3-skew-one-plane.tar.gz	3-skew-one-plane/skew-y-toward-z-by-plus-0.085	skew-y-toward-z							0.085		complete
+3-skew-one-plane.tar.gz	3-skew-one-plane/skew-y-toward-z-by-plus-0.090	skew-y-toward-z							0.090		complete
+3-skew-one-plane.tar.gz	3-skew-one-plane/skew-y-toward-z-by-plus-0.095	skew-y-toward-z							0.095		complete
+3-skew-one-plane.tar.gz	3-skew-one-plane/skew-y-toward-z-by-plus-0.100	skew-y-toward-z							0.100	dup-group-24	complete
+4-skew-two-planes.tar.gz	4-skew-two-planes/skew-xy-minus-0.025-xz-minus-0.025	skew-two-planes					-0.025	-0.025			complete
+4-skew-two-planes.tar.gz	4-skew-two-planes/skew-xy-minus-0.025-xz-minus-0.050	skew-two-planes					-0.025	-0.050			complete
+4-skew-two-planes.tar.gz	4-skew-two-planes/skew-xy-minus-0.025-xz-minus-0.075	skew-two-planes					-0.025	-0.075			complete
+4-skew-two-planes.tar.gz	4-skew-two-planes/skew-xy-minus-0.025-xz-minus-0.100	skew-two-planes					-0.025	-0.100			complete
+4-skew-two-planes.tar.gz	4-skew-two-planes/skew-xy-minus-0.025-xz-plus-0.000	skew-two-planes					-0.025	0.000		dup-group-01	complete
+4-skew-two-planes.tar.gz	4-skew-two-planes/skew-xy-minus-0.025-xz-plus-0.025	skew-two-planes					-0.025	0.025			complete
+4-skew-two-planes.tar.gz	4-skew-two-planes/skew-xy-minus-0.025-xz-plus-0.050	skew-two-planes					-0.025	0.050			complete
+4-skew-two-planes.tar.gz	4-skew-two-planes/skew-xy-minus-0.025-xz-plus-0.075	skew-two-planes					-0.025	0.075			complete
+4-skew-two-planes.tar.gz	4-skew-two-planes/skew-xy-minus-0.025-xz-plus-0.100	skew-two-planes					-0.025	0.100			complete
+4-skew-two-planes.tar.gz	4-skew-two-planes/skew-xy-minus-0.050-xz-minus-0.025	skew-two-planes					-0.050	-0.025			complete
+4-skew-two-planes.tar.gz	4-skew-two-planes/skew-xy-minus-0.050-xz-minus-0.075	skew-two-planes					-0.050	-0.075			complete
+4-skew-two-planes.tar.gz	4-skew-two-planes/skew-xy-minus-0.050-xz-minus-0.100	skew-two-planes					-0.050	-0.100			complete
+4-skew-two-planes.tar.gz	4-skew-two-planes/skew-xy-minus-0.050-xz-plus-0.000	skew-two-planes					-0.050	0.000		dup-group-02	complete
+4-skew-two-planes.tar.gz	4-skew-two-planes/skew-xy-minus-0.050-xz-plus-0.025	skew-two-planes					-0.050	0.025			complete
+4-skew-two-planes.tar.gz	4-skew-two-planes/skew-xy-minus-0.050-xz-plus-0.075	skew-two-planes					-0.050	0.075			complete
+4-skew-two-planes.tar.gz	4-skew-two-planes/skew-xy-minus-0.050-xz-plus-0.100	skew-two-planes					-0.050	0.100			complete
+4-skew-two-planes.tar.gz	4-skew-two-planes/skew-xy-minus-0.075-xz-minus-0.025	skew-two-planes					-0.075	-0.025			complete
+4-skew-two-planes.tar.gz	4-skew-two-planes/skew-xy-minus-0.075-xz-minus-0.050	skew-two-planes					-0.075	-0.050			complete
+4-skew-two-planes.tar.gz	4-skew-two-planes/skew-xy-minus-0.075-xz-minus-0.075	skew-two-planes					-0.075	-0.075			complete
+4-skew-two-planes.tar.gz	4-skew-two-planes/skew-xy-minus-0.075-xz-minus-0.100	skew-two-planes					-0.075	-0.100			complete
+4-skew-two-planes.tar.gz	4-skew-two-planes/skew-xy-minus-0.075-xz-plus-0.000	skew-two-planes					-0.075	0.000		dup-group-03	complete
+4-skew-two-planes.tar.gz	4-skew-two-planes/skew-xy-minus-0.075-xz-plus-0.025	skew-two-planes					-0.075	0.025			complete
+4-skew-two-planes.tar.gz	4-skew-two-planes/skew-xy-minus-0.075-xz-plus-0.050	skew-two-planes					-0.075	0.050			complete
+4-skew-two-planes.tar.gz	4-skew-two-planes/skew-xy-minus-0.075-xz-plus-0.075	skew-two-planes					-0.075	0.075			complete
+4-skew-two-planes.tar.gz	4-skew-two-planes/skew-xy-minus-0.075-xz-plus-0.100	skew-two-planes					-0.075	0.100			complete
+4-skew-two-planes.tar.gz	4-skew-two-planes/skew-xy-minus-0.100-xz-minus-0.025	skew-two-planes					-0.100	-0.025			complete
+4-skew-two-planes.tar.gz	4-skew-two-planes/skew-xy-minus-0.100-xz-minus-0.050	skew-two-planes					-0.100	-0.050			complete
+4-skew-two-planes.tar.gz	4-skew-two-planes/skew-xy-minus-0.100-xz-minus-0.075	skew-two-planes					-0.100	-0.075			complete
+4-skew-two-planes.tar.gz	4-skew-two-planes/skew-xy-minus-0.100-xz-minus-0.100	skew-two-planes					-0.100	-0.100			complete
+4-skew-two-planes.tar.gz	4-skew-two-planes/skew-xy-minus-0.100-xz-plus-0.000	skew-two-planes					-0.100	0.000		dup-group-04	complete
+4-skew-two-planes.tar.gz	4-skew-two-planes/skew-xy-minus-0.100-xz-plus-0.025	skew-two-planes					-0.100	0.025			complete
+4-skew-two-planes.tar.gz	4-skew-two-planes/skew-xy-minus-0.100-xz-plus-0.050	skew-two-planes					-0.100	0.050			complete
+4-skew-two-planes.tar.gz	4-skew-two-planes/skew-xy-minus-0.100-xz-plus-0.075	skew-two-planes					-0.100	0.075			complete
+4-skew-two-planes.tar.gz	4-skew-two-planes/skew-xy-minus-0.100-xz-plus-0.100	skew-two-planes					-0.100	0.100			complete
+4-skew-two-planes.tar.gz	4-skew-two-planes/skew-xy-plus-0.000-xz-minus-0.025	skew-two-planes					0.000	-0.025		dup-group-09	complete
+4-skew-two-planes.tar.gz	4-skew-two-planes/skew-xy-plus-0.000-xz-minus-0.050	skew-two-planes					0.000	-0.050		dup-group-10	complete
+4-skew-two-planes.tar.gz	4-skew-two-planes/skew-xy-plus-0.000-xz-minus-0.075	skew-two-planes					0.000	-0.075		dup-group-11	complete
+4-skew-two-planes.tar.gz	4-skew-two-planes/skew-xy-plus-0.000-xz-minus-0.100	skew-two-planes					0.000	-0.100		dup-group-12	complete
+4-skew-two-planes.tar.gz	4-skew-two-planes/skew-xy-plus-0.000-xz-plus-0.025	skew-two-planes					0.000	0.025		dup-group-13	complete
+4-skew-two-planes.tar.gz	4-skew-two-planes/skew-xy-plus-0.000-xz-plus-0.050	skew-two-planes					0.000	0.050		dup-group-14	complete
+4-skew-two-planes.tar.gz	4-skew-two-planes/skew-xy-plus-0.000-xz-plus-0.075	skew-two-planes					0.000	0.075		dup-group-15	complete
+4-skew-two-planes.tar.gz	4-skew-two-planes/skew-xy-plus-0.000-xz-plus-0.100	skew-two-planes					0.000	0.100		dup-group-16	complete
+4-skew-two-planes.tar.gz	4-skew-two-planes/skew-xy-plus-0.025-xz-minus-0.025	skew-two-planes					0.025	-0.025			complete
+4-skew-two-planes.tar.gz	4-skew-two-planes/skew-xy-plus-0.025-xz-minus-0.050	skew-two-planes					0.025	-0.050			complete
+4-skew-two-planes.tar.gz	4-skew-two-planes/skew-xy-plus-0.025-xz-minus-0.075	skew-two-planes					0.025	-0.075			complete
+4-skew-two-planes.tar.gz	4-skew-two-planes/skew-xy-plus-0.025-xz-minus-0.100	skew-two-planes					0.025	-0.100			complete
+4-skew-two-planes.tar.gz	4-skew-two-planes/skew-xy-plus-0.025-xz-plus-0.000	skew-two-planes					0.025	0.000		dup-group-05	complete
+4-skew-two-planes.tar.gz	4-skew-two-planes/skew-xy-plus-0.025-xz-plus-0.025	skew-two-planes					0.025	0.025			complete
+4-skew-two-planes.tar.gz	4-skew-two-planes/skew-xy-plus-0.025-xz-plus-0.050	skew-two-planes					0.025	0.050			complete
+4-skew-two-planes.tar.gz	4-skew-two-planes/skew-xy-plus-0.025-xz-plus-0.075	skew-two-planes					0.025	0.075			complete
+4-skew-two-planes.tar.gz	4-skew-two-planes/skew-xy-plus-0.025-xz-plus-0.100	skew-two-planes					0.025	0.100			complete
+4-skew-two-planes.tar.gz	4-skew-two-planes/skew-xy-plus-0.050-xz-minus-0.025	skew-two-planes					0.050	-0.025			complete
+4-skew-two-planes.tar.gz	4-skew-two-planes/skew-xy-plus-0.050-xz-minus-0.075	skew-two-planes					0.050	-0.075			complete
+4-skew-two-planes.tar.gz	4-skew-two-planes/skew-xy-plus-0.050-xz-minus-0.100	skew-two-planes					0.050	-0.100			complete
+4-skew-two-planes.tar.gz	4-skew-two-planes/skew-xy-plus-0.050-xz-plus-0.000	skew-two-planes					0.050	0.000		dup-group-06	complete
+4-skew-two-planes.tar.gz	4-skew-two-planes/skew-xy-plus-0.050-xz-plus-0.025	skew-two-planes					0.050	0.025			complete
+4-skew-two-planes.tar.gz	4-skew-two-planes/skew-xy-plus-0.050-xz-plus-0.075	skew-two-planes					0.050	0.075			complete
+4-skew-two-planes.tar.gz	4-skew-two-planes/skew-xy-plus-0.050-xz-plus-0.100	skew-two-planes					0.050	0.100			complete
+4-skew-two-planes.tar.gz	4-skew-two-planes/skew-xy-plus-0.075-xz-minus-0.025	skew-two-planes					0.075	-0.025			complete
+4-skew-two-planes.tar.gz	4-skew-two-planes/skew-xy-plus-0.075-xz-minus-0.050	skew-two-planes					0.075	-0.050			complete
+4-skew-two-planes.tar.gz	4-skew-two-planes/skew-xy-plus-0.075-xz-minus-0.075	skew-two-planes					0.075	-0.075			complete
+4-skew-two-planes.tar.gz	4-skew-two-planes/skew-xy-plus-0.075-xz-minus-0.100	skew-two-planes					0.075	-0.100			complete
+4-skew-two-planes.tar.gz	4-skew-two-planes/skew-xy-plus-0.075-xz-plus-0.000	skew-two-planes					0.075	0.000		dup-group-07	complete
+4-skew-two-planes.tar.gz	4-skew-two-planes/skew-xy-plus-0.075-xz-plus-0.025	skew-two-planes					0.075	0.025			complete
+4-skew-two-planes.tar.gz	4-skew-two-planes/skew-xy-plus-0.075-xz-plus-0.050	skew-two-planes					0.075	0.050			complete
+4-skew-two-planes.tar.gz	4-skew-two-planes/skew-xy-plus-0.075-xz-plus-0.075	skew-two-planes					0.075	0.075			complete
+4-skew-two-planes.tar.gz	4-skew-two-planes/skew-xy-plus-0.075-xz-plus-0.100	skew-two-planes					0.075	0.100			complete
+4-skew-two-planes.tar.gz	4-skew-two-planes/skew-xy-plus-0.100-xz-minus-0.025	skew-two-planes					0.100	-0.025			complete
+4-skew-two-planes.tar.gz	4-skew-two-planes/skew-xy-plus-0.100-xz-minus-0.050	skew-two-planes					0.100	-0.050			complete
+4-skew-two-planes.tar.gz	4-skew-two-planes/skew-xy-plus-0.100-xz-minus-0.075	skew-two-planes					0.100	-0.075			complete
+4-skew-two-planes.tar.gz	4-skew-two-planes/skew-xy-plus-0.100-xz-minus-0.100	skew-two-planes					0.100	-0.100			complete
+4-skew-two-planes.tar.gz	4-skew-two-planes/skew-xy-plus-0.100-xz-plus-0.000	skew-two-planes					0.100	0.000		dup-group-08	complete
+4-skew-two-planes.tar.gz	4-skew-two-planes/skew-xy-plus-0.100-xz-plus-0.025	skew-two-planes					0.100	0.025			complete
+4-skew-two-planes.tar.gz	4-skew-two-planes/skew-xy-plus-0.100-xz-plus-0.050	skew-two-planes					0.100	0.050			complete
+4-skew-two-planes.tar.gz	4-skew-two-planes/skew-xy-plus-0.100-xz-plus-0.075	skew-two-planes					0.100	0.075			complete
+4-skew-two-planes.tar.gz	4-skew-two-planes/skew-xy-plus-0.100-xz-plus-0.100	skew-two-planes					0.100	0.100			complete
+4-skew-two-planes.tar.gz	4-skew-two-planes/skew-xy-minus-0.025-yz-minus-0.025	skew-two-planes					-0.025		-0.025		complete
+4-skew-two-planes.tar.gz	4-skew-two-planes/skew-xy-minus-0.025-yz-minus-0.050	skew-two-planes					-0.025		-0.050		complete
+4-skew-two-planes.tar.gz	4-skew-two-planes/skew-xy-minus-0.025-yz-minus-0.075	skew-two-planes					-0.025		-0.075		complete
+4-skew-two-planes.tar.gz	4-skew-two-planes/skew-xy-minus-0.025-yz-minus-0.100	skew-two-planes					-0.025		-0.100		complete
+4-skew-two-planes.tar.gz	4-skew-two-planes/skew-xy-minus-0.025-yz-plus-0.000	skew-two-planes					-0.025		0.000	dup-group-01	complete
+4-skew-two-planes.tar.gz	4-skew-two-planes/skew-xy-minus-0.025-yz-plus-0.025	skew-two-planes					-0.025		0.025		complete
+4-skew-two-planes.tar.gz	4-skew-two-planes/skew-xy-minus-0.025-yz-plus-0.050	skew-two-planes					-0.025		0.050		complete
+4-skew-two-planes.tar.gz	4-skew-two-planes/skew-xy-minus-0.025-yz-plus-0.075	skew-two-planes					-0.025		0.075		complete
+4-skew-two-planes.tar.gz	4-skew-two-planes/skew-xy-minus-0.025-yz-plus-0.100	skew-two-planes					-0.025		0.100		complete
+4-skew-two-planes.tar.gz	4-skew-two-planes/skew-xy-minus-0.050-yz-minus-0.025	skew-two-planes					-0.050		-0.025		complete
+4-skew-two-planes.tar.gz	4-skew-two-planes/skew-xy-minus-0.050-yz-minus-0.075	skew-two-planes					-0.050		-0.075		complete
+4-skew-two-planes.tar.gz	4-skew-two-planes/skew-xy-minus-0.050-yz-minus-0.100	skew-two-planes					-0.050		-0.100		complete
+4-skew-two-planes.tar.gz	4-skew-two-planes/skew-xy-minus-0.050-yz-plus-0.000	skew-two-planes					-0.050		0.000	dup-group-02	complete
+4-skew-two-planes.tar.gz	4-skew-two-planes/skew-xy-minus-0.050-yz-plus-0.025	skew-two-planes					-0.050		0.025		complete
+4-skew-two-planes.tar.gz	4-skew-two-planes/skew-xy-minus-0.050-yz-plus-0.075	skew-two-planes					-0.050		0.075		complete
+4-skew-two-planes.tar.gz	4-skew-two-planes/skew-xy-minus-0.050-yz-plus-0.100	skew-two-planes					-0.050		0.100		complete
+4-skew-two-planes.tar.gz	4-skew-two-planes/skew-xy-minus-0.075-yz-minus-0.025	skew-two-planes					-0.075		-0.025		complete
+4-skew-two-planes.tar.gz	4-skew-two-planes/skew-xy-minus-0.075-yz-minus-0.050	skew-two-planes					-0.075		-0.050		complete
+4-skew-two-planes.tar.gz	4-skew-two-planes/skew-xy-minus-0.075-yz-minus-0.075	skew-two-planes					-0.075		-0.075		complete
+4-skew-two-planes.tar.gz	4-skew-two-planes/skew-xy-minus-0.075-yz-minus-0.100	skew-two-planes					-0.075		-0.100		complete
+4-skew-two-planes.tar.gz	4-skew-two-planes/skew-xy-minus-0.075-yz-plus-0.000	skew-two-planes					-0.075		0.000	dup-group-03	complete
+4-skew-two-planes.tar.gz	4-skew-two-planes/skew-xy-minus-0.075-yz-plus-0.025	skew-two-planes					-0.075		0.025		complete
+4-skew-two-planes.tar.gz	4-skew-two-planes/skew-xy-minus-0.075-yz-plus-0.050	skew-two-planes					-0.075		0.050		complete
+4-skew-two-planes.tar.gz	4-skew-two-planes/skew-xy-minus-0.075-yz-plus-0.075	skew-two-planes					-0.075		0.075		complete
+4-skew-two-planes.tar.gz	4-skew-two-planes/skew-xy-minus-0.075-yz-plus-0.100	skew-two-planes					-0.075		0.100		complete
+4-skew-two-planes.tar.gz	4-skew-two-planes/skew-xy-minus-0.100-yz-minus-0.025	skew-two-planes					-0.100		-0.025		complete
+4-skew-two-planes.tar.gz	4-skew-two-planes/skew-xy-minus-0.100-yz-minus-0.050	skew-two-planes					-0.100		-0.050		complete
+4-skew-two-planes.tar.gz	4-skew-two-planes/skew-xy-minus-0.100-yz-minus-0.075	skew-two-planes					-0.100		-0.075		complete
+4-skew-two-planes.tar.gz	4-skew-two-planes/skew-xy-minus-0.100-yz-minus-0.100	skew-two-planes					-0.100		-0.100		complete
+4-skew-two-planes.tar.gz	4-skew-two-planes/skew-xy-minus-0.100-yz-plus-0.000	skew-two-planes					-0.100		0.000	dup-group-04	complete
+4-skew-two-planes.tar.gz	4-skew-two-planes/skew-xy-minus-0.100-yz-plus-0.025	skew-two-planes					-0.100		0.025		complete
+4-skew-two-planes.tar.gz	4-skew-two-planes/skew-xy-minus-0.100-yz-plus-0.050	skew-two-planes					-0.100		0.050		complete
+4-skew-two-planes.tar.gz	4-skew-two-planes/skew-xy-minus-0.100-yz-plus-0.075	skew-two-planes					-0.100		0.075		complete
+4-skew-two-planes.tar.gz	4-skew-two-planes/skew-xy-minus-0.100-yz-plus-0.100	skew-two-planes					-0.100		0.100		complete
+4-skew-two-planes.tar.gz	4-skew-two-planes/skew-xy-plus-0.000-yz-minus-0.025	skew-two-planes					0.000		-0.025	dup-group-17	complete
+4-skew-two-planes.tar.gz	4-skew-two-planes/skew-xy-plus-0.000-yz-minus-0.050	skew-two-planes					0.000		-0.050	dup-group-18	complete
+4-skew-two-planes.tar.gz	4-skew-two-planes/skew-xy-plus-0.000-yz-minus-0.075	skew-two-planes					0.000		-0.075	dup-group-19	complete
+4-skew-two-planes.tar.gz	4-skew-two-planes/skew-xy-plus-0.000-yz-minus-0.100	skew-two-planes					0.000		-0.100	dup-group-20	complete
+4-skew-two-planes.tar.gz	4-skew-two-planes/skew-xy-plus-0.000-yz-plus-0.025	skew-two-planes					0.000		0.025	dup-group-21	complete
+4-skew-two-planes.tar.gz	4-skew-two-planes/skew-xy-plus-0.000-yz-plus-0.050	skew-two-planes					0.000		0.050	dup-group-22	complete
+4-skew-two-planes.tar.gz	4-skew-two-planes/skew-xy-plus-0.000-yz-plus-0.075	skew-two-planes					0.000		0.075	dup-group-23	complete
+4-skew-two-planes.tar.gz	4-skew-two-planes/skew-xy-plus-0.000-yz-plus-0.100	skew-two-planes					0.000		0.100	dup-group-24	complete
+4-skew-two-planes.tar.gz	4-skew-two-planes/skew-xy-plus-0.025-yz-minus-0.025	skew-two-planes					0.025		-0.025		complete
+4-skew-two-planes.tar.gz	4-skew-two-planes/skew-xy-plus-0.025-yz-minus-0.050	skew-two-planes					0.025		-0.050		complete
+4-skew-two-planes.tar.gz	4-skew-two-planes/skew-xy-plus-0.025-yz-minus-0.075	skew-two-planes					0.025		-0.075		complete
+4-skew-two-planes.tar.gz	4-skew-two-planes/skew-xy-plus-0.025-yz-minus-0.100	skew-two-planes					0.025		-0.100		complete
+4-skew-two-planes.tar.gz	4-skew-two-planes/skew-xy-plus-0.025-yz-plus-0.000	skew-two-planes					0.025		0.000	dup-group-05	complete
+4-skew-two-planes.tar.gz	4-skew-two-planes/skew-xy-plus-0.025-yz-plus-0.025	skew-two-planes					0.025		0.025		complete
+4-skew-two-planes.tar.gz	4-skew-two-planes/skew-xy-plus-0.025-yz-plus-0.050	skew-two-planes					0.025		0.050		complete
+4-skew-two-planes.tar.gz	4-skew-two-planes/skew-xy-plus-0.025-yz-plus-0.075	skew-two-planes					0.025		0.075		complete
+4-skew-two-planes.tar.gz	4-skew-two-planes/skew-xy-plus-0.025-yz-plus-0.100	skew-two-planes					0.025		0.100		complete
+4-skew-two-planes.tar.gz	4-skew-two-planes/skew-xy-plus-0.050-yz-minus-0.025	skew-two-planes					0.050		-0.025		complete
+4-skew-two-planes.tar.gz	4-skew-two-planes/skew-xy-plus-0.050-yz-minus-0.075	skew-two-planes					0.050		-0.075		complete
+4-skew-two-planes.tar.gz	4-skew-two-planes/skew-xy-plus-0.050-yz-minus-0.100	skew-two-planes					0.050		-0.100		complete
+4-skew-two-planes.tar.gz	4-skew-two-planes/skew-xy-plus-0.050-yz-plus-0.000	skew-two-planes					0.050		0.000	dup-group-06	complete
+4-skew-two-planes.tar.gz	4-skew-two-planes/skew-xy-plus-0.050-yz-plus-0.025	skew-two-planes					0.050		0.025		complete
+4-skew-two-planes.tar.gz	4-skew-two-planes/skew-xy-plus-0.050-yz-plus-0.075	skew-two-planes					0.050		0.075		complete
+4-skew-two-planes.tar.gz	4-skew-two-planes/skew-xy-plus-0.050-yz-plus-0.100	skew-two-planes					0.050		0.100		complete
+4-skew-two-planes.tar.gz	4-skew-two-planes/skew-xy-plus-0.075-yz-minus-0.025	skew-two-planes					0.075		-0.025		complete
+4-skew-two-planes.tar.gz	4-skew-two-planes/skew-xy-plus-0.075-yz-minus-0.050	skew-two-planes					0.075		-0.050		complete
+4-skew-two-planes.tar.gz	4-skew-two-planes/skew-xy-plus-0.075-yz-minus-0.075	skew-two-planes					0.075		-0.075		complete
+4-skew-two-planes.tar.gz	4-skew-two-planes/skew-xy-plus-0.075-yz-minus-0.100	skew-two-planes					0.075		-0.100		complete
+4-skew-two-planes.tar.gz	4-skew-two-planes/skew-xy-plus-0.075-yz-plus-0.000	skew-two-planes					0.075		0.000	dup-group-07	complete
+4-skew-two-planes.tar.gz	4-skew-two-planes/skew-xy-plus-0.075-yz-plus-0.025	skew-two-planes					0.075		0.025		complete
+4-skew-two-planes.tar.gz	4-skew-two-planes/skew-xy-plus-0.075-yz-plus-0.050	skew-two-planes					0.075		0.050		complete
+4-skew-two-planes.tar.gz	4-skew-two-planes/skew-xy-plus-0.075-yz-plus-0.075	skew-two-planes					0.075		0.075		complete
+4-skew-two-planes.tar.gz	4-skew-two-planes/skew-xy-plus-0.075-yz-plus-0.100	skew-two-planes					0.075		0.100		complete
+4-skew-two-planes.tar.gz	4-skew-two-planes/skew-xy-plus-0.100-yz-minus-0.025	skew-two-planes					0.100		-0.025		complete
+4-skew-two-planes.tar.gz	4-skew-two-planes/skew-xy-plus-0.100-yz-minus-0.050	skew-two-planes					0.100		-0.050		complete
+4-skew-two-planes.tar.gz	4-skew-two-planes/skew-xy-plus-0.100-yz-minus-0.075	skew-two-planes					0.100		-0.075		complete
+4-skew-two-planes.tar.gz	4-skew-two-planes/skew-xy-plus-0.100-yz-minus-0.100	skew-two-planes					0.100		-0.100		complete
+4-skew-two-planes.tar.gz	4-skew-two-planes/skew-xy-plus-0.100-yz-plus-0.000	skew-two-planes					0.100		0.000	dup-group-08	complete
+4-skew-two-planes.tar.gz	4-skew-two-planes/skew-xy-plus-0.100-yz-plus-0.025	skew-two-planes					0.100		0.025		complete
+4-skew-two-planes.tar.gz	4-skew-two-planes/skew-xy-plus-0.100-yz-plus-0.050	skew-two-planes					0.100		0.050		complete
+4-skew-two-planes.tar.gz	4-skew-two-planes/skew-xy-plus-0.100-yz-plus-0.075	skew-two-planes					0.100		0.075		complete
+4-skew-two-planes.tar.gz	4-skew-two-planes/skew-xy-plus-0.100-yz-plus-0.100	skew-two-planes					0.100		0.100		complete
+4-skew-two-planes.tar.gz	4-skew-two-planes/skew-xz-minus-0.025-yz-minus-0.025	skew-two-planes						-0.025	-0.025		complete
+4-skew-two-planes.tar.gz	4-skew-two-planes/skew-xz-minus-0.025-yz-minus-0.050	skew-two-planes						-0.025	-0.050		complete
+4-skew-two-planes.tar.gz	4-skew-two-planes/skew-xz-minus-0.025-yz-minus-0.075	skew-two-planes						-0.025	-0.075		complete
+4-skew-two-planes.tar.gz	4-skew-two-planes/skew-xz-minus-0.025-yz-minus-0.100	skew-two-planes						-0.025	-0.100		complete
+4-skew-two-planes.tar.gz	4-skew-two-planes/skew-xz-minus-0.025-yz-plus-0.000	skew-two-planes						-0.025	0.000	dup-group-09	complete
+4-skew-two-planes.tar.gz	4-skew-two-planes/skew-xz-minus-0.025-yz-plus-0.025	skew-two-planes						-0.025	0.025		complete
+4-skew-two-planes.tar.gz	4-skew-two-planes/skew-xz-minus-0.025-yz-plus-0.050	skew-two-planes						-0.025	0.050		complete
+4-skew-two-planes.tar.gz	4-skew-two-planes/skew-xz-minus-0.025-yz-plus-0.075	skew-two-planes						-0.025	0.075		complete
+4-skew-two-planes.tar.gz	4-skew-two-planes/skew-xz-minus-0.025-yz-plus-0.100	skew-two-planes						-0.025	0.100		complete
+4-skew-two-planes.tar.gz	4-skew-two-planes/skew-xz-minus-0.050-yz-minus-0.025	skew-two-planes						-0.050	-0.025		complete
+4-skew-two-planes.tar.gz	4-skew-two-planes/skew-xz-minus-0.050-yz-minus-0.075	skew-two-planes						-0.050	-0.075		complete
+4-skew-two-planes.tar.gz	4-skew-two-planes/skew-xz-minus-0.050-yz-minus-0.100	skew-two-planes						-0.050	-0.100		complete
+4-skew-two-planes.tar.gz	4-skew-two-planes/skew-xz-minus-0.050-yz-plus-0.000	skew-two-planes						-0.050	0.000	dup-group-10	complete
+4-skew-two-planes.tar.gz	4-skew-two-planes/skew-xz-minus-0.050-yz-plus-0.025	skew-two-planes						-0.050	0.025		complete
+4-skew-two-planes.tar.gz	4-skew-two-planes/skew-xz-minus-0.050-yz-plus-0.075	skew-two-planes						-0.050	0.075		complete
+4-skew-two-planes.tar.gz	4-skew-two-planes/skew-xz-minus-0.050-yz-plus-0.100	skew-two-planes						-0.050	0.100		complete
+4-skew-two-planes.tar.gz	4-skew-two-planes/skew-xz-minus-0.075-yz-minus-0.025	skew-two-planes						-0.075	-0.025		complete
+4-skew-two-planes.tar.gz	4-skew-two-planes/skew-xz-minus-0.075-yz-minus-0.050	skew-two-planes						-0.075	-0.050		complete
+4-skew-two-planes.tar.gz	4-skew-two-planes/skew-xz-minus-0.075-yz-minus-0.075	skew-two-planes						-0.075	-0.075		complete
+4-skew-two-planes.tar.gz	4-skew-two-planes/skew-xz-minus-0.075-yz-minus-0.100	skew-two-planes						-0.075	-0.100		complete
+4-skew-two-planes.tar.gz	4-skew-two-planes/skew-xz-minus-0.075-yz-plus-0.000	skew-two-planes						-0.075	0.000	dup-group-11	complete
+4-skew-two-planes.tar.gz	4-skew-two-planes/skew-xz-minus-0.075-yz-plus-0.025	skew-two-planes						-0.075	0.025		complete
+4-skew-two-planes.tar.gz	4-skew-two-planes/skew-xz-minus-0.075-yz-plus-0.050	skew-two-planes						-0.075	0.050		complete
+4-skew-two-planes.tar.gz	4-skew-two-planes/skew-xz-minus-0.075-yz-plus-0.075	skew-two-planes						-0.075	0.075		complete
+4-skew-two-planes.tar.gz	4-skew-two-planes/skew-xz-minus-0.075-yz-plus-0.100	skew-two-planes						-0.075	0.100		complete
+4-skew-two-planes.tar.gz	4-skew-two-planes/skew-xz-minus-0.100-yz-minus-0.025	skew-two-planes						-0.100	-0.025		complete
+4-skew-two-planes.tar.gz	4-skew-two-planes/skew-xz-minus-0.100-yz-minus-0.050	skew-two-planes						-0.100	-0.050		complete
+4-skew-two-planes.tar.gz	4-skew-two-planes/skew-xz-minus-0.100-yz-minus-0.075	skew-two-planes						-0.100	-0.075		complete
+4-skew-two-planes.tar.gz	4-skew-two-planes/skew-xz-minus-0.100-yz-minus-0.100	skew-two-planes						-0.100	-0.100		complete
+4-skew-two-planes.tar.gz	4-skew-two-planes/skew-xz-minus-0.100-yz-plus-0.000	skew-two-planes						-0.100	0.000	dup-group-12	complete
+4-skew-two-planes.tar.gz	4-skew-two-planes/skew-xz-minus-0.100-yz-plus-0.025	skew-two-planes						-0.100	0.025		complete
+4-skew-two-planes.tar.gz	4-skew-two-planes/skew-xz-minus-0.100-yz-plus-0.050	skew-two-planes						-0.100	0.050		complete
+4-skew-two-planes.tar.gz	4-skew-two-planes/skew-xz-minus-0.100-yz-plus-0.075	skew-two-planes						-0.100	0.075		complete
+4-skew-two-planes.tar.gz	4-skew-two-planes/skew-xz-minus-0.100-yz-plus-0.100	skew-two-planes						-0.100	0.100		complete
+4-skew-two-planes.tar.gz	4-skew-two-planes/skew-xz-plus-0.000-yz-minus-0.025	skew-two-planes						0.000	-0.025	dup-group-17	complete
+4-skew-two-planes.tar.gz	4-skew-two-planes/skew-xz-plus-0.000-yz-minus-0.050	skew-two-planes						0.000	-0.050	dup-group-18	complete
+4-skew-two-planes.tar.gz	4-skew-two-planes/skew-xz-plus-0.000-yz-minus-0.075	skew-two-planes						0.000	-0.075	dup-group-19	complete
+4-skew-two-planes.tar.gz	4-skew-two-planes/skew-xz-plus-0.000-yz-minus-0.100	skew-two-planes						0.000	-0.100	dup-group-20	complete
+4-skew-two-planes.tar.gz	4-skew-two-planes/skew-xz-plus-0.000-yz-plus-0.025	skew-two-planes						0.000	0.025	dup-group-21	complete
+4-skew-two-planes.tar.gz	4-skew-two-planes/skew-xz-plus-0.000-yz-plus-0.050	skew-two-planes						0.000	0.050	dup-group-22	complete
+4-skew-two-planes.tar.gz	4-skew-two-planes/skew-xz-plus-0.000-yz-plus-0.075	skew-two-planes						0.000	0.075	dup-group-23	complete
+4-skew-two-planes.tar.gz	4-skew-two-planes/skew-xz-plus-0.000-yz-plus-0.100	skew-two-planes						0.000	0.100	dup-group-24	complete
+4-skew-two-planes.tar.gz	4-skew-two-planes/skew-xz-plus-0.025-yz-minus-0.025	skew-two-planes						0.025	-0.025		complete
+4-skew-two-planes.tar.gz	4-skew-two-planes/skew-xz-plus-0.025-yz-minus-0.050	skew-two-planes						0.025	-0.050		complete
+4-skew-two-planes.tar.gz	4-skew-two-planes/skew-xz-plus-0.025-yz-minus-0.075	skew-two-planes						0.025	-0.075		complete
+4-skew-two-planes.tar.gz	4-skew-two-planes/skew-xz-plus-0.025-yz-minus-0.100	skew-two-planes						0.025	-0.100		complete
+4-skew-two-planes.tar.gz	4-skew-two-planes/skew-xz-plus-0.025-yz-plus-0.000	skew-two-planes						0.025	0.000	dup-group-13	complete
+4-skew-two-planes.tar.gz	4-skew-two-planes/skew-xz-plus-0.025-yz-plus-0.025	skew-two-planes						0.025	0.025		complete
+4-skew-two-planes.tar.gz	4-skew-two-planes/skew-xz-plus-0.025-yz-plus-0.050	skew-two-planes						0.025	0.050		complete
+4-skew-two-planes.tar.gz	4-skew-two-planes/skew-xz-plus-0.025-yz-plus-0.075	skew-two-planes						0.025	0.075		complete
+4-skew-two-planes.tar.gz	4-skew-two-planes/skew-xz-plus-0.025-yz-plus-0.100	skew-two-planes						0.025	0.100		complete
+4-skew-two-planes.tar.gz	4-skew-two-planes/skew-xz-plus-0.050-yz-minus-0.025	skew-two-planes						0.050	-0.025		complete
+4-skew-two-planes.tar.gz	4-skew-two-planes/skew-xz-plus-0.050-yz-minus-0.075	skew-two-planes						0.050	-0.075		complete
+4-skew-two-planes.tar.gz	4-skew-two-planes/skew-xz-plus-0.050-yz-minus-0.100	skew-two-planes						0.050	-0.100		complete
+4-skew-two-planes.tar.gz	4-skew-two-planes/skew-xz-plus-0.050-yz-plus-0.000	skew-two-planes						0.050	0.000	dup-group-14	complete
+4-skew-two-planes.tar.gz	4-skew-two-planes/skew-xz-plus-0.050-yz-plus-0.025	skew-two-planes						0.050	0.025		complete
+4-skew-two-planes.tar.gz	4-skew-two-planes/skew-xz-plus-0.050-yz-plus-0.075	skew-two-planes						0.050	0.075		complete
+4-skew-two-planes.tar.gz	4-skew-two-planes/skew-xz-plus-0.050-yz-plus-0.100	skew-two-planes						0.050	0.100		complete
+4-skew-two-planes.tar.gz	4-skew-two-planes/skew-xz-plus-0.075-yz-minus-0.025	skew-two-planes						0.075	-0.025		complete
+4-skew-two-planes.tar.gz	4-skew-two-planes/skew-xz-plus-0.075-yz-minus-0.050	skew-two-planes						0.075	-0.050		complete
+4-skew-two-planes.tar.gz	4-skew-two-planes/skew-xz-plus-0.075-yz-minus-0.075	skew-two-planes						0.075	-0.075		complete
+4-skew-two-planes.tar.gz	4-skew-two-planes/skew-xz-plus-0.075-yz-minus-0.100	skew-two-planes						0.075	-0.100		complete
+4-skew-two-planes.tar.gz	4-skew-two-planes/skew-xz-plus-0.075-yz-plus-0.000	skew-two-planes						0.075	0.000	dup-group-15	complete
+4-skew-two-planes.tar.gz	4-skew-two-planes/skew-xz-plus-0.075-yz-plus-0.025	skew-two-planes						0.075	0.025		complete
+4-skew-two-planes.tar.gz	4-skew-two-planes/skew-xz-plus-0.075-yz-plus-0.050	skew-two-planes						0.075	0.050		complete
+4-skew-two-planes.tar.gz	4-skew-two-planes/skew-xz-plus-0.075-yz-plus-0.075	skew-two-planes						0.075	0.075		complete
+4-skew-two-planes.tar.gz	4-skew-two-planes/skew-xz-plus-0.075-yz-plus-0.100	skew-two-planes						0.075	0.100		complete
+4-skew-two-planes.tar.gz	4-skew-two-planes/skew-xz-plus-0.100-yz-minus-0.025	skew-two-planes						0.100	-0.025		complete
+4-skew-two-planes.tar.gz	4-skew-two-planes/skew-xz-plus-0.100-yz-minus-0.050	skew-two-planes						0.100	-0.050		complete
+4-skew-two-planes.tar.gz	4-skew-two-planes/skew-xz-plus-0.100-yz-minus-0.075	skew-two-planes						0.100	-0.075		complete
+4-skew-two-planes.tar.gz	4-skew-two-planes/skew-xz-plus-0.100-yz-minus-0.100	skew-two-planes						0.100	-0.100		complete
+4-skew-two-planes.tar.gz	4-skew-two-planes/skew-xz-plus-0.100-yz-plus-0.000	skew-two-planes						0.100	0.000	dup-group-16	complete
+4-skew-two-planes.tar.gz	4-skew-two-planes/skew-xz-plus-0.100-yz-plus-0.025	skew-two-planes						0.100	0.025		complete
+4-skew-two-planes.tar.gz	4-skew-two-planes/skew-xz-plus-0.100-yz-plus-0.050	skew-two-planes						0.100	0.050		complete
+4-skew-two-planes.tar.gz	4-skew-two-planes/skew-xz-plus-0.100-yz-plus-0.075	skew-two-planes						0.100	0.075		complete
+4-skew-two-planes.tar.gz	4-skew-two-planes/skew-xz-plus-0.100-yz-plus-0.100	skew-two-planes						0.100	0.100		complete
+5-skew-three-planes.tar.gz	5-skew-three-planes/skew-xy-minus-0.030-xz-minus-0.030-yz-minus-0.030	skew-all-three-planes-at-once					-0.030	-0.030	-0.030		complete
+5-skew-three-planes.tar.gz	5-skew-three-planes/skew-xy-minus-0.030-xz-minus-0.030-yz-minus-0.090	skew-all-three-planes-at-once					-0.030	-0.030	-0.090		complete
+5-skew-three-planes.tar.gz	5-skew-three-planes/skew-xy-minus-0.030-xz-minus-0.030-yz-plus-0.030	skew-all-three-planes-at-once					-0.030	-0.030	0.030		complete
+5-skew-three-planes.tar.gz	5-skew-three-planes/skew-xy-minus-0.030-xz-minus-0.030-yz-plus-0.060	skew-all-three-planes-at-once					-0.030	-0.030	0.060		complete
+5-skew-three-planes.tar.gz	5-skew-three-planes/skew-xy-minus-0.030-xz-minus-0.030-yz-plus-0.090	skew-all-three-planes-at-once					-0.030	-0.030	0.090		complete
+5-skew-three-planes.tar.gz	5-skew-three-planes/skew-xy-minus-0.030-xz-minus-0.060-yz-minus-0.030	skew-all-three-planes-at-once					-0.030	-0.060	-0.030		complete
+5-skew-three-planes.tar.gz	5-skew-three-planes/skew-xy-minus-0.030-xz-minus-0.060-yz-plus-0.030	skew-all-three-planes-at-once					-0.030	-0.060	0.030		complete
+5-skew-three-planes.tar.gz	5-skew-three-planes/skew-xy-minus-0.030-xz-minus-0.060-yz-plus-0.060	skew-all-three-planes-at-once					-0.030	-0.060	0.060		complete
+5-skew-three-planes.tar.gz	5-skew-three-planes/skew-xy-minus-0.030-xz-minus-0.060-yz-plus-0.090	skew-all-three-planes-at-once					-0.030	-0.060	0.090		complete
+5-skew-three-planes.tar.gz	5-skew-three-planes/skew-xy-minus-0.030-xz-minus-0.090-yz-minus-0.030	skew-all-three-planes-at-once					-0.030	-0.090	-0.030		complete
+5-skew-three-planes.tar.gz	5-skew-three-planes/skew-xy-minus-0.030-xz-minus-0.090-yz-minus-0.060	skew-all-three-planes-at-once					-0.030	-0.090	-0.060		complete
+5-skew-three-planes.tar.gz	5-skew-three-planes/skew-xy-minus-0.030-xz-minus-0.090-yz-minus-0.090	skew-all-three-planes-at-once					-0.030	-0.090	-0.090		complete
+5-skew-three-planes.tar.gz	5-skew-three-planes/skew-xy-minus-0.030-xz-minus-0.090-yz-plus-0.030	skew-all-three-planes-at-once					-0.030	-0.090	0.030		complete
+5-skew-three-planes.tar.gz	5-skew-three-planes/skew-xy-minus-0.030-xz-minus-0.090-yz-plus-0.060	skew-all-three-planes-at-once					-0.030	-0.090	0.060		complete
+5-skew-three-planes.tar.gz	5-skew-three-planes/skew-xy-minus-0.030-xz-minus-0.090-yz-plus-0.090	skew-all-three-planes-at-once					-0.030	-0.090	0.090		complete
+5-skew-three-planes.tar.gz	5-skew-three-planes/skew-xy-minus-0.030-xz-plus-0.030-yz-minus-0.030	skew-all-three-planes-at-once					-0.030	0.030	-0.030		complete
+5-skew-three-planes.tar.gz	5-skew-three-planes/skew-xy-minus-0.030-xz-plus-0.030-yz-minus-0.060	skew-all-three-planes-at-once					-0.030	0.030	-0.060		complete
+5-skew-three-planes.tar.gz	5-skew-three-planes/skew-xy-minus-0.030-xz-plus-0.030-yz-minus-0.090	skew-all-three-planes-at-once					-0.030	0.030	-0.090		complete
+5-skew-three-planes.tar.gz	5-skew-three-planes/skew-xy-minus-0.030-xz-plus-0.030-yz-plus-0.030	skew-all-three-planes-at-once					-0.030	0.030	0.030		complete
+5-skew-three-planes.tar.gz	5-skew-three-planes/skew-xy-minus-0.030-xz-plus-0.030-yz-plus-0.090	skew-all-three-planes-at-once					-0.030	0.030	0.090		complete
+5-skew-three-planes.tar.gz	5-skew-three-planes/skew-xy-minus-0.030-xz-plus-0.060-yz-minus-0.030	skew-all-three-planes-at-once					-0.030	0.060	-0.030		complete
+5-skew-three-planes.tar.gz	5-skew-three-planes/skew-xy-minus-0.030-xz-plus-0.060-yz-minus-0.060	skew-all-three-planes-at-once					-0.030	0.060	-0.060		complete
+5-skew-three-planes.tar.gz	5-skew-three-planes/skew-xy-minus-0.030-xz-plus-0.060-yz-minus-0.090	skew-all-three-planes-at-once					-0.030	0.060	-0.090		complete
+5-skew-three-planes.tar.gz	5-skew-three-planes/skew-xy-minus-0.030-xz-plus-0.060-yz-plus-0.030	skew-all-three-planes-at-once					-0.030	0.060	0.030		complete
+5-skew-three-planes.tar.gz	5-skew-three-planes/skew-xy-minus-0.030-xz-plus-0.090-yz-minus-0.030	skew-all-three-planes-at-once					-0.030	0.090	-0.030		complete
+5-skew-three-planes.tar.gz	5-skew-three-planes/skew-xy-minus-0.030-xz-plus-0.090-yz-minus-0.060	skew-all-three-planes-at-once					-0.030	0.090	-0.060		complete
+5-skew-three-planes.tar.gz	5-skew-three-planes/skew-xy-minus-0.030-xz-plus-0.090-yz-minus-0.090	skew-all-three-planes-at-once					-0.030	0.090	-0.090		complete
+5-skew-three-planes.tar.gz	5-skew-three-planes/skew-xy-minus-0.030-xz-plus-0.090-yz-plus-0.030	skew-all-three-planes-at-once					-0.030	0.090	0.030		complete
+5-skew-three-planes.tar.gz	5-skew-three-planes/skew-xy-minus-0.030-xz-plus-0.090-yz-plus-0.060	skew-all-three-planes-at-once					-0.030	0.090	0.060		complete
+5-skew-three-planes.tar.gz	5-skew-three-planes/skew-xy-minus-0.030-xz-plus-0.090-yz-plus-0.090	skew-all-three-planes-at-once					-0.030	0.090	0.090		complete
+5-skew-three-planes.tar.gz	5-skew-three-planes/skew-xy-minus-0.060-xz-minus-0.030-yz-minus-0.030	skew-all-three-planes-at-once					-0.060	-0.030	-0.030		complete
+5-skew-three-planes.tar.gz	5-skew-three-planes/skew-xy-minus-0.060-xz-minus-0.030-yz-minus-0.090	skew-all-three-planes-at-once					-0.060	-0.030	-0.090		complete
+5-skew-three-planes.tar.gz	5-skew-three-planes/skew-xy-minus-0.060-xz-minus-0.030-yz-plus-0.030	skew-all-three-planes-at-once					-0.060	-0.030	0.030		complete
+5-skew-three-planes.tar.gz	5-skew-three-planes/skew-xy-minus-0.060-xz-minus-0.030-yz-plus-0.060	skew-all-three-planes-at-once					-0.060	-0.030	0.060		complete
+5-skew-three-planes.tar.gz	5-skew-three-planes/skew-xy-minus-0.060-xz-minus-0.030-yz-plus-0.090	skew-all-three-planes-at-once					-0.060	-0.030	0.090		complete
+5-skew-three-planes.tar.gz	5-skew-three-planes/skew-xy-minus-0.060-xz-minus-0.060-yz-minus-0.060	skew-all-three-planes-at-once					-0.060	-0.060	-0.060		complete
+5-skew-three-planes.tar.gz	5-skew-three-planes/skew-xy-minus-0.060-xz-minus-0.060-yz-minus-0.090	skew-all-three-planes-at-once					-0.060	-0.060	-0.090		complete
+5-skew-three-planes.tar.gz	5-skew-three-planes/skew-xy-minus-0.060-xz-minus-0.060-yz-plus-0.030	skew-all-three-planes-at-once					-0.060	-0.060	0.030		complete
+5-skew-three-planes.tar.gz	5-skew-three-planes/skew-xy-minus-0.060-xz-minus-0.060-yz-plus-0.060	skew-all-three-planes-at-once					-0.060	-0.060	0.060		complete
+5-skew-three-planes.tar.gz	5-skew-three-planes/skew-xy-minus-0.060-xz-minus-0.060-yz-plus-0.090	skew-all-three-planes-at-once					-0.060	-0.060	0.090		complete
+5-skew-three-planes.tar.gz	5-skew-three-planes/skew-xy-minus-0.060-xz-minus-0.090-yz-minus-0.030	skew-all-three-planes-at-once					-0.060	-0.090	-0.030		complete
+5-skew-three-planes.tar.gz	5-skew-three-planes/skew-xy-minus-0.060-xz-minus-0.090-yz-minus-0.060	skew-all-three-planes-at-once					-0.060	-0.090	-0.060		complete
+5-skew-three-planes.tar.gz	5-skew-three-planes/skew-xy-minus-0.060-xz-minus-0.090-yz-minus-0.090	skew-all-three-planes-at-once					-0.060	-0.090	-0.090		complete
+5-skew-three-planes.tar.gz	5-skew-three-planes/skew-xy-minus-0.060-xz-minus-0.090-yz-plus-0.030	skew-all-three-planes-at-once					-0.060	-0.090	0.030		complete
+5-skew-three-planes.tar.gz	5-skew-three-planes/skew-xy-minus-0.060-xz-minus-0.090-yz-plus-0.060	skew-all-three-planes-at-once					-0.060	-0.090	0.060		complete
+5-skew-three-planes.tar.gz	5-skew-three-planes/skew-xy-minus-0.060-xz-minus-0.090-yz-plus-0.090	skew-all-three-planes-at-once					-0.060	-0.090	0.090		complete
+5-skew-three-planes.tar.gz	5-skew-three-planes/skew-xy-minus-0.060-xz-plus-0.030-yz-minus-0.030	skew-all-three-planes-at-once					-0.060	0.030	-0.030		complete
+5-skew-three-planes.tar.gz	5-skew-three-planes/skew-xy-minus-0.060-xz-plus-0.030-yz-minus-0.060	skew-all-three-planes-at-once					-0.060	0.030	-0.060		complete
+5-skew-three-planes.tar.gz	5-skew-three-planes/skew-xy-minus-0.060-xz-plus-0.030-yz-minus-0.090	skew-all-three-planes-at-once					-0.060	0.030	-0.090		complete
+5-skew-three-planes.tar.gz	5-skew-three-planes/skew-xy-minus-0.060-xz-plus-0.030-yz-plus-0.030	skew-all-three-planes-at-once					-0.060	0.030	0.030		complete
+5-skew-three-planes.tar.gz	5-skew-three-planes/skew-xy-minus-0.060-xz-plus-0.030-yz-plus-0.090	skew-all-three-planes-at-once					-0.060	0.030	0.090		complete
+5-skew-three-planes.tar.gz	5-skew-three-planes/skew-xy-minus-0.060-xz-plus-0.060-yz-minus-0.030	skew-all-three-planes-at-once					-0.060	0.060	-0.030		complete
+5-skew-three-planes.tar.gz	5-skew-three-planes/skew-xy-minus-0.060-xz-plus-0.060-yz-minus-0.060	skew-all-three-planes-at-once					-0.060	0.060	-0.060		complete
+5-skew-three-planes.tar.gz	5-skew-three-planes/skew-xy-minus-0.060-xz-plus-0.060-yz-minus-0.090	skew-all-three-planes-at-once					-0.060	0.060	-0.090		complete
+5-skew-three-planes.tar.gz	5-skew-three-planes/skew-xy-minus-0.060-xz-plus-0.060-yz-plus-0.060	skew-all-three-planes-at-once					-0.060	0.060	0.060		complete
+5-skew-three-planes.tar.gz	5-skew-three-planes/skew-xy-minus-0.060-xz-plus-0.060-yz-plus-0.090	skew-all-three-planes-at-once					-0.060	0.060	0.090		complete
+5-skew-three-planes.tar.gz	5-skew-three-planes/skew-xy-minus-0.060-xz-plus-0.090-yz-minus-0.030	skew-all-three-planes-at-once					-0.060	0.090	-0.030		complete
+5-skew-three-planes.tar.gz	5-skew-three-planes/skew-xy-minus-0.060-xz-plus-0.090-yz-minus-0.060	skew-all-three-planes-at-once					-0.060	0.090	-0.060		complete
+5-skew-three-planes.tar.gz	5-skew-three-planes/skew-xy-minus-0.060-xz-plus-0.090-yz-minus-0.090	skew-all-three-planes-at-once					-0.060	0.090	-0.090		complete
+5-skew-three-planes.tar.gz	5-skew-three-planes/skew-xy-minus-0.060-xz-plus-0.090-yz-plus-0.030	skew-all-three-planes-at-once					-0.060	0.090	0.030		complete
+5-skew-three-planes.tar.gz	5-skew-three-planes/skew-xy-minus-0.060-xz-plus-0.090-yz-plus-0.060	skew-all-three-planes-at-once					-0.060	0.090	0.060		complete
+5-skew-three-planes.tar.gz	5-skew-three-planes/skew-xy-minus-0.060-xz-plus-0.090-yz-plus-0.090	skew-all-three-planes-at-once					-0.060	0.090	0.090		complete
+5-skew-three-planes.tar.gz	5-skew-three-planes/skew-xy-minus-0.090-xz-minus-0.030-yz-minus-0.030	skew-all-three-planes-at-once					-0.090	-0.030	-0.030		complete
+5-skew-three-planes.tar.gz	5-skew-three-planes/skew-xy-minus-0.090-xz-minus-0.030-yz-minus-0.060	skew-all-three-planes-at-once					-0.090	-0.030	-0.060		complete
+5-skew-three-planes.tar.gz	5-skew-three-planes/skew-xy-minus-0.090-xz-minus-0.030-yz-minus-0.090	skew-all-three-planes-at-once					-0.090	-0.030	-0.090		complete
+5-skew-three-planes.tar.gz	5-skew-three-planes/skew-xy-minus-0.090-xz-minus-0.030-yz-plus-0.030	skew-all-three-planes-at-once					-0.090	-0.030	0.030		complete
+5-skew-three-planes.tar.gz	5-skew-three-planes/skew-xy-minus-0.090-xz-minus-0.030-yz-plus-0.060	skew-all-three-planes-at-once					-0.090	-0.030	0.060		complete
+5-skew-three-planes.tar.gz	5-skew-three-planes/skew-xy-minus-0.090-xz-minus-0.030-yz-plus-0.090	skew-all-three-planes-at-once					-0.090	-0.030	0.090		complete
+5-skew-three-planes.tar.gz	5-skew-three-planes/skew-xy-minus-0.090-xz-minus-0.060-yz-minus-0.030	skew-all-three-planes-at-once					-0.090	-0.060	-0.030		complete
+5-skew-three-planes.tar.gz	5-skew-three-planes/skew-xy-minus-0.090-xz-minus-0.060-yz-minus-0.060	skew-all-three-planes-at-once					-0.090	-0.060	-0.060		complete
+5-skew-three-planes.tar.gz	5-skew-three-planes/skew-xy-minus-0.090-xz-minus-0.060-yz-minus-0.090	skew-all-three-planes-at-once					-0.090	-0.060	-0.090		complete
+5-skew-three-planes.tar.gz	5-skew-three-planes/skew-xy-minus-0.090-xz-minus-0.060-yz-plus-0.030	skew-all-three-planes-at-once					-0.090	-0.060	0.030		complete
+5-skew-three-planes.tar.gz	5-skew-three-planes/skew-xy-minus-0.090-xz-minus-0.060-yz-plus-0.090	skew-all-three-planes-at-once					-0.090	-0.060	0.090		complete
+5-skew-three-planes.tar.gz	5-skew-three-planes/skew-xy-minus-0.090-xz-minus-0.090-yz-minus-0.030	skew-all-three-planes-at-once					-0.090	-0.090	-0.030		complete
+5-skew-three-planes.tar.gz	5-skew-three-planes/skew-xy-minus-0.090-xz-minus-0.090-yz-minus-0.060	skew-all-three-planes-at-once					-0.090	-0.090	-0.060		complete
+5-skew-three-planes.tar.gz	5-skew-three-planes/skew-xy-minus-0.090-xz-minus-0.090-yz-minus-0.090	skew-all-three-planes-at-once					-0.090	-0.090	-0.090		complete
+5-skew-three-planes.tar.gz	5-skew-three-planes/skew-xy-minus-0.090-xz-minus-0.090-yz-plus-0.030	skew-all-three-planes-at-once					-0.090	-0.090	0.030		complete
+5-skew-three-planes.tar.gz	5-skew-three-planes/skew-xy-minus-0.090-xz-minus-0.090-yz-plus-0.060	skew-all-three-planes-at-once					-0.090	-0.090	0.060		complete
+5-skew-three-planes.tar.gz	5-skew-three-planes/skew-xy-minus-0.090-xz-minus-0.090-yz-plus-0.090	skew-all-three-planes-at-once					-0.090	-0.090	0.090		complete
+5-skew-three-planes.tar.gz	5-skew-three-planes/skew-xy-minus-0.090-xz-plus-0.030-yz-minus-0.030	skew-all-three-planes-at-once					-0.090	0.030	-0.030		complete
+5-skew-three-planes.tar.gz	5-skew-three-planes/skew-xy-minus-0.090-xz-plus-0.030-yz-minus-0.060	skew-all-three-planes-at-once					-0.090	0.030	-0.060		complete
+5-skew-three-planes.tar.gz	5-skew-three-planes/skew-xy-minus-0.090-xz-plus-0.030-yz-minus-0.090	skew-all-three-planes-at-once					-0.090	0.030	-0.090		complete
+5-skew-three-planes.tar.gz	5-skew-three-planes/skew-xy-minus-0.090-xz-plus-0.030-yz-plus-0.030	skew-all-three-planes-at-once					-0.090	0.030	0.030		complete
+5-skew-three-planes.tar.gz	5-skew-three-planes/skew-xy-minus-0.090-xz-plus-0.030-yz-plus-0.060	skew-all-three-planes-at-once					-0.090	0.030	0.060		complete
+5-skew-three-planes.tar.gz	5-skew-three-planes/skew-xy-minus-0.090-xz-plus-0.030-yz-plus-0.090	skew-all-three-planes-at-once					-0.090	0.030	0.090		complete
+5-skew-three-planes.tar.gz	5-skew-three-planes/skew-xy-minus-0.090-xz-plus-0.060-yz-minus-0.030	skew-all-three-planes-at-once					-0.090	0.060	-0.030		complete
+5-skew-three-planes.tar.gz	5-skew-three-planes/skew-xy-minus-0.090-xz-plus-0.060-yz-minus-0.090	skew-all-three-planes-at-once					-0.090	0.060	-0.090		complete
+5-skew-three-planes.tar.gz	5-skew-three-planes/skew-xy-minus-0.090-xz-plus-0.060-yz-plus-0.030	skew-all-three-planes-at-once					-0.090	0.060	0.030		complete
+5-skew-three-planes.tar.gz	5-skew-three-planes/skew-xy-minus-0.090-xz-plus-0.060-yz-plus-0.060	skew-all-three-planes-at-once					-0.090	0.060	0.060		complete
+5-skew-three-planes.tar.gz	5-skew-three-planes/skew-xy-minus-0.090-xz-plus-0.060-yz-plus-0.090	skew-all-three-planes-at-once					-0.090	0.060	0.090		complete
+5-skew-three-planes.tar.gz	5-skew-three-planes/skew-xy-minus-0.090-xz-plus-0.090-yz-minus-0.030	skew-all-three-planes-at-once					-0.090	0.090	-0.030		complete
+5-skew-three-planes.tar.gz	5-skew-three-planes/skew-xy-minus-0.090-xz-plus-0.090-yz-minus-0.060	skew-all-three-planes-at-once					-0.090	0.090	-0.060		complete
+5-skew-three-planes.tar.gz	5-skew-three-planes/skew-xy-minus-0.090-xz-plus-0.090-yz-minus-0.090	skew-all-three-planes-at-once					-0.090	0.090	-0.090		complete
+5-skew-three-planes.tar.gz	5-skew-three-planes/skew-xy-minus-0.090-xz-plus-0.090-yz-plus-0.030	skew-all-three-planes-at-once					-0.090	0.090	0.030		complete
+5-skew-three-planes.tar.gz	5-skew-three-planes/skew-xy-minus-0.090-xz-plus-0.090-yz-plus-0.060	skew-all-three-planes-at-once					-0.090	0.090	0.060		complete
+5-skew-three-planes.tar.gz	5-skew-three-planes/skew-xy-minus-0.090-xz-plus-0.090-yz-plus-0.090	skew-all-three-planes-at-once					-0.090	0.090	0.090		complete
+5-skew-three-planes.tar.gz	5-skew-three-planes/skew-xy-plus-0.030-xz-minus-0.030-yz-minus-0.030	skew-all-three-planes-at-once					0.030	-0.030	-0.030		complete
+5-skew-three-planes.tar.gz	5-skew-three-planes/skew-xy-plus-0.030-xz-minus-0.030-yz-minus-0.060	skew-all-three-planes-at-once					0.030	-0.030	-0.060		complete
+5-skew-three-planes.tar.gz	5-skew-three-planes/skew-xy-plus-0.030-xz-minus-0.030-yz-minus-0.090	skew-all-three-planes-at-once					0.030	-0.030	-0.090		complete
+5-skew-three-planes.tar.gz	5-skew-three-planes/skew-xy-plus-0.030-xz-minus-0.030-yz-plus-0.030	skew-all-three-planes-at-once					0.030	-0.030	0.030		complete
+5-skew-three-planes.tar.gz	5-skew-three-planes/skew-xy-plus-0.030-xz-minus-0.030-yz-plus-0.090	skew-all-three-planes-at-once					0.030	-0.030	0.090		complete
+5-skew-three-planes.tar.gz	5-skew-three-planes/skew-xy-plus-0.030-xz-minus-0.060-yz-minus-0.030	skew-all-three-planes-at-once					0.030	-0.060	-0.030		complete
+5-skew-three-planes.tar.gz	5-skew-three-planes/skew-xy-plus-0.030-xz-minus-0.060-yz-minus-0.060	skew-all-three-planes-at-once					0.030	-0.060	-0.060		complete
+5-skew-three-planes.tar.gz	5-skew-three-planes/skew-xy-plus-0.030-xz-minus-0.060-yz-minus-0.090	skew-all-three-planes-at-once					0.030	-0.060	-0.090		complete
+5-skew-three-planes.tar.gz	5-skew-three-planes/skew-xy-plus-0.030-xz-minus-0.060-yz-plus-0.030	skew-all-three-planes-at-once					0.030	-0.060	0.030		complete
+5-skew-three-planes.tar.gz	5-skew-three-planes/skew-xy-plus-0.030-xz-minus-0.090-yz-minus-0.030	skew-all-three-planes-at-once					0.030	-0.090	-0.030		complete
+5-skew-three-planes.tar.gz	5-skew-three-planes/skew-xy-plus-0.030-xz-minus-0.090-yz-minus-0.060	skew-all-three-planes-at-once					0.030	-0.090	-0.060		complete
+5-skew-three-planes.tar.gz	5-skew-three-planes/skew-xy-plus-0.030-xz-minus-0.090-yz-minus-0.090	skew-all-three-planes-at-once					0.030	-0.090	-0.090		complete
+5-skew-three-planes.tar.gz	5-skew-three-planes/skew-xy-plus-0.030-xz-minus-0.090-yz-plus-0.030	skew-all-three-planes-at-once					0.030	-0.090	0.030		complete
+5-skew-three-planes.tar.gz	5-skew-three-planes/skew-xy-plus-0.030-xz-minus-0.090-yz-plus-0.060	skew-all-three-planes-at-once					0.030	-0.090	0.060		complete
+5-skew-three-planes.tar.gz	5-skew-three-planes/skew-xy-plus-0.030-xz-minus-0.090-yz-plus-0.090	skew-all-three-planes-at-once					0.030	-0.090	0.090		complete
+5-skew-three-planes.tar.gz	5-skew-three-planes/skew-xy-plus-0.030-xz-plus-0.030-yz-minus-0.030	skew-all-three-planes-at-once					0.030	0.030	-0.030		complete
+5-skew-three-planes.tar.gz	5-skew-three-planes/skew-xy-plus-0.030-xz-plus-0.030-yz-minus-0.090	skew-all-three-planes-at-once					0.030	0.030	-0.090		complete
+5-skew-three-planes.tar.gz	5-skew-three-planes/skew-xy-plus-0.030-xz-plus-0.030-yz-plus-0.030	skew-all-three-planes-at-once					0.030	0.030	0.030		complete
+5-skew-three-planes.tar.gz	5-skew-three-planes/skew-xy-plus-0.030-xz-plus-0.030-yz-plus-0.060	skew-all-three-planes-at-once					0.030	0.030	0.060		complete
+5-skew-three-planes.tar.gz	5-skew-three-planes/skew-xy-plus-0.030-xz-plus-0.030-yz-plus-0.090	skew-all-three-planes-at-once					0.030	0.030	0.090		complete
+5-skew-three-planes.tar.gz	5-skew-three-planes/skew-xy-plus-0.030-xz-plus-0.060-yz-minus-0.030	skew-all-three-planes-at-once					0.030	0.060	-0.030		complete
+5-skew-three-planes.tar.gz	5-skew-three-planes/skew-xy-plus-0.030-xz-plus-0.060-yz-plus-0.030	skew-all-three-planes-at-once					0.030	0.060	0.030		complete
+5-skew-three-planes.tar.gz	5-skew-three-planes/skew-xy-plus-0.030-xz-plus-0.060-yz-plus-0.060	skew-all-three-planes-at-once					0.030	0.060	0.060		complete
+5-skew-three-planes.tar.gz	5-skew-three-planes/skew-xy-plus-0.030-xz-plus-0.060-yz-plus-0.090	skew-all-three-planes-at-once					0.030	0.060	0.090		complete
+5-skew-three-planes.tar.gz	5-skew-three-planes/skew-xy-plus-0.030-xz-plus-0.090-yz-minus-0.030	skew-all-three-planes-at-once					0.030	0.090	-0.030		complete
+5-skew-three-planes.tar.gz	5-skew-three-planes/skew-xy-plus-0.030-xz-plus-0.090-yz-minus-0.060	skew-all-three-planes-at-once					0.030	0.090	-0.060		complete
+5-skew-three-planes.tar.gz	5-skew-three-planes/skew-xy-plus-0.030-xz-plus-0.090-yz-minus-0.090	skew-all-three-planes-at-once					0.030	0.090	-0.090		complete
+5-skew-three-planes.tar.gz	5-skew-three-planes/skew-xy-plus-0.030-xz-plus-0.090-yz-plus-0.030	skew-all-three-planes-at-once					0.030	0.090	0.030		complete
+5-skew-three-planes.tar.gz	5-skew-three-planes/skew-xy-plus-0.030-xz-plus-0.090-yz-plus-0.060	skew-all-three-planes-at-once					0.030	0.090	0.060		complete
+5-skew-three-planes.tar.gz	5-skew-three-planes/skew-xy-plus-0.030-xz-plus-0.090-yz-plus-0.090	skew-all-three-planes-at-once					0.030	0.090	0.090		complete
+5-skew-three-planes.tar.gz	5-skew-three-planes/skew-xy-plus-0.060-xz-minus-0.030-yz-minus-0.030	skew-all-three-planes-at-once					0.060	-0.030	-0.030		complete
+5-skew-three-planes.tar.gz	5-skew-three-planes/skew-xy-plus-0.060-xz-minus-0.030-yz-minus-0.060	skew-all-three-planes-at-once					0.060	-0.030	-0.060		complete
+5-skew-three-planes.tar.gz	5-skew-three-planes/skew-xy-plus-0.060-xz-minus-0.030-yz-minus-0.090	skew-all-three-planes-at-once					0.060	-0.030	-0.090		complete
+5-skew-three-planes.tar.gz	5-skew-three-planes/skew-xy-plus-0.060-xz-minus-0.030-yz-plus-0.030	skew-all-three-planes-at-once					0.060	-0.030	0.030		complete
+5-skew-three-planes.tar.gz	5-skew-three-planes/skew-xy-plus-0.060-xz-minus-0.030-yz-plus-0.090	skew-all-three-planes-at-once					0.060	-0.030	0.090		complete
+5-skew-three-planes.tar.gz	5-skew-three-planes/skew-xy-plus-0.060-xz-minus-0.060-yz-minus-0.030	skew-all-three-planes-at-once					0.060	-0.060	-0.030		complete
+5-skew-three-planes.tar.gz	5-skew-three-planes/skew-xy-plus-0.060-xz-minus-0.060-yz-minus-0.060	skew-all-three-planes-at-once					0.060	-0.060	-0.060		complete
+5-skew-three-planes.tar.gz	5-skew-three-planes/skew-xy-plus-0.060-xz-minus-0.060-yz-minus-0.090	skew-all-three-planes-at-once					0.060	-0.060	-0.090		complete
+5-skew-three-planes.tar.gz	5-skew-three-planes/skew-xy-plus-0.060-xz-minus-0.060-yz-plus-0.060	skew-all-three-planes-at-once					0.060	-0.060	0.060		complete
+5-skew-three-planes.tar.gz	5-skew-three-planes/skew-xy-plus-0.060-xz-minus-0.060-yz-plus-0.090	skew-all-three-planes-at-once					0.060	-0.060	0.090		complete
+5-skew-three-planes.tar.gz	5-skew-three-planes/skew-xy-plus-0.060-xz-minus-0.090-yz-minus-0.030	skew-all-three-planes-at-once					0.060	-0.090	-0.030		complete
+5-skew-three-planes.tar.gz	5-skew-three-planes/skew-xy-plus-0.060-xz-minus-0.090-yz-minus-0.060	skew-all-three-planes-at-once					0.060	-0.090	-0.060		complete
+5-skew-three-planes.tar.gz	5-skew-three-planes/skew-xy-plus-0.060-xz-minus-0.090-yz-minus-0.090	skew-all-three-planes-at-once					0.060	-0.090	-0.090		complete
+5-skew-three-planes.tar.gz	5-skew-three-planes/skew-xy-plus-0.060-xz-minus-0.090-yz-plus-0.030	skew-all-three-planes-at-once					0.060	-0.090	0.030		complete
+5-skew-three-planes.tar.gz	5-skew-three-planes/skew-xy-plus-0.060-xz-minus-0.090-yz-plus-0.060	skew-all-three-planes-at-once					0.060	-0.090	0.060		complete
+5-skew-three-planes.tar.gz	5-skew-three-planes/skew-xy-plus-0.060-xz-minus-0.090-yz-plus-0.090	skew-all-three-planes-at-once					0.060	-0.090	0.090		complete
+5-skew-three-planes.tar.gz	5-skew-three-planes/skew-xy-plus-0.060-xz-plus-0.030-yz-minus-0.030	skew-all-three-planes-at-once					0.060	0.030	-0.030		complete
+5-skew-three-planes.tar.gz	5-skew-three-planes/skew-xy-plus-0.060-xz-plus-0.030-yz-minus-0.090	skew-all-three-planes-at-once					0.060	0.030	-0.090		complete
+5-skew-three-planes.tar.gz	5-skew-three-planes/skew-xy-plus-0.060-xz-plus-0.030-yz-plus-0.030	skew-all-three-planes-at-once					0.060	0.030	0.030		complete
+5-skew-three-planes.tar.gz	5-skew-three-planes/skew-xy-plus-0.060-xz-plus-0.030-yz-plus-0.060	skew-all-three-planes-at-once					0.060	0.030	0.060		complete
+5-skew-three-planes.tar.gz	5-skew-three-planes/skew-xy-plus-0.060-xz-plus-0.030-yz-plus-0.090	skew-all-three-planes-at-once					0.060	0.030	0.090		complete
+5-skew-three-planes.tar.gz	5-skew-three-planes/skew-xy-plus-0.060-xz-plus-0.060-yz-minus-0.060	skew-all-three-planes-at-once					0.060	0.060	-0.060		complete
+5-skew-three-planes.tar.gz	5-skew-three-planes/skew-xy-plus-0.060-xz-plus-0.060-yz-minus-0.090	skew-all-three-planes-at-once					0.060	0.060	-0.090		complete
+5-skew-three-planes.tar.gz	5-skew-three-planes/skew-xy-plus-0.060-xz-plus-0.060-yz-plus-0.030	skew-all-three-planes-at-once					0.060	0.060	0.030		complete
+5-skew-three-planes.tar.gz	5-skew-three-planes/skew-xy-plus-0.060-xz-plus-0.060-yz-plus-0.060	skew-all-three-planes-at-once					0.060	0.060	0.060		complete
+5-skew-three-planes.tar.gz	5-skew-three-planes/skew-xy-plus-0.060-xz-plus-0.060-yz-plus-0.090	skew-all-three-planes-at-once					0.060	0.060	0.090		complete
+5-skew-three-planes.tar.gz	5-skew-three-planes/skew-xy-plus-0.060-xz-plus-0.090-yz-minus-0.030	skew-all-three-planes-at-once					0.060	0.090	-0.030		complete
+5-skew-three-planes.tar.gz	5-skew-three-planes/skew-xy-plus-0.060-xz-plus-0.090-yz-minus-0.060	skew-all-three-planes-at-once					0.060	0.090	-0.060		complete
+5-skew-three-planes.tar.gz	5-skew-three-planes/skew-xy-plus-0.060-xz-plus-0.090-yz-minus-0.090	skew-all-three-planes-at-once					0.060	0.090	-0.090		complete
+5-skew-three-planes.tar.gz	5-skew-three-planes/skew-xy-plus-0.060-xz-plus-0.090-yz-plus-0.030	skew-all-three-planes-at-once					0.060	0.090	0.030		complete
+5-skew-three-planes.tar.gz	5-skew-three-planes/skew-xy-plus-0.060-xz-plus-0.090-yz-plus-0.060	skew-all-three-planes-at-once					0.060	0.090	0.060		complete
+5-skew-three-planes.tar.gz	5-skew-three-planes/skew-xy-plus-0.060-xz-plus-0.090-yz-plus-0.090	skew-all-three-planes-at-once					0.060	0.090	0.090		complete
+5-skew-three-planes.tar.gz	5-skew-three-planes/skew-xy-plus-0.090-xz-minus-0.030-yz-minus-0.030	skew-all-three-planes-at-once					0.090	-0.030	-0.030		complete
+5-skew-three-planes.tar.gz	5-skew-three-planes/skew-xy-plus-0.090-xz-minus-0.030-yz-minus-0.060	skew-all-three-planes-at-once					0.090	-0.030	-0.060		complete
+5-skew-three-planes.tar.gz	5-skew-three-planes/skew-xy-plus-0.090-xz-minus-0.030-yz-minus-0.090	skew-all-three-planes-at-once					0.090	-0.030	-0.090		complete
+5-skew-three-planes.tar.gz	5-skew-three-planes/skew-xy-plus-0.090-xz-minus-0.030-yz-plus-0.030	skew-all-three-planes-at-once					0.090	-0.030	0.030		complete
+5-skew-three-planes.tar.gz	5-skew-three-planes/skew-xy-plus-0.090-xz-minus-0.030-yz-plus-0.060	skew-all-three-planes-at-once					0.090	-0.030	0.060		complete
+5-skew-three-planes.tar.gz	5-skew-three-planes/skew-xy-plus-0.090-xz-minus-0.030-yz-plus-0.090	skew-all-three-planes-at-once					0.090	-0.030	0.090		complete
+5-skew-three-planes.tar.gz	5-skew-three-planes/skew-xy-plus-0.090-xz-minus-0.060-yz-minus-0.030	skew-all-three-planes-at-once					0.090	-0.060	-0.030		complete
+5-skew-three-planes.tar.gz	5-skew-three-planes/skew-xy-plus-0.090-xz-minus-0.060-yz-minus-0.090	skew-all-three-planes-at-once					0.090	-0.060	-0.090		complete
+5-skew-three-planes.tar.gz	5-skew-three-planes/skew-xy-plus-0.090-xz-minus-0.060-yz-plus-0.030	skew-all-three-planes-at-once					0.090	-0.060	0.030		complete
+5-skew-three-planes.tar.gz	5-skew-three-planes/skew-xy-plus-0.090-xz-minus-0.060-yz-plus-0.060	skew-all-three-planes-at-once					0.090	-0.060	0.060		complete
+5-skew-three-planes.tar.gz	5-skew-three-planes/skew-xy-plus-0.090-xz-minus-0.060-yz-plus-0.090	skew-all-three-planes-at-once					0.090	-0.060	0.090		complete
+5-skew-three-planes.tar.gz	5-skew-three-planes/skew-xy-plus-0.090-xz-minus-0.090-yz-minus-0.030	skew-all-three-planes-at-once					0.090	-0.090	-0.030		complete
+5-skew-three-planes.tar.gz	5-skew-three-planes/skew-xy-plus-0.090-xz-minus-0.090-yz-minus-0.060	skew-all-three-planes-at-once					0.090	-0.090	-0.060		complete
+5-skew-three-planes.tar.gz	5-skew-three-planes/skew-xy-plus-0.090-xz-minus-0.090-yz-minus-0.090	skew-all-three-planes-at-once					0.090	-0.090	-0.090		complete
+5-skew-three-planes.tar.gz	5-skew-three-planes/skew-xy-plus-0.090-xz-minus-0.090-yz-plus-0.030	skew-all-three-planes-at-once					0.090	-0.090	0.030		complete
+5-skew-three-planes.tar.gz	5-skew-three-planes/skew-xy-plus-0.090-xz-minus-0.090-yz-plus-0.060	skew-all-three-planes-at-once					0.090	-0.090	0.060		complete
+5-skew-three-planes.tar.gz	5-skew-three-planes/skew-xy-plus-0.090-xz-minus-0.090-yz-plus-0.090	skew-all-three-planes-at-once					0.090	-0.090	0.090		complete
+5-skew-three-planes.tar.gz	5-skew-three-planes/skew-xy-plus-0.090-xz-plus-0.030-yz-minus-0.030	skew-all-three-planes-at-once					0.090	0.030	-0.030		complete
+5-skew-three-planes.tar.gz	5-skew-three-planes/skew-xy-plus-0.090-xz-plus-0.030-yz-minus-0.060	skew-all-three-planes-at-once					0.090	0.030	-0.060		complete
+5-skew-three-planes.tar.gz	5-skew-three-planes/skew-xy-plus-0.090-xz-plus-0.030-yz-minus-0.090	skew-all-three-planes-at-once					0.090	0.030	-0.090		complete
+5-skew-three-planes.tar.gz	5-skew-three-planes/skew-xy-plus-0.090-xz-plus-0.030-yz-plus-0.030	skew-all-three-planes-at-once					0.090	0.030	0.030		complete
+5-skew-three-planes.tar.gz	5-skew-three-planes/skew-xy-plus-0.090-xz-plus-0.030-yz-plus-0.060	skew-all-three-planes-at-once					0.090	0.030	0.060		complete
+5-skew-three-planes.tar.gz	5-skew-three-planes/skew-xy-plus-0.090-xz-plus-0.030-yz-plus-0.090	skew-all-three-planes-at-once					0.090	0.030	0.090		complete
+5-skew-three-planes.tar.gz	5-skew-three-planes/skew-xy-plus-0.090-xz-plus-0.060-yz-minus-0.030	skew-all-three-planes-at-once					0.090	0.060	-0.030		complete
+5-skew-three-planes.tar.gz	5-skew-three-planes/skew-xy-plus-0.090-xz-plus-0.060-yz-minus-0.060	skew-all-three-planes-at-once					0.090	0.060	-0.060		complete
+5-skew-three-planes.tar.gz	5-skew-three-planes/skew-xy-plus-0.090-xz-plus-0.060-yz-minus-0.090	skew-all-three-planes-at-once					0.090	0.060	-0.090		complete
+5-skew-three-planes.tar.gz	5-skew-three-planes/skew-xy-plus-0.090-xz-plus-0.060-yz-plus-0.030	skew-all-three-planes-at-once					0.090	0.060	0.030		complete
+5-skew-three-planes.tar.gz	5-skew-three-planes/skew-xy-plus-0.090-xz-plus-0.060-yz-plus-0.090	skew-all-three-planes-at-once					0.090	0.060	0.090		complete
+5-skew-three-planes.tar.gz	5-skew-three-planes/skew-xy-plus-0.090-xz-plus-0.090-yz-minus-0.030	skew-all-three-planes-at-once					0.090	0.090	-0.030		complete
+5-skew-three-planes.tar.gz	5-skew-three-planes/skew-xy-plus-0.090-xz-plus-0.090-yz-minus-0.060	skew-all-three-planes-at-once					0.090	0.090	-0.060		complete
+5-skew-three-planes.tar.gz	5-skew-three-planes/skew-xy-plus-0.090-xz-plus-0.090-yz-minus-0.090	skew-all-three-planes-at-once					0.090	0.090	-0.090		complete
+5-skew-three-planes.tar.gz	5-skew-three-planes/skew-xy-plus-0.090-xz-plus-0.090-yz-plus-0.030	skew-all-three-planes-at-once					0.090	0.090	0.030		complete
+5-skew-three-planes.tar.gz	5-skew-three-planes/skew-xy-plus-0.090-xz-plus-0.090-yz-plus-0.060	skew-all-three-planes-at-once					0.090	0.090	0.060		complete
+5-skew-three-planes.tar.gz	5-skew-three-planes/skew-xy-plus-0.090-xz-plus-0.090-yz-plus-0.090	skew-all-three-planes-at-once					0.090	0.090	0.090		complete
+6-stretch-all-three-axes.tar.gz	6-stretch-all-three-axes/stretch-x-minus-0.020-y-minus-0.020-z-minus-0.020	stretch-all-three-axes-independently		-0.020	-0.020	-0.020					complete
+6-stretch-all-three-axes.tar.gz	6-stretch-all-three-axes/stretch-x-minus-0.020-y-minus-0.020-z-minus-0.040	stretch-all-three-axes-independently		-0.020	-0.020	-0.040					complete
+6-stretch-all-three-axes.tar.gz	6-stretch-all-three-axes/stretch-x-minus-0.020-y-minus-0.020-z-minus-0.060	stretch-all-three-axes-independently		-0.020	-0.020	-0.060					complete
+6-stretch-all-three-axes.tar.gz	6-stretch-all-three-axes/stretch-x-minus-0.020-y-minus-0.020-z-minus-0.080	stretch-all-three-axes-independently		-0.020	-0.020	-0.080					complete
+6-stretch-all-three-axes.tar.gz	6-stretch-all-three-axes/stretch-x-minus-0.020-y-minus-0.020-z-plus-0.020	stretch-all-three-axes-independently		-0.020	-0.020	0.020					complete
+6-stretch-all-three-axes.tar.gz	6-stretch-all-three-axes/stretch-x-minus-0.020-y-minus-0.020-z-plus-0.040	stretch-all-three-axes-independently		-0.020	-0.020	0.040					complete
+6-stretch-all-three-axes.tar.gz	6-stretch-all-three-axes/stretch-x-minus-0.020-y-minus-0.020-z-plus-0.060	stretch-all-three-axes-independently		-0.020	-0.020	0.060					complete
+6-stretch-all-three-axes.tar.gz	6-stretch-all-three-axes/stretch-x-minus-0.020-y-minus-0.020-z-plus-0.080	stretch-all-three-axes-independently		-0.020	-0.020	0.080					complete
+6-stretch-all-three-axes.tar.gz	6-stretch-all-three-axes/stretch-x-minus-0.020-y-minus-0.040-z-minus-0.020	stretch-all-three-axes-independently		-0.020	-0.040	-0.020					complete
+6-stretch-all-three-axes.tar.gz	6-stretch-all-three-axes/stretch-x-minus-0.020-y-minus-0.040-z-minus-0.040	stretch-all-three-axes-independently		-0.020	-0.040	-0.040					complete
+6-stretch-all-three-axes.tar.gz	6-stretch-all-three-axes/stretch-x-minus-0.020-y-minus-0.040-z-minus-0.060	stretch-all-three-axes-independently		-0.020	-0.040	-0.060					complete
+6-stretch-all-three-axes.tar.gz	6-stretch-all-three-axes/stretch-x-minus-0.020-y-minus-0.040-z-minus-0.080	stretch-all-three-axes-independently		-0.020	-0.040	-0.080					complete
+6-stretch-all-three-axes.tar.gz	6-stretch-all-three-axes/stretch-x-minus-0.020-y-minus-0.040-z-plus-0.020	stretch-all-three-axes-independently		-0.020	-0.040	0.020					complete
+6-stretch-all-three-axes.tar.gz	6-stretch-all-three-axes/stretch-x-minus-0.020-y-minus-0.040-z-plus-0.040	stretch-all-three-axes-independently		-0.020	-0.040	0.040					complete
+6-stretch-all-three-axes.tar.gz	6-stretch-all-three-axes/stretch-x-minus-0.020-y-minus-0.040-z-plus-0.060	stretch-all-three-axes-independently		-0.020	-0.040	0.060					complete
+6-stretch-all-three-axes.tar.gz	6-stretch-all-three-axes/stretch-x-minus-0.020-y-minus-0.040-z-plus-0.080	stretch-all-three-axes-independently		-0.020	-0.040	0.080					complete
+6-stretch-all-three-axes.tar.gz	6-stretch-all-three-axes/stretch-x-minus-0.020-y-minus-0.060-z-minus-0.020	stretch-all-three-axes-independently		-0.020	-0.060	-0.020					complete
+6-stretch-all-three-axes.tar.gz	6-stretch-all-three-axes/stretch-x-minus-0.020-y-minus-0.060-z-minus-0.040	stretch-all-three-axes-independently		-0.020	-0.060	-0.040					complete
+6-stretch-all-three-axes.tar.gz	6-stretch-all-three-axes/stretch-x-minus-0.020-y-minus-0.060-z-minus-0.060	stretch-all-three-axes-independently		-0.020	-0.060	-0.060					complete
+6-stretch-all-three-axes.tar.gz	6-stretch-all-three-axes/stretch-x-minus-0.020-y-minus-0.060-z-minus-0.080	stretch-all-three-axes-independently		-0.020	-0.060	-0.080					complete
+6-stretch-all-three-axes.tar.gz	6-stretch-all-three-axes/stretch-x-minus-0.020-y-minus-0.060-z-plus-0.020	stretch-all-three-axes-independently		-0.020	-0.060	0.020					complete
+6-stretch-all-three-axes.tar.gz	6-stretch-all-three-axes/stretch-x-minus-0.020-y-minus-0.060-z-plus-0.040	stretch-all-three-axes-independently		-0.020	-0.060	0.040					complete
+6-stretch-all-three-axes.tar.gz	6-stretch-all-three-axes/stretch-x-minus-0.020-y-minus-0.060-z-plus-0.060	stretch-all-three-axes-independently		-0.020	-0.060	0.060					complete
+6-stretch-all-three-axes.tar.gz	6-stretch-all-three-axes/stretch-x-minus-0.020-y-minus-0.060-z-plus-0.080	stretch-all-three-axes-independently		-0.020	-0.060	0.080					complete
+6-stretch-all-three-axes.tar.gz	6-stretch-all-three-axes/stretch-x-minus-0.020-y-minus-0.080-z-minus-0.020	stretch-all-three-axes-independently		-0.020	-0.080	-0.020					complete
+6-stretch-all-three-axes.tar.gz	6-stretch-all-three-axes/stretch-x-minus-0.020-y-minus-0.080-z-minus-0.040	stretch-all-three-axes-independently		-0.020	-0.080	-0.040					complete
+6-stretch-all-three-axes.tar.gz	6-stretch-all-three-axes/stretch-x-minus-0.020-y-minus-0.080-z-minus-0.060	stretch-all-three-axes-independently		-0.020	-0.080	-0.060					complete
+6-stretch-all-three-axes.tar.gz	6-stretch-all-three-axes/stretch-x-minus-0.020-y-minus-0.080-z-minus-0.080	stretch-all-three-axes-independently		-0.020	-0.080	-0.080					complete
+6-stretch-all-three-axes.tar.gz	6-stretch-all-three-axes/stretch-x-minus-0.020-y-minus-0.080-z-plus-0.020	stretch-all-three-axes-independently		-0.020	-0.080	0.020					complete
+6-stretch-all-three-axes.tar.gz	6-stretch-all-three-axes/stretch-x-minus-0.020-y-minus-0.080-z-plus-0.040	stretch-all-three-axes-independently		-0.020	-0.080	0.040					complete
+6-stretch-all-three-axes.tar.gz	6-stretch-all-three-axes/stretch-x-minus-0.020-y-minus-0.080-z-plus-0.060	stretch-all-three-axes-independently		-0.020	-0.080	0.060					complete
+6-stretch-all-three-axes.tar.gz	6-stretch-all-three-axes/stretch-x-minus-0.020-y-minus-0.080-z-plus-0.080	stretch-all-three-axes-independently		-0.020	-0.080	0.080					complete
+6-stretch-all-three-axes.tar.gz	6-stretch-all-three-axes/stretch-x-minus-0.020-y-plus-0.020-z-minus-0.020	stretch-all-three-axes-independently		-0.020	0.020	-0.020					complete
+6-stretch-all-three-axes.tar.gz	6-stretch-all-three-axes/stretch-x-minus-0.020-y-plus-0.020-z-minus-0.040	stretch-all-three-axes-independently		-0.020	0.020	-0.040					complete
+6-stretch-all-three-axes.tar.gz	6-stretch-all-three-axes/stretch-x-minus-0.020-y-plus-0.020-z-minus-0.060	stretch-all-three-axes-independently		-0.020	0.020	-0.060					complete
+6-stretch-all-three-axes.tar.gz	6-stretch-all-three-axes/stretch-x-minus-0.020-y-plus-0.020-z-minus-0.080	stretch-all-three-axes-independently		-0.020	0.020	-0.080					complete
+6-stretch-all-three-axes.tar.gz	6-stretch-all-three-axes/stretch-x-minus-0.020-y-plus-0.020-z-plus-0.020	stretch-all-three-axes-independently		-0.020	0.020	0.020					complete
+6-stretch-all-three-axes.tar.gz	6-stretch-all-three-axes/stretch-x-minus-0.020-y-plus-0.020-z-plus-0.040	stretch-all-three-axes-independently		-0.020	0.020	0.040					complete
+6-stretch-all-three-axes.tar.gz	6-stretch-all-three-axes/stretch-x-minus-0.020-y-plus-0.020-z-plus-0.060	stretch-all-three-axes-independently		-0.020	0.020	0.060					complete
+6-stretch-all-three-axes.tar.gz	6-stretch-all-three-axes/stretch-x-minus-0.020-y-plus-0.020-z-plus-0.080	stretch-all-three-axes-independently		-0.020	0.020	0.080					complete
+6-stretch-all-three-axes.tar.gz	6-stretch-all-three-axes/stretch-x-minus-0.020-y-plus-0.040-z-minus-0.020	stretch-all-three-axes-independently		-0.020	0.040	-0.020					complete
+6-stretch-all-three-axes.tar.gz	6-stretch-all-three-axes/stretch-x-minus-0.020-y-plus-0.040-z-minus-0.040	stretch-all-three-axes-independently		-0.020	0.040	-0.040					complete
+6-stretch-all-three-axes.tar.gz	6-stretch-all-three-axes/stretch-x-minus-0.020-y-plus-0.040-z-minus-0.060	stretch-all-three-axes-independently		-0.020	0.040	-0.060					complete
+6-stretch-all-three-axes.tar.gz	6-stretch-all-three-axes/stretch-x-minus-0.020-y-plus-0.040-z-minus-0.080	stretch-all-three-axes-independently		-0.020	0.040	-0.080					complete
+6-stretch-all-three-axes.tar.gz	6-stretch-all-three-axes/stretch-x-minus-0.020-y-plus-0.040-z-plus-0.020	stretch-all-three-axes-independently		-0.020	0.040	0.020					complete
+6-stretch-all-three-axes.tar.gz	6-stretch-all-three-axes/stretch-x-minus-0.020-y-plus-0.040-z-plus-0.040	stretch-all-three-axes-independently		-0.020	0.040	0.040					complete
+6-stretch-all-three-axes.tar.gz	6-stretch-all-three-axes/stretch-x-minus-0.020-y-plus-0.040-z-plus-0.060	stretch-all-three-axes-independently		-0.020	0.040	0.060					complete
+6-stretch-all-three-axes.tar.gz	6-stretch-all-three-axes/stretch-x-minus-0.020-y-plus-0.040-z-plus-0.080	stretch-all-three-axes-independently		-0.020	0.040	0.080					complete
+6-stretch-all-three-axes.tar.gz	6-stretch-all-three-axes/stretch-x-minus-0.020-y-plus-0.060-z-minus-0.020	stretch-all-three-axes-independently		-0.020	0.060	-0.020					complete
+6-stretch-all-three-axes.tar.gz	6-stretch-all-three-axes/stretch-x-minus-0.020-y-plus-0.060-z-minus-0.040	stretch-all-three-axes-independently		-0.020	0.060	-0.040					complete
+6-stretch-all-three-axes.tar.gz	6-stretch-all-three-axes/stretch-x-minus-0.020-y-plus-0.060-z-minus-0.060	stretch-all-three-axes-independently		-0.020	0.060	-0.060					complete
+6-stretch-all-three-axes.tar.gz	6-stretch-all-three-axes/stretch-x-minus-0.020-y-plus-0.060-z-minus-0.080	stretch-all-three-axes-independently		-0.020	0.060	-0.080					complete
+6-stretch-all-three-axes.tar.gz	6-stretch-all-three-axes/stretch-x-minus-0.020-y-plus-0.060-z-plus-0.020	stretch-all-three-axes-independently		-0.020	0.060	0.020					complete
+6-stretch-all-three-axes.tar.gz	6-stretch-all-three-axes/stretch-x-minus-0.020-y-plus-0.060-z-plus-0.040	stretch-all-three-axes-independently		-0.020	0.060	0.040					complete
+6-stretch-all-three-axes.tar.gz	6-stretch-all-three-axes/stretch-x-minus-0.020-y-plus-0.060-z-plus-0.060	stretch-all-three-axes-independently		-0.020	0.060	0.060					complete
+6-stretch-all-three-axes.tar.gz	6-stretch-all-three-axes/stretch-x-minus-0.020-y-plus-0.060-z-plus-0.080	stretch-all-three-axes-independently		-0.020	0.060	0.080					complete
+6-stretch-all-three-axes.tar.gz	6-stretch-all-three-axes/stretch-x-minus-0.020-y-plus-0.080-z-minus-0.020	stretch-all-three-axes-independently		-0.020	0.080	-0.020					complete
+6-stretch-all-three-axes.tar.gz	6-stretch-all-three-axes/stretch-x-minus-0.020-y-plus-0.080-z-minus-0.040	stretch-all-three-axes-independently		-0.020	0.080	-0.040					complete
+6-stretch-all-three-axes.tar.gz	6-stretch-all-three-axes/stretch-x-minus-0.020-y-plus-0.080-z-minus-0.060	stretch-all-three-axes-independently		-0.020	0.080	-0.060					complete
+6-stretch-all-three-axes.tar.gz	6-stretch-all-three-axes/stretch-x-minus-0.020-y-plus-0.080-z-minus-0.080	stretch-all-three-axes-independently		-0.020	0.080	-0.080					complete
+6-stretch-all-three-axes.tar.gz	6-stretch-all-three-axes/stretch-x-minus-0.020-y-plus-0.080-z-plus-0.020	stretch-all-three-axes-independently		-0.020	0.080	0.020					complete
+6-stretch-all-three-axes.tar.gz	6-stretch-all-three-axes/stretch-x-minus-0.020-y-plus-0.080-z-plus-0.040	stretch-all-three-axes-independently		-0.020	0.080	0.040					complete
+6-stretch-all-three-axes.tar.gz	6-stretch-all-three-axes/stretch-x-minus-0.020-y-plus-0.080-z-plus-0.060	stretch-all-three-axes-independently		-0.020	0.080	0.060					complete
+6-stretch-all-three-axes.tar.gz	6-stretch-all-three-axes/stretch-x-minus-0.020-y-plus-0.080-z-plus-0.080	stretch-all-three-axes-independently		-0.020	0.080	0.080					complete
+6-stretch-all-three-axes.tar.gz	6-stretch-all-three-axes/stretch-x-minus-0.040-y-minus-0.020-z-minus-0.020	stretch-all-three-axes-independently		-0.040	-0.020	-0.020					complete
+6-stretch-all-three-axes.tar.gz	6-stretch-all-three-axes/stretch-x-minus-0.040-y-minus-0.020-z-minus-0.040	stretch-all-three-axes-independently		-0.040	-0.020	-0.040					complete
+6-stretch-all-three-axes.tar.gz	6-stretch-all-three-axes/stretch-x-minus-0.040-y-minus-0.020-z-minus-0.060	stretch-all-three-axes-independently		-0.040	-0.020	-0.060					complete
+6-stretch-all-three-axes.tar.gz	6-stretch-all-three-axes/stretch-x-minus-0.040-y-minus-0.020-z-minus-0.080	stretch-all-three-axes-independently		-0.040	-0.020	-0.080					complete
+6-stretch-all-three-axes.tar.gz	6-stretch-all-three-axes/stretch-x-minus-0.040-y-minus-0.020-z-plus-0.020	stretch-all-three-axes-independently		-0.040	-0.020	0.020					complete
+6-stretch-all-three-axes.tar.gz	6-stretch-all-three-axes/stretch-x-minus-0.040-y-minus-0.020-z-plus-0.040	stretch-all-three-axes-independently		-0.040	-0.020	0.040					complete
+6-stretch-all-three-axes.tar.gz	6-stretch-all-three-axes/stretch-x-minus-0.040-y-minus-0.020-z-plus-0.060	stretch-all-three-axes-independently		-0.040	-0.020	0.060					complete
+6-stretch-all-three-axes.tar.gz	6-stretch-all-three-axes/stretch-x-minus-0.040-y-minus-0.020-z-plus-0.080	stretch-all-three-axes-independently		-0.040	-0.020	0.080					complete
+6-stretch-all-three-axes.tar.gz	6-stretch-all-three-axes/stretch-x-minus-0.040-y-minus-0.040-z-minus-0.020	stretch-all-three-axes-independently		-0.040	-0.040	-0.020					complete
+6-stretch-all-three-axes.tar.gz	6-stretch-all-three-axes/stretch-x-minus-0.040-y-minus-0.040-z-minus-0.040	stretch-all-three-axes-independently		-0.040	-0.040	-0.040					complete
+6-stretch-all-three-axes.tar.gz	6-stretch-all-three-axes/stretch-x-minus-0.040-y-minus-0.040-z-minus-0.060	stretch-all-three-axes-independently		-0.040	-0.040	-0.060					complete
+6-stretch-all-three-axes.tar.gz	6-stretch-all-three-axes/stretch-x-minus-0.040-y-minus-0.040-z-minus-0.080	stretch-all-three-axes-independently		-0.040	-0.040	-0.080					complete
+6-stretch-all-three-axes.tar.gz	6-stretch-all-three-axes/stretch-x-minus-0.040-y-minus-0.040-z-plus-0.020	stretch-all-three-axes-independently		-0.040	-0.040	0.020					complete
+6-stretch-all-three-axes.tar.gz	6-stretch-all-three-axes/stretch-x-minus-0.040-y-minus-0.040-z-plus-0.040	stretch-all-three-axes-independently		-0.040	-0.040	0.040					complete
+6-stretch-all-three-axes.tar.gz	6-stretch-all-three-axes/stretch-x-minus-0.040-y-minus-0.040-z-plus-0.060	stretch-all-three-axes-independently		-0.040	-0.040	0.060					complete
+6-stretch-all-three-axes.tar.gz	6-stretch-all-three-axes/stretch-x-minus-0.040-y-minus-0.040-z-plus-0.080	stretch-all-three-axes-independently		-0.040	-0.040	0.080					complete
+6-stretch-all-three-axes.tar.gz	6-stretch-all-three-axes/stretch-x-minus-0.040-y-minus-0.060-z-minus-0.020	stretch-all-three-axes-independently		-0.040	-0.060	-0.020					complete
+6-stretch-all-three-axes.tar.gz	6-stretch-all-three-axes/stretch-x-minus-0.040-y-minus-0.060-z-minus-0.040	stretch-all-three-axes-independently		-0.040	-0.060	-0.040					complete
+6-stretch-all-three-axes.tar.gz	6-stretch-all-three-axes/stretch-x-minus-0.040-y-minus-0.060-z-minus-0.060	stretch-all-three-axes-independently		-0.040	-0.060	-0.060					complete
+6-stretch-all-three-axes.tar.gz	6-stretch-all-three-axes/stretch-x-minus-0.040-y-minus-0.060-z-minus-0.080	stretch-all-three-axes-independently		-0.040	-0.060	-0.080					complete
+6-stretch-all-three-axes.tar.gz	6-stretch-all-three-axes/stretch-x-minus-0.040-y-minus-0.060-z-plus-0.020	stretch-all-three-axes-independently		-0.040	-0.060	0.020					complete
+6-stretch-all-three-axes.tar.gz	6-stretch-all-three-axes/stretch-x-minus-0.040-y-minus-0.060-z-plus-0.040	stretch-all-three-axes-independently		-0.040	-0.060	0.040					complete
+6-stretch-all-three-axes.tar.gz	6-stretch-all-three-axes/stretch-x-minus-0.040-y-minus-0.060-z-plus-0.060	stretch-all-three-axes-independently		-0.040	-0.060	0.060					complete
+6-stretch-all-three-axes.tar.gz	6-stretch-all-three-axes/stretch-x-minus-0.040-y-minus-0.060-z-plus-0.080	stretch-all-three-axes-independently		-0.040	-0.060	0.080					complete
+6-stretch-all-three-axes.tar.gz	6-stretch-all-three-axes/stretch-x-minus-0.040-y-minus-0.080-z-minus-0.020	stretch-all-three-axes-independently		-0.040	-0.080	-0.020					complete
+6-stretch-all-three-axes.tar.gz	6-stretch-all-three-axes/stretch-x-minus-0.040-y-minus-0.080-z-minus-0.040	stretch-all-three-axes-independently		-0.040	-0.080	-0.040					complete
+6-stretch-all-three-axes.tar.gz	6-stretch-all-three-axes/stretch-x-minus-0.040-y-minus-0.080-z-minus-0.060	stretch-all-three-axes-independently		-0.040	-0.080	-0.060					complete
+6-stretch-all-three-axes.tar.gz	6-stretch-all-three-axes/stretch-x-minus-0.040-y-minus-0.080-z-minus-0.080	stretch-all-three-axes-independently		-0.040	-0.080	-0.080					complete
+6-stretch-all-three-axes.tar.gz	6-stretch-all-three-axes/stretch-x-minus-0.040-y-minus-0.080-z-plus-0.020	stretch-all-three-axes-independently		-0.040	-0.080	0.020					complete
+6-stretch-all-three-axes.tar.gz	6-stretch-all-three-axes/stretch-x-minus-0.040-y-minus-0.080-z-plus-0.040	stretch-all-three-axes-independently		-0.040	-0.080	0.040					complete
+6-stretch-all-three-axes.tar.gz	6-stretch-all-three-axes/stretch-x-minus-0.040-y-minus-0.080-z-plus-0.060	stretch-all-three-axes-independently		-0.040	-0.080	0.060					complete
+6-stretch-all-three-axes.tar.gz	6-stretch-all-three-axes/stretch-x-minus-0.040-y-minus-0.080-z-plus-0.080	stretch-all-three-axes-independently		-0.040	-0.080	0.080					complete
+6-stretch-all-three-axes.tar.gz	6-stretch-all-three-axes/stretch-x-minus-0.040-y-plus-0.020-z-minus-0.020	stretch-all-three-axes-independently		-0.040	0.020	-0.020					complete
+6-stretch-all-three-axes.tar.gz	6-stretch-all-three-axes/stretch-x-minus-0.040-y-plus-0.020-z-minus-0.040	stretch-all-three-axes-independently		-0.040	0.020	-0.040					complete
+6-stretch-all-three-axes.tar.gz	6-stretch-all-three-axes/stretch-x-minus-0.040-y-plus-0.020-z-minus-0.060	stretch-all-three-axes-independently		-0.040	0.020	-0.060					complete
+6-stretch-all-three-axes.tar.gz	6-stretch-all-three-axes/stretch-x-minus-0.040-y-plus-0.020-z-minus-0.080	stretch-all-three-axes-independently		-0.040	0.020	-0.080					complete
+6-stretch-all-three-axes.tar.gz	6-stretch-all-three-axes/stretch-x-minus-0.040-y-plus-0.020-z-plus-0.020	stretch-all-three-axes-independently		-0.040	0.020	0.020					complete
+6-stretch-all-three-axes.tar.gz	6-stretch-all-three-axes/stretch-x-minus-0.040-y-plus-0.020-z-plus-0.040	stretch-all-three-axes-independently		-0.040	0.020	0.040					complete
+6-stretch-all-three-axes.tar.gz	6-stretch-all-three-axes/stretch-x-minus-0.040-y-plus-0.020-z-plus-0.060	stretch-all-three-axes-independently		-0.040	0.020	0.060					complete
+6-stretch-all-three-axes.tar.gz	6-stretch-all-three-axes/stretch-x-minus-0.040-y-plus-0.020-z-plus-0.080	stretch-all-three-axes-independently		-0.040	0.020	0.080					complete
+6-stretch-all-three-axes.tar.gz	6-stretch-all-three-axes/stretch-x-minus-0.040-y-plus-0.040-z-minus-0.020	stretch-all-three-axes-independently		-0.040	0.040	-0.020					complete
+6-stretch-all-three-axes.tar.gz	6-stretch-all-three-axes/stretch-x-minus-0.040-y-plus-0.040-z-minus-0.040	stretch-all-three-axes-independently		-0.040	0.040	-0.040					complete
+6-stretch-all-three-axes.tar.gz	6-stretch-all-three-axes/stretch-x-minus-0.040-y-plus-0.040-z-minus-0.060	stretch-all-three-axes-independently		-0.040	0.040	-0.060					complete
+6-stretch-all-three-axes.tar.gz	6-stretch-all-three-axes/stretch-x-minus-0.040-y-plus-0.040-z-minus-0.080	stretch-all-three-axes-independently		-0.040	0.040	-0.080					complete
+6-stretch-all-three-axes.tar.gz	6-stretch-all-three-axes/stretch-x-minus-0.040-y-plus-0.040-z-plus-0.020	stretch-all-three-axes-independently		-0.040	0.040	0.020					complete
+6-stretch-all-three-axes.tar.gz	6-stretch-all-three-axes/stretch-x-minus-0.040-y-plus-0.040-z-plus-0.040	stretch-all-three-axes-independently		-0.040	0.040	0.040					complete
+6-stretch-all-three-axes.tar.gz	6-stretch-all-three-axes/stretch-x-minus-0.040-y-plus-0.040-z-plus-0.060	stretch-all-three-axes-independently		-0.040	0.040	0.060					complete
+6-stretch-all-three-axes.tar.gz	6-stretch-all-three-axes/stretch-x-minus-0.040-y-plus-0.040-z-plus-0.080	stretch-all-three-axes-independently		-0.040	0.040	0.080					complete
+6-stretch-all-three-axes.tar.gz	6-stretch-all-three-axes/stretch-x-minus-0.040-y-plus-0.060-z-minus-0.020	stretch-all-three-axes-independently		-0.040	0.060	-0.020					complete
+6-stretch-all-three-axes.tar.gz	6-stretch-all-three-axes/stretch-x-minus-0.040-y-plus-0.060-z-minus-0.040	stretch-all-three-axes-independently		-0.040	0.060	-0.040					complete
+6-stretch-all-three-axes.tar.gz	6-stretch-all-three-axes/stretch-x-minus-0.040-y-plus-0.060-z-minus-0.060	stretch-all-three-axes-independently		-0.040	0.060	-0.060					complete
+6-stretch-all-three-axes.tar.gz	6-stretch-all-three-axes/stretch-x-minus-0.040-y-plus-0.060-z-minus-0.080	stretch-all-three-axes-independently		-0.040	0.060	-0.080					complete
+6-stretch-all-three-axes.tar.gz	6-stretch-all-three-axes/stretch-x-minus-0.040-y-plus-0.060-z-plus-0.020	stretch-all-three-axes-independently		-0.040	0.060	0.020					complete
+6-stretch-all-three-axes.tar.gz	6-stretch-all-three-axes/stretch-x-minus-0.040-y-plus-0.060-z-plus-0.040	stretch-all-three-axes-independently		-0.040	0.060	0.040					complete
+6-stretch-all-three-axes.tar.gz	6-stretch-all-three-axes/stretch-x-minus-0.040-y-plus-0.060-z-plus-0.060	stretch-all-three-axes-independently		-0.040	0.060	0.060					complete
+6-stretch-all-three-axes.tar.gz	6-stretch-all-three-axes/stretch-x-minus-0.040-y-plus-0.060-z-plus-0.080	stretch-all-three-axes-independently		-0.040	0.060	0.080					complete
+6-stretch-all-three-axes.tar.gz	6-stretch-all-three-axes/stretch-x-minus-0.040-y-plus-0.080-z-minus-0.020	stretch-all-three-axes-independently		-0.040	0.080	-0.020					complete
+6-stretch-all-three-axes.tar.gz	6-stretch-all-three-axes/stretch-x-minus-0.040-y-plus-0.080-z-minus-0.040	stretch-all-three-axes-independently		-0.040	0.080	-0.040					complete
+6-stretch-all-three-axes.tar.gz	6-stretch-all-three-axes/stretch-x-minus-0.040-y-plus-0.080-z-minus-0.060	stretch-all-three-axes-independently		-0.040	0.080	-0.060					complete
+6-stretch-all-three-axes.tar.gz	6-stretch-all-three-axes/stretch-x-minus-0.040-y-plus-0.080-z-minus-0.080	stretch-all-three-axes-independently		-0.040	0.080	-0.080					complete
+6-stretch-all-three-axes.tar.gz	6-stretch-all-three-axes/stretch-x-minus-0.040-y-plus-0.080-z-plus-0.020	stretch-all-three-axes-independently		-0.040	0.080	0.020					complete
+6-stretch-all-three-axes.tar.gz	6-stretch-all-three-axes/stretch-x-minus-0.040-y-plus-0.080-z-plus-0.040	stretch-all-three-axes-independently		-0.040	0.080	0.040					complete
+6-stretch-all-three-axes.tar.gz	6-stretch-all-three-axes/stretch-x-minus-0.040-y-plus-0.080-z-plus-0.060	stretch-all-three-axes-independently		-0.040	0.080	0.060					complete
+6-stretch-all-three-axes.tar.gz	6-stretch-all-three-axes/stretch-x-minus-0.040-y-plus-0.080-z-plus-0.080	stretch-all-three-axes-independently		-0.040	0.080	0.080					complete
+6-stretch-all-three-axes.tar.gz	6-stretch-all-three-axes/stretch-x-minus-0.060-y-minus-0.020-z-minus-0.020	stretch-all-three-axes-independently		-0.060	-0.020	-0.020					complete
+6-stretch-all-three-axes.tar.gz	6-stretch-all-three-axes/stretch-x-minus-0.060-y-minus-0.020-z-minus-0.040	stretch-all-three-axes-independently		-0.060	-0.020	-0.040					complete
+6-stretch-all-three-axes.tar.gz	6-stretch-all-three-axes/stretch-x-minus-0.060-y-minus-0.020-z-minus-0.060	stretch-all-three-axes-independently		-0.060	-0.020	-0.060					complete
+6-stretch-all-three-axes.tar.gz	6-stretch-all-three-axes/stretch-x-minus-0.060-y-minus-0.020-z-minus-0.080	stretch-all-three-axes-independently		-0.060	-0.020	-0.080					complete
+6-stretch-all-three-axes.tar.gz	6-stretch-all-three-axes/stretch-x-minus-0.060-y-minus-0.020-z-plus-0.020	stretch-all-three-axes-independently		-0.060	-0.020	0.020					complete
+6-stretch-all-three-axes.tar.gz	6-stretch-all-three-axes/stretch-x-minus-0.060-y-minus-0.020-z-plus-0.040	stretch-all-three-axes-independently		-0.060	-0.020	0.040					complete
+6-stretch-all-three-axes.tar.gz	6-stretch-all-three-axes/stretch-x-minus-0.060-y-minus-0.020-z-plus-0.060	stretch-all-three-axes-independently		-0.060	-0.020	0.060					complete
+6-stretch-all-three-axes.tar.gz	6-stretch-all-three-axes/stretch-x-minus-0.060-y-minus-0.020-z-plus-0.080	stretch-all-three-axes-independently		-0.060	-0.020	0.080					complete
+6-stretch-all-three-axes.tar.gz	6-stretch-all-three-axes/stretch-x-minus-0.060-y-minus-0.040-z-minus-0.020	stretch-all-three-axes-independently		-0.060	-0.040	-0.020					complete
+6-stretch-all-three-axes.tar.gz	6-stretch-all-three-axes/stretch-x-minus-0.060-y-minus-0.040-z-minus-0.040	stretch-all-three-axes-independently		-0.060	-0.040	-0.040					complete
+6-stretch-all-three-axes.tar.gz	6-stretch-all-three-axes/stretch-x-minus-0.060-y-minus-0.040-z-minus-0.060	stretch-all-three-axes-independently		-0.060	-0.040	-0.060					complete
+6-stretch-all-three-axes.tar.gz	6-stretch-all-three-axes/stretch-x-minus-0.060-y-minus-0.040-z-minus-0.080	stretch-all-three-axes-independently		-0.060	-0.040	-0.080					complete
+6-stretch-all-three-axes.tar.gz	6-stretch-all-three-axes/stretch-x-minus-0.060-y-minus-0.040-z-plus-0.020	stretch-all-three-axes-independently		-0.060	-0.040	0.020					complete
+6-stretch-all-three-axes.tar.gz	6-stretch-all-three-axes/stretch-x-minus-0.060-y-minus-0.040-z-plus-0.040	stretch-all-three-axes-independently		-0.060	-0.040	0.040					complete
+6-stretch-all-three-axes.tar.gz	6-stretch-all-three-axes/stretch-x-minus-0.060-y-minus-0.040-z-plus-0.060	stretch-all-three-axes-independently		-0.060	-0.040	0.060					complete
+6-stretch-all-three-axes.tar.gz	6-stretch-all-three-axes/stretch-x-minus-0.060-y-minus-0.040-z-plus-0.080	stretch-all-three-axes-independently		-0.060	-0.040	0.080					complete
+6-stretch-all-three-axes.tar.gz	6-stretch-all-three-axes/stretch-x-minus-0.060-y-minus-0.060-z-minus-0.020	stretch-all-three-axes-independently		-0.060	-0.060	-0.020					complete
+6-stretch-all-three-axes.tar.gz	6-stretch-all-three-axes/stretch-x-minus-0.060-y-minus-0.060-z-minus-0.040	stretch-all-three-axes-independently		-0.060	-0.060	-0.040					complete
+6-stretch-all-three-axes.tar.gz	6-stretch-all-three-axes/stretch-x-minus-0.060-y-minus-0.060-z-minus-0.060	stretch-all-three-axes-independently		-0.060	-0.060	-0.060					complete
+6-stretch-all-three-axes.tar.gz	6-stretch-all-three-axes/stretch-x-minus-0.060-y-minus-0.060-z-minus-0.080	stretch-all-three-axes-independently		-0.060	-0.060	-0.080					complete
+6-stretch-all-three-axes.tar.gz	6-stretch-all-three-axes/stretch-x-minus-0.060-y-minus-0.060-z-plus-0.020	stretch-all-three-axes-independently		-0.060	-0.060	0.020					complete
+6-stretch-all-three-axes.tar.gz	6-stretch-all-three-axes/stretch-x-minus-0.060-y-minus-0.060-z-plus-0.040	stretch-all-three-axes-independently		-0.060	-0.060	0.040					complete
+6-stretch-all-three-axes.tar.gz	6-stretch-all-three-axes/stretch-x-minus-0.060-y-minus-0.060-z-plus-0.060	stretch-all-three-axes-independently		-0.060	-0.060	0.060					complete
+6-stretch-all-three-axes.tar.gz	6-stretch-all-three-axes/stretch-x-minus-0.060-y-minus-0.060-z-plus-0.080	stretch-all-three-axes-independently		-0.060	-0.060	0.080					complete
+6-stretch-all-three-axes.tar.gz	6-stretch-all-three-axes/stretch-x-minus-0.060-y-minus-0.080-z-minus-0.020	stretch-all-three-axes-independently		-0.060	-0.080	-0.020					complete
+6-stretch-all-three-axes.tar.gz	6-stretch-all-three-axes/stretch-x-minus-0.060-y-minus-0.080-z-minus-0.040	stretch-all-three-axes-independently		-0.060	-0.080	-0.040					complete
+6-stretch-all-three-axes.tar.gz	6-stretch-all-three-axes/stretch-x-minus-0.060-y-minus-0.080-z-minus-0.060	stretch-all-three-axes-independently		-0.060	-0.080	-0.060					complete
+6-stretch-all-three-axes.tar.gz	6-stretch-all-three-axes/stretch-x-minus-0.060-y-minus-0.080-z-minus-0.080	stretch-all-three-axes-independently		-0.060	-0.080	-0.080					complete
+6-stretch-all-three-axes.tar.gz	6-stretch-all-three-axes/stretch-x-minus-0.060-y-minus-0.080-z-plus-0.020	stretch-all-three-axes-independently		-0.060	-0.080	0.020					complete
+6-stretch-all-three-axes.tar.gz	6-stretch-all-three-axes/stretch-x-minus-0.060-y-minus-0.080-z-plus-0.040	stretch-all-three-axes-independently		-0.060	-0.080	0.040					complete
+6-stretch-all-three-axes.tar.gz	6-stretch-all-three-axes/stretch-x-minus-0.060-y-minus-0.080-z-plus-0.060	stretch-all-three-axes-independently		-0.060	-0.080	0.060					complete
+6-stretch-all-three-axes.tar.gz	6-stretch-all-three-axes/stretch-x-minus-0.060-y-minus-0.080-z-plus-0.080	stretch-all-three-axes-independently		-0.060	-0.080	0.080					complete
+6-stretch-all-three-axes.tar.gz	6-stretch-all-three-axes/stretch-x-minus-0.060-y-plus-0.020-z-minus-0.020	stretch-all-three-axes-independently		-0.060	0.020	-0.020					complete
+6-stretch-all-three-axes.tar.gz	6-stretch-all-three-axes/stretch-x-minus-0.060-y-plus-0.020-z-minus-0.040	stretch-all-three-axes-independently		-0.060	0.020	-0.040					complete
+6-stretch-all-three-axes.tar.gz	6-stretch-all-three-axes/stretch-x-minus-0.060-y-plus-0.020-z-minus-0.060	stretch-all-three-axes-independently		-0.060	0.020	-0.060					complete
+6-stretch-all-three-axes.tar.gz	6-stretch-all-three-axes/stretch-x-minus-0.060-y-plus-0.020-z-minus-0.080	stretch-all-three-axes-independently		-0.060	0.020	-0.080					complete
+6-stretch-all-three-axes.tar.gz	6-stretch-all-three-axes/stretch-x-minus-0.060-y-plus-0.020-z-plus-0.020	stretch-all-three-axes-independently		-0.060	0.020	0.020					complete
+6-stretch-all-three-axes.tar.gz	6-stretch-all-three-axes/stretch-x-minus-0.060-y-plus-0.020-z-plus-0.040	stretch-all-three-axes-independently		-0.060	0.020	0.040					complete
+6-stretch-all-three-axes.tar.gz	6-stretch-all-three-axes/stretch-x-minus-0.060-y-plus-0.020-z-plus-0.060	stretch-all-three-axes-independently		-0.060	0.020	0.060					complete
+6-stretch-all-three-axes.tar.gz	6-stretch-all-three-axes/stretch-x-minus-0.060-y-plus-0.020-z-plus-0.080	stretch-all-three-axes-independently		-0.060	0.020	0.080					complete
+6-stretch-all-three-axes.tar.gz	6-stretch-all-three-axes/stretch-x-minus-0.060-y-plus-0.040-z-minus-0.020	stretch-all-three-axes-independently		-0.060	0.040	-0.020					complete
+6-stretch-all-three-axes.tar.gz	6-stretch-all-three-axes/stretch-x-minus-0.060-y-plus-0.040-z-minus-0.040	stretch-all-three-axes-independently		-0.060	0.040	-0.040					complete
+6-stretch-all-three-axes.tar.gz	6-stretch-all-three-axes/stretch-x-minus-0.060-y-plus-0.040-z-minus-0.060	stretch-all-three-axes-independently		-0.060	0.040	-0.060					complete
+6-stretch-all-three-axes.tar.gz	6-stretch-all-three-axes/stretch-x-minus-0.060-y-plus-0.040-z-minus-0.080	stretch-all-three-axes-independently		-0.060	0.040	-0.080					complete
+6-stretch-all-three-axes.tar.gz	6-stretch-all-three-axes/stretch-x-minus-0.060-y-plus-0.040-z-plus-0.020	stretch-all-three-axes-independently		-0.060	0.040	0.020					complete
+6-stretch-all-three-axes.tar.gz	6-stretch-all-three-axes/stretch-x-minus-0.060-y-plus-0.040-z-plus-0.040	stretch-all-three-axes-independently		-0.060	0.040	0.040					complete
+6-stretch-all-three-axes.tar.gz	6-stretch-all-three-axes/stretch-x-minus-0.060-y-plus-0.040-z-plus-0.060	stretch-all-three-axes-independently		-0.060	0.040	0.060					complete
+6-stretch-all-three-axes.tar.gz	6-stretch-all-three-axes/stretch-x-minus-0.060-y-plus-0.040-z-plus-0.080	stretch-all-three-axes-independently		-0.060	0.040	0.080					complete
+6-stretch-all-three-axes.tar.gz	6-stretch-all-three-axes/stretch-x-minus-0.060-y-plus-0.060-z-minus-0.020	stretch-all-three-axes-independently		-0.060	0.060	-0.020					complete
+6-stretch-all-three-axes.tar.gz	6-stretch-all-three-axes/stretch-x-minus-0.060-y-plus-0.060-z-minus-0.040	stretch-all-three-axes-independently		-0.060	0.060	-0.040					complete
+6-stretch-all-three-axes.tar.gz	6-stretch-all-three-axes/stretch-x-minus-0.060-y-plus-0.060-z-minus-0.060	stretch-all-three-axes-independently		-0.060	0.060	-0.060					complete
+6-stretch-all-three-axes.tar.gz	6-stretch-all-three-axes/stretch-x-minus-0.060-y-plus-0.060-z-minus-0.080	stretch-all-three-axes-independently		-0.060	0.060	-0.080					complete
+6-stretch-all-three-axes.tar.gz	6-stretch-all-three-axes/stretch-x-minus-0.060-y-plus-0.060-z-plus-0.020	stretch-all-three-axes-independently		-0.060	0.060	0.020					complete
+6-stretch-all-three-axes.tar.gz	6-stretch-all-three-axes/stretch-x-minus-0.060-y-plus-0.060-z-plus-0.040	stretch-all-three-axes-independently		-0.060	0.060	0.040					complete
+6-stretch-all-three-axes.tar.gz	6-stretch-all-three-axes/stretch-x-minus-0.060-y-plus-0.060-z-plus-0.060	stretch-all-three-axes-independently		-0.060	0.060	0.060					complete
+6-stretch-all-three-axes.tar.gz	6-stretch-all-three-axes/stretch-x-minus-0.060-y-plus-0.060-z-plus-0.080	stretch-all-three-axes-independently		-0.060	0.060	0.080					complete
+6-stretch-all-three-axes.tar.gz	6-stretch-all-three-axes/stretch-x-minus-0.060-y-plus-0.080-z-minus-0.020	stretch-all-three-axes-independently		-0.060	0.080	-0.020					complete
+6-stretch-all-three-axes.tar.gz	6-stretch-all-three-axes/stretch-x-minus-0.060-y-plus-0.080-z-minus-0.040	stretch-all-three-axes-independently		-0.060	0.080	-0.040					complete
+6-stretch-all-three-axes.tar.gz	6-stretch-all-three-axes/stretch-x-minus-0.060-y-plus-0.080-z-minus-0.060	stretch-all-three-axes-independently		-0.060	0.080	-0.060					complete
+6-stretch-all-three-axes.tar.gz	6-stretch-all-three-axes/stretch-x-minus-0.060-y-plus-0.080-z-minus-0.080	stretch-all-three-axes-independently		-0.060	0.080	-0.080					complete
+6-stretch-all-three-axes.tar.gz	6-stretch-all-three-axes/stretch-x-minus-0.060-y-plus-0.080-z-plus-0.020	stretch-all-three-axes-independently		-0.060	0.080	0.020					complete
+6-stretch-all-three-axes.tar.gz	6-stretch-all-three-axes/stretch-x-minus-0.060-y-plus-0.080-z-plus-0.040	stretch-all-three-axes-independently		-0.060	0.080	0.040					complete
+6-stretch-all-three-axes.tar.gz	6-stretch-all-three-axes/stretch-x-minus-0.060-y-plus-0.080-z-plus-0.060	stretch-all-three-axes-independently		-0.060	0.080	0.060					complete
+6-stretch-all-three-axes.tar.gz	6-stretch-all-three-axes/stretch-x-minus-0.060-y-plus-0.080-z-plus-0.080	stretch-all-three-axes-independently		-0.060	0.080	0.080					complete
+6-stretch-all-three-axes.tar.gz	6-stretch-all-three-axes/stretch-x-minus-0.080-y-minus-0.020-z-minus-0.020	stretch-all-three-axes-independently		-0.080	-0.020	-0.020					complete
+6-stretch-all-three-axes.tar.gz	6-stretch-all-three-axes/stretch-x-minus-0.080-y-minus-0.020-z-minus-0.040	stretch-all-three-axes-independently		-0.080	-0.020	-0.040					complete
+6-stretch-all-three-axes.tar.gz	6-stretch-all-three-axes/stretch-x-minus-0.080-y-minus-0.020-z-minus-0.060	stretch-all-three-axes-independently		-0.080	-0.020	-0.060					complete
+6-stretch-all-three-axes.tar.gz	6-stretch-all-three-axes/stretch-x-minus-0.080-y-minus-0.020-z-minus-0.080	stretch-all-three-axes-independently		-0.080	-0.020	-0.080					complete
+6-stretch-all-three-axes.tar.gz	6-stretch-all-three-axes/stretch-x-minus-0.080-y-minus-0.020-z-plus-0.020	stretch-all-three-axes-independently		-0.080	-0.020	0.020					complete
+6-stretch-all-three-axes.tar.gz	6-stretch-all-three-axes/stretch-x-minus-0.080-y-minus-0.020-z-plus-0.040	stretch-all-three-axes-independently		-0.080	-0.020	0.040					complete
+6-stretch-all-three-axes.tar.gz	6-stretch-all-three-axes/stretch-x-minus-0.080-y-minus-0.020-z-plus-0.060	stretch-all-three-axes-independently		-0.080	-0.020	0.060					complete
+6-stretch-all-three-axes.tar.gz	6-stretch-all-three-axes/stretch-x-minus-0.080-y-minus-0.020-z-plus-0.080	stretch-all-three-axes-independently		-0.080	-0.020	0.080					complete
+6-stretch-all-three-axes.tar.gz	6-stretch-all-three-axes/stretch-x-minus-0.080-y-minus-0.040-z-minus-0.020	stretch-all-three-axes-independently		-0.080	-0.040	-0.020					complete
+6-stretch-all-three-axes.tar.gz	6-stretch-all-three-axes/stretch-x-minus-0.080-y-minus-0.040-z-minus-0.040	stretch-all-three-axes-independently		-0.080	-0.040	-0.040					complete
+6-stretch-all-three-axes.tar.gz	6-stretch-all-three-axes/stretch-x-minus-0.080-y-minus-0.040-z-minus-0.060	stretch-all-three-axes-independently		-0.080	-0.040	-0.060					complete
+6-stretch-all-three-axes.tar.gz	6-stretch-all-three-axes/stretch-x-minus-0.080-y-minus-0.040-z-minus-0.080	stretch-all-three-axes-independently		-0.080	-0.040	-0.080					complete
+6-stretch-all-three-axes.tar.gz	6-stretch-all-three-axes/stretch-x-minus-0.080-y-minus-0.040-z-plus-0.020	stretch-all-three-axes-independently		-0.080	-0.040	0.020					complete
+6-stretch-all-three-axes.tar.gz	6-stretch-all-three-axes/stretch-x-minus-0.080-y-minus-0.040-z-plus-0.040	stretch-all-three-axes-independently		-0.080	-0.040	0.040					complete
+6-stretch-all-three-axes.tar.gz	6-stretch-all-three-axes/stretch-x-minus-0.080-y-minus-0.040-z-plus-0.060	stretch-all-three-axes-independently		-0.080	-0.040	0.060					complete
+6-stretch-all-three-axes.tar.gz	6-stretch-all-three-axes/stretch-x-minus-0.080-y-minus-0.040-z-plus-0.080	stretch-all-three-axes-independently		-0.080	-0.040	0.080					complete
+6-stretch-all-three-axes.tar.gz	6-stretch-all-three-axes/stretch-x-minus-0.080-y-minus-0.060-z-minus-0.020	stretch-all-three-axes-independently		-0.080	-0.060	-0.020					complete
+6-stretch-all-three-axes.tar.gz	6-stretch-all-three-axes/stretch-x-minus-0.080-y-minus-0.060-z-minus-0.040	stretch-all-three-axes-independently		-0.080	-0.060	-0.040					complete
+6-stretch-all-three-axes.tar.gz	6-stretch-all-three-axes/stretch-x-minus-0.080-y-minus-0.060-z-minus-0.060	stretch-all-three-axes-independently		-0.080	-0.060	-0.060					complete
+6-stretch-all-three-axes.tar.gz	6-stretch-all-three-axes/stretch-x-minus-0.080-y-minus-0.060-z-minus-0.080	stretch-all-three-axes-independently		-0.080	-0.060	-0.080					complete
+6-stretch-all-three-axes.tar.gz	6-stretch-all-three-axes/stretch-x-minus-0.080-y-minus-0.060-z-plus-0.020	stretch-all-three-axes-independently		-0.080	-0.060	0.020					complete
+6-stretch-all-three-axes.tar.gz	6-stretch-all-three-axes/stretch-x-minus-0.080-y-minus-0.060-z-plus-0.040	stretch-all-three-axes-independently		-0.080	-0.060	0.040					complete
+6-stretch-all-three-axes.tar.gz	6-stretch-all-three-axes/stretch-x-minus-0.080-y-minus-0.060-z-plus-0.060	stretch-all-three-axes-independently		-0.080	-0.060	0.060					complete
+6-stretch-all-three-axes.tar.gz	6-stretch-all-three-axes/stretch-x-minus-0.080-y-minus-0.060-z-plus-0.080	stretch-all-three-axes-independently		-0.080	-0.060	0.080					complete
+6-stretch-all-three-axes.tar.gz	6-stretch-all-three-axes/stretch-x-minus-0.080-y-minus-0.080-z-minus-0.020	stretch-all-three-axes-independently		-0.080	-0.080	-0.020					complete
+6-stretch-all-three-axes.tar.gz	6-stretch-all-three-axes/stretch-x-minus-0.080-y-minus-0.080-z-minus-0.040	stretch-all-three-axes-independently		-0.080	-0.080	-0.040					complete
+6-stretch-all-three-axes.tar.gz	6-stretch-all-three-axes/stretch-x-minus-0.080-y-minus-0.080-z-minus-0.060	stretch-all-three-axes-independently		-0.080	-0.080	-0.060					complete
+6-stretch-all-three-axes.tar.gz	6-stretch-all-three-axes/stretch-x-minus-0.080-y-minus-0.080-z-minus-0.080	stretch-all-three-axes-independently		-0.080	-0.080	-0.080					complete
+6-stretch-all-three-axes.tar.gz	6-stretch-all-three-axes/stretch-x-minus-0.080-y-minus-0.080-z-plus-0.020	stretch-all-three-axes-independently		-0.080	-0.080	0.020					complete
+6-stretch-all-three-axes.tar.gz	6-stretch-all-three-axes/stretch-x-minus-0.080-y-minus-0.080-z-plus-0.040	stretch-all-three-axes-independently		-0.080	-0.080	0.040					complete
+6-stretch-all-three-axes.tar.gz	6-stretch-all-three-axes/stretch-x-minus-0.080-y-minus-0.080-z-plus-0.060	stretch-all-three-axes-independently		-0.080	-0.080	0.060					complete
+6-stretch-all-three-axes.tar.gz	6-stretch-all-three-axes/stretch-x-minus-0.080-y-minus-0.080-z-plus-0.080	stretch-all-three-axes-independently		-0.080	-0.080	0.080					complete
+6-stretch-all-three-axes.tar.gz	6-stretch-all-three-axes/stretch-x-minus-0.080-y-plus-0.020-z-minus-0.020	stretch-all-three-axes-independently		-0.080	0.020	-0.020					complete
+6-stretch-all-three-axes.tar.gz	6-stretch-all-three-axes/stretch-x-minus-0.080-y-plus-0.020-z-minus-0.040	stretch-all-three-axes-independently		-0.080	0.020	-0.040					complete
+6-stretch-all-three-axes.tar.gz	6-stretch-all-three-axes/stretch-x-minus-0.080-y-plus-0.020-z-minus-0.060	stretch-all-three-axes-independently		-0.080	0.020	-0.060					complete
+6-stretch-all-three-axes.tar.gz	6-stretch-all-three-axes/stretch-x-minus-0.080-y-plus-0.020-z-minus-0.080	stretch-all-three-axes-independently		-0.080	0.020	-0.080					complete
+6-stretch-all-three-axes.tar.gz	6-stretch-all-three-axes/stretch-x-minus-0.080-y-plus-0.020-z-plus-0.020	stretch-all-three-axes-independently		-0.080	0.020	0.020					complete
+6-stretch-all-three-axes.tar.gz	6-stretch-all-three-axes/stretch-x-minus-0.080-y-plus-0.020-z-plus-0.040	stretch-all-three-axes-independently		-0.080	0.020	0.040					complete
+6-stretch-all-three-axes.tar.gz	6-stretch-all-three-axes/stretch-x-minus-0.080-y-plus-0.020-z-plus-0.060	stretch-all-three-axes-independently		-0.080	0.020	0.060					complete
+6-stretch-all-three-axes.tar.gz	6-stretch-all-three-axes/stretch-x-minus-0.080-y-plus-0.020-z-plus-0.080	stretch-all-three-axes-independently		-0.080	0.020	0.080					complete
+6-stretch-all-three-axes.tar.gz	6-stretch-all-three-axes/stretch-x-minus-0.080-y-plus-0.040-z-minus-0.020	stretch-all-three-axes-independently		-0.080	0.040	-0.020					complete
+6-stretch-all-three-axes.tar.gz	6-stretch-all-three-axes/stretch-x-minus-0.080-y-plus-0.040-z-minus-0.040	stretch-all-three-axes-independently		-0.080	0.040	-0.040					complete
+6-stretch-all-three-axes.tar.gz	6-stretch-all-three-axes/stretch-x-minus-0.080-y-plus-0.040-z-minus-0.060	stretch-all-three-axes-independently		-0.080	0.040	-0.060					complete
+6-stretch-all-three-axes.tar.gz	6-stretch-all-three-axes/stretch-x-minus-0.080-y-plus-0.040-z-minus-0.080	stretch-all-three-axes-independently		-0.080	0.040	-0.080					complete
+6-stretch-all-three-axes.tar.gz	6-stretch-all-three-axes/stretch-x-minus-0.080-y-plus-0.040-z-plus-0.020	stretch-all-three-axes-independently		-0.080	0.040	0.020					complete
+6-stretch-all-three-axes.tar.gz	6-stretch-all-three-axes/stretch-x-minus-0.080-y-plus-0.040-z-plus-0.040	stretch-all-three-axes-independently		-0.080	0.040	0.040					complete
+6-stretch-all-three-axes.tar.gz	6-stretch-all-three-axes/stretch-x-minus-0.080-y-plus-0.040-z-plus-0.060	stretch-all-three-axes-independently		-0.080	0.040	0.060					complete
+6-stretch-all-three-axes.tar.gz	6-stretch-all-three-axes/stretch-x-minus-0.080-y-plus-0.040-z-plus-0.080	stretch-all-three-axes-independently		-0.080	0.040	0.080					complete
+6-stretch-all-three-axes.tar.gz	6-stretch-all-three-axes/stretch-x-minus-0.080-y-plus-0.060-z-minus-0.020	stretch-all-three-axes-independently		-0.080	0.060	-0.020					complete
+6-stretch-all-three-axes.tar.gz	6-stretch-all-three-axes/stretch-x-minus-0.080-y-plus-0.060-z-minus-0.040	stretch-all-three-axes-independently		-0.080	0.060	-0.040					complete
+6-stretch-all-three-axes.tar.gz	6-stretch-all-three-axes/stretch-x-minus-0.080-y-plus-0.060-z-minus-0.060	stretch-all-three-axes-independently		-0.080	0.060	-0.060					complete
+6-stretch-all-three-axes.tar.gz	6-stretch-all-three-axes/stretch-x-minus-0.080-y-plus-0.060-z-minus-0.080	stretch-all-three-axes-independently		-0.080	0.060	-0.080					complete
+6-stretch-all-three-axes.tar.gz	6-stretch-all-three-axes/stretch-x-minus-0.080-y-plus-0.060-z-plus-0.020	stretch-all-three-axes-independently		-0.080	0.060	0.020					complete
+6-stretch-all-three-axes.tar.gz	6-stretch-all-three-axes/stretch-x-minus-0.080-y-plus-0.060-z-plus-0.040	stretch-all-three-axes-independently		-0.080	0.060	0.040					complete
+6-stretch-all-three-axes.tar.gz	6-stretch-all-three-axes/stretch-x-minus-0.080-y-plus-0.060-z-plus-0.060	stretch-all-three-axes-independently		-0.080	0.060	0.060					complete
+6-stretch-all-three-axes.tar.gz	6-stretch-all-three-axes/stretch-x-minus-0.080-y-plus-0.060-z-plus-0.080	stretch-all-three-axes-independently		-0.080	0.060	0.080					complete
+6-stretch-all-three-axes.tar.gz	6-stretch-all-three-axes/stretch-x-minus-0.080-y-plus-0.080-z-minus-0.020	stretch-all-three-axes-independently		-0.080	0.080	-0.020					complete
+6-stretch-all-three-axes.tar.gz	6-stretch-all-three-axes/stretch-x-minus-0.080-y-plus-0.080-z-minus-0.040	stretch-all-three-axes-independently		-0.080	0.080	-0.040					complete
+6-stretch-all-three-axes.tar.gz	6-stretch-all-three-axes/stretch-x-minus-0.080-y-plus-0.080-z-minus-0.060	stretch-all-three-axes-independently		-0.080	0.080	-0.060					complete
+6-stretch-all-three-axes.tar.gz	6-stretch-all-three-axes/stretch-x-minus-0.080-y-plus-0.080-z-minus-0.080	stretch-all-three-axes-independently		-0.080	0.080	-0.080					complete
+6-stretch-all-three-axes.tar.gz	6-stretch-all-three-axes/stretch-x-minus-0.080-y-plus-0.080-z-plus-0.020	stretch-all-three-axes-independently		-0.080	0.080	0.020					complete
+6-stretch-all-three-axes.tar.gz	6-stretch-all-three-axes/stretch-x-minus-0.080-y-plus-0.080-z-plus-0.040	stretch-all-three-axes-independently		-0.080	0.080	0.040					complete
+6-stretch-all-three-axes.tar.gz	6-stretch-all-three-axes/stretch-x-minus-0.080-y-plus-0.080-z-plus-0.060	stretch-all-three-axes-independently		-0.080	0.080	0.060					complete
+6-stretch-all-three-axes.tar.gz	6-stretch-all-three-axes/stretch-x-minus-0.080-y-plus-0.080-z-plus-0.080	stretch-all-three-axes-independently		-0.080	0.080	0.080					complete
+6-stretch-all-three-axes.tar.gz	6-stretch-all-three-axes/stretch-x-plus-0.020-y-minus-0.020-z-minus-0.020	stretch-all-three-axes-independently		0.020	-0.020	-0.020					complete
+6-stretch-all-three-axes.tar.gz	6-stretch-all-three-axes/stretch-x-plus-0.020-y-minus-0.020-z-minus-0.040	stretch-all-three-axes-independently		0.020	-0.020	-0.040					complete
+6-stretch-all-three-axes.tar.gz	6-stretch-all-three-axes/stretch-x-plus-0.020-y-minus-0.020-z-minus-0.060	stretch-all-three-axes-independently		0.020	-0.020	-0.060					complete
+6-stretch-all-three-axes.tar.gz	6-stretch-all-three-axes/stretch-x-plus-0.020-y-minus-0.020-z-minus-0.080	stretch-all-three-axes-independently		0.020	-0.020	-0.080					complete
+6-stretch-all-three-axes.tar.gz	6-stretch-all-three-axes/stretch-x-plus-0.020-y-minus-0.020-z-plus-0.020	stretch-all-three-axes-independently		0.020	-0.020	0.020					complete
+6-stretch-all-three-axes.tar.gz	6-stretch-all-three-axes/stretch-x-plus-0.020-y-minus-0.020-z-plus-0.040	stretch-all-three-axes-independently		0.020	-0.020	0.040					complete
+6-stretch-all-three-axes.tar.gz	6-stretch-all-three-axes/stretch-x-plus-0.020-y-minus-0.020-z-plus-0.060	stretch-all-three-axes-independently		0.020	-0.020	0.060					complete
+6-stretch-all-three-axes.tar.gz	6-stretch-all-three-axes/stretch-x-plus-0.020-y-minus-0.020-z-plus-0.080	stretch-all-three-axes-independently		0.020	-0.020	0.080					complete
+6-stretch-all-three-axes.tar.gz	6-stretch-all-three-axes/stretch-x-plus-0.020-y-minus-0.040-z-minus-0.020	stretch-all-three-axes-independently		0.020	-0.040	-0.020					complete
+6-stretch-all-three-axes.tar.gz	6-stretch-all-three-axes/stretch-x-plus-0.020-y-minus-0.040-z-minus-0.040	stretch-all-three-axes-independently		0.020	-0.040	-0.040					complete
+6-stretch-all-three-axes.tar.gz	6-stretch-all-three-axes/stretch-x-plus-0.020-y-minus-0.040-z-minus-0.060	stretch-all-three-axes-independently		0.020	-0.040	-0.060					complete
+6-stretch-all-three-axes.tar.gz	6-stretch-all-three-axes/stretch-x-plus-0.020-y-minus-0.040-z-minus-0.080	stretch-all-three-axes-independently		0.020	-0.040	-0.080					complete
+6-stretch-all-three-axes.tar.gz	6-stretch-all-three-axes/stretch-x-plus-0.020-y-minus-0.040-z-plus-0.020	stretch-all-three-axes-independently		0.020	-0.040	0.020					complete
+6-stretch-all-three-axes.tar.gz	6-stretch-all-three-axes/stretch-x-plus-0.020-y-minus-0.040-z-plus-0.040	stretch-all-three-axes-independently		0.020	-0.040	0.040					complete
+6-stretch-all-three-axes.tar.gz	6-stretch-all-three-axes/stretch-x-plus-0.020-y-minus-0.040-z-plus-0.060	stretch-all-three-axes-independently		0.020	-0.040	0.060					complete
+6-stretch-all-three-axes.tar.gz	6-stretch-all-three-axes/stretch-x-plus-0.020-y-minus-0.040-z-plus-0.080	stretch-all-three-axes-independently		0.020	-0.040	0.080					complete
+6-stretch-all-three-axes.tar.gz	6-stretch-all-three-axes/stretch-x-plus-0.020-y-minus-0.060-z-minus-0.020	stretch-all-three-axes-independently		0.020	-0.060	-0.020					complete
+6-stretch-all-three-axes.tar.gz	6-stretch-all-three-axes/stretch-x-plus-0.020-y-minus-0.060-z-minus-0.040	stretch-all-three-axes-independently		0.020	-0.060	-0.040					complete
+6-stretch-all-three-axes.tar.gz	6-stretch-all-three-axes/stretch-x-plus-0.020-y-minus-0.060-z-minus-0.060	stretch-all-three-axes-independently		0.020	-0.060	-0.060					complete
+6-stretch-all-three-axes.tar.gz	6-stretch-all-three-axes/stretch-x-plus-0.020-y-minus-0.060-z-minus-0.080	stretch-all-three-axes-independently		0.020	-0.060	-0.080					complete
+6-stretch-all-three-axes.tar.gz	6-stretch-all-three-axes/stretch-x-plus-0.020-y-minus-0.060-z-plus-0.020	stretch-all-three-axes-independently		0.020	-0.060	0.020					complete
+6-stretch-all-three-axes.tar.gz	6-stretch-all-three-axes/stretch-x-plus-0.020-y-minus-0.060-z-plus-0.040	stretch-all-three-axes-independently		0.020	-0.060	0.040					complete
+6-stretch-all-three-axes.tar.gz	6-stretch-all-three-axes/stretch-x-plus-0.020-y-minus-0.060-z-plus-0.060	stretch-all-three-axes-independently		0.020	-0.060	0.060					complete
+6-stretch-all-three-axes.tar.gz	6-stretch-all-three-axes/stretch-x-plus-0.020-y-minus-0.060-z-plus-0.080	stretch-all-three-axes-independently		0.020	-0.060	0.080					complete
+6-stretch-all-three-axes.tar.gz	6-stretch-all-three-axes/stretch-x-plus-0.020-y-minus-0.080-z-minus-0.020	stretch-all-three-axes-independently		0.020	-0.080	-0.020					complete
+6-stretch-all-three-axes.tar.gz	6-stretch-all-three-axes/stretch-x-plus-0.020-y-minus-0.080-z-minus-0.040	stretch-all-three-axes-independently		0.020	-0.080	-0.040					complete
+6-stretch-all-three-axes.tar.gz	6-stretch-all-three-axes/stretch-x-plus-0.020-y-minus-0.080-z-minus-0.060	stretch-all-three-axes-independently		0.020	-0.080	-0.060					complete
+6-stretch-all-three-axes.tar.gz	6-stretch-all-three-axes/stretch-x-plus-0.020-y-minus-0.080-z-minus-0.080	stretch-all-three-axes-independently		0.020	-0.080	-0.080					complete
+6-stretch-all-three-axes.tar.gz	6-stretch-all-three-axes/stretch-x-plus-0.020-y-minus-0.080-z-plus-0.020	stretch-all-three-axes-independently		0.020	-0.080	0.020					complete
+6-stretch-all-three-axes.tar.gz	6-stretch-all-three-axes/stretch-x-plus-0.020-y-minus-0.080-z-plus-0.040	stretch-all-three-axes-independently		0.020	-0.080	0.040					complete
+6-stretch-all-three-axes.tar.gz	6-stretch-all-three-axes/stretch-x-plus-0.020-y-minus-0.080-z-plus-0.060	stretch-all-three-axes-independently		0.020	-0.080	0.060					complete
+6-stretch-all-three-axes.tar.gz	6-stretch-all-three-axes/stretch-x-plus-0.020-y-minus-0.080-z-plus-0.080	stretch-all-three-axes-independently		0.020	-0.080	0.080					complete
+6-stretch-all-three-axes.tar.gz	6-stretch-all-three-axes/stretch-x-plus-0.020-y-plus-0.020-z-minus-0.020	stretch-all-three-axes-independently		0.020	0.020	-0.020					complete
+6-stretch-all-three-axes.tar.gz	6-stretch-all-three-axes/stretch-x-plus-0.020-y-plus-0.020-z-minus-0.040	stretch-all-three-axes-independently		0.020	0.020	-0.040					complete
+6-stretch-all-three-axes.tar.gz	6-stretch-all-three-axes/stretch-x-plus-0.020-y-plus-0.020-z-minus-0.060	stretch-all-three-axes-independently		0.020	0.020	-0.060					complete
+6-stretch-all-three-axes.tar.gz	6-stretch-all-three-axes/stretch-x-plus-0.020-y-plus-0.020-z-minus-0.080	stretch-all-three-axes-independently		0.020	0.020	-0.080					complete
+6-stretch-all-three-axes.tar.gz	6-stretch-all-three-axes/stretch-x-plus-0.020-y-plus-0.020-z-plus-0.020	stretch-all-three-axes-independently		0.020	0.020	0.020					complete
+6-stretch-all-three-axes.tar.gz	6-stretch-all-three-axes/stretch-x-plus-0.020-y-plus-0.020-z-plus-0.040	stretch-all-three-axes-independently		0.020	0.020	0.040					complete
+6-stretch-all-three-axes.tar.gz	6-stretch-all-three-axes/stretch-x-plus-0.020-y-plus-0.020-z-plus-0.060	stretch-all-three-axes-independently		0.020	0.020	0.060					complete
+6-stretch-all-three-axes.tar.gz	6-stretch-all-three-axes/stretch-x-plus-0.020-y-plus-0.020-z-plus-0.080	stretch-all-three-axes-independently		0.020	0.020	0.080					complete
+6-stretch-all-three-axes.tar.gz	6-stretch-all-three-axes/stretch-x-plus-0.020-y-plus-0.040-z-minus-0.020	stretch-all-three-axes-independently		0.020	0.040	-0.020					complete
+6-stretch-all-three-axes.tar.gz	6-stretch-all-three-axes/stretch-x-plus-0.020-y-plus-0.040-z-minus-0.040	stretch-all-three-axes-independently		0.020	0.040	-0.040					complete
+6-stretch-all-three-axes.tar.gz	6-stretch-all-three-axes/stretch-x-plus-0.020-y-plus-0.040-z-minus-0.060	stretch-all-three-axes-independently		0.020	0.040	-0.060					complete
+6-stretch-all-three-axes.tar.gz	6-stretch-all-three-axes/stretch-x-plus-0.020-y-plus-0.040-z-minus-0.080	stretch-all-three-axes-independently		0.020	0.040	-0.080					complete
+6-stretch-all-three-axes.tar.gz	6-stretch-all-three-axes/stretch-x-plus-0.020-y-plus-0.040-z-plus-0.020	stretch-all-three-axes-independently		0.020	0.040	0.020					complete
+6-stretch-all-three-axes.tar.gz	6-stretch-all-three-axes/stretch-x-plus-0.020-y-plus-0.040-z-plus-0.040	stretch-all-three-axes-independently		0.020	0.040	0.040					complete
+6-stretch-all-three-axes.tar.gz	6-stretch-all-three-axes/stretch-x-plus-0.020-y-plus-0.040-z-plus-0.060	stretch-all-three-axes-independently		0.020	0.040	0.060					complete
+6-stretch-all-three-axes.tar.gz	6-stretch-all-three-axes/stretch-x-plus-0.020-y-plus-0.040-z-plus-0.080	stretch-all-three-axes-independently		0.020	0.040	0.080					complete
+6-stretch-all-three-axes.tar.gz	6-stretch-all-three-axes/stretch-x-plus-0.020-y-plus-0.060-z-minus-0.020	stretch-all-three-axes-independently		0.020	0.060	-0.020					complete
+6-stretch-all-three-axes.tar.gz	6-stretch-all-three-axes/stretch-x-plus-0.020-y-plus-0.060-z-minus-0.040	stretch-all-three-axes-independently		0.020	0.060	-0.040					complete
+6-stretch-all-three-axes.tar.gz	6-stretch-all-three-axes/stretch-x-plus-0.020-y-plus-0.060-z-minus-0.060	stretch-all-three-axes-independently		0.020	0.060	-0.060					complete
+6-stretch-all-three-axes.tar.gz	6-stretch-all-three-axes/stretch-x-plus-0.020-y-plus-0.060-z-minus-0.080	stretch-all-three-axes-independently		0.020	0.060	-0.080					complete
+6-stretch-all-three-axes.tar.gz	6-stretch-all-three-axes/stretch-x-plus-0.020-y-plus-0.060-z-plus-0.020	stretch-all-three-axes-independently		0.020	0.060	0.020					complete
+6-stretch-all-three-axes.tar.gz	6-stretch-all-three-axes/stretch-x-plus-0.020-y-plus-0.060-z-plus-0.040	stretch-all-three-axes-independently		0.020	0.060	0.040					complete
+6-stretch-all-three-axes.tar.gz	6-stretch-all-three-axes/stretch-x-plus-0.020-y-plus-0.060-z-plus-0.060	stretch-all-three-axes-independently		0.020	0.060	0.060					complete
+6-stretch-all-three-axes.tar.gz	6-stretch-all-three-axes/stretch-x-plus-0.020-y-plus-0.060-z-plus-0.080	stretch-all-three-axes-independently		0.020	0.060	0.080					complete
+6-stretch-all-three-axes.tar.gz	6-stretch-all-three-axes/stretch-x-plus-0.020-y-plus-0.080-z-minus-0.020	stretch-all-three-axes-independently		0.020	0.080	-0.020					complete
+6-stretch-all-three-axes.tar.gz	6-stretch-all-three-axes/stretch-x-plus-0.020-y-plus-0.080-z-minus-0.040	stretch-all-three-axes-independently		0.020	0.080	-0.040					complete
+6-stretch-all-three-axes.tar.gz	6-stretch-all-three-axes/stretch-x-plus-0.020-y-plus-0.080-z-minus-0.060	stretch-all-three-axes-independently		0.020	0.080	-0.060					complete
+6-stretch-all-three-axes.tar.gz	6-stretch-all-three-axes/stretch-x-plus-0.020-y-plus-0.080-z-minus-0.080	stretch-all-three-axes-independently		0.020	0.080	-0.080					complete
+6-stretch-all-three-axes.tar.gz	6-stretch-all-three-axes/stretch-x-plus-0.020-y-plus-0.080-z-plus-0.020	stretch-all-three-axes-independently		0.020	0.080	0.020					complete
+6-stretch-all-three-axes.tar.gz	6-stretch-all-three-axes/stretch-x-plus-0.020-y-plus-0.080-z-plus-0.040	stretch-all-three-axes-independently		0.020	0.080	0.040					complete
+6-stretch-all-three-axes.tar.gz	6-stretch-all-three-axes/stretch-x-plus-0.020-y-plus-0.080-z-plus-0.060	stretch-all-three-axes-independently		0.020	0.080	0.060					complete
+6-stretch-all-three-axes.tar.gz	6-stretch-all-three-axes/stretch-x-plus-0.020-y-plus-0.080-z-plus-0.080	stretch-all-three-axes-independently		0.020	0.080	0.080					complete
+6-stretch-all-three-axes.tar.gz	6-stretch-all-three-axes/stretch-x-plus-0.040-y-minus-0.020-z-minus-0.020	stretch-all-three-axes-independently		0.040	-0.020	-0.020					complete
+6-stretch-all-three-axes.tar.gz	6-stretch-all-three-axes/stretch-x-plus-0.040-y-minus-0.020-z-minus-0.040	stretch-all-three-axes-independently		0.040	-0.020	-0.040					complete
+6-stretch-all-three-axes.tar.gz	6-stretch-all-three-axes/stretch-x-plus-0.040-y-minus-0.020-z-minus-0.060	stretch-all-three-axes-independently		0.040	-0.020	-0.060					complete
+6-stretch-all-three-axes.tar.gz	6-stretch-all-three-axes/stretch-x-plus-0.040-y-minus-0.020-z-minus-0.080	stretch-all-three-axes-independently		0.040	-0.020	-0.080					complete
+6-stretch-all-three-axes.tar.gz	6-stretch-all-three-axes/stretch-x-plus-0.040-y-minus-0.020-z-plus-0.020	stretch-all-three-axes-independently		0.040	-0.020	0.020					complete
+6-stretch-all-three-axes.tar.gz	6-stretch-all-three-axes/stretch-x-plus-0.040-y-minus-0.020-z-plus-0.040	stretch-all-three-axes-independently		0.040	-0.020	0.040					complete
+6-stretch-all-three-axes.tar.gz	6-stretch-all-three-axes/stretch-x-plus-0.040-y-minus-0.020-z-plus-0.060	stretch-all-three-axes-independently		0.040	-0.020	0.060					complete
+6-stretch-all-three-axes.tar.gz	6-stretch-all-three-axes/stretch-x-plus-0.040-y-minus-0.020-z-plus-0.080	stretch-all-three-axes-independently		0.040	-0.020	0.080					complete
+6-stretch-all-three-axes.tar.gz	6-stretch-all-three-axes/stretch-x-plus-0.040-y-minus-0.040-z-minus-0.020	stretch-all-three-axes-independently		0.040	-0.040	-0.020					complete
+6-stretch-all-three-axes.tar.gz	6-stretch-all-three-axes/stretch-x-plus-0.040-y-minus-0.040-z-minus-0.040	stretch-all-three-axes-independently		0.040	-0.040	-0.040					complete
+6-stretch-all-three-axes.tar.gz	6-stretch-all-three-axes/stretch-x-plus-0.040-y-minus-0.040-z-minus-0.060	stretch-all-three-axes-independently		0.040	-0.040	-0.060					complete
+6-stretch-all-three-axes.tar.gz	6-stretch-all-three-axes/stretch-x-plus-0.040-y-minus-0.040-z-minus-0.080	stretch-all-three-axes-independently		0.040	-0.040	-0.080					complete
+6-stretch-all-three-axes.tar.gz	6-stretch-all-three-axes/stretch-x-plus-0.040-y-minus-0.040-z-plus-0.020	stretch-all-three-axes-independently		0.040	-0.040	0.020					complete
+6-stretch-all-three-axes.tar.gz	6-stretch-all-three-axes/stretch-x-plus-0.040-y-minus-0.040-z-plus-0.040	stretch-all-three-axes-independently		0.040	-0.040	0.040					complete
+6-stretch-all-three-axes.tar.gz	6-stretch-all-three-axes/stretch-x-plus-0.040-y-minus-0.040-z-plus-0.060	stretch-all-three-axes-independently		0.040	-0.040	0.060					complete
+6-stretch-all-three-axes.tar.gz	6-stretch-all-three-axes/stretch-x-plus-0.040-y-minus-0.040-z-plus-0.080	stretch-all-three-axes-independently		0.040	-0.040	0.080					complete
+6-stretch-all-three-axes.tar.gz	6-stretch-all-three-axes/stretch-x-plus-0.040-y-minus-0.060-z-minus-0.020	stretch-all-three-axes-independently		0.040	-0.060	-0.020					complete
+6-stretch-all-three-axes.tar.gz	6-stretch-all-three-axes/stretch-x-plus-0.040-y-minus-0.060-z-minus-0.040	stretch-all-three-axes-independently		0.040	-0.060	-0.040					complete
+6-stretch-all-three-axes.tar.gz	6-stretch-all-three-axes/stretch-x-plus-0.040-y-minus-0.060-z-minus-0.060	stretch-all-three-axes-independently		0.040	-0.060	-0.060					complete
+6-stretch-all-three-axes.tar.gz	6-stretch-all-three-axes/stretch-x-plus-0.040-y-minus-0.060-z-minus-0.080	stretch-all-three-axes-independently		0.040	-0.060	-0.080					complete
+6-stretch-all-three-axes.tar.gz	6-stretch-all-three-axes/stretch-x-plus-0.040-y-minus-0.060-z-plus-0.020	stretch-all-three-axes-independently		0.040	-0.060	0.020					complete
+6-stretch-all-three-axes.tar.gz	6-stretch-all-three-axes/stretch-x-plus-0.040-y-minus-0.060-z-plus-0.040	stretch-all-three-axes-independently		0.040	-0.060	0.040					complete
+6-stretch-all-three-axes.tar.gz	6-stretch-all-three-axes/stretch-x-plus-0.040-y-minus-0.060-z-plus-0.060	stretch-all-three-axes-independently		0.040	-0.060	0.060					complete
+6-stretch-all-three-axes.tar.gz	6-stretch-all-three-axes/stretch-x-plus-0.040-y-minus-0.060-z-plus-0.080	stretch-all-three-axes-independently		0.040	-0.060	0.080					complete
+6-stretch-all-three-axes.tar.gz	6-stretch-all-three-axes/stretch-x-plus-0.040-y-minus-0.080-z-minus-0.020	stretch-all-three-axes-independently		0.040	-0.080	-0.020					complete
+6-stretch-all-three-axes.tar.gz	6-stretch-all-three-axes/stretch-x-plus-0.040-y-minus-0.080-z-minus-0.040	stretch-all-three-axes-independently		0.040	-0.080	-0.040					complete
+6-stretch-all-three-axes.tar.gz	6-stretch-all-three-axes/stretch-x-plus-0.040-y-minus-0.080-z-minus-0.060	stretch-all-three-axes-independently		0.040	-0.080	-0.060					complete
+6-stretch-all-three-axes.tar.gz	6-stretch-all-three-axes/stretch-x-plus-0.040-y-minus-0.080-z-minus-0.080	stretch-all-three-axes-independently		0.040	-0.080	-0.080					complete
+6-stretch-all-three-axes.tar.gz	6-stretch-all-three-axes/stretch-x-plus-0.040-y-minus-0.080-z-plus-0.020	stretch-all-three-axes-independently		0.040	-0.080	0.020					complete
+6-stretch-all-three-axes.tar.gz	6-stretch-all-three-axes/stretch-x-plus-0.040-y-minus-0.080-z-plus-0.040	stretch-all-three-axes-independently		0.040	-0.080	0.040					complete
+6-stretch-all-three-axes.tar.gz	6-stretch-all-three-axes/stretch-x-plus-0.040-y-minus-0.080-z-plus-0.060	stretch-all-three-axes-independently		0.040	-0.080	0.060					complete
+6-stretch-all-three-axes.tar.gz	6-stretch-all-three-axes/stretch-x-plus-0.040-y-minus-0.080-z-plus-0.080	stretch-all-three-axes-independently		0.040	-0.080	0.080					complete
+6-stretch-all-three-axes.tar.gz	6-stretch-all-three-axes/stretch-x-plus-0.040-y-plus-0.020-z-minus-0.020	stretch-all-three-axes-independently		0.040	0.020	-0.020					complete
+6-stretch-all-three-axes.tar.gz	6-stretch-all-three-axes/stretch-x-plus-0.040-y-plus-0.020-z-minus-0.040	stretch-all-three-axes-independently		0.040	0.020	-0.040					complete
+6-stretch-all-three-axes.tar.gz	6-stretch-all-three-axes/stretch-x-plus-0.040-y-plus-0.020-z-minus-0.060	stretch-all-three-axes-independently		0.040	0.020	-0.060					complete
+6-stretch-all-three-axes.tar.gz	6-stretch-all-three-axes/stretch-x-plus-0.040-y-plus-0.020-z-minus-0.080	stretch-all-three-axes-independently		0.040	0.020	-0.080					complete
+6-stretch-all-three-axes.tar.gz	6-stretch-all-three-axes/stretch-x-plus-0.040-y-plus-0.020-z-plus-0.020	stretch-all-three-axes-independently		0.040	0.020	0.020					complete
+6-stretch-all-three-axes.tar.gz	6-stretch-all-three-axes/stretch-x-plus-0.040-y-plus-0.020-z-plus-0.040	stretch-all-three-axes-independently		0.040	0.020	0.040					complete
+6-stretch-all-three-axes.tar.gz	6-stretch-all-three-axes/stretch-x-plus-0.040-y-plus-0.020-z-plus-0.060	stretch-all-three-axes-independently		0.040	0.020	0.060					complete
+6-stretch-all-three-axes.tar.gz	6-stretch-all-three-axes/stretch-x-plus-0.040-y-plus-0.020-z-plus-0.080	stretch-all-three-axes-independently		0.040	0.020	0.080					complete
+6-stretch-all-three-axes.tar.gz	6-stretch-all-three-axes/stretch-x-plus-0.040-y-plus-0.040-z-minus-0.020	stretch-all-three-axes-independently		0.040	0.040	-0.020					complete
+6-stretch-all-three-axes.tar.gz	6-stretch-all-three-axes/stretch-x-plus-0.040-y-plus-0.040-z-minus-0.040	stretch-all-three-axes-independently		0.040	0.040	-0.040					complete
+6-stretch-all-three-axes.tar.gz	6-stretch-all-three-axes/stretch-x-plus-0.040-y-plus-0.040-z-minus-0.060	stretch-all-three-axes-independently		0.040	0.040	-0.060					complete
+6-stretch-all-three-axes.tar.gz	6-stretch-all-three-axes/stretch-x-plus-0.040-y-plus-0.040-z-minus-0.080	stretch-all-three-axes-independently		0.040	0.040	-0.080					complete
+6-stretch-all-three-axes.tar.gz	6-stretch-all-three-axes/stretch-x-plus-0.040-y-plus-0.040-z-plus-0.020	stretch-all-three-axes-independently		0.040	0.040	0.020					complete
+6-stretch-all-three-axes.tar.gz	6-stretch-all-three-axes/stretch-x-plus-0.040-y-plus-0.040-z-plus-0.040	stretch-all-three-axes-independently		0.040	0.040	0.040					complete
+6-stretch-all-three-axes.tar.gz	6-stretch-all-three-axes/stretch-x-plus-0.040-y-plus-0.040-z-plus-0.060	stretch-all-three-axes-independently		0.040	0.040	0.060					complete
+6-stretch-all-three-axes.tar.gz	6-stretch-all-three-axes/stretch-x-plus-0.040-y-plus-0.040-z-plus-0.080	stretch-all-three-axes-independently		0.040	0.040	0.080					complete
+6-stretch-all-three-axes.tar.gz	6-stretch-all-three-axes/stretch-x-plus-0.040-y-plus-0.060-z-minus-0.020	stretch-all-three-axes-independently		0.040	0.060	-0.020					complete
+6-stretch-all-three-axes.tar.gz	6-stretch-all-three-axes/stretch-x-plus-0.040-y-plus-0.060-z-minus-0.040	stretch-all-three-axes-independently		0.040	0.060	-0.040					complete
+6-stretch-all-three-axes.tar.gz	6-stretch-all-three-axes/stretch-x-plus-0.040-y-plus-0.060-z-minus-0.060	stretch-all-three-axes-independently		0.040	0.060	-0.060					complete
+6-stretch-all-three-axes.tar.gz	6-stretch-all-three-axes/stretch-x-plus-0.040-y-plus-0.060-z-minus-0.080	stretch-all-three-axes-independently		0.040	0.060	-0.080					complete
+6-stretch-all-three-axes.tar.gz	6-stretch-all-three-axes/stretch-x-plus-0.040-y-plus-0.060-z-plus-0.020	stretch-all-three-axes-independently		0.040	0.060	0.020					complete
+6-stretch-all-three-axes.tar.gz	6-stretch-all-three-axes/stretch-x-plus-0.040-y-plus-0.060-z-plus-0.040	stretch-all-three-axes-independently		0.040	0.060	0.040					complete
+6-stretch-all-three-axes.tar.gz	6-stretch-all-three-axes/stretch-x-plus-0.040-y-plus-0.060-z-plus-0.060	stretch-all-three-axes-independently		0.040	0.060	0.060					complete
+6-stretch-all-three-axes.tar.gz	6-stretch-all-three-axes/stretch-x-plus-0.040-y-plus-0.060-z-plus-0.080	stretch-all-three-axes-independently		0.040	0.060	0.080					complete
+6-stretch-all-three-axes.tar.gz	6-stretch-all-three-axes/stretch-x-plus-0.040-y-plus-0.080-z-minus-0.020	stretch-all-three-axes-independently		0.040	0.080	-0.020					complete
+6-stretch-all-three-axes.tar.gz	6-stretch-all-three-axes/stretch-x-plus-0.040-y-plus-0.080-z-minus-0.040	stretch-all-three-axes-independently		0.040	0.080	-0.040					complete
+6-stretch-all-three-axes.tar.gz	6-stretch-all-three-axes/stretch-x-plus-0.040-y-plus-0.080-z-minus-0.060	stretch-all-three-axes-independently		0.040	0.080	-0.060					complete
+6-stretch-all-three-axes.tar.gz	6-stretch-all-three-axes/stretch-x-plus-0.040-y-plus-0.080-z-minus-0.080	stretch-all-three-axes-independently		0.040	0.080	-0.080					complete
+6-stretch-all-three-axes.tar.gz	6-stretch-all-three-axes/stretch-x-plus-0.040-y-plus-0.080-z-plus-0.020	stretch-all-three-axes-independently		0.040	0.080	0.020					complete
+6-stretch-all-three-axes.tar.gz	6-stretch-all-three-axes/stretch-x-plus-0.040-y-plus-0.080-z-plus-0.040	stretch-all-three-axes-independently		0.040	0.080	0.040					complete
+6-stretch-all-three-axes.tar.gz	6-stretch-all-three-axes/stretch-x-plus-0.040-y-plus-0.080-z-plus-0.060	stretch-all-three-axes-independently		0.040	0.080	0.060					complete
+6-stretch-all-three-axes.tar.gz	6-stretch-all-three-axes/stretch-x-plus-0.040-y-plus-0.080-z-plus-0.080	stretch-all-three-axes-independently		0.040	0.080	0.080					complete
+6-stretch-all-three-axes.tar.gz	6-stretch-all-three-axes/stretch-x-plus-0.060-y-minus-0.020-z-minus-0.020	stretch-all-three-axes-independently		0.060	-0.020	-0.020					complete
+6-stretch-all-three-axes.tar.gz	6-stretch-all-three-axes/stretch-x-plus-0.060-y-minus-0.020-z-minus-0.040	stretch-all-three-axes-independently		0.060	-0.020	-0.040					complete
+6-stretch-all-three-axes.tar.gz	6-stretch-all-three-axes/stretch-x-plus-0.060-y-minus-0.020-z-minus-0.060	stretch-all-three-axes-independently		0.060	-0.020	-0.060					complete
+6-stretch-all-three-axes.tar.gz	6-stretch-all-three-axes/stretch-x-plus-0.060-y-minus-0.020-z-minus-0.080	stretch-all-three-axes-independently		0.060	-0.020	-0.080					complete
+6-stretch-all-three-axes.tar.gz	6-stretch-all-three-axes/stretch-x-plus-0.060-y-minus-0.020-z-plus-0.020	stretch-all-three-axes-independently		0.060	-0.020	0.020					complete
+6-stretch-all-three-axes.tar.gz	6-stretch-all-three-axes/stretch-x-plus-0.060-y-minus-0.020-z-plus-0.040	stretch-all-three-axes-independently		0.060	-0.020	0.040					complete
+6-stretch-all-three-axes.tar.gz	6-stretch-all-three-axes/stretch-x-plus-0.060-y-minus-0.020-z-plus-0.060	stretch-all-three-axes-independently		0.060	-0.020	0.060					complete
+6-stretch-all-three-axes.tar.gz	6-stretch-all-three-axes/stretch-x-plus-0.060-y-minus-0.020-z-plus-0.080	stretch-all-three-axes-independently		0.060	-0.020	0.080					complete
+6-stretch-all-three-axes.tar.gz	6-stretch-all-three-axes/stretch-x-plus-0.060-y-minus-0.040-z-minus-0.020	stretch-all-three-axes-independently		0.060	-0.040	-0.020					complete
+6-stretch-all-three-axes.tar.gz	6-stretch-all-three-axes/stretch-x-plus-0.060-y-minus-0.040-z-minus-0.040	stretch-all-three-axes-independently		0.060	-0.040	-0.040					complete
+6-stretch-all-three-axes.tar.gz	6-stretch-all-three-axes/stretch-x-plus-0.060-y-minus-0.040-z-minus-0.060	stretch-all-three-axes-independently		0.060	-0.040	-0.060					complete
+6-stretch-all-three-axes.tar.gz	6-stretch-all-three-axes/stretch-x-plus-0.060-y-minus-0.040-z-minus-0.080	stretch-all-three-axes-independently		0.060	-0.040	-0.080					complete
+6-stretch-all-three-axes.tar.gz	6-stretch-all-three-axes/stretch-x-plus-0.060-y-minus-0.040-z-plus-0.020	stretch-all-three-axes-independently		0.060	-0.040	0.020					complete
+6-stretch-all-three-axes.tar.gz	6-stretch-all-three-axes/stretch-x-plus-0.060-y-minus-0.040-z-plus-0.040	stretch-all-three-axes-independently		0.060	-0.040	0.040					complete
+6-stretch-all-three-axes.tar.gz	6-stretch-all-three-axes/stretch-x-plus-0.060-y-minus-0.040-z-plus-0.060	stretch-all-three-axes-independently		0.060	-0.040	0.060					complete
+6-stretch-all-three-axes.tar.gz	6-stretch-all-three-axes/stretch-x-plus-0.060-y-minus-0.040-z-plus-0.080	stretch-all-three-axes-independently		0.060	-0.040	0.080					complete
+6-stretch-all-three-axes.tar.gz	6-stretch-all-three-axes/stretch-x-plus-0.060-y-minus-0.060-z-minus-0.020	stretch-all-three-axes-independently		0.060	-0.060	-0.020					complete
+6-stretch-all-three-axes.tar.gz	6-stretch-all-three-axes/stretch-x-plus-0.060-y-minus-0.060-z-minus-0.040	stretch-all-three-axes-independently		0.060	-0.060	-0.040					complete
+6-stretch-all-three-axes.tar.gz	6-stretch-all-three-axes/stretch-x-plus-0.060-y-minus-0.060-z-minus-0.060	stretch-all-three-axes-independently		0.060	-0.060	-0.060					complete
+6-stretch-all-three-axes.tar.gz	6-stretch-all-three-axes/stretch-x-plus-0.060-y-minus-0.060-z-minus-0.080	stretch-all-three-axes-independently		0.060	-0.060	-0.080					complete
+6-stretch-all-three-axes.tar.gz	6-stretch-all-three-axes/stretch-x-plus-0.060-y-minus-0.060-z-plus-0.020	stretch-all-three-axes-independently		0.060	-0.060	0.020					complete
+6-stretch-all-three-axes.tar.gz	6-stretch-all-three-axes/stretch-x-plus-0.060-y-minus-0.060-z-plus-0.040	stretch-all-three-axes-independently		0.060	-0.060	0.040					complete
+6-stretch-all-three-axes.tar.gz	6-stretch-all-three-axes/stretch-x-plus-0.060-y-minus-0.060-z-plus-0.060	stretch-all-three-axes-independently		0.060	-0.060	0.060					complete
+6-stretch-all-three-axes.tar.gz	6-stretch-all-three-axes/stretch-x-plus-0.060-y-minus-0.060-z-plus-0.080	stretch-all-three-axes-independently		0.060	-0.060	0.080					complete
+6-stretch-all-three-axes.tar.gz	6-stretch-all-three-axes/stretch-x-plus-0.060-y-minus-0.080-z-minus-0.020	stretch-all-three-axes-independently		0.060	-0.080	-0.020					complete
+6-stretch-all-three-axes.tar.gz	6-stretch-all-three-axes/stretch-x-plus-0.060-y-minus-0.080-z-minus-0.040	stretch-all-three-axes-independently		0.060	-0.080	-0.040					complete
+6-stretch-all-three-axes.tar.gz	6-stretch-all-three-axes/stretch-x-plus-0.060-y-minus-0.080-z-minus-0.060	stretch-all-three-axes-independently		0.060	-0.080	-0.060					complete
+6-stretch-all-three-axes.tar.gz	6-stretch-all-three-axes/stretch-x-plus-0.060-y-minus-0.080-z-minus-0.080	stretch-all-three-axes-independently		0.060	-0.080	-0.080					complete
+6-stretch-all-three-axes.tar.gz	6-stretch-all-three-axes/stretch-x-plus-0.060-y-minus-0.080-z-plus-0.020	stretch-all-three-axes-independently		0.060	-0.080	0.020					complete
+6-stretch-all-three-axes.tar.gz	6-stretch-all-three-axes/stretch-x-plus-0.060-y-minus-0.080-z-plus-0.040	stretch-all-three-axes-independently		0.060	-0.080	0.040					complete
+6-stretch-all-three-axes.tar.gz	6-stretch-all-three-axes/stretch-x-plus-0.060-y-minus-0.080-z-plus-0.060	stretch-all-three-axes-independently		0.060	-0.080	0.060					complete
+6-stretch-all-three-axes.tar.gz	6-stretch-all-three-axes/stretch-x-plus-0.060-y-minus-0.080-z-plus-0.080	stretch-all-three-axes-independently		0.060	-0.080	0.080					complete
+6-stretch-all-three-axes.tar.gz	6-stretch-all-three-axes/stretch-x-plus-0.060-y-plus-0.020-z-minus-0.020	stretch-all-three-axes-independently		0.060	0.020	-0.020					complete
+6-stretch-all-three-axes.tar.gz	6-stretch-all-three-axes/stretch-x-plus-0.060-y-plus-0.020-z-minus-0.040	stretch-all-three-axes-independently		0.060	0.020	-0.040					complete
+6-stretch-all-three-axes.tar.gz	6-stretch-all-three-axes/stretch-x-plus-0.060-y-plus-0.020-z-minus-0.060	stretch-all-three-axes-independently		0.060	0.020	-0.060					complete
+6-stretch-all-three-axes.tar.gz	6-stretch-all-three-axes/stretch-x-plus-0.060-y-plus-0.020-z-minus-0.080	stretch-all-three-axes-independently		0.060	0.020	-0.080					complete
+6-stretch-all-three-axes.tar.gz	6-stretch-all-three-axes/stretch-x-plus-0.060-y-plus-0.020-z-plus-0.020	stretch-all-three-axes-independently		0.060	0.020	0.020					complete
+6-stretch-all-three-axes.tar.gz	6-stretch-all-three-axes/stretch-x-plus-0.060-y-plus-0.020-z-plus-0.040	stretch-all-three-axes-independently		0.060	0.020	0.040					complete
+6-stretch-all-three-axes.tar.gz	6-stretch-all-three-axes/stretch-x-plus-0.060-y-plus-0.020-z-plus-0.060	stretch-all-three-axes-independently		0.060	0.020	0.060					complete
+6-stretch-all-three-axes.tar.gz	6-stretch-all-three-axes/stretch-x-plus-0.060-y-plus-0.020-z-plus-0.080	stretch-all-three-axes-independently		0.060	0.020	0.080					complete
+6-stretch-all-three-axes.tar.gz	6-stretch-all-three-axes/stretch-x-plus-0.060-y-plus-0.040-z-minus-0.020	stretch-all-three-axes-independently		0.060	0.040	-0.020					complete
+6-stretch-all-three-axes.tar.gz	6-stretch-all-three-axes/stretch-x-plus-0.060-y-plus-0.040-z-minus-0.040	stretch-all-three-axes-independently		0.060	0.040	-0.040					complete
+6-stretch-all-three-axes.tar.gz	6-stretch-all-three-axes/stretch-x-plus-0.060-y-plus-0.040-z-minus-0.060	stretch-all-three-axes-independently		0.060	0.040	-0.060					complete
+6-stretch-all-three-axes.tar.gz	6-stretch-all-three-axes/stretch-x-plus-0.060-y-plus-0.040-z-minus-0.080	stretch-all-three-axes-independently		0.060	0.040	-0.080					complete
+6-stretch-all-three-axes.tar.gz	6-stretch-all-three-axes/stretch-x-plus-0.060-y-plus-0.040-z-plus-0.020	stretch-all-three-axes-independently		0.060	0.040	0.020					complete
+6-stretch-all-three-axes.tar.gz	6-stretch-all-three-axes/stretch-x-plus-0.060-y-plus-0.040-z-plus-0.040	stretch-all-three-axes-independently		0.060	0.040	0.040					complete
+6-stretch-all-three-axes.tar.gz	6-stretch-all-three-axes/stretch-x-plus-0.060-y-plus-0.040-z-plus-0.060	stretch-all-three-axes-independently		0.060	0.040	0.060					complete
+6-stretch-all-three-axes.tar.gz	6-stretch-all-three-axes/stretch-x-plus-0.060-y-plus-0.040-z-plus-0.080	stretch-all-three-axes-independently		0.060	0.040	0.080					complete
+6-stretch-all-three-axes.tar.gz	6-stretch-all-three-axes/stretch-x-plus-0.060-y-plus-0.060-z-minus-0.020	stretch-all-three-axes-independently		0.060	0.060	-0.020					complete
+6-stretch-all-three-axes.tar.gz	6-stretch-all-three-axes/stretch-x-plus-0.060-y-plus-0.060-z-minus-0.040	stretch-all-three-axes-independently		0.060	0.060	-0.040					complete
+6-stretch-all-three-axes.tar.gz	6-stretch-all-three-axes/stretch-x-plus-0.060-y-plus-0.060-z-minus-0.060	stretch-all-three-axes-independently		0.060	0.060	-0.060					complete
+6-stretch-all-three-axes.tar.gz	6-stretch-all-three-axes/stretch-x-plus-0.060-y-plus-0.060-z-minus-0.080	stretch-all-three-axes-independently		0.060	0.060	-0.080					complete
+6-stretch-all-three-axes.tar.gz	6-stretch-all-three-axes/stretch-x-plus-0.060-y-plus-0.060-z-plus-0.020	stretch-all-three-axes-independently		0.060	0.060	0.020					complete
+6-stretch-all-three-axes.tar.gz	6-stretch-all-three-axes/stretch-x-plus-0.060-y-plus-0.060-z-plus-0.040	stretch-all-three-axes-independently		0.060	0.060	0.040					complete
+6-stretch-all-three-axes.tar.gz	6-stretch-all-three-axes/stretch-x-plus-0.060-y-plus-0.060-z-plus-0.060	stretch-all-three-axes-independently		0.060	0.060	0.060					complete
+6-stretch-all-three-axes.tar.gz	6-stretch-all-three-axes/stretch-x-plus-0.060-y-plus-0.060-z-plus-0.080	stretch-all-three-axes-independently		0.060	0.060	0.080					complete
+6-stretch-all-three-axes.tar.gz	6-stretch-all-three-axes/stretch-x-plus-0.060-y-plus-0.080-z-minus-0.020	stretch-all-three-axes-independently		0.060	0.080	-0.020					complete
+6-stretch-all-three-axes.tar.gz	6-stretch-all-three-axes/stretch-x-plus-0.060-y-plus-0.080-z-minus-0.040	stretch-all-three-axes-independently		0.060	0.080	-0.040					complete
+6-stretch-all-three-axes.tar.gz	6-stretch-all-three-axes/stretch-x-plus-0.060-y-plus-0.080-z-minus-0.060	stretch-all-three-axes-independently		0.060	0.080	-0.060					complete
+6-stretch-all-three-axes.tar.gz	6-stretch-all-three-axes/stretch-x-plus-0.060-y-plus-0.080-z-minus-0.080	stretch-all-three-axes-independently		0.060	0.080	-0.080					complete
+6-stretch-all-three-axes.tar.gz	6-stretch-all-three-axes/stretch-x-plus-0.060-y-plus-0.080-z-plus-0.020	stretch-all-three-axes-independently		0.060	0.080	0.020					complete
+6-stretch-all-three-axes.tar.gz	6-stretch-all-three-axes/stretch-x-plus-0.060-y-plus-0.080-z-plus-0.040	stretch-all-three-axes-independently		0.060	0.080	0.040					complete
+6-stretch-all-three-axes.tar.gz	6-stretch-all-three-axes/stretch-x-plus-0.060-y-plus-0.080-z-plus-0.060	stretch-all-three-axes-independently		0.060	0.080	0.060					complete
+6-stretch-all-three-axes.tar.gz	6-stretch-all-three-axes/stretch-x-plus-0.060-y-plus-0.080-z-plus-0.080	stretch-all-three-axes-independently		0.060	0.080	0.080					complete
+6-stretch-all-three-axes.tar.gz	6-stretch-all-three-axes/stretch-x-plus-0.080-y-minus-0.020-z-minus-0.020	stretch-all-three-axes-independently		0.080	-0.020	-0.020					complete
+6-stretch-all-three-axes.tar.gz	6-stretch-all-three-axes/stretch-x-plus-0.080-y-minus-0.020-z-minus-0.040	stretch-all-three-axes-independently		0.080	-0.020	-0.040					complete
+6-stretch-all-three-axes.tar.gz	6-stretch-all-three-axes/stretch-x-plus-0.080-y-minus-0.020-z-minus-0.060	stretch-all-three-axes-independently		0.080	-0.020	-0.060					complete
+6-stretch-all-three-axes.tar.gz	6-stretch-all-three-axes/stretch-x-plus-0.080-y-minus-0.020-z-minus-0.080	stretch-all-three-axes-independently		0.080	-0.020	-0.080					complete
+6-stretch-all-three-axes.tar.gz	6-stretch-all-three-axes/stretch-x-plus-0.080-y-minus-0.020-z-plus-0.020	stretch-all-three-axes-independently		0.080	-0.020	0.020					complete
+6-stretch-all-three-axes.tar.gz	6-stretch-all-three-axes/stretch-x-plus-0.080-y-minus-0.020-z-plus-0.040	stretch-all-three-axes-independently		0.080	-0.020	0.040					complete
+6-stretch-all-three-axes.tar.gz	6-stretch-all-three-axes/stretch-x-plus-0.080-y-minus-0.020-z-plus-0.060	stretch-all-three-axes-independently		0.080	-0.020	0.060					complete
+6-stretch-all-three-axes.tar.gz	6-stretch-all-three-axes/stretch-x-plus-0.080-y-minus-0.020-z-plus-0.080	stretch-all-three-axes-independently		0.080	-0.020	0.080					complete
+6-stretch-all-three-axes.tar.gz	6-stretch-all-three-axes/stretch-x-plus-0.080-y-minus-0.040-z-minus-0.020	stretch-all-three-axes-independently		0.080	-0.040	-0.020					complete
+6-stretch-all-three-axes.tar.gz	6-stretch-all-three-axes/stretch-x-plus-0.080-y-minus-0.040-z-minus-0.040	stretch-all-three-axes-independently		0.080	-0.040	-0.040					complete
+6-stretch-all-three-axes.tar.gz	6-stretch-all-three-axes/stretch-x-plus-0.080-y-minus-0.040-z-minus-0.060	stretch-all-three-axes-independently		0.080	-0.040	-0.060					complete
+6-stretch-all-three-axes.tar.gz	6-stretch-all-three-axes/stretch-x-plus-0.080-y-minus-0.040-z-minus-0.080	stretch-all-three-axes-independently		0.080	-0.040	-0.080					complete
+6-stretch-all-three-axes.tar.gz	6-stretch-all-three-axes/stretch-x-plus-0.080-y-minus-0.040-z-plus-0.020	stretch-all-three-axes-independently		0.080	-0.040	0.020					complete
+6-stretch-all-three-axes.tar.gz	6-stretch-all-three-axes/stretch-x-plus-0.080-y-minus-0.040-z-plus-0.040	stretch-all-three-axes-independently		0.080	-0.040	0.040					complete
+6-stretch-all-three-axes.tar.gz	6-stretch-all-three-axes/stretch-x-plus-0.080-y-minus-0.040-z-plus-0.060	stretch-all-three-axes-independently		0.080	-0.040	0.060					complete
+6-stretch-all-three-axes.tar.gz	6-stretch-all-three-axes/stretch-x-plus-0.080-y-minus-0.040-z-plus-0.080	stretch-all-three-axes-independently		0.080	-0.040	0.080					complete
+6-stretch-all-three-axes.tar.gz	6-stretch-all-three-axes/stretch-x-plus-0.080-y-minus-0.060-z-minus-0.020	stretch-all-three-axes-independently		0.080	-0.060	-0.020					complete
+6-stretch-all-three-axes.tar.gz	6-stretch-all-three-axes/stretch-x-plus-0.080-y-minus-0.060-z-minus-0.040	stretch-all-three-axes-independently		0.080	-0.060	-0.040					complete
+6-stretch-all-three-axes.tar.gz	6-stretch-all-three-axes/stretch-x-plus-0.080-y-minus-0.060-z-minus-0.060	stretch-all-three-axes-independently		0.080	-0.060	-0.060					complete
+6-stretch-all-three-axes.tar.gz	6-stretch-all-three-axes/stretch-x-plus-0.080-y-minus-0.060-z-minus-0.080	stretch-all-three-axes-independently		0.080	-0.060	-0.080					complete
+6-stretch-all-three-axes.tar.gz	6-stretch-all-three-axes/stretch-x-plus-0.080-y-minus-0.060-z-plus-0.020	stretch-all-three-axes-independently		0.080	-0.060	0.020					complete
+6-stretch-all-three-axes.tar.gz	6-stretch-all-three-axes/stretch-x-plus-0.080-y-minus-0.060-z-plus-0.040	stretch-all-three-axes-independently		0.080	-0.060	0.040					complete
+6-stretch-all-three-axes.tar.gz	6-stretch-all-three-axes/stretch-x-plus-0.080-y-minus-0.060-z-plus-0.060	stretch-all-three-axes-independently		0.080	-0.060	0.060					complete
+6-stretch-all-three-axes.tar.gz	6-stretch-all-three-axes/stretch-x-plus-0.080-y-minus-0.060-z-plus-0.080	stretch-all-three-axes-independently		0.080	-0.060	0.080					complete
+6-stretch-all-three-axes.tar.gz	6-stretch-all-three-axes/stretch-x-plus-0.080-y-minus-0.080-z-minus-0.020	stretch-all-three-axes-independently		0.080	-0.080	-0.020					complete
+6-stretch-all-three-axes.tar.gz	6-stretch-all-three-axes/stretch-x-plus-0.080-y-minus-0.080-z-minus-0.040	stretch-all-three-axes-independently		0.080	-0.080	-0.040					complete
+6-stretch-all-three-axes.tar.gz	6-stretch-all-three-axes/stretch-x-plus-0.080-y-minus-0.080-z-minus-0.060	stretch-all-three-axes-independently		0.080	-0.080	-0.060					complete
+6-stretch-all-three-axes.tar.gz	6-stretch-all-three-axes/stretch-x-plus-0.080-y-minus-0.080-z-minus-0.080	stretch-all-three-axes-independently		0.080	-0.080	-0.080					complete
+6-stretch-all-three-axes.tar.gz	6-stretch-all-three-axes/stretch-x-plus-0.080-y-minus-0.080-z-plus-0.020	stretch-all-three-axes-independently		0.080	-0.080	0.020					complete
+6-stretch-all-three-axes.tar.gz	6-stretch-all-three-axes/stretch-x-plus-0.080-y-minus-0.080-z-plus-0.040	stretch-all-three-axes-independently		0.080	-0.080	0.040					complete
+6-stretch-all-three-axes.tar.gz	6-stretch-all-three-axes/stretch-x-plus-0.080-y-minus-0.080-z-plus-0.060	stretch-all-three-axes-independently		0.080	-0.080	0.060					complete
+6-stretch-all-three-axes.tar.gz	6-stretch-all-three-axes/stretch-x-plus-0.080-y-minus-0.080-z-plus-0.080	stretch-all-three-axes-independently		0.080	-0.080	0.080					complete
+6-stretch-all-three-axes.tar.gz	6-stretch-all-three-axes/stretch-x-plus-0.080-y-plus-0.020-z-minus-0.020	stretch-all-three-axes-independently		0.080	0.020	-0.020					complete
+6-stretch-all-three-axes.tar.gz	6-stretch-all-three-axes/stretch-x-plus-0.080-y-plus-0.020-z-minus-0.040	stretch-all-three-axes-independently		0.080	0.020	-0.040					complete
+6-stretch-all-three-axes.tar.gz	6-stretch-all-three-axes/stretch-x-plus-0.080-y-plus-0.020-z-minus-0.060	stretch-all-three-axes-independently		0.080	0.020	-0.060					complete
+6-stretch-all-three-axes.tar.gz	6-stretch-all-three-axes/stretch-x-plus-0.080-y-plus-0.020-z-minus-0.080	stretch-all-three-axes-independently		0.080	0.020	-0.080					complete
+6-stretch-all-three-axes.tar.gz	6-stretch-all-three-axes/stretch-x-plus-0.080-y-plus-0.020-z-plus-0.020	stretch-all-three-axes-independently		0.080	0.020	0.020					complete
+6-stretch-all-three-axes.tar.gz	6-stretch-all-three-axes/stretch-x-plus-0.080-y-plus-0.020-z-plus-0.040	stretch-all-three-axes-independently		0.080	0.020	0.040					complete
+6-stretch-all-three-axes.tar.gz	6-stretch-all-three-axes/stretch-x-plus-0.080-y-plus-0.020-z-plus-0.060	stretch-all-three-axes-independently		0.080	0.020	0.060					complete
+6-stretch-all-three-axes.tar.gz	6-stretch-all-three-axes/stretch-x-plus-0.080-y-plus-0.020-z-plus-0.080	stretch-all-three-axes-independently		0.080	0.020	0.080					complete
+6-stretch-all-three-axes.tar.gz	6-stretch-all-three-axes/stretch-x-plus-0.080-y-plus-0.040-z-minus-0.020	stretch-all-three-axes-independently		0.080	0.040	-0.020					complete
+6-stretch-all-three-axes.tar.gz	6-stretch-all-three-axes/stretch-x-plus-0.080-y-plus-0.040-z-minus-0.040	stretch-all-three-axes-independently		0.080	0.040	-0.040					complete
+6-stretch-all-three-axes.tar.gz	6-stretch-all-three-axes/stretch-x-plus-0.080-y-plus-0.040-z-minus-0.060	stretch-all-three-axes-independently		0.080	0.040	-0.060					complete
+6-stretch-all-three-axes.tar.gz	6-stretch-all-three-axes/stretch-x-plus-0.080-y-plus-0.040-z-minus-0.080	stretch-all-three-axes-independently		0.080	0.040	-0.080					complete
+6-stretch-all-three-axes.tar.gz	6-stretch-all-three-axes/stretch-x-plus-0.080-y-plus-0.040-z-plus-0.020	stretch-all-three-axes-independently		0.080	0.040	0.020					complete
+6-stretch-all-three-axes.tar.gz	6-stretch-all-three-axes/stretch-x-plus-0.080-y-plus-0.040-z-plus-0.040	stretch-all-three-axes-independently		0.080	0.040	0.040					complete
+6-stretch-all-three-axes.tar.gz	6-stretch-all-three-axes/stretch-x-plus-0.080-y-plus-0.040-z-plus-0.060	stretch-all-three-axes-independently		0.080	0.040	0.060					complete
+6-stretch-all-three-axes.tar.gz	6-stretch-all-three-axes/stretch-x-plus-0.080-y-plus-0.040-z-plus-0.080	stretch-all-three-axes-independently		0.080	0.040	0.080					complete
+6-stretch-all-three-axes.tar.gz	6-stretch-all-three-axes/stretch-x-plus-0.080-y-plus-0.060-z-minus-0.020	stretch-all-three-axes-independently		0.080	0.060	-0.020					complete
+6-stretch-all-three-axes.tar.gz	6-stretch-all-three-axes/stretch-x-plus-0.080-y-plus-0.060-z-minus-0.040	stretch-all-three-axes-independently		0.080	0.060	-0.040					complete
+6-stretch-all-three-axes.tar.gz	6-stretch-all-three-axes/stretch-x-plus-0.080-y-plus-0.060-z-minus-0.060	stretch-all-three-axes-independently		0.080	0.060	-0.060					complete
+6-stretch-all-three-axes.tar.gz	6-stretch-all-three-axes/stretch-x-plus-0.080-y-plus-0.060-z-minus-0.080	stretch-all-three-axes-independently		0.080	0.060	-0.080					complete
+6-stretch-all-three-axes.tar.gz	6-stretch-all-three-axes/stretch-x-plus-0.080-y-plus-0.060-z-plus-0.020	stretch-all-three-axes-independently		0.080	0.060	0.020					complete
+6-stretch-all-three-axes.tar.gz	6-stretch-all-three-axes/stretch-x-plus-0.080-y-plus-0.060-z-plus-0.040	stretch-all-three-axes-independently		0.080	0.060	0.040					complete
+6-stretch-all-three-axes.tar.gz	6-stretch-all-three-axes/stretch-x-plus-0.080-y-plus-0.060-z-plus-0.060	stretch-all-three-axes-independently		0.080	0.060	0.060					complete
+6-stretch-all-three-axes.tar.gz	6-stretch-all-three-axes/stretch-x-plus-0.080-y-plus-0.060-z-plus-0.080	stretch-all-three-axes-independently		0.080	0.060	0.080					complete
+6-stretch-all-three-axes.tar.gz	6-stretch-all-three-axes/stretch-x-plus-0.080-y-plus-0.080-z-minus-0.020	stretch-all-three-axes-independently		0.080	0.080	-0.020					complete
+6-stretch-all-three-axes.tar.gz	6-stretch-all-three-axes/stretch-x-plus-0.080-y-plus-0.080-z-minus-0.040	stretch-all-three-axes-independently		0.080	0.080	-0.040					complete
+6-stretch-all-three-axes.tar.gz	6-stretch-all-three-axes/stretch-x-plus-0.080-y-plus-0.080-z-minus-0.060	stretch-all-three-axes-independently		0.080	0.080	-0.060					complete
+6-stretch-all-three-axes.tar.gz	6-stretch-all-three-axes/stretch-x-plus-0.080-y-plus-0.080-z-minus-0.080	stretch-all-three-axes-independently		0.080	0.080	-0.080					complete
+6-stretch-all-three-axes.tar.gz	6-stretch-all-three-axes/stretch-x-plus-0.080-y-plus-0.080-z-plus-0.020	stretch-all-three-axes-independently		0.080	0.080	0.020					complete
+6-stretch-all-three-axes.tar.gz	6-stretch-all-three-axes/stretch-x-plus-0.080-y-plus-0.080-z-plus-0.040	stretch-all-three-axes-independently		0.080	0.080	0.040					complete
+6-stretch-all-three-axes.tar.gz	6-stretch-all-three-axes/stretch-x-plus-0.080-y-plus-0.080-z-plus-0.060	stretch-all-three-axes-independently		0.080	0.080	0.060					complete
+6-stretch-all-three-axes.tar.gz	6-stretch-all-three-axes/stretch-x-plus-0.080-y-plus-0.080-z-plus-0.080	stretch-all-three-axes-independently		0.080	0.080	0.080					complete

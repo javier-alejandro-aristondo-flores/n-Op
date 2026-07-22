@@ -1,0 +1,203 @@
+# Diamond defect corpus — one row per VASP run. 199 rows.
+# spin_sum_rule: ok | FAIL-fractional (non-integer magnetisation) | FAIL-parity (odd electron count, even magnetisation)
+# Generated 2026-07-21 from the recovered archives; see 04-data-health-gaps-and-caveats.md
+run_directory	archive	level	aexx	hfscreen	encut	sigma	nsw	ionic_steps	reached_accuracy	clean_exit	defect_order	n_substituted	species	nelect	magnetization	spin_sum_rule	gap_eV	frac_occ_states	E_final_eV	elapsed_s	cores
+Pure/Converged_for_doping_analyze/GGA-PBE	Pure	GGA-PBE	0.0000		460	0.1	40	1	yes	yes	pure	0	C	255.9999605	-2.2e-06	ok	4.111	0	-581.97197666	32.86	112
+Pure/Converged_for_doping_analyze/HSE06	Pure	HSE06	0.2500	0.2	460	0.1	0	1	no	yes	pure	0	C	255.9999611		ok	5.2789	0	-674.68094989	3306.467	112
+Pure/converged_without_stress	Pure	GGA-PBE	0.0000		460	0.1	80	1	yes	yes	pure	0	C	255.9999626		ok	4.119	0	-581.97264979	35.302	96
+pair_defects/B-Li/C8-C1-were_replaced/GGA-PBE	pair_defects	GGA-PBE	0.0000		500	0.0001	100	74	yes	yes	pair	2	B Li C	251.9999771	0.25	FAIL-fractional	0.1355	0	-563.95818143	646.479	112
+pair_defects/B-Li/C8-C1-were_replaced/HSE06	pair_defects	HSE06	0.2500	0.2	500	0.0001	0	1	no	yes	pair	2	B Li C	251.9999774	0.0015116	ok	0.4538	0	-653.84836823	5372.95	112
+pair_defects/B-Li/C8-C53-were_replaced/GGA-PBE	pair_defects	GGA-PBE	0.0000		500	0.0001	40	3	yes	yes	pair	2	B Li C	251.9999688	1.9999995	ok	0.253	0	-564.82476062	28.855	112
+pair_defects/B-Li/C8-C53-were_replaced/HSE06	pair_defects	HSE06	0.2500	0.2	500	0.0001	0	1	no	yes	pair	2	B Li C	251.9999693	1.9999996	ok	1.4452	0	-655.13839691	3293.133	112
+pair_defects/B-P/C8-C1-were_replaced/GGA-PBE	pair_defects	GGA-PBE	0.0000		500	0.1	40	14	yes	yes	pair	2	B P C	255.999974		ok	3.3583	0	-572.05188592	154.673	112
+pair_defects/B-P/C8-C1-were_replaced/HSE06	pair_defects	HSE06	0.2500	0.2	500	0.1	0	1	no	yes	pair	2	B P C	255.9999744		ok	4.5163	0	-664.14118056	3492.489	112
+pair_defects/B-P/C8-C53-were_replaced/GGA-PBE	pair_defects	GGA-PBE	0.0000		500	0.1	40	18	yes	yes	pair	2	B P C	255.9999732		ok	3.6445	0	-572.20878642	179.47	112
+pair_defects/B-P/C8-C53-were_replaced/HSE06	pair_defects	HSE06	0.2500	0.2	500	0.1	0	1	no	yes	pair	2	B P C	255.9999736		ok	4.7898	0	-664.26179391	3391.305	112
+pair_defects/B-S/C8-C1-were_replaced/GGA-PBE	pair_defects	GGA-PBE	0.0000		500	0.0001	40	17	yes	yes	pair	2	B S C	256.999974	0.25	FAIL-fractional	0.0874	0	-566.20534595	128.714	112
+pair_defects/B-S/C8-C1-were_replaced/HSE06	pair_defects	HSE06	0.2500	0.2	500	0.0001	0	1	no	yes	pair	2	B S C	256.9999744	0.25	FAIL-fractional	0.2573	0	-657.72970784	3499.537	112
+pair_defects/B-S/C8-C53-were_replaced/GGA-PBE	pair_defects	GGA-PBE	0.0000		500	0.0001	40	15	yes	yes	pair	2	B S C	256.9999725		FAIL-parity	0.0563	0	-567.24283896	108.575	112
+pair_defects/B-S/C8-C53-were_replaced/HSE06	pair_defects	HSE06	0.2500	0.2	500	0.0001	0	1	no	yes	pair	2	B S C	256.999973		FAIL-parity	0.1166	0	-658.77723306	3415.531	112
+pair_defects/B-Se/C8-C1-were_replaced/GGA-PBE	pair_defects	GGA-PBE	0.0000		500	0.0001	40	13	yes	yes	pair	2	B Se C	256.9999848	-0.25	FAIL-fractional	0.0829	0	-562.01157917	94.353	112
+pair_defects/B-Se/C8-C1-were_replaced/HSE06	pair_defects	HSE06	0.2500	0.2	500	0.0001	0	1	no	yes	pair	2	B Se C	256.9999851	-0.25	FAIL-fractional	0.1589	0	-653.50441082	3848.275	112
+pair_defects/B-Se/C8-C53-were_replaced/GGA-PBE	pair_defects	GGA-PBE	0.0000		500	0.0001	40	32	yes	yes	pair	2	B Se C	256.9999808		FAIL-parity	0.1411	0	-563.00023827	314.497	112
+pair_defects/B-Se/C8-C53-were_replaced/HSE06	pair_defects	HSE06	0.2500	0.2	500	0.0001	0	1	no	yes	pair	2	B Se C	256.9999811		FAIL-parity	0.218	0	-654.49773072	3939.372	112
+pair_defects/N-H/C8-C1-were_replaced/GGA-PBE	pair_defects	GGA-PBE	0.0000		500	0.0001	100	15	yes	yes	pair	2	N H C	253.9999684	1.9999997	ok	0.7401	0	-567.76085646	93.073	112
+pair_defects/N-H/C8-C1-were_replaced/HSE06	pair_defects	HSE06	0.2500	0.2	500	0.0001	0	1	no	yes	pair	2	N H C	253.9999689	1.9999998	ok	2.1137	0	-659.65035786	3276.734	112
+pair_defects/N-H/C8-C53-were_replaced/GGA-PBE	pair_defects	GGA-PBE	0.0000		500	0.1	40	27	yes	yes	pair	2	N H C	253.9999683	1.9999995	ok	0.6695	0	-569.78066431	221.222	112
+pair_defects/N-H/C8-C53-were_replaced/HSE06	pair_defects	HSE06	0.2500	0.2	500	0.1	0	1	no	yes	pair	2	N H C	253.9999688	2.0000003	ok	2.0245	0	-661.80237285	3283.433	112
+pair_defects/N-Li/C8-C1-were_replaced/GGA-PBE	pair_defects	GGA-PBE	0.0000		500	0.0001	40	23	yes	yes	pair	2	N Li C	253.9999698	2.0000001	ok	0.0553	0	-563.7226381	237.204	112
+pair_defects/N-Li/C8-C1-were_replaced/HSE06	pair_defects	HSE06	0.2500	0.2	500	0.0001	0	1	no	yes	pair	2	N Li C	253.9999703	2.0000001	ok	0.1181	0	-654.78553848	4524.792	112
+pair_defects/N-Li/C8-C53-were_replaced/GGA-PBE	pair_defects	GGA-PBE	0.0000		500	0.1	40	21	yes	yes	pair	2	N Li C	253.9999717	1.9982531	ok	0.4017	0	-566.95770249	189.258	112
+pair_defects/N-Li/C8-C53-were_replaced/HSE06	pair_defects	HSE06	0.2500	0.2	500	0.1	0	1	no	yes	pair	2	N Li C	253.9999721	1.9999894	ok	1.5066	0	-658.51155948	3362.905	112
+pair_defects/N-S/C8-C1-were_replaced/GGA-PBE	pair_defects	GGA-PBE	0.0000		500	0.0001	40	9	yes	yes	pair	2	N S C	258.9999736	0.25	FAIL-fractional	0.0552	0	-561.3162346	81.716	112
+pair_defects/N-S/C8-C1-were_replaced/HSE06	pair_defects	HSE06	0.2500	0.2	500	0.0001	0	1	no	yes	pair	2	N S C	258.9999741	0.25	FAIL-fractional	0.0759	0	-652.91703678	3442.907	112
+pair_defects/N-S/C8-C53-were_replaced/GGA-PBE	pair_defects	GGA-PBE	0.0000		500	0.0001	40	4	yes	yes	pair	2	N S C	258.9999788	0.0001599	FAIL-parity	0.0445	0	-564.35258221	90.852	112
+pair_defects/N-S/C8-C53-were_replaced/HSE06	pair_defects	HSE06	0.2500	0.2	500	0.0001	0	1	no	yes	pair	2	N S C	258.9999791		FAIL-parity	0.1871	0	-656.93127141	3423.233	112
+pair_defects/N-Si/C8-C1-were_replaced/GGA-PBE	pair_defects	GGA-PBE	0.0000		500	0.1	40	14	yes	yes	pair	2	N Si C	256.9999771		FAIL-parity	0.3339	0	-568.90952819	157.458	112
+pair_defects/N-Si/C8-C1-were_replaced/HSE06	pair_defects	HSE06	0.2500	0.2	500	0.1	0	1	no	yes	pair	2	N Si C	256.9999774		FAIL-parity	0.503	0	-661.27517282	3398.166	112
+pair_defects/N-Si/C8-C53-were_replaced/GGA-PBE	pair_defects	GGA-PBE	0.0000		500	0.1	40	18	yes	yes	pair	2	N Si C	256.9999737		FAIL-parity	0.3421	0	-570.06056342	181.722	112
+pair_defects/N-Si/C8-C53-were_replaced/HSE06	pair_defects	HSE06	0.2500	0.2	500	0.1	0	1	no	yes	pair	2	N Si C	256.9999741		FAIL-parity	0.4891	0	-662.52011337	3408.402	112
+single_defect/IA-element-single-impurity/H/gga-pbe	single_defect	GGA-PBE	0.0000		500	0.1	40	13	yes	yes	single	1	H C	252.9999638	2.9999231	ok	0.5253	0	-569.79455356	135.781	112
+single_defect/IA-element-single-impurity/H/hse06	single_defect	HSE06	0.2500	0.2	500	0.1	0	1	no	yes	single	1	H C	252.9999643	2.9999991	ok	1.9244	0	-661.27495738	3267.105	112
+single_defect/IA-element-single-impurity/Li/gga-pbe	single_defect	GGA-PBE	0.0000		500	0.01	40	7	yes	yes	single	1	Li C	252.9999698	3.0000007	ok	0.132	0	-566.47111244	55.572	112
+single_defect/IA-element-single-impurity/Li/hse06	single_defect	HSE06	0.2500	0.2	500	0.01	0	1	no	yes	single	1	Li C	252.9999703	3.0000008	ok	1.0584	0	-657.38044434	3383.716	112
+single_defect/IA-element-single-impurity/Na/gga-pbe	single_defect	GGA-PBE	0.0000		500	0.1	40	17	yes	yes	single	1	Na C	252.9999758	2.9999418	ok	0.5378	0	-561.09549842	593.291	112
+single_defect/IA-element-single-impurity/Na/hse06	single_defect	HSE06	0.2500	0.2	500	0.1	0	1	no	yes	single	1	Na C	252.9999762	2.9999999	ok	1.3959	0	-652.07263832	3293.6	112
+single_defect/IIA-element-single-impurity/Be/gga-pbe	single_defect	GGA-PBE	0.0000		500	0.001	40	9	yes	yes	single	1	Be C	253.999964		ok	0.0359	0	-571.64876395	89.12	112
+single_defect/IIA-element-single-impurity/Be/hse06	single_defect	HSE06	0.2500	0.2	500	0.001	0	1	no	yes	single	1	Be C	253.9999646		ok	0.0312	0	-661.93926021	3317.885	112
+single_defect/IIA-element-single-impurity/Mg/gga-pbe	single_defect	GGA-PBE	0.0000		500	0.001	40	19	yes	yes	single	1	Mg C	253.9999725	1.9999994	ok	0.0175	0	-563.3333179	436.948	112
+single_defect/IIA-element-single-impurity/Mg/hse06	single_defect	HSE06	0.2500	0.2	500	0.001	0	1	no	yes	single	1	Mg C	253.999973	1.9999993	ok	0.1362	0	-654.08038188	3674.84	112
+single_defect/IIIA-element-single-imputiry/B/GGA-PBE	single_defect	GGA-PBE	0.0000		500	0.0001	40	13	yes	yes	single	1	B C	254.9999645		FAIL-parity	0.0394	0	-578.46908792	379.599	112
+single_defect/IIIA-element-single-imputiry/B/hse06	single_defect	HSE06	0.2500	0.2	500	0.0001	0	1	no	yes	single	1	B C	254.9999651		FAIL-parity	0.1372	0	-669.97442883	3269.54	112
+single_defect/IVA-element-single-impurity/Si/GGA-PBE	single_defect	GGA-PBE	0.0000		500	0.1	40	14	yes	yes	single	1	H C	255.9999726		ok	3.8464	0	-573.93088179	164.616	112
+single_defect/IVA-element-single-impurity/Si/HSE06	single_defect	HSE06	0.2500	0.2	500	0.1	0	1	no	yes	single	1	H C	255.9999731		ok	5.0096	0	-666.37809101	3400.91	112
+single_defect/VA-element-single-impurity/As/GGA-PBE	single_defect	GGA-PBE	0.0000		500	0.0001	40	1	yes	yes	single	1	As C	256.9999826	1.8e-05	FAIL-parity	0.2128	6	-567.40876906	16.564	112
+single_defect/VA-element-single-impurity/As/HSE06	single_defect	HSE06	0.2500	0.2	500	0.0001	0	1	no	yes	single	1	As C	256.9999828	0.2485022	FAIL-fractional	0.099	0	-659.66311698	3956.623	112
+single_defect/VA-element-single-impurity/N/GGA-PBE	single_defect	GGA-PBE	0.0000		500	0.01	40	3	yes	yes	single	1	N C	256.9999641		FAIL-parity	0.2742	0	-576.81391395	27.341	112
+single_defect/VA-element-single-impurity/N/HSE06	single_defect	HSE06	0.2500	0.2	500	0.01	0	1	no	yes	single	1	N C	256.9999647		FAIL-parity	0.4368	0	-669.41718756	3450.16	112
+single_defect/VA-element-single-impurity/P/GGA-PBE	single_defect	GGA-PBE	0.0000		500	0.001	40	12	yes	yes	single	1	P C	256.9999698	0.25	FAIL-fractional	0.0466	0	-571.91044349	106.754	112
+single_defect/VA-element-single-impurity/P/HSE06	single_defect	HSE06	0.2500	0.2	500	0.001	0	1	no	yes	single	1	P C	256.9999703	0.25	FAIL-fractional	0.1678	0	-664.14279408	3386.088	112
+single_defect/VA-element-single-impurity/Sb/GGA-PBE	single_defect	GGA-PBE	0.0000		500	0.0001	40	3	yes	yes	single	1	Sb C	256.9999826	0.2500001	FAIL-fractional	0.0049	0	-560.54165425	35.172	112
+single_defect/VA-element-single-impurity/Sb/HSE06	single_defect	HSE06	0.2500	0.2	500	0.0001	0	1	no	yes	single	1	Sb C	256.9999829	0.25	FAIL-fractional	0.1011	0	-652.89900881	3650.196	112
+single_defect/VIA-element-single-impurity/O/GGA-PBE	single_defect	GGA-PBE	0.0000		500	0.1	40	13	yes	yes	single	1	O C	257.9999659		ok	1.1551	0	-572.29222803	145.667	112
+single_defect/VIA-element-single-impurity/O/HSE06	single_defect	HSE06	0.2500	0.2	500	0.1	0	1	no	yes	single	1	O C	257.9999664		ok	1.8016	0	-664.6394796	3385.148	112
+single_defect/VIA-element-single-impurity/S/GGA-PBE	single_defect	GGA-PBE	0.0000		500	0.0001	40	5	yes	yes	single	1	S C	257.9999693	0.25	FAIL-fractional	0.0065	0	-566.27734223	43.835	112
+single_defect/VIA-element-single-impurity/S/HSE06	single_defect	HSE06	0.2500	0.2	500	0.0001	0	1	no	yes	single	1	S C	257.9999698	0.25	FAIL-fractional	0.0437	0	-657.94952074	3412.572	112
+single_defect/VIA-element-single-impurity/Se/GGA-PBE	single_defect	GGA-PBE	0.0000		500	0.0001	40	5	yes	yes	single	1	Se C	257.9999781	0.25	FAIL-fractional	0.0	2	-562.05014019	58.958	112
+single_defect/VIA-element-single-impurity/Se/HSE06	single_defect	HSE06	0.2500	0.2	500	0.0001	0	1	no	yes	single	1	Se C	257.9999785	0.25	FAIL-fractional	0.0941	0	-653.67270052	3923.64	112
+single_defect/VIA-element-single-impurity/Te/GGA-PBE	single_defect	GGA-PBE	0.0000		500	0.001	40	22	yes	yes	single	1	Te C	257.9999856	-0.5	FAIL-fractional	0.0341	0	-556.04820166	196.453	112
+single_defect/VIA-element-single-impurity/Te/HSE06	single_defect	HSE06	0.2500	0.2	500	0.001	0	1	no	yes	single	1	Te C	257.9999858	-0.5	FAIL-fractional	0.2009	0	-647.65534653	3878.69	112
+single_defect/VIIA-element-single-impurity/Br/GGA-PBE	single_defect	GGA-PBE	0.0000		500	0.01	40	40	no	yes	single	1	Br C	258.9999822	-0.9999999	ok	0.1512	0	-556.32860366	646.093	112
+single_defect/VIIA-element-single-impurity/Br/HSE06	single_defect	HSE06	0.2500	0.2	500	0.01	0	1	no	yes	single	1	Br C	258.9999825	-0.9999999	ok	1.0308	0	-647.71010621	3814.928	112
+single_defect/VIIA-element-single-impurity/Cl/GGA-PBE	single_defect	GGA-PBE	0.0000		500	0.0001	100	7	yes	yes	single	1	Cl C	258.9999789	-0.25	FAIL-fractional	0.0042	0	-559.88891304	52.762	112
+single_defect/VIIA-element-single-impurity/Cl/HSE06	single_defect	HSE06	0.2500	0.2	500	0.0001	0	1	no	yes	single	1	Cl C	258.9999793	-0.9988513	ok	0.764	0	-651.38812217	4154.675	112
+single_defect/VIIA-element-single-impurity/F/GGA-PBE	single_defect	GGA-PBE	0.0000		500	0.0001	40	40	no	yes	single	1	F C	258.9999767	1.0000003	ok	0.6028	0	-567.25759441	486.499	112
+single_defect/VIIA-element-single-impurity/F/HSE06	single_defect	HSE06	0.2500	0.2	500	0.0001	0	1	no	yes	single	1	F C	258.9999771	1.0000004	ok	2.2289	0	-659.80377425	3572.991	112
+single_defect/VIIA-element-single-impurity/I/GGA-PBE	single_defect	GGA-PBE	0.0000		500	0.0001	40	3	yes	yes	single	1	I C	258.9999835	0.4999999	FAIL-fractional	0.0201	3	-550.70661735	26.382	112
+single_defect/VIIA-element-single-impurity/I/HSE06	single_defect	HSE06	0.2500	0.2	500	0.0001	0	1	no	yes	single	1	I C	258.9999838	0.4999999	FAIL-fractional	0.0492	0	-641.47740824	3827.981	112
+single_defects_new-only-GGA-PBE/IA-impurity/Cs/GGA-PBE	single_defects_new-only-GGA-PBE	GGA-PBE	0.0000		500	0.001	40	15	yes	yes	single	1	Cs C	260.9999931		FAIL-parity	0.3966	0	-545.71810178	229.191	112
+single_defects_new-only-GGA-PBE/IA-impurity/Fr/GGA-PBE	single_defects_new-only-GGA-PBE	GGA-PBE	0.0000		500	0.001	40	40	no	yes	single	1	Fr C	260.9999964		FAIL-parity	0.0619	0	-510.38074042	667.826	112
+single_defects_new-only-GGA-PBE/IA-impurity/K/GGA-PBE	single_defects_new-only-GGA-PBE	GGA-PBE	0.0000		500	0.001	40	14	yes	yes	single	1	K C	258.9999837		FAIL-parity	0.2409	0	-553.11450563	193.312	112
+single_defects_new-only-GGA-PBE/IA-impurity/Rb/GGA-PBE	single_defects_new-only-GGA-PBE	GGA-PBE	0.0000		500	0.001	40	14	yes	yes	single	1	Rb C	258.9999926		FAIL-parity	0.3511	0	-549.23520914	194.78	112
+single_defects_new-only-GGA-PBE/IIA-impurity/Ba/GGA-PBE	single_defects_new-only-GGA-PBE	GGA-PBE	0.0000		500	0.0001	40	5	yes	yes	single	1	Ba C	261.9999907	2.0000002	ok	0.0035	0	-549.16011363	42.068	112
+single_defects_new-only-GGA-PBE/IIA-impurity/Ca/GGA-PBE	single_defects_new-only-GGA-PBE	GGA-PBE	0.0000		500	0.001	40	15	yes	yes	single	1	Ca C	259.9999839	-1.9999999	ok	0.0111	0	-558.92059346	303.116	112
+single_defects_new-only-GGA-PBE/IIA-impurity/Ra/GGA-PBE	single_defects_new-only-GGA-PBE	GGA-PBE	0.0000		500	0.001	40	40	no	yes	single	1	Ra C	261.9999949	0.2500001	FAIL-fractional	0.0694	0	-516.23792819	638.94	112
+single_defects_new-only-GGA-PBE/IIA-impurity/Sr/GGA-PBE	single_defects_new-only-GGA-PBE	GGA-PBE	0.0000		500	0.001	40	40	no	yes	single	1	Sr C	261.9999868	-1.9999999	ok	0.0387	0	-554.3387737	512.95	112
+single_defects_new-only-GGA-PBE/III-A/Al/GGA-PBE	single_defects_new-only-GGA-PBE	GGA-PBE	0.0000		500	0.001	40	19	yes	yes	single	1	Al C	254.9999792	0.25	FAIL-fractional	0.0253	0	-568.9105413	269.921	112
+single_defects_new-only-GGA-PBE/III-A/Ga/GGA-PBE	single_defects_new-only-GGA-PBE	GGA-PBE	0.0000		500	0.001	40	17	yes	yes	single	1	Ga C	264.9999818		FAIL-parity	0.0214	0	-567.21865214	246.916	112
+single_defects_new-only-GGA-PBE/III-A/In/GGA-PBE	single_defects_new-only-GGA-PBE	GGA-PBE	0.0000		500	0.001	40	17	yes	yes	single	1	In C	264.9999879		FAIL-parity	0.0435	0	-560.33897304	237.436	112
+single_defects_new-only-GGA-PBE/III-A/Tl/GGA-PBE	single_defects_new-only-GGA-PBE	GGA-PBE	0.0000		500	0.001	40	18	yes	yes	single	1	Tl C	264.9999881		FAIL-parity	0.0456	0	-557.03571243	300.637	112
+single_defects_new-only-GGA-PBE/IV-A/Ge/GGA-PBE	single_defects_new-only-GGA-PBE	GGA-PBE	0.0000		500	0.001	40	17	yes	yes	single	1	Ge C	265.9999852		ok	3.8276	0	-570.42345073	262.552	112
+single_defects_new-only-GGA-PBE/IV-A/Pb/GGA-PBE	single_defects_new-only-GGA-PBE	GGA-PBE	0.0000		500	0.001	40	18	yes	yes	single	1	Pb C	265.9999881		ok	3.2649	0	-558.91693168	270.717	112
+single_defects_new-only-GGA-PBE/IV-A/Sn/GGA-PBE	single_defects_new-only-GGA-PBE	GGA-PBE	0.0000		500	0.001	40	17	yes	yes	single	1	Sn C	265.9999925		ok	3.4608	0	-562.96758449	254.554	112
+single_defects_new-only-GGA-PBE/Transition-Metals/Ag/GGA-PBE	single_defects_new-only-GGA-PBE	GGA-PBE	0.0000		500	0.001	40	16	yes	yes	single	1	Ag C	268.9999837	-1.4999997	FAIL-fractional	0.1439	0	-560.91790494	194.503	112
+single_defects_new-only-GGA-PBE/Transition-Metals/Cd/GGA-PBE	single_defects_new-only-GGA-PBE	GGA-PBE	0.0000		500	0.001	40	21	yes	yes	single	1	Cd C	263.999983	2.0000004	ok	0.045	0	-557.84456143	279.495	112
+single_defects_new-only-GGA-PBE/Transition-Metals/Co/GGA-PBE	single_defects_new-only-GGA-PBE	GGA-PBE	0.0000		500	0.001	40	14	yes	yes	single	1	Co C	266.9999657	0.25	FAIL-fractional	0.0364	0	-572.9414414	181.513	112
+single_defects_new-only-GGA-PBE/Transition-Metals/Cr/GGA-PBE	single_defects_new-only-GGA-PBE	GGA-PBE	0.0000		500	0.001	40	15	yes	yes	single	1	Cr C	263.9999853	2.0000054	ok	1.774	0	-574.49853492	216.231	112
+single_defects_new-only-GGA-PBE/Transition-Metals/Cu/GGA-PBE	single_defects_new-only-GGA-PBE	GGA-PBE	0.0000		500	0.001	40	13	yes	yes	single	1	Cu C	269.000021	1.5	FAIL-fractional	0.0455	0	-567.22098505	192.779	112
+single_defects_new-only-GGA-PBE/Transition-Metals/Fe/GGA-PBE	single_defects_new-only-GGA-PBE	GGA-PBE	0.0000		500	0.001	40	14	yes	yes	single	1	Fe C	265.9999563		ok	2.1153	0	-574.87712563	181.6	112
+single_defects_new-only-GGA-PBE/Transition-Metals/Mn/sigma-0.0001	single_defects_new-only-GGA-PBE	GGA-PBE	0.0000		500	0.0001	40	3	yes	yes	single	1	Mn C	264.9999628	0.999996	ok	0.0026	0	-574.57876088	33.224	112
+single_defects_new-only-GGA-PBE/Transition-Metals/Mo/GGA-PBE	single_defects_new-only-GGA-PBE	GGA-PBE	0.0000		500	0.001	40	15	yes	yes	single	1	Mo C	263.9999785	1.9999991	ok	1.0844	0	-571.31962242	359.95	112
+single_defects_new-only-GGA-PBE/Transition-Metals/Nb/GGA-PBE	single_defects_new-only-GGA-PBE	GGA-PBE	0.0000		500	0.0001	40	3	yes	yes	single	1	Nb C	262.9999845	-0.9999998	ok	0.0025	0	-568.96319999	33.242	112
+single_defects_new-only-GGA-PBE/Transition-Metals/Ni/GGA-PBE	single_defects_new-only-GGA-PBE	GGA-PBE	0.0000		500	0.001	40	19	yes	yes	single	1	Ni C	267.999943	0.5000001	FAIL-fractional	0.0383	0	-570.51630197	244.194	112
+single_defects_new-only-GGA-PBE/Transition-Metals/Pd/GGA-PBE	single_defects_new-only-GGA-PBE	GGA-PBE	0.0000		500	0.001	40	23	yes	yes	single	1	Pd C	267.9999678	0.4999999	FAIL-fractional	0.0196	0	-566.08429516	249.898	112
+single_defects_new-only-GGA-PBE/Transition-Metals/Rh/GGA-PBE	single_defects_new-only-GGA-PBE	GGA-PBE	0.0000		500	0.001	40	15	yes	yes	single	1	Rh C	266.9999821	-0.4999999	FAIL-fractional	0.0281	0	-569.92958162	212.709	112
+single_defects_new-only-GGA-PBE/Transition-Metals/Ru/GGA-PBE	single_defects_new-only-GGA-PBE	GGA-PBE	0.0000		500	0.001	40	15	yes	yes	single	1	Ru C	265.9999876		ok	2.933	0	-572.70733018	286.543	112
+single_defects_new-only-GGA-PBE/Transition-Metals/Sc/GGA-PBE	single_defects_new-only-GGA-PBE	GGA-PBE	0.0000		500	0.001	40	15	yes	yes	single	1	Sc C	262.9999847	-1.0	ok	0.0288	0	-566.84466332	269.109	112
+single_defects_new-only-GGA-PBE/Transition-Metals/Tc/GGA-PBE	single_defects_new-only-GGA-PBE	GGA-PBE	0.0000		500	0.0001	40	3	yes	yes	single	1	Tc C	264.9999844	1.0000016	ok	0.0066	0	-572.10036279	26.455	112
+single_defects_new-only-GGA-PBE/Transition-Metals/Ti/GGA-PBE	single_defects_new-only-GGA-PBE	GGA-PBE	0.0000		500	0.001	40	15	yes	yes	single	1	Ti C	261.9999762		ok	2.5724	0	-571.32501892	456.243	112
+single_defects_new-only-GGA-PBE/Transition-Metals/V/GGA-PBE	single_defects_new-only-GGA-PBE	GGA-PBE	0.0000		500	0.0001	40	3	yes	yes	single	1	V C	262.9999781	-1.0000011	ok	0.0012	0	-572.76590338	35.233	112
+single_defects_new-only-GGA-PBE/Transition-Metals/Y/GGA-PBE	single_defects_new-only-GGA-PBE	GGA-PBE	0.0000		500	0.001	40	19	yes	yes	single	1	Y C	262.9999857	0.9999999	ok	0.0276	0	-562.72877623	268.407	112
+single_defects_new-only-GGA-PBE/Transition-Metals/Zn/GGA-PBE	single_defects_new-only-GGA-PBE	GGA-PBE	0.0000		500	0.0001	40	4	yes	yes	single	1	Zn C	263.999967	1.2500001	FAIL-fractional	0.0012	0	-564.12339738	41.179	112
+single_defects_new-only-GGA-PBE/Transition-Metals/Zr/GGA-PBE	single_defects_new-only-GGA-PBE	GGA-PBE	0.0000		500	0.001	40	17	yes	yes	single	1	Zr C	263.9999898		ok	2.6107	0	-567.66827904	463.221	112
+single_defects_new-only-GGA-PBE/VA/Bi/GGA-PBE	single_defects_new-only-GGA-PBE	GGA-PBE	0.0000		500	0.001	40	19	yes	yes	single	1	Bi C	266.9999939		FAIL-parity	0.1078	0	-556.58086828	284.779	112
+single_defects_new-only-GGA-PBE/VIA/Po/GGA-PBE	single_defects_new-only-GGA-PBE	GGA-PBE	0.0000		500	0.001	40	18	yes	yes	single	1	Po C	267.9999881		ok	0.1068	0	-553.19107686	303.314	112
+single_defects_new-only-GGA-PBE/VIIA/At/GGA-PBE	single_defects_new-only-GGA-PBE	GGA-PBE	0.0000		500	0.001	40	40	no	yes	single	1	At C	258.9999844		FAIL-parity	0.0556	0	-548.58428117	407.839	112
+single_defects_new-only-HSE06/IA-impurity/Cs/hse06	single_defects_new-only-HSE06	HSE06	0.2500	0.2	500	0.001	40	15	yes	yes	single	1	Cs C	260.9999917	-2e-07	FAIL-parity	0.1629	0	-636.39330483	45330.786	112
+single_defects_new-only-HSE06/IA-impurity/Fr/hse06	single_defects_new-only-HSE06	HSE06	0.2500	0.2	500	0.001	40	40	no	yes	single	1	Fr C	260.9999917	-0.9999999	ok	0.0253	0	-611.01567882	196520.077	112
+single_defects_new-only-HSE06/IA-impurity/K/hse06	single_defects_new-only-HSE06	HSE06	0.2500	0.2	500	0.001	40	13	yes	yes	single	1	K C	258.9999852		FAIL-parity	0.3502	0	-643.76206351	31375.257	112
+single_defects_new-only-HSE06/IA-impurity/Rb/hse06	single_defects_new-only-HSE06	HSE06	0.2500	0.2	500	0.001	40	22	yes	yes	single	1	Rb C	258.999991	-1.0000005	ok	0.4517	0	-639.9465071	53912.223	112
+single_defects_new-only-HSE06/IIA-impurity/Ba/hse06	single_defects_new-only-HSE06	HSE06	0.2500	0.2	500	0.0001	40	7	yes	yes	single	1	Ba C	261.9999912	2.0000003	ok	0.0663	0	-639.58679225	17217.881	112
+single_defects_new-only-HSE06/IIA-impurity/Ca/hse06	single_defects_new-only-HSE06	HSE06	0.2500	0.2	500	0.001	40	40	no	yes	single	1	Ca C	259.9999845	-2.0	ok	0.4908	0	-649.4632528	160347.655	112
+single_defects_new-only-HSE06/IIA-impurity/Ra/hse06	single_defects_new-only-HSE06	HSE06	0.2500	0.2	500	0.001	40	40	no	yes	single	1	Ra C	262.0000037	2e-07	ok	0.5996	0	-611.76295048	528909.516	112
+single_defects_new-only-HSE06/IIA-impurity/Sr/hse06	single_defects_new-only-HSE06	HSE06	0.2500	0.2	500	0.001	40	40	no	yes	single	1	Sr C	261.9999864	-2.0000001	ok	0.4868	0	-644.93722629	114401.067	112
+single_defects_new-only-HSE06/III-A/Al/hse06	single_defects_new-only-HSE06	HSE06	0.2500	0.2	500	0.001	40	5	yes	yes	single	1	Al C	254.9999798	0.2500001	FAIL-fractional	0.1352	0	-660.24436543	9605.263	112
+single_defects_new-only-HSE06/III-A/Ga/hse06	single_defects_new-only-HSE06	HSE06	0.2500	0.2	500	0.001	40	7	yes	yes	single	1	Ga C	264.9999823		FAIL-parity	0.1108	0	-658.65356668	15896.378	112
+single_defects_new-only-HSE06/III-A/In/hse06	single_defects_new-only-HSE06	HSE06	0.2500	0.2	500	0.001	40	7	yes	yes	single	1	In C	264.9999878		FAIL-parity	0.0908	0	-651.71286996	17494.008	112
+single_defects_new-only-HSE06/III-A/Tl/hse06	single_defects_new-only-HSE06	HSE06	0.2500	0.2	500	0.001	40	7	yes	yes	single	1	Tl C	264.9999882		FAIL-parity	0.1497	0	-648.40237337	16676.005	112
+single_defects_new-only-HSE06/IV-A/Ge/hse06	single_defects_new-only-HSE06	HSE06	0.2500	0.2	500	0.001	40	7	yes	yes	single	1	Ge C	265.9999854		ok	4.9933	0	-662.89688864	17291.633	112
+single_defects_new-only-HSE06/IV-A/Pb/hse06	single_defects_new-only-HSE06	HSE06	0.2500	0.2	500	0.001	40	7	yes	yes	single	1	Pb C	265.9999876		ok	4.4401	0	-651.14753999	21103.162	112
+single_defects_new-only-HSE06/IV-A/Sn/hse06	single_defects_new-only-HSE06	HSE06	0.2500	0.2	500	0.001	40	7	yes	yes	single	1	Sn C	265.9999923		ok	4.6409	0	-655.27852191	19330.691	112
+single_defects_new-only-HSE06/Transition-Metals/Ag/hse06	single_defects_new-only-HSE06	HSE06	0.2500	0.2	500	0.001	40	7	yes	yes	single	1	Ag C	268.9999845	-2.9999995	ok	1.2654	0	-652.0736545	20125.09	112
+single_defects_new-only-HSE06/Transition-Metals/Cd/hse06	single_defects_new-only-HSE06	HSE06	0.2500	0.2	500	0.001	40	5	yes	yes	single	1	Cd C	263.9999832	2.0000005	ok	0.0939	0	-648.82792578	12763.174	112
+single_defects_new-only-HSE06/Transition-Metals/Co/hse06	single_defects_new-only-HSE06	HSE06	0.2500	0.2	500	0.001	40	13	yes	yes	single	1	Co C	266.9999663	0.9999999	ok	0.1044	0	-665.97373553	53790.722	112
+single_defects_new-only-HSE06/Transition-Metals/Cr/hse06	single_defects_new-only-HSE06	HSE06	0.2500	0.2	500	0.001	40	5	yes	yes	single	1	Cr C	263.9999866	2.0000055	ok	4.4323	0	-669.04944665	14129.644	112
+single_defects_new-only-HSE06/Transition-Metals/Cu/hse06	single_defects_new-only-HSE06	HSE06	0.2500	0.2	500	0.001	40	7	yes	yes	single	1	Cu C	269.0000223	3.0000001	ok	1.2577	0	-658.14987442	20674.956	112
+single_defects_new-only-HSE06/Transition-Metals/Fe/hse06	single_defects_new-only-HSE06	HSE06	0.2500	0.2	500	0.001	40	5	yes	yes	single	1	Fe C	265.999956		ok	4.3586	0	-668.96094939	19589.867	112
+single_defects_new-only-HSE06/Transition-Metals/Mn/hse06	single_defects_new-only-HSE06	HSE06	0.2500	0.2	500	0.0001	40	22	yes	yes	single	1	Mn C	264.9999628	0.999996	ok	3.0399	0	-669.06133431	179729.437	112
+single_defects_new-only-HSE06/Transition-Metals/Mo/hse06	single_defects_new-only-HSE06	HSE06	0.2500	0.2	500	0.001	40	5	yes	yes	single	1	Mo C	263.9999791	1.9999991	ok	2.8698	0	-664.96589138	14420.764	112
+single_defects_new-only-HSE06/Transition-Metals/Nb/hse06	single_defects_new-only-HSE06	HSE06	0.2500	0.2	500	0.0001	40	13	yes	yes	single	1	Nb C	262.9999843	-0.9999998	ok	1.1827	0	-662.0502339	34910.883	112
+single_defects_new-only-HSE06/Transition-Metals/Ni/hse06	single_defects_new-only-HSE06	HSE06	0.2500	0.2	500	0.001	40	19	yes	yes	single	1	Ni C	267.9999407		ok	1.0557	0	-662.6704015	56034.736	112
+single_defects_new-only-HSE06/Transition-Metals/Pd/hse06	single_defects_new-only-HSE06	HSE06	0.2500	0.2	500	0.001	40	25	yes	yes	single	1	Pd C	267.9999688		ok	0.8148	0	-658.08922096	68160.379	112
+single_defects_new-only-HSE06/Transition-Metals/Rh/hse06	single_defects_new-only-HSE06	HSE06	0.2500	0.2	500	0.001	40	30	yes	yes	single	1	Rh C	266.9999838	-1.0000001	ok	0.8809	0	-662.84189651	81373.125	112
+single_defects_new-only-HSE06/Transition-Metals/Ru/hse06	single_defects_new-only-HSE06	HSE06	0.2500	0.2	500	0.001	0	1	no	yes	single	1	Ru C	265.9999881		ok	4.4227	0	-666.20665022	4210.713	112
+single_defects_new-only-HSE06/Transition-Metals/Sc/hse06	single_defects_new-only-HSE06	HSE06	0.2500	0.2	500	0.001	40	40	no	yes	single	1	Sc C	262.9999814	-1.0000002	ok	1.3949	0	-659.28161649	112111.476	112
+single_defects_new-only-HSE06/Transition-Metals/Tc/hse06	single_defects_new-only-HSE06	HSE06	0.2500	0.2	500	0.0001	40	11	yes	yes	single	1	Tc C	264.9999854	1.0000016	ok	1.5487	0	-665.72138266	26367.012	112
+single_defects_new-only-HSE06/Transition-Metals/Ti/hse06	single_defects_new-only-HSE06	HSE06	0.2500	0.2	500	0.001	40	7	yes	yes	single	1	Ti C	261.9999775		ok	4.0717	0	-664.57010376	18950.266	112
+single_defects_new-only-HSE06/Transition-Metals/V/hse06	single_defects_new-only-HSE06	HSE06	0.2500	0.2	500	0.0001	40	15	yes	yes	single	1	V C	262.9999796	-1.0000012	ok	2.652	0	-666.71763836	110159.888	112
+single_defects_new-only-HSE06/Transition-Metals/Y/hse06	single_defects_new-only-HSE06	HSE06	0.2500	0.2	500	0.001	40	40	no	yes	single	1	Y C	262.999985	0.9999999	ok	0.9773	0	-654.7587408	127517.615	112
+single_defects_new-only-HSE06/Transition-Metals/Zn/hse06	single_defects_new-only-HSE06	HSE06	0.2500	0.2	500	0.0001	40	19	yes	yes	single	1	Zn C	263.9999708	2.0	ok	0.1616	0	-654.98882595	48211.068	112
+single_defects_new-only-HSE06/Transition-Metals/Zr/hse06	single_defects_new-only-HSE06	GGA-PBE	0.0000		500	0.001	40	17	yes	yes	single	1	Zr C	263.9999898		ok	2.6107	0	-567.66827904	463.221	112
+single_defects_new-only-HSE06/VA/Bi/hse06	single_defects_new-only-HSE06	HSE06	0.2500	0.2	500	0.001	40	9	yes	yes	single	1	Bi C	266.9999941		FAIL-parity	0.245	0	-648.4477111	22335.02	112
+single_defects_new-only-HSE06/VIA/Po/hse06	single_defects_new-only-HSE06	HSE06	0.2500	0.2	500	0.001	40	7	yes	yes	single	1	Po C	267.9999888		ok	0.5782	0	-644.73041829	18805.845	112
+single_defects_new-only-HSE06/VIIA/At/hse06	single_defects_new-only-HSE06	HSE06	0.2500	0.2	500	0.001	40	35	yes	yes	single	1	At C	258.9999838		FAIL-parity	0.3338	0	-639.42421092	74391.605	112
+triads_defects/B-N-S/C8-C53-C1-were_replaced/config1/GGA-PBE	triads_defects	GGA-PBE	0.0000		500	0.0001	100	7	yes	yes	triad	3	B N S C	257.9999742		ok	0.0069	0	-562.77487457	67.131	112
+triads_defects/B-N-S/C8-C53-C1-were_replaced/config1/HSE06	triads_defects	HSE06	0.2500	0.2	500	0.0001	0	1	no	yes	triad	3	B N S C	257.9999746		ok	0.1099	0	-654.332519	3450.837	112
+triads_defects/B-N-S/C8-C53-C1-were_replaced/config2/GGA-PBE	triads_defects	GGA-PBE	0.0000		500	0.0001	100	12	yes	yes	triad	3	S B N C	257.9999758	-0.25	FAIL-fractional	0.0079	0	-562.33583449	97.464	112
+triads_defects/B-N-S/C8-C53-C1-were_replaced/config2/HSE06	triads_defects	HSE06	0.2500	0.2	500	0.0001	0	1	no	yes	triad	3	S B N C	257.9999762	-0.25	FAIL-fractional	0.1051	0	-653.79558711	3470.967	112
+triads_defects/B-N-S/C8-C53-C1-were_replaced/config3/GGA-PBE	triads_defects	GGA-PBE	0.0000		500	0.1	100	23	yes	yes	triad	3	N S B C	257.9999798		ok	2.1664	0	-564.3652105	231.133	112
+triads_defects/B-N-S/C8-C53-C1-were_replaced/config3/HSE06	triads_defects	HSE06	0.2500	0.2	500	0.1	0	1	no	yes	triad	3	N S B C	257.9999801		ok	3.4373	0	-656.82070312	3456.675	112
+triads_defects/B-N-S/C8-C55-C1-were_replaced/config1/GGA-PBE	triads_defects	GGA-PBE	0.0000		500	0.0001	100	7	yes	yes	triad	3	B N S C	257.9999742		ok	0.0069	0	-562.77487457	67.131	112
+triads_defects/B-N-S/C8-C55-C1-were_replaced/config1/HSE06	triads_defects	HSE06	0.2500	0.2	500	0.0001	0	1	no	yes	triad	3	B N S C	257.9999746		ok	0.1099	0	-654.332519	3450.837	112
+triads_defects/B-N-S/C8-C55-C1-were_replaced/config2/GGA-PBE	triads_defects	GGA-PBE	0.0000		500	0.0001	100	12	yes	yes	triad	3	S B N C	257.9999758	-0.25	FAIL-fractional	0.0079	0	-562.33583449	97.464	112
+triads_defects/B-N-S/C8-C55-C1-were_replaced/config2/HSE06	triads_defects	HSE06	0.2500	0.2	500	0.0001	0	1	no	yes	triad	3	S B N C	257.9999762	-0.25	FAIL-fractional	0.1051	0	-653.79558711	3470.967	112
+triads_defects/B-N-S/C8-C55-C1-were_replaced/config3/GGA-PBE	triads_defects	GGA-PBE	0.0000		500	0.1	100	23	yes	yes	triad	3	N S B C	257.9999798		ok	2.1664	0	-564.3652105	231.133	112
+triads_defects/B-N-S/C8-C55-C1-were_replaced/config3/HSE06	triads_defects	HSE06	0.2500	0.2	500	0.1	0	1	no	yes	triad	3	N S B C	257.9999801		ok	3.4373	0	-656.82070312	3456.675	112
+triads_defects/H-B-Si/C8-C53-C1-were_replaced/config1/GGA-PBE	triads_defects	GGA-PBE	0.0000		500	0.1	100	26	yes	yes	triad	3	H B Si C	251.9999793	1.9923633	ok	0.317	5	-560.57877843	253.071	112
+triads_defects/H-B-Si/C8-C53-C1-were_replaced/config1/HSE06	triads_defects	HSE06	0.2500	0.2	500	0.1	0	1	no	yes	triad	3	H B Si C	251.9999796	1.9999537	ok	1.6035	0	-651.14168574	3325.171	112
+triads_defects/H-B-Si/C8-C53-C1-were_replaced/config2/GGA-PBE	triads_defects	GGA-PBE	0.0000		500	0.0001	100	48	yes	yes	triad	3	Si H B C	251.9999897	-0.25	FAIL-fractional	0.0027	0	-563.21189238	482.865	112
+triads_defects/H-B-Si/C8-C53-C1-were_replaced/config2/HSE06	triads_defects	HSE06	0.2500	0.2	500	0.0001	0	1	no	yes	triad	3	Si H B C	251.9999898	-0.25	FAIL-fractional	0.0578	0	-653.04527518	3354.568	112
+triads_defects/H-B-Si/C8-C53-C1-were_replaced/config3/GGA-PBE	triads_defects	GGA-PBE	0.0000		500	0.0001	100	62	yes	yes	triad	3	B Si H C	251.9999811		ok	0.2568	0	-559.23266127	498.988	112
+triads_defects/H-B-Si/C8-C53-C1-were_replaced/config3/HSE06	triads_defects	HSE06	0.2500	0.2	500	0.0001	0	1	no	yes	triad	3	B Si H C	251.9999814		ok	0.71	0	-648.9657126	3639.032	112
+triads_defects/H-B-Si/C8-C55-C1-were_replaced/config1/GGA-PBE	triads_defects	GGA-PBE	0.0000		500	0.1	100	62	yes	yes	triad	3	H B Si C	251.9999867		ok	0.3743	0	-560.29252735	1156.358	112
+triads_defects/H-B-Si/C8-C55-C1-were_replaced/config1/HSE06	triads_defects	HSE06	0.2500	0.2	500	0.1	0	1	no	yes	triad	3	H B Si C	251.9999869		ok	1.0443	0	-650.28129809	3356.347	112
+triads_defects/H-B-Si/C8-C55-C1-were_replaced/config2/GGA-PBE	triads_defects	GGA-PBE	0.0000		500	0.1	100	53	yes	yes	triad	3	Si H B C	251.9999837	1e-07	ok	0.3522	0	-560.71858863	979.173	112
+triads_defects/H-B-Si/C8-C55-C1-were_replaced/config2/HSE06	triads_defects	HSE06	0.2500	0.2	500	0.1	0	1	no	yes	triad	3	Si H B C	251.9999839		ok	0.9911	0	-650.9794707	7325.551	112
+triads_defects/H-B-Si/C8-C55-C1-were_replaced/config3/GGA-PBE	triads_defects	GGA-PBE	0.0000		500	0.0001	100	3	yes	yes	triad	3	B Si H C	251.9999821	1.5	FAIL-fractional	0.2182	0	-560.16201551	30.245	112
+triads_defects/H-B-Si/C8-C55-C1-were_replaced/config3/HSE06	triads_defects	HSE06	0.2500	0.2	500	0.0001	0	1	no	yes	triad	3	B Si H C	251.9999824	1.9969769	ok	0.5593	0	-650.26825241	3491.742	112
+triads_defects/H-N-O/c8-c53-c1/config1/GGA-PBE	triads_defects	GGA-PBE	0.0000		500	0.1	100	29	yes	yes	triad	3	H N O C	255.9999767	1.969543	FAIL-fractional	0.2376	9	-560.61432429	287.403	112
+triads_defects/H-N-O/c8-c53-c1/config1/HSE06	triads_defects	HSE06	0.2500	0.2	500	0.1	0	1	no	yes	triad	3	H N O C	255.9999771	1.9998164	ok	0.1894	4	-652.1856401	3520.72	112
+triads_defects/H-N-O/c8-c53-c1/config2	triads_defects	GGA-PBE	0.0000		500	0.1	100	21	yes	yes	triad	3	O H N C	255.9999749	-0.0002291	ok	0.2454	10	-562.01345358	195.85	112
+triads_defects/H-N-O/c8-c53-c1/config2/sigma00001	triads_defects	GGA-PBE	0.0000		500	0.0001	100	5	yes	yes	triad	3	O H N C	255.9999748	-0.25	FAIL-fractional	0.1141	0	-562.00569742	49.099	112
+triads_defects/H-N-O/c8-c53-c1/config2/sigma00001/hse06	triads_defects	HSE06	0.2500	0.2	500	0.0001	0	1	no	yes	triad	3	O H N C	255.9999752	0.000907	ok	0.7581	0	-654.21990659	3805.326	112
+triads_defects/H-N-O/c8-c53-c1/config3	triads_defects	GGA-PBE	0.0000		500	0.1	100	36	yes	yes	triad	3	N O H C	255.9999823	1.9999999	ok	0.3238	8	-560.64275789	316.329	112
+triads_defects/H-N-O/c8-c53-c1/config3/sigma00001	triads_defects	GGA-PBE	0.0000		500	0.0001	100	59	yes	yes	triad	3	N O H C	255.9999834	1.9999998	ok	0.6243	0	-561.65531629	621.708	112
+triads_defects/H-N-O/c8-c53-c1/config3/sigma00001/hse06	triads_defects	HSE06	0.2500	0.2	500	0.0001	0	1	no	yes	triad	3	N O H C	255.9999837	1.9999998	ok	1.9646	0	-654.21252969	3417.51	112
+triads_defects/H-N-O/c8-c55-c1/config1/GGA-PBE	triads_defects	GGA-PBE	0.0000		500	0.0001	100	56	yes	yes	triad	3	H N O C	255.999985	1.9999999	ok	0.6408	0	-559.05228239	493.572	112
+triads_defects/H-N-O/c8-c55-c1/config1/HSE06	triads_defects	HSE06	0.2500	0.2	500	0.0001	0	1	no	yes	triad	3	H N O C	255.9999853	1.9999999	ok	1.9155	0	-651.29638345	3466.308	112
+triads_defects/H-N-O/c8-c55-c1/config2/GGA-PBE	triads_defects	GGA-PBE	0.0000		500	0.1	40	39	yes	yes	triad	3	O H N C	255.9999903		ok	0.5973	0	-560.16863153	367.324	112
+triads_defects/H-N-O/c8-c55-c1/config2/HSE06	triads_defects	HSE06	0.2500	0.2	500	0.1	0	1	no	yes	triad	3	O H N C	255.9999905		ok	1.5565	0	-652.25422625	3536.691	112
+triads_defects/H-N-O/c8-c55-c1/config3/GGA-PBE	triads_defects	GGA-PBE	0.0000		500	0.0001	100	70	yes	yes	triad	3	N O H C	255.9999776	2e-07	ok	0.2604	0	-560.29203378	594.559	112
+triads_defects/H-N-O/c8-c55-c1/config3/HSE06	triads_defects	HSE06	0.2500	0.2	500	0.0001	0	1	no	yes	triad	3	N O H C	255.999978	3e-07	ok	1.2307	0	-652.57665189	4124.063	112
+triads_defects/Li-B-P/c8-c53-c1/config1/GGA-PBE	triads_defects	GGA-PBE	0.0000		500	0.0001	100	7	yes	yes	triad	3	Li B P C	252.999977	0.9999997	ok	0.0	2	-557.08283036	112.113	112
+triads_defects/Li-B-P/c8-c53-c1/config1/HSE06	triads_defects	HSE06	0.2500	0.2	500	0.0001	0	1	no	yes	triad	3	Li B P C	252.9999773	0.9999997	ok	0.1148	0	-647.21425484	3660.659	112
+triads_defects/Li-B-P/c8-c53-c1/config2/GGA-PBE	triads_defects	GGA-PBE	0.0000		500	0.1	100	29	yes	yes	triad	3	P Li B C	252.9999876		FAIL-parity	0.4277	6	-560.55637703	263.725	112
+triads_defects/Li-B-P/c8-c53-c1/config2/HSE06	triads_defects	HSE06	0.2500	0.2	500	0.1	0	1	no	yes	triad	3	P Li B C	252.9999878	3e-07	FAIL-parity	0.4747	6	-650.37800273	3290.797	112
+triads_defects/Li-B-P/c8-c53-c1/config3/GGA-PBE	triads_defects	GGA-PBE	0.0000		500	0.0001	100	24	yes	yes	triad	3	B P Li C	252.9999786	2.4999998	FAIL-fractional	0.0686	0	-556.84939644	152.031	112
+triads_defects/Li-B-P/c8-c53-c1/config3/HSE06	triads_defects	HSE06	0.2500	0.2	500	0.0001	0	1	no	yes	triad	3	B P Li C	252.9999789	2.9969764	ok	1.1421	0	-647.11208489	3468.329	112
+triads_defects/Li-B-P/c8-c55-c1/config1/GGA-PBE	triads_defects	GGA-PBE	0.0000		500	0.0001	100	17	yes	yes	triad	3	Li B P C	252.9999798	2.7499996	FAIL-fractional	0.0327	0	-556.85005236	104.295	112
+triads_defects/Li-B-P/c8-c55-c1/config1/HSE06	triads_defects	HSE06	0.2500	0.2	500	0.0001	0	1	no	yes	triad	3	Li B P C	252.99998	2.9984879	ok	1.0921	0	-647.21579023	3409.406	112
+triads_defects/Li-B-P/c8-c55-c1/config2/GGA-PBE	triads_defects	GGA-PBE	0.0000		500	0.0001	100	11	yes	yes	triad	3	P Li B C	252.9999817	0.75	FAIL-fractional	0.0366	0	-557.27946171	77.189	112
+triads_defects/Li-B-P/c8-c55-c1/config2/HSE06	triads_defects	HSE06	0.2500	0.2	500	0.0001	0	1	no	yes	triad	3	P Li B C	252.9999819	1.0009071	ok	0.5321	0	-647.39143111	3761.326	112
+triads_defects/Li-B-P/c8-c55-c1/config3/GGA-PBE	triads_defects	GGA-PBE	0.0000		500	0.0001	100	14	yes	yes	triad	3	B P Li C	252.9999817	0.9999999	ok	0.0324	0	-557.17099237	89.821	112
+triads_defects/Li-B-P/c8-c55-c1/config3/HSE06	triads_defects	HSE06	0.2500	0.2	500	0.0001	0	1	no	yes	triad	3	B P Li C	252.9999819	1.0000001	ok	1.0173	0	-647.26078894	4877.564	112

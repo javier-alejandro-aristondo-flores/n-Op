@@ -408,17 +408,30 @@ for _p in sorted((REPO / 'physics/library/cert/reference-data').glob('*.csv')):
 
 # (n) every coded registry column must stay inside its vocabulary -----------
 # `Diff` got a checker after a Diff incident and `Tier` after a Tier incident.
-# `Bundle` and `Path` appeared in neither tool, and a defect was sitting in
-# `Bundle` the whole time: rows 91-94 read `L1`, which is a Born-Oppenheimer
-# level, not an observable bundle. The canon table in `canonical-vocabularies`
-# lists bundles as `| B1 | electronic-structure | L1 |` -- code, name, BO level
-# -- so the author took the third column instead of the first. Two vocabularies
-# meeting in one cell, with nothing to notice.
+# `Bundle` and `Path` appeared in neither tool.
 #
-# The bundle codes are HARVESTED from the page that owns them, not restated
-# here: a second copy of a vocabulary is the thing this tool exists to catch.
+# The vocabularies are HARVESTED, never restated here -- a second copy is the
+# thing this tool exists to catch. For `Bundle` that means TWO sources, and
+# reading only one produced a false positive with teeth: the eleven `B*` codes
+# come from the table in `canonical-vocabularies`, but `named-formulas` owns
+# the *schema* and admits one more value --
+#
+#     bundle : {BundleId}   -- one or more of B1..B11, or the L1 primitive tag
+#
+# `L1` on rows 91-94 is deliberate: Z*, ε∞, χ∞ and α_M are level-1 primitives
+# feeding several bundles at once, and both canon pages say so. A first version
+# of this check harvested only the table, reported those four rows as a defect,
+# and the "fix" retagged four correct rows to `B1` before either page was read
+# (`[traps]` §70). Harvest from the field's schema, not from an enumeration
+# that happens to sit nearby.
 _VOCAB_PAGE = REPO / 'journal/pages/06-vocabularies-and-registry/6.1-canonical-vocabularies.md'
+_SCHEMA_PAGE = REPO / 'journal/pages/06-vocabularies-and-registry/6.6-named-formulas.md'
 _BUNDLES = set(re.findall(r'^\|\s*(B\d+)\s*\|', _VOCAB_PAGE.read_text(encoding='utf-8'), re.M))
+# ...plus any extra tag the schema documents for this field.
+# The phrase wraps inside a code fence, so it is matched wherever it lands
+# rather than anchored to the words that precede it on one line.
+_BUNDLES |= set(re.findall(r'`?(\w+)`?\s+primitive tag',
+                           _SCHEMA_PAGE.read_text(encoding='utf-8')))
 COLUMN_VOCAB = {
     3: ('Bundle', _BUNDLES),
     4: ('Tier', {'T0', 'T1', 'T2', 'T3'}),

@@ -204,13 +204,15 @@ PROBES: list[tuple[str, str, str, str, str, str]] = [
      "journal/pages/01-purpose-and-product/1.4-architectural-principles.md",
      "# Architectural principles", "# Architectural principles\n\nAlgebraicOf({x}, formula = not-a-row)",
      "formula-arg"),
-    # A BO level in the Bundle column is how the real defect arrived: the canon
-    # table reads `| B1 | electronic-structure | L1 |` and rows 91-94 took the
-    # third column. Plant the same slip.
+    # `L1` is NOT the defect to plant here: it is a documented primitive tag
+    # that rows 91-94 carry deliberately, and a probe planting it would assert
+    # the false positive rather than the check (`[traps]` §70). `L4` is a real
+    # BO level that is not an admitted bundle value, so it plants the *class*
+    # of slip -- a level where a bundle belongs -- without asserting the bug.
     ("BO level in the Bundle column", "data",
      "physics/library/formulas/registry-manifest.csv",
      "1,bandgap-direct,`(BandStruct) → Scalar`,B1,",
-     "1,bandgap-direct,`(BandStruct) → Scalar`,L1,",
+     "1,bandgap-direct,`(BandStruct) → Scalar`,L4,",
      "vocabulary"),
     ("out-of-vocabulary cost tier", "data",
      "physics/library/formulas/registry-manifest.csv",

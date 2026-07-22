@@ -89,10 +89,10 @@
 88,long-range-coulomb-directional-limit-correction,"`(D(q), q̂, Z*, ε∞, Ω) → D_NA(q)`",B2,T1,D2,faithful,extension (a.k.a. Pick-Cochran-Martin / Gonze-Lee),"Z*, ε∞ (L1 primitives)"
 89,charged-supercell-extrapolation-isotropic-general,"`(q, ε, L, α_M) → ΔE_iso`",B4,T0,D1,cheap,extension (lattice-general; α_M explicit),"q, ε, Madelung"
 90,charged-supercell-extrapolation-atomic-site-averaged,"`(q, ε, V_atomic, L) → ΔE_atomic`",B4,T0,D1,cheap,extension (a.k.a. Kumagai-Oba),"q, ε, atomic-site potential"
-91,lattice-coulomb-summation-scalar,`(lattice) → α_M`,L1,T1,D1,cheap,extension (a.k.a. Madelung constant),lattice
-92,operator-position-derivative-tensor,"`(γ̂, R, h) → Z*[I,α,β]`",L1,T2,D2,faithful,extension (a.k.a. Born effective charges Z*),linear-response sub-stage
-93,high-frequency-response-tensor,"`(γ̂, h) → ε∞[α,β]`",L1,T2,D2,faithful,extension (a.k.a. high-frequency dielectric ε∞),linear-response sub-stage
-94,electronic-linear-response-tensor,"`(γ̂, h) → χ∞[α,β]`",L1,T2,D2,faithful,extension (a.k.a. electronic susceptibility χ∞),linear-response sub-stage
+91,lattice-coulomb-summation-scalar,`(lattice) → α_M`,B1,T1,D1,cheap,extension (a.k.a. Madelung constant),lattice
+92,operator-position-derivative-tensor,"`(γ̂, R, h) → Z*[I,α,β]`",B1,T2,D2,faithful,extension (a.k.a. Born effective charges Z*),linear-response sub-stage
+93,high-frequency-response-tensor,"`(γ̂, h) → ε∞[α,β]`",B1,T2,D2,faithful,extension (a.k.a. high-frequency dielectric ε∞),linear-response sub-stage
+94,electronic-linear-response-tensor,"`(γ̂, h) → χ∞[α,β]`",B1,T2,D2,faithful,extension (a.k.a. electronic susceptibility χ∞),linear-response sub-stage
 95,composition-dependent-excess-free-energy-basis,"`(x, T, {L_ν}) → G_ex`",B8,T0,D1,cheap,extension (a.k.a. Redlich-Kister),"composition, basis parameters"
 96,symmetry-classification-group-via-snf,"`(SG_number, AZ_class) → AbelianGroup`",B1/B11,T1,DN,cheap,topology atlas (X_BS; SNF on orbit-rep matrix),"SG, AZ class"
 97,symmetry-orbit-representation-matrix,"`(SG, [site-orbit], [orbital]) → IntMatrix`",B1,T1,DN,cheap,topology atlas (a.k.a. EBR / band-representation matrix),"SG, orbits, orbital basis"

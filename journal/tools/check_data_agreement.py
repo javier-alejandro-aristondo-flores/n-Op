@@ -147,20 +147,54 @@ for path in EDITABLE:
                     + (f' (nearest: {close[0]})' if close else ''))
 
 # (c) duplicated numeric literals ------------------------------------------
-# The symbol list below is HARD-CODED and covers 9 of the 17 tolerance symbols in
-# `cert-obligations §1.2`. It compares known symbols for divergent values between
-# sites; it does not discover a symbol introduced without a row there. That page
-# states the limitation; this comment is here so the limitation is visible from
-# the checker too, rather than only from the page it fails to cover.
+# The symbol list is HARVESTED from the page that owns it, not restated here.
+# It used to be nine symbols hard-coded in this file against seventeen in
+# `cert-obligations §1.2` -- a check reporting clean on 53% coverage, with the
+# shortfall recorded honestly in a comment and acted on by nothing. Reading the
+# owner's table is the same technique `check_the_checkers.py` already uses to
+# derive its coverage, applied one level over.
+_CERT = REPO / 'journal/pages/05-certification-and-applicability/5.1-cert-obligations.md'
+_ledger = re.search(r'^## [\d.]+ Tolerance ledger$(.*?)^## ',
+                    _CERT.read_text(encoding='utf-8'), re.S | re.M)
+TOL_SYMBOLS = sorted(re.findall(r'^\|\s*`([τδ]_[^`]+)`\s*\|', _ledger.group(1), re.M),
+                     key=len, reverse=True) if _ledger else []
+if not TOL_SYMBOLS:
+    findings['tolerance'].append(
+        'cert-obligations: the tolerance ledger table could not be read — '
+        'every tolerance symbol is going unchecked')
+
+_TOL_VALUE = r'(1e-\d+|10[–-]20%|\d+%|\d+ meV/atom|\d+σ)'
 tol_sites = defaultdict(set)
-for path in EDITABLE:
-    for ln, line in enumerate(path.read_text(encoding='utf-8').splitlines(), 1):
-        for m in re.finditer(r'(τ_adj|δ_sym|δ_PSD|τ_SCF,strict|τ_SCF,train|τ_L3L4|τ_method|δ_surrogate|δ_meta)\D{0,20}?(1e-\d+|10[–-]20%|\d+%)', line):
-            tol_sites[m.group(1)].add((m.group(2), str(path.relative_to(REPO))))
+if TOL_SYMBOLS:
+    _tol_re = re.compile('(' + '|'.join(re.escape(s) for s in TOL_SYMBOLS)
+                         + r')\D{0,20}?' + _TOL_VALUE)
+    for path in EDITABLE:
+        for ln, line in enumerate(path.read_text(encoding='utf-8').splitlines(), 1):
+            for m in _tol_re.finditer(line):
+                tol_sites[m.group(1)].add((m.group(2), str(path.relative_to(REPO))))
 for sym, sites in sorted(tol_sites.items()):
     values = {v for v, _ in sites}
     if len(values) > 1:
         findings['tolerance'].append(f'{sym}: divergent values {sorted(values)} across {sorted({p for _, p in sites})}')
+
+# The ledger's exhaustiveness rule -- "a tolerance stated anywhere but absent
+# from this table is a defect in this table" -- is NOT machine-checkable, and an
+# attempt to make it one is recorded here so the next person does not repeat it.
+#
+# The obvious check is: flag every `τ_*` / `δ_*` not in the table. It fires 48
+# times on correct prose. `τ` is not a reserved tolerance prefix in this corpus:
+# `τ_n` and `τ_p` are SRH carrier lifetimes, `τ_PO` a polar-optical scattering
+# time, `τ_E` an energy relaxation time, `τ_hop`, `τ_iv`, `τ_alloy` likewise.
+# The ledger page's claim that "`δ`/`τ` denotes a *tolerance* throughout" is
+# false of the appendices, and that overclaim is what made the check look sound.
+#
+# Narrowing it by requiring a tolerance-shaped value does not rescue it either:
+# a relaxation time of `1e-12` s is shaped exactly like a tolerance of `1e-12`.
+# Separating the two needs a namespace the corpus does not have (`tol_adj` vs
+# `τ_adj`, say). Until then this stays a review rule, stated honestly as one.
+# A check that cries wolf 48 times is worse than an absent check: it teaches
+# the reader to skim past output, which is the failure the whole corpus is
+# fighting.
 
 # (h) declared-gap list must match what is actually invoked ----------------
 # A declaration that has drifted from the body is worse than none: it reports a
@@ -208,18 +242,87 @@ def _blocks(lines):
             start = i + 1
     return out
 
+# The identifier form is only half the surface. `Born-stability-cubic` is caught;
+# "Born stability" -- which is how prose actually writes it -- was not, and
+# neither were "Coffin–Manson fatigue" (en-dash, space) or "Pauling radius
+# ratio". The rename discipline covered the machine spelling and missed the
+# human one, and the human one is what sits in the bundle descriptions.
+#
+# Derived, not hand-authored: a `prose-form` column on 62 rows is 62 more things
+# to keep in sync. Each retired name yields a separator-insensitive pattern
+# (hyphen / en-dash / space), plus the same pattern minus its trailing
+# qualifier, since prose says "Born stability" for `Born-stability-cubic`.
+# Single-token stems are never generated -- "Born" alone would fire on
+# Born–Oppenheimer, a different physicist and a live concept here.
+SEP = r'[-–— ]'
+
+
+def _prose_patterns(name: str) -> list[str]:
+    parts = name.split('-')
+    out = []
+    for stem in (parts, parts[:-1]):
+        if len(stem) >= 2 and stem[0][:1].isupper():
+            out.append(SEP.join(re.escape(p) for p in stem))
+    return out
+
+
+prose_retired = {}
+for _old in retired:
+    for _pat in _prose_patterns(_old):
+        prose_retired.setdefault(_pat, _old)
+
+# One pass per line, with the word-boundary lookarounds hoisted OUT of the
+# alternation. This is the whole performance story of this tool: 62 retired
+# names each wrapped in its own `(?<![\w-])...(?![\w-])` costs 2.5 s per run,
+# and calibration runs the tool once per probe, which turned a two-second check
+# into a two-minute one and tripped a timeout. The same 62 names under a single
+# shared lookbehind cost 0.14 s -- 18x, for identical hits. Longest-first so
+# `Born-stability-cubic` wins over any prefix of itself.
+def _one_pass(names):
+    if not names:
+        return None
+    alts = '|'.join(re.escape(n) for n in sorted(names, key=len, reverse=True))
+    return re.compile(rf'(?<![\w-])({alts})(?![\w-])', re.I)
+
+
+_RETIRED_RE = _one_pass(retired)
+_RETIRED_BY_LOWER = {o.lower(): o for o in retired}
+
+# The prose forms are patterns, not literals (they carry a separator class), so
+# they are joined directly rather than escaped.
+_PROSE_RE = re.compile(
+    r'(?<![\w-])(' + '|'.join(sorted(prose_retired, key=len, reverse=True))
+    + r')(?![\w-])') if prose_retired else None
+_PROSE_LOOKUP = {}
+for _pat, _old in prose_retired.items():
+    _PROSE_LOOKUP[re.compile(rf'\A{_pat}\Z')] = _old
+
 for path in EDITABLE:
     lines = path.read_text(encoding='utf-8').splitlines()
     blocks = _blocks(lines)
     for ln, line in enumerate(lines, 1):
-        for old, new in retired.items():
-            if not re.search(rf'(?<![\w-]){re.escape(old)}(?![\w-])', line, re.I):
-                continue
+        hit_ident = set()
+        for m in (_RETIRED_RE.finditer(line) if _RETIRED_RE else ()):
+            old = _RETIRED_BY_LOWER[m.group(1).lower()]
+            hit_ident.add(old)
+            new = retired[old]
             scope = blocks.get(ln, line)
             if any(part.strip() in scope for part in new.replace('+', ' ').split()):
                 continue                     # the paragraph resolves it in place
             findings['retired-name'].append(
                 f'{path.relative_to(REPO)}:{ln}: `{old}` is retired — landed as {new}')
+        for m in (_PROSE_RE.finditer(line) if _PROSE_RE else ()):
+            old = next((o for rx, o in _PROSE_LOOKUP.items()
+                        if rx.match(m.group(1))), None)
+            if old is None or old in hit_ident:
+                continue                     # the identifier check owns that one
+            new = retired[old]
+            scope = blocks.get(ln, line)
+            if any(part.strip() in scope for part in new.replace('+', ' ').split()):
+                continue                     # the paragraph resolves it in place
+            findings['retired-eponym'].append(
+                f'{path.relative_to(REPO)}:{ln}: "{m.group(0)}" is the prose form '
+                f'of retired `{old}` — landed as {new}')
 
 # (f) near-miss formula names ----------------------------------------------
 lower_names = {n.lower(): n for n in row_names}
@@ -302,6 +405,42 @@ for _p in sorted((REPO / 'physics/library/cert/reference-data').glob('*.csv')):
             findings['bad-date'].append(
                 f"{_p.name}: {_label} was Modified {_seen['Modified']} before it "
                 f"was Added {_seen['Added']}")
+
+# (n) every coded registry column must stay inside its vocabulary -----------
+# `Diff` got a checker after a Diff incident and `Tier` after a Tier incident.
+# `Bundle` and `Path` appeared in neither tool, and a defect was sitting in
+# `Bundle` the whole time: rows 91-94 read `L1`, which is a Born-Oppenheimer
+# level, not an observable bundle. The canon table in `canonical-vocabularies`
+# lists bundles as `| B1 | electronic-structure | L1 |` -- code, name, BO level
+# -- so the author took the third column instead of the first. Two vocabularies
+# meeting in one cell, with nothing to notice.
+#
+# The bundle codes are HARVESTED from the page that owns them, not restated
+# here: a second copy of a vocabulary is the thing this tool exists to catch.
+_VOCAB_PAGE = REPO / 'journal/pages/06-vocabularies-and-registry/6.1-canonical-vocabularies.md'
+_BUNDLES = set(re.findall(r'^\|\s*(B\d+)\s*\|', _VOCAB_PAGE.read_text(encoding='utf-8'), re.M))
+COLUMN_VOCAB = {
+    3: ('Bundle', _BUNDLES),
+    4: ('Tier', {'T0', 'T1', 'T2', 'T3'}),
+    5: ('Diff', {'D0', 'D1', 'D2', 'D3', 'D4', 'DN'}),
+    6: ('Path', {'cheap', 'faithful'}),
+}
+if not _BUNDLES:
+    findings['vocabulary'].append(
+        'canonical-vocabularies: no `| Bn |` bundle table found — the Bundle '
+        'vocabulary could not be harvested, so Bundle went unchecked')
+for r in rows:
+    for _i, (_name, _allowed) in COLUMN_VOCAB.items():
+        _cell = r[_i].strip()
+        if _cell in ('—', ''):
+            continue                       # architectural markers carry no tags
+        # a cell may name several, `B6/B7`; every part must be in vocabulary
+        _bad = [p for p in _cell.split('/') if p.strip() not in _allowed]
+        if _bad:
+            findings['vocabulary'].append(
+                f'registry row {r[0]} ({r[1]}): {_name}={_cell!r} — '
+                f'{", ".join(repr(b) for b in _bad)} not in '
+                f'{{{", ".join(sorted(_allowed))}}}')
 
 # (g) D2/D4 rows must carry their gate/relaxation rationale in `source` -----
 # A D4 row with no named relaxation is un-gateable (named-formulas); the

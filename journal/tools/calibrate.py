@@ -195,6 +195,16 @@ PROBES: list[tuple[str, str, str, str, str, str]] = [
      "physics/library/cert/reference-data/elastic-tensors.csv",
      "Polian Grimsditch Grzegory JAP 79 3343 (1996) 10.1063/1.361236,experimental",
      ",experimental", "refdata-source"),
+    # An unquoted comma in a prose cell, which is how the real defect arrived:
+    # every column right of it shifts, and the by-name checks keep passing
+    # because the cells they read are still non-empty.
+    ("reference-data row whose columns have shifted", "seams",
+     "physics/library/cert/reference-data/elastic-tensors.csv",
+     "242.8 GPa,2.9 GPa,", "242.8 GPa,2.9 GPa,extra,", "refdata-arity"),
+    ("reference-data date in the future", "seams",
+     "physics/library/cert/reference-data/elastic-tensors.csv",
+     ",experimental,1,2026-06-10,2026-06-10", ",experimental,1,2026-06-10,2099-01-01",
+     "refdata-date"),
     ("backticked name that is not a registry row", "seams",
      "journal/pages/01-purpose-and-product/1.4-principles.md",
      "# Architectural principles",

@@ -89,7 +89,7 @@ named relaxation, and a stale hash.
 **Green is not evidence a check ran.** Both checkers have shipped holes that made them
 skip whole classes of citation silently. Before citing a clean run, plant a defect of
 the class you are claiming is absent and confirm the checker fails (`[traps]` §58).
-`python journal/tools/calibrate.py` does exactly that — 45 probes into a temporary
+`python journal/tools/calibrate.py` does exactly that — 47 probes into a temporary
 copy — and additionally reports any check that *no* probe reaches, since a calibration
 with holes in it is the same failure one level up.
 
@@ -101,12 +101,16 @@ Tracked in `[arch-18-open-decisions]`. The load-bearing ones:
   compiler host with its own AD, a separate numeric runtime, offline computer
   algebra and proof assistants) is one candidate configuration under evaluation,
   not a commitment. Everything in the book stays language-neutral.
-- Surrogate-net build vs adopt; the PDE-mesh adjoint scheme; the γ̂ open
-  questions; the Layer-1.75 spec.
-- Three named **verifier-soundness gaps**: no post-registration adjoint-drift
-  monitoring, no Stage-3 rewrite-soundness contract, and no declared validity
-  radius for frozen Layer-1.25 dressings. Named rather than left absent, because
-  an absent check reads exactly like a passing one.
+- Surrogate-net build vs adopt; the PDE-mesh adjoint scheme; the Layer-1.75 spec.
+  (The four γ̂ data-structure questions closed 2026-07-21 — identity stays exact
+  and ε is estimated beside it; see `[arch-15-gamma-hat]` §15.4.)
+- **One** open verifier-soundness gap: no post-registration adjoint-drift
+  monitoring — the registration gate validates the *formula's* adjoint, Stage 4
+  synthesizes the *composition's* adjoint later over a rewritten graph, and
+  nothing revalidates the second. Three others were named and closed on
+  2026-07-21; all four stay listed in `[arch-18-open-decisions]` with their
+  resolutions, because an absent check reads exactly like a passing one and a
+  silently closed one reads like it was never there.
 
 The integrator interface closed 2026-07-16: a per-tier tangent kernel plus a
 steppable-form manifest, with the integrator staying consumer-side.

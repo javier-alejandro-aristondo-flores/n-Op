@@ -148,16 +148,24 @@ mechanically. Do not produce one.
 11. an out-of-vocabulary `status` or `authority`
 12. a stale `content-hash`
 
-`python journal/tools/seams.py` fails on fourteen classes: row-band claims whose
+`python journal/tools/seams.py` fails on sixteen classes: row-band claims whose
 endpoints are not in the CSV; backticked formula names that are not registry rows;
 `formula =` arguments carrying inline mathematics, or an undeclared name; divergent
 tolerance literals; duplicate glossary entries; retired formula names left
 unresolved; case-variant near-misses; `D4` rows whose `source` cell names no
 relaxation; registry `name (row N)` pointers naming the wrong row;
 `unregistered-formulas` declarations the body no longer invokes; glossary rows
-whose canonical pointer names no page; and reference-data rows with no uncertainty
-or no source. Its sweep covers the book, the
-README, this file, the reference-data CSVs, and `informed-operator/design/`.
+whose canonical pointer names no page; and, in the reference-data CSVs, rows with
+no uncertainty or no source, rows whose **field count** disagrees with the header,
+and dates that are non-ISO, in the future, or modified-before-added. Its sweep
+covers the book, the README, this file, the reference-data CSVs, and
+`informed-operator/design/`.
+
+The arity check earns its place: a `Source` cell holding an unquoted comma splits
+into extra fields and shifts every column right of it. One such row sat in
+`transport-coefficients.csv` with `Added` = `experimental` and `Modified` = `1`,
+and the presence checks passed it — the cells they read *by name* were still
+non-empty, just holding the wrong values.
 
 **Green means the corpus is internally consistent. It does not mean the physics
 is right** — that is what the audit protocol in `10.3-audit-prompt` is for. And
@@ -166,7 +174,7 @@ silently skip whole classes of citation. Before citing a clean run as evidence,
 plant a defect of exactly the class you claim is absent and confirm the checker
 fails (`10.4-traps` §58). That is now a script:
 `python journal/tools/calibrate.py` plants a defect in a temporary copy and
-asserts it fires — 45 probes. It reports three failure modes, and all three are
+asserts it fires — 47 probes. It reports three failure modes, and all three are
 holes: a **missed** probe is a hole in the checker; a **stale** probe — one whose
 planted text no longer exists — is a hole in the probe list; an **uncovered**
 check is one no probe reaches at all, which the script derives from `seams.py`'s

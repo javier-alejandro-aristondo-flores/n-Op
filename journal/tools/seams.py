@@ -12,11 +12,15 @@
 (i) glossary rows whose canonical pointer names no page
 (j) registry `name (row N)` pointers that name the wrong row
 (k) reference-data rows with no uncertainty or no source
+(l) reference-data rows whose field count disagrees with the header
+(m) reference-data dates that are non-ISO, in the future, or modified-before-added
 Read-only; prints findings, exit code = number of finding classes that fired.
 """
 from __future__ import annotations
 
 import csv
+import csv as _csv
+import datetime as _dt
 import re
 import sys
 from collections import defaultdict
@@ -237,7 +241,6 @@ for r in rows:
 # arch-19 §19.8: an unprovenanced coefficient refuses the composition, and a
 # sigma-column hole makes that refusal un-checkable. The rule was asserted in
 # canon and verified once by hand during a 2026-07 audit; nothing kept it true.
-import csv as _csv
 for _p in sorted((REPO / 'physics/library/cert/reference-data').glob('*.csv')):
     for _r in _csv.DictReader(_p.open(encoding='utf-8')):
         _v = (_r.get('Value') or '').strip()
@@ -248,6 +251,43 @@ for _p in sorted((REPO / 'physics/library/cert/reference-data').glob('*.csv')):
         if not (_r.get('Source') or '').strip():
             findings['refdata-source'].append(
                 f'{_p.name}: {_label} has no source (unprovenanced coefficient)')
+
+# (l) reference-data row arity, and (m) date sanity ------------------------
+# A Source cell carrying an unquoted comma splits into extra fields and shifts
+# every column right of it. `transport-coefficients.csv` shipped one such row for
+# a month: its `Source class` held a prose fragment, `Added` held "experimental"
+# and `Modified` held "1". Check (k) passed it, because the cells it reads by
+# NAME were still non-empty -- they just held the wrong values. Arity is what
+# catches a shift; presence is not.
+_TODAY = _dt.date.today()
+for _p in sorted((REPO / 'physics/library/cert/reference-data').glob('*.csv')):
+    _raw = list(_csv.reader(_p.open(encoding='utf-8')))
+    _width = len(_raw[0])
+    for _n, _row in enumerate(_raw[1:], 2):
+        if _row and len(_row) != _width:
+            findings['refdata-arity'].append(
+                f'{_p.name}:{_n}: {len(_row)} fields, header has {_width} — a cell '
+                f'with an unquoted comma shifts every column after it')
+    for _r in _csv.DictReader(_p.open(encoding='utf-8')):
+        _label = f"{_r.get('Property')}/{_r.get('Material')}"
+        _seen = {}
+        for _f in ('Added', 'Modified'):
+            _v = (_r.get(_f) or '').strip()
+            if not _v:
+                continue
+            try:
+                _seen[_f] = _dt.date.fromisoformat(_v)
+            except ValueError:
+                findings['refdata-date'].append(
+                    f'{_p.name}: {_label} has {_f}={_v!r}, not an ISO date')
+                continue
+            if _seen[_f] > _TODAY:
+                findings['refdata-date'].append(
+                    f'{_p.name}: {_label} has {_f}={_v}, which is in the future')
+        if len(_seen) == 2 and _seen['Modified'] < _seen['Added']:
+            findings['refdata-date'].append(
+                f"{_p.name}: {_label} was Modified {_seen['Modified']} before it "
+                f"was Added {_seen['Added']}")
 
 # (g) D2/D4 rows must carry their gate/relaxation rationale in `source` -----
 # A D4 row with no named relaxation is un-gateable (impl-04-formulas); the

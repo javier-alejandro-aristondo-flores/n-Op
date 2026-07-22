@@ -339,6 +339,23 @@ def check_counts(pages: list[dict]) -> list[str]:
                 errs.append(f"{r['rel']}: says {n} rows tagged `{tag}`; "
                             f"registry CSV has {want}")
 
+    # "N probes" — the calibration's own size, quoted in four places. It drifted
+    # the moment two probes were added, which is the same failure the calibration
+    # exists to catch, one level up again. Counted from calibrate.py's source.
+    cal = ROOT / "tools" / "calibrate.py"
+    if cal.exists():
+        want = len(re.findall(r'^\s{4}\("', cal.read_text(encoding="utf-8"), re.M))
+        if want:
+            for r in pages:
+                # [timeline] is a dated record: its entries state what was true on
+                # a day, and rewriting them to today's number destroys the record.
+                if r["id"] == "timeline":
+                    continue
+                for n in re.findall(r"(\d+)\s+probes\b", CHANGELOG_RE.sub("", r["body"])):
+                    if int(n) != want:
+                        errs.append(f"{r['rel']}: says {n} probes; calibrate.py "
+                                    f"defines {want}")
+
     # Cost-tier distributions, the diff tally's twin. Only the diff tally was
     # checked, so the tier line beside it drifted to 75/40/13/4 against an actual
     # 76/40/11/5 -- and because the wrong numbers still summed to 132, the error

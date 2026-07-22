@@ -7,7 +7,7 @@
 (d) glossary-term divergence candidates (term defined once, redefined elsewhere)
 (e) retired formula names still resolving to nothing (retired-names.csv)
 (f) near-miss formula names: case variants and one-edit neighbours of real rows
-(g) D2/D4 rows whose `source` cell names no relaxation / no gate rationale
+(g) D4 rows whose `source` cell names no relaxation
 (h) `unregistered-formulas` declarations that the body no longer invokes
 (i) glossary rows whose canonical pointer names no page
 (j) registry `name (row N)` pointers that name the wrong row
@@ -43,7 +43,6 @@ EDITABLE += sorted((REPO / 'informed-operator/design').glob('*.md'))
 rows = list(csv.reader(CSV_PATH.open(encoding='utf-8')))[1:]
 row_ids = {int(r[0]) for r in rows}
 row_names = {r[1] for r in rows}
-marker_ids = {int(r[0]) for r in rows if r[4].strip() == '—'}
 
 findings = defaultdict(list)
 
@@ -130,7 +129,11 @@ for path in EDITABLE:
                     + (f' (nearest: {close[0]})' if close else ''))
 
 # (c) duplicated numeric literals ------------------------------------------
-TOL = re.compile(r'\b(?:τ|δ)_[A-Za-z,]+\s*(?:=|≈)?\s*`?([0-9.]+e?-?[0-9]*)`?')
+# The symbol list below is HARD-CODED and covers 9 of the 17 tolerance symbols in
+# `arch-12-cert §12.0.2`. It compares known symbols for divergent values between
+# sites; it does not discover a symbol introduced without a row there. That page
+# states the limitation; this comment is here so the limitation is visible from
+# the checker too, rather than only from the page it fails to cover.
 tol_sites = defaultdict(set)
 for path in EDITABLE:
     for ln, line in enumerate(path.read_text(encoding='utf-8').splitlines(), 1):

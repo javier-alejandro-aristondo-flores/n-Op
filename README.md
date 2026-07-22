@@ -68,6 +68,7 @@ n-Op/
 │   │   └── 11-appendix-derivations/   9 supporting derivations
 │   ├── live/                 work products still executing
 │   └── tools/                apparatus.py (regenerate + check) · seams.py (sweeps)
+│                             · calibrate.py (plants defects; proves the other two look)
 ├── physics/
 │   └── library/              code scaffold (no code yet)
 │       ├── formulas/registry-manifest.csv    the canonical formula registry
@@ -81,13 +82,16 @@ hashes and regenerates `contents.md` / `index.md`. `--check` verifies without wr
 and is the gate, alongside `python journal/tools/seams.py`. Between them they fail on
 a duplicate `canonical-for` topic, an asymmetric or missing dependency edge, an
 unresolvable `[id]`, a section coordinate or dated anchor that resolves to nothing, a
-line-number citation, a registry count or per-tag tally that disagrees with the CSV, a
-retired formula name left unresolved, a `D4` row with no named relaxation, and a stale
-hash.
+line-number citation, a registry count, per-tag tally or per-tier distribution that
+disagrees with the CSV, a retired formula name left unresolved, a `D4` row with no
+named relaxation, and a stale hash.
 
 **Green is not evidence a check ran.** Both checkers have shipped holes that made them
 skip whole classes of citation silently. Before citing a clean run, plant a defect of
 the class you are claiming is absent and confirm the checker fails (`[traps]` §58).
+`python journal/tools/calibrate.py` does exactly that — 45 probes into a temporary
+copy — and additionally reports any check that *no* probe reaches, since a calibration
+with holes in it is the same failure one level up.
 
 ## Open decisions
 

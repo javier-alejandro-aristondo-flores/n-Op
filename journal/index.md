@@ -21,7 +21,7 @@ Every canonical topic and the single page that owns it. If a topic is not here, 
 | content-addressed identity discipline | 4.3 [Representation substrate](pages/04-pipeline-and-compilation/4.3-representations.md) | `arch-20-representations` |
 | conventions | 10.1 [Doc-tree conventions](pages/10-process-and-governance/10.1-conventions.md) | `conventions` |
 | coupling coverage policy | 3.3 [Coupling structure](pages/03-laws-and-residuals/3.3-coupling-structure.md) | `arch-19-coupling-structure` |
-| coupling target shapes (Scalar | AntisymmForm | PSDSymmForm) | 3.3 [Coupling structure](pages/03-laws-and-residuals/3.3-coupling-structure.md) | `arch-19-coupling-structure` |
+| coupling target shapes (Scalar \| AntisymmForm \| PSDSymmForm) | 3.3 [Coupling structure](pages/03-laws-and-residuals/3.3-coupling-structure.md) | `arch-19-coupling-structure` |
 | CouplingChannel record | 3.3 [Coupling structure](pages/03-laws-and-residuals/3.3-coupling-structure.md) | `arch-19-coupling-structure` |
 | CouplingSpec record | 3.3 [Coupling structure](pages/03-laws-and-residuals/3.3-coupling-structure.md) | `arch-19-coupling-structure` |
 | CoverageBound record | 3.3 [Coupling structure](pages/03-laws-and-residuals/3.3-coupling-structure.md) | `arch-19-coupling-structure` |

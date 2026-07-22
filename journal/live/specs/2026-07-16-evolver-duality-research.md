@@ -327,7 +327,8 @@ specified.
 Stages 1–3 are shared verbatim — S6 *requires* it, and everything the lowering consumes
 (pruned graph, symmetry sidecar, invariant sidecar, sparsity/incidence, category facets,
 fixed-point facts) already exists at Stage 4. Stage 4 gains one concurrent decision cluster
-beside compression-plan selection, adjoint synthesis, and codegen (`arch-07-pipeline §7.4`):
+beside compression-plan selection, adjoint synthesis, the adjoint-tape materialization
+schedule, and codegen (`arch-07-pipeline §7.4`):
 
 - **causalization audit** — check S1–S4 per tier over the extracted graph; compute the
   matching, the alias eliminations, the index witness, and the per-block generator tags;

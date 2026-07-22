@@ -6,13 +6,25 @@ Emits at the repo root:
     index.md      canonical topic -> owning page (the "one fact, one home" index)
 
 Checks (exit 1 on any failure):
-    1. every page has parseable frontmatter and the required fields
-    2. `id` globally unique
-    3. `canonical-for` topics globally unique   <- the anti-drift invariant
-    4. `depends-on` / `referenced-by` symmetric
-    5. every [id] reference in prose resolves to a real page
-    6. `content-hash` matches the body (stale hash = someone edited by hand
-       without regenerating, which breaks working-copy staleness detection)
+     1. every page has parseable frontmatter and the required fields
+     2. `id` globally unique; page filed in the folder its `chapter` names
+     3. `canonical-for` topics globally unique   <- the anti-drift invariant
+     4. `depends-on` / `referenced-by` symmetric, both directions, no unknown ids
+     5. every [id] reference in prose resolves to a real page
+     6. a body citing an [id] has the corresponding depends-on edge
+     7. section coordinates (`§12.0.3`, `§2026-06-10 (parenthetical)`) resolve,
+        and an ambiguous dated anchor is rejected
+     8. no line-number citations (`file.md:42` rots on every edit)
+     9. registry counts: substantive/marker totals, the five other canonical
+        vocabulary phrasings, the ledger headline, the per-tag diff tally, and
+        the per-tier cost distribution
+    10. trap numbering contiguous, and `[traps] §N` resolves
+    11. `status` / `authority` in vocabulary
+    12. `content-hash` matches the body (stale hash = someone edited by hand
+        without regenerating, which breaks working-copy staleness detection)
+
+This list is duplicated in prose at `journal/instructions.md` §8 and
+`10.1-conventions`; `calibrate.py` is what keeps all three honest.
 
 This replaces the old assemble.py, whose job (emitting monoliths that
 restated the tree) was deleted with the monoliths themselves.
@@ -223,8 +235,8 @@ def check(pages: list[dict]) -> list[str]:
     return errs
 
 
-def registry_tallies() -> tuple[int, int, dict[str, int]] | None:
-    """(substantive, markers, diff tally) from the canonical registry CSV.
+def registry_tallies() -> tuple[int, int, dict[str, int], dict[str, int]] | None:
+    """(substantive, markers, diff tally, cost-tier tally) from the registry CSV.
     A row whose Tier is an em dash is an architectural marker, not a formula."""
     csv_path = ROOT.parent / "physics/library/formulas/registry-manifest.csv"
     if not csv_path.exists():
@@ -232,16 +244,17 @@ def registry_tallies() -> tuple[int, int, dict[str, int]] | None:
     import csv as _csv
     with csv_path.open(encoding="utf-8", newline="") as fh:
         rows = list(_csv.reader(fh))[1:]
-    markers, diff = 0, {}
+    markers, diff, tier_tally = 0, {}, {}
     for row in rows:
         tier = row[4].strip() if len(row) > 4 else ""
         if tier == "—":
             markers += 1
             continue
+        tier_tally[tier] = tier_tally.get(tier, 0) + 1
         if len(row) > 5:
             d = row[5].strip()
             diff[d] = diff.get(d, 0) + 1
-    return len(rows) - markers, markers, diff
+    return len(rows) - markers, markers, diff, tier_tally
 
 
 def check_counts(pages: list[dict]) -> list[str]:
@@ -251,7 +264,7 @@ def check_counts(pages: list[dict]) -> list[str]:
     tallies = registry_tallies()
     if tallies is None:
         return ["registry-manifest.csv not found — cannot check counts"]
-    substantive, markers, _diff = tallies
+    substantive, markers, _diff, _tier = tallies
 
     canon = next((r for r in pages if "vocabulary counts" in r["canonical-for"]), None)
     if canon is None:
@@ -325,6 +338,23 @@ def check_counts(pages: list[dict]) -> list[str]:
             if int(n) != want:
                 errs.append(f"{r['rel']}: says {n} rows tagged `{tag}`; "
                             f"registry CSV has {want}")
+
+    # Cost-tier distributions, the diff tally's twin. Only the diff tally was
+    # checked, so the tier line beside it drifted to 75/40/13/4 against an actual
+    # 76/40/11/5 -- and because the wrong numbers still summed to 132, the error
+    # survived every eyeball that checked the total. A distribution line is one
+    # naming three or more tiers with counts; a lone `T3 (computing C)` is prose.
+    TIER_COUNT = re.compile(r"\bT([0-3])\b[^()\n]{0,90}?\((\d+)")
+    for r in pages:
+        for line in r["body"].splitlines():
+            hits = TIER_COUNT.findall(line)
+            if len(hits) < 3:
+                continue
+            for tier, n in hits:
+                want = _tier.get(f"T{tier}", 0)
+                if int(n) != want:
+                    errs.append(f"{r['rel']}: says {n} rows in cost tier T{tier}; "
+                                f"registry CSV has {want}")
     return errs
 
 
@@ -451,7 +481,12 @@ def render_index(pages: list[dict]) -> str:
            "one-fact-one-home invariant holds.", "",
            "| Topic | Page | id |", "|---|---|---|"]
     for topic, r in rows:
-        out.append(f"| {topic} | {r['tag']} [{r['title']}]({r['rel']}) | `{r['id']}` |")
+        # A topic may legitimately contain `|` -- "coupling target shapes (Scalar
+        # | AntisymmForm | PSDSymmForm)" does -- and an unescaped one silently
+        # splits its row into five cells. The glossary already escapes them; this
+        # generator did not, so the index shipped one broken row.
+        cell = topic.replace("|", r"\|")
+        out.append(f"| {cell} | {r['tag']} [{r['title']}]({r['rel']}) | `{r['id']}` |")
     out += ["", f"*{len(rows)} canonical topics across {len(pages)} pages.*", ""]
     return "\n".join(out)
 

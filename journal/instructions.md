@@ -172,8 +172,13 @@ relaxation; registry `name (row N)` pointers naming the wrong row;
 whose canonical pointer names no page; and, in the reference-data CSVs, rows with
 no uncertainty or no source, rows whose **field count** disagrees with the header,
 and dates that are non-ISO, in the future, or modified-before-added. Its sweep
-covers the book, the README, this file, the reference-data CSVs, and
-`informed-operator/design/`.
+covers the book, the README, this file, the reference-data CSVs,
+`informed-operator/design/`, and `journal/live/specs/`. **`live/audits/` is
+excluded and `live/specs/` is not** — an audit is a frozen dated record, whereas
+a spec tracks current truth (§4), so a stale claim in one misdirects the next
+agent instead of preserving history. The sweep read all of `journal/live/` as
+frozen until 2026-07-22, which is how research specs — the stratum agents
+actually write into — went unchecked the longest.
 
 The arity check earns its place: a `Source` cell holding an unquoted comma splits
 into extra fields and shifts every column right of it. One such row sat in
@@ -188,7 +193,7 @@ silently skip whole classes of citation. Before citing a clean run as evidence,
 plant a defect of exactly the class you claim is absent and confirm the checker
 fails (`10.4-traps` §58). That is now a script:
 `python journal/tools/check_the_checkers.py` plants a defect in a temporary copy and
-asserts it fires — 58 probes. It reports three failure modes, and all three are
+asserts it fires — 59 probes. It reports three failure modes, and all three are
 holes: a **missed** probe is a hole in the checker; a **stale** probe — one whose
 planted text no longer exists — is a hole in the probe list; an **uncovered**
 check is one no probe reaches at all, which the script derives from `check_data_agreement.py`'s

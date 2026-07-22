@@ -66,8 +66,14 @@ CSV_PATH = REPO / 'physics/library/formulas/registry-manifest.csv'
 
 corpus_root.refuse_if_scratch_copy(REPO, allowed='--worktree' in sys.argv)
 
-# The editable surface is the book. journal/live/ is frozen work product:
-# internal staleness there is by-design and exempt (conventions, authority order).
+# The editable surface is the book. Only journal/live/audits/ is frozen work
+# product: an audit is a dated record, so internal staleness there is by-design
+# and exempt (conventions, authority order). This comment used to say all of
+# journal/live/ was exempt, and lifted the audits rationale one directory up —
+# but conventions says specs are NOT frozen: a spec is still executing, the next
+# agent researches against it, so a stale claim there misdirects work instead of
+# preserving history. Research specs are where agents write, which made this the
+# one exemption that cost the most.
 # instructions.md is the entry point an agent reads first, so its staleness
 # costs the most — and it sits outside pages/, where nothing was checking it.
 EDITABLE = [REPO / 'README.md', REPO / 'journal' / 'instructions.md']
@@ -80,6 +86,8 @@ EDITABLE += sorted((REPO / 'physics/library/cert/reference-data').glob('*.csv'))
 # Nothing was sweeping them, and the note in residual-loss-methodology.md warning
 # about a stale D-tag legend had itself gone stale.
 EDITABLE += sorted((REPO / 'informed-operator/design').glob('*.md'))
+# live/specs track current truth (conventions); live/audits are the frozen record.
+EDITABLE += sorted((REPO / 'journal/live/specs').glob('*.md'))
 
 rows = list(csv.reader(CSV_PATH.open(encoding='utf-8')))[1:]
 row_ids = {int(r[0]) for r in rows}

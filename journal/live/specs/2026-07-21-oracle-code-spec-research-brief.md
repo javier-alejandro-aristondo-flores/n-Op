@@ -66,7 +66,7 @@ The contract must guarantee all six, so the neural operator can be trained and c
 ### 3.5 The diamond MVP acceptance test (the first end-to-end validation target)
 The MVP code spec must be validated by this test (also recorded in [capability-slices], Cap 1):
 - **Null:** grade a ground-truth, relaxed pure-diamond state → every residual slot ≈ 0 within σ (the oracle certifies truth as lawful).
-- **Sensitivity:** perturb the state (displace an atom, distort the cell off the energy minimum, wrong lattice constant) → non-zero residual, **and the specific keys that fire name the violated law** (`∇_R E_BO = 0` for a bad relaxation, space-group equivariance for a broken symmetry, Born stability for an over-stretch).
+- **Sensitivity:** perturb the state (displace an atom, distort the cell off the energy minimum, wrong lattice constant) → non-zero residual, **and the specific keys that fire name the violated law** (`∇_R E_BO = 0` for a bad relaxation, space-group equivariance for a broken symmetry, Born stability — now `elastic-stability-criteria` — for an over-stretch).
 - **Data-backed sensitivity:** perturb *along* the existing diamond strain-hypersurface dataset (1,179 DFT points, PBE/HSE) and confirm the residual tracks the DFT energy rise off the minimum — a quantitative curve-match, not just a sign check. **De-duplicate first:** the manifest's 1,179 rows are only 1,131 distinct shapes. (Note: the "~877" figure that appears in older narrative is the byte-salvage count from a truncated download, not the dataset size.)
 
 ### 3.6 Settled architecture decisions (do not reopen)

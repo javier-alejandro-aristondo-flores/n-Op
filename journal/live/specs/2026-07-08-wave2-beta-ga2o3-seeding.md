@@ -98,7 +98,8 @@ bowing, B3). Diamond battery: landed (gap-audit Phase 3). c-BN / 4H-SiC: Wave 3.
 
 Source: resonant ultrasound spectroscopy + laser-Doppler interferometry, "Unusual elasticity of
 monoclinic β-Ga₂O₃", JAP 124 085102 (2018) **[verified]**. Notable anisotropy: C₁₁ ≈ 30% below
-C₂₂/C₃₃; C₄₄ vs C₆₆ differ >50% — Born-stability check must use the full monoclinic criteria
+C₂₂/C₃₃; C₄₄ vs C₆₆ differ >50% — the Born-stability check (row 57,
+`elastic-stability-criteria`) must use the full monoclinic criteria
 (row 57 generalizes; **not** the cubic reduced set).
 
 *Phonon / thermal:*

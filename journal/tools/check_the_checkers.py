@@ -192,6 +192,15 @@ PROBES: list[tuple[str, str, str, str, str, str]] = [
      "# Architectural principles",
      "# Architectural principles\n\nSee the Schottky–Mott rule.",
      "retired-eponym"),
+    # Surface probe, not a defect class: live/specs/ was exempt until 2026-07-22
+    # because the tool read all of journal/live/ as frozen, which is the audits
+    # rule applied one directory up. Specs are the stratum agents write research
+    # into, so the exemption cost the most there. This probe fails if it returns.
+    ("retired name in a live spec (surface probe)", "data",
+     "journal/live/specs/2026-07-21-oracle-code-spec-research-brief.md",
+     "# /physics Oracle — Code-Specification Research Brief",
+     "# /physics Oracle — Code-Specification Research Brief\n\nA stray `Padovani-Stratton-TFE`.",
+     "retired-name"),
     ("case-variant near-miss", "data",
      "journal/pages/01-purpose-and-product/1.4-architectural-principles.md",
      "# Architectural principles", "# Architectural principles\n\nSee `acoustic-mismatch-tbr`.",

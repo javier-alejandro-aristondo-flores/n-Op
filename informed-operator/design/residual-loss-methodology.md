@@ -85,7 +85,7 @@ The expanded loss `L = Σ_k λ_k L_k` requires choosing weights. Survey:
 |---|---|---|---|---|
 | **Fixed weights** | Hand-tuned λ_k | Few terms, similar scales | 0 | — |
 | **Uncertainty weighting** | `λ_k = 1/(2σ_k²)`, σ_k learned | Multi-task supervised, when scales differ in magnitude | Negligible | Kendall, Gal, Cipolla CVPR 2018 |
-| **GradNorm** | Adjust λ_k so per-task gradient norms `||∇_W L_k||` equalize | Multi-task; reduces task interference | O(K) gradient norms/step | Chen et al. ICML 2018 |
+| **GradNorm** | Adjust λ_k so per-task gradient norms `\|\|∇_W L_k\|\|` equalize | Multi-task; reduces task interference | O(K) gradient norms/step | Chen et al. ICML 2018 |
 | **NTK-balancing** | λ_k from spectrum of `K_k = J_k J_k^T` (NTK block per loss) | PINN; addresses spectral bias | O(N²) per epoch (subsample) | Wang, Yu, Perdikaris JCP 2022 |
 | **Self-Adaptive PINN** | Per-collocation-point trainable weights, ascended | PINN regions of high residual | O(N) extra params | McClenny & Braga-Neto JCP 2023 |
 | **Learning Rate Annealing** | Heuristic from gradient magnitudes per loss | PINN startup | Low | Wang et al. SIAM JSC 2021 |
@@ -157,7 +157,7 @@ Many residuals at many costs; can't evaluate all every step.
 |---|---|---|
 | **Uniform random** | baseline | T0 residuals where landscape is uniform |
 | **Residual-Adaptive Refinement (RAR)** | Lu et al. SIAM Rev 2021 | Add collocation points where residual is large |
-| **RAD (Residual-based Adaptive Distribution)** | Wu, Lu, Xu, Karniadakis CMAME 2023 | Importance sample from `p(x) ∝ |res(x)|^k / Σ + c` |
+| **RAD (Residual-based Adaptive Distribution)** | Wu, Lu, Xu, Karniadakis CMAME 2023 | Importance sample from `p(x) ∝ \|res(x)\|^k / Σ + c` |
 | **Causal sampling** | Wang, Sankaran, Perdikaris 2022 | Time-causal weighting for IVPs |
 | **Curriculum** | Krishnapriyan 2021 | Easy-to-hard residuals; start with smooth/cheap residuals |
 

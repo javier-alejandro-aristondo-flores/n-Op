@@ -204,7 +204,7 @@ coefficient or row pair.
 
 Obligation 4 and its versioning discipline in obligation 8 read from a single
 content-addressed store, the **`SqliteReferenceCache`**: a process-local SQLite file at
-`physics/library/cert/reference-data/cache.sqlite`, opened in write-ahead-log mode for
+the cache inside [reference-data], opened in write-ahead-log mode for
 concurrent reads from the training process and the cert evaluator.
 
 ```

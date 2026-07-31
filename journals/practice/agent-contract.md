@@ -100,6 +100,19 @@ Anchors are declared, so they cannot.
 
 **Never cite by file path or line number.** Paths move; line numbers rot on every edit.
 
+**Data files are cited by id too.** The registry, the reference data and the datasets
+are named in `data-artifacts` below and cited exactly like pages — `[registry]`,
+`[reference-data]`. They carry no anchors and need no `depends-on` edge, because there
+is no page on the other end.
+
+This exists for one reason: **no wording of a path is true across a move.** A page that
+names where a file lives today is wrong the moment the file moves, and right now is
+wrong afterwards — the present tense cannot disambiguate a claim about a location that
+is about to change. An id can. Moving a file is one edit to the map below, not one edit
+per page that mentions it. This is the same discipline that let the pages themselves be
+moved wholesale without breaking a single reference; data files were the one class
+still outside it.
+
 ## Where a fact goes
 
 1. Name the topic.
@@ -188,6 +201,18 @@ citations:
     - section-ordinal        # §4.1
     - line-number            # file.md:42
     - bare-path              # journals/oracle/state/unified-state.md
+
+# Data artifacts are cited by id, exactly like pages, and for the same reason: the
+# corpus survived being moved wholesale because nothing referenced a path. These
+# files are the one class that still did — and the cutover is the move that would
+# have broken them. Changing where a file lives is one edit here, not N across the
+# corpus.
+data-artifacts:
+  registry: data/registry-manifest.csv
+  reference-data: data/reference-data/
+  strain-sweep: data/diamond-strain-sweep/
+  research-log: log/timeline.md
+  corpus-index: generated/corpus.json
 
 libraries:
   oracle: physics

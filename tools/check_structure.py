@@ -166,8 +166,12 @@ def check_topics(pages: list[dict], errs: list[str]) -> dict[str, tuple[str, str
 
 
 def check_citations(pages: list[dict], errs: list[str], pending: list[str],
-                    partial: bool = False) -> None:
+                    schema: dict, partial: bool = False) -> None:
     by_id = {p["fm"].get("id"): p for p in pages}
+    # Data artifacts share the page namespace: ids are unique corpus-wide, so a
+    # reader never has to know which kind a citation is. They carry no anchors and
+    # no graph edge — there is nothing on the other end to depend on.
+    data_ids = set(schema.get("data-artifacts") or {})
     unresolved = pending if partial else errs
     for p in pages:
         # Frontmatter carries prose too — an open question's summary can cite a
@@ -179,6 +183,10 @@ def check_citations(pages: list[dict], errs: list[str], pending: list[str],
             if target not in by_id:
                 unresolved.append(f"{rel}: depends-on names {target!r}, which is not a page")
         for cid, anchor in CITE_RE.findall(text):
+            if cid in data_ids:
+                if anchor:
+                    errs.append(f"{rel}: [{cid}#{anchor}] — a data artifact has no anchors")
+                continue
             if cid not in by_id:
                 unresolved.append(f"{rel}: citation [{cid}] resolves to no page")
                 continue
@@ -283,6 +291,7 @@ def emit(pages: list[dict], owner: dict, schema: dict) -> dict:
             } for p in sorted(pages, key=lambda x: x["fm"]["id"])
         },
         "topics": {t: {"page": pid} for t, (pid, _) in sorted(owner.items())},
+        "data": dict(sorted((schema.get("data-artifacts") or {}).items())),
         # Malformed entries are already reported as findings; emitting must not
         # crash on them. A checker that dies on bad input reports nothing at all,
         # and its traceback can even satisfy a probe by accident — which is how
@@ -308,7 +317,7 @@ def main() -> int:
 
     check_frontmatter(pages, schema, errs)
     owner = check_topics(pages, errs)
-    check_citations(pages, errs, pending, partial)
+    check_citations(pages, errs, pending, schema, partial)
     check_tables(pages, errs)
     check_vocabulary(pages, schema, errs)
 

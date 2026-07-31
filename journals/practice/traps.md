@@ -561,7 +561,7 @@ every downstream check that treats a clearance as a fact. — enforced,
 ### Seed from the source, never from a page that quotes it
 
 Values come from [accuracy-ledger#seed-provenance] and from the reference data under
-`physics/library/cert/reference-data/`. A page that quotes a value is quoting it; the
+[reference-data]. A page that quotes a value is quoting it; the
 file is where it is changed and where a disagreement is settled. *Breaks:* a seeding wave
 silently reverts a landed fix by re-deriving a value from prose. — enforced,
 [conventions#artifacts]

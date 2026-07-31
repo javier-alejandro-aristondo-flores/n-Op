@@ -118,7 +118,7 @@ A check is what remains for the rules that cannot be built out.
 Three kinds of file sit outside the journals, and each relates to prose differently.
 
 **Data files are sources.** The registry manifest and the reference data under
-`physics/library/` hold the corpus's coefficients, formula rows, signatures and tags. A
+[registry] and [reference-data] hold the corpus's coefficients, formula rows, signatures and tags. A
 page that states one of those values is *quoting* it: the file is where the value
 changes, and where a disagreement between a page and the data is settled. Seed from the
 file, or from [accuracy-ledger#seed-provenance], never from a page that quotes one

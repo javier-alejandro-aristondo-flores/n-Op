@@ -82,8 +82,8 @@ This is the **error-model seed**. Each value is a declared characteristic scale 
 
 **It is a reference table, not the registry.** The canonical per-formula bundle,
 evaluation cost and differentiability live in
-`physics/library/formulas/registry-manifest.csv`, and the canonical per-value citations
-live in the `Source` column of `physics/library/cert/reference-data/*.csv`
+[registry], and the canonical per-value citations
+live in the `Source` column of [reference-data]
 ([reference-battery]).
 
 ## Design-grade
@@ -209,7 +209,7 @@ canonical curated-coefficient seed. Each is a `ProvenanceLedger` entry
 task before that material is claimed.
 
 **Per-value citations are the `Source` column of
-`physics/library/cert/reference-data/*.csv`, which is canonical for them.** This page
+[reference-data], which is canonical for them.** This page
 carries the values and the composition rules that travel with them; it is not the
 citation of record. Where a `Source` cell names no author and no year,
 the seeded-value provenance section below says what the row actually rests on.

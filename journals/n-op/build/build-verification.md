@@ -5,6 +5,7 @@ owns:
   - static consistency set
   - runtime gate sequence
   - first end-to-end capability gate
+  - diamond strain hypersurface
   - registration gate
   - worked example gate
   - curriculum gate
@@ -13,6 +14,7 @@ owns:
 anchors:
   static-consistency: "Internal consistency, checked statically"
   first-end-to-end-gate: "The first end-to-end gate"
+  strain-hypersurface: "The strain hypersurface this gate runs against"
   gates: "The five runtime gates"
   registration: "Gate 1 — registration sanity"
   worked-example: "Gate 2 — end-to-end worked example"
@@ -86,9 +88,39 @@ chain runs ([capability-slices#structure-prediction]). Three parts, in order.
   the elastic stability criteria for an over-stretch. Because residuals are keyed and
   never aggregated ([residual-definitions#granularity]), "the right law fired" is
   directly checkable rather than inferred from a total.
-- **Data-backed sensitivity.** Perturbing along the diamond strain-hypersurface
-  reference dataset ([reference-battery]), the residual tracks the reference energy
-  rise off the minimum — a quantitative match, not only a sign check.
+- **Data-backed sensitivity.** Perturbing along the diamond strain hypersurface, the
+  residual tracks the reference energy rise off the minimum — a quantitative match,
+  not only a sign check.
+
+## The strain hypersurface this gate runs against
+
+The data-backed arm runs against a recovered hybrid-level strain hypersurface of
+diamond — HSE06 with gap-tuned exact exchange, six lattice-distortion families to
+±10%, with stress tensors — in `data/diamond-strain-sweep/`. It is **simulation
+output, not measured reference data**, which is why it sits beside the reference data
+rather than inside it: the reference battery is not a cache of computed results
+([reference-battery#boundaries]).
+
+**1,179 rows, of which 1,131 are distinct shapes.** Twenty-four shapes are each
+computed three times, and the three copies agree bit for bit, so de-duplication drops
+48 surplus rows and loses nothing. Left in, those 24 shapes carry triple weight in any
+fit.
+
+**De-duplicate before any fit, and de-duplicate on the manifest's own
+`duplicate_group` column.** Naming the column is not pedantry — it is the only method
+that works, and the obvious alternative fails *silently*:
+
+- The three copies of a shape are geometrically identical and **textually different**.
+  One row leaves the untouched skew columns blank; the others write an explicit
+  `0.000` into one of them.
+- The copies also arrive from different source archives under different shape-change
+  labels, so de-duplicating on the shape-change kind together with the geometry fails
+  the same way.
+- Sorting the geometry columns for unique rows therefore returns all 1,179 and reports
+  the data clean.
+
+A careful person doing the sensible thing gets the wrong answer and no warning. The
+`duplicate_group` column is the key; the coordinates are not.
 
 ## The five runtime gates
 

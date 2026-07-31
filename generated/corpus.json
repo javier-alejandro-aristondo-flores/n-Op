@@ -1,4 +1,11 @@
 {
+  "data": {
+    "corpus-index": "generated/corpus.json",
+    "reference-data": "data/reference-data/",
+    "registry": "data/registry-manifest.csv",
+    "research-log": "log/timeline.md",
+    "strain-sweep": "data/diamond-strain-sweep/"
+  },
   "open_questions": [
     {
       "anchor": "stub",
@@ -618,6 +625,7 @@
         "registration": "Gate 1 — registration sanity",
         "seam-smoke-test": "Gate 5 — operator seam smoke test",
         "static-consistency": "Internal consistency, checked statically",
+        "strain-hypersurface": "The strain hypersurface this gate runs against",
         "worked-example": "Gate 2 — end-to-end worked example"
       },
       "depends_on": [
@@ -643,6 +651,7 @@
         "static consistency set",
         "runtime gate sequence",
         "first end-to-end capability gate",
+        "diamond strain hypersurface",
         "registration gate",
         "worked example gate",
         "curriculum gate",
@@ -2794,6 +2803,9 @@
     },
     "diamond primitive cell": {
       "page": "mvp-system"
+    },
+    "diamond strain hypersurface": {
+      "page": "build-verification"
     },
     "differentiability vocabulary": {
       "page": "named-formulas"

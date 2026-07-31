@@ -119,6 +119,8 @@ PROBES: list[tuple[str, str, str, str]] = [
      "open-questions: []",
      "open-questions:\n  - id: q\n    anchor: here",
      "missing 'summary'"),
+    ("anchor on a data artifact",
+     "[agent-contract#shape]", "[registry#some-anchor]", "has no anchors"),
     ("stale emitted corpus.json",
      None, None, "stale"),
     # Structural probes: these plant a whole file rather than mutating the victim,

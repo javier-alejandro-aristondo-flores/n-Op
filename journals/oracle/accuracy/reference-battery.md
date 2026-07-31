@@ -28,7 +28,7 @@ open-questions: []
 
 ## Purpose
 
-`physics/library/cert/reference-data/` holds the **machine-readable reference data** that
+[reference-data] holds the **machine-readable reference data** that
 cert obligation 8 reads ([cert-obligations#the-ten-obligations]). It is the canonical
 source of truth for one question — *what does the literature say about this quantity?* —
 and it is what the oracle's predictions and computed values are checked against.

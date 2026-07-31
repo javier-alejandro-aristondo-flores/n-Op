@@ -69,21 +69,88 @@ the column-vocabulary check.
 
 ---
 
-## 2. The remaining tag families
+## 2. The complete name map
 
-Recovery status per family. Names are proposed only where the meaning is established.
+**Every tag family already had English names written beside the serial.** Not one
+required invention. This is D18's argument demonstrated rather than asserted: the
+serials were decoration over names that were already there, and the only thing they
+contributed was collision potential.
 
-| Family | Status | Notes |
+### `T0`–`T3` — two vocabularies, not one (D20)
+
+Full reasoning in the plan, §4.4. In short: the registry classifies **evaluation cost**
+(a property of the formula); `informed-operator` classifies **training cadence** (a loop
+policy). They belong to different libraries — `purpose-and-scope` forbids the oracle
+from owning loop policy — and they already mis-bind, since an SCF residual is `T3` by
+cost and `T2` by cadence.
+
+| Was | Oracle — evaluation cost | Operator — training cadence |
 |---|---|---|
-| `D0`–`D4`, `DN` | **named** (D17) | `read · direct · adjoint · fixpoint-adjoint · relaxed · none` |
-| Layer `1`–`3` | **named** (D17) | `substrate · one-shot-dressing · iterative-dressing · property-machinery`; Layer 3 is the operator **library**, never a layer |
-| `S1`–`S5` | **named** (§1 above) | recovered from two agreeing paths |
-| `T0`–`T3` | needs naming | meanings are stated in `6.9-formula-registry:102-104`; **but three incompatible legends exist** — registry, generator-catalog, and `informed-operator`, the last unbannered. Reconcile before naming. |
-| `B1`–`B11` | needs naming | bundle names already exist in prose at `6.1-canonical-vocabularies:153-165`; this is transcription, not recovery |
-| `C1`–`C7` | needs naming | cluster names exist at `4.3-representation-substrate:133-139` |
-| `L1`–`L4` | needs naming | BO level names exist at `2.5-born-oppenheimer-levels:40-55`. **Note the `L1` trap:** it is simultaneously a BO level and a registry `Bundle` value — the collision that corrupted four rows (`traps §70`) |
-| `P0`–`P2`, `P1`/`P4` | **dies** | audit priorities and a retired coupling family — scaffolding under D1. **`P3` at `3.3-coupling-structure:579` is already dangling** and must be resolved or deleted, not carried |
-| gap-audit `A#`–`E#` | **dies** | audit findings are history under D1. But they are **embedded in registry `Source` cells** (`extension (2026-07 gap-audit B1; …)`), so removal touches the canonical CSV, not just the timeline |
+| `T0` | `microseconds` | `per-step` |
+| `T1` | `milliseconds` | `per-batch` |
+| `T2` | `seconds` | `per-epoch` |
+| `T3` | `minutes` | `on-demand` |
+
+Magnitude names on the oracle side because the mechanism names all collide:
+`solve` is the verb of *"score, not solve"*; `kernel` is overloaded three ways;
+`iterative` is D17's name for a dressing layer.
+
+### `B1`–`B11` — observable bundles → their own names
+
+Transcribed verbatim from the table at `6.1-canonical-vocabularies:153-165`, which
+already carries both columns:
+
+`electronic-structure` · `phonon` · `transport` · `defect-resolved` ·
+`surface-resolved` · `interface-resolved` · `mechanics` · `thermodynamics` ·
+`non-equilibrium-operating` · `static-validity` · `degradation`
+
+**Plus one that was never a `B` at all.** Rows 91–94 carry `L1` in the `Bundle`
+column — a BO level used as a bundle value, because they are level-1 primitives
+feeding several bundles. That is the exact collision that corrupted four rows
+(`traps §70`: a checker harvested the wrong vocabulary and retagged them `B1`).
+It becomes **`linear-response-primitive`**, and the collision stops being
+representable. The four rows are `lattice-coulomb-summation-scalar`,
+`operator-position-derivative-tensor`, `high-frequency-response-tensor`,
+`electronic-linear-response-tensor` — already descriptive, only their bundle tag
+was ambiguous.
+
+### `C1`–`C7` — substrate clusters → their own names
+
+Transcribed from `4.3-representation-substrate:133-141`:
+
+`vocabularies` · `registered-generators` · `sidecars` · `evidence` ·
+`content-addressing` · `selected-subsets` · `sparse-masks`
+
+### `L1`–`L4` — Born–Oppenheimer levels → their own names
+
+Transcribed from `2.5-born-oppenheimer-levels:40-55`:
+
+`quantum-electronic-substrate` · `born-oppenheimer-surface` ·
+`equilibrium-statistics` · `non-equilibrium-kinetics`
+
+**On the eponym.** `born-oppenheimer-surface` keeps its name under the corpus's own
+existing rule (`conventions:82`): *"Eponyms are renamed when they misdescribe, not
+merely because they are eponyms… The test is whether a reader could bind the name to
+the wrong object."* It names one thing unambiguously, so it stays. **D18 targets
+serials and symbols — tokens that are contentless or ambiguous — not standard
+technical vocabulary.** `sigma` → `standard deviation` is spelling out a symbol;
+removing a proper noun that correctly names one object would be a different and worse
+change.
+
+### Families that die rather than get renamed
+
+| Family | Why |
+|---|---|
+| `P0`–`P2` audit priority, `P1`/`P4` retired coupling | scaffolding under D1. **`P3` at `3.3-coupling-structure:579` is already dangling** — defined nowhere, a survivor of the retired family. Resolve or delete; do not carry |
+| gap-audit `A#`–`E#` | audit findings are history under D1. But they are **embedded in registry `Source` cells** (`extension (2026-07 gap-audit B1; …)`), so removal touches the canonical CSV, not only the timeline |
+
+### Already named (D17)
+
+| Family | Becomes |
+|---|---|
+| `D0`–`D4`, `DN` | `read · direct · adjoint · fixpoint-adjoint · relaxed · none` |
+| Layer `1`–`2` | `substrate · one-shot-dressing · iterative-dressing · property-machinery` |
+| Layer `3` | *not a layer* — it is the operator **library** |
 
 ---
 

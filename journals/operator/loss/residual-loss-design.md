@@ -54,7 +54,7 @@ open-questions:
     summary: "The source-weight curriculum gives physics residuals weight from the first training phase, and the stage ordering gives the oracle a single stage at the end; one is the multi-fidelity literature's schedule and the other is this project's decision, and which governs is unstated."
   - id: experimental-sigma-source
     anchor: tension
-    summary: "The experimental loss term is scaled by a per-observable standard deviation, and it is undetermined whether that comes from instrument metadata on the datum or from the declared accuracy scale of the observable — they are different quantities and only one of them varies per measurement."
+    summary: "The seam supplies two standard deviations without conflating them — one per datum on the external-ground-truth call, one the observable's declared accuracy scale, which feeds the error budget and not a loss weight — and this page has not chosen which one scales the experimental Huber term. Only the per-datum one varies per measurement."
 ---
 # Residual loss design
 
@@ -288,7 +288,8 @@ L_total = w_cheap(t) · Σ_o∈O_cheap  m_o · squared-error(ŷ_o, y_o^cheap)
         + Σ_i λ_i(t) · residual_i(ŷ ; state)
 
   m_o       label-presence for observable o on this sample, 1 or 0
-  σ_o^exp   experimental standard deviation, which the Huber term respects
+  σ_o^exp   the standard deviation scaling the experimental term; whether it is
+            per datum or per observable is open
   w_*(t)    source-weight curriculum schedules
   λ_i(t)    per-residual weights, set by the balancing policy
 ```
@@ -362,12 +363,17 @@ Pareto trade-off between them. Three fixes are documented:
 3. **Hierarchy through weights.** The noise band is absorbed by inverse-variance
    weighting in an uncertainty-based balancing scheme.
 
-**The first is the policy here** — a Huber term with a per-observable standard
-deviation — because it is the cheapest and empirically the most reliable. It depends on
-a standard deviation whose origin is not yet fixed: instrument metadata on the datum
-and the declared accuracy scale of the observable
-([accuracy-ledger#observable-regimes]) are
-different quantities, and only one of them varies per measurement.
+**The first is the policy here** — a scaled Huber term — because it is the cheapest and
+empirically the most reliable.
+
+**Which standard deviation scales it is not fixed, and this page does not pre-empt it.**
+The seam supplies two, and does not conflate them: the external-ground-truth call
+carries a standard deviation **per datum** ([residual-machinery#subtypes]), while the
+generator's characteristic scale is the observable's **declared accuracy scale**, seeded
+from the ledger ([accuracy-ledger#observable-regimes]) and composed into the error
+budget rather than into a loss weight. Both are reachable across the seam; only the
+per-datum one varies per measurement. The formula above writes the scale per observable,
+which is the survey's form and not a decision.
 
 ## What convergence does and does not guarantee
 
@@ -403,7 +409,8 @@ Settable defaults, gathered. Each is the recommendation of a section above.
 - **Inner balancing.** Kernel-initialised fixed weights per residual, multiplied by
   the curriculum schedule. Optional per-point self-adaptive weights for `per-step`
   residuals whose landscape is non-uniform.
-- **Experimental term.** Huber, scaled by a per-observable standard deviation.
+- **Experimental term.** Huber, scaled by a stated standard deviation — which of the
+  two the seam supplies is open, above.
 - **Sampling.** `per-step` always on, full evaluation. `per-batch` always on,
   importance-sampled by residual magnitude. `per-epoch` curriculum-gated off early;
   when active, evaluated on the largest-residual fraction of the batch. `on-demand`

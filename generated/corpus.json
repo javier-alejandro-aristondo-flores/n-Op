@@ -810,6 +810,7 @@
         "boundary": "The compose-time and runtime boundary",
         "invariant-synthesis": "Invariant synthesis",
         "lowering-and-adjoint-synthesis": "Lowering and adjoint synthesis",
+        "partial-evaluation": "The pipeline is partial evaluation",
         "rewrite-admission": "The rewrite-admission rule",
         "runtime-kernel-application": "Runtime kernel application",
         "symbolic-lift": "Symbolic lift",
@@ -842,6 +843,7 @@
       "owns": [
         "compose-time pipeline stages",
         "always-cheap discipline",
+        "the pipeline as partial evaluation",
         "stage boundaries",
         "rewrite admission rule",
         "compression plan selection",
@@ -3227,6 +3229,9 @@
     },
     "the micro-to-macro homogenisation map": {
       "page": "multiscale-state"
+    },
+    "the pipeline as partial evaluation": {
+      "page": "compose-time-pipeline"
     },
     "the refined emergence axiom": {
       "page": "multiscale-state"

@@ -21,7 +21,8 @@ Read this first. Read the per-subject files for evidence.
 | Subjects delivered | compilation (12 findings, closed) |
 | Subjects with substantial drafts | laws (15+), seams (16), certification, registry, state, values |
 | Undergraduate reports returned and verified | 22 |
-| Findings established | 223 structured, across eight subjects |
+| Findings established | 246 structured, across nine subjects |
+| Adjacent-contradiction class | **swept complete: 45 of 45 pages, 41 findings, 18 STRONG** |
 | Corpus gates | still green; nothing in this audit changed `journals/` or `data/` |
 | Stopped by | session limit, not by completion |
 
@@ -435,7 +436,49 @@ Three things sharpen it rather than soften it:
 **The sweep's own caution, kept because it is the honest part:** its positive control was
 self-planted and the blind control never arrived. A 4-of-4 self-plant measures sensitivity
 to a shape already being looked for. **This is a discovery result, not a certification** —
-it says the class is dense, not that the class has been enumerated. 27 pages are unread.
+it says the class is dense, not that the class has been enumerated.
+
+#### The remaining 27 pages were then swept, and the extrapolation held
+
+`findings/class1-tail.md`. **23 findings across the 27 pages the first sweep never read** —
+10 STRONG, 12 MEDIUM, 1 WEAK. All 27 read fully, nothing skipped.
+
+| | pages | findings | STRONG | STRONG per page |
+|---|--:|--:|--:|--:|
+| first sweep (discursive pages) | 18 | 18 | 8 | 0.44 |
+| tail (registry- and table-heavy) | 27 | 23 | 10 | 0.37 |
+| **corpus-wide, measured** | **45** | **41** | **18** | **0.40** |
+
+**The predicted decline did not materialise.** The first sweep read the corpus's most
+discursive prose first and warned the rate would fall on registry and table-heavy pages.
+It barely did — 0.37 against 0.44. And its extrapolation, *"somewhere near 40 adjacent
+contradictions"*, is now a measured **41**.
+
+**This is the largest single defect class in the corpus, and it is now measured rather than
+estimated.** Every one of the 41 passes every structural gate: valid links, a resolving
+citation, a single owner.
+
+##### The calibration says even 41 is a floor
+
+The tail sweep was calibrated by re-reading `practice/conventions.md` cold — a page the
+first sweep had already covered — with no answer key and no planting. Result, reported as
+found: **1 of the 2 known findings recovered.** It missed the id-citation contradiction
+while quoting the very sentence that carries it.
+
+But it found **3 further contradictions on that same page** that the first sweep had not.
+So two independent readers of one page produced 2 and 4 findings, **overlapping in exactly
+one**. Neither reader is close to exhaustive on a single page, which means the corpus-wide
+41 is a lower bound, not a count.
+
+##### The tail's by-catch is a second result
+
+Eleven **cross-page** contradictions were found and correctly not chased, among them: the
+oracle library "holds no instance" of the state type while `gamma-hat` budgets ~18 MB of
+density-matrix storage inside it; `computational-methods` naming a typeclass alias `Field`
+that `typeclass-alphabet` does not list, while the alias it does list never appears in a
+method signature; and a per-evaluation eigenvalue guard in `coupling-structure` against
+`representation-substrate`'s "No hot path requires a solver call". These belong to the
+cross-page classes and are logged, not resolved.
 
 ---
 

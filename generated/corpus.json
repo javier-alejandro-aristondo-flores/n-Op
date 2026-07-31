@@ -46,7 +46,7 @@
       "anchor": "tension",
       "id": "experimental-sigma-source",
       "page": "residual-loss-design",
-      "summary": "The experimental loss term is scaled by a per-observable standard deviation, and it is undetermined whether that comes from instrument metadata on the datum or from the declared accuracy scale of the observable — they are different quantities and only one of them varies per measurement."
+      "summary": "The seam supplies two standard deviations without conflating them — one per datum on the external-ground-truth call, one the observable's declared accuracy scale, which feeds the error budget and not a loss weight — and this page has not chosen which one scales the experimental Huber term. Only the per-datum one varies per measurement."
     },
     {
       "anchor": "conditioning-inputs",

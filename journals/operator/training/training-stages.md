@@ -105,8 +105,8 @@ loop that walks these stages lives in the loops library ([boundary]).
 The stage ordering says **when** the oracle attaches. **Which** residual categories
 participate, and at what elapsed fraction, is a second schedule, and it is the
 oracle's: [residual-definitions#curriculum-gate] states the gate and the fractions it
-turns on. The operator library may override any fraction or any category — the schedule is a
-normative default, not a contract.
+turns on. The operator library may override any fraction or any category — the
+schedule is a normative default, not a contract.
 
 **Which run those fractions denominate is unsettled**, and it is carried as an open
 item on that anchor. The answer moves the gate's phases relative to the stage boundary

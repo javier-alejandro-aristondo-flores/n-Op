@@ -95,6 +95,94 @@ prevent."*
 
 ---
 
+---
+
+## What the lead sweep returned
+
+Three agents, one per material family. Full detail in `restructure/leads/`. Every claim
+below was re-verified against the CSVs before being written here.
+
+**Not every finding is a missing citation.** Four classes came back, and two were not
+what this pass was looking for.
+
+### A. Resolves internally — no search was needed
+
+| Row | Resolves via |
+|---|---|
+| `frohlich-alpha` AlN | its own inputs are two rows of `phonon-frequencies.csv`, both citing Davydov with year and DOI |
+| `bulk-modulus` AlN | derivable from the elastic constants already in the same CSV |
+| `mass-density` β-Ga₂O₃ | the Åhman citation sits in the audit file, unpropagated |
+| `caughey-thomas-mu-n-set` β-Ga₂O₃ | the audit's gap register carries the substantiating sentence |
+
+Four of the twenty-four never needed literature. They needed the corpus to look at itself.
+
+### B. Resolved to named primary literature
+
+`mobility-electron-best-exp` β-Ga₂O₃ → four named papers, three matching exactly ·
+`debye-temperature` AlN → full citation recovered · `lattice-constant-a`,
+`phonon-max-energy`, `mass-density` diamond → primary sources with exact matches.
+
+### C. A declared absence that contradicts a citation in the same file
+
+`transport-coefficients.csv` row 43 states AlN conductivity is theory-only with
+**"no >500 K single-crystal measurement"**. Row 24 of the same file cites
+**Slack, J. Phys. Chem. Solids 48, 641 (1987)** for the 300 K value — and that paper
+reports measurements to far above 500 K.
+
+This is the opposite failure from an unsourced value: **a refusal to seed, on grounds
+the corpus's own citation contradicts.** An unnecessary refusal costs coverage
+silently, and unlike a wrong value nothing will ever fire on it.
+
+`caughey-thomas-mu-n-set` AlN may be the same shape — the lead found one named source
+that is an open preprint.
+
+### D. The diamond conductivity rows — four separate problems
+
+The two rows this pass was aimed at (`transport-coefficients.csv` 773 K = 620 W/mK,
+1100 K = 450 W/mK, both `Pass C battery anchor`).
+
+1. **The ledger and the CSV describe the same numbers differently.** The accuracy
+   ledger attributes all three temperatures to *Feng–Lindsay–Ruan (2017); Broido
+   (2007)*. The CSV declares two of them `theory-interpolation`. Both are canon; the
+   ledger outranks nothing here — they simply disagree about what kind of number this
+   is. **Structural, and mine.**
+2. **A citation appears to name the wrong material.** `Broido, Appl. Phys. Lett. 91,
+   231922 (2007)` is, by its published abstract, about **silicon and germanium**. The
+   diamond paper from that group is a different one (Ward et al., Phys. Rev. B 80,
+   125203, 2009). The corpus records the 2026-06-10 re-audit as having missed *a
+   mis-citation*; this is a candidate for it, or for a second one on the same quantity.
+3. **The overprediction is probably named in the corpus's own cited paper.**
+   Feng–Lindsay–Ruan states that three-phonon scattering alone **overpredicts diamond
+   conductivity by 31% at 1000 K**, and that including four-phonon scattering reduces
+   the prediction by 30% at 1000 K. The corpus records that re-audit as having missed
+   *a κ overprediction*. The two are very likely the same thing.
+4. **A numerical confusion trap, and it belongs in the traps register.** That paper's
+   widely-quoted "2200 → 1400 W/mK at room temperature" figures are for **boron
+   arsenide, not diamond** — and they collide numerically with diamond's own ~2200
+   W/mK, one paragraph away. Anyone re-deriving the diamond anchor from this paper can
+   land on the right number for the wrong material and see nothing wrong.
+
+**The single highest-value acquisition:** Olson et al., *Phys. Rev. B* **47**,
+14850 (1993) — the only primary measurement spanning 170–1200 K, which both
+high-temperature rows depend on, and which could not be retrieved.
+
+### E. Where "no source found" is the honest answer
+
+`dielectric-static` diamond and `debye-temperature` diamond. Neither is a minor row:
+the first feeds image-force lowering, the second sets the four-phonon validity window
+that the 773 K conductivity row depends on. The Debye temperature additionally carries
+±50 K against a literature spread of 1860–2230 K by method — **a stated uncertainty
+narrower than the disagreement between methods.**
+
+### F. One value whose trail points at the wrong material
+
+`cohesive-energy` diamond, 7.37 eV/atom ± 0.05. The lead traces the standard tabulated
+7.374 to **graphite**; diamond's figure is 7.346. Both sit inside the stated band, so
+the *value* is defensible either way — but the *provenance* may be another material's
+number. Registered, not adjudicated.
+
+---
+
 ## Disposition for Phase 2
 
 | Class | Action |

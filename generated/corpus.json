@@ -1,0 +1,43 @@
+{
+  "open_questions": [],
+  "pages": {
+    "agent-contract": {
+      "anchors": {
+        "citing": "Citing",
+        "forbidden": "Forbidden",
+        "frontmatter": "Frontmatter",
+        "placement": "Where a fact goes",
+        "schema": "The machine-readable schema",
+        "shape": "The shape of the base",
+        "vocabulary": "The vocabulary rule"
+      },
+      "depends_on": [],
+      "journal": "practice",
+      "library": null,
+      "owns": [
+        "frontmatter schema",
+        "citation syntax",
+        "fact placement rule",
+        "vocabulary rule"
+      ],
+      "path": "journals/practice/agent-contract.md",
+      "referenced_by": [],
+      "section": null,
+      "title": "Agent contract"
+    }
+  },
+  "topics": {
+    "citation syntax": {
+      "page": "agent-contract"
+    },
+    "fact placement rule": {
+      "page": "agent-contract"
+    },
+    "frontmatter schema": {
+      "page": "agent-contract"
+    },
+    "vocabulary rule": {
+      "page": "agent-contract"
+    }
+  }
+}

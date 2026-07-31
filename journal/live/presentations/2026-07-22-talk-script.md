@@ -1,14 +1,11 @@
 # Talk script
 
-*~25–30 min · 14 slides, 12 figures · figures in `figures/`, slide N uses fig N−1.*
+*~13 min · 10 slides. Every bullet is a line to say out loud, roughly as written.*
 
-Audience: materials scientists, EEs, physicists. They have the physics; the CS is the new part.
-Spine: operator predicts material behaviour → its loss needs physics → oracle compiles the laws
-into keyed differentiable residual terms that enter that loss. No proposer. Inverse design is a
-direction, not a claim.
+Audience: materials scientists, EEs, physicists. They have the physics. The CS is the new part.
 
-Pacing: slides 2–7 are the argument — ~2½ min each. 8–12 are machinery — ~90 s. Run long, cut
-machinery, never the first half.
+3 argues the architecture and 7 gives its limits. 4 is the object against real data;
+5 and 6 are why it's shaped that way and how data earns its way in. 8 and 9 are the checker.
 
 ---
 
@@ -16,157 +13,137 @@ machinery, never the first half.
 
 **Screen:** title, name, affiliation.
 
-- CS undergrad, working on crystals.
-- Claim: there's a CS-shaped problem in here, and treating it as one buys things.
-- One line: compile the laws into a fast, checkable program; use it to keep an ML model honest.
-- Half of this is complexity theory and compilers. Physics only where it pays.
+- I'm a CS undergrad, and I work on crystals.
+- Half of this is complexity theory and compilers. The claim is that the data structure and the
+  physical law are the same object.
 
-## 2 · Two incumbents · `fig-01`
+## 2 · What this operator does · `fig-02`
 
-- Target: material behaviour at device conditions — >500 °C, high field, radiation.
-- Direct DFT: trustworthy, unaffordable there.
-- ML surrogate: cheap, unreliable under extrapolation — and fails *silently*. Returns a confident
-  number at 900 K after training at 300 K.
-- Empty quadrant. Instinct is to compromise along the diagonal. Don't — change the object.
+- The operator does channel completion. You hand it a topology plus whatever properties you know,
+  and it returns the ones you didn't.
+- Some channels are constants, some are curves. All of them are functions.
+- The topology has to be there, or the problem is one-to-many. What I'm after is predicting crystal
+  structures.
 
-## 3 · Hardness · `fig-02`
+## 3 · Why an operator · `fig-03`
 
-- Classical lattice ground states: NP-hard (Barahona '82).
-- General quantum case — local Hamiltonian — QMA-complete (Kitaev).
-- No efficient general algorithm under standard assumptions. Hardware doesn't move the wall.
-- Other direction: checking a supplied candidate is cheap. That asymmetry *is* NP.
-- So: not a faster solver. A cheap checker.
+- A few things here push toward an operator rather than a fixed-size network.
+- The channels are functions — the density matrix over two points in space, the field over space
+  and time. A wide output layer has to pick a grid and commit to it, and the meshes change per
+  material.
+- The oracle also evaluates residuals at arbitrary points on an axis, nowhere near the training
+  grid, and the model has to answer there.
+- And the physics is nonlocal, so a kernel that sees the whole cell in one layer beats a local
+  stencil.
 
-## 4 · Oracles · `fig-03`
+## 4 · The state, against a real run · `fig-04`
 
-- Oracle = black box, one query, unit cost. Used to stratify difficulty: `P^A`, `NP^A`; PH is
-  iterated oracle access.
-- Known limit: BGS '75 — oracles exist both ways, so relativizing arguments can't settle P vs NP.
-- Ours is not a decision oracle. Returns a residual vector + gradients, not a bit.
-- Reason: a bit gives a learner no direction. Valuation oracle, not decision oracle.
+- The record is seven slots, and this is it measured against a real calculation. Hydrogen in a box,
+  four ionic steps.
+- h is the cell. R and P are the ion positions and momenta, and Pi-h is the cell's own momentum.
+- Z is species — the only discrete slot, and it never changes. No gradient runs through an integer,
+  so you can't search over composition by descent.
+- Gamma-hat is the one-body density matrix, a function of two points in space. A is the external
+  field.
+- Three slots come straight out of the run. Gamma-hat is partial — the charge density file gives me
+  the diagonal, and the off-diagonal needs a wavefunction file this run didn't write.
+- Three are missing, for three different reasons. Two are settings: I froze the cell, and this was a
+  relaxation and not dynamics, so I've plotted the conjugate quantities instead.
+- The vector potential is different. It doesn't exist in the theory that produced these files.
+  That's the term n-Op adds.
 
-## 5 · Witness completeness · `fig-04`
+## 5 · Why those seven · `fig-05`
 
-- Cheap verification requires the *complete* witness.
-- Partial witness — structure only — and the checker must solve for the electronic state. Back in
-  the hard class.
-- Complete witness → one pass.
-- So score-not-solve is a complexity constraint, not a style preference.
-- Consequence: the operator carries γ̂. The expensive part is exactly what we want learned.
+- This is the law I care about. L is the reversible part, antisymmetric and energy-conserving;
+  M is dissipative and makes entropy.
+- Elastic response, phonons, transport and optics are all restrictions of that one law.
+- L acts on conjugate pairs, so the momenta have to be in the state. The record is the domain of the
+  law, not a schema I picked. Leave a slot out and you've deleted the physics that needed it.
 
-## 6 · The system · `fig-05`
+## 6 · Getting data in · `fig-06`
 
-- Four objects, four maps. θ → x → (r, ∇r) → L → θ.
-- Operator emits a complete state. Oracle scores it against the laws. Residuals are terms in the
-  loss. Gradient returns to weights.
-- Oracle is one arrow: no solving, no proposing, no loop, no verdict.
-- Residuals stay keyed — per law, per axis point. Not one scalar. That's what lets you weight,
-  schedule, and audit them individually.
-- Status: spec'd and adversarially audited, **zero code**. Every number today is a design
-  commitment, not a benchmark.
+- Before I read a run I hash its settings — functional, cutoff, pseudopotentials, k-mesh, smearing,
+  symmetry. Energies only compare within one hash.
+- Then it has to pass arithmetic it already claims. Forces sum to zero, stress is symmetric,
+  occupations count the electrons, the determinant matches the volume. One frame, closed form, free.
+- Past that gate every value carries an uncertainty or it doesn't go in. Either I compute the same
+  shape twice and look at the spread, or I read the components symmetry says must vanish. Either way
+  that's precision, not accuracy.
 
-## 7 · The artifact · `fig-06`
+## 7 · Where it falls short · `fig-07`
 
-- Compile once per material identity → a file. Not a service, not a framework.
-- Four parts: the callable; the slot schema; a content-hash ID; a pinned cert.
-- Slot schema means it's self-describing — enumerate every check it contains. Not in the list ⇒
-  not there.
-- ID: file hash = kernel hash. Provenance is a lookup, not archaeology.
-- Cert travels with it.
-- Immutable — new pin, new registry version, new identity ⇒ new file.
-- Two outputs overall: per material, this file. Across the programme, a model whose predictions
-  carry evidence.
+- The honest other half. Two failure modes, and both are quiet.
+- Off the training distribution it keeps answering, in range, with the same confidence. And spectral
+  bias means smooth modes get learned first and sharp ones last, so band edges and defect levels
+  come out rounded.
+- Neither announces itself, which is the argument for scoring the output against something that
+  isn't learned.
 
-## 8 · Grammar · `fig-07`
+## 8 · The checker, and where it goes · `fig-08`
 
-- CIF + conditions is a *compile request*, not a scoreable object. Parse, then elaborate.
-- Closed grammar: 132 formulas, 12 methods, 20 templates, 11 bundles. No free-form expressions.
-- Walk the tree: κ_lattice derives to a template and a method; terminals are registry rows — 9, 10,
-  25. An observable is a sentence, not new code.
-- Dotted branch is pruned: `is-polar` is false for diamond, so the polar scattering term never
-  enters the kernel. Applicability is first-order decidable, and non-decidable classifiers are
-  rejected at registration.
-- So a request compiles or is refused with a reason — before it costs cluster time.
-- Rest of the compiler, briefly: cross-formula CSE, hash-consing, tearing, then lowering + codegen.
-- Two time scales: compile s–min once per material; call µs–ms, millions of times. Partial
-  evaluation (Futamura), not a trick.
+- Running DFT directly at device conditions is trustworthy and unaffordable. Finding a ground state
+  is NP-hard — Barahona, 1982 — and the quantum version is QMA-complete, which is Kitaev. But
+  checking a candidate you already have is one pass.
+- So I build the checker. A textbook oracle hands back one bit; mine hands back one residual per
+  law, with gradients, because a bit gives a learner no direction to move in.
+- It attaches here. Supervised epochs on VASP data first, which is what narrows the search space,
+  then the informed epoch, where the oracle scores the operator's output into the loss.
+- The data does the searching and the oracle only refines. At inference the operator runs alone.
+- Residuals stay keyed and never summed, so I can weight them and see which law fired. And none of
+  this is implemented yet — every number is a design target.
 
-## 9 · Symmetry · `fig-08`
+## 9 · What gets checked · `fig-09`
 
-- Operator commutes with the group ⇒ Schur ⇒ block-diagonal by irrep. Blank blocks are work
-  avoided.
-- Sampling collapses onto orbits — one representative each.
-- Cost scales with orbits, not points. Paid once, at compile.
+- These are named laws, not one penalty term.
+- Forces vanish at a relaxed structure. Phonon frequencies squared stay non-negative on anything
+  claimed stable. The density matrix is Hermitian, eigenvalues between zero and one, trace is the
+  electron count. Then conservation, algebraic identities, thermodynamics and symmetry — nineteen
+  categories.
+- The last few need gamma-hat, so you can't get them out of geometry. That's why the operator hands
+  over the whole record.
 
-## 10 · Cost · `fig-09`
-
-- Commitment: no per-sample hot path worse than `O(log n)`, and none calls a solver.
-- Left: the shaded band is the admissible region. Set membership, map lookup, BDD evaluate, verdict
-  meet — all of them sit inside it. `O(n)` is excluded by construction.
-- Deliberately falsifiable — each op is checkable against the bound.
-- Gradients: naive reverse mode tapes all N iterations. IFT adjoint at a converged fixed point is
-  one linear solve — flat in N.
-- That's the difference between gradients being affordable and being the blocker.
-
-## 11 · Refusal · `fig-10`
-
-- Applicability as a BDD over material predicates.
-- Terminal `absent`: the check isn't in the compiled kernel. No zero, no NaN, no silent fallback to
-  an inapplicable formula.
-- Absence carries a machine-readable reason. So a file's coverage is enumerable — including its
-  gaps.
-
-## 12 · Trust · `fig-11`
-
-- Cert per kernel: obligations, verdicts, numeric witnesses. No prose anywhere.
-- Aggregation is a semilattice meet. One `Failed` ⇒ `Failed`.
-- Content-addressed throughout: file hash = kernel hash. Reproducibility is structural, not
-  procedural.
-
-## 13 · Sign trap · `fig-12`
-
-- Two conventions for one quantity. Both correct in-frame.
-- Lift `b` across ⇒ bowing inverts ⇒ interface charge takes the wrong sign. Review doesn't catch
-  it — the wrong version is as plausible as the right one.
-- 51 in the register. Most found *after* something had been stated wrongly.
-- Fix: state the invariant once, canonically; machine-check it. Care isn't a mechanism.
-- Own example: the seams checker scanned formula names in one syntactic position, missed another.
-  Reported clean. Widening it surfaced 17 real findings. A narrow parser fails quietly.
-
-## 14 · Close
+## 10 · Close
 
 **Screen:** *Verifying is cheaper than solving.*
 
-- General problem stays intractable. Checking is cheap. Put the checker inside the loss.
-- Out: per material, a file that states what it knows and refuses the rest. Across the programme,
-  a model whose predictions arrive with evidence.
-- Frame's own limit: relativization — an oracle only tells you what's reachable *relative to what
-  it's handed*. Which is why witness completeness was the load-bearing decision.
-- Not faster physics. Addressable, checkable, reproducible physics.
+- The general problem stays hard and checking stays cheap, so put the checker inside the loss.
+- Pick the state so the law fits it, and make the data pass a gate before it gets in.
+- Thanks — happy to take questions.
 
 ---
 
 ## Backup slides
 
-Specs in the outline; render if asked.
+On disk in `figures/unused/`. Render if asked.
 
-- CSE / hash-consing — "which optimisations?"
-- CEGIS side-by-side — "has this shape been done?" Yes; gradient replaces the counterexample.
-- Pullback square — for a categorical questioner.
-- Evolver negative result — "what doesn't work?" One IR for scorer *and* stepper: strong form
-  refuted (causality assignment is global matching, not per-node); shared-kernel form survives.
+- The seven slots as a plain table, without the run — `fig-04-state`.
+- Find versus check, the search tree against one pass — `fig-09-hardness`.
+- The closed grammar: a CIF compiles, guards prune, seconds to compile and microseconds to call —
+  `fig-12-grammar`.
+- Fingerprint and the invariant battery, drawn out — `fig-04-admission`.
+- Green–Lagrange strain, both routes, and the transpose trap — `fig-06-strain`.
+- Clamped versus relaxed off the trajectory, and Kleinman zeta — `fig-07-trajectory`.
+- Cost tiers and preconditions — `fig-09-tiers`.
+- Delta-transferability, is the correction constant — `fig-10-delta`.
+- Accuracy targets per observable, with uncertainty and source.
+- What it refuses, and the physical reason for each.
+- CEGIS side by side, with a gradient in place of the counterexample.
 
-## Likely questions
+## Answers to have ready
 
-- **Benchmarks?** None. Zero code. Design commitments; spec'd and audited, not built. Say it early.
-- **Does it design materials?** No, and the oracle doesn't try — inverse design is out of scope for
-  it. The contract stays compatible with that direction.
-- **Time evolution / lifetime?** Unclaimed. Researched; verdict was "survives with restrictions";
-  waits on its own wave.
-- **Language?** Open, being re-evaluated. A polyglot proposal is documented; treating it as a
-  candidate.
-- **Isn't this a PINN?** Same family, different rigour. A PINN adds a penalty term. This compiles a
-  closed, versioned, citation-traced vocabulary into a certified artifact, keeps every residual
-  separately addressable, and refuses what it can't stand behind.
-- **Why an undergrad on this?** The failure modes here are CS failure modes — conventions, naming,
-  provenance, parsers. Fifty-one documented cases where care wasn't enough.
+Short versions. The long ones are in the prep doc.
+
+- **Oracle at inference?** No, training-time only. A trained operator is a standalone predictor.
+- **Why not residuals alone?** Local signal, nothing to point at over a big space. VASP narrows first.
+- **Benchmarks?** None. No code yet. Everything I quoted is a design target.
+- **Does it design materials?** No. Inverse design is out of scope for the oracle.
+- **Why is species immutable?** It's discrete. Composition search needs something off the gradient
+  path, which is a different problem.
+- **Time evolution?** Researched, survives with restrictions, not claimed yet.
+- **What language?** Open. There's a polyglot proposal and everything in it is a candidate.
+- **Isn't this a PINN?** A PINN adds a penalty term by hand. This compiles a closed, cited
+  vocabulary into an artifact, keeps every residual addressable, and refuses what it can't back.
+- **Topological materials?** That Kitaev result is the complexity one, not band topology. There's a
+  topology atlas, but it classifies a structure you hand it. It generates nothing.
+- **Why an undergrad?** The failure modes are CS failure modes — conventions, transposes,
+  provenance, parsers. 51 documented cases where care wasn't enough.

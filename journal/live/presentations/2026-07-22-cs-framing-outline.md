@@ -213,7 +213,7 @@ topic ownership, symmetric dependency graph, content-hash freshness), a calibrat
 adversarial audit, and a **standing traps register**: durable findings where *the wrong version
 looks exactly as plausible as the right one*. Show one worked sign-convention trap. → **D12**
 
-**Beat 31 — the parser bug, told against myself.** `seams.py` originally scanned only
+**Beat 31 — the parser bug, told against myself.** `check_data_agreement.py` originally scanned only
 backtick-quoted formula names, so `formula = <name>` arguments were invisible: the checker
 reported **clean** while pages invoked formulas absent from the registry. Widening the scan
 surfaced 17 findings immediately. A false negative caused by an under-specified parser — proof

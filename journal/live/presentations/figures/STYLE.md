@@ -61,11 +61,11 @@ Curved arrows are `<path d="M … Q … …">` with `fill="none"` — never `<li
 length `L`, place the control point about `0.2 L` along the outward normal from the chord
 midpoint; that yields a sagitta of about `0.1 L`.
 
-Per-figure: **curved** — F2, F3, F4, F5, F6, F8, F12. **Straight** — F1 (chart),
-F7 (program flow), F9 (chart), F10 (BDD convention), F11 (Hasse + DAG convention).
+Per-figure: **curved** — F2, F5, F6, F8. **Straight** — F3 (plot), F7 (plot), F9 (table).
+F4 is an imported raster and outside the scheme.
 
 Note that a curly brace is drawn with `Q` segments but is *not* an arrow; a straight-arrow figure
-may legitimately contain one (F7 does).
+may legitimately contain one.
 
 ## Fills — five values, no others
 
@@ -129,7 +129,28 @@ colour of any kind.
 </defs>
 ```
 
+## Colour — one declared exception
+
+`fig-02-completion.svg` is allowed colour. It shows several functional channels at once, and hue
+is the only encoding that separates them without adding shape noise.
+
+(`fig-04-dashboard.png` is an imported raster and sits outside this style entirely. It carries its
+own light ground, and the deck gives that one slide a light background rather than framing white in
+black.)
+
+Its palette, and nothing beyond it:
+
+`#5b8fc7` · `#f2963d` · `#6bb562` · `#bd8ac4` · `#e8676a` · `#4fa8a0`
+
+Mid-tone by design, so they read on white and on the `#1c1c1c` slide unchanged. The dark build
+maps greys only, so colour passes through untouched.
+
+No other figure gets colour. If a second one seems to need it, the figure is probably encoding too
+much.
+
 ## The one rule that must not drift
 
-Every `fill=` and `stroke=` value is one of the five permitted greys, `none`, or `url(#hatch)`.
-Anything else is a defect. This is mechanically checkable — do check it.
+Every `fill=` and `stroke=` value is one of the five permitted greys, `none`, or `url(#hatch)` —
+except in `fig-02-completion.svg`, which may also use the six accent colours above.
+
+This is mechanically checkable. Check it, with `fig-02` whitelisted rather than the rule relaxed.

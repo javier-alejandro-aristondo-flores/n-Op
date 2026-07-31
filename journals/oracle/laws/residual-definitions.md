@@ -41,6 +41,7 @@ depends-on:
   - residual-machinery
   - crystal-inputs
   - training-stages
+  - residual-loss-design
 open-questions:
   - id: curriculum-denominator
     anchor: curriculum-gate
@@ -305,6 +306,11 @@ either side of the one it attaches to, a schedule indexed on the whole training
 run and a schedule indexed on that single stage place Warmup and Cooldown in
 different places. Both readings are coherent; the corpus does not say which is
 meant.
+
+The choice is not free downstream. The operator's source-weight curriculum gives
+physics residuals weight from its own first phase; under the single-stage reading
+that phase lies inside the window where the oracle is attached, and under the
+whole-run reading it lies outside it ([residual-loss-design#curriculum]).
 
 The schedule is a normative default, not a contract: the operator declares its
 own `Map<CategoryTag, GateSchedule>` if it overrides any fraction or category.

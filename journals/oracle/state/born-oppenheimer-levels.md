@@ -69,7 +69,9 @@ The micro seven-tuple is the tier of the two lowest levels.
 Within `quantum-electronic-substrate`, corrections that dress the bare substrate are organised
 into implementation tiers. **These are version-1-versus-version-2 implementation scope, not a
 runtime hierarchy.** Dressing is a lowering choice for specific `MethodInvoke` nodes, and the
-`dressing` tag on `ContributionFacets` is a **provenance label, not a loss-weighting axis**.
+`dressing` tag on `ContributionFacets` is a **provenance label, not a loss-weighting axis**. That
+is a structural fact rather than a convention — the graph is what makes it true
+([physics-graph#observable-selection]).
 
 | Tier | Contents | Certificate |
 |---|---|---|

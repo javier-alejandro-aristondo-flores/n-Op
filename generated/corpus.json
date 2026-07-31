@@ -28,7 +28,19 @@
       "anchor": "sampling",
       "id": "sampling-policy-record-home",
       "page": "residual-loss-design",
-      "summary": "A sampling policy is a cadence, a sampler and an optional importance function; the oracle's generator record carries the sampler alone, so the cadence and the importance function have no typed home on either side of the seam."
+      "summary": "A sampling policy is a cadence, a sampler and an optional importance function, and nothing carries all three: the oracle's generator record has one flat four-valued field fusing a sampler, two importance schemes and an evaluation-scope value, with no cadence field at all, so the importance function has no typed home on either side of the seam."
+    },
+    {
+      "anchor": "four-sources",
+      "id": "compared-against-versus-supervisory-sources",
+      "page": "residual-loss-design",
+      "summary": "The per-generator compared-against enum has four values and this page has four supervisory sources, and they are not the same four: two enum values are compute-side and none names a physics residual. Whether the two enumerations are meant to align is unstated."
+    },
+    {
+      "anchor": "curriculum",
+      "id": "residual-weight-before-the-informed-epoch",
+      "page": "residual-loss-design",
+      "summary": "The source-weight curriculum gives physics residuals weight from the first training phase, and the stage ordering gives the oracle a single stage at the end; one is the multi-fidelity literature's schedule and the other is this project's decision, and which governs is unstated."
     },
     {
       "anchor": "tension",
@@ -50,13 +62,13 @@
     },
     {
       "anchor": "observable-regimes",
-      "id": "mesh-sigma-floor-undeclared",
+      "id": "mesh-uncertainty-floor-undeclared",
       "page": "accuracy-ledger",
       "summary": "No numeric per-observable mesh-uncertainty floor is declared anywhere in the corpus. Transport observables computed from a Boltzmann solve need roughly 50-cubed-equivalent sampling of the Brillouin zone, and the MVP's 8×8×8 mesh is factor-two-grade for transport even with exact inputs. Row 2 of the regime table needs that floor as a number before any transport regime below factor two can be claimed."
     },
     {
       "anchor": "polarization-bowing",
-      "id": "algan-bowing-b-unseeded",
+      "id": "alloy-polarization-bowing-unseeded",
       "page": "accuracy-ledger",
       "summary": "The aluminium-gallium-nitride polarization bowing coefficient and the piezoelectric-tensor bowings are UNSEEDED. Until they are seeded, mid-composition interface-polarization claims carry a widened uncertainty, and the sign guard between the ledger's minus-b form and the reference file's plus-b form is live. Seeding is gated on a paywalled pin-read of the two primary sources."
     },
@@ -74,13 +86,13 @@
     },
     {
       "anchor": "kappa-battery",
-      "id": "diamond-kappa-high-temperature-provenance",
+      "id": "diamond-thermal-conductivity-provenance",
       "page": "accuracy-ledger",
       "summary": "The diamond thermal conductivities at 773 K and 1100 K have two incompatible descriptions in canon. This ledger attributed all three temperatures to a pair of papers; the reference file declares these two theory-interpolation with no source named beyond an internal audit pointer. The primary measurement spanning 170–1200 K — Olson et al., Phys. Rev. B 47, 14850 (1993) — is the source both rows would rest on and could not be retrieved. The reference file's own stated law for the 1100 K row does not reproduce the 773 K row: the implied exponent falls from 1.34 to 0.91 across the interval, whereas four-phonon scattering steepens the high-temperature falloff."
     },
     {
       "anchor": "kappa-battery",
-      "id": "diamond-kappa-citation-material",
+      "id": "diamond-thermal-conductivity-citation-material",
       "page": "accuracy-ledger",
       "summary": "Broido et al., Appl. Phys. Lett. 91, 231922 (2007), cited for the diamond 300 K thermal conductivity, appears from its published abstract to be about silicon and germanium. The diamond paper from that group is Ward et al., Phys. Rev. B 80, 125203 (2009). Settling it needs one look at the 2007 paper to confirm diamond is absent."
     },
@@ -116,7 +128,7 @@
     },
     {
       "anchor": "the-ten-obligations",
-      "id": "obligation-9-scope",
+      "id": "surrogate-validity-scope",
       "page": "cert-obligations",
       "summary": "Obligation 9 names a set of formulas that does not exist. It is stated as surrogate-net validity over the formulas tagged `relaxed`, but `relaxed` means genuinely non-smooth — argmin, soft hull, sort, discrete — and all six formulas carrying it are relaxations, not learned nets. The one learned surrogate in the registry, the quasi-particle-shift surrogate, is tagged `adjoint` and falls outside the obligation entirely. The obligation's checker body (declared input domain contains the query, surrogate uncertainty below tolerance, refresh current, measured on a held-out development set) describes a learned net, which a soft-hull relaxation is not. This page contradicts itself about it: the obligation reads `surrogate`, its tolerance-ledger row reads `relaxation validity`. Does obligation 9 rebind to the learned surrogates, split into surrogate-validity plus relaxation-validity, or rescope some other way?"
     },
@@ -524,6 +536,7 @@
         "learnable-structure-contract",
         "library-landscape",
         "pino-bridge",
+        "product",
         "purpose-and-scope",
         "residual-loss-design",
         "training-stages"
@@ -1277,6 +1290,7 @@
         "crystal-inputs",
         "multiscale-state",
         "pino-bridge",
+        "product",
         "purpose-and-scope",
         "representation-substrate",
         "residual-definitions",
@@ -1288,7 +1302,7 @@
       "owns": [
         "operator-oracle seam obligations",
         "state emission obligations",
-        "two-loop symmetry",
+        "seam loop-agnosticism",
         "operator architecture motivation",
         "seam exclusions"
       ],
@@ -1578,6 +1592,7 @@
         "acyclic": "Acyclic, and why that word is load-bearing",
         "node": "Anatomy of a node",
         "node-kinds": "The three node kinds",
+        "observable-selection": "Which formula the observable exposes",
         "output-role": "Output role",
         "representation": "The arena representation",
         "sidecars": "Per-stage sidecars",
@@ -1615,7 +1630,8 @@
         "per-stage sidecars",
         "graph realization of the closed vocabularies",
         "arena and index graph representation",
-        "graph acyclicity guarantee"
+        "graph acyclicity guarantee",
+        "observable selection precedence"
       ],
       "path": "journals/oracle/compilation/physics-graph.md",
       "referenced_by": [
@@ -1740,7 +1756,9 @@
       "path": "journals/n-op/purpose/product.md",
       "referenced_by": [
         "architectural-principles",
+        "boundary",
         "crystal-inputs",
+        "learnable-structure-contract",
         "library-landscape",
         "purpose-and-scope",
         "representation-substrate"
@@ -1818,12 +1836,14 @@
     "purpose-and-scope": {
       "anchors": {
         "downstream-target": "The downstream target",
+        "hardness": "The hardness results the design rests on",
         "material-scope": "Material scope",
         "mvp": "The minimum viable demonstration",
         "mvp-discipline": "The MVP discipline",
         "no-loops": "What the oracle library is not",
         "oracle-remit": "What the oracle library does",
         "spec-and-build": "Comprehensive spec, diamond-first build",
+        "valuation-oracle": "A valuation oracle, not a decision oracle",
         "what-n-op-is": "What n-Op is",
         "why-a-grader": "Verifying is cheaper than solving"
       },
@@ -1840,6 +1860,7 @@
         "pino-bridge",
         "product",
         "residual-definitions",
+        "training-stages",
         "unified-state"
       ],
       "journal": "n-op",
@@ -1851,6 +1872,8 @@
         "oracle library remit",
         "oracle loop exclusion",
         "verifying is cheaper than solving",
+        "computational hardness argument",
+        "valuation oracle versus decision oracle",
         "minimum viable demonstration",
         "MVP discipline",
         "material scope",
@@ -1864,7 +1887,8 @@
         "library-landscape",
         "mvp-system",
         "out-of-scope",
-        "product"
+        "product",
+        "training-stages"
       ],
       "section": "purpose",
       "title": "Purpose and scope"
@@ -1873,6 +1897,7 @@
       "anchors": {
         "boundaries": "What this is not",
         "contents": "What the reference data holds",
+        "invariant-checks": "Invariant checks on a computed row",
         "purpose": "Purpose",
         "row-schema": "The row schema",
         "wave-programme": "The remaining waves",
@@ -1892,7 +1917,8 @@
         "uncertainty encodings",
         "reference-data contents",
         "battery seeding waves",
-        "reference archive format"
+        "reference archive format",
+        "reference-calculation invariant checks"
       ],
       "path": "journals/oracle/accuracy/reference-battery.md",
       "referenced_by": [
@@ -2005,6 +2031,7 @@
         "multiscale-state",
         "physics-graph",
         "representation-substrate",
+        "residual-loss-design",
         "residual-machinery",
         "training-stages",
         "typeclass-alphabet",
@@ -2091,7 +2118,9 @@
         "residual evaluation cadence",
         "residual sampling policy",
         "four supervisory sources",
+        "compared-against enum",
         "label-presence mask",
+        "sample-applicability mask",
         "source-weight curriculum",
         "label-versus-residual tension",
         "loss convergence honesty"
@@ -2099,6 +2128,7 @@
       "path": "journals/operator/loss/residual-loss-design.md",
       "referenced_by": [
         "boundary",
+        "residual-definitions",
         "training-stages"
       ],
       "section": "loss",
@@ -2195,8 +2225,9 @@
     "training-stages": {
       "anchors": {
         "consequences": "What follows from it",
-        "curriculum-pointer": "Curriculum gating inside the informed epoch",
+        "curriculum-pointer": "Curriculum gating of residual categories",
         "limits": "Where the trained operator falls short",
+        "oracle-kind": "What kind of oracle this is",
         "stage-ordering": "The stage ordering",
         "why-this-order": "Why this order"
       },
@@ -2204,6 +2235,7 @@
         "boundary",
         "learnable-structure-contract",
         "pino-bridge",
+        "purpose-and-scope",
         "residual-definitions",
         "residual-loss-design"
       ],
@@ -2212,12 +2244,16 @@
       "owns": [
         "training stage ordering",
         "where the oracle attaches",
+        "valuation oracle distinction",
+        "the synthesis analogue",
+        "quantum search refusal",
         "trained-operator failure modes"
       ],
       "path": "journals/operator/training/training-stages.md",
       "referenced_by": [
         "boundary",
         "learnable-structure-contract",
+        "purpose-and-scope",
         "residual-definitions",
         "residual-loss-design"
       ],
@@ -2264,6 +2300,7 @@
         "high-temperature-breakdown": "Breakdown above 500 degrees Celsius is refused",
         "image-force-lowering": "Image-force lowering",
         "impact-ionization-spread": "Impact-ionization prefactors span four orders of magnitude",
+        "lattice-transpose": "Lattice matrices are stored by row",
         "lifted-values": "Values that are wrong if lifted naively",
         "metastability-band": "The hull residual is temperature- and pressure-aware",
         "misfit-strain-sign": "Misfit strain sign",
@@ -2642,6 +2679,9 @@
     "command-line verbs": {
       "page": "product"
     },
+    "compared-against enum": {
+      "page": "residual-loss-design"
+    },
     "compose-time pipeline stages": {
       "page": "compose-time-pipeline"
     },
@@ -2656,6 +2696,9 @@
     },
     "compression plan selection": {
       "page": "compose-time-pipeline"
+    },
+    "computational hardness argument": {
+      "page": "purpose-and-scope"
     },
     "content-addressed identity discipline": {
       "page": "representation-substrate"
@@ -2900,6 +2943,9 @@
     "observable output typeclasses": {
       "page": "typeclass-alphabet"
     },
+    "observable selection precedence": {
+      "page": "physics-graph"
+    },
     "one compile pipeline over one substrate": {
       "page": "architectural-principles"
     },
@@ -3002,11 +3048,17 @@
     "property-targeted crystal design goal": {
       "page": "purpose-and-scope"
     },
+    "quantum search refusal": {
+      "page": "training-stages"
+    },
     "reference archive format": {
       "page": "reference-battery"
     },
     "reference-cache backend": {
       "page": "cert-obligations"
+    },
+    "reference-calculation invariant checks": {
+      "page": "reference-battery"
     },
     "reference-data contents": {
       "page": "reference-battery"
@@ -3062,6 +3114,9 @@
     "runtime symbolic exclusion": {
       "page": "architectural-principles"
     },
+    "sample-applicability mask": {
+      "page": "residual-loss-design"
+    },
     "schema versioning discipline": {
       "page": "representation-substrate"
     },
@@ -3075,6 +3130,9 @@
       "page": "product"
     },
     "seam exclusions": {
+      "page": "learnable-structure-contract"
+    },
+    "seam loop-agnosticism": {
       "page": "learnable-structure-contract"
     },
     "seam smoke test": {
@@ -3173,6 +3231,9 @@
     "the refined emergence axiom": {
       "page": "multiscale-state"
     },
+    "the synthesis analogue": {
+      "page": "training-stages"
+    },
     "the ten cert obligations": {
       "page": "cert-obligations"
     },
@@ -3221,9 +3282,6 @@
     "training stage ordering": {
       "page": "training-stages"
     },
-    "two-loop symmetry": {
-      "page": "learnable-structure-contract"
-    },
     "typeclass aliases": {
       "page": "typeclass-alphabet"
     },
@@ -3241,6 +3299,12 @@
     },
     "unregistered composition formulas": {
       "page": "typed-compositions"
+    },
+    "valuation oracle distinction": {
+      "page": "training-stages"
+    },
+    "valuation oracle versus decision oracle": {
+      "page": "purpose-and-scope"
     },
     "verdict discipline": {
       "page": "conventions"

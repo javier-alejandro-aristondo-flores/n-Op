@@ -30,7 +30,7 @@ depends-on:
   - conventions
   - named-formulas
 open-questions:
-  - id: obligation-9-scope
+  - id: surrogate-validity-scope
     anchor: the-ten-obligations
     summary: "Obligation 9 names a set of formulas that does not exist. It is stated as surrogate-net validity over the formulas tagged `relaxed`, but `relaxed` means genuinely non-smooth — argmin, soft hull, sort, discrete — and all six formulas carrying it are relaxations, not learned nets. The one learned surrogate in the registry, the quasi-particle-shift surrogate, is tagged `adjoint` and falls outside the obligation entirely. The obligation's checker body (declared input domain contains the query, surrogate uncertainty below tolerance, refresh current, measured on a held-out development set) describes a learned net, which a soft-hull relaxation is not. This page contradicts itself about it: the obligation reads `surrogate`, its tolerance-ledger row reads `relaxation validity`. Does obligation 9 rebind to the learned surrogates, split into surrogate-validity plus relaxation-validity, or rescope some other way?"
   - id: csv-to-sqlite-path
@@ -72,7 +72,7 @@ different second columns and a retag reached one of them.
 | 6 | GENERIC degeneracy and named-formula consistency across equivalent compositions | `Sampleable` + `approxEq`: two formulas claiming one quantity agree on the shared domain (compare formula trees and coefficients within tolerance), plus the cert-only degeneracy tripwire `‖L δS/δx‖² + ‖M δE/δx‖² ≈ 0` per tier — a generator-construction bug detector ([generic-dynamics], [residual-definitions]) | `O(\|G\|)` per equivalence |
 | 7 | bulk-boundary correspondence | `DiscreteStructure` morphism: for a bulk carrying a given symmetry-indicator class, the slab must carry boundary states with the multiplicities a lookup table gives for `(indicator generator, boundary orientation)`. Elementary-band-representation table lookup plus multiplicity enumeration | `O(1)` + `O(#Wyckoff)` |
 | 8 | reference-battery versioning | versioning discipline on obligation 4: per-entry provenance travels with the verdict, the row's schema version is compared by the reader, and the cert trips at `τ_battery` with the numerical witness | `O(log n)` + `O(1)` |
-| 9 | surrogate validity | declared input domain contains the query · surrogate uncertainty below `δ_surrogate` · refresh current, measured on a held-out development set. **Which formulas this ranges over is the open question `obligation-9-scope`** — the obligation names a tag whose meaning does not match its checker body | forward pass over the development set |
+| 9 | surrogate validity | declared input domain contains the query · surrogate uncertainty below `δ_surrogate` · refresh current, measured on a held-out development set. **Which formulas this ranges over is the open question `surrogate-validity-scope`** — the obligation names a tag whose meaning does not match its checker body | forward pass over the development set |
 | 10 | adjoint existence at registration | the registration-time adjoint gate ([residual-machinery]), enforced at registration and never at prediction: a DAG walk asserting every upstream node has a registered adjoint. It covers **both** `adjoint` and `fixpoint-adjoint`, because the second refines the first rather than replacing it and runs its gate plus a conditioning check ([named-formulas#diff-tags]) — gating only `adjoint` would exempt the stronger tier from the test the weaker one must pass | `O(#nodes)`, memoized |
 
 ## Evidence aggregation
@@ -141,7 +141,7 @@ physical times, and a `τ_x` is a tolerance only if it appears in the table belo
 | `τ_adj` | registration adjoint vector-Jacobian-versus-Jacobian-vector gate, over `adjoint` and `fixpoint-adjoint` ([residual-machinery]) | `1e-4` relative |
 | `τ_cond` | `fixpoint-adjoint` fixed-point-Jacobian conditioning guard at the same sampled points; below it, registration refuses | `1e-8` reciprocal condition number |
 | `τ_trunc` | a-posteriori estimate of the gradient error a **truncated** inner solve introduces in an implicit-function adjoint — the error `τ_cond` cannot see, because `τ_cond` bounds the Jacobian's conditioning while `τ_trunc` bounds `‖J⁻¹‖·‖r_stop‖`, that conditioning times the stopping residual. Emitted by the fidelity generator ([residual-machinery]), not a threshold to configure | measured per instance; enters `combineTol` |
-| `δ_surrogate` | obligation-9 validity margin, measured on a held-out development set. **What it ranges over is `obligation-9-scope`**: this row reads *relaxation* validity and the obligation reads *surrogate* validity | per formula |
+| `δ_surrogate` | obligation-9 validity margin, measured on a held-out development set. **What it ranges over is `surrogate-validity-scope`**: this row reads *relaxation* validity and the obligation reads *surrogate* validity | per formula |
 | `τ_battery` | reference-battery agreement before the cert trips (obligation 8, [reference-battery]) | 3σ of the entry's declared uncertainty |
 | `δ_plan` | per-compression-plan truncation error target ([compose-time-pipeline]); the sum over active plans is the compression term in `combineTol` | per plan, declared at plan selection |
 | `τ_NEB` | `PathStationaryOf` climbing-image nudged-elastic-band force convergence | `1e-3` |

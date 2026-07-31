@@ -4,7 +4,7 @@ title: "The learnable-structure contract"
 owns:
   - operator-oracle seam obligations
   - state emission obligations
-  - two-loop symmetry
+  - seam loop-agnosticism
   - operator architecture motivation
   - seam exclusions
 anchors:
@@ -23,6 +23,7 @@ anchors:
   out-of-scope: "What the oracle does not ask about"
 depends-on:
   - unified-state
+  - product
   - representation-substrate
   - residual-definitions
   - compose-time-pipeline
@@ -71,11 +72,12 @@ different one. Neither constrains the other.
 
 ## Loop-agnostic, by the two-loop symmetry
 
-The same seam serves two loops. In **training**, the external loop pushes the oracle's
-cotangents into weights. In **design**, it pushes them into the candidate itself. Same
-seam, same requirements — only the gradient sink differs.
+Two loops drive this seam, and [product#two-loops] says what each does with the
+gradient. What matters here is that **the seam does not distinguish them**: same
+emission, same cotangent intake, same requirements, and no requirement below names a
+loop.
 
-This is what lets the loops library own the loop without the contract knowing which
+That is what lets the loops library own the loop without the contract knowing which
 loop it is.
 
 ## Emit the state in the oracle's type
@@ -96,7 +98,8 @@ business — convert before the boundary.
 **Physical** admissibility is *not* required. Admissibility is scored, never
 presupposed: [residual-definitions#categories] owns the admissibility categories and
 [purpose-and-scope#why-a-grader] owns score-not-solve. Emitting a structurally valid
-but physically poor state is normal operation. That is what the residual surface is for.
+but physically poor state is normal operation. That is what the residual surface is
+for.
 
 ## Evaluate at points
 
@@ -118,10 +121,9 @@ Accept a cotangent structured like the emitted state, and backpropagate it to in
 parameters.
 
 The oracle returns *per-key* cotangents ([pino-bridge#validate]). The external loop
-linearly combines them into **one** state-shaped cotangent before handing it over, so a
-single
-vector–Jacobian application per state-and-combined-cotangent pair is sufficient.
-Per-key application is not required.
+linearly combines them into **one** state-shaped cotangent before handing it over, so
+a single vector–Jacobian application per state-and-combined-cotangent pair is
+sufficient. Per-key application is not required.
 
 ## Conditioning inputs
 
@@ -178,8 +180,8 @@ equivariance either way.
 
 **Per-slot update rates.** The state's tiers evolve at heterogeneous rates
 ([multiscale-state#three-tiers]). If the kernel supports per-slot update rates in a
-compiled structure, a future multi-rate driver can exploit that. Nothing currently depends on
-it.
+compiled structure, a future multi-rate driver can exploit that. Nothing currently
+depends on it.
 
 ## What the oracle does not ask about
 

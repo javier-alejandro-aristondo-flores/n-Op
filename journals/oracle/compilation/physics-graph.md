@@ -8,6 +8,7 @@ owns:
   - graph realization of the closed vocabularies
   - arena and index graph representation
   - graph acyclicity guarantee
+  - observable selection precedence
 anchors:
   the-graph: "The one data structure"
   acyclic: "Acyclic, and why that word is load-bearing"
@@ -15,6 +16,7 @@ anchors:
   node: "Anatomy of a node"
   node-kinds: "The three node kinds"
   output-role: "Output role"
+  observable-selection: "Which formula the observable exposes"
   sidecars: "Per-stage sidecars"
   vocabulary-realization: "The graph is every other vocabulary"
   why-one-structure: "Why it is the data structure"

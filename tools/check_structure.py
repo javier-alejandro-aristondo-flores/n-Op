@@ -99,7 +99,7 @@ def load_pages(errs: list[str]) -> list[dict]:
             errs.append(f"{rel}: frontmatter is not a mapping")
             continue
         pages.append({
-            "rel": str(rel), "path": path, "fm": fm,
+            "rel": str(rel), "path": path, "fm": fm, "fm_text": m.group(1),
             "body": text[m.end():], "stem": path.stem,
             "journal": parts[0], "section": parts[1] if len(parts) == 3 else None,
         })
@@ -130,6 +130,21 @@ def check_frontmatter(pages: list[dict], schema: dict, errs: list[str]) -> None:
         if fm.get("id") in owns:
             errs.append(f"{rel}: owns lists its own id — that claims no topic")
 
+        # Every open question points at an anchor on its own page, and that pointer
+        # was unvalidated — a register whose entries resolve to nothing is worse than
+        # no register, because it is what an agent reads to find the gaps.
+        for q in fm.get("open-questions") or []:
+            if not isinstance(q, dict):
+                errs.append(f"{rel}: open-questions entry is not a mapping")
+                continue
+            for field in ("id", "anchor", "summary"):
+                if not q.get(field):
+                    errs.append(f"{rel}: open question missing {field!r}")
+            a = q.get("anchor")
+            if a and a not in (fm.get("anchors") or {}):
+                errs.append(f"{rel}: open question {q.get('id')!r} points at anchor "
+                            f"{a!r}, which this page does not declare")
+
         anchors = fm.get("anchors") or {}
         headings = set(HEADING_RE.findall(p["body"]))
         for slug, heading in anchors.items():
@@ -155,7 +170,10 @@ def check_citations(pages: list[dict], errs: list[str], pending: list[str],
     by_id = {p["fm"].get("id"): p for p in pages}
     unresolved = pending if partial else errs
     for p in pages:
-        rel, text = p["rel"], prose(p["body"])
+        # Frontmatter carries prose too — an open question's summary can cite a
+        # page — and scanning only the body left those citations unchecked.
+        rel = p["rel"]
+        text = prose(p["body"]) + "\n" + p["fm_text"]
         declared = set(p["fm"].get("depends-on") or [])
         for target in declared:
             if target not in by_id:
@@ -265,9 +283,14 @@ def emit(pages: list[dict], owner: dict, schema: dict) -> dict:
             } for p in sorted(pages, key=lambda x: x["fm"]["id"])
         },
         "topics": {t: {"page": pid} for t, (pid, _) in sorted(owner.items())},
+        # Malformed entries are already reported as findings; emitting must not
+        # crash on them. A checker that dies on bad input reports nothing at all,
+        # and its traceback can even satisfy a probe by accident — which is how
+        # this line was found.
         "open_questions": [
             {**q, "page": p["fm"]["id"]}
             for p in pages for q in (p["fm"].get("open-questions") or [])
+            if isinstance(q, dict)
         ],
     }
 

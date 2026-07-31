@@ -7,10 +7,12 @@ owns:
   - reference-data contents
   - battery seeding waves
   - reference archive format
+  - reference-calculation invariant checks
 anchors:
   purpose: "Purpose"
   contents: "What the reference data holds"
   row-schema: "The row schema"
+  invariant-checks: "Invariant checks on a computed row"
   why-csv: "Why CSV"
   wave-programme: "The remaining waves"
   boundaries: "What this is not"
@@ -99,6 +101,36 @@ and the gallium-nitride breakdown-field slope, whose normalized form is itself d
 **Population is incremental and reviewable: every row must be defensible against a
 literature citation before it is committed.** Where a row is not,
 [accuracy-ledger#seed-provenance] names it rather than letting it pass as seeded.
+
+## Invariant checks on a computed row
+
+A row sourced from literature is defensible against its citation. **A row whose `Source`
+is a computational provenance has no citation to be defensible against** — and these
+checks are what defensibility means for it. Each is a closed form that any correct
+calculation already satisfies, and each follows from a conservation law.
+
+| Written | Read as | Holds because |
+|---|---|---|
+| `Σ_I f_I = 0` | forces summed over ions vanish | translational invariance |
+| `σ_ij = σ_ji` | the stress tensor is symmetric | conservation of angular momentum |
+| `Σ_nk w_k f_nk = NELECT` | occupations, weighted over bands and k-points, sum to the electron count | electrons are conserved |
+| `det(A) = V` | the lattice-matrix determinant equals the reported volume | arithmetic |
+| spin parity | an odd electron count forces an odd integer magnetisation | you cannot pair every electron |
+
+Closed form, one pass per frame, and **no anchor is required** — the calculation is
+checked against itself rather than against a curated value.
+
+**They catch parser bugs and run failures together, and both are otherwise invisible**:
+the run exits cleanly and the numbers look reasonable. That is what earns them their
+place. A value comparison cannot see either failure, because a mis-parsed run produces
+plausible numbers that no tolerance will catch — the number is not far from the anchor,
+it is a different quantity.
+
+These are not cert obligations, and the distinction is the object rather than the law.
+Obligations 1, 2 and 5 check symmetry, positivity and conservation on an **emitted
+composition** ([cert-obligations#coupling-derived-checks]); these check an **ingested
+calculation** before its numbers ever become a row. Same conservation laws, opposite
+ends of the pipeline.
 
 ## Why CSV
 

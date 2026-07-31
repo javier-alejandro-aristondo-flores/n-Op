@@ -10,6 +10,7 @@ anchors:
   stub: "What is not designed"
 depends-on:
   - library-landscape
+  - product
   - purpose-and-scope
   - learnable-structure-contract
   - training-stages
@@ -52,9 +53,10 @@ A command line is not a driver, which is why the oracle's own ships with the ora
 - **Active learning.** Residual-adaptive sampling beyond a formula's declared policy,
   query by committee, importance reweighting against running loss statistics. This
   lives here and in neither of the other two.
-- **The gradient sink.** Training pushes the oracle's cotangents into weights; design
-  search pushes them into the candidate. The seam does not distinguish the two
-  ([learnable-structure-contract#loop-agnostic]), so the choice is the driver's.
+- **The gradient sink.** The two loops sink the oracle's gradients in different places
+  ([product#two-loops]), and the seam does not distinguish them
+  ([learnable-structure-contract#loop-agnostic]) — so which sink is in play is the
+  driver's choice, and nothing outside the driver observes it.
 
 Nothing in this list is visible through the seam. That is the point of the seam.
 

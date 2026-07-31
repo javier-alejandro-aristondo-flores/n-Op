@@ -139,8 +139,11 @@ register through this same pattern ([coupling-structure#registration]).
   loss; `adjoint` entries are gated on adjoint existence.
 - **Ground-truth-bridge** — anchors a generator to an `Import`-supplied target
   value with `(value, standard-deviation, provenance, axis-coverage)`
-  ([pino-bridge#import]); the loss is the scale-normalised Huber against the
-  target.
+  ([pino-bridge#import]); the loss is a Huber scaled by the standard deviation
+  that `Import` call supplied for that datum. That is a different quantity from
+  the observable's `characteristic-scale` above: one is per-datum, the other is
+  the observable's declared accuracy scale and feeds the error budget, not the
+  loss.
 - **Cert-only** — no loss contribution; runs as part of cert evidence
   ([cert-obligations#the-ten-obligations]), not as part of training loss.
 

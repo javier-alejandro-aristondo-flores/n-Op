@@ -4,15 +4,20 @@ title: "Training stages"
 owns:
   - training stage ordering
   - where the oracle attaches
+  - valuation oracle distinction
+  - the synthesis analogue
+  - quantum search refusal
   - trained-operator failure modes
 anchors:
   stage-ordering: "The stage ordering"
+  oracle-kind: "What kind of oracle this is"
   why-this-order: "Why this order"
   consequences: "What follows from it"
-  curriculum-pointer: "Curriculum gating inside the informed epoch"
+  curriculum-pointer: "Curriculum gating of residual categories"
   limits: "Where the trained operator falls short"
 depends-on:
   - residual-definitions
+  - purpose-and-scope
   - pino-bridge
   - residual-loss-design
   - learnable-structure-contract
@@ -39,9 +44,33 @@ with their gradients. Those terms guide the final epoch.
 
 What the informed epoch consumes is **keyed** residuals, one per law per axis point,
 never a sum. [residual-definitions#granularity] owns that granularity; what the
-ordering adds is why the loop wants it. Keys are what let the epoch weight and schedule each law
-separately, and they are what makes a perturbation test meaningful: perturb a structure
-and the key that fires names the law it violated.
+ordering adds is why the loop wants it. Keys are what let the epoch weight and
+schedule each law separately, and they are what makes a perturbation test meaningful:
+perturb a structure and the key that fires names the law it violated.
+
+## What kind of oracle this is
+
+Why the system is built around a check at all is [purpose-and-scope#why-a-grader].
+What follows is what kind of check it is.
+
+A textbook oracle returns one bit: yes or no. This one returns a keyed vector of
+real-valued residuals together with their cotangents — a **valuation** oracle, not a
+decision oracle. That distinction is the whole reason the seam carries what it carries
+([learnable-structure-contract#vector-jacobian-product]): one bit gives a learner no
+direction, and a residual with a gradient does.
+
+The honest computational analogue of the informed epoch is
+**counterexample-guided inductive synthesis** — a learner proposes, an independent
+checker answers, and the answer drives the next proposal — **with a gradient in place
+of the counterexample**. That names what the oracle contributes better than
+"physics-informed loss" does: not a penalty term bolted onto an objective, but a
+directed correction from a checker that was never trained.
+
+**Grover's algorithm does not apply**, and the question deserves an answer because it
+is the first one the word *oracle* provokes. Grover needs superposition over the search
+space, a *marking* oracle, and amplitude amplification, and it pays only for
+unstructured search. Training has gradients and does local descent: none of the three
+preconditions holds, and there is no unstructured search to accelerate.
 
 ## Why this order
 
@@ -71,13 +100,17 @@ The seam through which the oracle attaches is unchanged by any of this: it is th
 seam a design loop would drive ([learnable-structure-contract#loop-agnostic]), and the
 loop that walks these stages lives in the loops library ([boundary]).
 
-## Curriculum gating inside the informed epoch
+## Curriculum gating of residual categories
 
 The stage ordering says **when** the oracle attaches. **Which** residual categories
-participate at each fraction of the training budget is a second schedule, and it is the
+participate, and at what elapsed fraction, is a second schedule, and it is the
 oracle's: [residual-definitions#curriculum-gate] states the gate and the fractions it
-turns on. The operator library may override any fraction or any category — the schedule
-is a normative default, not a contract.
+turns on. The operator library may override any fraction or any category — the schedule is a
+normative default, not a contract.
+
+**Which run those fractions denominate is unsettled**, and it is carried as an open
+item on that anchor. The answer moves the gate's phases relative to the stage boundary
+above, so this page does not assert one.
 
 That schedule gates residual *categories*. The source-weight curriculum
 ([residual-loss-design#curriculum]) gates the four supervisory *sources*. They share

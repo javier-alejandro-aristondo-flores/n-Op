@@ -4,6 +4,7 @@ title: "The compose-time pipeline"
 owns:
   - compose-time pipeline stages
   - always-cheap discipline
+  - the pipeline as partial evaluation
   - stage boundaries
   - rewrite admission rule
   - compression plan selection
@@ -11,6 +12,7 @@ owns:
   - runtime cost classes
 anchors:
   always-cheap: "The always-cheap discipline"
+  partial-evaluation: "The pipeline is partial evaluation"
   symbolic-lift: "Symbolic lift"
   symmetry-quotient: "Symmetry quotient"
   invariant-synthesis: "Invariant synthesis"
@@ -64,6 +66,35 @@ reduction, sparsity pattern, compression plan, adjoint factorization — happens
 compose time, so the runtime only *applies* precomputed structured operators. That is
 what lets every runtime hot path stay logarithmic or better and call no solver
 ([representation-substrate#hot-paths]).
+
+## The pipeline is partial evaluation
+
+That lever has a name, and the name carries a result.
+
+**The first Futamura projection:** specialising an interpreter to a fixed program
+yields a compiled program (Futamura, *Partial Evaluation of Computation Process — An
+Approach to a Compiler-Compiler*, Systems·Computers·Controls 2(5), 1971, 45–50).
+
+This library is that construction. The general physics evaluator is the interpreter;
+the `(PeriodicityStructure, SiteDecoration, Environment)` tuple
+([crystal-inputs#top-level-inputs]) is the fixed program; the compiled kernel is the
+specialised residue. **Compile in seconds, call in microseconds** is therefore the
+expected shape of a partial evaluator, not an optimisation anyone had to hope would
+work.
+
+Two things follow that are otherwise easy to mistake for taste.
+
+- **The compose-time and runtime split is the specialisation boundary**, not a
+  convenience. Everything symbolic happens on the side where the fixed program is
+  known; everything numeric happens on the side where only the varying input remains.
+  That is why the boundary falls exactly where it does — the compose-time and runtime
+  boundary below states which stage sits on which side — and why a decision cannot be
+  moved across it without changing what is being specialised.
+- **A runtime structural branch is a specialisation failure.** If the kernel still has
+  to ask a question whose answer was fixed at compose time, the specialiser left work
+  undone. That is the reason structural branching on the hot path is barred rather than
+  merely discouraged, and it is why every predicate this library evaluates is settled
+  before codegen.
 
 ## Symbolic lift
 

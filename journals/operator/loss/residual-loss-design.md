@@ -8,7 +8,9 @@ owns:
   - residual evaluation cadence
   - residual sampling policy
   - four supervisory sources
+  - compared-against enum
   - label-presence mask
+  - sample-applicability mask
   - source-weight curriculum
   - label-versus-residual tension
   - loss convergence honesty
@@ -43,7 +45,13 @@ depends-on:
 open-questions:
   - id: sampling-policy-record-home
     anchor: sampling
-    summary: "A sampling policy is a cadence, a sampler and an optional importance function; the oracle's generator record carries the sampler alone, so the cadence and the importance function have no typed home on either side of the seam."
+    summary: "A sampling policy is a cadence, a sampler and an optional importance function, and nothing carries all three: the oracle's generator record has one flat four-valued field fusing a sampler, two importance schemes and an evaluation-scope value, with no cadence field at all, so the importance function has no typed home on either side of the seam."
+  - id: compared-against-versus-supervisory-sources
+    anchor: four-sources
+    summary: "The per-generator compared-against enum has four values and this page has four supervisory sources, and they are not the same four: two enum values are compute-side and none names a physics residual. Whether the two enumerations are meant to align is unstated."
+  - id: residual-weight-before-the-informed-epoch
+    anchor: curriculum
+    summary: "The source-weight curriculum gives physics residuals weight from the first training phase, and the stage ordering gives the oracle a single stage at the end; one is the multi-fidelity literature's schedule and the other is this project's decision, and which governs is unstated."
   - id: experimental-sigma-source
     anchor: tension
     summary: "The experimental loss term is scaled by a per-observable standard deviation, and it is undetermined whether that comes from instrument metadata on the datum or from the declared accuracy scale of the observable — they are different quantities and only one of them varies per measurement."
@@ -163,20 +171,24 @@ exploding the parameter count.
 
 The discrete adjoint method gives the loss gradient at the cost of one adjoint solve
 per loss gradient, independent of the number of parameters (Giles and Pierce 2000;
-Plessix 2006). That is the cost claim behind the `adjoint` tier.
+Plessix 2006). That is the cost claim behind the `adjoint` tier, whose name means what
+[named-formulas#diff-tags] says it means.
 
-Where the residual's output is a **converged fixed point**, the implicit-function form
-applies instead and costs one linear solve, independent of iteration count — the
-`fixpoint-adjoint` tier. Named instances: Pulay-style adjoints in the
+`fixpoint-adjoint` is a **refinement of** `adjoint`, not an alternative to it. It
+applies where the residual's output is a converged fixed point: the implicit-function
+form then costs one linear solve independent of iteration count, and the formula runs
+`adjoint`'s registration gate plus a conditioning check on the fixed-point Jacobian
+([residual-machinery#registration-gate]). Named instances: Pulay-style adjoints in the
 density-functional perturbation framework for a self-consistent field (Baroni et al.
 2001); variational principles, or the relaxation-time approximation, for the Boltzmann
 transport equation.
 
-The tiers themselves, the registration gate that admits a formula to one, and the
-conditioning guard on the adjoint solve are the oracle's
-([named-formulas#diff-tags], [residual-machinery#registration-gate]). What belongs on
-this page is the consequence for the loop: an adjoint-tier residual costs roughly one
-extra forward-equivalent per gradient, which is what keeps it off the per-step path.
+Neither is an escape hatch. A residual that cannot supply a derivative at all belongs
+to `relaxed` or `none`, below.
+
+What belongs on this page is the consequence for the loop: an adjoint-tier residual
+costs roughly one extra forward-equivalent per gradient, which is what keeps it off the
+per-step path.
 
 ## Residuals with no useful derivative
 
@@ -198,7 +210,8 @@ than smoothing it: the discrete fact becomes the sign of a differentiable scalar
 the residual stays exact.
 
 Which tier a formula sits in is the oracle's classification
-([named-formulas#diff-tags]), not the loop's. What the loop owns is whether it evaluates such a residual at all.
+([named-formulas#diff-tags]), not the loop's. What the loop owns is whether it
+evaluates such a residual at all.
 
 ## Cadence is a loop policy
 
@@ -219,8 +232,8 @@ binds it to whichever sense the reader happens to hold.
 | minutes, iterative or partial-differential-equation solve | `on-demand` |
 
 The cost names belong to the registry ([named-formulas#cost-tiers]); the four cadence
-names belong here. The mapping is a **default**: the loop may depart from it — gating a cheap
-residual off during warm-up, or pulling an expensive one forward when a validation
+names belong here. The mapping is a **default**: the loop may depart from it — gating
+a cheap residual off during warm-up, or pulling an expensive one forward when a validation
 signal asks for it. What the loop may not do is put a minutes-cost residual on the
 per-step path.
 
@@ -237,10 +250,11 @@ Cadence says how often. Sampling says **which points**.
 | Curriculum | easy-to-hard; start with the smooth, cheap residuals |
 
 A **sampling policy** is three things: a cadence, a sampler, and an optional importance
-function over candidate points. The oracle's generator record carries a sampler
-selection per formula ([residual-machinery#generator-record]); the cadence and the
-importance function
-are the loop's, and have no typed home yet on either side.
+function over candidate points. **Nothing carries all three.** The oracle's generator
+record ([residual-machinery#generator-record]) carries one flat four-valued field that
+fuses a sampler, two importance schemes and one evaluation-scope value, and it has no
+cadence field at all. The cadence is this library's, above. The importance function has
+no typed home on either side.
 
 ## The four supervisory sources
 
@@ -254,6 +268,16 @@ are the loop's, and have no typed home yet on either side.
 The stage ordering that decides *when* each source is live is
 [training-stages#stage-ordering]. This page decides how they are weighted once they
 are.
+
+**What a ground-truth-bridge residual compares against** is a per-generator choice, and
+the name for it is `compared-against` — never `source`, which already denotes a
+provenance citation on a formula record. Its four values are a model, a
+density-functional-theory battery, an experiment battery, and a machine-learned
+interatomic potential.
+
+Those four values are not the four rows above. Two of them are compute-side, and none
+of them names a physics residual, because a physics residual is compared against a law
+rather than against a datum.
 
 ## The assembled loss
 
@@ -282,13 +306,16 @@ observable against source, and it is per sample.
 
 It is **not** the oracle's axis-coverage mask, which indexes the axis tuples of one
 named target and says which of them an imported datum constrains
-([pino-bridge#axis-coverage]). It is **not** the applicability mask either, which says whether a formula applies to the
-material at all ([applicability-classifiers#the-predicate-contract]).
+([pino-bridge#axis-coverage]). It is **not** the `sample-applicability-mask` either —
+the per-sample bit, over a batch, saying whether a given generator applies to that
+sample at all. That mask derives from the applicability predicate
+([applicability-classifiers#the-predicate-contract]): the predicate is the oracle's,
+the per-sample mask is the loop's.
 
 **All three multiply into the same loss term**, which is exactly why they need three
-names. A term survives only if the observable is applicable to the material, the sample
-carries a label for it, and the axis tuple is covered by the datum. Conflate any two
-and the loss is wrong and green.
+names. A term survives only if the generator applies to the sample, the sample carries
+a label for that observable, and the axis tuple is covered by the datum. Conflate any
+two and the loss is wrong and green.
 
 Every training sample therefore carries a label-presence vector over observables, per
 source, and every data term is masked by it. This is standard practice in multi-task
@@ -297,7 +324,7 @@ terms cannot share a network.
 
 ## The source-weight curriculum
 
-| Phase, as a fraction of the training budget | Active weights | Rationale |
+| Phase, by elapsed fraction | Active weights | Rationale |
 |---|---|---|
 | Warm-up, 0 to 0.10 | cheap high, residual weights moderate, theory and experiment low | the network learns a smooth approximate functional form from cheap data |
 | Refine, 0.10 to 0.60 | cheap decaying, density-functional theory ramping, residual weights high | high-fidelity correction, with physics enforced |
@@ -312,6 +339,15 @@ calibration.
 **This schedule gates source weights.** The residual-category gate
 ([training-stages#curriculum-pointer]) gates which laws participate. They share their
 endpoints and they gate different things.
+
+**Which run these fractions denominate is unsettled**, and the residual-category gate
+faces the same question — [residual-definitions#curriculum-gate] carries it. Both
+schedules inherit whatever it resolves to.
+
+**The residual column above does not agree with the stage ordering.** It gives residual
+weight from the first phase; [training-stages#stage-ordering] gives the oracle one
+stage at the end. The column is what the multi-fidelity literature reports; the stage
+ordering is this project's own decision. Nothing reconciles them.
 
 ## When a label and a residual disagree
 

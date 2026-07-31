@@ -29,6 +29,7 @@ anchors:
   zero-point-renormalization-tag: "Zero-point renormalization is the isochoric value"
   diamond-valley-quarantine: "Diamond's direct-gap renormalization stays quarantined"
   gallium-oxide-axes: "Gallium oxide carries four axis systems"
+  lattice-transpose: "Lattice matrices are stored by row"
   polarized-averaging: "Never average a polarized quantity"
   electron-affinity-termination: "Diamond electron affinity is termination-dependent"
   refusal-boundaries: "Certification refusal boundaries"
@@ -282,6 +283,40 @@ is the *real* `a`, not `a*`; the two differ by 13.83°, so the `C₁₁` seeded 
 along the crystal-physical `e₁`. Four frames, one material. Every value carries its
 frame or it is not usable. *Breaks:* in a material about 2.5× anisotropic, values attach
 to the wrong crystallographic direction. — enforced, [accuracy-ledger#monoclinic-frames]
+
+### Lattice matrices are stored by row
+
+Green-Lagrange strain is built from the deformation gradient, with `A_ref` the reference
+lattice matrix, `A_def` the deformed one, `F` the deformation gradient and `I` the
+identity:
+
+```
+M = A_ref⁻¹ A_def      F = Mᵀ      E_GL = ½ (FᵀF − I)
+```
+
+**Each row of a lattice matrix is a lattice vector**, so every transpose in that chain is
+a chance to be wrong and stay plausible. Consider the slip that drops one — computing
+`MᵀM` where the row convention calls for `MMᵀ`. The result is still a symmetric tensor of
+the right magnitude, and it is quieter than that: `MᵀM` and `MMᵀ` are similar matrices
+for any invertible `M`, so the two candidates have **identical principal strains, trace
+and determinant**. Every invariant check on the strain — a volumetric strain, a
+magnitude, a norm, a comparison against the applied deformation — passes exactly. Only
+the principal *directions* move, and they surface only in the direction-resolved elastic
+constants derived from the tensor.
+
+The transpose-free form removes the hazard rather than warning about it. With the metric
+tensor `G = A Aᵀ`, whose entries are the lattice-vector dot products:
+
+```
+E_GL = ½ (A_ref⁻¹ G_def A_ref⁻ᵀ − I)
+```
+
+No deformation gradient is ever formed, so no transpose is left to get wrong — which is
+the construction-over-check preference applied to a formula ([conventions#verdicts]).
+*Breaks:* a strain tensor silently corrupted by a storage convention, propagating into
+every elastic constant derived from it. **This is a software defect, not a physics one.**
+The equations above are correct; what is wrong sits between them and the array they are
+evaluated over, so a reviewer checking the physics never reaches it. — advisory
 
 ### Never average a polarized quantity
 

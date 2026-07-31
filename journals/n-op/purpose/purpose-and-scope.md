@@ -8,6 +8,8 @@ owns:
   - oracle library remit
   - oracle loop exclusion
   - verifying is cheaper than solving
+  - computational hardness argument
+  - valuation oracle versus decision oracle
   - minimum viable demonstration
   - MVP discipline
   - material scope
@@ -18,6 +20,8 @@ anchors:
   oracle-remit: "What the oracle library does"
   no-loops: "What the oracle library is not"
   why-a-grader: "Verifying is cheaper than solving"
+  hardness: "The hardness results the design rests on"
+  valuation-oracle: "A valuation oracle, not a decision oracle"
   mvp: "The minimum viable demonstration"
   mvp-discipline: "The MVP discipline"
   material-scope: "Material scope"
@@ -34,6 +38,7 @@ depends-on:
   - residual-definitions
   - canonical-vocabularies
   - named-formulas
+  - training-stages
   - pino-bridge
   - boundary
 open-questions:
@@ -137,6 +142,51 @@ are the reason a grader can be trusted at all:
   registry row ([named-formulas#the-registry]).
 - **Decidable.** A request compiles or is rejected. Nothing fails ambiguously at
   runtime.
+
+## The hardness results the design rests on
+
+The section above states the trade informally. Its formal backing is two complexity
+results, and they are the reason there is a grader in the architecture at all rather
+than a better solver.
+
+- **Finding the ground state is NP-hard.** Barahona (1982) established that finding
+  the ground state of a three-dimensional Ising spin glass is NP-hard. NP is the class
+  of problems whose solutions are *verifiable* in polynomial time; NP-hard means at
+  least as hard as everything in it.
+- **Quantum hardware does not rescue it.** Kitaev established that the k-local
+  Hamiltonian problem is QMA-complete. Quantum Merlin–Arthur is the quantum analogue
+  of NP — a quantum verifier checking a quantum witness — so the hardness survives the
+  change of machine rather than dissolving with it.
+
+The consequence is the architecture. The search side is intractable and the check side
+is not, so the system is built around the check: the oracle scores and never solves,
+and score-not-solve is a principle rather than a preference
+([product#score-not-solve]).
+
+**One citation carries a qualification that must travel with it.** Baker–Gill–Solovay
+(1975) exhibits oracles `A` and `B` with `P^A = NP^A` and `P^B ≠ NP^B`, so no proof
+technique that *relativizes* — that survives handing both sides an oracle — can settle
+P versus NP. It is cited here as a limit on the oracle **technique**, not as a claim
+about this system. Detached from that qualification it reads as something far stronger
+than was ever argued.
+
+The loop this produces is not a search. Its honest analogue is counterexample-guided
+inductive synthesis, with a gradient in place of the counterexample. Where in training
+the oracle attaches, and why it cannot come first, is
+[training-stages#why-this-order].
+
+## A valuation oracle, not a decision oracle
+
+A textbook oracle returns one bit: yes or no. **This one returns a keyed vector of
+real-valued residuals together with cotangents** — the gradient information for the
+backward pass ([product#call-contract]).
+
+The difference is load-bearing, and it is why the complexity framing above does not
+make this a decision procedure. **One bit gives a learner no direction; a residual
+with a gradient does.** A yes-or-no verifier could certify a candidate and still teach
+nothing about how to produce a better one. The design needs the direction, so the
+oracle is a valuation oracle — and the shape of what it returns follows from that
+requirement rather than from convenience.
 
 ## The minimum viable demonstration
 

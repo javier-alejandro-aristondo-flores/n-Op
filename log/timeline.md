@@ -35,7 +35,9 @@ Every entry carries five fields:
 
 **Reaching an artifact marked `EVIDENCE-DIES`.** It is removed from the working tree,
 not from the record. The state immediately before the restructure is tagged
-`pre-restructure-main`, and any file it names can be read directly:
+`pre-restructure-main`; the audit apparatus is at `pre-cutover-apparatus` and the talk
+deck at `pre-cutover`, since no single commit holds all three. Any file they name can be
+read directly:
 
 ```
 git show pre-restructure-main:journal/pages/11-appendix-derivations/11.3-deriv-transport.md

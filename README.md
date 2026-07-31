@@ -88,9 +88,16 @@ proves it fires cannot tell you it fires too often.
 
 ## History
 
-The corpus before the 2026-07-31 restructure is tagged **`pre-restructure-main`**, and
-the state including the audit apparatus and the talk deck is tagged **`pre-cutover`**.
-Anything the log marks as no longer present is readable from there:
+Three tags hold what the working tree no longer does. No single commit holds all of it,
+so each names what it actually contains:
+
+| tag | holds |
+|---|---|
+| **`pre-restructure-main`** | the corpus as it stood before the 2026-07-31 restructure |
+| **`pre-cutover-apparatus`** | the audit apparatus — dispositions, provenance register, contradiction register, leads |
+| **`pre-cutover`** | the 2026-07-22 talk deck, which had never been committed before that point |
+
+Anything the log marks as no longer present is readable from the tag that holds it:
 
 ```
 git show pre-restructure-main:<path>

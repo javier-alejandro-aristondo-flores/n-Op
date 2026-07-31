@@ -33,6 +33,17 @@ Every entry carries five fields:
   shown was recovered from git history. The commit is named so the pin can be checked.
   A pin is a claim about evidence, not an estimate.
 
+**Reaching an artifact marked `EVIDENCE-DIES`.** It is removed from the working tree,
+not from the record. The state immediately before the restructure is tagged
+`pre-restructure-main`, and any file it names can be read directly:
+
+```
+git show pre-restructure-main:journal/pages/11-appendix-derivations/11.3-deriv-transport.md
+```
+
+An auditor told an artifact does not exist, without being told where it went, has been
+given a dead end rather than a record. The tag is the answer, and it is permanent.
+
 Undated entries come first, each carrying whatever bound is known. After them the
 record runs forward in time, oldest first, so it can be read as it happened. Four
 entries carry a month but no day; each sits at the end of its month, and its heading

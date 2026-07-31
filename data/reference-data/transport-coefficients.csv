@@ -5,13 +5,13 @@ caughey-thomas-mu-n-Nref,GaN (wz),300 K,1e17 cm-3,×0.5,Farahmand et al. 2001,mo
 caughey-thomas-mu-n-alpha,GaN (wz),300 K,0.66,0.1,Farahmand et al. 2001,monte-carlo-fit,2,2026-06-10,2026-07-16
 caughey-thomas-mu-p-max,GaN (wz),300 K,170 cm2/Vs,×0.3,Mnatsakanov et al. SSE 47 111 (2003) 10.1016/S0038-1101(02)00256-3,analytic-fit,2,2026-06-10,2026-07-16
 caughey-thomas-mu-p-min,GaN (wz),300 K,10 cm2/Vs,×0.5,Mnatsakanov et al. 2003,analytic-fit,2,2026-06-10,2026-07-16
-caughey-thomas-mu-n-set,AlN (wz),300 K,GAP — paywalled (Farahmand 2001 Tbl II / Wang 2025 Tbl SIII),—,one targeted follow-up,gap,1,2026-06-10,2026-06-10
+caughey-thomas-mu-n-set,AlN (wz),300 K,UNSEEDED — paywalled (Farahmand 2001 Tbl II / Wang 2025 Tbl SIII),—,one targeted follow-up,gap,1,2026-06-10,2026-06-10
 mobility-electron-fp-ceiling,GaN (wz),300 K,1034 cm2/Vs,×0.15,Ponce Jena Giustino PRB 100 085204 (2019),first-principles-bte,1,2026-06-10,2026-06-10
 mobility-hole-fp-ceiling,GaN (wz),300 K,52 cm2/Vs,×0.15,Ponce et al. 2019,first-principles-bte,1,2026-06-10,2026-06-10
 mobility-electron-intrinsic-perp,AlN (wz),300 K,871 cm2/Vs,×0.25,Wang et al. arXiv 2506.09240 (2025),first-principles-bte,1,2026-06-10,2026-06-10
 mobility-electron-intrinsic-para,AlN (wz),300 K,619 cm2/Vs,×0.25,Wang et al. 2025,first-principles-bte,1,2026-06-10,2026-06-10
 mobility-electron-best-exp,AlN (wz),300 K,426 cm2/Vs,×0.15,Taniyasu Kasu Makimoto APL 89 182112 (2006) 10.1063/1.2378726,experimental,2,2026-06-10,2026-07-16
-mobility-hole,AlN (wz),300 K,GAP — deep Mg acceptor; holes < 1e10 cm-3,—,genuine gap,gap,1,2026-06-10,2026-06-10
+mobility-hole,AlN (wz),300 K,UNSEEDED — deep Mg acceptor; holes < 1e10 cm-3,—,genuine gap,gap,1,2026-06-10,2026-06-10
 saturation-velocity,GaN (wz),high field,1.4e7 cm/s,×0.15,Foutz JAP 85 7727 (1999); O'Leary JMSE 17 87 (2006),monte-carlo,1,2026-06-10,2026-06-10
 peak-velocity,GaN (wz),~150 kV/cm,2.85e7 cm/s,×0.15,Foutz 1999; O'Leary 2006,monte-carlo,1,2026-06-10,2026-06-10
 saturation-velocity,AlN (wz),high field,1.4e7 cm/s,×0.2,O'Leary JMSE 17 87 (2006),monte-carlo,1,2026-06-10,2026-06-10
@@ -24,12 +24,12 @@ thermal-conductivity,GaN (wz a-axis),1100 K,37 W/mK,×0.4,Zheng 2019 extrapolati
 thermal-conductivity,AlN (wz c-axis),300 K,339 W/mK,7 W/mK,Rounds/Slack APEX 11 071001 (2018); Slack JPCS 48 641 (1987),experimental,1,2026-06-10,2026-06-10
 thermal-conductivity,AlN (wz c-axis),773 K,140 W/mK,×0.3,3-ph BTE / Slack extrapolation (theory-only),first-principles-bte,1,2026-06-10,2026-06-10
 breakdown-field-critical,GaN (wz),300 K,3.3 MV/cm,×0.15,Maeda JAP 129 185702 (2021),experimental,1,2026-06-10,2026-06-10
-breakdown-field-slope-kBR,GaN (wz),300-500 K,+3.85e-4 /K,—,Frontiers Mater 9 846418 (2022) device dV_BR/dT; normalized K-1 is a GAP,experimental,1,2026-06-10,2026-06-10
+breakdown-field-slope-kBR,GaN (wz),300-500 K,+3.85e-4 /K,—,Frontiers Mater 9 846418 (2022) device dV_BR/dT; normalized K-1 is UNSEEDED,experimental,1,2026-06-10,2026-06-10
 impact-ionization-an,GaN (wz),high field,4.48e8 cm-1,×3,Cao Ye Wang Fay APL 112 262103 (2018) 10.1063/1.5031785,experimental,1,2026-06-10,2026-06-10
 impact-ionization-bn,GaN (wz),high field,3.39e7 V/cm,×3,Cao et al. 2018,experimental,1,2026-06-10,2026-06-10
 impact-ionization-ap,GaN (wz),high field,7.13e6 cm-1,×3,Cao et al. 2018,experimental,1,2026-06-10,2026-06-10
 impact-ionization-bp,GaN (wz),high field,1.46e7 V/cm,×3,Cao et al. 2018,experimental,1,2026-06-10,2026-06-10
-impact-ionization-an,AlN (wz),high field,8.875e6 cm-1,unbounded,Bulutay SST 17 L59 (2002) Monte-Carlo electron-only; measured = GAP,monte-carlo,1,2026-06-10,2026-06-10
+impact-ionization-an,AlN (wz),high field,8.875e6 cm-1,unbounded,Bulutay SST 17 L59 (2002) Monte-Carlo electron-only; measured = UNSEEDED,monte-carlo,1,2026-06-10,2026-06-10
 thermal-conductivity,diamond (type IIa),300 K,2200 W/mK,×0.15,exp 2000–2500; Feng–Lindsay–Ruan PRB 96 161201 (2017); Broido APL 91 231922 (2007),experimental,1,2026-07-08,2026-07-08
 thermal-conductivity,diamond (type IIa),773 K,620 W/mK,×0.4,Pass C battery anchor (interpolation ±40%; independent est. 600–700; 2026-06-10 re-audit),theory-interpolation,1,2026-07-08,2026-07-08
 thermal-conductivity,diamond (type IIa),1100 K,450 W/mK,×0.4,Pass C battery anchor (κ∝T^−1.2 consistency),theory-interpolation,1,2026-07-08,2026-07-08
@@ -39,7 +39,7 @@ saturation-velocity,diamond (holes),high field,1.5e7 cm/s,×0.2,accuracy-ledger 
 caughey-thomas-beta,diamond,high field,1,0.5,Pass C / accuracy-ledger (β=1); supersedes non-eq Part A β≈2 (2026-07 gap-audit B8 resolution),experimental-review,1,2026-07-08,2026-07-08
 impact-ionization-a,diamond,high field,1.93e5 cm-1,×2.5,Hiraiwa & Kawarada JAP 114 034506 (2013); electron/hole never separated (ledger residue — cert treats as both),experimental,1,2026-07-08,2026-07-08
 impact-ionization-b,diamond,high field,7.59e6 V/cm,×2.5,Hiraiwa & Kawarada JAP 114 034506 (2013),experimental,1,2026-07-08,2026-07-08
-impact-ionization-bn,AlN (wz),high field,3.759e8 V/cm,unbounded,Bulutay SST 17 L59 (2002) Monte-Carlo electron-only; pairs with the seeded a; measured = GAP,monte-carlo,1,2026-07-16,2026-07-16
+impact-ionization-bn,AlN (wz),high field,3.759e8 V/cm,unbounded,Bulutay SST 17 L59 (2002) Monte-Carlo electron-only; pairs with the seeded a; measured = UNSEEDED,monte-carlo,1,2026-07-16,2026-07-16
 thermal-conductivity,AlN (wz c-axis),1100 K,95 W/mK,×0.4,3-ph BTE / Slack extrapolation (theory-only; no >500 K single-crystal measurement),first-principles-bte,1,2026-07-16,2026-07-16
 caughey-thomas-mu-p-Nref,GaN (wz),—,2.5e17 cm-3,×0.5,Mnatsakanov SSE 47 111 (2003),experimental-review,1,2026-07-16,2026-07-16
 caughey-thomas-mu-p-gamma,GaN (wz),—,1.5,0.3,Mnatsakanov SSE 47 111 (2003),experimental-review,1,2026-07-16,2026-07-16
@@ -58,10 +58,10 @@ impact-ionization-an,β-Ga₂O₃ (C2/m),high field [E∥b],2.16e6 cm-1,×3,Ghos
 impact-ionization-bn,β-Ga₂O₃ (C2/m),high field [E∥b],1.77e7 V/cm,×3,Ghosh & Singisetti 2018 Table 1,monte-carlo,1,2026-07-16,2026-07-16
 impact-ionization-an,β-Ga₂O₃ (C2/m),high field [E∥c*] (c* 13.83° from [001]),7.06e5 cm-1,×3,Ghosh & Singisetti 2018 Table 1,monte-carlo,1,2026-07-16,2026-07-16
 impact-ionization-bn,β-Ga₂O₃ (C2/m),high field [E∥c*],2.10e7 V/cm,×3,Ghosh & Singisetti 2018 Table 1,monte-carlo,1,2026-07-16,2026-07-16
-impact-ionization-hole,β-Ga₂O₃ (C2/m),high field,"GAP — cert-refused: self-trapped holes, no band-like p-transport",unbounded,Varley et al. PRB 85 081109(R) (2012); holes never measured,gap,1,2026-07-16,2026-07-16
+impact-ionization-hole,β-Ga₂O₃ (C2/m),high field,"UNSEEDED — cert-refused: self-trapped holes, no band-like p-transport",unbounded,Varley et al. PRB 85 081109(R) (2012); holes never measured,gap,1,2026-07-16,2026-07-16
 breakdown-field-critical,β-Ga₂O₃ (C2/m),300 K [a] (E_g=4.9 eV ionization integral),10.2 MV/cm,×0.3,Ghosh-Singisetti 2018 Table 1; device-measured lower (Higashiwaki SST 31 034001 (2016) bandgap-scaling ≈8),monte-carlo,1,2026-07-16,2026-07-16
 breakdown-field-critical,β-Ga₂O₃ (C2/m),300 K [b],4.8 MV/cm,×0.3,Ghosh-Singisetti 2018 Table 1,monte-carlo,1,2026-07-16,2026-07-16
 breakdown-field-critical,β-Ga₂O₃ (C2/m),300 K [c*],7.6 MV/cm,×0.3,Ghosh-Singisetti 2018 Table 1,monte-carlo,1,2026-07-16,2026-07-16
-caughey-thomas-mu-n-set,β-Ga₂O₃ (C2/m),300 K,GAP — no consensus published fit; derive from μ(N_D) or acquire,—,Wave-2 audit confirmed genuine,gap,1,2026-07-16,2026-07-16
+caughey-thomas-mu-n-set,β-Ga₂O₃ (C2/m),300 K,UNSEEDED — no consensus published fit; derive from μ(N_D) or acquire,—,Wave-2 audit confirmed genuine,gap,1,2026-07-16,2026-07-16
 mobility-electron-best-exp,GaN (wz),300 K,1265 cm2/Vs,×0.15,"Wave-1 seeding table 2.5, source cell ""(cmp. Ponce 2019)"" — quoted there as a COMPARISON against the 1034 first-principles ceiling of Ponce Jena Giustino PRB 100 085204 (2019), not as an independently cited measurement; provenance pin outstanding. Sigma carried from the sibling AlN best-exp row pending its own pin",experimental,1,2026-07-21,2026-07-21
-breakdown-field-critical,AlN (wz),300 K,12–15.4 MV/cm,range (theory only),"Maeda JAP 129 185702 (2021) via Wave-1 seeding table 2.7; THEORY ONLY — AlN has no measured avalanche, so the measured value stays cert-refused (see the AlN alpha_ii GAP row and traps 23). Recorded as a range, not a pick",monte-carlo,1,2026-07-21,2026-07-21
+breakdown-field-critical,AlN (wz),300 K,12–15.4 MV/cm,range (theory only),"Maeda JAP 129 185702 (2021) via Wave-1 seeding table 2.7; THEORY ONLY — AlN has no measured avalanche, so the measured value stays cert-refused (see the AlN alpha_ii UNSEEDED row and traps 23). Recorded as a range, not a pick",monte-carlo,1,2026-07-21,2026-07-21

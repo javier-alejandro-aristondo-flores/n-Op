@@ -310,7 +310,7 @@ self-consistent pairing the cert enforces ([cert-obligations#composition-refusal
 
 | Quantity | GaN | AlN | source |
 |---|---|---|---|
-| P_sp, zincblende reference | −0.029…−0.034 | −0.081…−0.090 C/m² | Bernardini, Fiorentini & Vanderbilt PRB 56 (1997); Zoroddu PRB 63 (2001) |
+| P_sp, zincblende reference | −0.029…−0.034 | −0.081…−0.090 C/m² | Bernardini, Fiorentini & Vanderbilt PRB 56 (1997); Zoroddu PRB 64 (2001) |
 | Z*, axial, cation positive | +2.7 | +2.7 | Bernardini 1997 |
 | e₃₃, full | 0.73 / 1.02 hybrid | 1.46 / 1.57 | Bernardini 1997; Dreyer PRX 6 (2016) |
 | **e₃₁ proper** | −0.49 / −0.55 hybrid | −0.60 / −0.68 C/m² | Bernardini 1997; Dreyer 2016 |

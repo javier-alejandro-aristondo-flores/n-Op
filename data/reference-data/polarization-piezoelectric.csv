@@ -1,6 +1,6 @@
 Property,Material,Environment,Value,Uncertainty,Source,Source class,Version,Added,Modified
-spontaneous-polarization-ZBref,GaN (wz),—,−0.029 to −0.034 C/m2,0.003 C/m2,Bernardini Fiorentini Vanderbilt PRB 56 R10024 (1997); Zoroddu PRB 63 045208 (2001) GGA,dft-lda,2,2026-06-10,2026-07-08
-spontaneous-polarization-ZBref,AlN (wz),—,−0.081 to −0.090 C/m2,0.005 C/m2,BFV PRB 56 R10024 (1997); Zoroddu PRB 63 (2001),dft-lda,2,2026-06-10,2026-07-08
+spontaneous-polarization-ZBref,GaN (wz),—,−0.029 to −0.034 C/m2,0.003 C/m2,Bernardini Fiorentini Vanderbilt PRB 56 R10024 (1997); Zoroddu PRB 64 045208 (2001) GGA,dft-lda,2,2026-06-10,2026-07-08
+spontaneous-polarization-ZBref,AlN (wz),—,−0.081 to −0.090 C/m2,0.005 C/m2,BFV PRB 56 R10024 (1997); Zoroddu PRB 64 (2001),dft-lda,2,2026-06-10,2026-07-08
 born-charge-Zstar-axial,GaN (wz),—,+2.7 e,0.1 e,BFV PRB 56 R10024 (1997),dft-dfpt,2,2026-06-10,2026-07-08
 born-charge-Zstar-axial,AlN (wz),—,+2.7 e,0.1 e,BFV PRB 56 R10024 (1997),dft-dfpt,2,2026-06-10,2026-07-08
 piezoelectric-e33-full,GaN (wz),—,0.73 C/m2 (HSE 1.02),0.15 C/m2,BFV 1997; Dreyer PRX 6 021038 (2016),dft-lda,2,2026-06-10,2026-07-08

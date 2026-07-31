@@ -6,11 +6,18 @@ owns:
   - Validate signature
   - Import signature
   - axis coverage of an imported datum
+  - the evolver hand-off
+  - steppable-form manifest fields
+  - encoding validity domain
+  - residual obligation map
 anchors:
   surface: "The only surface"
   validate: "Validate — the differentiated residual surface"
   import: "Import — external ground truth"
   axis-coverage: "Axis coverage"
+  steppable-form-manifest: "The evolver hand-off"
+  encoding-validity-domain: "The encoding validity domain"
+  obligation-map: "What the obligation map is for"
   not-exported: "What is not exported"
 depends-on:
   - unified-state
@@ -20,14 +27,23 @@ depends-on:
   - cert-obligations
   - residual-machinery
   - crystal-inputs
-open-questions: []
+  - multiscale-state
+  - gamma-hat
+  - generic-dynamics
+  - product
+open-questions:
+  - id: evolver-lowering-spec
+    anchor: steppable-form-manifest
+    summary: "The full lowering specification — the manifest record, the refusal enum, and the scorer-versus-evolver exactness obligation — is not written. No time-evolution product verb is claimed until it is."
 ---
 # The pino-bridge exports
 
 ## The only surface
 
 `pino-bridge` is the only surface the operator library — and any other
-downstream consumer — sees of the oracle. It has two exports.
+downstream consumer — sees of the oracle. It has three exports: `Validate` and
+`Import` for a consumer that scores, and `dynamics` for a consumer that
+integrates.
 
 ## Validate — the differentiated residual surface
 
@@ -110,6 +126,79 @@ RoaringAxisCoverage = serialised Roaring bitmap of selected flat-index positions
 - **Persisted form.** The serialised bytes are stored in the axis-coverage
   column of the reference cache's entry table, and are part of the content
   address of a cache entry ([cert-obligations#reference-cache]).
+
+## The evolver hand-off
+
+The oracle scores; it does not step. A consumer that *integrates* a tier
+([multiscale-state#three-tiers]) calls `dynamics(tier)`, which hands back a
+**causalized tangent kernel and a steppable-form manifest — not an
+integrator**. Scheme choice, step-size control and the loop stay with the
+caller.
+
+```
+dynamics(tier) exposes:
+  tangent map           (state_tier, env, adiabatic-params) → tangent_tier;
+                        a pure function
+  generator sub-entries E, S, δE/δx, δS/δx and the L· / M· contraction blocks,
+                        separately addressable — required by
+                        degeneracy-respecting and discrete-gradient integrators
+  algebraic subsystem   per-step solve plans, with an index-≤1 witness
+  preservation grades   per-block generator tags
+  obligation map        ResidualKey → conserve | bound | monotone
+  cadence contract      the tier's cadence and its coupling to the others
+  per-step cost         declared
+  encoding validity domain
+  sibling fingerprint   and the certificate reference
+```
+
+It is a flag-gated sibling emission at the lowering stage
+([compose-time-pipeline#lowering-and-adjoint-synthesis]) sharing the scorer's
+content-addressed right-hand-side forests: one extraction, two lowerings.
+Score-not-solve survives it, because the hand-off is a per-call readout of the
+instantaneous lawful tendency and never a trajectory
+([product#score-not-solve]).
+
+### The encoding validity domain
+
+The oracle is scorer-only ([gamma-hat#scorer-only]), so nothing accumulates
+here — and a consumer that integrates a tier inherits the representation-health
+problem along with the tangent map. The manifest therefore declares the encoding
+each block was compiled against, and the conditions under which that encoding
+stops being a fair approximation: the `CompressionPlan` slot, its rank, and its
+truncation target.
+
+**Exporting the problem is legitimate; exporting it silently is not.**
+
+### What the obligation map is for
+
+`conserve | bound | monotone` is not an arbitrary vocabulary. It is the
+vocabulary the robust dynamical-low-rank literature states its guarantees in, so
+a consumer can match an integrator to the obligations term for term.
+
+The named family is the **rank-adaptive basis-update-and-Galerkin integrator**
+(Ceruti, Kusch & Lubich, *BIT* 62, 2022). Up to a declared truncation tolerance
+it preserves:
+
+- the norm, where the equation does — `conserve`, for instance `Tr γ̂`;
+- the energy, for Hamiltonian systems — `conserve`, the `L` block;
+- monotone decrease of the functional in gradient flows — `monotone`, the `M`
+  block.
+
+The blocks are [generic-dynamics#operators], so the three guarantees map
+term-for-term onto the structure the residuals are written against.
+
+Its error bounds are **independent of small singular values** — Ceruti & Lubich,
+*BIT* 62(1) 23–44 (2022), which carries that robustness over to this family;
+first proved for projector splitting by Kieri, Lubich & Walach, *SIAM J. Numer.
+Anal.* 54 (2016), projector splitting itself being Lubich & Oseledets, *BIT* 54
+(2014). That is the property no standard integrator has, and the one that makes
+a low-rank density matrix safe to step at all.
+
+**Naming the family is a declaration, not an implementation obligation.** The
+oracle guarantees exactness against its scorer sibling, tag totality, structural
+witnesses and refusal accounting. The consumer — the operator library, an
+integration harness in the loops library, or a user program — owns scheme
+choice, step-size control and the loop.
 
 ## What is not exported
 

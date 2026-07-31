@@ -211,6 +211,12 @@
       "summary": "Which averaging scheme the bulk modulus takes over the elastic constants — Voigt, Reuss or Hill — is an open pick."
     },
     {
+      "anchor": "steppable-form-manifest",
+      "id": "evolver-lowering-spec",
+      "page": "pino-bridge",
+      "summary": "The full lowering specification — the manifest record, the refusal enum, and the scorer-versus-evolver exactness obligation — is not written. No time-evolution product verb is claimed until it is."
+    },
+    {
       "anchor": "registration-gate",
       "id": "adjoint-drift-monitoring",
       "page": "residual-machinery",
@@ -1171,6 +1177,7 @@
       "referenced_by": [
         "compose-time-pipeline",
         "physics-graph",
+        "pino-bridge",
         "residual-definitions"
       ],
       "section": "state",
@@ -1219,6 +1226,7 @@
         "glossary",
         "multiscale-state",
         "physics-graph",
+        "pino-bridge",
         "purpose-and-scope",
         "representation-substrate",
         "residual-definitions",
@@ -1418,6 +1426,7 @@
         "named-formulas",
         "observable-bundles",
         "out-of-scope",
+        "pino-bridge",
         "residual-definitions",
         "traps",
         "unified-state"
@@ -1654,8 +1663,11 @@
     "pino-bridge": {
       "anchors": {
         "axis-coverage": "Axis coverage",
+        "encoding-validity-domain": "The encoding validity domain",
         "import": "Import — external ground truth",
         "not-exported": "What is not exported",
+        "obligation-map": "What the obligation map is for",
+        "steppable-form-manifest": "The evolver hand-off",
         "surface": "The only surface",
         "validate": "Validate — the differentiated residual surface"
       },
@@ -1663,7 +1675,11 @@
         "cert-obligations",
         "compose-time-pipeline",
         "crystal-inputs",
+        "gamma-hat",
+        "generic-dynamics",
+        "multiscale-state",
         "physics-graph",
+        "product",
         "residual-definitions",
         "residual-machinery",
         "unified-state"
@@ -1674,7 +1690,11 @@
         "the exported surface contract",
         "Validate signature",
         "Import signature",
-        "axis coverage of an imported datum"
+        "axis coverage of an imported datum",
+        "the evolver hand-off",
+        "steppable-form manifest fields",
+        "encoding validity domain",
+        "residual obligation map"
       ],
       "path": "journals/oracle/seams/pino-bridge.md",
       "referenced_by": [
@@ -1762,6 +1782,7 @@
         "crystal-inputs",
         "learnable-structure-contract",
         "library-landscape",
+        "pino-bridge",
         "purpose-and-scope",
         "representation-substrate"
       ],
@@ -2792,6 +2813,9 @@
     "driver responsibilities": {
       "page": "boundary"
     },
+    "encoding validity domain": {
+      "page": "pino-bridge"
+    },
     "energy and entropy functionals": {
       "page": "generic-dynamics"
     },
@@ -3101,6 +3125,9 @@
     "residual granularity discipline": {
       "page": "residual-definitions"
     },
+    "residual obligation map": {
+      "page": "pino-bridge"
+    },
     "residual sampling policy": {
       "page": "residual-loss-design"
     },
@@ -3185,6 +3212,9 @@
     "static slot schema": {
       "page": "product"
     },
+    "steppable-form manifest fields": {
+      "page": "pino-bridge"
+    },
     "structural and swept Environment partition": {
       "page": "crystal-inputs"
     },
@@ -3220,6 +3250,9 @@
     },
     "the eleven observable bundles": {
       "page": "observable-bundles"
+    },
+    "the evolver hand-off": {
+      "page": "pino-bridge"
     },
     "the exported surface contract": {
       "page": "pino-bridge"

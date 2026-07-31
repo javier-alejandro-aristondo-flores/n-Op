@@ -165,7 +165,9 @@ Seeding proceeds in waves, and two conditions gate one of them.
 ## What this is not
 
 - **Not a training dataset.** Training data belongs to the operator library.
-- **Not a simulation-result cache.** Simulation results live in their own area with
-  different versioning semantics.
+- **Not a simulation-result cache.** Computed sweeps live at `data/diamond-strain-sweep/`,
+  under different versioning semantics. A hypersurface generated to exercise an acceptance
+  check is not a battery entry however many rows it carries — the battery is curated
+  anchors, keyed for lookup, one row per quantity.
 - **Not authoritative beyond what its sources support.** It inherits the uncertainties of
   its primary sources, and it inherits their absences too.

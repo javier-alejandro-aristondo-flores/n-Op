@@ -1,0 +1,44 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 300" font-family="Charter, Georgia, 'Times New Roman', serif">
+  <defs>
+    <pattern id="hatch" width="6" height="6" patternTransform="rotate(45)" patternUnits="userSpaceOnUse">
+      <line x1="0" y1="0" x2="0" y2="6" stroke="#999999" stroke-width="0.6"/>
+    </pattern>
+  </defs>
+
+  <!-- cost ladder, straight: an ordering, drawn as one -->
+  <line x1="48" y1="36" x2="48" y2="212" stroke="#000000" stroke-width="1"/>
+
+  <circle cx="48" cy="46" r="2.4" fill="#000000"/>
+  <text x="62" y="50" font-size="9">E0 · read the bytes</text>
+  <text x="230" y="50" font-size="8" font-style="italic">energies, forces, stress, geometry, every trajectory step</text>
+
+  <circle cx="48" cy="80" r="2.4" fill="#000000"/>
+  <text x="62" y="84" font-size="9">E1 · closed form, one frame</text>
+  <text x="230" y="84" font-size="8" font-style="italic">strain, sublattice displacement, gaps, the invariant battery</text>
+
+  <circle cx="48" cy="114" r="2.4" fill="#000000"/>
+  <text x="62" y="118" font-size="9">E2 · two frames or more</text>
+  <text x="230" y="118" font-size="8" font-style="italic">clamped vs relaxed, precision floors, error propagation</text>
+
+  <circle cx="48" cy="148" r="2.4" fill="#000000"/>
+  <text x="62" y="152" font-size="9">E3 · fits over the corpus</text>
+  <text x="230" y="152" font-size="8" font-style="italic">equation of state, elastic tensor, deformation manifold</text>
+
+  <circle cx="48" cy="182" r="2.4" fill="#999999"/>
+  <text x="62" y="186" font-size="9">E4 · learned models</text>
+  <text x="230" y="186" font-size="8" font-style="italic">surrogates, learning curves, where to spend the next run</text>
+
+  <circle cx="48" cy="208" r="2.4" fill="#999999"/>
+  <text x="62" y="212" font-size="9">E5 · new DFT</text>
+  <text x="230" y="212" font-size="8" font-style="italic">the only tier that costs a supercomputer</text>
+
+  <text x="20" y="28" font-size="8" font-style="italic">cost</text>
+
+  <line x1="28" y1="234" x2="572" y2="234" stroke="#cccccc" stroke-width="0.6"/>
+
+  <text x="28" y="254" font-size="9">Cost is the easy axis. The hard one is preconditions — an operation whose precondition fails is</text>
+  <text x="28" y="268" font-size="9">not expensive, it is impossible, and no budget fixes it. That is a sampling decision, made before</text>
+  <text x="28" y="282" font-size="9">the runs, not after.</text>
+
+  <text x="28" y="298" font-size="8" font-style="italic">Figure 9. Most of what a DFT corpus can say costs nothing to say. Almost none of it is usually said.</text>
+</svg>

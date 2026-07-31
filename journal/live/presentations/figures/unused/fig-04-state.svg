@@ -1,0 +1,50 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 580 292" font-family="Charter, Georgia, 'Times New Roman', serif">
+  <defs>
+    <pattern id="hatch" width="6" height="6" patternTransform="rotate(45)" patternUnits="userSpaceOnUse">
+      <line x1="0" y1="0" x2="0" y2="6" stroke="#999999" stroke-width="0.6"/>
+    </pattern>
+  </defs>
+
+  <text x="28" y="30" font-size="8" font-style="italic">slot</text>
+  <text x="96" y="30" font-size="8" font-style="italic">shape</text>
+  <text x="300" y="30" font-size="8" font-style="italic">what it is</text>
+  <line x1="28" y1="38" x2="552" y2="38" stroke="#000000" stroke-width="0.6"/>
+
+  <text x="28" y="58" font-size="12">h</text>
+  <text x="96" y="58" font-size="9">3×3, GL⁺(3,ℝ)</text>
+  <text x="300" y="58" font-size="8">cell vectors — the lattice, orientation and all</text>
+  <line x1="28" y1="68" x2="552" y2="68" stroke="#cccccc" stroke-width="0.6"/>
+
+  <text x="28" y="88" font-size="12">R_I</text>
+  <text x="96" y="88" font-size="9">ℝ^3N</text>
+  <text x="300" y="88" font-size="8">ion positions</text>
+  <line x1="28" y1="98" x2="552" y2="98" stroke="#cccccc" stroke-width="0.6"/>
+
+  <text x="28" y="118" font-size="12">P_I</text>
+  <text x="96" y="118" font-size="9">ℝ^3N</text>
+  <text x="300" y="118" font-size="8">ion momenta</text>
+  <line x1="28" y1="128" x2="552" y2="128" stroke="#cccccc" stroke-width="0.6"/>
+
+  <text x="28" y="148" font-size="12">Π_h</text>
+  <text x="96" y="148" font-size="9">3×3</text>
+  <text x="300" y="148" font-size="8">cell momentum — Parrinello–Rahman, the cell moves too</text>
+  <line x1="28" y1="158" x2="552" y2="158" stroke="#cccccc" stroke-width="0.6"/>
+
+  <text x="28" y="178" font-size="12">Z_I</text>
+  <text x="96" y="178" font-size="9">discrete, immutable</text>
+  <text x="300" y="178" font-size="8">species labels — the only slot with no derivative</text>
+  <line x1="28" y1="188" x2="552" y2="188" stroke="#cccccc" stroke-width="0.6"/>
+
+  <text x="28" y="208" font-size="12">γ̂</text>
+  <text x="96" y="208" font-size="9">operator on (r, r′)</text>
+  <text x="300" y="208" font-size="8">one-body density matrix, 2×2 in spin — a function of two arguments</text>
+  <line x1="28" y1="218" x2="552" y2="218" stroke="#cccccc" stroke-width="0.6"/>
+
+  <text x="28" y="238" font-size="12">A</text>
+  <text x="96" y="238" font-size="9">field A(r, t)</text>
+  <text x="300" y="238" font-size="8">external EM vector potential</text>
+  <line x1="28" y1="248" x2="552" y2="248" stroke="#000000" stroke-width="0.6"/>
+
+  <text x="28" y="268" font-size="8" font-style="italic">Figure 4. Seven slots. Two are functions, one is discrete and frozen, four are arrays. A candidate state fills</text>
+  <text x="28" y="280" font-size="8" font-style="italic">every one of them. The oracle scores what it is given and does not compute missing slots.</text>
+</svg>

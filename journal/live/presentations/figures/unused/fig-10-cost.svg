@@ -1,0 +1,24 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 214" font-family="Charter, Georgia, 'Times New Roman', serif">
+  <defs>
+    <marker id="a" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+      <path d="M0 0 L10 5 L0 10 z" fill="#000000"/>
+    </marker>
+    <pattern id="hatch" width="6" height="6" patternTransform="rotate(45)" patternUnits="userSpaceOnUse">
+      <line x1="0" y1="0" x2="0" y2="6" stroke="#999999" stroke-width="0.6"/>
+    </pattern>
+  </defs>
+
+  <line x1="52" y1="150" x2="372" y2="150" stroke="#000000" stroke-width="0.6" marker-end="url(#a)"/>
+  <line x1="52" y1="150" x2="52" y2="34" stroke="#000000" stroke-width="0.6" marker-end="url(#a)"/>
+  <text x="374" y="162" font-size="8" font-style="italic">N, iterations of the solve</text>
+  <text x="48" y="32" font-size="8" text-anchor="end" font-style="italic">cost of one gradient</text>
+
+  <line x1="56" y1="148" x2="340" y2="46" stroke="#000000" stroke-width="1" stroke-dasharray="4 2"/>
+  <text x="338" y="42" font-size="8" text-anchor="end" font-style="italic">naive reverse mode, tapes every iteration</text>
+
+  <line x1="56" y1="112" x2="350" y2="112" stroke="#000000" stroke-width="1.6"/>
+  <text x="200" y="104" font-size="8" text-anchor="middle">implicit adjoint, one linear solve</text>
+
+  <text x="20" y="190" font-size="8" font-style="italic">Figure 10. At a converged fixed point the implicit function theorem makes the gradient flat in N.</text>
+  <text x="20" y="202" font-size="8" font-style="italic">This is a design target. Nothing is implemented yet.</text>
+</svg>

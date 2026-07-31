@@ -1,0 +1,44 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 560 264" font-family="Charter, Georgia, 'Times New Roman', serif">
+  <defs>
+    <pattern id="hatch" width="6" height="6" patternTransform="rotate(45)" patternUnits="userSpaceOnUse">
+      <line x1="0" y1="0" x2="0" y2="6" stroke="#999999" stroke-width="0.6"/>
+    </pattern>
+  </defs>
+
+  <text x="28" y="34" font-size="8" font-style="italic">observable</text>
+  <text x="268" y="34" font-size="8" font-style="italic" text-anchor="end">target</text>
+  <text x="292" y="34" font-size="8" font-style="italic">why that number</text>
+  <line x1="28" y1="42" x2="532" y2="42" stroke="#000000" stroke-width="0.6"/>
+
+  <text x="28" y="62" font-size="9">elastic constants C_ij</text>
+  <text x="268" y="62" font-size="9" text-anchor="end">± 5 %</text>
+  <text x="292" y="62" font-size="8">DFPT, or stress–strain with a pinned protocol</text>
+  <line x1="28" y1="72" x2="532" y2="72" stroke="#cccccc" stroke-width="0.6"/>
+
+  <text x="28" y="92" font-size="9">defect formation energy</text>
+  <text x="268" y="92" font-size="9" text-anchor="end">± 0.2 eV</text>
+  <text x="292" y="92" font-size="8">it sets the equilibrium defect concentration</text>
+  <line x1="28" y1="102" x2="532" y2="102" stroke="#cccccc" stroke-width="0.6"/>
+
+  <text x="28" y="122" font-size="9">Schottky barrier φ_B</text>
+  <text x="268" y="122" font-size="9" text-anchor="end">± 0.1 eV</text>
+  <text x="292" y="122" font-size="8">contact resistance moves as e^(Δ/kT) — ×e⁴ at 500 °C</text>
+  <line x1="28" y1="132" x2="532" y2="132" stroke="#cccccc" stroke-width="0.6"/>
+
+  <text x="28" y="152" font-size="9">impact-ionisation prefactor</text>
+  <text x="268" y="152" font-size="9" text-anchor="end">σ ≥ ×3</text>
+  <text x="292" y="152" font-size="8">the literature spans four orders of magnitude</text>
+  <line x1="28" y1="162" x2="532" y2="162" stroke="#cccccc" stroke-width="0.6"/>
+
+  <text x="28" y="182" font-size="9">lattice thermal conductivity</text>
+  <text x="268" y="182" font-size="9" text-anchor="end">iterative</text>
+  <text x="292" y="182" font-size="8">RTA underestimates diamond 30–50 % near 300 K</text>
+  <line x1="28" y1="192" x2="532" y2="192" stroke="#cccccc" stroke-width="0.6"/>
+
+  <text x="28" y="212" font-size="9">ΔP, AlGaN on GaN</text>
+  <text x="268" y="212" font-size="9" text-anchor="end">± 5 %</text>
+  <text x="292" y="212" font-size="8">rests on an accidental cancellation — does not generalise</text>
+  <line x1="28" y1="222" x2="532" y2="222" stroke="#000000" stroke-width="0.6"/>
+
+  <text x="28" y="252" font-size="8" font-style="italic">Figure 7. Every seeded value carries a target, an uncertainty and a source. A row with no σ cannot back a coefficient.</text>
+</svg>

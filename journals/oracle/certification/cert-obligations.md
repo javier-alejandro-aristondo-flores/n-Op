@@ -28,6 +28,7 @@ depends-on:
   - compose-time-pipeline
   - generic-dynamics
   - conventions
+  - named-formulas
 open-questions:
   - id: obligation-9-scope
     anchor: the-ten-obligations
@@ -72,7 +73,7 @@ different second columns and a retag reached one of them.
 | 7 | bulk-boundary correspondence | `DiscreteStructure` morphism: for a bulk carrying a given symmetry-indicator class, the slab must carry boundary states with the multiplicities a lookup table gives for `(indicator generator, boundary orientation)`. Elementary-band-representation table lookup plus multiplicity enumeration | `O(1)` + `O(#Wyckoff)` |
 | 8 | reference-battery versioning | versioning discipline on obligation 4: per-entry provenance travels with the verdict, the row's schema version is compared by the reader, and the cert trips at `τ_battery` with the numerical witness | `O(log n)` + `O(1)` |
 | 9 | surrogate validity | declared input domain contains the query · surrogate uncertainty below `δ_surrogate` · refresh current, measured on a held-out development set. **Which formulas this ranges over is the open question `obligation-9-scope`** — the obligation names a tag whose meaning does not match its checker body | forward pass over the development set |
-| 10 | adjoint existence at registration | the registration-time adjoint gate ([residual-machinery]), enforced at registration and never at prediction: a DAG walk asserting every upstream node has a registered adjoint, over both `adjoint` and `fixpoint-adjoint` formulas | `O(#nodes)`, memoized |
+| 10 | adjoint existence at registration | the registration-time adjoint gate ([residual-machinery]), enforced at registration and never at prediction: a DAG walk asserting every upstream node has a registered adjoint. It covers **both** `adjoint` and `fixpoint-adjoint`, because the second refines the first rather than replacing it and runs its gate plus a conditioning check ([named-formulas#diff-tags]) — gating only `adjoint` would exempt the stronger tier from the test the weaker one must pass | `O(#nodes)`, memoized |
 
 ## Evidence aggregation
 

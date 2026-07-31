@@ -36,12 +36,12 @@ open-questions: []
 Each capability is a **strict selection** from the closed vocabularies — methods,
 templates, formulas, bundles ([canonical-vocabularies]) — from the residual categories
 of [residual-definitions#categories], and from the certification obligations of
-[cert-obligations#the-ten-obligations].
-Formula numbers reference the registry manifest ([named-formulas#the-registry]).
+[cert-obligations#the-ten-obligations]. Formula numbers reference the registry
+manifest ([named-formulas#the-registry]).
 
-Nothing in a capability is described in its own terms. A capability is the *set of rows
-it selects*, which is what makes the totals at the end of this page a sum rather than a
-second definition.
+Nothing in a capability is described in its own terms. A capability is the *set of
+rows it selects*, which is what makes the totals at the end of this page a sum rather
+than a second definition.
 
 ## Crystal-structure prediction
 
@@ -60,8 +60,8 @@ certify stability; one heterostructure check — c-BN on diamond — by lattice 
 | Certification | 1 symmetry · 2 bounds · 3 analytic limits · 5 conservation |
 | Implementation | density-functional Born–Oppenheimer energy with perturbation-theory stress for the elastic constants; tight binding as a warm start ([forced-decisions#tb-warm-start]) |
 
-The acceptance test for this slice is the build's **first end-to-end gate** and is stated
-with the other gates, at [build-verification#first-end-to-end-gate].
+The acceptance test for this slice is the build's **first end-to-end gate** and is
+stated with the other gates, at [build-verification#first-end-to-end-gate].
 
 ## Electron-cloud diffusion
 
@@ -105,20 +105,21 @@ will eventually disagree with it.
 
 **In the MVP.**
 
-- About **34 named formulas** — the rows selected above, including the high-temperature
-  conductivity siblings 121 and 122 and the hull pair 67 and 124.
+- About **34 named formulas** — the rows selected above, including the
+  high-temperature conductivity siblings 121 and 122 and the hull pair 67 and 124.
 - All computational methods except `path-search` and `statistical-sampling`, with
-  `convex-optimization` reaching only the hull check: chemical and Monte-Carlo machinery
-  is not on the diamond path.
+  `convex-optimization` reaching only the hull check: chemical and Monte-Carlo
+  machinery is not on the diamond path.
 - **Ten distinct templates** — about half the template vocabulary.
 - Bundles electronic-structure, phonon, transport, mechanics and static-validity as
-  **primaries**; defect-resolved, surface-resolved, interface-resolved, thermodynamics,
-  non-equilibrium-operating and degradation touched per row. Every bundle is touched;
-  five are primaries.
+  **primaries**; defect-resolved, surface-resolved, interface-resolved,
+  thermodynamics, non-equilibrium-operating and degradation touched per row. Every
+  bundle is touched; five are primaries.
 - Residual families exercised: micro equation-of-motion violation, conservation,
-  positivity, algebraic identities, static snapshot, static thermodynamic. Degeneracy is
-  certification-only ([generic-dynamics#operators], [residual-definitions#categories]); the slow-tier and
-  macro equation-of-motion siblings defer with their tiers.
+  positivity, algebraic identities, static snapshot, static thermodynamic. Degeneracy
+  is certification-only ([generic-dynamics#operators],
+  [residual-definitions#categories]); the slow-tier and macro equation-of-motion
+  siblings defer with their tiers.
 - **Certification obligations 1–6 and 10.** The registration adjoint gate — obligation
   10 — stays in the MVP because adjoint-tagged gradients must be validated when the
   operator first trains. Only the battery and topology obligations 7, 8 and 9 defer.
@@ -127,10 +128,10 @@ will eventually disagree with it.
 
 **Deferred.** The complement — the remaining formulas, the defect zoo beyond row 30,
 surface chemistry, interface and Schottky physics, high-field and hot-carrier and
-breakdown, degradation, most of the topology atlas, iterative dressing, self-consistent
-phonon theory, the non-diamond materials, and heterostructures beyond the single c-BN
-lattice match — is [out-of-scope#exclusions]. Deferrals are stated once, where scope exclusions
-are owned.
+breakdown, degradation, most of the topology atlas, iterative dressing,
+self-consistent phonon theory, the non-diamond materials, and heterostructures beyond
+the single c-BN lattice match — is [out-of-scope#exclusions]. Deferrals are stated
+once, where scope exclusions are owned.
 
 **The buildable unit is roughly one-third of the full vocabulary.** That is the one
 judgment on this page rather than a sum, and it is what makes the MVP a demonstration

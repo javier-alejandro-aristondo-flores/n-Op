@@ -54,14 +54,14 @@ The specification is internally consistent when:
    parameters.
 3. The directory tree built in the scaffold phase ([build-sequence#phases]) contains
    every concept this base names.
-4. The nine regime extractions ([generic-dynamics#nine-regimes]) are realizable as typed
-   compositions of the template and method vocabularies ([property-templates#signatures],
-   [computational-methods#the-alphabet]).
-5. Every residual category ([residual-definitions#categories]) is grounded in a GENERIC identity or
-   a named formula.
-6. Every certification obligation ([cert-obligations#the-ten-obligations]) corresponds to a residual
-   category or an algebraic identity, and maps to an axis of the typeclass alphabet
-   ([typeclass-alphabet#axes]).
+4. The nine regime extractions ([generic-dynamics#nine-regimes]) are realizable as
+   typed compositions of the template and method vocabularies
+   ([property-templates#signatures], [computational-methods#the-alphabet]).
+5. Every residual category ([residual-definitions#categories]) is grounded in a
+   GENERIC identity or a named formula.
+6. Every certification obligation ([cert-obligations#the-ten-obligations]) corresponds
+   to a residual category or an algebraic identity, and maps to an axis of the
+   typeclass alphabet ([typeclass-alphabet#axes]).
 7. The counts stated anywhere in this base agree with the vocabulary page and the
    registry manifest ([canonical-vocabularies]). No count is restated where it can be
    emitted.
@@ -79,16 +79,16 @@ chain runs ([capability-slices#structure-prediction]). Three parts, in order.
 - **Null.** Grading a ground-truth, relaxed pure-diamond state returns every residual
   slot at approximately zero within its declared error scale. The oracle certifies a
   lawful structure as lawful.
-- **Sensitivity.** Perturbing the state — an atomic displacement, a cell distortion off
-  the energy minimum, or a wrong lattice constant — returns a non-zero residual **and
-  the specific keys that fire name the violated law**: the vanishing-gradient residual
-  for a broken relaxation, space-group equivariance for a broken symmetry, the elastic
-  stability criteria for an over-stretch. Because residuals are keyed and never
-  aggregated ([residual-definitions#granularity]), "the right law fired" is directly checkable
-  rather than inferred from a total.
+- **Sensitivity.** Perturbing the state — an atomic displacement, a cell distortion
+  off the energy minimum, or a wrong lattice constant — returns a non-zero residual
+  **and the specific keys that fire name the violated law**: the vanishing-gradient
+  residual for a broken relaxation, space-group equivariance for a broken symmetry,
+  the elastic stability criteria for an over-stretch. Because residuals are keyed and
+  never aggregated ([residual-definitions#granularity]), "the right law fired" is
+  directly checkable rather than inferred from a total.
 - **Data-backed sensitivity.** Perturbing along the diamond strain-hypersurface
-  reference dataset ([reference-battery]), the residual tracks the reference energy rise
-  off the minimum — a quantitative match, not only a sign check.
+  reference dataset ([reference-battery]), the residual tracks the reference energy
+  rise off the minimum — a quantitative match, not only a sign check.
 
 ## The five runtime gates
 
@@ -105,55 +105,58 @@ Then, by differentiability tag:
   conditioning check ([residual-machinery#registration-gate]).
 - Every `relaxed` entry carries a rationale **naming its relaxation**, under the
   obligation that governs relaxations ([cert-obligations#the-ten-obligations]).
-- `read` and `none` entries register without an adjoint, and `direct` entries without a
-  gate — none is needed.
+- `read` and `none` entries register without an adjoint, and `direct` entries without
+  a gate — none is needed.
 
 **Fidelity pairing.** Every generator whose lowering introduces representation error
-registers its paired fidelity generator ([residual-machinery#fidelity-generators]): a compression plan that
-is not dense, a truncated inner solve, or a rewrite admitted under a side condition. **A
-missing pairing fails the build.** It is not a warning — without enforcement the pairing
-obligation would be prose that nothing checks, and a build that passes without checking
-looks exactly like a build that checked ([traps#checker-not-looking]).
+registers its paired fidelity generator ([residual-machinery#fidelity-generators]): a
+compression plan that is not dense, a truncated inner solve, or a rewrite admitted
+under a side condition. **A missing pairing fails the build.** It is not a warning —
+without enforcement the pairing obligation would be prose that nothing checks, and a
+build that passes without checking looks exactly like a build that checked
+([traps#checker-not-looking]).
 
-The adjoint-tape materialization schedule ([compose-time-pipeline#lowering-and-adjoint-synthesis]) is the one lowering
+The adjoint-tape materialization schedule
+([compose-time-pipeline#lowering-and-adjoint-synthesis]) is the one lowering
 **exempt** by construction: it changes cost, not value, so there is no discrepancy to
 estimate. Without that exemption the pairing rule would be over-broad.
 
 ## Gate 2 — end-to-end worked example
 
 A diamond–tungsten Schottky contact at 500 °C. Input: diamond bulk, a tungsten contact
-and a silicon substrate, with the environment record set to 773 K and a field of
-1 MV/cm.
+and a silicon substrate, with the environment record set to 773 K and a field of 1
+MV/cm.
 
 The graph layers fire in order; the equilibrium-statistics ↔ non-equilibrium-kinetics
-cycle — charge balance against self-heating — closes by a same-pass fixed point in five
-iterations or fewer; roughly three dozen residuals fire and are accounted for in the
-certification manifest. Outputs: Schottky barrier, drift velocity, electron temperature,
-self-heating temperature rise, and predicted mean time to failure. The run completes
-within its declared cost budget, and certification obligations 1, 2, 3, 5 and 8 emit
-verdicts.
+cycle — charge balance against self-heating — closes by a same-pass fixed point in
+five iterations or fewer; roughly three dozen residuals fire and are accounted for in
+the certification manifest. Outputs: Schottky barrier, drift velocity, electron
+temperature, self-heating temperature rise, and predicted mean time to failure. The
+run completes within its declared cost budget, and certification obligations 1, 2, 3,
+5 and 8 emit verdicts.
 
 ## Gate 3 — curriculum sanity
 
-A synthetic three-phase training run on bulk silicon — about five observables and about
-a thousand samples — completes without gradient-norm divergence, without an
+A synthetic three-phase training run on bulk silicon — about five observables and
+about a thousand samples — completes without gradient-norm divergence, without an
 equilibrium-statistics ↔ non-equilibrium-kinetics fixed-point failure, and without an
 adjoint-certificate reset mid-training.
 
 This gate is the one place a build check reaches across the seam into training. The
 curriculum phases and their gating fractions are owned on the operator side
-([residual-definitions#curriculum-gate]); what this gate asserts is only that a run of that shape
-completes.
+([residual-definitions#curriculum-gate]); what this gate asserts is only that a run of
+that shape completes.
 
 ## Gate 4 — cross-regime obligations fire
 
 Four obligations are exercised on cases chosen so that each *must* trip:
 
-- **Obligation 6** — Boltzmann conductivity against Kubo conductivity on an equilibrium
-  reference.
-- **Obligation 9** — a `relaxed` query outside its declared domain trips with a witness.
-- **Obligation 10** — a synthetic `adjoint` formula with a deliberately broken adjoint is
-  refused at registration: loud, at build time.
+- **Obligation 6** — Boltzmann conductivity against Kubo conductivity on an
+  equilibrium reference.
+- **Obligation 9** — a `relaxed` query outside its declared domain trips with a
+  witness.
+- **Obligation 10** — a synthetic `adjoint` formula with a deliberately broken adjoint
+  is refused at registration: loud, at build time.
 - **Obligation 7** — non-topological diamond emits "not applicable" with a rationale,
   while a contrived time-reversal-invariant test system emits the predicted edge-state
   count.
@@ -166,8 +169,8 @@ The seam is exercised through its own entry points ([pino-bridge#validate]):
   observables.
 - Validate with gradients computed returns finite per-residual scalars and finite
   cotangents of the declared shape, on a randomly initialised state.
-- Import accepts a synthetic payload in the format the plane-wave reference code emits,
-  and returns ground-truth bridge generators with their coverage masks.
+- Import accepts a synthetic payload in the format the plane-wave reference code
+  emits, and returns ground-truth bridge generators with their coverage masks.
 
 All three return within their typed contracts. This is the gate the MVP exit criterion
 depends on ([build-sequence#exit-criterion]).

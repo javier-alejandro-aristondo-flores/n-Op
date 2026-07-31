@@ -178,14 +178,16 @@ The argument types these signatures are written in are defined by no page
 
 Three constructions look like candidate templates and are not:
 
-- **`ClusterExpansion` is a parameterization of `ConfigurationalFreeEnergyOf`**,
-  not a separate template. It is one of three parameterizations of one free
-  energy, and the three are distinct in form rather than in kind.
-- **Bulk-boundary correspondence is a certification obligation, not a template.**
-  It is obligation-7 ([cert-obligations]), a morphism over the discrete
+- **`ClusterExpansion` is a parameterization of
+  `ConfigurationalFreeEnergyOf`**, not a separate template. It is one of three
+  parameterizations of one free energy, and the three are distinct in form
+  rather than in kind. - **Bulk-boundary correspondence is a certification
+  obligation, not a template.** It is obligation-7
+  ([cert-obligations#the-ten-obligations]), a morphism over the discrete
   structures the topology atlas emits ([typeclass-alphabet#discrete-structure],
   [topology-atlas#entry]). A template produces an observable; this checks a
-  relation between two, which is the certification layer's job.
-- **`HarmonicStiffnessHessianOf` specializes `SecondDerivativeOf`** rather than
+  relation between two, which is the certification layer's job. -
+  **`HarmonicStiffnessHessianOf` specializes `SecondDerivativeOf`** rather than
   duplicating it. The specialization exists because the symmetrization and
-  sum-rule work belongs to every caller and would otherwise be repeated by each.
+  sum-rule work belongs to every caller and would otherwise be repeated by
+  each.

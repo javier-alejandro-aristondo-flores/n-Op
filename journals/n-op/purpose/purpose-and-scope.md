@@ -47,14 +47,14 @@ open-questions:
 
 n-Op pairs a **compiled oracle for crystalline matter** with a **neural operator
 trained against it**. The oracle is handed a candidate state of a crystal under stated
-operating conditions and returns a granular, itemised account of how far that candidate
-is from satisfying each law it is supposed to satisfy — many independent named checks,
-each a number, each traceable to a published formula. The operator is the fast learner
-that produces the candidate states.
+operating conditions and returns a granular, itemised account of how far that
+candidate is from satisfying each law it is supposed to satisfy — many independent
+named checks, each a number, each traceable to a published formula. The operator is
+the fast learner that produces the candidate states.
 
 **The oracle side of that division is settled and is stated crisply.** The oracle
-receives a *complete* candidate state together with the crystal identity its kernel was
-compiled for, and grades it. It never fills in a missing piece, owns no loop, and
+receives a *complete* candidate state together with the crystal identity its kernel
+was compiled for, and grades it. It never fills in a missing piece, owns no loop, and
 proposes nothing ([product#score-not-solve]). The operator is the half that supplies
 what the caller does not have; the state type is deliberately a superset of any
 interchange format, and the pieces no database carries are the operator's to produce
@@ -70,12 +70,12 @@ are present in the material this base is built from, and they are different clai
 
 The open question on this page carries the choice. Three things hold under either
 reading and can be relied on now: n-Op claims **no time-evolution verb** today
-([architectural-principles#numerics-agnostic]); the oracle grades whatever it is handed
-and is indifferent to how the candidate was produced; and the MVP's capability is fixed
-independently, as a selection from closed vocabularies rather than as a verb
-([capability-slices#selection-discipline]). Two of the three MVP capabilities are named
-for transport processes, so whether their output is a trajectory or a completed channel
-set is the same open question, asked about a concrete slice.
+([architectural-principles#numerics-agnostic]); the oracle grades whatever it is
+handed and is indifferent to how the candidate was produced; and the MVP's capability
+is fixed independently, as a selection from closed vocabularies rather than as a verb
+([capability-slices#selection-discipline]). Two of the three MVP capabilities are
+named for transport processes, so whether their output is a trajectory or a completed
+channel set is the same open question, asked about a concrete slice.
 
 ## The downstream target
 
@@ -87,19 +87,20 @@ vibration, high field, high current density, possibly radiation.
 Stated as a direction rather than a mechanism: **properties in, structures out.** You
 state the properties you need, and the system searches for crystals that are
 simultaneously physically real and fit for purpose — and can show its work for every
-candidate it accepts or rejects. The mechanism that makes a measured datum and a desired
-property the same object is [product#import-is-a-compiler-input]; the two loops that
-consume it are [product#two-loops]. **No component that proposes candidates is specified
-in this base.** The direction is a direction.
+candidate it accepts or rejects. The mechanism that makes a measured datum and a
+desired property the same object is [product#import-is-a-compiler-input]; the two
+loops that consume it are [product#two-loops]. **No component that proposes candidates
+is specified in this base.** The direction is a direction.
 
 ## What the oracle library does
 
 The oracle library does not represent the *state values* of a system. It is the way to
-**instantiate a physical system** — a crystal — and to define the laws that a candidate
-is held to. It defines what a state is ([unified-state#slots]), what laws govern it
-([generic-dynamics#generic-form]), and how to evaluate whether a candidate state satisfies
-those laws ([residual-definitions#categories]). Where the edges of that library run —
-what may not enter it, and what the other two libraries own — is [library-landscape].
+**instantiate a physical system** — a crystal — and to define the laws that a
+candidate is held to. It defines what a state is ([unified-state#slots]), what laws
+govern it ([generic-dynamics#generic-form]), and how to evaluate whether a candidate
+state satisfies those laws ([residual-definitions#categories]). Where the edges of
+that library run — what may not enter it, and what the other two libraries own — is
+[library-landscape].
 
 ## What the oracle library is not
 
@@ -107,28 +108,29 @@ The oracle library is a **pure oracle**. It owns no training control flow, no sa
 selection beyond the per-generator sampling policy, and no loop that consumes loss
 values to decide what to evaluate next.
 
-Active-learning policies belong to the interface library, in neither the oracle nor the
-operator; both the oracle and the operator expose the signals such a policy consumes —
-granular residuals, gradients, certification evidence. [boundary#ownership] states what the
-interface library owns.
+Active-learning policies belong to the interface library, in neither the oracle nor
+the operator; both the oracle and the operator expose the signals such a policy
+consumes — granular residuals, gradients, certification evidence. [boundary#ownership]
+states what the interface library owns.
 
 ## Verifying is cheaper than solving
 
 Direct simulation of these materials at device-relevant conditions is prohibitively
-expensive, and machine-learned surrogates are fast but untrustworthy precisely where it
-matters — extrapolation into the harsh corners this program targets. The answer is an
-old one from computer science: **checking a proposed solution is far cheaper than
+expensive, and machine-learned surrogates are fast but untrustworthy precisely where
+it matters — extrapolation into the harsh corners this program targets. The answer is
+an old one from computer science: **checking a proposed solution is far cheaper than
 producing one.**
 
 n-Op does not build a faster solver. It builds a *grader* cheap enough and complete
 enough that the learned half can be disciplined by it at every step
-([product#score-not-solve], [pino-bridge#surface]). The grader never solves for anything; its
-only job is to measure disagreement with the laws. That division of labour is what makes
-the learned half safe to use: its known weakness — drift under long rollouts, and
-extrapolation — is exactly the thing the grader exposes, cheaply, at every step.
+([product#score-not-solve], [pino-bridge#surface]). The grader never solves for
+anything; its only job is to measure disagreement with the laws. That division of
+labour is what makes the learned half safe to use: its known weakness — drift under
+long rollouts, and extrapolation — is exactly the thing the grader exposes, cheaply,
+at every step.
 
-Three properties follow from the grammar being closed ([canonical-vocabularies]) and are
-the reason a grader can be trusted at all:
+Three properties follow from the grammar being closed ([canonical-vocabularies]) and
+are the reason a grader can be trusted at all:
 
 - **Enumerable.** A compiled oracle can list every check it contains.
 - **Traceable.** Every emitted number leads back to a numbered, literature-cited
@@ -156,8 +158,8 @@ semiconductor with diamond: c-BN, AlN, GaN, β-Ga₂O₃, AlGaN; refractory cont
 
 ## Comprehensive spec, diamond-first build
 
-**The comprehensiveness of the specification is the point**, even though implementation
-is diamond-first. That distinction — comprehensive spec, diamond-first build — runs
-through everything here. The in-versus-deferred boundary, formula by formula, is
-[capability-slices#totals]; the phase-by-phase construction, and which phases the
-diamond-first build reaches, is [build-sequence].
+**The comprehensiveness of the specification is the point**, even though
+implementation is diamond-first. That distinction — comprehensive spec, diamond-first
+build — runs through everything here. The in-versus-deferred boundary, formula by
+formula, is [capability-slices#totals]; the phase-by-phase construction, and which
+phases the diamond-first build reaches, is [build-sequence].

@@ -43,10 +43,11 @@ open-questions:
 
 ## The factory
 
-The consumer-facing factory that turns named formulas ([named-formulas]) into
-`ResidualLeaf` nodes ([physics-graph]) in the physics graph. Under the
-always-cheap reframe it is part of the graph-construction stage
-([compose-time-pipeline]).
+The consumer-facing factory that turns named formulas
+([named-formulas#the-registry]) into `ResidualLeaf` nodes
+([physics-graph#node-kinds]) in the physics graph. Under the always-cheap
+discipline ([compose-time-pipeline#always-cheap]) it is part of the
+symbolic-lift stage ([compose-time-pipeline#symbolic-lift]).
 
 It has three responsibilities: generate the leaves with content-addressed keys,
 gate registration on adjoint correctness, and provide the per-formula metadata
@@ -97,10 +98,10 @@ record ResidualGenerator {
 }
 ```
 
-`Crystal` and `Environment` are [crystal-inputs]. The key each generator emits,
-and the facets carried alongside it, are [residual-definitions#residualkey]; the
-accuracy scale it declares is [residual-definitions#error-budget], seeded from
-[accuracy-ledger].
+`Crystal` and `Environment` are [crystal-inputs#crystal-type]. The key each
+generator emits, and the facets carried alongside it, are
+[residual-definitions#residualkey]; the accuracy scale it declares is
+[residual-definitions#error-budget], seeded from [accuracy-ledger#composition].
 
 ## The layered compute DAG
 
@@ -128,9 +129,9 @@ make-residual-generator(observable      : ObservableRef,
 ```
 
 Called once per formula at load time. The returned generator is inserted into
-the graph-construction stage ([compose-time-pipeline]) when its `applicability`
-predicate holds for the current composition. Coupling channels register through
-this same pattern ([coupling-structure]).
+the symbolic-lift stage ([compose-time-pipeline#symbolic-lift]) when its
+`applicability` predicate holds for the current composition. Coupling channels
+register through this same pattern ([coupling-structure#registration]).
 
 ## Generator subtypes
 
@@ -141,14 +142,14 @@ this same pattern ([coupling-structure]).
   ([pino-bridge#import]); the loss is the scale-normalised Huber against the
   target.
 - **Cert-only** — no loss contribution; runs as part of cert evidence
-  ([cert-obligations]), not as part of training loss.
+  ([cert-obligations#the-ten-obligations]), not as part of training loss.
 
 ## Fidelity generators
 
 Identity is exact in the representation substrate
-([representation-substrate]), and any operation that can make the computed
-object differ from its exact counterpart must estimate that difference. This is
-where the estimate lives.
+([representation-substrate#identity-exact]), and any operation that can make the
+computed object differ from its exact counterpart must estimate that difference.
+This is where the estimate lives.
 
 **Normative.** A generator whose lowering introduces representation error must
 register a paired **fidelity generator** — a cert-only subtype carrying a
@@ -157,15 +158,15 @@ today:
 
 | Lowering | Estimator | Cost |
 |---|---|---|
-| A `CompressionPlan` other than `Dense` ([compose-time-pipeline]) | the discarded spectrum, `‖A − A_k‖₂ = σ_{k+1}`, with the Frobenius tail for the root-sum-square form | already computed by the truncation |
-| A truncated inner solve — a self-consistent field at its tolerance, the equilibrium-statistics ↔ non-equilibrium-kinetics cycle at its ≤5-iteration cap | the a-posteriori inexact-adjoint estimate `τ_trunc` ([cert-obligations]): the implicit-function adjoint assumes the forward solve *converged*, and the error from stopping early is bounded by `‖J⁻¹‖·‖r_stop‖`, computable a-posteriori per Ehrhardt & Roberts, *IMA J. Appl. Math.* 89(1) 254–278 (2024) | the stopping residual is already computed |
-| A rewrite admitted under a side condition at the simplification stage ([compose-time-pipeline]) | the rewrite's declared float discrepancy on the sampled points | shares the adjoint gate's sample set |
+| A `CompressionPlan` other than `Dense` ([compose-time-pipeline#lowering-and-adjoint-synthesis]) | the discarded spectrum, `‖A − A_k‖₂ = σ_{k+1}`, with the Frobenius tail for the root-sum-square form | already computed by the truncation |
+| A truncated inner solve — a self-consistent field at its tolerance, the equilibrium-statistics ↔ non-equilibrium-kinetics cycle at its ≤5-iteration cap | the a-posteriori inexact-adjoint estimate `τ_trunc` ([cert-obligations#tolerance-ledger]): the implicit-function adjoint assumes the forward solve *converged*, and the error from stopping early is bounded by `‖J⁻¹‖·‖r_stop‖`, computable a-posteriori per Ehrhardt & Roberts, *IMA J. Appl. Math.* 89(1) 254–278 (2024) | the stopping residual is already computed |
+| A rewrite admitted under a side condition at the simplification stage ([compose-time-pipeline#rewrite-admission]) | the rewrite's declared float discrepancy on the sampled points | shares the adjoint gate's sample set |
 
 **An a-priori target is not a substitute for an a-posteriori estimate.** A
 compression plan already carries an error *target* and picks its rank to meet
 it. The target is what the plan intended; the estimate is what it achieved; only
 the second is evidence. A declared intention that nothing measures is not a
-measurement ([traps]).
+measurement ([traps#target-is-not-measurement]).
 
 The fidelity generator's output flows into `Quantity.combineTol`
 ([residual-definitions#error-budget]) alongside the other budget terms, and into
@@ -219,23 +220,25 @@ as such in the cert rather than emitted as a pass. Any other row whose
 deferred gate is none of them. The rule above cannot be encoded in the record
 this page defines.
 
-Under the always-cheap reframe, most `adjoint` generators with a fixed-point
+Under the always-cheap discipline, most `adjoint` generators with a fixed-point
 solve in their forward pass are wired to the **implicit-differentiation adjoint
-synthesised at the lowering stage** ([compose-time-pipeline]); the gate verifies
-that synthesised adjoint, not a hand-written backward.
+synthesised at the lowering stage**
+([compose-time-pipeline#lowering-and-adjoint-synthesis]); the gate verifies that
+synthesised adjoint, not a hand-written backward.
 
 **What the gate does not cover.** It runs once, at registration, against the
 *formula's* adjoint. The *composition's* adjoint is synthesised later, per
 composition, over a graph the simplification stage has already rewritten.
 Nothing revalidates the second against the first. The rewrite-admission rule
-makes a rewrite's *value* discrepancy visible; it says nothing about whether the
-adjoint that ships is still the one that was gated.
+([compose-time-pipeline#rewrite-admission]) makes a rewrite's *value* discrepancy
+visible; it says nothing about whether the adjoint that ships is still the one
+that was gated.
 
 ## Dressing certificates
 
 The `OneShotCert` and `IterativeResult` records — one-shot-dressing and
-iterative-dressing per [born-oppenheimer-levels] — are schemas attached to
-dressed `MethodInvoke` nodes, not per-generator fields.
+iterative-dressing per [born-oppenheimer-levels#dressing-tiers] — are schemas
+attached to dressed `MethodInvoke` nodes, not per-generator fields.
 
 ```
 record OneShotCert {
@@ -257,10 +260,10 @@ record OneShotCert {
 
 The last two fields are the frozen dressing's **validity radius**, computable
 rather than declared. A one-shot dressing does not respond to state excursions
-and contributes no gradient ([born-oppenheimer-levels]), so the term it drops is
-its state-dependence. To first order that term is
-`‖x − reference-state‖ · staleness-coeff` — a compile-time coefficient measured
-once where the dressing is already being computed, times a runtime norm. Their
+and contributes no gradient ([born-oppenheimer-levels#dressing-tiers]), so the
+term it drops is its state-dependence. To first order that term is `‖x −
+reference-state‖ · staleness-coeff` — a compile-time coefficient measured once
+where the dressing is already being computed, times a runtime norm. Their
 product is the dressing-staleness entry of the error budget
 ([residual-definitions#error-budget]).
 

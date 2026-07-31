@@ -121,7 +121,7 @@ Three kinds of file sit outside the journals, and each relates to prose differen
 `physics/library/` hold the corpus's coefficients, formula rows, signatures and tags. A
 page that states one of those values is *quoting* it: the file is where the value
 changes, and where a disagreement between a page and the data is settled. Seed from the
-file, or from [accuracy-ledger], never from a page that quotes one
+file, or from [accuracy-ledger#seed-provenance], never from a page that quotes one
 ([traps#seed-from-the-source]). A value carried forward because it has always been there
 is not a seeded value — a row whose provenance does not resolve is `UNSEEDED`, which is
 a thing the corpus knows how to say.

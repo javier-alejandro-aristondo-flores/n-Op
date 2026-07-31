@@ -26,9 +26,10 @@ open-questions: []
 ## The ten vocabularies
 
 A `TheoryContext` is the global theory frame a coupling specification is
-interpreted in — the answer to *"computed at what level of theory?"* for a whole
-composition at once. [coupling-structure] owns the record and its four axes; this
-page owns the ten closed vocabularies those axes are built from.
+interpreted in — the answer to *"computed at what level of theory?"* for a
+whole composition at once. [coupling-structure#theory-context-placement] owns
+the record and its four axes; this page owns the ten closed vocabularies those
+axes are built from.
 
 They are a genuinely separate axis, not a restatement of one the corpus already
 has. The nearest neighbour is the dressing-method selector inside
@@ -58,13 +59,13 @@ with `ManyBodyLevel.KohnSham`.** "Hybrid" is not a member of `ManyBodyLevel`:
 recording the same physical choice on two axes would make two different records
 denote one calculation, and the address a theory context hashes to would stop
 being canonical. `make-theory-context` normalizes this on construction
-([coupling-structure]).
+([coupling-structure#couplingspec]).
 
 ## Adding a member is a version bump
 
-Each of the ten is a `Universe` instance with a closed carrier and dense unsigned
-ordinals ([representation-substrate]). A downstream record stores the ordinal,
-not the name.
+Each of the ten is a `Universe` instance with a closed carrier and dense
+unsigned ordinals ([representation-substrate#primitives]). A downstream record
+stores the ordinal, not the name.
 
 **Adding a member is a versioned schema bump, not an open-registry append** —
 because it changes the meaning of every coefficient already recorded against that
@@ -81,10 +82,11 @@ key universe of the pseudopotential set. Its membership is
 
 Oxygen and hydrogen are there because committed content requires them, not
 because of anticipated scope: β-Ga₂O₃ is a host material
-([purpose-and-scope]) and a defect host ([multiscale-state]); the oxygen-bearing
-defects `O_N`, `V_Al–O`, `V_Ga–O_N` and `V_O–H` decorate the nitride and oxide
-hosts; and the seeded slow-tier rows read hydrogen (rows 106 and 110) and oxygen
-through the oxygen partial pressure (row 109).
+([purpose-and-scope#material-scope]) and a defect host
+([multiscale-state#defect-species]); the oxygen-bearing defects `O_N`,
+`V_Al–O`, `V_Ga–O_N` and `V_O–H` decorate the nitride and oxide hosts; and the
+seeded slow-tier rows read hydrogen (rows 106 and 110) and oxygen through the
+oxygen partial pressure (row 109).
 
 Silicon and the contact-metal species enter with their material waves, under the
 version bump above.
@@ -97,10 +99,11 @@ invariants exist is a property of the crystal symmetry group, and a change of
 functional cannot add or remove one.
 
 That boundary is why they touch exactly four certification obligations —
-reference battery, named-formula consistency, reference versioning, and surrogate
-validity — and none of the others ([cert-obligations]). Every obligation they
-touch is one about whether a number may be compared to another number; none is
-about what the composition contains.
+reference battery, named-formula consistency, reference versioning, and
+surrogate validity — and none of the others
+([cert-obligations#the-ten-obligations]). Every obligation they touch is one
+about whether a number may be compared to another number; none is about what
+the composition contains.
 
 Counts over the registry are the manifest's ([formula-registry#counts]); the
 per-page ownership of any other vocabulary in this corpus is answered by the

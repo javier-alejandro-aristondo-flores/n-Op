@@ -47,7 +47,7 @@ depends-on:
   - named-formulas
   - residual-machinery
   - crystal-inputs
-  - learned-corrections
+  - traps
 open-questions:
   - id: sub-dof-pair-table
     anchor: channel-record
@@ -104,7 +104,7 @@ and — where applicable — `sublattice` and `valley`; `h` carries `strain`; `A
 carries `gauge`. **Which `(component, sub-dof)` pairs are legal is not stated
 anywhere in this corpus**, and `make-coupling-channel` cannot validate a
 `StatePiece` without that table. `Crystal` and `Environment` are
-[crystal-inputs].
+[crystal-inputs#crystal-type].
 
 `order` and `derivative` declare the truncation. They are not part of the
 underlying physical structure; they are the compose-time choice of how high in
@@ -128,7 +128,7 @@ generate-invariants : CrystalSymmetryGroup × CouplingChannel
 ```
 
 Standard representation theory. Given the crystal's symmetry group
-([canonical-vocabularies] lifts `CrystalSymmetryGroup` to a first-class
+([canonical-vocabularies#scope] lifts `CrystalSymmetryGroup` to a first-class
 typeclass entity, built at compose time from `PeriodicityStructure ×
 SiteDecoration`) and a channel specification, this routine returns the finite
 basis of `target`-shaped symmetry-invariant terms at the requested `order` and
@@ -167,8 +167,8 @@ short-range basis as the complete coupling.
 
 The generator is the **constructive** direction of the irrep machinery that the
 compose-time pipeline already uses **decompositionally** to block-diagonalise
-operators by irrep ([compose-time-pipeline]). Same module, same primitives, new
-direction.
+operators by irrep ([compose-time-pipeline#symmetry-quotient]). Same module, same
+primitives, new direction.
 
 ## The generator contract
 
@@ -198,12 +198,12 @@ never forming `ρ(g)` explicitly.
 
 For the MVP worst case (`|G| ≤ 192` with the double cover and time reversal,
 `dim(T) ≤ ~250` at `order = 4, Gradient(1)`): the character pre-prune is
-`O(|G|) ≤ ~200` operations; the full Reynolds projection `P = (1/|G|) Σ_g ρ(g)`,
-run only when the basis is non-empty, is `O(|G|·dim(T)²) ≤ ~12M` operations. The
-result is cached on `Address[CrystalSymmetryGroup] × Address[CouplingChannel]`
-([representation-substrate]), so per-composition cost is one-shot. The cache key
-does **not** include the theory context: the polynomial basis is
-symmetry-determined and theory-independent.
+`O(|G|) ≤ ~200` operations; the full Reynolds projection `P = (1/|G|) Σ_g
+ρ(g)`, run only when the basis is non-empty, is `O(|G|·dim(T)²) ≤ ~12M`
+operations. The result is cached on `Address[CrystalSymmetryGroup] ×
+Address[CouplingChannel]` ([representation-substrate#serialization]), so
+per-composition cost is one-shot. The cache key does **not** include the theory
+context: the polynomial basis is symmetry-determined and theory-independent.
 
 > **Emptiness is not correctness.** A non-empty `poly` is correct as far as it
 > goes, but may still be only the short-range part of a long-range coupling.
@@ -224,17 +224,18 @@ electron-phonon = CouplingChannel {
 }
 ```
 
-At compose time ([compose-time-pipeline]):
+At compose time ([compose-time-pipeline#always-cheap]):
 
-1. **Stage 1** records the channel in the stage sidecar.
-2. **Stage 2** has already constructed the diamond symmetry group
+1. **Symbolic lift** records the channel in the stage sidecar.
+2. **Symmetry quotient** has already constructed the diamond symmetry group
    (Fd-3m + time reversal).
-3. **The invariant-synthesis sub-stage** runs
+3. **Invariant synthesis** ([compose-time-pipeline#invariant-synthesis]) runs
    `generate-invariants(Fd-3m+TR, electron-phonon)` and returns one
    `InvariantTerm`: the canonical `g_{nm,ν}(k,q)` matrix element written as a
    symmetry-respecting tensor.
-4. **Stages 3–4** lower that `InvariantTerm` into a `FormulaApply` node
-   ([physics-graph]) attached to the `E_coupling` aggregator.
+4. **Algebraic simplification and lowering** turn that `InvariantTerm` into a
+   `FormulaApply` node ([physics-graph#node-kinds]) attached to the
+   `E_coupling` aggregator.
 
 Spin-orbit, magneto-elastic, minimal coupling (γ̂ ↔ A), Stark, Zeeman,
 phonon-phonon and radiative damping are each a `CouplingChannel` record with a
@@ -279,7 +280,8 @@ provenance contract below rests on that separation.
 ## Cert hooks
 
 The invariant-generator structure simplifies three cert obligations, which
-[cert-obligations] collapses to projection-residual checks.
+[cert-obligations#coupling-derived-checks] collapses to projection-residual
+checks.
 
 - **Symmetry equivariance.** Polynomial invariants are trivial-irrep basis
   vectors *by construction*, so equivariance is automatic and cert reduces to a
@@ -303,9 +305,10 @@ The invariant-generator structure simplifies three cert obligations, which
 
 The polynomial checks are O(1) per invariant, and both integrate with the
 symmetry-adapted Hamiltonian machinery ([canonical-vocabularies]) that already
-exists. The cert-obligation indices are fixed in [cert-obligations]:
-equivariance is obligation 1, antisymmetry of `L` is obligation 5
-(conservation), positive-semidefiniteness of `M` is obligation 2 (positivity).
+exists. The cert-obligation indices are fixed in
+[cert-obligations#the-ten-obligations]: equivariance is obligation 1,
+antisymmetry of `L` is obligation 5 (conservation), positive-semidefiniteness
+of `M` is obligation 2 (positivity).
 
 ## Registration discipline
 
@@ -318,8 +321,9 @@ make-coupling-channel(channel : CouplingChannel) → CouplingChannel
 
 It returns the channel with its `applicability` validated as first-order
 decidable on typeclass tags — the registration-time invariant of
-[named-formulas]. The channel's identity is `Address[CouplingChannel]` under the
-canonical-serialisation rule of [representation-substrate]: domain-separated and
+[named-formulas#applicability-decidability]. The channel's identity is
+`Address[CouplingChannel]` under the canonical-serialisation rule of
+[representation-substrate#serialization]: domain-separated and
 schema-versioned, so identical channels collapse to one address.
 
 ## The coefficient-provenance contract
@@ -335,7 +339,7 @@ coefficient carries:
 
 where `cost-class ∈ {curated, per-material-DFPT, fit}` declares its acquisition
 pipeline, `provenance` is the citation it rests on, and the standard deviation
-reuses the reference-battery machinery ([cert-obligations]).
+reuses the reference-battery machinery ([cert-obligations#reference-cache]).
 
 **A cert obligation refuses any composition whose active channels carry
 coefficients without a `ProvenanceLedger` entry** — an unprovenanced coefficient
@@ -344,8 +348,9 @@ other materials are `per-material-DFPT`, and their provenance is the gating
 data-acquisition task before that material is claimed.
 
 A coefficient whose `provenance` is a learned correction is additionally bound
-by the learned-correction training contract ([learned-corrections]) and by the
-refusal that contract rests on ([cert-obligations]).
+by the rule that it is fit only against external anchors and frozen with respect
+to the training loss ([traps#frozen-corrections]), and by the refusal that rule
+rests on ([cert-obligations#composition-refusals]).
 
 ## The slope-kind double-count guard
 
@@ -356,13 +361,13 @@ Quoted experimental `dE_g/dT` slopes are mostly *total*: they already fold in
 the lattice-expansion part that registry row 63
 (`deformation-potential-gap-shift`) carries separately, which is 30–40% of the
 shift. **A cert obligation refuses any composition in which a `total`-tagged
-adiabatic-Allen-Heine-Cardona slope and row 63's thermal-expansion path are both
+Allen–Heine–Cardona slope and row 63's thermal-expansion path are both
 active on the same observable**; an `isochoric`-tagged slope composes with row
 63 freely. The tag is a first-class field on the coefficient, so the check is a
 tag comparison at compose time, not a reviewer's caveat.
 
 The curated zero-point-renormalisation amplitudes feeding the `coth` path
-([accuracy-ledger]) are the **isochoric** electron-phonon values and are tagged
+([accuracy-ledger#ahc-zpr]) are the **isochoric** electron-phonon values, tagged
 `isochoric`: GaN −189 meV and AlN −399 meV (Engel PRB 106 094316 (2022); Miglio
 npj Comput. Mater. 6 167 (2020)), diamond −345 meV indirect (Antonius PRL 112
 215501 (2014)). The zero-point lattice-expansion part — GaN −49 meV, AlN −85 meV
@@ -387,13 +392,14 @@ with `ΔP_corr` and **improper** `e₃₁`. Because improper `e₃₁ ≈ 3.4×`
 GaN and AlN, mixing conventions silently corrupts `n_s`.
 
 Each polarization coefficient — `P_sp` (registry row 113), `e₃₁` (registry rows
-114 and 117) — therefore carries
-`polarization-reference ∈ {ZB-proper, H-improper}`, and **a cert obligation
-refuses any composition whose active `P_sp` and `e₃₁` carry mismatched tags**
-([cert-obligations]). The `ΔP` accuracy target also carries an `is-AlGaN-GaN`
-validity scope: the cancellation fails for high-indium InGaN/GaN, where the
-target is degraded and the composition cert-refused. The curated III-nitride
-coefficients ([accuracy-ledger]) are all `ZB-proper`.
+114 and 117) — therefore carries `polarization-reference ∈ {ZB-proper,
+H-improper}`, and **a cert obligation refuses any composition whose active
+`P_sp` and `e₃₁` carry mismatched tags**
+([cert-obligations#composition-refusals]). The `ΔP` accuracy target also
+carries an `is-AlGaN-GaN` validity scope: the cancellation fails for
+high-indium InGaN/GaN, where the target is degraded and the composition
+cert-refused. The curated III-nitride coefficients
+([accuracy-ledger#polarization-coefficients]) are all `ZB-proper`.
 
 ## The CouplingSpec record
 
@@ -407,12 +413,13 @@ record CouplingSpec {
 }
 ```
 
-Its `Address` is computed by the record rule of [representation-substrate], so
-two specs with identical channel sets but different `theory_context` are
-guaranteed distinct addresses: the theory frame is part of identity,
-automatically. `CouplingSpec` carries its own schema version, so its addresses
-cannot collide with those of any other encoding of the same channel set. The
-spec travels alongside the composition request ([compose-time-pipeline]).
+Its `Address` is computed by the record rule of
+[representation-substrate#serialization], so two specs with identical channel
+sets but different `theory_context` are guaranteed distinct addresses: the
+theory frame is part of identity, automatically. `CouplingSpec` carries its own
+schema version, so its addresses cannot collide with those of any other
+encoding of the same channel set. The spec travels alongside the composition
+request ([compose-time-pipeline#symbolic-lift]).
 
 The diamond MVP's `CouplingSpec` is short: electron-phonon (short-range) +
 minimal coupling + ion-ion electrostatic + phonon-phonon scattering in `M`,
@@ -420,8 +427,9 @@ under the MVP default theory context.
 
 ## TheoryContext placement
 
-`theory_context` is **definitional input**. It is set at Stage 1, and it must
-exist before Stage 2 builds the — possibly double-cover — symmetry group,
+`theory_context` is **definitional input**. It is set at the symbolic-lift
+stage, and it must exist before the symmetry quotient builds the — possibly
+double-cover — symmetry group,
 because the relativistic treatment determines whether the group carries the spin
 SU(2) factor.
 
@@ -445,11 +453,12 @@ record TheoryContext {
 ```
 
 The ten closed vocabularies backing these four fields are
-[canonical-vocabularies]. The theory context does **not** enter the
+[canonical-vocabularies#theory-context]. The theory context does **not** enter the
 `generate-invariants` cache key: the polynomial basis is symmetry-only, and the
 relativistic treatment's one effect — spin-orbit — enters through the symmetry
 group's double cover, captured by `Address[CrystalSymmetryGroup]`. It does
-**not** enter the runtime kernel either: by the lowering stage the theory choice
+**not** enter the runtime kernel either: by the lowering stage
+([compose-time-pipeline#lowering-and-adjoint-synthesis]) the theory choice
 has already selected the symmetry group and conditioned the coefficient values,
 so the lowered kernel is theory-agnostic. `theory_context` is therefore solely
 metadata for the cert and provenance layer.
@@ -462,9 +471,9 @@ promoted to valence / `KohnSham` plain density-functional theory /
 non-magnetic with no spin-orbit-dependent observable.
 
 PBE's underestimate of ultra-wide-bandgap band gaps is handled by
-theory-conditioning the reference-battery obligation ([cert-obligations]), not
-by upgrading the default. `Hybrid(HSE06)` is the documented accuracy upgrade for
-gap-sensitive work.
+theory-conditioning the reference-battery obligation
+([cert-obligations#the-ten-obligations]), not by upgrading the default.
+`Hybrid(HSE06)` is the documented accuracy upgrade for gap-sensitive work.
 
 ## Coverage policy
 
@@ -503,8 +512,9 @@ code edit.
 The **piezoelectric-acoustic** channel is `LongRangeStatic(1)` with a `1/q`
 pole: the second long-range electron-phonon mechanism the wurtzite III-nitride
 members carry, alongside Fröhlich's `1/q²`. It is gated on
-`is-noncentrosymmetric` ([applicability-classifiers]) — piezoelectric scattering
-needs a piezoelectric class — and is inert for diamond.
+`is-noncentrosymmetric` ([applicability-classifiers#polar-predicate-split]) —
+piezoelectric scattering needs a piezoelectric class — and is inert for
+diamond.
 
 ## Mechanism range and polynomial sufficiency
 
@@ -588,7 +598,7 @@ four variants share one backbone — a section of a `BZ × ℝ_ω` fiber bundle 
 in a bounded-rank tensor — and differ only in tensor rank, real-versus-complex
 value, and whether they are given parametrically or as a tabulated grid. No new
 substrate primitive is needed; every field maps onto the primitives of
-[representation-substrate].
+[representation-substrate#primitives].
 
 ```
 record KernelExt {
@@ -606,16 +616,16 @@ record KernelExt {
 
 `Parametric` kernels — Fröhlich's `ε_∞`, `ε_static`, Born charges `Z*`, `ω_LO`;
 the long-range-corrected `f_xc`'s single `α` — are tiny, under 1 KB.
-`Tabulated` kernels can be large: the full-frequency dense dielectric matrix for
-diamond, at a `12³` q-mesh × 64 frequencies × 500 G-vectors, complex, is
-≈ **440 GB** worst case, dropping to ≈ 0.5 GB after a plasmon-pole model and
+`Tabulated` kernels can be large: the full-frequency dense dielectric matrix
+for diamond, at a `12³` q-mesh × 64 frequencies × 500 G-vectors, complex, is ≈
+**440 GB** worst case, dropping to ≈ 0.5 GB after a plasmon-pole model and
 irreducible-Brillouin-zone reduction. The grid is a cache-eligible sidecar
-attached by `Address[TabulatedField]` ([representation-substrate]) — folded into
-the channel's identity by address, never by value, so content addressing stays
-O(1). **No MVP channel is tabulated**: the active set is all-polynomial, and
-Fröhlich for the polar members is `Parametric`. Tabulated storage is a V2
-concern, and 440 GB is the number the persistent-storage tier must be designed
-against before those channels turn on.
+attached by `Address[TabulatedField]` ([representation-substrate#clusters]) —
+folded into the channel's identity by address, never by value, so content
+addressing stays O(1). **No MVP channel is tabulated**: the active set is
+all-polynomial, and Fröhlich for the polar members is `Parametric`. Tabulated
+storage is a V2 concern, and 440 GB is the number the persistent-storage tier
+must be designed against before those channels turn on.
 
 **`GaugeRule`** resolves a residual continuous basis ambiguity — for instance
 the Wannier-gauge or orbital-projection choice for a downfolded channel. It is
@@ -640,21 +650,21 @@ runtime search:
 Assumption [PSD-e-ph]   — electron-phonon dissipation kernel M_{e-ph}
   Origin:    GENERIC M-block axiom + fluctuation-dissipation theorem
              + Fermi-golden-rule Gram structure (sum of squared coupling matrix elements)
-  Reference: Öttinger 2005 §5.3 (DOI 10.1002/0471727903); Callen–Welton 1951
+  Reference: Öttinger 2005 section 5.3 (DOI 10.1002/0471727903); Callen–Welton 1951
              (DOI 10.1103/PhysRev.83.34); Giustino 2017 (DOI 10.1103/RevModPhys.89.015003)
   Closure:   tight at the operator level / loose at the coefficient level
 
 Assumption [PSD-ph-ph] — phonon-phonon scattering kernel M_{ph-ph}
   Origin:    GENERIC axiom + Onsager/detailed-balance + fluctuation-dissipation
-  Reference: Öttinger 2005 §5.3; De Groot & Mazur Ch. IV (ISBN 978-0-486-64741-8);
+  Reference: Öttinger 2005 section 5.3; De Groot & Mazur Ch. IV (ISBN 978-0-486-64741-8);
              Maradudin & Fein 1962 (DOI 10.1103/PhysRev.128.2589)
   Closure:   tight / loose
 
 Assumption [PSD-rad]    — radiative damping kernel M_{rad}
   Origin:    GENERIC axiom + Lindblad/GKSL completely-positive structure (rate Γ ≥ 0);
              fluctuation-dissipation root
-  Reference: Öttinger 2005 §5.3; Breuer & Petruccione 2002 Ch. 3
-             (ISBN 978-0-19-852063-4); Jackson 1998 §17.2
+  Reference: Öttinger 2005 section 5.3; Breuer & Petruccione 2002 Ch. 3
+             (ISBN 978-0-19-852063-4); Jackson 1998 section 17.2
   Closure:   tight / loose (a trivial sign check when the invariant basis has dimension 1)
 ```
 
@@ -668,7 +678,7 @@ The closure is **loose at the coefficient level**: the operator learns the basis
 coefficients and could transiently leave the cone during training. So the
 positivity obligation keeps a cheap per-evaluation guard
 `λ_min(M_block) ≥ −δ_PSD` on the assembled per-mechanism super-block
-([cert-obligations]).
+([cert-obligations#tolerance-ledger]).
 
 **Dormant semidefinite-program fallback (V2).** A future `PSDSymmForm` channel
 with no structural guarantee would, at registration, solve the semidefinite

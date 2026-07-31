@@ -64,11 +64,10 @@ Every row carries ten fields.
 
 - **Property** — the canonical name from the formula registry.
 - **Material** — the formula, with space group or polytype where that is ambiguous.
-- **Environment** — the external conditions of the measurement: temperature, pressure and
-  applied field, as applicable. [crystal-inputs#environment] owns the record; this column
-  is a serialization of it, and it is also the third component of the obligation-8 lookup
-  key, so a row whose environment cell does not name a value the record can hold is a row
-  no lookup will ever match.
+- **Environment** — the conditions the value was measured or computed under, as a
+  serialization of the record [crystal-inputs#environment] owns. It is also the third
+  component of the obligation-8 lookup key, so a cell naming something that record cannot
+  hold is a row no lookup will ever match.
 - **Value** — the numerical value in canonical units.
 - **Uncertainty** — the one-sigma band, instrumental or computational. See below.
 - **Source** — a DOI, paper title and page reference; or a computational provenance,

@@ -40,7 +40,7 @@ depends-on:
   - multiscale-state
   - residual-machinery
   - crystal-inputs
-  - stage-ordering
+  - training-stages
 open-questions:
   - id: curriculum-denominator
     anchor: curriculum-gate
@@ -54,8 +54,8 @@ open-questions:
 ## Granularity
 
 Residuals are the physics-informed loss terms the operator library trains
-against. In the physics graph ([physics-graph]) they are realised as nodes with
-`OutputRole = ResidualLeaf(key)`.
+against. In the physics graph ([physics-graph#output-role]) they are realised as
+nodes with `OutputRole = ResidualLeaf(key)`.
 
 The emission discipline is **granular**: every independent component is its own
 scalar with its own content-addressed key, and the oracle never preaggregates.
@@ -72,7 +72,7 @@ each contribution — not a granularity floor, and not a unit of weighting.
 ### Equation-of-motion violation — 9 categories
 
 Seven per micro state-component degree of freedom ([unified-state#slots]), plus
-two cross-tier siblings ([multiscale-state]):
+two cross-tier siblings ([multiscale-state#three-tiers]):
 
   1. `EOM/γ̂` — `‖∂γ̂/∂t − …‖²` on the density-matrix degree of freedom.
   2. `EOM/A` — same form on the EM gauge potential.
@@ -95,7 +95,7 @@ own axis tuple. There is no per-coupling residual category.
 
 The two **cross-tier** siblings share the same
 `‖∂_t x − (L δE/δx + M δS/δx)‖²` shape with `x` ranging over a non-micro tier
-([multiscale-state]):
+([multiscale-state#residual-contract]):
 
   - `EOM/DefectPopulation` — slow-tier defect-population kinetics,
     `‖d[D]^q/dt − (G − [D]^q·k_ann)‖²`.
@@ -127,11 +127,11 @@ The two **cross-tier** siblings share the same
      - **γ̂ admissibility** — ensemble N-representability, the state-level
        analogue of `f ∈ [0,1]`: `γ̂† = γ̂` and `0 ⪯ γ̂ ⪯ 1`, evaluated as
        per-block spectral bounds on the block-diagonal reciprocal-space
-       encoding ([gamma-hat]). The extreme eigenvalues of each block are cheap
-       to extract, which is what makes the bound affordable per evaluation. The
-       zero-temperature idempotency `‖γ̂² − γ̂‖²` is applicability-gated to
-       claimed-zero-temperature states exactly as `ω² ≥ 0` is gated to
-       claimed-stable phases.
+       encoding ([gamma-hat#encoding-vocabulary]). The extreme eigenvalues of
+       each block are cheap to extract, which makes the bound affordable per
+       evaluation. The zero-temperature idempotency `‖γ̂² − γ̂‖²` is
+       applicability-gated to claimed-zero-temperature states exactly as
+       `ω² ≥ 0` is gated to claimed-stable phases.
 
 A candidate γ̂ outside these bounds can zero every equation-of-motion residual
 while being unphysical. These admissibility gates are what make the oracle sound
@@ -160,14 +160,14 @@ the pair, not two tags:
 
 - An **equivalence pair** binds two formulas that share an *agreement theorem*,
   and trips on any disagreement beyond `τ_equiv`, the numerical-agreement grade
-  ([cert-obligations]). Conductivity by Boltzmann transport versus by Kubo is
-  one.
+  ([cert-obligations#tolerance-ledger]). Conductivity by Boltzmann transport
+  versus by Kubo is one.
 - A **consistency pair** binds a cheap model to a microscopic reference with
   **no** agreement theorem — Callaway/Slack thermal conductivity against
   iterative Boltzmann transport, cheap-Chynoweth ionisation against
   Boltzmann/Monte-Carlo — and trips only on *excess beyond a declared model-gap
-  tolerance* `τ_method` ([cert-obligations]). A legitimate model gap is
-  therefore not scored as a bug.
+  tolerance* `τ_method` ([cert-obligations#tolerance-ledger]). A legitimate
+  model gap is therefore not scored as a bug.
 
 The thermal-conductivity siblings — registry rows 121
 (`kappa-4phonon-high-t-correction`) and 122 (`iterative-lbte-kappa`) — bind to
@@ -191,7 +191,8 @@ Disjoint by the *type* of input the constraint reads:
      mass-action and carbide formation; and the three slow-tier
      thermodynamic-consistency identities — Gibbs adsorption `dγ/dμ = −Γ`,
      charge–Fermi Maxwell `dE_form/dE_F = q`, and the Clausius–Clapeyron
-     analogue `d ln[D]/d(1/T)` against `S_form` ([multiscale-state]).
+     analogue `d ln[D]/d(1/T)` against `S_form`
+     ([multiscale-state#slow-kinetics]).
 
 Categories 16 and 17 stay disjoint because they consume type-distinct inputs —
 snapshot versus snapshot-plus-environment — and the curriculum schedules them
@@ -227,10 +228,10 @@ those weights persist across compose-time recompiles. Facets are exposed through
 a parallel `Map<ResidualKey, ContributionFacets>` that the consumer reads for
 category- or bundle-level aggregation.
 
-In the representation substrate ([representation-substrate]), `ResidualKey` is a
-typed `ContentAddress` instance; `CategoryTag`, `BundleName` and `AxisLabel` are
-typed indexed universes; `ContributionFacets` is the value type of a typed
-sidecar fiber and never participates in `ResidualKey` identity.
+In the representation substrate ([representation-substrate#clusters]),
+`ResidualKey` is a typed `ContentAddress` instance; `CategoryTag`, `BundleName`
+and `AxisLabel` are typed indexed universes; `ContributionFacets` is the value
+type of a typed sidecar fiber and never participates in `ResidualKey` identity.
 
 ## Facets are provenance, not weighting axes
 
@@ -266,10 +267,10 @@ evaluate : (State, Environment) → ( residuals : Map<ResidualKey, Scalar>
                                   , …  )
 ```
 
-`Environment` is [crystal-inputs]. Aggregation — per-category sums, GradNorm
-balancing, residual-adaptive sampling, per-bundle weight schedules, curriculum
-gating — lives in the operator library. This library is an oracle that reports
-per-component values; the consumer chooses how to reduce them.
+`Environment` is [crystal-inputs#environment]. Aggregation — per-category sums,
+GradNorm balancing, residual-adaptive sampling, per-bundle weight schedules,
+curriculum gating — lives in the operator library. This library is an oracle
+that reports per-component values; the consumer chooses how to reduce them.
 
 ## The curriculum category gate
 
@@ -293,10 +294,11 @@ equivalence and thermodynamic-consistency residuals once the dynamical residuals
 are quiet; Cooldown freezes the schedule for deterministic final-cert
 evaluation.
 
-The gate is keyed on `CategoryTag`, this library's own closed vocabulary, and it
-answers one question: *when is this residual meaningful?* It says nothing about
-which epoch runs against which data source. The oracle is attached for one
-training stage only, and the sequence of stages is [stage-ordering].
+The gate is keyed on `CategoryTag`, this library's own closed vocabulary, and
+it answers one question: *when is this residual meaningful?* It says nothing
+about which epoch runs against which data source. The oracle is attached for
+one training stage only, and the sequence of stages is
+[training-stages#stage-ordering].
 
 **The denominator is unsettled.** Because the oracle is absent from the stages
 either side of the one it attaches to, a schedule indexed on the whole training
@@ -312,9 +314,9 @@ own `Map<CategoryTag, GateSchedule>` if it overrides any fraction or category.
 Two contributions sharing 99% of their DAG ancestry — for example, all
 Kramers–Kronig identities sharing one dielectric-function computation — is the
 common case. The compose-time pipeline's hash-consing stage
-([compose-time-pipeline]) already gives that upstream sharing for free. The
-granularity directive adds only that the *leaves* of the DAG, the
-per-contribution scalars, are individually addressable.
+([compose-time-pipeline#algebraic-simplification]) already gives that upstream
+sharing for free. The granularity directive adds only that the *leaves* of the
+DAG, the per-contribution scalars, are individually addressable.
 
 One compose-time pipeline therefore produces a kernel that emits the full
 `Map<ResidualKey, Scalar>` in a single forward pass at no extra cost over
@@ -334,18 +336,18 @@ reconciles it with unbounded emission.
 
 Every residual generator carries a `characteristic-scale` — the target accuracy
 of its observable, a standard deviation seeded from the per-observable accuracy
-ledger ([accuracy-ledger]).
+ledger ([accuracy-ledger#composition]).
 
 It is a **declared scale, not a fitted weight**. It is the error-model input
-that `Quantity.combineTol` ([typeclass-alphabet]) composes along the DAG, per
-instance by max-abs or by root-sum-square, into a per-`ResidualKey` error
-budget. That budget sums:
+that `Quantity.combineTol` ([typeclass-alphabet#quantity]) composes along the
+DAG, per instance by max-abs or by root-sum-square, into a per-`ResidualKey`
+error budget. That budget sums:
 
 - the input standard deviation;
 - **model-form error** — relaxation-time and three-phonon approximations,
   compact models, the quasi-harmonic approximation;
 - **compression truncation** at the lowering stage, against its per-plan error
-  target ([compose-time-pipeline]);
+  target ([compose-time-pipeline#lowering-and-adjoint-synthesis]);
 - **dressing staleness** for a frozen one-shot dressing
   ([residual-machinery#dressing-certs]);
 - **coefficient-provenance** standard deviation
@@ -355,7 +357,7 @@ So *"is this closed-form choice accurate enough?"* is answerable by the system,
 not only by external judgment.
 
 The headline design-grade accuracy targets and the full ledger are
-[accuracy-ledger]; the reference battery checks them at the MVP anchors
-([cert-obligations]). Every numeric tolerance named across this library is
-valued once, in the tolerance ledger ([cert-obligations]), which is canonical
-for that list.
+[accuracy-ledger#mvp-targets]; the reference battery checks them at the MVP
+anchors ([cert-obligations#the-ten-obligations]). Every numeric tolerance named
+across this library is valued once, in the tolerance ledger
+([cert-obligations#tolerance-ledger]), which is canonical for that list.

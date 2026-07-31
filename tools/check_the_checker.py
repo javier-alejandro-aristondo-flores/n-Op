@@ -94,8 +94,14 @@ PROBES: list[tuple[str, str, str, str]] = [
     ("history marker",
      "A page that exists", "This was formerly a different page. It exists",
      "history marker"),
-    ("retired vocabulary token",
-     "A page that exists", "The row is tagged D2. A page that exists", "retired"),
+    # Backticked, because that is the form a tag takes. An unbacked D2 is a
+    # deformation potential and must NOT be caught — planting the unbacked form
+    # would test the opposite of the rule.
+    ("retired vocabulary tag (backticked)",
+     "A page that exists", "The row is tagged `D2`. A page that exists", "retired tag"),
+    ("unbacked tag-shaped token is NOT a tag",
+     "A page that exists", "D1 through D5 are deformation potentials. A page exists",
+     None),
     ("stale emitted corpus.json",
      None, None, "stale"),
     # Structural probes: these plant a whole file rather than mutating the victim,
@@ -186,7 +192,12 @@ def main() -> int:
                 victim.write_text(text.replace(find, repl, 1), encoding="utf-8")
 
             out = run(work)
-            if expect.strip() in out:
+            if expect is None:                     # negative probe: must stay clean
+                if "OK" in out:
+                    seen.append("")
+                else:
+                    missed.append((name, "no finding", out.strip()[:200]))
+            elif expect.strip() in out:
                 seen.append(out)
             else:
                 missed.append((name, expect, out.strip()[:200]))

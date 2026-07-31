@@ -171,8 +171,8 @@ Hardness(model)    = AlgebraicOf({K, G, …},
 ```
 
 Which averaging scheme `BulkModulus` takes over the elastic constants — Voigt,
-Reuss or Hill — is an open pick; [accuracy-ledger] carries the accuracy note on
-the elastic constants it depends on.
+Reuss or Hill — is an open pick; [accuracy-ledger#elastic-coefficients] carries
+the accuracy note on the elastic constants it depends on.
 
 ## Thermal
 
@@ -244,8 +244,9 @@ MigrationBarrier    = PathStationaryOf(F = E_BO, initial = site-i, final = site-
 
 `Conductivity` evaluates both members. Their agreement is not assumed: it is
 enforced as a method-equivalence residual under obligation-6
-([residual-definitions], [cert-obligations]). This is the worked instance of that
-obligation — two methods, one observable, one residual scoring the difference.
+([residual-definitions#pair-kinds], [cert-obligations#the-ten-obligations]).
+This is the worked instance of that obligation — two methods, one observable,
+one residual scoring the difference.
 
 The harmonic transition-rate normalization consumes the **product** of normal-mode
 frequencies through the `product-of-modes` extractor, not the spectra
@@ -313,7 +314,7 @@ gap from an *undeclared* one — a new unregistered name still fails loudly.
 | `slab-arithmetic` | transcription | determined by its inputs |
 | `arrhenius` | transcription | determined by its inputs |
 | `adsorption-energy-difference` | transcription | determined by its inputs |
-| `QHA-expansion` | transcription | tensor form pinned by [traps] |
+| `QHA-expansion` | transcription | tensor form pinned by [traps#thermal-expansion-form] |
 | `chen-hardness` | research | needs literature |
 | `teter-hardness` | research | needs literature |
 | `tian-hardness` | research | needs literature |
@@ -325,19 +326,20 @@ gap from an *undeclared* one — a new unregistered name still fails loudly.
 | `formation-energy-from-references` | research | needs literature |
 
 **They are deliberately not registered.** A manifest row must be defensible
-against a literature citation, and registering these on thin provenance would put
-unsourced rows into the artifact whose entire discipline is that unsourced values
-are refused ([traps]). A declared gap is honest; an unsourced row is not.
+against a literature citation, and registering these on thin provenance would
+put unsourced rows into the artifact whose entire discipline is that unsourced
+values are refused ([traps#unprovenanced-coefficient]). A declared gap is
+honest; an unsourced row is not.
 
 The two kinds need different work. **Transcription** means the expression is
 written above, or the name plus its inputs determine it, or this corpus already
 pins the form — registering one is transcription plus tag assignment. The four
-expressions in the table are recorded precisely because that is what makes those
-rows transcription rather than research: deleting them would convert four
+expressions in the table are recorded precisely because that is what makes
+those rows transcription rather than research: deleting them would convert four
 bookkeeping tasks into four literature searches. `QHA-expansion` is the case
-where the pinned form matters most, because [traps] pins the *tensor* form
-including the compliance-not-stiffness trap that makes the naive version
-dimensionally wrong.
+where the pinned form matters most, because [traps#thermal-expansion-form] pins
+the *tensor* form including the compliance-not-stiffness trap that makes the
+naive version dimensionally wrong.
 
 **Research** means a modelling choice with literature behind it, and the choice
 has to be made and cited before a row exists.

@@ -50,16 +50,16 @@ line, and it is not.
   pinned at compile time ([product#import-is-a-compiler-input]). There is no path by
   which a compiled kernel shells out to a solver.
 
-The oracle library is numerics-agnostic *at its seam* while internally committed to the
-representation substrate ([representation-substrate#contract]); the principle that states this
-once is [architectural-principles#numerics-agnostic].
+The oracle library is numerics-agnostic *at its seam* while internally committed to
+the representation substrate ([representation-substrate#contract]); the principle that
+states this once is [architectural-principles#numerics-agnostic].
 
 ## The operator library
 
 The operator library is the neural operator itself. It **consumes** the oracle library
 and is trained against it; the dependency never runs the other way. What it is trained
-to produce is [purpose-and-scope#what-n-op-is], where the framing is an open question —
-this page fixes only the direction of the dependency.
+to produce is [purpose-and-scope#what-n-op-is], where the framing is an open question
+— this page fixes only the direction of the dependency.
 
 Its seam contract and its loss methodology are the operator library's own pages, not
 this one's.

@@ -67,8 +67,8 @@ language would move a language decision onto the critical path.
 | 12 | **Dynamics and integration validation** (`dynamics`): assemble the unified right-hand side and validate it on the harmonic oscillator, the two-level Rabi problem and ideal-gas relaxation ([generic-dynamics#operators]) | Unified dynamics callable; right-hand side handed to any integrator | open |
 | 13 | **Seal and operator seam**: the single typed seal, the validate and import entry points ([pino-bridge#surface]), worked examples, end-to-end demonstration | Shippable; downstream libraries can build against it | open |
 
-Two admission rules live inside that table and are easy to lose there, so they are named
-again:
+Two admission rules live inside that table and are easy to lose there, so they are
+named again:
 
 - **Applicability decidability (phase 7).** Every applicability classifier must be
   first-order decidable on typeclass tags. A non-decidable entry is rejected at
@@ -87,27 +87,27 @@ then the seal.
   required by the exit criterion.
 - **open** — the MVP's scope statements require the phase's output, and the step list
   the MVP build was written as does not name the phase. See the open question on this
-  page. These cells are the reason the column exists: as a separate page, the MVP order
-  asserted that it was a subset of this table, and nothing compared the two.
-- Phases marked **in** map onto the MVP steps in order, with two collapses: the methods
-  and the formula registry are built together, and the certification obligations land
-  with the seeded diamond reference battery ([reference-battery#contents]) in the same phase as
-  the residuals.
+  page. These cells are the reason the column exists: as a separate page, the MVP
+  order asserted that it was a subset of this table, and nothing compared the two.
+- Phases marked **in** map onto the MVP steps in order, with two collapses: the
+  methods and the formula registry are built together, and the certification
+  obligations land with the seeded diamond reference battery
+  ([reference-battery#contents]) in the same phase as the residuals.
 
 The MVP's final step is not a phase but a **run**: relaxed lattice constant, gap with
 the quasi-particle correction, elastic constants, maximum phonon energy and
-room-temperature thermal conductivity, each evaluated against the battery. It belongs to
-verification ([build-verification]).
+room-temperature thermal conductivity, each evaluated against the battery. It belongs
+to verification ([build-verification]).
 
 ## The MVP exit criterion
 
 Completing the MVP column yields a **diamond-only oracle library** that can emit a
-granular residual vector with cotangents, expose observable values, and certify them for
-all three capabilities ([capability-slices]) — the concrete substrate the operator
+granular residual vector with cotangents, expose observable values, and certify them
+for all three capabilities ([capability-slices]) — the concrete substrate the operator
 library then trains against ([library-landscape#operator]).
 
 The criterion is stated in terms of what a caller can do, which is why it reaches the
 seal phase: emitting cotangents through a typed entry point is what "trains against"
 means. That is the same dependency the seam smoke test exercises
-([build-verification#seam-smoke-test]), and it is why phase 13 sits in the open question
-above rather than outside the MVP by default.
+([build-verification#seam-smoke-test]), and it is why phase 13 sits in the open
+question above rather than outside the MVP by default.

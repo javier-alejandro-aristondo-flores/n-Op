@@ -65,11 +65,13 @@ Lowering selects one slot per density-matrix-typed node from the
 `(PeriodicityStructure, SiteDecoration)` pair ([crystal-inputs#top-level-inputs]). Transcoders
 convert on demand for operations whose runtime cost is lower in a different encoding.
 
-**Rank-dependent applicability is a compile-time predicate, not a runtime check.** Whether the
-`(NaturalOrbital, LowRank)` slot applies is decided at lowering from the same pair, alongside
-every other slot choice above. There is nothing accumulating that would need monitoring, so the
-runtime check whose cost was the original objection is not needed. Four-index objects — the
-Bethe–Salpeter kernel, Boltzmann collision matrices — go directly to tensor-train compression.
+**Rank governs one of these slots, and it is decided once.** Whether `(NaturalOrbital, LowRank)`
+applies is one of the compile-time slot predicates
+([compose-time-pipeline#lowering-and-adjoint-synthesis]); what this one tests is the substrate's
+rank. It can be settled at compile time because nothing accumulates here — there is no trajectory
+inside the oracle, so there is no rank growth to monitor. Four-index objects — the
+Bethe–Salpeter kernel, Boltzmann collision matrices — bypass the slot choice and go to
+tensor-train compression directly.
 
 ## Scorer-only — the density matrix never evolves here
 

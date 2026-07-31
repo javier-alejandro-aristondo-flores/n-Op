@@ -15,6 +15,7 @@ depends-on:
   - born-oppenheimer-levels
   - multiscale-state
   - residual-definitions
+  - traps
 open-questions: []
 ---
 # Observable bundles
@@ -22,9 +23,9 @@ open-questions: []
 ## The eleven bundles
 
 Observables are grouped by physics domain. The grouping is what the residual
-machinery aggregates over ([residual-definitions]), so it is the grouping that
-has to be canonical — a second grouping of the same observables competes with it
-rather than complementing it.
+machinery aggregates over ([residual-definitions#facets]), so it is the
+grouping that has to be canonical — a second grouping of the same observables
+competes with it rather than complementing it.
 
 | Bundle | Primary level |
 |---|---|
@@ -40,7 +41,8 @@ rather than complementing it.
 | `static-validity` | born-oppenheimer-surface |
 | `degradation` | non-equilibrium-kinetics |
 
-The levels are the Born–Oppenheimer hierarchy's ([born-oppenheimer-levels]).
+The levels are the Born–Oppenheimer hierarchy's
+([born-oppenheimer-levels#hierarchy]).
 
 **The `bundle` field of a formula record takes these eleven names or the value
 `linear-response-primitive`** — twelve admissible values in all. Any consumer
@@ -94,7 +96,7 @@ Representative contents. The authoritative per-row assignment is the manifest's
   `plastic-strain-fatigue-life` (a.k.a. Coffin–Manson fatigue); the slow-tier
   kinetics of rows 105–112 — vacancy generation, hydrogen redistribution and
   desorption, platelet nucleation, vibration-driven dislocation multiplication,
-  air oxidation, radiation displacement ([multiscale-state]); the
+  air oxidation, radiation displacement ([multiscale-state#slow-kinetics]); the
   gate-dielectric lifetime pair (`tddb-thermochemical-e-model`, row 130, and
   `dielectric-crystallization-jmak`, row 131).
 
@@ -120,4 +122,4 @@ Born–Oppenheimer hierarchy. The distinction matters because these four rows ar
 correct as they stand: a consumer that takes the bundle vocabulary from the
 eleven-row table above, rather than from the field's full vocabulary, finds four
 rows carrying a value it does not recognise and reports four correct rows as
-defects.
+defects ([traps#vocabulary-has-an-owner]).

@@ -7,7 +7,6 @@ owns:
   - evaluation cost vocabulary
   - no-inline-math rule
   - anchor class
-  - consistency pair
   - formula row bands
   - applicability decidability
   - corrected canonical forms
@@ -29,14 +28,15 @@ depends-on:
   - typeclass-alphabet
   - topology-atlas
   - accuracy-ledger
-  - cross-cutting-rules
   - cert-obligations
+  - residual-definitions
   - residual-machinery
   - applicability-classifiers
   - compose-time-pipeline
   - build-sequence
   - build-verification
   - multiscale-state
+  - traps
 open-questions: []
 ---
 # Named formulas
@@ -47,7 +47,7 @@ The registry is the closed set of typed, fully parameterized algebraic formulas
 the oracle is allowed to invoke. It is a contract between the property machinery
 and the operator: each row is independently citable to published work and
 independently verifiable by the certification sub-tree, and new rows enter only
-through the registry-build gate ([build-sequence]).
+through the registry-build gate ([build-sequence#phases]).
 
 The rows themselves live in the manifest, which is canonical and
 machine-readable. [formula-registry] describes its table shape; this page
@@ -74,7 +74,7 @@ record FormulaRecord {
   signature         : (Inputs) → Output -- typed, with units
   bundle            : {BundleName}      -- one or more observable bundles, or
                                         --   linear-response-primitive
-  evaluation-cost   : microseconds | milliseconds | seconds | minutes
+  cost-tier         : microseconds | milliseconds | seconds | minutes
   differentiability : read | direct | adjoint | fixpoint-adjoint | relaxed | none
   anchor-class      : cheap | faithful
   provenance        : research stream, literature citation, or relaxation name
@@ -110,7 +110,7 @@ them and no arithmetic on them.
 
 - **`read`** — the output is a stored or passed-through value and the adjoint is
   the identity. Registers without a synthesized adjoint, and the registration
-  gate exempts it from adjoint synthesis ([build-verification]).
+  gate exempts it from adjoint synthesis ([build-verification#registration]).
   `reference-phase-energy-cache`, keyed on a phase identifier alone, is the row
   this describes.
 
@@ -127,7 +127,8 @@ them and no arithmetic on them.
   not relaxable in place, so a consumer needing a gradient must route around the
   row or use a relaxation registered as its own row.
 
-  **This is the strongest claim in the vocabulary.** It asserts that no
+  **This is the strongest claim in the vocabulary**
+  ([traps#no-derivative-claim]). It asserts that no
   relaxation exists, not merely that none is written yet, so it is the value most
   likely to be wrong. Before assigning it, check two things: whether the output
   has a real-valued component — the mixed-output rule below — and whether this
@@ -139,9 +140,10 @@ them and no arithmetic on them.
 
 - **`adjoint`** — an adjoint is required and is validated at registration.
   Vector-Jacobian and Jacobian-vector products must agree on sampled points
-  within `τ_adj` ([residual-machinery]). The gate checks the *synthesized*
-  adjoint, not a hand-written backward pass — a hand-written backward that agrees
-  with itself proves nothing about the code the compiler emits.
+  within `τ_adj` ([residual-machinery#registration-gate]). The gate checks the
+  *synthesized* adjoint, not a hand-written backward pass — a hand-written
+  backward that agrees with itself proves nothing about the code the compiler
+  emits.
 
 - **`fixpoint-adjoint`** — **a refinement of `adjoint`, not an alternative to
   it.** The output is a converged fixed point, and the gradient is one linear
@@ -153,10 +155,11 @@ them and no arithmetic on them.
   The name says refinement and the gate matches it. Every `fixpoint-adjoint` row
   runs the same registration gate as `adjoint`, **and one more**: a conditioning
   check on the fixed-point Jacobian at the sampled points, refusing registration
-  when the reciprocal condition number falls below `τ_cond`. Without that second
-  check the value would be strictly weaker than `adjoint`, which is backwards —
-  the ill-conditioned fixed point is the one failure mode this construction has,
-  and the gradient it produces is *large and wrong* rather than absent.
+  when the reciprocal condition number falls below `τ_cond`
+  ([residual-machinery#registration-gate]). Without that second check the value
+  would be strictly weaker than `adjoint`, which is backwards: it names a
+  stronger structural claim than `adjoint` does, so it cannot carry a weaker
+  obligation ([traps#fixpoint-claim]).
 
   The rows it bites are not exotic. `fermi-level-charge-neutral` and
   `self-consistent-charge-balance` solve charge neutrality, whose Jacobian is
@@ -167,9 +170,10 @@ them and no arithmetic on them.
 - **`relaxed`** — genuinely non-smooth: argmin, convex hull, sort, discrete
   metric. Ships a declared smooth relaxation whose bias is a model-form error
   entering the tolerance composition of [typeclass-alphabet#quantity], approved
-  at registration with a validity domain under obligation-9 ([cert-obligations]).
-  **The relaxation is named in the row's provenance cell**; a `relaxed` row
-  without one is un-gateable and fails the registry-build gate.
+  at registration with a validity domain under obligation-9
+  ([cert-obligations#the-ten-obligations]). **The relaxation is named in the
+  row's provenance cell**; a `relaxed` row without one is un-gateable and fails
+  the registry-build gate ([traps#unnamed-relaxation]).
 
 The values are spelled out in English so that no differentiability value can be
 read as a physical quantity. Wide-bandgap semiconductor physics is dense with
@@ -205,22 +209,38 @@ What one evaluation of the formula costs:
 | `seconds` | Brillouin-zone or mesh integral | ≤ 10 s |
 | `minutes` | self-consistent loop or partial-differential-equation solve | ≤ 10 min |
 
+Four rows make the scale concrete. `single-mode-rta-lattice-kappa` (row 25) and
+`operator-position-derivative-tensor` (row 92) are `seconds` — a Brillouin-zone
+integral each. `NEGF-transmission` (row 80) and `reference-phase-energy-cache`
+(row 87) are `minutes`. These are examples and not the membership of either
+value: the assignment for a given row is the manifest's `cost-tier` field, which
+is where it is looked up ([formula-registry#fields]).
+
+The last of the four is worth reading twice. `reference-phase-energy-cache` costs
+`minutes` to evaluate and is `read` for differentiability — among the most
+expensive evaluations in the registry, carrying the cheapest gradient there is,
+an identity adjoint. Cost and differentiability are independent axes, and the
+expensive tail is where they come apart.
+
 **Evaluation cost is a property of the formula. Cadence is a training-loop policy
 and lives in the operator library.** They are two vocabularies over two different
 things, and the oracle owns no loop. An iterative residual is `minutes` by cost
-and `per-epoch` by cadence; nothing forces those to agree, and reading one as the
-other is off by one on the most expensive rows in the manifest — the rows where
-being wrong costs the most.
+and `per-epoch` by cadence, and nothing forces those to agree. The expensive tail
+is where reading one as the other does its damage: at the cheap end a row is
+evaluated on every step under either reading, so a confusion changes nothing,
+while a `minutes` row sampled as though its cost value were a cadence is sampled
+at the wrong rate on exactly the rows whose evaluation dominates the budget.
 
 The cost value is what the residual factory reads when it decides how often to
-sample a generator ([residual-machinery]); the decision itself, and the cadence
-vocabulary it is expressed in, belong to the operator.
+sample a generator ([residual-machinery#factory]); the decision itself, and the
+cadence vocabulary it is expressed in, belong to the operator.
 
 ## Anchor class
 
 `cheap` against `faithful`. This is **not** a runtime path selector: under the
-always-cheap pipeline ([compose-time-pipeline]) every registered formula lands on
-the single residual surface and nothing chooses between two paths at runtime.
+always-cheap pipeline ([compose-time-pipeline#always-cheap]) every registered
+formula lands on the single residual surface and nothing chooses between two
+paths at runtime.
 
 What the field records is what a row's value is *anchored against*. A `cheap` row
 stands on its own closed form. A `faithful` row is one whose value is trusted
@@ -228,13 +248,13 @@ only against a reference-grade computation — a density-functional, perturbatio
 non-equilibrium-Green's-function or Monte-Carlo evaluation — or against a
 measured battery entry.
 
-That makes it the axis obligation-6 pairs run along. A **consistency pair** is a
-`cheap` row and a `faithful` row computing the same observable with no agreement
-theorem between them, only a bounded model gap ([cross-cutting-rules]). The
-quasi-harmonic Slack–Callaway thermal conductivity against the iterative
-linearized-Boltzmann one is the worked example, and scoring it as an equivalence
-pair records a legitimate model gap as a defect. The `Cheap vs faithful` column of
-[accuracy-ledger] is the per-observable statement of the same distinction.
+That makes it the axis a consistency pair runs along:
+[residual-definitions#pair-kinds] defines the pair kinds, and a consistency pair
+is one whose two members sit on opposite sides of this field — the cheap model
+against the microscopic reference it has no agreement theorem with
+([traps#consistency-not-equivalence]). The `Cheap vs faithful` column of
+[accuracy-ledger#observable-regimes] is the per-observable statement of the
+same distinction.
 
 ## What the row bands hold
 
@@ -264,13 +284,14 @@ Wilson-loop invariants, and boundary-mode multiplicity ([topology-atlas]).
 
 **Rows 105–112** are the slow-tier rows: vacancy generation, hydrogen
 redistribution and desorption, platelet nucleation, vibration-driven vacancy
-generation, air oxidation, and radiation displacement ([multiscale-state]).
+generation, air oxidation, and radiation displacement
+([multiscale-state#slow-kinetics]).
 
 **Rows 113–115 and 117–118** are gated by `is-noncentrosymmetric`. That is the
 piezoelectric-class predicate of the two-predicate split in
-[applicability-classifiers], **not** the polar-coupling gate `is-polar-material`.
-The two predicates look interchangeable and are not: a material can be polar for
-coupling purposes without being piezoelectric.
+[applicability-classifiers#polar-predicate-split], **not** the polar-coupling
+gate `is-polar-material`. The two predicates look interchangeable and are not:
+a material can be polar for coupling purposes without being piezoelectric.
 
 **Rows 120–127** are the per-material accuracy package:
 `ahc-gap-renormalization` (a one-shot temperature-dependent gap dressing),
@@ -313,4 +334,4 @@ answer rather than a compile-time property of the composition, and the mask the
 operator trains against would stop being knowable before training.
 
 Non-decidable classifiers are refused at registration by the registry-build gate
-([build-sequence]).
+([build-sequence#phases]).

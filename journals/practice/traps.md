@@ -97,7 +97,7 @@ depends-on:
   - cert-obligations
   - out-of-scope
   - applicability-classifiers
-  - cross-cutting-rules
+  - cert-obligations
   - residual-definitions
   - residual-machinery
   - unified-state
@@ -107,7 +107,7 @@ depends-on:
   - representation-substrate
   - compose-time-pipeline
   - named-formulas
-  - canonical-vocabularies
+  - observable-bundles
   - mvp-system
 open-questions:
   - id: rename-forwarding-mechanism
@@ -164,9 +164,9 @@ Adding a trap is adding a heading and an anchor. Nothing else moves.
 The reference data writes aluminum-gallium-nitride spontaneous polarization bowing as
 `+b·x(1−x)` with **b positive**. The primary literature defines the same physics as
 `−b·x(1−x)` with **b negative** ("bowing always upward"). The two are equivalent through
-the double negative. *Breaks:* lifting one convention's `b` into the other's form inverts
-the bowing and corrupts interface charge at mid-to-high aluminum fraction. — enforced,
-[accuracy-ledger]
+the double negative. *Breaks:* lifting one convention's `b` into the other's form
+inverts the bowing and corrupts interface charge at mid-to-high aluminum fraction. —
+enforced, [accuracy-ledger#polarization-bowing]
 
 ### Pyroelectric coefficient sign
 
@@ -175,7 +175,7 @@ and their magnitude falls with rising temperature, so **`p = dP_sp/dT` is positi
 the seeded frame. Raw literature quotes `p` negative under the positive-polarization
 convention. *Breaks:* sheet-density drift over a harsh-environment temperature span — a
 20 to 30 percent effect over ΔT ≈ 750 K, per the figure [accuracy-ledger] owns — runs
-the wrong direction. — enforced, [accuracy-ledger]
+the wrong direction. — enforced, [accuracy-ledger#polarization-coefficients]
 
 ### Breakdown-field temperature slope
 
@@ -183,7 +183,7 @@ The slope is **positive**: breakdown field **rises** with temperature (diamond
 +5×10⁻⁴/K, 4H silicon carbide +7×10⁻⁴/K). The widely repeated "drops about 20 percent"
 claim conflates breakdown field with mobility collapse, and it is the version a reader
 will meet first. *Breaks:* every high-temperature device claim predicts softening where
-the material hardens. — enforced, [accuracy-ledger]
+the material hardens. — enforced, [accuracy-ledger#observable-regimes]
 
 ### Misfit strain sign
 
@@ -192,9 +192,9 @@ Matthews-Blakeslee critical thickness, and every heterostructure strain sign. �
 
 ### Shear piezoelectric sign
 
-The `e₁₅` piezoelectric constant is literature-split (±) and is `UNSEEDED`, never picked.
-*Breaks:* silently choosing a sign gives a wrong shear-piezoelectric response with no
-provenance trail behind it. — enforced, [accuracy-ledger]
+The `e₁₅` piezoelectric constant is literature-split (±) and is `UNSEEDED`, never
+picked. *Breaks:* silently choosing a sign gives a wrong shear-piezoelectric response
+with no provenance trail behind it. — enforced, [accuracy-ledger#residue]
 
 ### Entropy-production direction
 
@@ -205,9 +205,9 @@ monotonicity an entropy-monotone integrator or residual would enforce. — advis
 
 ### Frenkel-pair yield needs a macroscopic cross-section
 
-The macroscopic displacement cross-section `Σ_d = N_atom·σ_d` (cm⁻¹) is required. Without
-it the expression is a fluence (cm⁻²), not a concentration. *Breaks:* the radiation
-channel is dimensionally invalid. — enforced, [multiscale-state]
+The macroscopic displacement cross-section `Σ_d = N_atom·σ_d` (cm⁻¹) is required.
+Without it the expression is a fluence (cm⁻²), not a concentration. *Breaks:* the
+radiation channel is dimensionally invalid. — enforced, [multiscale-state#slow-kinetics]
 
 ### Three uncertainty encodings, and one that is unassigned
 
@@ -215,7 +215,7 @@ Absolute standard deviation, multiplicative `×N` (log-standard-deviation `ln N`
 `unbounded`. A row whose uncertainty cell is unassigned **cannot** back a provenance
 ledger coefficient. *Breaks:* consumers dispatch on the wrong uncertainty format, or a
 certification run refuses exactly the compositions a seeding wave existed to enable. —
-enforced, [reference-battery]
+enforced, [reference-battery#row-schema]
 
 ### Thermal-expansion tensor form
 
@@ -243,7 +243,7 @@ Use *exactly one* of (a) zincblende-reference spontaneous polarization + **prope
 the correction term + **improper** `e₃₁`. Never mix: improper `e₃₁` is about **3.4×**
 proper for gallium nitride and aluminum nitride. *Breaks:* two-dimensional electron gas
 sheet density silently corrupted about threefold in the piezoelectric term. — enforced,
-[cert-obligations]
+[coupling-structure#polarization-pairing-guard]
 
 ### The polarization error budget rests on a cancellation
 
@@ -252,9 +252,9 @@ not a generic one: the spurious zincblende-reference term and the proper/imprope
 are large, opposite in sign, and nearly cancel **for aluminum-gallium-nitride on gallium
 nitride only**. This is reinforced experimentally — off-axis holography shows
 zincblende-frame theory bowing with the *opposite curvature sign* to measurement for
-indium-gallium-nitride, so **bowing is not reference-invariant**. *Breaks:* extending the
-±5 percent figure to other alloy systems, or importing a bowing curvature across
-reference frames. — enforced, [accuracy-ledger]
+indium-gallium-nitride, so **bowing is not reference-invariant**. *Breaks:* extending
+the ±5 percent figure to other alloy systems, or importing a bowing curvature across
+reference frames. — enforced, [accuracy-ledger#observable-regimes]
 
 ### Zero-point renormalization is the isochoric value
 
@@ -263,25 +263,25 @@ saying so. The `coth` dressing is pure electron-phonon; lattice expansion belong
 thermal-expansion row, and a `total` tag co-activated with it is **refused**. The tag
 rides the renormalization *amplitude*, not a total shift at temperature. *Breaks:* the
 gap's temperature derivative double-counted, and intrinsic carrier concentration is
-exponentially sensitive to the gap. — enforced, [cert-obligations]
+exponentially sensitive to the gap. — enforced, [coupling-structure#slope-kind-guard]
 
 ### Diamond's direct-gap renormalization stays quarantined
 
 Diamond's direct-gap zero-point renormalization is a different valley from the indirect
 gap and never substitutes for it. *Breaks:* about twofold overstated renormalization on
-the load-bearing indirect gap. — enforced, [accuracy-ledger]
+the load-bearing indirect gap. — enforced, [accuracy-ledger#ahc-zpr]
 
 ### Gallium oxide carries four axis systems
 
-The crystal-physical frame is `e₂∥b`, `e₃∥c`, `e₁ = a*`, so the second and third diagonal
-components are the `[010]` and `[001]` directions — but **plane-normal**
-measurements lie along `a*` and `c*` and must never be relabelled `[100]` and
-`[001]`. The high-field third axis is `c*`, about 13.8° off `[001]`. A fourth
-frame is live in the reference data: the elastic tensors are seeded in `x∥a y∥b z∥c*`,
-whose first axis is the *real* `a`, not `a*`; the two differ by 13.83°, so the `C₁₁`
-seeded there is not along the crystal-physical `e₁`. Four frames, one material. Every
-value carries its frame or it is not usable. *Breaks:* in a material about 2.5× anisotropic,
-values attach to the wrong crystallographic direction. — enforced, [accuracy-ledger]
+The crystal-physical frame is `e₂∥b`, `e₃∥c`, `e₁ = a*`, so the second and third
+diagonal components are the `[010]` and `[001]` directions — but **plane-normal**
+measurements lie along `a*` and `c*` and must never be relabelled `[100]` and `[001]`.
+The high-field third axis is `c*`, about 13.8° off `[001]`. A fourth frame is live in
+the reference data: the elastic tensors are seeded in `x∥a y∥b z∥c*`, whose first axis
+is the *real* `a`, not `a*`; the two differ by 13.83°, so the `C₁₁` seeded there is not
+along the crystal-physical `e₁`. Four frames, one material. Every value carries its
+frame or it is not usable. *Breaks:* in a material about 2.5× anisotropic, values attach
+to the wrong crystallographic direction. — enforced, [accuracy-ledger#monoclinic-frames]
 
 ### Never average a polarized quantity
 
@@ -298,35 +298,37 @@ pick a surface that is not the device's. — advisory
 
 ### An unprovenanced coefficient refuses the composition
 
-Any active channel without a provenance-ledger entry — value, uncertainty, source,
-cost class — refuses. *Breaks:* a silent accuracy hole ships as a confident number. —
-enforced, [cert-obligations]
+Any active channel without a provenance-ledger entry — value, uncertainty, source, cost
+class — refuses. *Breaks:* a silent accuracy hole ships as a confident number. —
+enforced, [cert-obligations#composition-refusals]
 
 ### No breakdown claim without that carrier's coefficients
 
 No breakdown claim for a material without that material's provenanced ionization
 coefficients **for that carrier**. A contested-but-provenanced value does not refuse; it
 flags. *Breaks:* breakdown predicted for materials with no measured ionization
-coefficient. — enforced, [cert-obligations]
+coefficient. — advisory
 
 ### Breakdown above 500 degrees Celsius is refused
 
 Above 500 °C, breakdown is certification-refused and frontier — not a "±20 percent met"
 target. The distribution-tail anchor data do not exist. *Breaks:* the project's headline
-harsh-environment claim asserted where nothing anchors it. — enforced, [accuracy-ledger]
+harsh-environment claim asserted where nothing anchors it. — enforced,
+[accuracy-ledger#observable-regimes]
 
 ### Gallium oxide holes are refused, not seeded
 
 Flat valence bands, small-polaron self-trapping, no band-like hole transport; the
 about-3.5 eV ultraviolet luminescence is free-electron to self-trapped-hole
 recombination, **not** band-edge. *Breaks:* seeding a hole mobility, ionization
-coefficient or mobility-fit set for a material that has none. — enforced, [out-of-scope]
+coefficient or mobility-fit set for a material that has none. — enforced,
+[out-of-scope#exclusions]
 
 ### Measured avalanche in aluminum nitride is unseeded
 
 The available impact-ionization coefficient is Monte-Carlo and electron-only. The
-*measured* value stays certification-refused. *Breaks:* a Monte-Carlo number presented as
-measurement-grade. — enforced, [accuracy-ledger]
+*measured* value stays certification-refused. *Breaks:* a Monte-Carlo number presented
+as measurement-grade. — enforced, [out-of-scope#exclusions]
 
 ## Verifier soundness
 
@@ -335,36 +337,36 @@ measurement-grade. — enforced, [accuracy-ledger]
 `γ̂† = γ̂`, `0 ⪯ γ̂ ⪯ 1`, `Tr γ̂ = N_e`, and idempotency only where zero temperature is
 claimed. *Breaks:* a candidate zeroes every equation-of-motion residual while being an
 unphysical density matrix, and the oracle stops being sound as a verifier. — enforced,
-[residual-definitions]
+[residual-definitions#structural-categories]
 
 ### Gauge and electrostatic partition
 
 Weyl gauge `A₀ ≡ 0`; the transverse sector in the electromagnetic energy; the
 longitudinal and electrostatic sector owned by Hartree plus ion-ion. *Breaks:*
 electrostatic energy double-counted, and the vector-potential equation of motion becomes
-gauge-dependent. — enforced, [unified-state], [generic-dynamics]
+gauge-dependent. — enforced, [unified-state#slots], [generic-dynamics#gauge-partition]
 
 ### Two independent polar predicates
 
-`is-polar-material` (Born charges, longitudinal-transverse splitting) gates the Fröhlich,
-polar-optical and Lyddane-Sachs-Teller machinery. `is-noncentrosymmetric` (point group)
-gates spontaneous polarization, piezoelectricity, pyroelectricity and the
+`is-polar-material` (Born charges, longitudinal-transverse splitting) gates the
+Fröhlich, polar-optical and Lyddane-Sachs-Teller machinery. `is-noncentrosymmetric`
+(point group) gates spontaneous polarization, piezoelectricity, pyroelectricity and the
 two-dimensional electron gas. They coincide on diamond and on wurtzite nitrides and
 **split on gallium oxide** — centrosymmetric, yet Fröhlich-dominated. *Breaks:* a single
 gate either invents spontaneous polarization for gallium oxide or kills its dominant
-scattering channel. — enforced, [applicability-classifiers]
+scattering channel. — enforced, [applicability-classifiers#polar-predicate-split]
 
 ### Real phonon frequencies are gated to claimed-stable phases
 
 The `ω² ≥ 0` condition is applicability-gated to phases claimed stable. *Breaks:*
 legitimate saddle points — which transition-path calculations must traverse — score as
-violations. — enforced, [residual-definitions]
+violations. — enforced, [residual-definitions#structural-categories]
 
 ### The hull residual is temperature- and pressure-aware
 
 It carries a metastability band, so metastable diamond reads zero residual. *Breaks:* a
 naive convex hull tells the operator the flagship material should not exist. — enforced,
-[residual-definitions]
+[residual-definitions#constraint-categories]
 
 ### A model-versus-microscopic pair is a consistency pair
 
@@ -372,7 +374,7 @@ Callaway against the full Boltzmann transport equation is a **consistency** pair
 equivalence pair. No agreement theorem exists for model-versus-microscopic pairs; the
 obligation trips only on *excess*, and it is circular when the relaxation time is fitted
 to the microscopic solution. *Breaks:* an obligation that either always trips or is
-vacuously satisfied. — enforced, [cross-cutting-rules]
+vacuously satisfied. — enforced, [residual-definitions#pair-kinds]
 
 ### A learned correction is frozen against the loss it modifies
 
@@ -380,14 +382,14 @@ The distribution-tail correction to the ionization coefficient is fit only to ex
 anchors; with no anchors it **ships as identity** and the corner stays
 certification-refused. *Breaks:* the model co-adapts the correction to zero its own
 residual, destroying supervision exactly in the unmeasured corner the validity domain
-exists to protect. — enforced, [cert-obligations]
+exists to protect. — enforced, [cert-obligations#composition-refusals]
 
 ### Drift-diffusion face flux is Scharfetter-Gummel
 
 Not central differencing. At MV/cm fields with about 10 nm cells the cell Péclet number
-is around 40. *Breaks:* the **residual operator itself** is wrong at the operating point,
-so the operator is scored against a discretization artifact. — enforced,
-[multiscale-state]
+is around 40. *Breaks:* the **residual operator itself** is wrong at the operating
+point, so the operator is scored against a discretization artifact. — enforced,
+[multiscale-state#eom-continuum]
 
 ### Positive semidefiniteness is a condition on the assembly
 
@@ -395,89 +397,92 @@ It is a condition on the assembled dissipative super-block per mechanism, and th
 projector must be the congruence-action Reynolds operator — a bare orthogonal projection
 does not preserve positive semidefiniteness. *Breaks:* per-kernel positivity holds while
 the global friction operator fails it, and entropy production goes negative. — enforced,
-[coupling-structure] for the assembly and [cert-obligations] for the obligation that
-checks it
+[coupling-structure#psd-closure] for the assembly and
+[cert-obligations#coupling-derived-checks] for the obligation that checks it
 
 ### Validity windows are re-evaluated per training sample
 
 Swept-environment validity windows are re-evaluated per sample, each kernel tagged with
 the environment box its structure is valid on. *Breaks:* a temperature sweep crosses a
 quasiharmonic, ionization-fit or dynamical-stability boundary and leaves a stale kernel
-silently in force. — enforced, [applicability-classifiers]
+silently in force. — enforced, [applicability-classifiers#swept-environment-windows]
 
 ## Values that are wrong if lifted naively
 
 ### The thermal-conductivity errors do not cancel
 
-Decouple them. The relaxation-time approximation *under*estimates diamond conductivity by
-30 to 50 percent near 300 K; omitting four-phonon scattering *over*estimates by about
+Decouple them. The relaxation-time approximation *under*estimates diamond conductivity
+by 30 to 50 percent near 300 K; omitting four-phonon scattering *over*estimates by about
 1 percent at 300 K, rising to about 30 percent at 1000 K. Anchor to the iterative
 solution, not to the relaxation-time approximation. Every conductivity column declares
 its isotope, boundary and relaxation-time-versus-iterative scope. — enforced,
-[accuracy-ledger]
+[accuracy-ledger#kappa-battery]
 
 ### A conductivity figure that names the wrong material
 
 The paper this corpus cites for diamond's high-temperature conductivity also carries a
 headline pair of figures, **2200 falling to 1400 W/mK at room temperature**, which are
-for **boron arsenide**. Diamond's own room-temperature conductivity is about
-2200 W/mK, quoted one paragraph away in the same paper. The two numbers collide
-numerically, so anyone re-deriving the diamond anchor from that paper can land on the
-right number for the wrong material and see nothing wrong — no unit is off, no order of
-magnitude is off, and the figure agrees with what diamond is known to do. *Breaks:*
-the anchor for the corpus's flagship material, undetectably. Read the sentence that names
-the material, not the number. — advisory
+for **boron arsenide**. Diamond's own room-temperature conductivity is about 2200 W/mK,
+quoted one paragraph away in the same paper. The two numbers collide numerically, so
+anyone re-deriving the diamond anchor from that paper can land on the right number for
+the wrong material and see nothing wrong — no unit is off, no order of magnitude is off,
+and the figure agrees with what diamond is known to do. *Breaks:* the anchor for the
+corpus's flagship material, undetectably. Read the sentence that names the material, not
+the number. — advisory; the anchor this endangers is [accuracy-ledger#kappa-battery]
 
 ### Three-phonon transport overpredicts nitrides at high temperature
 
 Measured gallium nitride conductivity falls as `T^−1.2` to `T^−1.5`, faster than
 three-phonon theory. **Aluminum nitride above about 500 K is theory-only** — there is no
 single-crystal measurement there. *Breaks:* nitride thermal budgets optimistic by about
-1.7× at the operating point. — enforced, [accuracy-ledger]
+1.7× at the operating point. — enforced, [accuracy-ledger#kappa-battery]
 
 ### Impact-ionization prefactors span four orders of magnitude
 
 More than four orders, so the uncertainty is **at least ×3**, never ×1.5. *Breaks:*
 breakdown field enters the Baliga figure of merit cubed, so a falsely tight ionization
-uncertainty produces a falsely tight figure of merit. — enforced, [accuracy-ledger]
+uncertainty produces a falsely tight figure of merit. — enforced,
+[accuracy-ledger#high-field-coefficients]
 
 ### Image-force lowering
 
 `Δφ = √(qE/4πε_sε₀)` — diamond 0.16 eV at 10⁶ V/cm. Two wrong values circulate: one
 carrying a √10 field-scaling error, and one about 13 percent high. *Breaks:*
-barrier-derived contact resistance shifts by `e^(Δ/kT)`. — enforced, [accuracy-ledger]
+barrier-derived contact resistance shifts by `e^(Δ/kT)`. — enforced,
+[accuracy-ledger#observable-regimes]
 
 ### Peak velocity is not saturation velocity
 
 Gallium nitride's 2.5×10⁷ cm/s is the **peak** velocity. Separately, aluminum nitride
-electron mobility around 300 cm²/Vs is a doped and defective value, not an intrinsic one.
-*Breaks:* velocity and mobility ceilings overstated by about 2× and about 3×. — enforced,
-[accuracy-ledger]
+electron mobility around 300 cm²/Vs is a doped and defective value, not an intrinsic
+one. *Breaks:* velocity and mobility ceilings overstated by about 2× and about 3×. —
+enforced, [accuracy-ledger#high-field-coefficients]
 
 ### Gallium oxide's critical field is an anisotropic triple
 
 10.2, 4.8 and 7.6 MV/cm along `a`, `b` and `c*`. The widely quoted "about 8 MV/cm"
-appears nowhere in the paper it is attributed to. *Breaks:* the scalar overstates the weak
-`b` axis — the one that actually limits the device — by **1.67×**, and understates `a` by
-1.28×. — enforced, [accuracy-ledger]
+appears nowhere in the paper it is attributed to. *Breaks:* the scalar overstates the
+weak `b` axis — the one that actually limits the device — by **1.67×**, and understates
+`a` by 1.28×. — enforced, [accuracy-ledger#high-field-coefficients]
 
 ### Quasiharmonic validity is per-material
 
 It does not follow a Debye-temperature-scaled rule. Diamond (Debye temperature about
 2200 K) holds through about 800 °C; gallium nitride (about 600 K) fails near 500 °C;
-aluminum nitride (about 1000 K) also fails at 500 °C. Those are 0.49, 1.29 and 0.77 of the
-Debye temperature — no single fraction fits. The plausible "half the Debye temperature"
-rule is back-fitted from diamond alone and contradicts its own gallium nitride example,
-where half the Debye temperature is 27 °C rather than 500 °C. **"Quasiharmonic suffices"
-is a diamond-only claim; for the nitrides the boundary is 500 °C and it is measured, not
-derived.** *Breaks:* thermal expansion, gap-versus-temperature strain, shear modulus and
-the hull, for the flagship polar materials at the design point. — enforced, [out-of-scope]
+aluminum nitride (about 1000 K) also fails at 500 °C. Those are 0.49, 1.29 and 0.77 of
+the Debye temperature — no single fraction fits. The plausible "half the Debye
+temperature" rule is back-fitted from diamond alone and contradicts its own gallium
+nitride example, where half the Debye temperature is 27 °C rather than 500 °C.
+**"Quasiharmonic suffices" is a diamond-only claim; for the nitrides the boundary is 500
+°C and it is measured, not derived.** *Breaks:* thermal expansion,
+gap-versus-temperature strain, shear modulus and the hull, for the flagship polar
+materials at the design point. — enforced, [out-of-scope#exclusions]
 
 ### Alloy disorder is the dominant mobility limiter
 
 For aluminum-gallium-nitride, alloy-disorder scattering dominates. *Breaks:* mobility
 systematically optimistic for the flagship device's channel material. — enforced,
-[accuracy-ledger]
+[accuracy-ledger#transport-coefficients]
 
 ### Degenerate doping breaks two non-degenerate assumptions
 
@@ -485,13 +490,14 @@ Degenerate p-type diamond breaks both: the Einstein relation becomes a declared
 model-form error, and the Lyddane-Sachs-Teller dielectric constant with Fröhlich
 screening must be gated on carrier density below degeneracy. *Breaks:* standard heavily
 doped contact layers modelled with the wrong diffusion constant and an out-of-validity
-dielectric function. — enforced, [multiscale-state], [out-of-scope]
+dielectric function. — enforced, [multiscale-state#moment-closures],
+[out-of-scope#exclusions]
 
 ### Diamond's high-temperature failure mode is oxidation
 
 Air-oxidation at about 600 to 700 °C, not graphitization at about 1500 °C in vacuum.
 *Breaks:* an about-800 °C error in the stated operating ceiling. — enforced,
-[mvp-system]
+[mvp-system#high-t-failure]
 
 ### A worked example is not one artifact
 
@@ -519,7 +525,7 @@ every downstream check that treats a clearance as a fact. — enforced,
 
 ### Seed from the source, never from a page that quotes it
 
-Values come from [accuracy-ledger] and from the reference data under
+Values come from [accuracy-ledger#seed-provenance] and from the reference data under
 `physics/library/cert/reference-data/`. A page that quotes a value is quoting it; the
 file is where it is changed and where a disagreement is settled. *Breaks:* a seeding wave
 silently reverts a landed fix by re-deriving a value from prose. — enforced,
@@ -530,8 +536,7 @@ silently reverts a landed fix by re-deriving a value from prose. — enforced,
 Registry formula names are hash-consed into content addresses. A rename after landing is
 a substrate-wide rekey, not an edit: every cached kernel, certificate and address keyed
 on the old name breaks. **Fix names before they land.** *Breaks:* the cache, the
-certificates, and every address derived from them, all at once. — enforced,
-[named-formulas]
+certificates, and every address derived from them, all at once. — advisory
 
 ### A rename orphans every prose mention
 
@@ -564,62 +569,65 @@ is safe for scoring corrupts a trajectory. — advisory
 ### Pin provenance before the ledger entry
 
 Record an unresolved conflict as a range, not as a pick. Open pins include contested
-Schottky barriers, carbide onsets, and a Curie point sitting inside the operating window.
-*Breaks:* a contested value enters the ledger as fact and propagates into contact
-resistance and lifetime figures of merit. — enforced, [reference-battery]
+Schottky barriers, carbide onsets, and a Curie point sitting inside the operating
+window. *Breaks:* a contested value enters the ledger as fact and propagates into
+contact resistance and lifetime figures of merit. — enforced,
+[reference-battery#wave-programme]
 
 ### A passing adjoint gate is not evidence of a gradient
 
-Vector-Jacobian and Jacobian-vector products agree trivially wherever the true gradient is
-zero, so a row whose output is piecewise constant — an argmin over a discrete set, a
+Vector-Jacobian and Jacobian-vector products agree trivially wherever the true gradient
+is zero, so a row whose output is piecewise constant — an argmin over a discrete set, a
 hard-cutoff integer count — **passes the registration gate spuriously** and ships a
 certificate for a gradient that does not exist. *Breaks:* the one gate that exists to
-catch a missing gradient issues a pass instead. — enforced, [residual-machinery]
+catch a missing gradient issues a pass instead. — enforced,
+[residual-machinery#registration-gate]
 
 ### A conditioning failure is invisible to the adjoint gate
 
-Both products solve against the *same* near-singular fixed-point Jacobian, so they agree —
-on a gradient that is large and wrong. This is the mirror of *A passing
-adjoint gate is not evidence of a gradient*: there the gate passes because the true gradient is zero,
-here because both sides make the same error. A fixed-point row therefore carries a second
-gate on the reciprocal condition number. *Breaks:* charge neutrality in a wide-gap
-intrinsic semiconductor — this corpus's own subject — has the flattest Fermi-level
-derivative there is, and the rows that compute it sit right on it. — enforced,
-[residual-machinery]
+Both products solve against the *same* near-singular fixed-point Jacobian, so they agree
+— on a gradient that is large and wrong. This is the mirror of *A passing adjoint gate
+is not evidence of a gradient*: there the gate passes because the true gradient is zero,
+here because both sides make the same error. A fixed-point row therefore carries a
+second gate on the reciprocal condition number. *Breaks:* charge neutrality in a
+wide-gap intrinsic semiconductor — this corpus's own subject — has the flattest
+Fermi-level derivative there is, and the rows that compute it sit right on it. —
+enforced, [residual-machinery#registration-gate]
 
 ### Fixed-point adjoint is a structural claim, not a fallback
 
-`fixpoint-adjoint` asserts that the output is a converged fixed point whose adjoint costs
-one linear solve **independent of the forward iteration count**. It is a refinement of
-`adjoint`, not a tier below it and not a place to put rows whose gradient is awkward. A
-finite difference is not a fixed point; neither is a transient partial differential
-equation. Material written under other conventions inverts two of these labels — `D3`
-for a finite-difference fallback and `D0` for a closed-form analytic gradient — so a
-label lifted from outside this corpus is translated, never copied. *Breaks:* a row
-promises an iteration-count-independent adjoint it cannot deliver. — enforced,
-[named-formulas]
+`fixpoint-adjoint` asserts that the output is a converged fixed point whose adjoint
+costs one linear solve **independent of the forward iteration count**. It is a
+refinement of `adjoint`, not a tier below it and not a place to put rows whose gradient
+is awkward. A finite difference is not a fixed point; neither is a transient partial
+differential equation. Material written under other conventions inverts two of these
+labels — `D3` for a finite-difference fallback and `D0` for a closed-form analytic
+gradient — so a label lifted from outside this corpus is translated, never copied.
+*Breaks:* a row promises an iteration-count-independent adjoint it cannot deliver. —
+enforced, [named-formulas#diff-tags]
 
 ### No-derivative is the strongest claim in the vocabulary
 
-`none` asserts that no relaxation **exists**, not merely that none has been written. It is
-therefore the label most often wrong. Check for a real-valued output component, and for an
-existing relaxation, before assigning it: a row whose output is a list of real phases is
-smooth in the eigenstates away from the branch cut, and is produced by the same
-eigendecomposition structure that other rows carry at `adjoint`. *Breaks:* a row critical
-to the minimum viable product silently leaves the differentiable path. — enforced,
-[named-formulas]
+`none` asserts that no relaxation **exists**, not merely that none has been written. It
+is therefore the label most often wrong. Check for a real-valued output component, and
+for an existing relaxation, before assigning it: a row whose output is a list of real
+phases is smooth in the eigenstates away from the branch cut, and is produced by the
+same eigendecomposition structure that other rows carry at `adjoint`. *Breaks:* a row
+critical to the minimum viable product silently leaves the differentiable path. —
+enforced, [named-formulas#diff-tags]
 
 ### A relaxed row that names no relaxation is ungateable
 
-The approving obligation has nothing to approve, and the model-form bias never enters the
-combined tolerance. *Breaks:* a relaxation ships with an undeclared, unbounded bias. —
-enforced, [named-formulas]
+The approving obligation has nothing to approve, and the model-form bias never enters
+the combined tolerance. *Breaks:* a relaxation ships with an undeclared, unbounded bias.
+— enforced, [named-formulas#diff-tags]
 
 ### A short token collides with real physics
 
 `D1` through `D5` are the wurtzite deformation potentials in
-[accuracy-ledger]. Any short alphanumeric token the corpus invents will collide with a
-physical quantity somewhere, and no checker can separate the two by shape — which is why
+[accuracy-ledger#iii-n-electronic]. Any short alphanumeric token the corpus invents will
+collide with a physical quantity somewhere, and no checker can separate the two by shape
+— which is why
 corpus-invented names are spelled out in English ([agent-contract#vocabulary]). Where
 prose must quote a symbol, put it in backticks so a search for one does not return the
 other. *Breaks:* a sweep over one vocabulary silently collects rows from another. —
@@ -675,17 +683,17 @@ skimming past it, which is the disease this apparatus exists to treat. — enfor
 ### Harvest a vocabulary from the schema that owns the field
 
 A closed-vocabulary check on the registry read the observable-bundle codes out of a table
-in [canonical-vocabularies] and reported four rows as defects for carrying a
-linear-response primitive tag instead. They are not defects: [named-formulas] owns the
-bundle field's schema and admits that tag, and [canonical-vocabularies] says the same
-thing in the paragraph directly beneath its own table — the four rows are level-one
-primitives feeding several bundles, so they carry the primitive tag *instead of* a bundle,
-deliberately. Two pages, consulted by neither the check nor its author. *Rule:* a
-vocabulary has an owner; find the page that defines the *type*, not the page that lists the
-*values*. And when a check fires on data that has been stable for months, suspect the check
-first. *Breaks:* worse than a false positive — the "fix" retagged four correct rows, so a
-checker built on a partial vocabulary corrupted the data it was written to protect. —
-enforced, [named-formulas]
+and reported four rows as defects for carrying a linear-response primitive tag instead.
+They are not defects: [named-formulas#formula-record] owns the `bundle` field's schema and
+admits that tag, and [observable-bundles#linear-response-primitives] says the same thing
+in the paragraph directly beneath its own table — the four rows are level-one
+primitives feeding several bundles, so they carry the primitive tag *instead of* a
+bundle, deliberately. Two pages, consulted by neither the check nor its author. *Rule:*
+a vocabulary has an owner; find the page that defines the *type*, not the page that
+lists the *values*. And when a check fires on data that has been stable for months,
+suspect the check first. *Breaks:* worse than a false positive — the "fix" retagged four
+correct rows, so a checker built on a partial vocabulary corrupted the data it was
+written to protect. — enforced, [named-formulas#formula-record]
 
 ### Sum-preserving arithmetic errors survive every eyeball
 
@@ -700,14 +708,15 @@ verified. — enforced, [conventions#counts]
 ### A number quoted without its complement
 
 A result was cited here as "*faster*, and more accurate in 104 of 289 benchmarks",
-concluding that soundness is not a tax — at three sites. The paper's **very next sentence**
-reports that the unsound rule set won on accuracy in **135** cases. On accuracy the sound
-version lost more often than it won; what the paper shows is that soundness is
-*affordable* — free in time, roughly even in accuracy, and it solved one benchmark the
-unsound set could not solve at all. Nothing in the quoted half was false. *Rule:* when a
-result is a comparison, quote **both arms**, and read the sentence after the one you are
-lifting. *Breaks:* the conclusion, not the datum — and undetectably, because every number
-checks out against the source. — enforced, [compose-time-pipeline]
+concluding that soundness is not a tax — at three sites. The paper's **very next
+sentence** reports that the unsound rule set won on accuracy in **135** cases. On
+accuracy the sound version lost more often than it won; what the paper shows is that
+soundness is *affordable* — free in time, roughly even in accuracy, and it solved one
+benchmark the unsound set could not solve at all. Nothing in the quoted half was false.
+*Rule:* when a result is a comparison, quote **both arms**, and read the sentence after
+the one you are lifting. *Breaks:* the conclusion, not the datum — and undetectably,
+because every number checks out against the source. — enforced,
+[compose-time-pipeline#rewrite-admission]
 
 ### A dangling pointer is safer than a plausible reconstruction
 
@@ -736,30 +745,34 @@ fresh timestamp on it. — advisory
 
 Content-addressed identity is an *equivalence* relation; numerical closeness is a
 *tolerance* relation and is **not transitive** (`‖a−b‖≤ε` and `‖b−c‖≤ε` give `2ε`). A
-tolerance relation induces a covering by maximal cliques, not a partition — so there is no
-canonical representative and nothing to hash. Any proposal to round before hashing, to
-deduplicate "close enough" objects, or to make node identity bisimulation-up-to-tolerance
-destroys hash-consing, Merkle deduplication, constant-time address equality and the cache
-at once. Carry the tolerance *beside* the address, as evidence. *Breaks:* the single
-highest-consequence invariant in the substrate, in exchange for a deduplication nobody
-asked for. — enforced, [representation-substrate]
+tolerance relation induces a covering by maximal cliques, not a partition — so there is
+no canonical representative and nothing to hash. Any proposal to round before hashing,
+to deduplicate "close enough" objects, or to make node identity
+bisimulation-up-to-tolerance destroys hash-consing, Merkle deduplication, constant-time
+address equality and the cache at once. Carry the tolerance *beside* the address, as
+evidence. *Breaks:* the single highest-consequence invariant in the substrate, in
+exchange for a deduplication nobody asked for. — enforced,
+[representation-substrate#identity-exact]
 
 ### A declared error target is not a measured error
 
-A compression plan picks a rank to meet a truncation target; a truncated solve stops at a
-tolerance. Those are intentions. What the composition actually achieved is a different
+A compression plan picks a rank to meet a truncation target; a truncated solve stops at
+a tolerance. Those are intentions. What the composition actually achieved is a different
 number, and only that one is evidence — the discarded singular value and the stopping
-residual are both already computed, so the measurement is free. *Rule:* an intention that
-nothing measures is not a measurement. *Breaks:* an error budget assembled from what every
-stage *meant* to do. — enforced, [residual-machinery]
+residual are both already computed, so the measurement is free. *Rule:* an intention
+that nothing measures is not a measurement. *Breaks:* an error budget assembled from
+what every stage *meant* to do. — enforced,
+[representation-substrate#estimate-dont-decide]
 
 ### Exact-only is not a conservative gate
 
 It is an untested one. The reference tool for float-accuracy rewriting carried
-known-unsound rules for years; when the rules were simply deleted, the tool became useless
-on a large part of its own benchmark suite. The fix was not exactness — it was **side
-conditions discharged by an equivalence-class analysis**, intervals and not-equals facts
-riding alongside an equality that stays exact over the reals — and the sound version ran
-*faster* overall while roughly breaking even on accuracy (*A number quoted without its complement* is
-the same result read honestly). *Breaks:* a rule set kept small in the name of safety, which is
-neither safe nor small enough to be useful. — enforced, [compose-time-pipeline]
+known-unsound rules for years; when the rules were simply deleted, the tool became
+useless on a large part of its own benchmark suite. The fix was not exactness — it was
+**side conditions discharged by an equivalence-class analysis**, intervals and
+not-equals facts riding alongside an equality that stays exact over the reals — and the
+sound version ran *faster* overall while roughly breaking even on accuracy (*A number
+quoted without its complement* is the same result read honestly). *Breaks:* a rule set
+kept small in the name of safety, which is neither safe nor small enough to be useful. —
+enforced, [compose-time-pipeline#rewrite-admission]
+

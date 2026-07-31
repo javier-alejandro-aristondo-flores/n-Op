@@ -52,9 +52,13 @@ Registry rows cite `data/registry-manifest.csv`; seeded coefficients cite
 # Undated
 
 Four entries whose date is not recoverable at all, and six more that carry only an
-upper bound. Ordering within this section is by subject, not by time. Five further entries
-that reached Phase 1 undated were pinned from git history and appear in the dated run
-below, each marked `PINNED`.
+upper bound. Ordering within this section is by subject, not by time.
+
+Eleven further entries appear in the dated run below because a date was recovered for
+them from git history: four that arrived here with only an upper bound, six that carried
+a month but no day, and one whose recorded date was simply wrong — the coupling-record
+promotion, dated three weeks after the commit that contains it. All eleven are marked
+`PINNED`.
 
 ### undated · The coupled electrical–thermal residual was filed inside the equation-of-motion category rather than beside it
 
@@ -89,7 +93,7 @@ conservation, positivity and inequality, algebraic identities — which is the s
 Three distinct state schemas sharing a *common* residual contract, resolved into
 concrete types.
 
-- **Evidence** — [multiscale-state#three-tier-residual-contract]. EVIDENCE-DIES: the
+- **Evidence** — [multiscale-state#residual-contract]. EVIDENCE-DIES: the
   originating argument is at `11.3:601-630`.
 - **Attribution** — the group-C derivation stream.
 - **Supersedes** — the informal kinematic-geometry argument.
@@ -125,7 +129,7 @@ a 1e-12 tolerance. Verdict: this is a review rule, and it is labelled as one.
 Recomputing a value and reading a stored one give the same value. This marks the
 boundary of the estimate-don't-decide rule: it is about value, not cost.
 
-- **Evidence** — [compose-time-pipeline#stage4-adjoint-tape].
+- **Evidence** — [compose-time-pipeline#lowering-and-adjoint-synthesis].
 - **Attribution** — corpus. MISSING: no pass named.
 - **Supersedes** — nothing.
 
@@ -149,7 +153,7 @@ This closed a violation of the no-inline-mathematics rule *inside the page that
 validates the closed vocabulary*. The expressions are recorded beside the names, which
 is what makes registering those four rows transcription rather than research.
 
-- **Evidence** — [typed-compositions#per-observable-compositions];
+- **Evidence** — [typed-compositions];
   [named-formulas#no-inline-math].
 - **Attribution** — corpus audit. MISSING: no pass named.
 - **Supersedes** — inline mathematics in `formula =` slots.
@@ -217,7 +221,7 @@ Leading candidates recorded as Haskell, Julia, the GAP computer-algebra system, 
 Lean 4.
 
 - **Evidence** — commit `ec52314` ("Close arch-18 §1: implementation-language
-  decision"); [forced-decisions#language-roles]. EVIDENCE-DIES: the study itself is
+  decision"); [forced-decisions#implementation-language]. EVIDENCE-DIES: the study itself is
   `11.9-deriv-language-study`. Worse — the study's own per-axis dossiers were written
   under `/tmp/impl-lang-research/` and **no longer exist**, so its internal provenance
   is unrecoverable regardless of what this restructure deletes.
@@ -395,7 +399,7 @@ piezoelectric constant (literature-split); aluminium-gallium-nitride piezoelectr
 constants, composition-dependent saturation velocity, and holes; the aluminium-nitride
 pressure derivative of the bulk modulus and its per-axis sound velocities.
 
-- **Evidence** — [cert-obligations#ingest-battery], [coupling-structure],
+- **Evidence** — [cert-obligations], [coupling-structure],
   [accuracy-ledger#iii-n-electronic], [traps#frames], [traps#practice]; the seeded
   reference CSVs under `data/reference-data/`; commit `d6f4883`.
 - **Attribution** — two inventory passes, six primary-literature deep dives, two
@@ -472,7 +476,7 @@ against:
 | **D** | Data gaps — the per-material research programme. **D0** diamond battery missing · **D1** wave two = β-gallium-oxide · **D2** wave three = cubic boron nitride and 4H silicon carbide · **D3** no wave covered contact metals, substrates beyond silicon carbide, or dielectrics · **D4** standing acquisitions |
 | **E** | Standing open registers — confirmed complete |
 
-- **Evidence** — [traps#verifier-soundness]; [reference-battery#wave-program];
+- **Evidence** — [traps#verifier-soundness]; [reference-battery#wave-programme];
   `data/registry-manifest.csv` (seven Source cells) and
   `data/reference-data/transport-coefficients.csv` (one); commits `6c8e2e3`, `2d38c39`,
   `577f083`, `e9e176e`.
@@ -489,7 +493,7 @@ matrix outside the bounds can zero every equation-of-motion residual while being
 unphysical, so the oracle would be sound as a verifier of the *dynamics* but not of the
 *state*.
 
-- **Evidence** — [residual-definitions#positivity].
+- **Evidence** — [residual-definitions#constraint-categories].
 - **Attribution** — the gap audit, item A1. MISSING: no agent named.
 - **Supersedes** — extends the pre-audit positivity category rather than replacing it.
 
@@ -546,7 +550,7 @@ The bare one-over-root-two-mass-times-frequency prefactor is single-species shor
 Multi-species cells carry a per-atom mass through the mass-weighted eigenvector
 normalization.
 
-- **Evidence** — [coupling-structure#electron-phonon]. EVIDENCE-DIES: `11.1:514-522`,
+- **Evidence** — [coupling-structure#mechanism-range-table]. EVIDENCE-DIES: `11.1:514-522`,
   `11.2:148-152`.
 - **Attribution** — gap audit B7. MISSING: no agent named.
 - **Supersedes** — the unannotated single-mass vertex.
@@ -590,7 +594,7 @@ The Lyapunov table said negative entropy is "non-decreasing"; the H-theorem give
 entropy production non-negative, so negative entropy is **non-increasing**. The error
 contradicted the same file's own earlier section.
 
-- **Evidence** — [generic-dynamics#entropy-functional]. EVIDENCE-DIES: `11.3:546`,
+- **Evidence** — [generic-dynamics#functionals]. EVIDENCE-DIES: `11.3:546`,
   `11.3:711-714`.
 - **Attribution** — gap audit B7. MISSING: no agent named.
 - **Supersedes** — the "non-decreasing" direction.
@@ -650,7 +654,7 @@ high-temperature four-phonon anchor — thermal conductivity about 620 W/m·K at
 and the 1100 K value — landing as two registry rows: a closed-form four-phonon
 correction and a dormant iterative linearized-Boltzmann consistency sibling.
 
-- **Evidence** — [reference-battery#diamond-battery];
+- **Evidence** — [reference-battery#contents];
   `data/reference-data/transport-coefficients.csv`; `data/registry-manifest.csv` rows
   121–122; commit `e9e176e`.
 - **Attribution** — a battery-seeding pass. MISSING: no agent named.
@@ -689,7 +693,7 @@ the integrator staying consumer-side. Time-evolution product verbs remain unclai
 until that lowering is specified and built as its own named wave, slow tier first.
 
 - **Evidence** — [product#deployment-shape];
-  [compose-time-pipeline#evolver-lowering]; [generic-dynamics#evolver-duality];
+  [compose-time-pipeline#lowering-and-adjoint-synthesis]; [generic-dynamics];
   commits `402cab1`, `9eff050`, `7910de4`. EVIDENCE-DIES: the research memo itself is
   `journal/live/specs/2026-07-16-evolver-duality-research.md`.
 - **Attribution** — an independent deep-research commission. MISSING: no agent, model
@@ -707,7 +711,7 @@ opaque right-hand-side closure discards the structure tags; shipping an integrat
 imports step-size judgment the library has no basis for; and deferring the decision
 buys no information.
 
-- **Evidence** — [pino-bridge#steppable-form-manifest]; [gamma-hat#read-write-paths];
+- **Evidence** — [pino-bridge]; [gamma-hat#read-write-paths];
   commit `7910de4`.
 - **Attribution** — the same commission, adopted. MISSING: no agent named.
 - **Supersedes** — long-trajectory drift as an internal open problem of the density
@@ -719,7 +723,7 @@ The ten non-equation-of-motion residual categories become the integrator's prese
 obligations under the *same* residual keys. Scoring an evolver-produced trajectory
 measures exactly the drift the integrator failed to prevent, with no new machinery.
 
-- **Evidence** — [residual-definitions#preservation-obligations].
+- **Evidence** — [residual-definitions].
   EVIDENCE-DIES: the memo section is in `journal/live/specs/`.
 - **Attribution** — the same commission. MISSING: no agent named.
 - **Supersedes** — nothing.
@@ -750,7 +754,7 @@ its C2/m structure yet whose dominant mobility limiter is a multi-mode Fröhlich
 interaction.
 
 - **Evidence** — [applicability-classifiers#polar-predicate-split];
-  [applicability-classifiers#is-polar-material].
+  [applicability-classifiers#example-predicates].
 - **Attribution** — the gap audit (item A3) and the Wave-2 seeding specification.
   MISSING: no agent named.
 - **Supersedes** — the single "polar" predicate.
@@ -858,7 +862,7 @@ Recorded because the mechanism — restatement instead of citation — is the ge
 failure this restructure exists to prevent, and because **the declared deference was
 never actually applied**: the dependent table kept its own column.
 
-- **Evidence** — [accuracy-ledger#diamond-metal-contacts]. EVIDENCE-DIES:
+- **Evidence** — [accuracy-ledger]. EVIDENCE-DIES:
   `11.6-deriv-csp.md:143-146`, and the owner it defers to is also a chapter-11 page.
 - **Attribution** — the strata rewrite. MISSING: no agent named.
 - **Supersedes** — the independent stability-temperature column in the
@@ -935,7 +939,7 @@ monotonicity up to a declared tolerance, matching the corpus's own conserve/boun
 monotone obligation map term for term. Inexact implicit differentiation has *computable
 a-posteriori* error estimates. Materialization was misfiled: it changes cost, not value.
 
-- **Evidence** — [gamma-hat#resolutions]; [representation-substrate#identity-exact];
+- **Evidence** — [gamma-hat]; [representation-substrate#identity-exact];
   the emitted open-question register.
 - **Attribution** — a registry and substrate repair pass. MISSING: no agent named.
 - **Supersedes** — the open-decision item that carried the four questions; the
@@ -953,7 +957,7 @@ time-stepping as a write path. Canon won. The consequence is that drift is **exp
 to the integrating consumer through the steppable-form manifest, not dissolved.
 
 - **Evidence** — [gamma-hat#scorer-only]; [gamma-hat#read-write-paths];
-  [pino-bridge#steppable-form-manifest].
+  [pino-bridge].
 - **Attribution** — the oracle-file decision of that date. MISSING: no agent named.
 - **Supersedes** — the time-stepping write path on the density-matrix page.
 
@@ -962,7 +966,7 @@ to the integrating consumer through the steppable-form manifest, not dissolved.
 Recorded because the registration gate's strength depends on which gaps remain live.
 The survivors are stated sharply rather than deleted.
 
-- **Evidence** — the emitted open-question register; [build-verification#gate-1-registration].
+- **Evidence** — the emitted open-question register; [build-verification#registration].
 - **Attribution** — the same pass. MISSING: no agent named.
 - **Supersedes** — three of the four originally-named verifier-soundness gaps.
 
@@ -1018,7 +1022,7 @@ Forcing versus deferring changes cost, not value, so no error term exists and no
 fidelity generator is owed. It is a schedule at the code-generation stage —
 checkpointing, in the `revolve` sense.
 
-- **Evidence** — [compose-time-pipeline#stage4-adjoint-tape]; [gamma-hat#stage4-internals].
+- **Evidence** — [compose-time-pipeline#lowering-and-adjoint-synthesis]; [gamma-hat#lowering-internals].
 - **Attribution** — corpus. MISSING: no agent named.
 - **Supersedes** — "materialization policy has no principled default" as an open
   data-structure problem.
@@ -1030,7 +1034,7 @@ Discrete Algorithms* **7**(4), 402–410 (2009) — a separate result from `revo
 (Griewank & Walther, *ACM TOMS* **26**(1), 19–45, 2000). The corpus had folded it into
 the `revolve` parenthetical as though one source gave both.
 
-- **Evidence** — [compose-time-pipeline#stage4-adjoint-tape]; [gamma-hat#stage4-internals].
+- **Evidence** — [compose-time-pipeline#lowering-and-adjoint-synthesis]; [gamma-hat#lowering-internals].
 - **Attribution** — corpus self-correction. MISSING: no agent named.
 - **Supersedes** — the merged citation.
 
@@ -1050,7 +1054,7 @@ Per-sample core work at microseconds to milliseconds; on-request spectral work a
 to 10 seconds, cached per epoch; per-composition reference work at seconds to minutes,
 calibration-only.
 
-- **Evidence** — [named-formulas#cost-tiers]; [gamma-budget#budget].
+- **Evidence** — [named-formulas#cost-tiers]; [gamma-hat#mvp-budget].
 - **Attribution** — corpus. MISSING: no agent named.
 - **Supersedes** — the single "microseconds to milliseconds" runtime figure.
 
@@ -1060,7 +1064,7 @@ Decided at the code-generation stage on the periodicity structure and site decor
 The runtime cost that was the original objection no longer exists.
 
 - **Evidence** — [gamma-hat#encoding-vocabulary];
-  [compose-time-pipeline#stage-4].
+  [compose-time-pipeline#lowering-and-adjoint-synthesis].
 - **Attribution** — corpus. MISSING: no agent named.
 - **Supersedes** — the runtime-check framing.
 
@@ -1292,8 +1296,8 @@ The fourth Born-Oppenheimer level's claim to "its own irreducible state" is made
 concrete as the macro continuum-field tier, with the full distribution kept emergent by
 moment closure.
 
-- **Evidence** — [born-oppenheimer-levels#l4-irreducible-state];
-  [multiscale-state#macro-tier].
+- **Evidence** — [born-oppenheimer-levels#kinetics-irreducible-state];
+  [multiscale-state#macro-state-schema].
 - **Attribution** — the corpus reconciliation. MISSING: no agent named; no day recorded.
 - **Supersedes** — the stated contradiction between the two pages.
 
@@ -1305,7 +1309,7 @@ for example, a vibronic coupling factor became the lattice-relaxation phonon qua
 a field-activated ionization rate became the impact-ionization coefficient. The token
 `GAP` was found to mean three different things.
 
-- **Evidence** — [traps#practice]; [conventions#naming]; commits `2f1d22f`, `be77d5b`.
+- **Evidence** — [traps#practice]; [agent-contract#vocabulary]; commits `2f1d22f`, `be77d5b`.
   EVIDENCE-DIES: the old-to-new maps were kept in `retired-ids.csv` and
   `retired-names.csv`, both of which this restructure deletes. Before they go, the
   literature-name-to-behaviour-name mapping they carry is the *only* bridge from the
@@ -1326,7 +1330,7 @@ requirement it was chosen to satisfy — never a mandate. The requirement is the
 part.
 
 - **Evidence** — [forced-decisions#implementation-language];
-  [forced-decisions#language-roles]; the emitted open-question register; commit
+  [forced-decisions#implementation-language]; the emitted open-question register; commit
   `a0ff5be`.
 - **Attribution** — Javier.
 - **Supersedes** — the record that the decision was closed with four languages
@@ -1469,7 +1473,7 @@ same band consumes the trap density. The subthreshold-swing row was rebound to a
 dielectric-layer predicate; the trap-density row was left on an always-true stub pending
 a named predicate.
 
-- **Evidence** — [applicability-classifiers#row-116-and-119]; the emitted open-question
+- **Evidence** — [applicability-classifiers#trap-density-gates]; the emitted open-question
   register; `data/registry-manifest.csv` rows 113–119; commit `edee529`.
 - **Attribution** — the corpus gap-audit of that date. MISSING: no agent named.
 - **Supersedes** — the whole-band gating of rows 113–119.
@@ -1519,7 +1523,7 @@ rule.
 Ranks are chosen to meet a stated target, not by structure alone, and the target enters
 the per-residual budget through the tolerance-composition function.
 
-- **Evidence** — [compose-time-pipeline#stage-4]; [cert-obligations#tolerance-ledger].
+- **Evidence** — [compose-time-pipeline#lowering-and-adjoint-synthesis]; [cert-obligations#tolerance-ledger].
 - **Attribution** — corpus. MISSING: no agent named.
 - **Supersedes** — rank selection by structure alone.
 
@@ -1581,7 +1585,7 @@ about 2× better, aluminium nitride (~35) and gallium oxide (~25) are better, an
 **gallium nitride (~20 eV) is at or below silicon**. Both halves of the claim — the
 ratio and the word "uniformly" — were wrong.
 
-- **Evidence** — [out-of-scope#material-limits]. EVIDENCE-DIES:
+- **Evidence** — [out-of-scope#exclusions]. EVIDENCE-DIES:
   `11.5-deriv-high-field.md:417`.
 - **Attribution** — the 2026-07-22 adversarial re-audit. MISSING: no agent named.
 - **Supersedes** — the "uniformly 1–2 orders of magnitude better" premise.

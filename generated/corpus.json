@@ -127,12 +127,6 @@
       "summary": "No page states how a reference row reaches the cache. The canonical archive is a set of CSVs; obligations 4 and 8 read a content-addressed SQLite cache in the same directory; there is no stated ingest step, no build target, and no statement of which artifact the obligation reads at runtime. A cache over a CSV archive is coherent, and this is not a physics gap — it is an unstated step in the corpus's own machine-readable path."
     },
     {
-      "anchor": "lowering-and-adjoint-synthesis",
-      "id": "adjoint-drift-monitoring",
-      "page": "compose-time-pipeline",
-      "summary": "Registration validates a formula's own adjoint. This stage synthesizes the composition's adjoint over a graph that algebraic simplification has already rewritten, and nothing revalidates the second against the first."
-    },
-    {
       "anchor": "algebraic-simplification",
       "id": "algebraic-simplification-performance",
       "page": "compose-time-pipeline",
@@ -406,6 +400,7 @@
       "depends_on": [
         "cert-obligations",
         "coupling-structure",
+        "crystal-inputs",
         "multiscale-state",
         "pino-bridge",
         "representation-substrate",
@@ -433,7 +428,6 @@
         "named-formulas",
         "physics-graph",
         "product",
-        "reference-battery",
         "representation-substrate",
         "residual-loss-design",
         "traps"
@@ -560,16 +554,18 @@
       },
       "depends_on": [
         "build-verification",
-        "canonical-vocabularies",
         "capability-slices",
         "cert-obligations",
+        "computational-methods",
         "coupling-structure",
         "crystal-inputs",
         "forced-decisions",
         "generic-dynamics",
         "library-landscape",
         "named-formulas",
+        "observable-bundles",
         "pino-bridge",
+        "property-templates",
         "reference-battery",
         "residual-definitions",
         "unified-state"
@@ -611,15 +607,16 @@
         "capability-slices",
         "cert-obligations",
         "compose-time-pipeline",
+        "computational-methods",
         "generic-dynamics",
         "named-formulas",
         "pino-bridge",
+        "property-templates",
         "reference-battery",
         "residual-definitions",
         "residual-machinery",
         "traps",
-        "typeclass-alphabet",
-        "typed-compositions"
+        "typeclass-alphabet"
       ],
       "journal": "n-op",
       "library": null,
@@ -670,20 +667,17 @@
       "path": "journals/oracle/registry/canonical-vocabularies.md",
       "referenced_by": [
         "architectural-principles",
-        "build-sequence",
         "build-verification",
         "capability-slices",
         "compose-time-pipeline",
         "coupling-structure",
-        "gamma-hat",
         "glossary",
         "multiscale-state",
         "physics-graph",
         "product",
         "purpose-and-scope",
         "representation-substrate",
-        "residual-definitions",
-        "traps"
+        "residual-definitions"
       ],
       "section": "registry",
       "title": "Theory-context vocabularies"
@@ -702,7 +696,6 @@
         "build-verification",
         "canonical-vocabularies",
         "cert-obligations",
-        "cross-cutting-rules",
         "forced-decisions",
         "generic-dynamics",
         "mvp-system",
@@ -749,6 +742,7 @@
         "conventions",
         "coupling-structure",
         "generic-dynamics",
+        "named-formulas",
         "out-of-scope",
         "reference-battery",
         "representation-substrate",
@@ -893,7 +887,10 @@
       ],
       "path": "journals/oracle/registry/computational-methods.md",
       "referenced_by": [
+        "build-sequence",
+        "build-verification",
         "compose-time-pipeline",
+        "multiscale-state",
         "named-formulas",
         "physics-graph",
         "property-templates",
@@ -965,11 +962,11 @@
         "compose-time-pipeline",
         "crystal-inputs",
         "generic-dynamics",
-        "learned-corrections",
         "named-formulas",
         "physics-graph",
         "representation-substrate",
         "residual-machinery",
+        "traps",
         "unified-state"
       ],
       "journal": "oracle",
@@ -1037,6 +1034,7 @@
       ],
       "path": "journals/oracle/state/crystal-inputs.md",
       "referenced_by": [
+        "applicability-classifiers",
         "build-sequence",
         "compose-time-pipeline",
         "coupling-structure",
@@ -1100,7 +1098,8 @@
         "applicability-classifiers",
         "named-formulas",
         "observable-bundles",
-        "topology-atlas"
+        "topology-atlas",
+        "traps"
       ],
       "journal": "oracle",
       "library": "physics",
@@ -1132,14 +1131,13 @@
         "scorer-only": "Scorer-only — the density matrix never evolves here"
       },
       "depends_on": [
-        "canonical-vocabularies",
         "compose-time-pipeline",
         "crystal-inputs",
         "forced-decisions",
         "generic-dynamics",
         "library-landscape",
         "physics-graph",
-        "pino-bridge",
+        "property-templates",
         "representation-substrate",
         "residual-definitions",
         "unified-state"
@@ -1234,6 +1232,7 @@
         "generic-dynamics",
         "multiscale-state",
         "named-formulas",
+        "observable-bundles",
         "physics-graph",
         "pino-bridge",
         "representation-substrate",
@@ -1361,12 +1360,14 @@
         "born-oppenheimer-levels",
         "canonical-vocabularies",
         "compose-time-pipeline",
+        "computational-methods",
         "coupling-structure",
         "crystal-inputs",
         "formula-registry",
         "generic-dynamics",
         "out-of-scope",
         "pino-bridge",
+        "property-templates",
         "representation-substrate",
         "residual-definitions",
         "unified-state"
@@ -1461,12 +1462,13 @@
         "cert-obligations",
         "compose-time-pipeline",
         "computational-methods",
-        "cross-cutting-rules",
         "formula-registry",
         "multiscale-state",
         "observable-bundles",
+        "residual-definitions",
         "residual-machinery",
         "topology-atlas",
+        "traps",
         "typeclass-alphabet"
       ],
       "journal": "oracle",
@@ -1477,7 +1479,6 @@
         "evaluation cost vocabulary",
         "no-inline-math rule",
         "anchor class",
-        "consistency pair",
         "formula row bands",
         "applicability decidability",
         "corrected canonical forms"
@@ -1487,6 +1488,7 @@
         "build-sequence",
         "build-verification",
         "capability-slices",
+        "cert-obligations",
         "compose-time-pipeline",
         "computational-methods",
         "coupling-structure",
@@ -1496,6 +1498,7 @@
         "observable-bundles",
         "physics-graph",
         "property-templates",
+        "purpose-and-scope",
         "residual-loss-design",
         "residual-machinery",
         "traps",
@@ -1516,7 +1519,8 @@
         "formula-registry",
         "multiscale-state",
         "named-formulas",
-        "residual-definitions"
+        "residual-definitions",
+        "traps"
       ],
       "journal": "oracle",
       "library": "physics",
@@ -1527,11 +1531,14 @@
       ],
       "path": "journals/oracle/registry/observable-bundles.md",
       "referenced_by": [
+        "build-sequence",
         "compose-time-pipeline",
         "formula-registry",
+        "glossary",
         "named-formulas",
         "physics-graph",
-        "properties"
+        "properties",
+        "traps"
       ],
       "section": "registry",
       "title": "Observable bundles"
@@ -1658,7 +1665,6 @@
         "build-sequence",
         "build-verification",
         "compose-time-pipeline",
-        "gamma-hat",
         "glossary",
         "learnable-structure-contract",
         "multiscale-state",
@@ -1795,9 +1801,13 @@
       ],
       "path": "journals/oracle/registry/property-templates.md",
       "referenced_by": [
+        "build-sequence",
+        "build-verification",
         "canonical-vocabularies",
         "compose-time-pipeline",
         "computational-methods",
+        "gamma-hat",
+        "multiscale-state",
         "physics-graph",
         "typeclass-alphabet",
         "typed-compositions"
@@ -1826,6 +1836,7 @@
         "generic-dynamics",
         "library-landscape",
         "mvp-system",
+        "named-formulas",
         "pino-bridge",
         "product",
         "residual-definitions",
@@ -1869,7 +1880,6 @@
       },
       "depends_on": [
         "accuracy-ledger",
-        "applicability-classifiers",
         "cert-obligations",
         "coupling-structure",
         "crystal-inputs",
@@ -1996,7 +2006,7 @@
         "physics-graph",
         "representation-substrate",
         "residual-machinery",
-        "stage-ordering",
+        "training-stages",
         "typeclass-alphabet",
         "unified-state"
       ],
@@ -2025,6 +2035,7 @@
         "glossary",
         "learnable-structure-contract",
         "multiscale-state",
+        "named-formulas",
         "observable-bundles",
         "physics-graph",
         "pino-bridge",
@@ -2192,7 +2203,6 @@
       "depends_on": [
         "boundary",
         "learnable-structure-contract",
-        "open-decisions",
         "pino-bridge",
         "residual-definitions",
         "residual-loss-design"
@@ -2208,6 +2218,7 @@
       "referenced_by": [
         "boundary",
         "learnable-structure-contract",
+        "residual-definitions",
         "residual-loss-design"
       ],
       "section": "training",
@@ -2300,17 +2311,17 @@
         "accuracy-ledger",
         "agent-contract",
         "applicability-classifiers",
-        "canonical-vocabularies",
+        "cert-obligations",
         "cert-obligations",
         "compose-time-pipeline",
         "conventions",
         "coupling-structure",
-        "cross-cutting-rules",
         "generic-dynamics",
         "glossary",
         "multiscale-state",
         "mvp-system",
         "named-formulas",
+        "observable-bundles",
         "out-of-scope",
         "reference-battery",
         "representation-substrate",
@@ -2334,7 +2345,11 @@
         "build-verification",
         "compose-time-pipeline",
         "conventions",
+        "coupling-structure",
+        "formula-registry",
         "glossary",
+        "named-formulas",
+        "observable-bundles",
         "out-of-scope",
         "reference-battery",
         "residual-machinery",
@@ -2420,7 +2435,6 @@
       ],
       "path": "journals/oracle/registry/typed-compositions.md",
       "referenced_by": [
-        "build-verification",
         "generic-dynamics",
         "properties",
         "property-templates"
@@ -2642,9 +2656,6 @@
     },
     "compression plan selection": {
       "page": "compose-time-pipeline"
-    },
-    "consistency pair": {
-      "page": "named-formulas"
     },
     "content-addressed identity discipline": {
       "page": "representation-substrate"

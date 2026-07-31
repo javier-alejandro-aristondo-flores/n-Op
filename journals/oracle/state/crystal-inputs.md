@@ -112,9 +112,9 @@ kernel caching sound.
 
 - A **structural** field participates in the composition fingerprint that keys the kernel cache
   ([compose-time-pipeline#boundary]). Changing it triggers a recompile.
-- A **swept** field is passed as a runtime input and is not baked into the kernel. Validity
-  windows that depend on it are re-evaluated per training sample in the loss mask, rather than
-  once against the composition's nominal values ([applicability-classifiers#swept-environment-windows]).
+- A **swept** field is passed as a runtime input and is not baked into the kernel. What follows
+  for a validity window over such a field — per-sample re-evaluation, and which windows that
+  covers — is [applicability-classifiers#swept-environment-windows].
 
 Each emitted kernel is stamped with its **environment box** — the per-swept-field range set on
 which its invariant-synthesis structure is valid. A sample whose swept scalar leaves the box is
@@ -126,10 +126,8 @@ recorded as swept is passed at runtime into a kernel whose compile-time structur
 for it, so the kernel is reused outside its envelope and nothing fires. The failure has no
 symptom at the seam; it shows up only as a wrong number.
 
-`temperature` is swept: the corpus fixes it as a runtime-swept scalar, and the quasi-harmonic
-window, the transport regime windows ([multiscale-state#moment-closures]), the claimed-stable
-phonon gate, the impact-ionisation field domain and the four-phonon window are all per-sample
-masks over it. The rest of the partition is unstated. `applied_stress` and
+`temperature` is swept: the corpus fixes it as a runtime-swept scalar. The rest of the partition
+is unstated. `applied_stress` and
 `applied_magnetic_field` are the hard cases in either direction, because both can change the
 symmetry that the symmetry-quotient stage builds its structure on, which is a compile-time
 property rather than a runtime one.

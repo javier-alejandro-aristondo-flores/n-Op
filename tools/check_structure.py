@@ -32,10 +32,16 @@ JOURNALS = ROOT / "journals"
 CONTRACT = JOURNALS / "practice" / "agent-contract.md"
 EMITTED = ROOT / "generated" / "corpus.json"
 
-# A page that must name what it forbids cannot also be searched for those names.
-# Exactly one page is exempt, and every run says so out loud — an exemption nobody
-# is told about is how the previous corpus grew holes it reported as green.
-MARKER_EXEMPT = {"agent-contract"}
+# Some pages exist to warn about vocabulary, and cannot do that without naming it.
+# Each exemption is narrow, carries its reason, and is printed on every run — an
+# exemption nobody is told about is how the previous corpus grew holes it reported
+# as green. Note these are the three pages a reader consults *about* words, which is
+# why they are the three that need to quote them.
+EXEMPT = {
+    "agent-contract": "specifies the vocabulary, so it must name what it forbids",
+    "traps":          "warns that short tokens collide with physics, by example",
+    "glossary":       "disambiguates retired tokens from the external names they shadow",
+}
 
 FM_RE = re.compile(r"\A---\n(.*?)\n---\n", re.DOTALL)
 FENCE_RE = re.compile(r"^```.*?^```", re.DOTALL | re.MULTILINE)
@@ -199,21 +205,44 @@ def check_tables(pages: list[dict], errs: list[str]) -> None:
 
 def check_vocabulary(pages: list[dict], schema: dict, errs: list[str]) -> None:
     markers = [m for group in schema["forbidden-markers"].values() for m in group]
-    retired = {tok: (fam, new)
-               for fam, mapping in schema["retired-vocabularies"].items()
-               for tok, new in mapping.items()}
-    tok_re = re.compile(r"(?<![\w-])(" + "|".join(re.escape(t) for t in retired) + r")(?![\w-])")
+    # A token may belong to more than one retired family — T0..T3 was cost in the
+    # oracle and cadence in the operator, which is exactly the collision that made
+    # an iterative residual read T3 by cost and T2 by cadence. Keep every reading so
+    # the finding names them all rather than silently picking whichever was parsed
+    # last.
+    retired: dict[str, list[tuple[str, str]]] = {}
+    for fam, mapping in schema["retired-vocabularies"].items():
+        for tok, new in mapping.items():
+            retired.setdefault(tok, []).append((fam, new))
     for p in pages:
-        rel, pid, text = p["rel"], p["fm"].get("id"), prose(p["body"])
-        if pid not in MARKER_EXEMPT:
-            low = text.lower()
-            for marker in markers:
-                if marker.lower() in low:
-                    errs.append(f"{rel}: history marker {marker!r} — pages state what "
-                                f"is true, not how it got that way; the log holds history")
-            for tok in set(tok_re.findall(text)):
-                fam, new = retired[tok]
-                errs.append(f"{rel}: retired {fam} token {tok!r} — use {new!r}")
+        rel, pid = p["rel"], p["fm"].get("id")
+        if pid in EXEMPT:
+            continue
+
+        # History markers are prose claims, so they are checked against prose.
+        low = prose(p["body"]).lower()
+        for marker in markers:
+            if marker.lower() in low:
+                errs.append(f"{rel}: history marker {marker!r} — pages state what "
+                            f"is true, not how it got that way; the log holds history")
+
+        # Retired tags are the opposite: they live INSIDE inline code, because the
+        # old convention wrote every short symbol in backticks precisely to hold
+        # `D1` the tag apart from D1 the wurtzite deformation potential. Checking
+        # prose (which strips code spans) therefore missed every tag in the form
+        # tags are actually written — verified by probe: `D2`, `T3` and `B7` all
+        # passed silently before this.
+        #
+        # The span must equal the token exactly. `C2/m` is a space group and
+        # contains C2; an unbacked D1 is a deformation potential. Neither is a
+        # retired tag, and a looser rule would flag both — which is how the old
+        # corpus's version of this check came to be deleted for crying wolf.
+        body = FENCE_RE.sub("", p["body"])
+        for span in INLINE_CODE_RE.findall(body):
+            tok = span.strip("` ").strip()
+            if tok in retired:
+                opts = " or ".join(f"{new!r} ({fam})" for fam, new in retired[tok])
+                errs.append(f"{rel}: retired tag `{tok}` — use {opts}")
 
 
 def emit(pages: list[dict], owner: dict, schema: dict) -> dict:
@@ -285,8 +314,9 @@ def main() -> int:
     print(f"structure {'OK (partial)' if partial else 'OK'} · {len(pages)} pages, "
           f"{len(owner)} owned topics, {len(corpus['open_questions'])} open questions")
     # A clean run must state its own holes, or it is measuring the checker.
-    print(f"  exempt from the history-marker sweep: {sorted(MARKER_EXEMPT)} "
-          f"(a page that forbids a word must be allowed to name it)")
+    print("  exempt from the vocabulary sweep, and why:")
+    for pid, why in sorted(EXEMPT.items()):
+        print(f"    {pid:<16} {why}")
     return 0
 
 

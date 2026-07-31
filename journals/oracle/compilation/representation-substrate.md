@@ -146,7 +146,7 @@ Four fibers are named directly rather than by cluster:
 |---|---|---|
 | `InvariantTerm` and `FormulaApply` symbolic form — **a separate fiber, not part of the evidence cluster** | `MerkleDAG[SymbolicTensorOps, TypedLeaf]` | hash-consed tensor-algebra DAG |
 | applicability predicates | `MerkleDAG[PredicateOps, VocabularyAtom]` | versioned decision diagram over vocabulary atoms |
-| `CrystalSymmetryGroup` | graded composite atlas, sui generis, plus derived `MerkleDAG[GroupOps, …]` caches | see [canonical-vocabularies] |
+| `CrystalSymmetryGroup` | graded composite atlas, sui generis, plus derived `MerkleDAG[GroupOps, …]` caches | see [canonical-vocabularies#scope] |
 | `PhysicsGraph` | closure of the output address multiset under children-pointers | identity is the multiset of output-root addresses ([physics-graph#node]) |
 
 The symbolic-form row shares a backend family with the evidence cluster and shares
@@ -197,9 +197,8 @@ The serializer's **injectivity** is the single highest-consequence invariant in 
 system: two distinct values hashing equal would break every cache, every dedup and
 every equality test at once.
 
-The reference cache ([cert-obligations#reference-cache]) and the residual cache
-([residual-machinery])
-both consume this rule unchanged.
+Every cache keyed on an address consumes this rule unchanged — the reference cache
+([cert-obligations#reference-cache]) is the worked instance.
 
 ## Identity is exact; the error bar rides alongside
 
@@ -265,7 +264,8 @@ evidence:
 > emits a computable *a-posteriori* estimate of that difference, as certification
 > evidence.**
 
-The registration obligation this creates is stated at [residual-machinery]; the
+The registration obligation this creates is stated at
+[residual-machinery#fidelity-generators]; the
 estimates enter the error budget through `Quantity.combineTol` exactly as every other
 term does ([residual-definitions#error-budget]). Three properties make the obligation cheap rather
 than burdensome.
@@ -352,7 +352,7 @@ universe, fixed at registration — not of an individual sparse set.**
   an `Address[GroupAtlas]` and its *derived outputs* are substrate fibers, but its
   multiplication, projector and restriction semantics are not reduced to the substrate.
   Hopf-algebra and Fourier views are derived view layers over the group defined in
-  [canonical-vocabularies].
+  [canonical-vocabularies#scope].
 - **Certification checkers are not decision diagrams.** They are typed registered
   morphisms from artifacts to evidence. Applicability predicates are first-order
   decidable; certification checkers evaluate whole dynamical artifacts
@@ -374,6 +374,7 @@ Adding an atom creates a new order id; predicate roots built under one order are
 comparable only under that order, with explicit re-canonicalization at migration
 boundaries.
 
-The typed state slots ([unified-state#slots]) and the seam schema ([pino-bridge]) are both
+The typed state slots ([unified-state#slots]) and the seam schema
+([pino-bridge#surface]) are both
 versioned by this rule, so a schema bump on either side is visible as an address change
 rather than as a silent reinterpretation.

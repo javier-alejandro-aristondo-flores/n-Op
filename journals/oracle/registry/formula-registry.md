@@ -18,6 +18,7 @@ depends-on:
   - topology-atlas
   - applicability-classifiers
   - agent-contract
+  - traps
 open-questions:
   - id: research-stream-documents-absent
     anchor: provenance
@@ -47,7 +48,7 @@ One column per field of the formula record ([named-formulas#formula-record]):
 | `name` | behavior-named identifier; a person's name appears only in `provenance` |
 | `signature` | typed inputs to output, with units |
 | `bundle` | one or more observable bundles, or `linear-response-primitive` |
-| `evaluation-cost` | what one evaluation costs |
+| `cost-tier` | what one evaluation costs |
 | `differentiability` | how a consumer obtains a gradient through the row |
 | `anchor-class` | what the row's value is trusted against |
 | `provenance` | where the row came from, and what it is called in the literature |
@@ -91,18 +92,18 @@ on exactly one page**:
 | Field | Vocabulary defined by |
 |---|---|
 | `bundle` | [observable-bundles#the-eleven] |
-| `evaluation-cost` | [named-formulas#cost-tiers] |
+| `cost-tier` | [named-formulas#cost-tiers] |
 | `differentiability` | [named-formulas#diff-tags] |
 | `anchor-class` | [named-formulas#anchor-class] |
 | `provenance` | this page |
-| `applicability` | [applicability-classifiers] |
+| `applicability` | [applicability-classifiers#the-predicate-contract] |
 
 **Every consumer harvests the vocabulary from its defining page. No consumer
 restates it.** This binds tools as hard as it binds pages: a checker that
 hard-codes the admissible values validates the column against its own copy, and
 goes on reporting clean after the definition changes underneath it. A harvest
 that fails to find its source must be a loud failure, not a silent empty set —
-an empty vocabulary accepts everything.
+an empty vocabulary accepts everything ([traps#vocabulary-has-an-owner]).
 
 The same rule is what stops a second legend from appearing. A vocabulary written
 out twice has no mechanism holding the copies together, and the copies diverge in

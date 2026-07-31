@@ -40,12 +40,12 @@ into one class hierarchy would force a choice between the three every time a new
 observable arrives.
 
 Every node of the physics graph carries a type drawn from this alphabet
-([physics-graph]), and the certification obligations map onto these axes
-mechanically ([cert-obligations]) — an obligation is a claim about one axis, so
-the axis decides which obligations even apply.
+([physics-graph#node]), and the certification obligations map onto these axes
+mechanically ([cert-obligations#the-ten-obligations]) — an obligation is a
+claim about one axis, so the axis decides which obligations even apply.
 
 The alphabet is written here as language-neutral typed pseudocode. The
-implementation language is undecided ([forced-decisions]).
+implementation language is undecided ([forced-decisions#implementation-language]).
 
 ## Quantity — the value axis
 

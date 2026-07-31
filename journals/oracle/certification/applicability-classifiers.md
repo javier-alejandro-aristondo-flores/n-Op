@@ -17,6 +17,7 @@ anchors:
   predicate-storage: "How a predicate is stored"
 depends-on:
   - cert-obligations
+  - crystal-inputs
   - typeclass-alphabet
   - coupling-structure
   - representation-substrate
@@ -142,10 +143,10 @@ The per-sample mask path already exists ([pino-bridge]). Compose-time structure 
 are frozen at invariant synthesis, but the *mask* over them is a runtime read of the
 swept scalar.
 
-To make that checkable, **each emitted kernel is tagged with the `Environment` box** —
-the scalar ranges on which its compose-time structure is valid. A sample whose swept
-scalar leaves that box is masked out, and for a cert query trips the relevant obligation,
-rather than being silently scored against a stale kernel.
+What makes that checkable rather than merely intended is the environment box stamped on
+each emitted kernel ([crystal-inputs#structural-swept]): without a recorded range set
+there is nothing for a per-sample mask to test the swept scalar against, and the
+re-evaluation would silently pass every sample.
 
 ## How a predicate is stored
 

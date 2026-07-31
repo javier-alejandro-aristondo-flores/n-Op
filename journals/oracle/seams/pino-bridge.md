@@ -43,7 +43,7 @@ Validate(state    : UnifiedState,           -- the seven-tuple of unified-state
 ```
 
 A single entry point. `state` is [unified-state#slots] and `env` is
-[crystal-inputs].
+[crystal-inputs#environment].
 
 The `request` parameter selects which subgraph of the compiled kernel to
 evaluate: the full graph, a subset of residual leaves keyed by `ResidualKey`, or
@@ -71,14 +71,14 @@ experimental mobility curve, a curated battery row — as a
 `GroundTruthBridgeGenerator`, the dataset analogue of the residual generator
 ([residual-machinery#generator-record]).
 
-At the graph-construction stage ([compose-time-pipeline]) the generator inserts
-a pinned `Input` node carrying `(value, standard-deviation)` and a **cert-only**
-`ResidualLeaf` node keyed by the named target's `ResidualKey`
-([physics-graph]).
+At the symbolic-lift stage ([compose-time-pipeline#symbolic-lift]) the generator
+inserts a pinned `Input` node carrying `(value, standard-deviation)` and a
+**cert-only** `ResidualLeaf` node keyed by the named target's `ResidualKey`
+([physics-graph#node-kinds]).
 
 `Import` is **not differentiated through**. Its residual-leaf outputs serve the
-reference-battery obligation ([cert-obligations]) and feed the operator's
-target-versus-prediction comparison.
+reference-battery obligation ([cert-obligations#the-ten-obligations]) and feed
+the operator's target-versus-prediction comparison.
 
 ## Axis coverage
 
@@ -109,7 +109,7 @@ RoaringAxisCoverage = serialised Roaring bitmap of selected flat-index positions
   in every candidate language.
 - **Persisted form.** The serialised bytes are stored in the axis-coverage
   column of the reference cache's entry table, and are part of the content
-  address of a cache entry ([cert-obligations]).
+  address of a cache entry ([cert-obligations#reference-cache]).
 
 ## What is not exported
 

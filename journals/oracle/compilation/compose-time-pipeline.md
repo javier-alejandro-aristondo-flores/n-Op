@@ -41,9 +41,6 @@ depends-on:
   - pino-bridge
   - traps
 open-questions:
-  - id: adjoint-drift-monitoring
-    anchor: lowering-and-adjoint-synthesis
-    summary: "Registration validates a formula's own adjoint. This stage synthesizes the composition's adjoint over a graph that algebraic simplification has already rewritten, and nothing revalidates the second against the first."
   - id: algebraic-simplification-performance
     anchor: algebraic-simplification
     summary: "Equality saturation is the hardest pass to build and its cost is open-ended; no bound on saturation time or e-graph size is committed anywhere."
@@ -89,7 +86,7 @@ meaningful for this composition, and the sidecar is discarded.
 ## Symmetry quotient
 
 **Inputs.** The pruned graph; the topology-atlas entry for this composition's space
-group, Wyckoff orbits and orbital basis ([topology-atlas]).
+group, Wyckoff orbits and orbital basis ([topology-atlas#entry]).
 
 **Action.** Two rewrites, both purely symbolic — no numerics run here. Both exist to
 reduce the work the runtime stage will do.
@@ -182,7 +179,7 @@ guards, branch-cut guards — that none of the three carries.
    condition discharged by an e-class analysis** — an interval fact, a not-equals fact
    — and not as a caveat in prose; and
 3. it registers a **fidelity generator** for its floating-point discrepancy
-   ([residual-machinery]).
+   ([residual-machinery#fidelity-generators]).
 
 Equality saturation stays an **offline** rewrite oracle. Its internals never cross this
 stage's boundary; only the chosen rewrite does, and that rewrite is admitted under the
@@ -210,10 +207,9 @@ is where two communities reached it independently.
 **A sharper form waits downstream.** [traps#trajectory-safety] records the case an
 evolving consumer faces, where a rewrite that is exact almost everywhere but wrong on a
 measure-zero set is tolerable for a pointwise scorer and not for a flow attracted to the
-bad set. The
-oracle scores rather than integrates ([gamma-hat#scorer-only]), so that case is
-consumer-side, and
-the seam manifest declares it ([pino-bridge]).
+bad set. The oracle scores rather than integrates ([gamma-hat#scorer-only]), so that
+case is consumer-side: the hazard is exported to whoever integrates, along with the rest
+of the integration contract, rather than dissolved here.
 
 ## Lowering and adjoint synthesis
 
@@ -235,12 +231,12 @@ for the low-rank, hierarchical and tensor-train ranks — and the rank is chosen
 that target*, not by structure alone. The target enters the per-residual error budget
 through `Quantity.combineTol` ([residual-definitions#error-budget]).
 
-**Whether a plan applies at all is decided here too.** Applicability of the low-rank
-density-matrix slot is a **compile-time predicate on `(PeriodicityStructure,
-SiteDecoration)`** ([gamma-hat#lowering-internals]), evaluated at this stage alongside
-every other slot
-choice. It is not a runtime check, and there is therefore no runtime cost to pay for
-it.
+**Whether a plan applies at all is decided here too, and by the same mechanism.** Slot
+applicability is a **compile-time predicate over `(PeriodicityStructure,
+SiteDecoration)`**, evaluated at this stage alongside every other lowering choice. It is
+never a runtime check — that would be structural branching on the hot path, and its cost
+is what made the question look hard. Which predicate governs a given encoding slot is
+the encoding vocabulary's ([gamma-hat#encoding-vocabulary]).
 
 **Adjoint synthesis.** For every `MethodInvoke` whose named method has fixed-point
 semantics, the **implicit-differentiation adjoint** is synthesized. Gradient cost
@@ -253,8 +249,14 @@ fixed-point semantics tractable as gradients.
 
 The conditioning of that linear solve is set by the fixed-point map's Jacobian.
 **Near-singular Jacobians — slow self-consistency — are the failure mode**, and they
-are what the registration-time conditioning gate ([residual-machinery]) exists to
-catch.
+are what the registration-time adjoint gate ([residual-machinery#registration-gate])
+exists to catch.
+
+**What the gate sees is a formula's own adjoint, validated once at registration. What
+this stage synthesizes is the *composition's* adjoint, per composition, over a graph
+that algebraic simplification has already rewritten.** The two are different objects,
+and the exposure that creates is the gate's to carry
+([residual-machinery#registration-gate]).
 
 Nesting constrains the order. A force evaluation on the Born–Oppenheimer surface
 *contains* a converged quantum-electronic-substrate inner solve
@@ -272,7 +274,8 @@ acyclic graph the problem is **NP-complete** (Naumann, *J. Discrete Algorithms* 
 402–410, 2009 — a separate result from `revolve`). The plan is therefore a bounded
 heuristic over the tape, with its choice recorded.
 
-**This lowering owes no fidelity generator** ([residual-machinery]). Recomputing a
+**This lowering owes no fidelity generator**
+([residual-machinery#fidelity-generators]). Recomputing a
 value and reading a stored one give the *same* value, so the schedule trades memory
 against time and introduces no discrepancy to estimate. That is worth stating because
 it marks the boundary of the error-estimate obligation
@@ -317,7 +320,7 @@ sense (`kernel_extension`) are always written with their qualifier and are never
 `kernel` alone denotes here.
 
 The operator library sees the graph only through `ResidualKey` content hashes and never
-touches a node directly ([pino-bridge]). **Loss aggregation lives in the operator
+touches a node directly ([pino-bridge#surface]). **Loss aggregation lives in the operator
 library, not here**: this stage emits the granular vector, and the operator chooses how
 to reduce it.
 
@@ -349,14 +352,17 @@ changes trigger a recompile. Which environment fields are structural and which a
 swept is [crystal-inputs#structural-swept]'s to state.
 
 **Runtime cost is three-class, not one.** The microseconds-to-milliseconds figure in
-the table is only the per-sample core. Scheduling across the classes is the cadence
-policy ([residual-machinery]).
+the table above is only the per-sample core.
 
-| Class | What | Cost | Cadence |
+| Class | What | Cost | Recomputed |
 |---|---|---|---|
-| per-sample core | equation-of-motion residual evaluation | microseconds–milliseconds | per-step, subsampled |
-| on-request spectral | zone-resolved observables, full PDE residuals | 0.1–10 s | per-epoch, cached per composition |
-| per-composition reference | property and reference solves | seconds–minutes | on-demand, calibration only |
+| per-sample core | equation-of-motion residual evaluation | microseconds–milliseconds | every call |
+| on-request spectral | zone-resolved observables, full PDE residuals | 0.1–10 s | on request, then cached per composition |
+| per-composition reference | property and reference solves | seconds–minutes | once per composition |
+
+The **Recomputed** column is a cost fact: how often this library must do the work
+again. How often a consumer *asks* is a loop policy and is not the oracle's to state
+([named-formulas#cost-tiers] holds the two apart).
 
 The seconds-to-minutes compile figure covers the five symbolic stages. The
 per-composition *reference* solves that property observables require sit in the third

@@ -34,8 +34,9 @@ Eight principles, carried throughout the build.
 ## One compile pipeline over one substrate
 
 Structure is the compose-time pipeline ([compose-time-pipeline]) operating over the
-content-addressed representation substrate ([representation-substrate#identity-exact]). One pipeline,
-one substrate — not a pipeline per capability and not a substrate per stage.
+content-addressed representation substrate
+([representation-substrate#identity-exact]). One pipeline, one substrate — not a
+pipeline per capability and not a substrate per stage.
 
 ## Minimum primitives
 
@@ -47,8 +48,8 @@ vocabulary; there is no third option.
 ## No symbolic computation on the runtime path
 
 Structured data appears only as compose-time input or as inert certificate output. The
-compiled kernel is a closed, straight-line numeric function: no symbolic work, no solver
-invocations, no branching on structure.
+compiled kernel is a closed, straight-line numeric function: no symbolic work, no
+solver invocations, no branching on structure.
 
 ## Typed everything
 
@@ -57,29 +58,31 @@ formulas. No implicit parameters.
 
 ## Composition over duplication
 
-Properties are typed compositions of the small method vocabulary; observables that share
-a shape share a template.
+Properties are typed compositions of the small method vocabulary; observables that
+share a shape share a template.
 
 ## Loud at compose time, absent at runtime
 
-A degeneracy the oracle cannot stand behind is caught at compose time and refused with a
-numeric witness. It is never *raised* from the compiled kernel — what the oracle cannot
-certify is simply not in the kernel, so its key is absent from every map
+A degeneracy the oracle cannot stand behind is caught at compose time and refused with
+a numeric witness. It is never *raised* from the compiled kernel — what the oracle
+cannot certify is simply not in the kernel, so its key is absent from every map
 ([product#refusal-is-absence]). At runtime, failure surfaces as a failed certificate
 leaf carrying its witness, never as an exception.
 
 ## Certification is first-class
 
-Schema, freeze fixture, tamper tripwire and high-precision oracle together carry roughly
-the weight of any one level of the system ([cert-obligations#certificate-artifact]). Certification is not a
-reporting layer bolted on at the end.
+Schema, freeze fixture, tamper tripwire and high-precision oracle together carry
+roughly the weight of any one level of the system
+([cert-obligations#certificate-artifact]). Certification is not a reporting layer
+bolted on at the end.
 
 ## Numerics-agnostic at the seam, committed within
 
 The emitted oracle assumes nothing about its caller: pure function, flat arrays at the
-boundary, no loop ownership. This is *not* substrate-agnosticism in general — internally
-the oracle library is committed to the substrate of [representation-substrate#contract].
+boundary, no loop ownership. This is *not* substrate-agnosticism in general —
+internally the oracle library is committed to the substrate of
+[representation-substrate#contract].
 
-It emits state readouts and residuals. The integrator, the trainer and the operator all
-live downstream, and **the time-evolution verbs are unclaimed**: nothing in this base
-promises a trajectory.
+It emits state readouts and residuals. The integrator, the trainer and the operator
+all live downstream, and **the time-evolution verbs are unclaimed**: nothing in this
+base promises a trajectory.

@@ -24,6 +24,7 @@ depends-on:
   - born-oppenheimer-levels
   - unified-state
   - canonical-vocabularies
+  - observable-bundles
   - named-formulas
   - coupling-structure
   - representation-substrate
@@ -100,7 +101,7 @@ failure: decide which page should own it and add the topic there
 | topology atlas | [topology-atlas] |
 | Born-Oppenheimer levels | [born-oppenheimer-levels] |
 | state component | [unified-state] |
-| observable bundle | [canonical-vocabularies] |
+| observable bundle | [observable-bundles] |
 | `CrystalSymmetryGroup` | [canonical-vocabularies] |
 | `IrrepLabel` | [canonical-vocabularies] |
 | cost tier | [named-formulas] |

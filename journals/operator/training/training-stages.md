@@ -13,7 +13,6 @@ anchors:
   limits: "Where the trained operator falls short"
 depends-on:
   - residual-definitions
-  - open-decisions
   - pino-bridge
   - residual-loss-design
   - learnable-structure-contract
@@ -75,10 +74,10 @@ loop that walks these stages lives in the loops library ([boundary]).
 ## Curriculum gating inside the informed epoch
 
 The stage ordering says **when** the oracle attaches. **Which** residual categories
-participate at each fraction of the training budget is a second schedule, and its
-defaults are the oracle's: [residual-definitions#curriculum-gate] specifies them and
-[open-decisions] records the fractions as settled. The operator library may override
-any fraction or any category — the schedule is a normative default, not a contract.
+participate at each fraction of the training budget is a second schedule, and it is the
+oracle's: [residual-definitions#curriculum-gate] states the gate and the fractions it
+turns on. The operator library may override any fraction or any category — the schedule
+is a normative default, not a contract.
 
 That schedule gates residual *categories*. The source-weight curriculum
 ([residual-loss-design#curriculum]) gates the four supervisory *sources*. They share

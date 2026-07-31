@@ -32,10 +32,10 @@ selection itself ([capability-slices]).
 
 The concrete needs are fixed by what the slice has to compute: reverse-mode automatic
 differentiation through implicit-differentiation adjoints, for Boltzmann transport in
-the relaxation-time approximation, for the self-consistent field, and for G₀W₀; a staged
-symbolic intermediate representation with code generation at the lowering stage
-([compose-time-pipeline#lowering-and-adjoint-synthesis]); irreducible-Brillouin-zone tooling; and optional GPU
-execution for k-point meshes.
+the relaxation-time approximation, for the self-consistent field, and for G₀W₀; a
+staged symbolic intermediate representation with code generation at the lowering stage
+([compose-time-pipeline#lowering-and-adjoint-synthesis]); irreducible-Brillouin-zone
+tooling; and optional GPU execution for k-point meshes.
 
 These are met by a **polyglot of domain-specific languages** filling four roles:
 
@@ -52,26 +52,26 @@ Two structural facts make the split safe rather than merely convenient. First, t
 boundary between *lowering* and *runtime kernel application* is a narrow, natural
 language seam: the compiler emits a kernel, the runtime applies it, and no substrate
 object ever serialises across — what crosses is the generated kernel once, then flat
-arrays in and keyed arrays out. Second, the group-theory engine and the proof assistant
-are **offline leaves**: they run at build and specification time, on no hot path, so
-they add no interop risk. Only two of the four roles are live at all.
+arrays in and keyed arrays out. Second, the group-theory engine and the proof
+assistant are **offline leaves**: they run at build and specification time, on no hot
+path, so they add no interop risk. Only two of the four roles are live at all.
 
-The selection constraints are part of the decision and outlast any particular pick: core
-infrastructure is built **in-house**, so a framework that would own differentiation is a
-liability rather than an asset; automatic differentiation and implicit differentiation
-are already in hand, so built-in differentiation is no advantage and driving adjoint
-synthesis from the project's own intermediate representation is the requirement;
-polyglot is acceptable **provided the boundaries are clean**; languages should be
-well-known within their domain and serve the problem; and Rust is excluded by
-preference. Team familiarity is not a factor.
+The selection constraints are part of the decision and outlast any particular pick:
+core infrastructure is built **in-house**, so a framework that would own
+differentiation is a liability rather than an asset; automatic differentiation and
+implicit differentiation are already in hand, so built-in differentiation is no
+advantage and driving adjoint synthesis from the project's own intermediate
+representation is the requirement; polyglot is acceptable **provided the boundaries
+are clean**; languages should be well-known within their domain and serve the problem;
+and Rust is excluded by preference. Team familiarity is not a factor.
 
 Every named candidate is a candidate to compare against, never a mandate. Compare
 against the requirement column above.
 
 ## Tight binding as a warm start
 
-A three-nearest-neighbour sp³d⁵ tight-binding model for carbon is used as a **warm-start
-initialiser** for the self-consistent-field inner loop.
+A three-nearest-neighbour sp³d⁵ tight-binding model for carbon is used as a
+**warm-start initialiser** for the self-consistent-field inner loop.
 
 **It is not a separately evaluated formula and not an independent residual.** It seeds
 an iteration whose converged result is what gets scored; nothing in the residual map
@@ -89,11 +89,11 @@ consume specific outputs:
   mode Grüneisen parameters follow.
 
 These are the substrate-level outputs the MVP requires. Their exact form — band count,
-wavefunction format, and the phonon output shape — is an open question on the page that
-owns the levels ([born-oppenheimer-levels#dressing-tiers]).
+wavefunction format, and the phonon output shape — is an open question on the page
+that owns the levels ([born-oppenheimer-levels#dressing-tiers]).
 
-The declared accuracy each headline output must meet is [accuracy-ledger#design-grade], and
-the machine-readable anchor for every one of those targets is
-[reference-battery#contents]. Neither
-is restated here; the decision this page carries is that the anchors must exist before
-the certification obligations can fire, not what their values are.
+The declared accuracy each headline output must meet is
+[accuracy-ledger#design-grade], and the machine-readable anchor for every one of those
+targets is [reference-battery#contents]. Neither is restated here; the decision this
+page carries is that the anchors must exist before the certification obligations can
+fire, not what their values are.

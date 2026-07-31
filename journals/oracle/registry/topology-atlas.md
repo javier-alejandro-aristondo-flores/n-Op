@@ -36,9 +36,9 @@ TopologyAtlasEntry =
 Every field is combinatorial, and atlas outputs are `DiscreteStructure`
 instances ([typeclass-alphabet#discrete-structure]) — no units, no domain, no
 tolerance. Obligation-7 is literally a morphism over them
-([cert-obligations]): bulk-boundary correspondence relates two discrete objects,
-so checking it is composition in a discrete category rather than a numerical
-comparison.
+([cert-obligations#the-ten-obligations]): bulk-boundary correspondence relates
+two discrete objects, so checking it is composition in a discrete category
+rather than a numerical comparison.
 
 ## The symmetry-indicator group
 
@@ -63,13 +63,13 @@ Chern integrals, the Pfaffian route to the Z₂ invariant — and those are opt-
 per observable. They cost a mesh integration each, which is the cost of an
 observable rather than the cost of a classification, so charging every
 composition for them would make the atlas the most expensive thing in the
-pipeline ([compose-time-pipeline]).
+pipeline ([compose-time-pipeline#always-cheap]).
 
 ## Why the atlas exists
 
 The atlas gives the operator a navigational signal. The symmetry-indicator group
 tells the model which compositions are topologically equivalent, so a gradient
-taken in one informs the other ([pino-bridge]).
+taken in one informs the other ([pino-bridge#validate]).
 
 **Topology is the map, not a feature.** The distinction decides how the atlas is
 consumed: a feature is one more input concatenated onto a vector, and the model

@@ -104,11 +104,11 @@ M (symmetric, positive semidefinite):
 ```
 
 The cross-blocks and cross-kernels are generated from declared channels, not
-enumerated: [coupling-structure].
+enumerated: [coupling-structure#coverage-policy].
 
-These pieces are assembled across the four levels of [born-oppenheimer-levels];
-each level contributes the `E`, `S`, `L` and `M` terms that act on its
-irreducible state.
+These pieces are assembled across the four levels of
+[born-oppenheimer-levels#hierarchy]; each level contributes the `E`, `S`, `L` and
+`M` terms that act on its irreducible state.
 
 ## The nine regimes as extractions
 
@@ -133,9 +133,9 @@ The two-generator form and its degeneracy conditions `L·δS/δx = 0`,
 `M·δE/δx = 0` hold **per tier / per level, with the generators active at that
 tier** — not as a single global bracket over all variables simultaneously. This
 is what reconciles the written functionals with the degeneracy conditions and
-with the "degeneracy verified" artifact of [build-sequence]. The tiers are
-[multiscale-state]; the split is the standard GENERIC mechanical-versus-thermal
-one.
+with the "degeneracy verified" artifact of [build-sequence#phases]. The tiers are
+[multiscale-state#three-tiers]; the split is the standard GENERIC
+mechanical-versus-thermal one.
 
 - **The `γ̂`-block of `L` is the Lie–Poisson bracket** — `{A,B}(γ̂) = Tr( γ̂ ·
   [δA/δγ̂, δB/δγ̂] )`, giving `∂γ̂/∂t = −(i/ℏ)[Ĥ_KS, γ̂]` with `Ĥ_KS = δE/δγ̂`,
@@ -159,12 +159,12 @@ The consequence for the `Degeneracy` residual category is stated at
 
 Canonical blocks (symplectic `(R,P)`, `(h,Π_h)`; Lie–Poisson `γ̂`; Maxwell `A`)
 satisfy Jacobi **exactly**. Generated `AntisymmForm` cross-blocks
-([coupling-structure]) conserve energy by antisymmetry but do **not**
-automatically satisfy Jacobi — that is an additional condition. V1 restricts
-them to the semidirect-product / Lie–Poisson class, where Jacobi holds by
-construction, or flags them. The "Jacobi verified" artifact of [build-sequence]
-is exact for canonical blocks and a cert-side numerical check for generated
-cross-blocks; it is not a global symbolic proof.
+([coupling-structure#target-shapes]) conserve energy by antisymmetry but do
+**not** automatically satisfy Jacobi — that is an additional condition. V1
+restricts them to the semidirect-product / Lie–Poisson class, where Jacobi
+holds by construction, or flags them. The "Jacobi verified" artifact of
+[build-sequence#phases] is exact for canonical blocks and a cert-side numerical
+check for generated cross-blocks; it is not a global symbolic proof.
 
 ## Energy activation is level-conditional
 

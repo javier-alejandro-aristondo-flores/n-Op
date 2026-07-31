@@ -163,10 +163,35 @@ OutputRole =
 ```
 
 The role tells the runtime kernel which nodes are *exposed*. `Internal` nodes are
-evaluated and never returned. `Observable` nodes feed the operator seam ([pino-bridge])
+evaluated and never returned. `Observable` nodes feed the operator seam
+([pino-bridge#surface])
 and carry a bundle tag drawn from the observable-bundle universe
 ([observable-bundles#the-eleven]). `ResidualLeaf` nodes produce the entries of the
 granularity-keyed residual vector defined in [residual-definitions#granularity].
+
+### Which formula the observable exposes
+
+When more than one formula computes the same observable, the `Observable` role
+designates which compose-time-selected one is the **exposed** value to downstream
+consumers. Selection is by precedence over the contribution facets
+([residual-definitions#facets]): declared dressing tier first, then registration order.
+
+**The unselected formulas still contribute their residual leaves.** Losing the
+`Observable` role does not remove a node from the graph; it removes it from the
+exposed output while its `ResidualLeaf` keys survive intact.
+
+That is the whole of the discipline: **the graph never averages observables and never
+silently selects between formulas at runtime.** Both are evaluated, both are exposed as
+leaves, and the disagreement between them is a typed residual rather than a hidden
+choice. A reader looking for where the blend happens will not find one, because there
+is none.
+
+The same shape governs dressed quantities. A bare and a dressed residual on the same
+observable live as **distinct `FormulaApply` and `MethodInvoke` chains** in the graph —
+**not as weighted siblings**. The dressing tag that distinguishes them is a provenance
+label rather than a weighting axis ([born-oppenheimer-levels#dressing-tiers]), and the
+graph structure is what makes that true: there is no node at which a weight between
+them could be applied.
 
 ## Per-stage sidecars
 
@@ -212,11 +237,11 @@ operator-typed node receives is decided by
 | Born–Oppenheimer levels ([born-oppenheimer-levels#hierarchy]) | a label **derivable from a node's transitive inputs; not stored** |
 | the typeclass alphabet ([typeclass-alphabet#axes]) | the `type` field on every node |
 | applicability classifiers ([applicability-classifiers#the-predicate-contract]) | a symbolic-lift sidecar that *prunes* the graph; not retained |
-| the topology atlas ([topology-atlas]) | a precomputed table consumed by the symmetry quotient |
+| the topology atlas ([topology-atlas#entry]) | a precomputed table consumed by the symmetry quotient |
 | certification obligations ([cert-obligations#the-ten-obligations]) | global traversals, indexed by `NodeKind` and `OutputRole` |
 | the density-matrix encoding ([gamma-hat#encoding-vocabulary]) | a `CompressionPlan` for nodes whose `type` is the density-matrix typeclass |
-| `Validate` ([pino-bridge]) | the differentiated projection to `Observable` and `ResidualLeaf` outputs |
-| `Import` ([pino-bridge]) | insertion of `Input` nodes pinned to external values, plus certification-only `ResidualLeaf` nodes |
+| `Validate` ([pino-bridge#validate]) | the differentiated projection to `Observable` and `ResidualLeaf` outputs |
+| `Import` ([pino-bridge#import]) | insertion of `Input` nodes pinned to external values, plus certification-only `ResidualLeaf` nodes |
 
 The Born–Oppenheimer row is the one to read twice. A node's level is a **derived**
 property, recomputed from the transitive input set; storing it would create a second
@@ -224,7 +249,7 @@ place for it to be wrong.
 
 ## Why it is the data structure
 
-- **Closure.** Every closed vocabulary ([canonical-vocabularies]) is either a typing
+- **Closure.** Every closed vocabulary ([canonical-vocabularies#scope]) is either a typing
   rule for a node kind, a labelled subset of nodes, or an annotation field on a node.
   Nothing in the oracle lives outside the graph.
 - **Composition.** Composing observables *is* composing subgraphs. Property templates

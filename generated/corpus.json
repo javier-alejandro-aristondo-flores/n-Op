@@ -1,5 +1,12 @@
 {
-  "open_questions": [],
+  "open_questions": [
+    {
+      "anchor": "wire-schema",
+      "id": "state-wire-schema",
+      "page": "unified-state",
+      "summary": "Per-slot dtype, unit, index order and memory layout are unspecified, and the density matrix's array shape is a function of a compile-time compression choice."
+    }
+  ],
   "pages": {
     "agent-contract": {
       "anchors": {
@@ -24,6 +31,31 @@
       "referenced_by": [],
       "section": null,
       "title": "Agent contract"
+    },
+    "unified-state": {
+      "anchors": {
+        "emergence": "What the state leaves out",
+        "slots": "The seven slots",
+        "type-not-value": "A type, not a value",
+        "wire-schema": "The wire schema"
+      },
+      "depends_on": [
+        "born-oppenheimer-levels",
+        "generic-dynamics",
+        "multiscale-state",
+        "representation-substrate"
+      ],
+      "journal": "oracle",
+      "library": "physics",
+      "owns": [
+        "state seven-tuple",
+        "state slot vocabulary",
+        "state as type not value"
+      ],
+      "path": "journals/oracle/state/unified-state.md",
+      "referenced_by": [],
+      "section": "state",
+      "title": "The unified state"
     }
   },
   "topics": {
@@ -35,6 +67,15 @@
     },
     "frontmatter schema": {
       "page": "agent-contract"
+    },
+    "state as type not value": {
+      "page": "unified-state"
+    },
+    "state seven-tuple": {
+      "page": "unified-state"
+    },
+    "state slot vocabulary": {
+      "page": "unified-state"
     },
     "vocabulary rule": {
       "page": "agent-contract"

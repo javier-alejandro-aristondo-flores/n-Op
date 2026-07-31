@@ -7,8 +7,16 @@ and the enforcement it faces are the same artifact and cannot disagree.
 
     python tools/check_structure.py            regenerate generated/corpus.json, then check
     python tools/check_structure.py --check    check only; fail if the emission is stale
+    python tools/check_structure.py --partial  while the corpus is being built
 
 Exit 0 clean, 1 on any finding.
+
+``--partial`` exists because the page graph is **cyclic by design** — two pages each
+explain the other — so no order exists in which every citation resolves as it is
+written. It downgrades "cites a page that does not exist yet" to a counted note and
+keeps every other check hard, so an agent writing one page can still catch its own
+frontmatter, table and vocabulary errors. It always prints what it downgraded: a
+partial run that read like a clean one would be worse than no run at all.
 """
 from __future__ import annotations
 
@@ -131,17 +139,19 @@ def check_topics(pages: list[dict], errs: list[str]) -> dict[str, tuple[str, str
     return owner
 
 
-def check_citations(pages: list[dict], errs: list[str]) -> None:
+def check_citations(pages: list[dict], errs: list[str], pending: list[str],
+                    partial: bool = False) -> None:
     by_id = {p["fm"].get("id"): p for p in pages}
+    unresolved = pending if partial else errs
     for p in pages:
         rel, text = p["rel"], prose(p["body"])
         declared = set(p["fm"].get("depends-on") or [])
         for target in declared:
             if target not in by_id:
-                errs.append(f"{rel}: depends-on names {target!r}, which is not a page")
+                unresolved.append(f"{rel}: depends-on names {target!r}, which is not a page")
         for cid, anchor in CITE_RE.findall(text):
             if cid not in by_id:
-                errs.append(f"{rel}: citation [{cid}] resolves to no page")
+                unresolved.append(f"{rel}: citation [{cid}] resolves to no page")
                 continue
             if cid not in declared:
                 errs.append(f"{rel}: cites [{cid}] without a depends-on edge")
@@ -228,8 +238,10 @@ def emit(pages: list[dict], owner: dict, schema: dict) -> dict:
 
 def main() -> int:
     check_only = "--check" in sys.argv
+    partial = "--partial" in sys.argv
     schema = load_contract()
     errs: list[str] = []
+    pending: list[str] = []
 
     pages = load_pages(errs)
     if not pages:
@@ -237,13 +249,13 @@ def main() -> int:
 
     check_frontmatter(pages, schema, errs)
     owner = check_topics(pages, errs)
-    check_citations(pages, errs)
+    check_citations(pages, errs, pending, partial)
     check_tables(pages, errs)
     check_vocabulary(pages, schema, errs)
 
     corpus = emit(pages, owner, schema)
     rendered = json.dumps(corpus, indent=2, ensure_ascii=False, sort_keys=True) + "\n"
-    if check_only:
+    if check_only or partial:
         current = EMITTED.read_text(encoding="utf-8") if EMITTED.exists() else None
         if current != rendered:
             errs.append("generated/corpus.json is stale — run without --check")
@@ -257,8 +269,14 @@ def main() -> int:
             print(f"  {e}")
         return 1
 
-    print(f"structure OK · {len(pages)} pages, {len(owner)} owned topics, "
-          f"{len(corpus['open_questions'])} open questions")
+    if pending:
+        print(f"PARTIAL · {len(pending)} citation(s) awaiting a page that is not "
+              f"written yet:\n")
+        for m in pending:
+            print(f"  {m}")
+        print()
+    print(f"structure {'OK (partial)' if partial else 'OK'} · {len(pages)} pages, "
+          f"{len(owner)} owned topics, {len(corpus['open_questions'])} open questions")
     # A clean run must state its own holes, or it is measuring the checker.
     print(f"  exempt from the history-marker sweep: {sorted(MARKER_EXEMPT)} "
           f"(a page that forbids a word must be allowed to name it)")

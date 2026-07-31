@@ -120,11 +120,16 @@ def error_sites() -> dict[str, str]:
     """
     tree = ast.parse(CHECKER.read_text(encoding="utf-8"))
     sites: dict[str, str] = {}
+    # Any finding sink, not just `errs`. A refactor that routed two sites through a
+    # local alias once dropped them silently out of this count — the coverage claim
+    # drifting away from the code it describes, which is the exact failure this
+    # script exists to catch, one level up.
+    sinks = {"errs", "pending", "unresolved", "findings"}
     for node in ast.walk(tree):
         if not (isinstance(node, ast.Call) and isinstance(node.func, ast.Attribute)
                 and node.func.attr == "append"
                 and isinstance(node.func.value, ast.Name)
-                and node.func.value.id == "errs"):
+                and node.func.value.id in sinks):
             continue
         arg = node.args[0] if node.args else None
         parts = ([v.value for v in arg.values if isinstance(v, ast.Constant)]
@@ -147,10 +152,16 @@ def main() -> int:
 
     for name, find, repl, expect in PROBES:
         with tempfile.TemporaryDirectory() as td:
+            # A minimal fixture — the contract plus one victim page — not a copy of
+            # the live corpus. The calibration measures the checker; if it copied
+            # the corpus it would break every time a page was mid-write, and the
+            # pressure would then be to weaken the calibration rather than fix the
+            # page.
             work = Path(td) / "corpus"
-            shutil.copytree(ROOT / "journals", work / "journals")
+            (work / "journals" / "practice").mkdir(parents=True)
             shutil.copytree(ROOT / "tools", work / "tools")
-            (work / "journals" / "practice" / "probe-target.md").write_text(VICTIM, encoding="utf-8")
+            shutil.copy2(ROOT / CONTRACT_REL, work / CONTRACT_REL)
+            (work / VICTIM_REL).write_text(VICTIM, encoding="utf-8")
 
             # Establish a clean, non-stale baseline for this scratch copy.
             subprocess.run([sys.executable, str(work / "tools" / "check_structure.py")],

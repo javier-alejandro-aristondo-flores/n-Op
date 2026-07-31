@@ -42,7 +42,12 @@ FENCE_RE = re.compile(r"^```.*?^```", re.DOTALL | re.MULTILINE)
 INLINE_CODE_RE = re.compile(r"`[^`\n]*`")
 CITE_RE = re.compile(r"\[([a-z0-9][a-z0-9-]{2,})(?:#([a-z0-9][a-z0-9-]*))?\]")
 HEADING_RE = re.compile(r"^#{1,6}\s+(.*?)\s*$", re.MULTILINE)
-ORDINAL_RE = re.compile(r"§\s*\d")
+# A bare § is an EXTERNAL citation — "Öttinger 2005 §5.3", "Jackson 1998 §17.2" —
+# and is legitimate. Internal citations cannot use § at all, since the syntax is
+# [page-id#anchor]. So the check is not "is there a §" but "is a corpus page id
+# standing in front of one". The old corpus built the blunt version, measured it
+# against real prose, and deleted it for crying wolf; this is the precise version.
+ORDINAL_RE = re.compile(r"(?<![\w-])([a-z0-9][a-z0-9-]{2,})[\s`]*§\s*\d")
 LINENUM_RE = re.compile(r"\b[\w./-]+\.(?:md|csv|py)\s*:\s*\d+\b")
 PATHCITE_RE = re.compile(r"\bjournals/[\w./-]+\.md\b")
 TABLE_ROW_RE = re.compile(r"^\s*\|.*\|\s*$")
@@ -158,8 +163,10 @@ def check_citations(pages: list[dict], errs: list[str], pending: list[str],
             if anchor and anchor not in (by_id[cid]["fm"].get("anchors") or {}):
                 errs.append(f"{rel}: cites [{cid}#{anchor}] but {cid} declares no "
                             f"such anchor")
-        if ORDINAL_RE.search(text):
-            errs.append(f"{rel}: section ordinal (§N) — cite a declared anchor instead")
+        for hit in ORDINAL_RE.findall(text):
+            if hit in by_id:
+                errs.append(f"{rel}: internal section ordinal '{hit} §N' — cite a "
+                            f"declared anchor instead")
         if LINENUM_RE.search(text):
             errs.append(f"{rel}: line-number citation — line refs rot on every edit")
         if PATHCITE_RE.search(text):

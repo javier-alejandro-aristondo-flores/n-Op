@@ -1,13 +1,367 @@
 {
   "open_questions": [
     {
+      "anchor": "stub",
+      "id": "loops-library-undesigned",
+      "page": "boundary",
+      "summary": "The loops library has a charter and no design: no driver interface, no schedule representation, no active-learning policy type, and no statement of what a driver persists between runs."
+    },
+    {
+      "anchor": "mvp-column",
+      "id": "mvp-phase-coverage",
+      "page": "build-sequence",
+      "summary": "Five phases — templates, GENERIC operators, observables, dynamics, and the seal — are marked open. The MVP's own scope statements require them (ten templates, five primary bundles, and an exit criterion plus a seam smoke test that both call the sealed entry points), while the step list the MVP build was written as does not name them. Which of the five are in the MVP is unresolved; the column records the disagreement instead of hiding it in a subset claim."
+    },
+    {
+      "anchor": "implementation-language",
+      "id": "implementation-language-picks",
+      "page": "forced-decisions",
+      "summary": "Which language fills each of the four roles — compiler host, runtime host, group-theory engine, proof assistant. The four-role shape is closed; the picks are not. Haskell, Julia, the `GAP` computer-algebra system and Lean 4 are on record as candidates, together with the requirement each was chosen to satisfy; each role must be re-argued against its alternatives, against bring-your-own reverse-mode differentiation, an equality-saturation library, a typed intermediate representation and a code-generation path, before code is written."
+    },
+    {
+      "anchor": "what-n-op-is",
+      "id": "operator-capability-framing",
+      "page": "purpose-and-scope",
+      "summary": "What the operator is trained to produce is stated two incompatible ways in the material this base is built from — predicting the time evolution of the state, versus returning the state channels the caller did not supply given a crystal identity and the properties already known. The oracle side is unaffected; the operator side cannot be described until this is settled."
+    },
+    {
+      "anchor": "sampling",
+      "id": "sampling-policy-record-home",
+      "page": "residual-loss-design",
+      "summary": "A sampling policy is a cadence, a sampler and an optional importance function; the oracle's generator record carries the sampler alone, so the cadence and the importance function have no typed home on either side of the seam."
+    },
+    {
+      "anchor": "tension",
+      "id": "experimental-sigma-source",
+      "page": "residual-loss-design",
+      "summary": "The experimental loss term is scaled by a per-observable standard deviation, and it is undetermined whether that comes from instrument metadata on the datum or from the declared accuracy scale of the observable — they are different quantities and only one of them varies per measurement."
+    },
+    {
+      "anchor": "conditioning-inputs",
+      "id": "environment-schema-at-the-seam",
+      "page": "learnable-structure-contract",
+      "summary": "The seam obliges the operator to accept the environment record as named typed conditioning channels, but no page fixes that record's field list, units or admissible ranges — so the obligation names a channel whose contents cannot be checked."
+    },
+    {
+      "anchor": "curriculum-pointer",
+      "id": "two-curriculum-schedules",
+      "page": "training-stages",
+      "summary": "Residual-category gating and the source-weight curriculum share the endpoints 0.10 / 0.60 / 0.90 but gate different things; whether that is one schedule described twice or two schedules that coincide is undetermined, and it decides whether the operator gets one knob or two."
+    },
+    {
+      "anchor": "observable-regimes",
+      "id": "mesh-sigma-floor-undeclared",
+      "page": "accuracy-ledger",
+      "summary": "No numeric per-observable mesh-uncertainty floor is declared anywhere in the corpus. Transport observables computed from a Boltzmann solve need roughly 50-cubed-equivalent sampling of the Brillouin zone, and the MVP's 8×8×8 mesh is factor-two-grade for transport even with exact inputs. Row 2 of the regime table needs that floor as a number before any transport regime below factor two can be claimed."
+    },
+    {
+      "anchor": "polarization-bowing",
+      "id": "algan-bowing-b-unseeded",
+      "page": "accuracy-ledger",
+      "summary": "The aluminium-gallium-nitride polarization bowing coefficient and the piezoelectric-tensor bowings are UNSEEDED. Until they are seeded, mid-composition interface-polarization claims carry a widened uncertainty, and the sign guard between the ledger's minus-b form and the reference file's plus-b form is live. Seeding is gated on a paywalled pin-read of the two primary sources."
+    },
+    {
+      "anchor": "seed-provenance",
+      "id": "diamond-static-permittivity-unseeded",
+      "page": "accuracy-ledger",
+      "summary": "The diamond static permittivity, 5.7 ± 0.05, is UNSEEDED: no primary measurement was found, and every trail ends in an unreferenced compilation. It is load-bearing — it is the permittivity in the image-force-lowering formula of regime row 31. Two closes are available: name a measurement, or derive it from the long-wavelength refractive index and cite that. The row does not state a frequency window, and the derivation only works at the right one — the infrared index gives 5.66, the visible index gives 5.84."
+    },
+    {
+      "anchor": "seed-provenance",
+      "id": "diamond-debye-temperature-unseeded",
+      "page": "accuracy-ledger",
+      "summary": "The diamond Debye temperature, 2200 K ± 50, is UNSEEDED, and the literature spread is method-dependent from about 1860 K (elastic constants) to about 2230 K (low-temperature specific heat) — far wider than the stated uncertainty, which is 2.3%. A stated uncertainty narrower than the disagreement between methods is a claim the corpus cannot support. This row is coupled to the thermal-conductivity battery: it sets the four-phonon validity threshold at 0.4 of it, so 2200 K puts the 773 K conductivity anchor outside the four-phonon window and 1860 K puts it inside. Closing it means first deciding which Debye temperature the corpus needs, because they are different numbers."
+    },
+    {
+      "anchor": "kappa-battery",
+      "id": "diamond-kappa-high-temperature-provenance",
+      "page": "accuracy-ledger",
+      "summary": "The diamond thermal conductivities at 773 K and 1100 K have two incompatible descriptions in canon. This ledger attributed all three temperatures to a pair of papers; the reference file declares these two theory-interpolation with no source named beyond an internal audit pointer. The primary measurement spanning 170–1200 K — Olson et al., Phys. Rev. B 47, 14850 (1993) — is the source both rows would rest on and could not be retrieved. The reference file's own stated law for the 1100 K row does not reproduce the 773 K row: the implied exponent falls from 1.34 to 0.91 across the interval, whereas four-phonon scattering steepens the high-temperature falloff."
+    },
+    {
+      "anchor": "kappa-battery",
+      "id": "diamond-kappa-citation-material",
+      "page": "accuracy-ledger",
+      "summary": "Broido et al., Appl. Phys. Lett. 91, 231922 (2007), cited for the diamond 300 K thermal conductivity, appears from its published abstract to be about silicon and germanium. The diamond paper from that group is Ward et al., Phys. Rev. B 80, 125203 (2009). Settling it needs one look at the 2007 paper to confirm diamond is absent."
+    },
+    {
+      "anchor": "seed-provenance",
+      "id": "diamond-cohesive-energy-allotrope",
+      "page": "accuracy-ledger",
+      "summary": "The diamond cohesive energy, 7.37 eV/atom, matches the standard tabulated figure for graphite (7.374) to three decimals and diamond (7.346) only to within 24 meV. Both sit inside the stated ±0.05 eV/atom, so the value is defensible either way — but the provenance may be another allotrope's number, and 24–28 meV/atom is the same size as the diamond-graphite formation-energy row it has to be consistent with, and half this row's own uncertainty."
+    },
+    {
+      "anchor": "seed-provenance",
+      "id": "aln-high-temperature-conductivity-absence",
+      "page": "accuracy-ledger",
+      "summary": "The aluminium-nitride 1100 K thermal-conductivity row states that no single-crystal measurement above 500 K exists, and the 300 K row of the same file cites Slack et al., J. Phys. Chem. Solids 48, 641 (1987) — a paper whose measurements are reported to extend far above 500 K. Either the absence claim is too strong or the citation is being read wrongly. This matters in the opposite direction from a wrong value: an unnecessary refusal costs coverage silently, and nothing will ever fire on it."
+    },
+    {
+      "anchor": "observable-counts",
+      "id": "figures-of-merit-count",
+      "page": "accuracy-ledger",
+      "summary": "The count of figures of merit is asserted as 16 in three places, and the corpus's only enumeration of them has 15 rows. Either one is missing from the enumeration or the count is wrong."
+    },
+    {
+      "anchor": "trap-density-gates",
+      "id": "semiconductor-interface-predicate",
+      "page": "applicability-classifiers",
+      "summary": "Interface trap density needs a semiconductor-interface applicability predicate, and the classifier vocabulary carries none broad enough. `has-metal-semiconductor-interface` is too narrow, because traps sit at semiconductor-dielectric interfaces as well. Until one is defined, the trap-density row carries an always-true stub. Naming the gap rather than inventing a classifier is the deliberate choice here: a dangling pointer is safer than a plausible reconstruction."
+    },
+    {
+      "anchor": "v1-commitment",
+      "id": "soft-applicability-classifiers",
+      "page": "applicability-classifiers",
+      "summary": "Applicability is Boolean in V1. Two extensions are deferred and unscoped: soft classifiers valued in [0,1], and the composition rule for classifiers under perturbation — what a composed predicate should return when one input crystal is a perturbation of another that the predicate accepts."
+    },
+    {
+      "anchor": "the-ten-obligations",
+      "id": "obligation-9-scope",
+      "page": "cert-obligations",
+      "summary": "Obligation 9 names a set of formulas that does not exist. It is stated as surrogate-net validity over the formulas tagged `relaxed`, but `relaxed` means genuinely non-smooth — argmin, soft hull, sort, discrete — and all six formulas carrying it are relaxations, not learned nets. The one learned surrogate in the registry, the quasi-particle-shift surrogate, is tagged `adjoint` and falls outside the obligation entirely. The obligation's checker body (declared input domain contains the query, surrogate uncertainty below tolerance, refresh current, measured on a held-out development set) describes a learned net, which a soft-hull relaxation is not. This page contradicts itself about it: the obligation reads `surrogate`, its tolerance-ledger row reads `relaxation validity`. Does obligation 9 rebind to the learned surrogates, split into surrogate-validity plus relaxation-validity, or rescope some other way?"
+    },
+    {
+      "anchor": "reference-cache",
+      "id": "csv-to-sqlite-path",
+      "page": "cert-obligations",
+      "summary": "No page states how a reference row reaches the cache. The canonical archive is a set of CSVs; obligations 4 and 8 read a content-addressed SQLite cache in the same directory; there is no stated ingest step, no build target, and no statement of which artifact the obligation reads at runtime. A cache over a CSV archive is coherent, and this is not a physics gap — it is an unstated step in the corpus's own machine-readable path."
+    },
+    {
+      "anchor": "lowering-and-adjoint-synthesis",
+      "id": "adjoint-drift-monitoring",
+      "page": "compose-time-pipeline",
+      "summary": "Registration validates a formula's own adjoint. This stage synthesizes the composition's adjoint over a graph that algebraic simplification has already rewritten, and nothing revalidates the second against the first."
+    },
+    {
+      "anchor": "algebraic-simplification",
+      "id": "algebraic-simplification-performance",
+      "page": "compose-time-pipeline",
+      "summary": "Equality saturation is the hardest pass to build and its cost is open-ended; no bound on saturation time or e-graph size is committed anywhere."
+    },
+    {
+      "anchor": "channel-record",
+      "id": "sub-dof-pair-table",
+      "page": "coupling-structure",
+      "summary": "Which (StateComponent, SubDofTag) pairs are legal is stated nowhere, and make-coupling-channel cannot validate a StatePiece without that table."
+    },
+    {
+      "anchor": "curriculum-gate",
+      "id": "curriculum-denominator",
+      "page": "residual-definitions",
+      "summary": "The gate is indexed on a training fraction, and what that fraction is a fraction of — the whole training run, or the single stage in which the oracle is attached — is not stated. The two readings place Warmup and Cooldown in different places."
+    },
+    {
+      "anchor": "curriculum-gate",
+      "id": "curriculum-phase-names",
+      "page": "residual-definitions",
+      "summary": "Consumers of this gate name three phases where it names four, and a further vocabulary substitutes Calibrate for Cooldown. The phase set is not agreed across the seam."
+    },
+    {
+      "anchor": "argument-types",
+      "id": "argument-type-alphabet-homeless",
+      "page": "computational-methods",
+      "summary": "The argument types the method and template signatures are written in — Extractor, Aggregator, ResponseKernel, Optimizer, EigenSolver and the rest — are defined by no page, so neither set of signatures can be typed as written."
+    },
+    {
+      "anchor": "provenance",
+      "id": "research-stream-documents-absent",
+      "page": "formula-registry",
+      "summary": "Four of the five research streams the provenance vocabulary names have no page in this corpus, so a provenance value on rows 1–87 identifies a stream but cannot be followed to the document that grounds the row."
+    },
+    {
+      "anchor": "bundle-map",
+      "id": "magnetic-has-no-bundle",
+      "page": "properties",
+      "summary": "The magnetic category projects onto no observable bundle: the one-body density matrix is mean-field and the wide-bandgap scope did not force a dedicated bundle, so magnetic properties are in scope with no residual grouping behind them."
+    },
+    {
+      "anchor": "axes",
+      "id": "implementation-language-undecided",
+      "page": "typeclass-alphabet",
+      "summary": "The alphabet is written as language-neutral typed pseudocode because the implementation language is undecided; the typeclass mechanism each axis assumes — coherence, dispatch, à-la-carte capabilities — is a language property this corpus has not yet chosen."
+    },
+    {
+      "anchor": "aliases",
+      "id": "three-aliases-never-expanded",
+      "page": "typeclass-alphabet",
+      "summary": "Scalar, Tensor and FieldOnGrid are used as return types throughout the method and template signatures and are expanded nowhere, so those signatures cannot be typed as written."
+    },
+    {
+      "anchor": "declared-gap",
+      "id": "unregistered-composition-formulas",
+      "page": "typed-compositions",
+      "summary": "Eighteen formula names invoked by the compositions on this page are not rows in the manifest, so the closed-vocabulary claim does not hold in full. Nine are transcription plus tag assignment; nine need literature before a row would be defensible."
+    },
+    {
+      "anchor": "declared-gap",
+      "id": "undeclared-non-formula-slots",
+      "page": "typed-compositions",
+      "summary": "Two names are invoked in slots that are not formula arguments and are neither manifest rows nor part of the declared gap: exchange-coupling-formula as a response kernel, and harmonic-rate-prefactor as a rate prefactor. Whether they belong to the declared gap or to a kernel vocabulary no page owns is unsettled."
+    },
+    {
+      "anchor": "mechanical",
+      "id": "cij-averaging-scheme",
+      "page": "typed-compositions",
+      "summary": "Which averaging scheme the bulk modulus takes over the elastic constants — Voigt, Reuss or Hill — is an open pick."
+    },
+    {
+      "anchor": "registration-gate",
+      "id": "adjoint-drift-monitoring",
+      "page": "residual-machinery",
+      "summary": "The gate validates the formula's adjoint once, at registration. The composition's adjoint is synthesised later, per composition, over a graph the simplification stage has already rewritten, and nothing revalidates the second."
+    },
+    {
+      "anchor": "registration-gate",
+      "id": "dormant-row-cert-encoding",
+      "page": "residual-machinery",
+      "summary": "A dormant row's gate is deferred rather than passed and must be recorded as such, but adjoint-cert has four cases and none of them is deferred."
+    },
+    {
+      "anchor": "dressing-tiers",
+      "id": "g0w0-cost-scope-tag",
+      "page": "born-oppenheimer-levels",
+      "summary": "The G₀W₀ quasi-particle correction's evaluation cost is not scope-tagged by cell size. A seconds-tier budget of ten seconds or less is plausible at MVP scale; for version-1 defect supercells it is hours. The cost tier is therefore violated silently rather than refused. This is a cost claim, so the error-estimate rule does not reach it."
+    },
+    {
+      "anchor": "environment",
+      "id": "environment-schema",
+      "page": "crystal-inputs",
+      "summary": "The environment record's field set is not closed and only its five harsh-environment fields carry a declared type and unit. The rest are prose nouns, and the record has no schema version, so adding a field silently changes which formulas apply to every existing composition."
+    },
+    {
+      "anchor": "structural-swept",
+      "id": "environment-structural-partition",
+      "page": "crystal-inputs",
+      "summary": "Which environment fields are structural and which are swept is stated for temperature alone. The structural subset keys the kernel cache, so a structural field misfiled as swept silently reuses a kernel outside its envelope."
+    },
+    {
+      "anchor": "crystal-type",
+      "id": "crystal-type",
+      "page": "crystal-inputs",
+      "summary": "The applicability signature on every registry row, every coupling channel, every residual generator and every property template is a function of a Crystal and an Environment. Crystal is defined nowhere. The pairing with Environment implies it is the periodicity structure and site decoration together, but nothing states it."
+    },
+    {
+      "anchor": "mvp-budget",
+      "id": "supercell-memory-budget",
+      "page": "gamma-hat",
+      "summary": "The density-matrix memory budget when leaving the primitive cell. Orbital storage stays linear in atom count and band count, but no supercell budget is written down, and the page states that revisiting it is the first obligation on leaving the primitive cell."
+    },
+    {
+      "anchor": "device-mesh",
+      "id": "mesh-adjoint-scheme",
+      "page": "multiscale-state",
+      "summary": "Discrete- versus continuous-adjoint of the finite-volume operator, for differentiating the continuum residual. The mesh format is committed; the adjoint binding is not, and it inherits the compile-time-to-runtime automatic-differentiation seam."
+    },
+    {
+      "anchor": "moment-closures",
+      "id": "hole-transport-anchors",
+      "page": "multiscale-state",
+      "summary": "Hole mobility, hole impact-ionisation coefficient and hole saturation velocity are anchored for few hosts. The hole schema is committed; the coefficients are a per-composition data gap, and every bipolar macro composition is unanchored until it closes."
+    },
+    {
+      "anchor": "slow-kinetics",
+      "id": "niel-displacement-coefficients",
+      "page": "multiscale-state",
+      "summary": "The recombination efficiency as a function of lattice temperature, and the NIEL-derived displacement cross-section per host, particle type and energy. No closed form exists in the corpus — only the coupling structure and a curated provenance-ledger slot. Frenkel-pair yield cannot be evaluated without them. A data-acquisition task, not an invention task."
+    },
+    {
+      "anchor": "moment-closures",
+      "id": "regime-threshold-windows",
+      "page": "multiscale-state",
+      "summary": "The per-host field windows that switch the transport regime are order-of-magnitude only. They gate the per-sample applicability mask, so their width is load-bearing."
+    },
+    {
+      "anchor": "slow-kinetics",
+      "id": "displacement-threshold-provenance",
+      "page": "multiscale-state",
+      "summary": "The per-host displacement thresholds feeding the NRT displacement count have no provenance outside the derivation chapter. The β-Ga₂O₃ value is UNSEEDED; diamond, GaN and AlN carry numbers whose only source is that chapter."
+    },
+    {
       "anchor": "wire-schema",
       "id": "state-wire-schema",
       "page": "unified-state",
       "summary": "Per-slot dtype, unit, index order and memory layout are unspecified, and the density matrix's array shape is a function of a compile-time compression choice."
+    },
+    {
+      "anchor": "verdicts",
+      "id": "appendix-comparison-replacement",
+      "page": "conventions",
+      "summary": "An auditor was previously told to diff the research stratum against the specification. There is one stratum now, so a certification pass has nothing to compare the corpus against except git history and the log. What the second source for a certification pass is has not been decided."
+    },
+    {
+      "anchor": "rename-orphans-prose",
+      "id": "rename-forwarding-mechanism",
+      "page": "traps",
+      "summary": "A registry name that changes in the data file orphans every prose mention of the old one. The discipline is to fix names before they land; whether the corpus also keeps a forwarding mechanism, and what it would be, is undecided."
     }
   ],
   "pages": {
+    "accuracy-ledger": {
+      "anchors": {
+        "ahc-zpr": "Zero-point renormalization and gap temperature slopes",
+        "composition": "How ledger values reach the residual budget",
+        "curated-coefficients": "Per-material curated coefficients",
+        "design-grade": "Design-grade",
+        "elastic-coefficients": "Elastic constants",
+        "high-field-coefficients": "High-field coefficients",
+        "iii-n-electronic": "III-nitride electronic baseline",
+        "kappa-battery": "Thermal-conductivity battery",
+        "monoclinic-frames": "Monoclinic frame guard",
+        "mvp-targets": "MVP design-grade targets",
+        "observable-counts": "Two counts, two terms",
+        "observable-regimes": "Per-observable accuracy regimes",
+        "polarization-bowing": "Alloy polarization bowing",
+        "polarization-coefficients": "Polarization, piezoelectric and Born coefficients",
+        "residue": "Residue",
+        "seed-provenance": "What the seeded values rest on",
+        "transport-coefficients": "Carrier transport coefficients",
+        "what-this-is": "What this ledger is"
+      },
+      "depends_on": [
+        "cert-obligations",
+        "compose-time-pipeline",
+        "coupling-structure",
+        "multiscale-state",
+        "out-of-scope",
+        "reference-battery",
+        "residual-definitions",
+        "traps",
+        "typeclass-alphabet"
+      ],
+      "journal": "oracle",
+      "library": "physics",
+      "owns": [
+        "per-observable accuracy regime",
+        "design-grade",
+        "ledger-tracked observable counts",
+        "MVP design-grade targets",
+        "curated coefficient seed",
+        "monoclinic frame guard",
+        "polarization sign guards",
+        "seeded-value provenance status",
+        "accuracy residue"
+      ],
+      "path": "journals/oracle/accuracy/accuracy-ledger.md",
+      "referenced_by": [
+        "cert-obligations",
+        "conventions",
+        "coupling-structure",
+        "forced-decisions",
+        "glossary",
+        "mvp-system",
+        "named-formulas",
+        "out-of-scope",
+        "product",
+        "reference-battery",
+        "residual-definitions",
+        "residual-loss-design",
+        "residual-machinery",
+        "traps",
+        "typed-compositions"
+      ],
+      "section": "accuracy",
+      "title": "Per-observable accuracy ledger"
+    },
     "agent-contract": {
       "anchors": {
         "citing": "Citing",
@@ -28,9 +382,2051 @@
         "vocabulary rule"
       ],
       "path": "journals/practice/agent-contract.md",
-      "referenced_by": [],
+      "referenced_by": [
+        "canonical-vocabularies",
+        "conventions",
+        "formula-registry",
+        "glossary",
+        "library-landscape",
+        "traps"
+      ],
       "section": null,
       "title": "Agent contract"
+    },
+    "applicability-classifiers": {
+      "anchors": {
+        "example-predicates": "Standard predicates",
+        "polar-predicate-split": "The two polar predicates",
+        "predicate-storage": "How a predicate is stored",
+        "swept-environment-windows": "Swept-environment validity windows",
+        "the-predicate-contract": "The predicate contract",
+        "trap-density-gates": "What gates trap density and subthreshold swing",
+        "v1-commitment": "The V1 commitment"
+      },
+      "depends_on": [
+        "cert-obligations",
+        "coupling-structure",
+        "multiscale-state",
+        "pino-bridge",
+        "representation-substrate",
+        "traps",
+        "typeclass-alphabet"
+      ],
+      "journal": "oracle",
+      "library": "physics",
+      "owns": [
+        "applicability predicate contract",
+        "polar predicate split",
+        "swept-environment validity windows",
+        "applicability predicate storage",
+        "always-true applicability stubs"
+      ],
+      "path": "journals/oracle/certification/applicability-classifiers.md",
+      "referenced_by": [
+        "capability-slices",
+        "compose-time-pipeline",
+        "coupling-structure",
+        "crystal-inputs",
+        "formula-registry",
+        "glossary",
+        "mvp-system",
+        "named-formulas",
+        "physics-graph",
+        "product",
+        "reference-battery",
+        "representation-substrate",
+        "residual-loss-design",
+        "traps"
+      ],
+      "section": "certification",
+      "title": "Applicability classifiers"
+    },
+    "architectural-principles": {
+      "anchors": {
+        "cert-first-class": "Certification is first-class",
+        "composition-over-duplication": "Composition over duplication",
+        "loud-then-absent": "Loud at compose time, absent at runtime",
+        "minimum-primitives": "Minimum primitives",
+        "no-runtime-symbolics": "No symbolic computation on the runtime path",
+        "numerics-agnostic": "Numerics-agnostic at the seam, committed within",
+        "one-pipeline": "One compile pipeline over one substrate",
+        "typed-everything": "Typed everything"
+      },
+      "depends_on": [
+        "canonical-vocabularies",
+        "cert-obligations",
+        "compose-time-pipeline",
+        "product",
+        "representation-substrate"
+      ],
+      "journal": "n-op",
+      "library": null,
+      "owns": [
+        "one compile pipeline over one substrate",
+        "minimum primitives",
+        "runtime symbolic exclusion",
+        "typed signatures principle",
+        "composition over duplication",
+        "loud at compose time absent at runtime",
+        "certification is first-class",
+        "numerics-agnostic seam"
+      ],
+      "path": "journals/n-op/purpose/architectural-principles.md",
+      "referenced_by": [
+        "library-landscape",
+        "product",
+        "purpose-and-scope"
+      ],
+      "section": "purpose",
+      "title": "Architectural principles"
+    },
+    "born-oppenheimer-levels": {
+      "anchors": {
+        "dressing-tiers": "Dressing tiers",
+        "hierarchy": "The four levels",
+        "kinetics-irreducible-state": "The irreducible state of the non-equilibrium-kinetics level"
+      },
+      "depends_on": [
+        "capability-slices",
+        "compose-time-pipeline",
+        "formula-registry",
+        "multiscale-state",
+        "physics-graph",
+        "residual-definitions",
+        "residual-machinery",
+        "unified-state"
+      ],
+      "journal": "oracle",
+      "library": "physics",
+      "owns": [
+        "four-level Born-Oppenheimer hierarchy",
+        "regime as a view across levels",
+        "dressing tiers",
+        "dressing-staleness bound"
+      ],
+      "path": "journals/oracle/state/born-oppenheimer-levels.md",
+      "referenced_by": [
+        "capability-slices",
+        "compose-time-pipeline",
+        "forced-decisions",
+        "generic-dynamics",
+        "glossary",
+        "multiscale-state",
+        "observable-bundles",
+        "physics-graph",
+        "residual-machinery",
+        "unified-state"
+      ],
+      "section": "state",
+      "title": "The four Born–Oppenheimer levels"
+    },
+    "boundary": {
+      "anchors": {
+        "ownership": "What it owns",
+        "stub": "What is not designed",
+        "what-it-is": "What the loops library is"
+      },
+      "depends_on": [
+        "learnable-structure-contract",
+        "library-landscape",
+        "pino-bridge",
+        "purpose-and-scope",
+        "residual-loss-design",
+        "training-stages"
+      ],
+      "journal": "interface",
+      "library": "interface",
+      "owns": [
+        "driver responsibilities",
+        "gradient sink selection"
+      ],
+      "path": "journals/interface/boundary.md",
+      "referenced_by": [
+        "learnable-structure-contract",
+        "library-landscape",
+        "purpose-and-scope",
+        "residual-loss-design",
+        "training-stages"
+      ],
+      "section": null,
+      "title": "What the loops library owns"
+    },
+    "build-sequence": {
+      "anchors": {
+        "exit-criterion": "The MVP exit criterion",
+        "language-neutrality": "The phases are language-neutral",
+        "mvp-column": "How to read the MVP column",
+        "phases": "The phases"
+      },
+      "depends_on": [
+        "build-verification",
+        "canonical-vocabularies",
+        "capability-slices",
+        "cert-obligations",
+        "coupling-structure",
+        "crystal-inputs",
+        "forced-decisions",
+        "generic-dynamics",
+        "library-landscape",
+        "named-formulas",
+        "pino-bridge",
+        "reference-battery",
+        "residual-definitions",
+        "unified-state"
+      ],
+      "journal": "n-op",
+      "library": null,
+      "owns": [
+        "build phases",
+        "build language neutrality",
+        "applicability decidability gate",
+        "invariant synthesis attachment",
+        "MVP build column",
+        "MVP exit criterion"
+      ],
+      "path": "journals/n-op/build/build-sequence.md",
+      "referenced_by": [
+        "build-verification",
+        "generic-dynamics",
+        "named-formulas",
+        "purpose-and-scope"
+      ],
+      "section": "build",
+      "title": "Build sequence"
+    },
+    "build-verification": {
+      "anchors": {
+        "curriculum": "Gate 3 — curriculum sanity",
+        "first-end-to-end-gate": "The first end-to-end gate",
+        "gates": "The five runtime gates",
+        "obligations": "Gate 4 — cross-regime obligations fire",
+        "registration": "Gate 1 — registration sanity",
+        "seam-smoke-test": "Gate 5 — operator seam smoke test",
+        "static-consistency": "Internal consistency, checked statically",
+        "worked-example": "Gate 2 — end-to-end worked example"
+      },
+      "depends_on": [
+        "build-sequence",
+        "canonical-vocabularies",
+        "capability-slices",
+        "cert-obligations",
+        "compose-time-pipeline",
+        "generic-dynamics",
+        "named-formulas",
+        "pino-bridge",
+        "reference-battery",
+        "residual-definitions",
+        "residual-machinery",
+        "traps",
+        "typeclass-alphabet",
+        "typed-compositions"
+      ],
+      "journal": "n-op",
+      "library": null,
+      "owns": [
+        "static consistency set",
+        "runtime gate sequence",
+        "first end-to-end capability gate",
+        "registration gate",
+        "worked example gate",
+        "curriculum gate",
+        "obligation firing gate",
+        "seam smoke test"
+      ],
+      "path": "journals/n-op/build/build-verification.md",
+      "referenced_by": [
+        "build-sequence",
+        "capability-slices",
+        "computational-methods",
+        "named-formulas"
+      ],
+      "section": "build",
+      "title": "Verification"
+    },
+    "canonical-vocabularies": {
+      "anchors": {
+        "atomic-species": "Atomic species",
+        "scope": "What these vocabularies do not decide",
+        "theory-context": "The ten vocabularies",
+        "versioning": "Adding a member is a version bump"
+      },
+      "depends_on": [
+        "agent-contract",
+        "cert-obligations",
+        "coupling-structure",
+        "formula-registry",
+        "multiscale-state",
+        "property-templates",
+        "purpose-and-scope",
+        "representation-substrate"
+      ],
+      "journal": "oracle",
+      "library": "physics",
+      "owns": [
+        "theory-context vocabularies",
+        "atomic species universe",
+        "closed-vocabulary versioning"
+      ],
+      "path": "journals/oracle/registry/canonical-vocabularies.md",
+      "referenced_by": [
+        "architectural-principles",
+        "build-sequence",
+        "build-verification",
+        "capability-slices",
+        "compose-time-pipeline",
+        "coupling-structure",
+        "gamma-hat",
+        "glossary",
+        "multiscale-state",
+        "physics-graph",
+        "product",
+        "purpose-and-scope",
+        "representation-substrate",
+        "residual-definitions",
+        "traps"
+      ],
+      "section": "registry",
+      "title": "Theory-context vocabularies"
+    },
+    "capability-slices": {
+      "anchors": {
+        "carrier-diffusion": "Electron-cloud diffusion",
+        "heat-diffusion": "Heat diffusion",
+        "selection-discipline": "Selection discipline",
+        "structure-prediction": "Crystal-structure prediction",
+        "totals": "What the three slices add up to"
+      },
+      "depends_on": [
+        "applicability-classifiers",
+        "born-oppenheimer-levels",
+        "build-verification",
+        "canonical-vocabularies",
+        "cert-obligations",
+        "cross-cutting-rules",
+        "forced-decisions",
+        "generic-dynamics",
+        "mvp-system",
+        "named-formulas",
+        "out-of-scope",
+        "residual-definitions",
+        "unified-state"
+      ],
+      "journal": "n-op",
+      "library": null,
+      "owns": [
+        "capability selection discipline",
+        "crystal-structure prediction slice",
+        "carrier diffusion slice",
+        "heat diffusion slice",
+        "MVP vocabulary totals",
+        "MVP buildable fraction"
+      ],
+      "path": "journals/n-op/build/capability-slices.md",
+      "referenced_by": [
+        "born-oppenheimer-levels",
+        "build-sequence",
+        "build-verification",
+        "forced-decisions",
+        "mvp-system",
+        "purpose-and-scope"
+      ],
+      "section": "build",
+      "title": "The three capability slices"
+    },
+    "cert-obligations": {
+      "anchors": {
+        "certificate-artifact": "The certificate artifact",
+        "composition-refusals": "Composition-validity refusals",
+        "coupling-derived-checks": "Coupling-derived checks",
+        "evidence-aggregation": "Evidence aggregation",
+        "reference-cache": "The reference cache",
+        "the-ten-obligations": "The ten obligations",
+        "tolerance-ledger": "Tolerance ledger"
+      },
+      "depends_on": [
+        "accuracy-ledger",
+        "compose-time-pipeline",
+        "conventions",
+        "coupling-structure",
+        "generic-dynamics",
+        "out-of-scope",
+        "reference-battery",
+        "representation-substrate",
+        "residual-definitions",
+        "residual-machinery",
+        "typeclass-alphabet"
+      ],
+      "journal": "oracle",
+      "library": "physics",
+      "owns": [
+        "the ten cert obligations",
+        "certificate artifact",
+        "cert evidence aggregation",
+        "tolerance ledger",
+        "composition-validity refusals",
+        "reference-cache backend"
+      ],
+      "path": "journals/oracle/certification/cert-obligations.md",
+      "referenced_by": [
+        "accuracy-ledger",
+        "applicability-classifiers",
+        "architectural-principles",
+        "build-sequence",
+        "build-verification",
+        "canonical-vocabularies",
+        "capability-slices",
+        "compose-time-pipeline",
+        "coupling-structure",
+        "glossary",
+        "named-formulas",
+        "out-of-scope",
+        "physics-graph",
+        "pino-bridge",
+        "product",
+        "property-templates",
+        "reference-battery",
+        "representation-substrate",
+        "residual-definitions",
+        "residual-machinery",
+        "topology-atlas",
+        "traps",
+        "typeclass-alphabet",
+        "typed-compositions"
+      ],
+      "section": "certification",
+      "title": "Cert obligations"
+    },
+    "compose-time-pipeline": {
+      "anchors": {
+        "algebraic-simplification": "Algebraic simplification",
+        "always-cheap": "The always-cheap discipline",
+        "boundary": "The compose-time and runtime boundary",
+        "invariant-synthesis": "Invariant synthesis",
+        "lowering-and-adjoint-synthesis": "Lowering and adjoint synthesis",
+        "rewrite-admission": "The rewrite-admission rule",
+        "runtime-kernel-application": "Runtime kernel application",
+        "symbolic-lift": "Symbolic lift",
+        "symmetry-quotient": "Symmetry quotient"
+      },
+      "depends_on": [
+        "applicability-classifiers",
+        "born-oppenheimer-levels",
+        "canonical-vocabularies",
+        "cert-obligations",
+        "computational-methods",
+        "coupling-structure",
+        "crystal-inputs",
+        "gamma-hat",
+        "generic-dynamics",
+        "named-formulas",
+        "observable-bundles",
+        "physics-graph",
+        "pino-bridge",
+        "property-templates",
+        "representation-substrate",
+        "residual-definitions",
+        "residual-machinery",
+        "topology-atlas",
+        "traps",
+        "unified-state"
+      ],
+      "journal": "oracle",
+      "library": "physics",
+      "owns": [
+        "compose-time pipeline stages",
+        "always-cheap discipline",
+        "stage boundaries",
+        "rewrite admission rule",
+        "compression plan selection",
+        "adjoint synthesis and tape scheduling",
+        "runtime cost classes"
+      ],
+      "path": "journals/oracle/compilation/compose-time-pipeline.md",
+      "referenced_by": [
+        "accuracy-ledger",
+        "architectural-principles",
+        "born-oppenheimer-levels",
+        "build-verification",
+        "cert-obligations",
+        "computational-methods",
+        "coupling-structure",
+        "crystal-inputs",
+        "forced-decisions",
+        "gamma-hat",
+        "glossary",
+        "learnable-structure-contract",
+        "multiscale-state",
+        "named-formulas",
+        "physics-graph",
+        "pino-bridge",
+        "product",
+        "representation-substrate",
+        "residual-definitions",
+        "residual-machinery",
+        "topology-atlas",
+        "traps"
+      ],
+      "section": "compilation",
+      "title": "The compose-time pipeline"
+    },
+    "computational-methods": {
+      "anchors": {
+        "argument-types": "The argument types are not defined",
+        "signatures": "The typed signatures",
+        "sub-methods": "Sub-methods",
+        "the-alphabet": "The alphabet"
+      },
+      "depends_on": [
+        "build-verification",
+        "compose-time-pipeline",
+        "named-formulas",
+        "property-templates",
+        "typeclass-alphabet"
+      ],
+      "journal": "oracle",
+      "library": "physics",
+      "owns": [
+        "the twelve computational methods",
+        "method signatures",
+        "sub-method registration",
+        "method argument types"
+      ],
+      "path": "journals/oracle/registry/computational-methods.md",
+      "referenced_by": [
+        "compose-time-pipeline",
+        "named-formulas",
+        "physics-graph",
+        "property-templates",
+        "typeclass-alphabet",
+        "typed-compositions"
+      ],
+      "section": "registry",
+      "title": "Computational methods"
+    },
+    "conventions": {
+      "anchors": {
+        "artifacts": "Data files and generated files",
+        "counts": "Count phrasing",
+        "scope": "What is left here",
+        "style": "Style",
+        "verdicts": "What a result has to show"
+      },
+      "depends_on": [
+        "accuracy-ledger",
+        "agent-contract",
+        "traps"
+      ],
+      "journal": "practice",
+      "library": null,
+      "owns": [
+        "page style",
+        "count phrasing",
+        "verdict discipline",
+        "data and generated files"
+      ],
+      "path": "journals/practice/conventions.md",
+      "referenced_by": [
+        "cert-obligations",
+        "glossary",
+        "mvp-system",
+        "traps"
+      ],
+      "section": null,
+      "title": "Writing conventions"
+    },
+    "coupling-structure": {
+      "anchors": {
+        "cert-hooks": "Cert hooks",
+        "channel-record": "The parameter axes",
+        "composition": "Composition",
+        "couplingspec": "The CouplingSpec record",
+        "coverage-policy": "Coverage policy",
+        "form-vs-values": "Symmetry generates the form; provenance supplies the values",
+        "generator-contract": "The generator contract",
+        "generator-cost": "Emptiness and cost",
+        "invariant-generator": "The invariant generator",
+        "kernel-ext": "Extension types",
+        "mechanism-range-table": "Mechanism range and polynomial sufficiency",
+        "mvp-theory-context": "The MVP default theory context",
+        "polarization-pairing-guard": "The polarization-reference pairing guard",
+        "provenance-contract": "The coefficient-provenance contract",
+        "psd-closure": "PSD closure for friction channels",
+        "registration": "Registration discipline",
+        "slope-kind-guard": "The slope-kind double-count guard",
+        "target-shapes": "The object and its three target shapes",
+        "theory-context-placement": "TheoryContext placement",
+        "worked-example": "Worked example — diamond electron-phonon"
+      },
+      "depends_on": [
+        "accuracy-ledger",
+        "applicability-classifiers",
+        "canonical-vocabularies",
+        "cert-obligations",
+        "compose-time-pipeline",
+        "crystal-inputs",
+        "generic-dynamics",
+        "learned-corrections",
+        "named-formulas",
+        "physics-graph",
+        "representation-substrate",
+        "residual-machinery",
+        "unified-state"
+      ],
+      "journal": "oracle",
+      "library": "physics",
+      "owns": [
+        "coupling target shapes",
+        "CouplingChannel record",
+        "invariant-generator routine",
+        "polynomial-sufficiency flag",
+        "CoverageBound record",
+        "coupling coverage policy",
+        "CouplingSpec record",
+        "KernelExt extension family",
+        "TheoryContext placement",
+        "coefficient-provenance contract",
+        "PSD closure assumptions"
+      ],
+      "path": "journals/oracle/laws/coupling-structure.md",
+      "referenced_by": [
+        "accuracy-ledger",
+        "applicability-classifiers",
+        "build-sequence",
+        "canonical-vocabularies",
+        "cert-obligations",
+        "compose-time-pipeline",
+        "generic-dynamics",
+        "glossary",
+        "multiscale-state",
+        "out-of-scope",
+        "physics-graph",
+        "reference-battery",
+        "representation-substrate",
+        "residual-definitions",
+        "residual-machinery",
+        "traps"
+      ],
+      "section": "laws",
+      "title": "Coupling structure"
+    },
+    "crystal-inputs": {
+      "anchors": {
+        "crystal-type": "The Crystal type",
+        "environment": "The environment record",
+        "not-inputs": "What is not an input",
+        "periodicity-structure": "The periodicity structure",
+        "site-decoration": "The site decoration",
+        "structural-swept": "Structural fields and swept fields",
+        "top-level-inputs": "The three inputs"
+      },
+      "depends_on": [
+        "applicability-classifiers",
+        "compose-time-pipeline",
+        "multiscale-state",
+        "product",
+        "unified-state"
+      ],
+      "journal": "oracle",
+      "library": "physics",
+      "owns": [
+        "top-level inputs",
+        "periodicity structure",
+        "site decoration",
+        "Environment record schema",
+        "structural and swept Environment partition"
+      ],
+      "path": "journals/oracle/state/crystal-inputs.md",
+      "referenced_by": [
+        "build-sequence",
+        "compose-time-pipeline",
+        "coupling-structure",
+        "gamma-hat",
+        "learnable-structure-contract",
+        "multiscale-state",
+        "physics-graph",
+        "pino-bridge",
+        "product",
+        "reference-battery",
+        "residual-definitions",
+        "residual-machinery"
+      ],
+      "section": "state",
+      "title": "Crystal inputs"
+    },
+    "forced-decisions": {
+      "anchors": {
+        "implementation-language": "The implementation language",
+        "substrate-data": "What the substrate level must expose",
+        "tb-warm-start": "Tight binding as a warm start"
+      },
+      "depends_on": [
+        "accuracy-ledger",
+        "born-oppenheimer-levels",
+        "capability-slices",
+        "compose-time-pipeline",
+        "reference-battery",
+        "representation-substrate",
+        "residual-definitions"
+      ],
+      "journal": "n-op",
+      "library": null,
+      "owns": [
+        "polyglot implementation shape",
+        "implementation role requirements",
+        "tight-binding warm start",
+        "one-shot-dressing substrate requirement"
+      ],
+      "path": "journals/n-op/build/forced-decisions.md",
+      "referenced_by": [
+        "build-sequence",
+        "capability-slices",
+        "gamma-hat",
+        "physics-graph",
+        "typeclass-alphabet"
+      ],
+      "section": "build",
+      "title": "Decisions this slice forces"
+    },
+    "formula-registry": {
+      "anchors": {
+        "counts": "Counts belong to the table",
+        "fields": "The fields",
+        "harvest": "Where a field's vocabulary lives",
+        "manifest": "What the manifest is",
+        "provenance": "The provenance vocabulary"
+      },
+      "depends_on": [
+        "agent-contract",
+        "applicability-classifiers",
+        "named-formulas",
+        "observable-bundles",
+        "topology-atlas"
+      ],
+      "journal": "oracle",
+      "library": "physics",
+      "owns": [
+        "manifest field schema",
+        "research-stream provenance vocabulary",
+        "column-vocabulary harvest rule",
+        "registry count discipline"
+      ],
+      "path": "journals/oracle/registry/formula-registry.md",
+      "referenced_by": [
+        "born-oppenheimer-levels",
+        "canonical-vocabularies",
+        "multiscale-state",
+        "named-formulas",
+        "observable-bundles",
+        "properties"
+      ],
+      "section": "registry",
+      "title": "The registry manifest"
+    },
+    "gamma-hat": {
+      "anchors": {
+        "encoding-vocabulary": "The encoding vocabulary",
+        "identity-is-exact": "Node identity is exact",
+        "lowering-internals": "Strategies that are lowering internals",
+        "mvp-budget": "The memory budget at MVP scale",
+        "read-write-paths": "Read path and write path",
+        "scorer-only": "Scorer-only — the density matrix never evolves here"
+      },
+      "depends_on": [
+        "canonical-vocabularies",
+        "compose-time-pipeline",
+        "crystal-inputs",
+        "forced-decisions",
+        "generic-dynamics",
+        "library-landscape",
+        "physics-graph",
+        "pino-bridge",
+        "representation-substrate",
+        "residual-definitions",
+        "unified-state"
+      ],
+      "journal": "oracle",
+      "library": "physics",
+      "owns": [
+        "density-matrix encoding vocabulary",
+        "density-matrix compression plan space",
+        "density-matrix scorer-only boundary",
+        "density-matrix read and write paths",
+        "density-matrix node identity",
+        "density-matrix memory budget at MVP scale"
+      ],
+      "path": "journals/oracle/state/gamma-hat.md",
+      "referenced_by": [
+        "compose-time-pipeline",
+        "physics-graph",
+        "residual-definitions"
+      ],
+      "section": "state",
+      "title": "The one-body density matrix as a lowering choice"
+    },
+    "generic-dynamics": {
+      "anchors": {
+        "extraction-principle": "Every regime is an extraction",
+        "functionals": "The energy and entropy functionals",
+        "gauge-partition": "Gauge fixing and the electrostatic partition",
+        "generic-form": "The two-generator form",
+        "jacobi-status": "Jacobi status per Poisson block",
+        "level-conditional-activation": "Energy activation is level-conditional",
+        "nine-regimes": "The nine regimes as extractions",
+        "operators": "The Poisson and friction operators",
+        "per-tier-generators": "Generator structure is per tier"
+      },
+      "depends_on": [
+        "born-oppenheimer-levels",
+        "build-sequence",
+        "coupling-structure",
+        "multiscale-state",
+        "residual-definitions",
+        "typed-compositions",
+        "unified-state"
+      ],
+      "journal": "oracle",
+      "library": "physics",
+      "owns": [
+        "the two-generator equation of motion",
+        "regimes as extractions",
+        "energy and entropy functionals",
+        "Poisson and friction operator blocks",
+        "per-tier generator structure",
+        "gauge fixing and the electrostatic partition"
+      ],
+      "path": "journals/oracle/laws/generic-dynamics.md",
+      "referenced_by": [
+        "build-sequence",
+        "build-verification",
+        "capability-slices",
+        "cert-obligations",
+        "compose-time-pipeline",
+        "coupling-structure",
+        "gamma-hat",
+        "glossary",
+        "multiscale-state",
+        "physics-graph",
+        "purpose-and-scope",
+        "representation-substrate",
+        "residual-definitions",
+        "traps",
+        "unified-state"
+      ],
+      "section": "laws",
+      "title": "Dynamics — the GENERIC form"
+    },
+    "glossary": {
+      "anchors": {
+        "overloaded": "Tokens that need a qualifier",
+        "vocabulary": "Where a name is specified",
+        "what-this-is": "An index, not a second definition"
+      },
+      "depends_on": [
+        "accuracy-ledger",
+        "agent-contract",
+        "applicability-classifiers",
+        "born-oppenheimer-levels",
+        "canonical-vocabularies",
+        "cert-obligations",
+        "compose-time-pipeline",
+        "conventions",
+        "coupling-structure",
+        "generic-dynamics",
+        "multiscale-state",
+        "named-formulas",
+        "physics-graph",
+        "pino-bridge",
+        "representation-substrate",
+        "residual-definitions",
+        "residual-machinery",
+        "topology-atlas",
+        "traps",
+        "unified-state"
+      ],
+      "journal": "practice",
+      "library": null,
+      "owns": [
+        "implementation-vocabulary index",
+        "overloaded-token register"
+      ],
+      "path": "journals/practice/glossary.md",
+      "referenced_by": [
+        "traps"
+      ],
+      "section": null,
+      "title": "Glossary"
+    },
+    "learnable-structure-contract": {
+      "anchors": {
+        "batch-axis": "Batch axis",
+        "conditioning-inputs": "Conditioning inputs",
+        "content-addressable-identity": "Content-addressable identity",
+        "evaluate-at-points": "Evaluate at points",
+        "loop-agnostic": "Loop-agnostic, by the two-loop symmetry",
+        "loop-drivability": "Loop-drivability",
+        "optional-offers": "Optional offers",
+        "out-of-scope": "What the oracle does not ask about",
+        "scope": "What this contract fixes",
+        "seam-purity": "Seam purity and determinism",
+        "state-emission": "Emit the state in the oracle's type",
+        "vector-jacobian-product": "Vector–Jacobian product at the state boundary",
+        "why-an-operator": "Why an operator"
+      },
+      "depends_on": [
+        "boundary",
+        "compose-time-pipeline",
+        "crystal-inputs",
+        "multiscale-state",
+        "pino-bridge",
+        "purpose-and-scope",
+        "representation-substrate",
+        "residual-definitions",
+        "training-stages",
+        "unified-state"
+      ],
+      "journal": "operator",
+      "library": "informed-operator",
+      "owns": [
+        "operator-oracle seam obligations",
+        "state emission obligations",
+        "two-loop symmetry",
+        "operator architecture motivation",
+        "seam exclusions"
+      ],
+      "path": "journals/operator/seam/learnable-structure-contract.md",
+      "referenced_by": [
+        "boundary",
+        "residual-loss-design",
+        "training-stages"
+      ],
+      "section": "seam",
+      "title": "The learnable-structure contract"
+    },
+    "library-landscape": {
+      "anchors": {
+        "cli-placement": "The command line ships inside the oracle library",
+        "engineering": "Engineering aspects are oracle-library work",
+        "interface": "The interface library",
+        "operator": "The operator library",
+        "oracle-exclusions": "What may not enter the oracle library",
+        "partition": "What this page is for"
+      },
+      "depends_on": [
+        "agent-contract",
+        "architectural-principles",
+        "boundary",
+        "product",
+        "purpose-and-scope",
+        "representation-substrate",
+        "unified-state"
+      ],
+      "journal": "n-op",
+      "library": null,
+      "owns": [
+        "library boundary rules",
+        "oracle runtime exclusions",
+        "command-line placement",
+        "engineering scope placement",
+        "operator library remit",
+        "interface library remit"
+      ],
+      "path": "journals/n-op/purpose/library-landscape.md",
+      "referenced_by": [
+        "boundary",
+        "build-sequence",
+        "gamma-hat",
+        "product",
+        "purpose-and-scope"
+      ],
+      "section": "purpose",
+      "title": "Library boundaries"
+    },
+    "multiscale-state": {
+      "anchors": {
+        "adiabatic-driving": "The adiabatic driving contract",
+        "defect-species": "The defect-species universe",
+        "device-mesh": "The device mesh",
+        "emergence-axiom": "The refined emergence axiom",
+        "eom-continuum": "The continuum residual",
+        "eom-defect-population": "The defect-population residual",
+        "homogenisation-map": "The homogenisation map",
+        "macro-state-schema": "The macro field set",
+        "moment-closures": "Moment closures",
+        "residual-contract": "The unified three-tier residual contract",
+        "slow-kinetics": "Slow-kinetic formulas",
+        "slow-state-schema": "The slow-state schema",
+        "three-tiers": "The three tiers"
+      },
+      "depends_on": [
+        "born-oppenheimer-levels",
+        "canonical-vocabularies",
+        "compose-time-pipeline",
+        "coupling-structure",
+        "crystal-inputs",
+        "formula-registry",
+        "generic-dynamics",
+        "out-of-scope",
+        "pino-bridge",
+        "representation-substrate",
+        "residual-definitions",
+        "unified-state"
+      ],
+      "journal": "oracle",
+      "library": "physics",
+      "owns": [
+        "three-tier state stratification",
+        "the refined emergence axiom",
+        "defect-species universe",
+        "slow configurational state schema",
+        "slow-kinetic formula set",
+        "adiabatic driving contract",
+        "device-mesh universe",
+        "macro continuum-field state schema",
+        "moment closures for electron temperature and current density",
+        "the micro-to-macro homogenisation map",
+        "the defect-population and continuum residual categories",
+        "the unified three-tier residual contract"
+      ],
+      "path": "journals/oracle/state/multiscale-state.md",
+      "referenced_by": [
+        "accuracy-ledger",
+        "applicability-classifiers",
+        "born-oppenheimer-levels",
+        "canonical-vocabularies",
+        "crystal-inputs",
+        "generic-dynamics",
+        "glossary",
+        "learnable-structure-contract",
+        "mvp-system",
+        "named-formulas",
+        "observable-bundles",
+        "out-of-scope",
+        "residual-definitions",
+        "traps",
+        "unified-state"
+      ],
+      "section": "state",
+      "title": "Multiscale state — the slow and macro tiers"
+    },
+    "mvp-system": {
+      "anchors": {
+        "consequences": "What each anchor forces",
+        "high-t-failure": "High-temperature failure",
+        "the-cell": "The cell"
+      },
+      "depends_on": [
+        "accuracy-ledger",
+        "applicability-classifiers",
+        "capability-slices",
+        "conventions",
+        "multiscale-state",
+        "named-formulas",
+        "purpose-and-scope",
+        "reference-battery"
+      ],
+      "journal": "n-op",
+      "library": null,
+      "owns": [
+        "diamond primitive cell",
+        "MVP anchor consequences",
+        "diamond high-temperature failure mode"
+      ],
+      "path": "journals/n-op/build/mvp-system.md",
+      "referenced_by": [
+        "capability-slices",
+        "purpose-and-scope",
+        "traps"
+      ],
+      "section": "build",
+      "title": "The MVP system"
+    },
+    "named-formulas": {
+      "anchors": {
+        "anchor-class": "Anchor class",
+        "applicability-decidability": "Applicability is decidable",
+        "corrected-forms": "Canonical forms",
+        "cost-tiers": "Evaluation cost",
+        "diff-tags": "How a consumer obtains a gradient",
+        "formula-record": "The formula record",
+        "mixed-outputs": "Rows with mixed outputs",
+        "no-inline-math": "No inline mathematics",
+        "row-bands": "What the row bands hold",
+        "the-registry": "What the registry is"
+      },
+      "depends_on": [
+        "accuracy-ledger",
+        "applicability-classifiers",
+        "build-sequence",
+        "build-verification",
+        "cert-obligations",
+        "compose-time-pipeline",
+        "computational-methods",
+        "cross-cutting-rules",
+        "formula-registry",
+        "multiscale-state",
+        "observable-bundles",
+        "residual-machinery",
+        "topology-atlas",
+        "typeclass-alphabet"
+      ],
+      "journal": "oracle",
+      "library": "physics",
+      "owns": [
+        "formula record schema",
+        "differentiability vocabulary",
+        "evaluation cost vocabulary",
+        "no-inline-math rule",
+        "anchor class",
+        "consistency pair",
+        "formula row bands",
+        "applicability decidability",
+        "corrected canonical forms"
+      ],
+      "path": "journals/oracle/registry/named-formulas.md",
+      "referenced_by": [
+        "build-sequence",
+        "build-verification",
+        "capability-slices",
+        "compose-time-pipeline",
+        "computational-methods",
+        "coupling-structure",
+        "formula-registry",
+        "glossary",
+        "mvp-system",
+        "observable-bundles",
+        "physics-graph",
+        "property-templates",
+        "residual-loss-design",
+        "residual-machinery",
+        "traps",
+        "typeclass-alphabet",
+        "typed-compositions"
+      ],
+      "section": "registry",
+      "title": "Named formulas"
+    },
+    "observable-bundles": {
+      "anchors": {
+        "contents": "What each bundle holds",
+        "linear-response-primitives": "Rows that feed several bundles",
+        "the-eleven": "The eleven bundles"
+      },
+      "depends_on": [
+        "born-oppenheimer-levels",
+        "formula-registry",
+        "multiscale-state",
+        "named-formulas",
+        "residual-definitions"
+      ],
+      "journal": "oracle",
+      "library": "physics",
+      "owns": [
+        "the eleven observable bundles",
+        "bundle contents",
+        "linear-response primitives"
+      ],
+      "path": "journals/oracle/registry/observable-bundles.md",
+      "referenced_by": [
+        "compose-time-pipeline",
+        "formula-registry",
+        "named-formulas",
+        "physics-graph",
+        "properties"
+      ],
+      "section": "registry",
+      "title": "Observable bundles"
+    },
+    "out-of-scope": {
+      "anchors": {
+        "exclusions": "What the oracle library does not model",
+        "refusal-mechanism": "How a refusal is raised"
+      },
+      "depends_on": [
+        "accuracy-ledger",
+        "cert-obligations",
+        "coupling-structure",
+        "multiscale-state",
+        "purpose-and-scope",
+        "traps"
+      ],
+      "journal": "oracle",
+      "library": "physics",
+      "owns": [
+        "scope exclusions",
+        "out-of-scope refusal mechanism"
+      ],
+      "path": "journals/oracle/certification/out-of-scope.md",
+      "referenced_by": [
+        "accuracy-ledger",
+        "capability-slices",
+        "cert-obligations",
+        "multiscale-state",
+        "traps"
+      ],
+      "section": "certification",
+      "title": "Out of scope"
+    },
+    "physics-graph": {
+      "anchors": {
+        "acyclic": "Acyclic, and why that word is load-bearing",
+        "node": "Anatomy of a node",
+        "node-kinds": "The three node kinds",
+        "output-role": "Output role",
+        "representation": "The arena representation",
+        "sidecars": "Per-stage sidecars",
+        "the-graph": "The one data structure",
+        "vocabulary-realization": "The graph is every other vocabulary",
+        "why-one-structure": "Why it is the data structure"
+      },
+      "depends_on": [
+        "applicability-classifiers",
+        "born-oppenheimer-levels",
+        "canonical-vocabularies",
+        "cert-obligations",
+        "compose-time-pipeline",
+        "computational-methods",
+        "coupling-structure",
+        "crystal-inputs",
+        "forced-decisions",
+        "gamma-hat",
+        "generic-dynamics",
+        "named-formulas",
+        "observable-bundles",
+        "pino-bridge",
+        "property-templates",
+        "representation-substrate",
+        "residual-definitions",
+        "topology-atlas",
+        "typeclass-alphabet",
+        "unified-state"
+      ],
+      "journal": "oracle",
+      "library": "physics",
+      "owns": [
+        "physics graph schema",
+        "graph node kinds and output roles",
+        "per-stage sidecars",
+        "graph realization of the closed vocabularies",
+        "arena and index graph representation",
+        "graph acyclicity guarantee"
+      ],
+      "path": "journals/oracle/compilation/physics-graph.md",
+      "referenced_by": [
+        "born-oppenheimer-levels",
+        "compose-time-pipeline",
+        "coupling-structure",
+        "gamma-hat",
+        "glossary",
+        "pino-bridge",
+        "representation-substrate",
+        "residual-definitions",
+        "residual-machinery",
+        "typeclass-alphabet"
+      ],
+      "section": "compilation",
+      "title": "The physics graph"
+    },
+    "pino-bridge": {
+      "anchors": {
+        "axis-coverage": "Axis coverage",
+        "import": "Import — external ground truth",
+        "not-exported": "What is not exported",
+        "surface": "The only surface",
+        "validate": "Validate — the differentiated residual surface"
+      },
+      "depends_on": [
+        "cert-obligations",
+        "compose-time-pipeline",
+        "crystal-inputs",
+        "physics-graph",
+        "residual-definitions",
+        "residual-machinery",
+        "unified-state"
+      ],
+      "journal": "oracle",
+      "library": "physics",
+      "owns": [
+        "the exported surface contract",
+        "Validate signature",
+        "Import signature",
+        "axis coverage of an imported datum"
+      ],
+      "path": "journals/oracle/seams/pino-bridge.md",
+      "referenced_by": [
+        "applicability-classifiers",
+        "boundary",
+        "build-sequence",
+        "build-verification",
+        "compose-time-pipeline",
+        "gamma-hat",
+        "glossary",
+        "learnable-structure-contract",
+        "multiscale-state",
+        "physics-graph",
+        "product",
+        "purpose-and-scope",
+        "representation-substrate",
+        "residual-loss-design",
+        "residual-machinery",
+        "topology-atlas",
+        "training-stages"
+      ],
+      "section": "seams",
+      "title": "The pino-bridge exports"
+    },
+    "product": {
+      "anchors": {
+        "behavioral-rules": "Three rules about files",
+        "call-contract": "The call",
+        "cli": "The command line",
+        "consumers": "Consumers",
+        "deployment-shape": "A compiler and its oracle-files",
+        "design-variable-boundary": "The design-variable boundary",
+        "environment-input": "Environment, per call",
+        "evidence-not-verdict": "Evidence, never verdicts",
+        "identity": "Identity",
+        "import-is-a-compiler-input": "Import is a compiler input",
+        "oracle-file-contents": "What an oracle-file contains",
+        "principles": "Principles",
+        "refusal-is-absence": "Refusal is absence",
+        "score-not-solve": "Score, not solve",
+        "selection": "Selection",
+        "state-input": "State, per call",
+        "static-schema": "The static slot schema",
+        "two-loops": "The two loops"
+      },
+      "depends_on": [
+        "accuracy-ledger",
+        "applicability-classifiers",
+        "architectural-principles",
+        "canonical-vocabularies",
+        "cert-obligations",
+        "compose-time-pipeline",
+        "crystal-inputs",
+        "library-landscape",
+        "pino-bridge",
+        "purpose-and-scope",
+        "representation-substrate",
+        "residual-definitions",
+        "unified-state"
+      ],
+      "journal": "n-op",
+      "library": null,
+      "owns": [
+        "product identity",
+        "evidence never verdicts",
+        "product consumers",
+        "product principles",
+        "score not solve",
+        "deployment shape",
+        "oracle-file contents",
+        "oracle-file rules",
+        "state input obligation",
+        "environment argument",
+        "static slot schema",
+        "refusal is absence",
+        "selection surfaces",
+        "import as compiler input",
+        "the two loops",
+        "design variable boundary",
+        "command-line verbs"
+      ],
+      "path": "journals/n-op/purpose/product.md",
+      "referenced_by": [
+        "architectural-principles",
+        "crystal-inputs",
+        "library-landscape",
+        "purpose-and-scope",
+        "representation-substrate"
+      ],
+      "section": "purpose",
+      "title": "The product"
+    },
+    "properties": {
+      "anchors": {
+        "bundle-map": "Category to bundle",
+        "catalogue": "The catalogue",
+        "categories": "The nine categories",
+        "scope-vs-inventory": "Scope, not inventory"
+      },
+      "depends_on": [
+        "formula-registry",
+        "observable-bundles",
+        "typed-compositions"
+      ],
+      "journal": "oracle",
+      "library": "physics",
+      "owns": [
+        "target property scope",
+        "property catalogue",
+        "property category to bundle map",
+        "scope versus inventory precedence"
+      ],
+      "path": "journals/oracle/registry/properties.md",
+      "referenced_by": [
+        "typed-compositions"
+      ],
+      "section": "registry",
+      "title": "Target properties"
+    },
+    "property-templates": {
+      "anchors": {
+        "discipline": "The collapse discipline",
+        "overlap-resolution": "Overlap resolution",
+        "signatures": "The typed signatures",
+        "what-a-template-is": "What a template is",
+        "what-each-produces": "What each template produces"
+      },
+      "depends_on": [
+        "cert-obligations",
+        "computational-methods",
+        "named-formulas",
+        "topology-atlas",
+        "typeclass-alphabet",
+        "typed-compositions"
+      ],
+      "journal": "oracle",
+      "library": "physics",
+      "owns": [
+        "template signatures",
+        "what each template produces",
+        "template collapse discipline",
+        "template overlap resolution"
+      ],
+      "path": "journals/oracle/registry/property-templates.md",
+      "referenced_by": [
+        "canonical-vocabularies",
+        "compose-time-pipeline",
+        "computational-methods",
+        "physics-graph",
+        "typeclass-alphabet",
+        "typed-compositions"
+      ],
+      "section": "registry",
+      "title": "Property templates"
+    },
+    "purpose-and-scope": {
+      "anchors": {
+        "downstream-target": "The downstream target",
+        "material-scope": "Material scope",
+        "mvp": "The minimum viable demonstration",
+        "mvp-discipline": "The MVP discipline",
+        "no-loops": "What the oracle library is not",
+        "oracle-remit": "What the oracle library does",
+        "spec-and-build": "Comprehensive spec, diamond-first build",
+        "what-n-op-is": "What n-Op is",
+        "why-a-grader": "Verifying is cheaper than solving"
+      },
+      "depends_on": [
+        "architectural-principles",
+        "boundary",
+        "build-sequence",
+        "canonical-vocabularies",
+        "capability-slices",
+        "generic-dynamics",
+        "library-landscape",
+        "mvp-system",
+        "pino-bridge",
+        "product",
+        "residual-definitions",
+        "unified-state"
+      ],
+      "journal": "n-op",
+      "library": null,
+      "owns": [
+        "program purpose",
+        "downstream device target",
+        "property-targeted crystal design goal",
+        "oracle library remit",
+        "oracle loop exclusion",
+        "verifying is cheaper than solving",
+        "minimum viable demonstration",
+        "MVP discipline",
+        "material scope",
+        "comprehensive spec diamond-first build"
+      ],
+      "path": "journals/n-op/purpose/purpose-and-scope.md",
+      "referenced_by": [
+        "boundary",
+        "canonical-vocabularies",
+        "learnable-structure-contract",
+        "library-landscape",
+        "mvp-system",
+        "out-of-scope",
+        "product"
+      ],
+      "section": "purpose",
+      "title": "Purpose and scope"
+    },
+    "reference-battery": {
+      "anchors": {
+        "boundaries": "What this is not",
+        "contents": "What the reference data holds",
+        "purpose": "Purpose",
+        "row-schema": "The row schema",
+        "wave-programme": "The remaining waves",
+        "why-csv": "Why CSV"
+      },
+      "depends_on": [
+        "accuracy-ledger",
+        "applicability-classifiers",
+        "cert-obligations",
+        "coupling-structure",
+        "crystal-inputs",
+        "traps"
+      ],
+      "journal": "oracle",
+      "library": "physics",
+      "owns": [
+        "reference-row schema",
+        "uncertainty encodings",
+        "reference-data contents",
+        "battery seeding waves",
+        "reference archive format"
+      ],
+      "path": "journals/oracle/accuracy/reference-battery.md",
+      "referenced_by": [
+        "accuracy-ledger",
+        "build-sequence",
+        "build-verification",
+        "cert-obligations",
+        "forced-decisions",
+        "mvp-system",
+        "traps"
+      ],
+      "section": "accuracy",
+      "title": "The reference battery"
+    },
+    "representation-substrate": {
+      "anchors": {
+        "clusters": "What each cluster is made of",
+        "contract": "A contract, not a container",
+        "estimate-dont-decide": "Estimate, don't decide",
+        "hot-paths": "Hot-path commitments",
+        "identity-exact": "Identity is exact; the error bar rides alongside",
+        "not-replaced": "What the substrate does not replace",
+        "op-signatures": "The op-signature family",
+        "primitives": "Substrate primitives",
+        "replaces": "What the substrate replaces",
+        "serialization": "The canonical serialization rule",
+        "versioning": "Versioning discipline"
+      },
+      "depends_on": [
+        "applicability-classifiers",
+        "canonical-vocabularies",
+        "cert-obligations",
+        "compose-time-pipeline",
+        "coupling-structure",
+        "generic-dynamics",
+        "physics-graph",
+        "pino-bridge",
+        "product",
+        "residual-definitions",
+        "residual-machinery",
+        "typeclass-alphabet",
+        "unified-state"
+      ],
+      "journal": "oracle",
+      "library": "physics",
+      "owns": [
+        "substrate primitives",
+        "content-addressed identity discipline",
+        "canonical serialization rule",
+        "typed indexed universe",
+        "sparse-set backend policy",
+        "typed Merkle DAG",
+        "persistent sidecar map",
+        "evidence attestation DAG",
+        "error-estimate obligation",
+        "schema versioning discipline"
+      ],
+      "path": "journals/oracle/compilation/representation-substrate.md",
+      "referenced_by": [
+        "applicability-classifiers",
+        "architectural-principles",
+        "canonical-vocabularies",
+        "cert-obligations",
+        "compose-time-pipeline",
+        "coupling-structure",
+        "forced-decisions",
+        "gamma-hat",
+        "glossary",
+        "learnable-structure-contract",
+        "library-landscape",
+        "multiscale-state",
+        "physics-graph",
+        "product",
+        "residual-definitions",
+        "residual-machinery",
+        "traps",
+        "unified-state"
+      ],
+      "section": "compilation",
+      "title": "The representation substrate"
+    },
+    "residual-definitions": {
+      "anchors": {
+        "algebraic-categories": "Algebraic identities — 5 categories",
+        "categories": "The 19 residual categories",
+        "categorytag": "The category vocabulary",
+        "closure": "Closure of the generator vocabulary",
+        "constraint-categories": "Constraint violations — 2 categories",
+        "curriculum-gate": "The curriculum category gate",
+        "eom-categories": "Equation-of-motion violation — 9 categories",
+        "error-budget": "Per-residual error composition",
+        "facets": "Facets are provenance, not weighting axes",
+        "granularity": "Granularity",
+        "granularity-examples": "What becomes a separately-weightable contribution",
+        "hash-consing": "Granularity composes with hash-consing",
+        "output-type": "Output type",
+        "pair-kinds": "Equivalence pairs and consistency pairs",
+        "residualkey": "The atomic unit — a residual contribution",
+        "structural-categories": "Structural axes of GENERIC — 3 categories"
+      },
+      "depends_on": [
+        "accuracy-ledger",
+        "canonical-vocabularies",
+        "cert-obligations",
+        "compose-time-pipeline",
+        "coupling-structure",
+        "crystal-inputs",
+        "gamma-hat",
+        "generic-dynamics",
+        "multiscale-state",
+        "physics-graph",
+        "representation-substrate",
+        "residual-machinery",
+        "stage-ordering",
+        "typeclass-alphabet",
+        "unified-state"
+      ],
+      "journal": "oracle",
+      "library": "physics",
+      "owns": [
+        "residual granularity discipline",
+        "the 19 residual categories",
+        "ResidualKey and ContributionFacets schema",
+        "equivalence pairs and consistency pairs",
+        "curriculum category gate",
+        "per-residual error composition"
+      ],
+      "path": "journals/oracle/laws/residual-definitions.md",
+      "referenced_by": [
+        "accuracy-ledger",
+        "born-oppenheimer-levels",
+        "build-sequence",
+        "build-verification",
+        "capability-slices",
+        "cert-obligations",
+        "compose-time-pipeline",
+        "forced-decisions",
+        "gamma-hat",
+        "generic-dynamics",
+        "glossary",
+        "learnable-structure-contract",
+        "multiscale-state",
+        "observable-bundles",
+        "physics-graph",
+        "pino-bridge",
+        "product",
+        "purpose-and-scope",
+        "representation-substrate",
+        "residual-loss-design",
+        "residual-machinery",
+        "training-stages",
+        "traps",
+        "typed-compositions"
+      ],
+      "section": "laws",
+      "title": "Residuals"
+    },
+    "residual-loss-design": {
+      "anchors": {
+        "adjoints": "Residuals that need an adjoint",
+        "anti-recommendations": "What not to do",
+        "architectural-over-soft": "Architectural before soft",
+        "balancing": "Balancing the terms",
+        "cadence": "Cadence is a loop policy",
+        "convergence": "What convergence does and does not guarantee",
+        "curriculum": "The source-weight curriculum",
+        "defaults": "Defaults",
+        "four-sources": "The four supervisory sources",
+        "label-presence": "The label-presence mask",
+        "loss-structure": "The assembled loss",
+        "references": "References",
+        "relaxations": "Residuals with no useful derivative",
+        "sampling": "Sampling",
+        "scope": "What this page is",
+        "survey": "The literature",
+        "tension": "When a label and a residual disagree"
+      },
+      "depends_on": [
+        "accuracy-ledger",
+        "applicability-classifiers",
+        "boundary",
+        "learnable-structure-contract",
+        "named-formulas",
+        "pino-bridge",
+        "residual-definitions",
+        "residual-machinery",
+        "training-stages"
+      ],
+      "journal": "operator",
+      "library": "informed-operator",
+      "owns": [
+        "physics-informed loss survey",
+        "architectural-before-soft principle",
+        "loss balancing policy",
+        "residual evaluation cadence",
+        "residual sampling policy",
+        "four supervisory sources",
+        "label-presence mask",
+        "source-weight curriculum",
+        "label-versus-residual tension",
+        "loss convergence honesty"
+      ],
+      "path": "journals/operator/loss/residual-loss-design.md",
+      "referenced_by": [
+        "boundary",
+        "training-stages"
+      ],
+      "section": "loss",
+      "title": "Residual loss design"
+    },
+    "residual-machinery": {
+      "anchors": {
+        "dressing-certs": "Dressing certificates",
+        "factory": "The factory",
+        "factory-entry": "Factory entry point",
+        "fidelity-generators": "Fidelity generators",
+        "generator-record": "The ResidualGenerator record",
+        "layer-dag": "The layered compute DAG",
+        "registration-gate": "The registration-time adjoint gate",
+        "subtypes": "Generator subtypes"
+      },
+      "depends_on": [
+        "accuracy-ledger",
+        "born-oppenheimer-levels",
+        "cert-obligations",
+        "compose-time-pipeline",
+        "coupling-structure",
+        "crystal-inputs",
+        "named-formulas",
+        "physics-graph",
+        "pino-bridge",
+        "representation-substrate",
+        "residual-definitions",
+        "traps"
+      ],
+      "journal": "oracle",
+      "library": "physics",
+      "owns": [
+        "ResidualGenerator record",
+        "residual factory",
+        "the layered compute DAG",
+        "generator subtypes",
+        "fidelity generators",
+        "registration-time adjoint gate",
+        "dressing certificates"
+      ],
+      "path": "journals/oracle/seams/residual-machinery.md",
+      "referenced_by": [
+        "born-oppenheimer-levels",
+        "build-verification",
+        "cert-obligations",
+        "compose-time-pipeline",
+        "coupling-structure",
+        "glossary",
+        "named-formulas",
+        "pino-bridge",
+        "representation-substrate",
+        "residual-definitions",
+        "residual-loss-design",
+        "traps"
+      ],
+      "section": "seams",
+      "title": "Residual machinery"
+    },
+    "topology-atlas": {
+      "anchors": {
+        "cost-split": "What is always on and what is opt-in",
+        "entry": "The atlas entry",
+        "pino-signal": "Why the atlas exists",
+        "x-bs": "The symmetry-indicator group"
+      },
+      "depends_on": [
+        "cert-obligations",
+        "compose-time-pipeline",
+        "pino-bridge",
+        "typeclass-alphabet"
+      ],
+      "journal": "oracle",
+      "library": "physics",
+      "owns": [
+        "topology atlas entry",
+        "symmetry indicator group",
+        "topology cost split",
+        "topological equivalence signal"
+      ],
+      "path": "journals/oracle/registry/topology-atlas.md",
+      "referenced_by": [
+        "compose-time-pipeline",
+        "formula-registry",
+        "glossary",
+        "named-formulas",
+        "physics-graph",
+        "property-templates",
+        "typeclass-alphabet"
+      ],
+      "section": "registry",
+      "title": "The topology atlas"
+    },
+    "training-stages": {
+      "anchors": {
+        "consequences": "What follows from it",
+        "curriculum-pointer": "Curriculum gating inside the informed epoch",
+        "limits": "Where the trained operator falls short",
+        "stage-ordering": "The stage ordering",
+        "why-this-order": "Why this order"
+      },
+      "depends_on": [
+        "boundary",
+        "learnable-structure-contract",
+        "open-decisions",
+        "pino-bridge",
+        "residual-definitions",
+        "residual-loss-design"
+      ],
+      "journal": "operator",
+      "library": "informed-operator",
+      "owns": [
+        "training stage ordering",
+        "where the oracle attaches",
+        "trained-operator failure modes"
+      ],
+      "path": "journals/operator/training/training-stages.md",
+      "referenced_by": [
+        "boundary",
+        "learnable-structure-contract",
+        "residual-loss-design"
+      ],
+      "section": "training",
+      "title": "Training stages"
+    },
+    "traps": {
+      "anchors": {
+        "accidental-cancellation": "The polarization error budget rests on a cancellation",
+        "addressing": "How a trap is cited",
+        "adjoint-gate-passes-on-zero": "A passing adjoint gate is not evidence of a gradient",
+        "alloy-disorder-limiter": "Alloy disorder is the dominant mobility limiter",
+        "aluminum-nitride-avalanche": "Measured avalanche in aluminum nitride is unseeded",
+        "boron-arsenide-collision": "A conductivity figure that names the wrong material",
+        "bowing-sign": "Bowing coefficient sign",
+        "breakdown-slope-sign": "Breakdown-field temperature slope",
+        "breakdown-without-anchors": "No breakdown claim without that carrier's coefficients",
+        "calibration-holes": "A calibration with holes is a green you cannot cash",
+        "checker-inherits-its-premise": "A checker inherits the soundness of its premise",
+        "checker-not-looking": "A checker that finds nothing may not be looking",
+        "clearance-is-not-evidence": "A prior audit's clearance is not evidence",
+        "conditioning-invisible": "A conditioning failure is invisible to the adjoint gate",
+        "conductivity-error-decoupling": "The thermal-conductivity errors do not cancel",
+        "consistency-not-equivalence": "A model-versus-microscopic pair is a consistency pair",
+        "dangling-over-invented": "A dangling pointer is safer than a plausible reconstruction",
+        "degenerate-doping-assumptions": "Degenerate doping breaks two non-degenerate assumptions",
+        "density-matrix-admissibility": "Density-matrix admissibility is scored, not presupposed",
+        "diamond-oxidation-ceiling": "Diamond's high-temperature failure mode is oxidation",
+        "diamond-valley-quarantine": "Diamond's direct-gap renormalization stays quarantined",
+        "displacement-cross-section": "Frenkel-pair yield needs a macroscopic cross-section",
+        "dynamical-stability-gate": "Real phonon frequencies are gated to claimed-stable phases",
+        "electron-affinity-termination": "Diamond electron affinity is termination-dependent",
+        "entropy-direction": "Entropy-production direction",
+        "exact-only-is-untested": "Exact-only is not a conservative gate",
+        "face-flux-discretization": "Drift-diffusion face flux is Scharfetter-Gummel",
+        "fixpoint-claim": "Fixed-point adjoint is a structural claim, not a fallback",
+        "frames": "Reference frames and pairing rules",
+        "frozen-corrections": "A learned correction is frozen against the loss it modifies",
+        "gallium-oxide-axes": "Gallium oxide carries four axis systems",
+        "gallium-oxide-critical-field": "Gallium oxide's critical field is an anisotropic triple",
+        "gallium-oxide-holes": "Gallium oxide holes are refused, not seeded",
+        "gauge-partition": "Gauge and electrostatic partition",
+        "gaussian-units": "Gaussian units and the Maxwell source term",
+        "high-temperature-breakdown": "Breakdown above 500 degrees Celsius is refused",
+        "image-force-lowering": "Image-force lowering",
+        "impact-ionization-spread": "Impact-ionization prefactors span four orders of magnitude",
+        "lifted-values": "Values that are wrong if lifted naively",
+        "metastability-band": "The hull residual is temperature- and pressure-aware",
+        "misfit-strain-sign": "Misfit strain sign",
+        "missing-data-marker": "The missing-data marker and its collisions",
+        "names-are-addresses": "A registry name is an address",
+        "no-derivative-claim": "No-derivative is the strongest claim in the vocabulary",
+        "peak-not-saturation-velocity": "Peak velocity is not saturation velocity",
+        "pin-provenance-first": "Pin provenance before the ledger entry",
+        "polarization-pairing": "Polarization-convention pairing",
+        "polarized-averaging": "Never average a polarized quantity",
+        "positive-semidefinite-assembly": "Positive semidefiniteness is a condition on the assembly",
+        "practice": "Practice",
+        "predating-gaps": "Not every gap a repair exposes was caused by the thing repaired",
+        "pyroelectric-sign": "Pyroelectric coefficient sign",
+        "quasiharmonic-validity": "Quasiharmonic validity is per-material",
+        "quote-both-arms": "A number quoted without its complement",
+        "refusal-boundaries": "Certification refusal boundaries",
+        "relaxed-rows-in-a-flow": "A relaxed row is refused inside an evolver",
+        "rename-orphans-prose": "A rename orphans every prose mention",
+        "seed-from-the-source": "Seed from the source, never from a page that quotes it",
+        "shear-piezo-sign": "Shear piezoelectric sign",
+        "sign-conventions": "Sign conventions",
+        "structural-index-genericity": "Structural index analysis is generic-values-only",
+        "sum-preserving-errors": "Sum-preserving arithmetic errors survive every eyeball",
+        "swept-environment-windows": "Validity windows are re-evaluated per training sample",
+        "target-is-not-measurement": "A declared error target is not a measured error",
+        "thermal-expansion-form": "Thermal-expansion tensor form",
+        "three-phonon-high-temperature": "Three-phonon transport overpredicts nitrides at high temperature",
+        "token-collides-with-physics": "A short token collides with real physics",
+        "tolerance-in-the-address": "Never put a tolerance in the address",
+        "trajectory-safety": "Differentiation safety is trajectory safety for an evolver",
+        "two-polar-predicates": "Two independent polar predicates",
+        "uncertainty-encodings": "Three uncertainty encodings, and one that is unassigned",
+        "units": "Units, dimensions, and uncertainty encodings",
+        "unnamed-relaxation": "A relaxed row that names no relaxation is ungateable",
+        "unprovenanced-coefficient": "An unprovenanced coefficient refuses the composition",
+        "verifier-soundness": "Verifier soundness",
+        "vertex-normalization": "Electron-phonon vertex normalization",
+        "vocabulary-has-an-owner": "Harvest a vocabulary from the schema that owns the field",
+        "what-a-trap-is": "What a trap is",
+        "worked-examples": "A worked example is not one artifact",
+        "zero-point-renormalization-tag": "Zero-point renormalization is the isochoric value"
+      },
+      "depends_on": [
+        "accuracy-ledger",
+        "agent-contract",
+        "applicability-classifiers",
+        "canonical-vocabularies",
+        "cert-obligations",
+        "compose-time-pipeline",
+        "conventions",
+        "coupling-structure",
+        "cross-cutting-rules",
+        "generic-dynamics",
+        "glossary",
+        "multiscale-state",
+        "mvp-system",
+        "named-formulas",
+        "out-of-scope",
+        "reference-battery",
+        "representation-substrate",
+        "residual-definitions",
+        "residual-machinery",
+        "unified-state"
+      ],
+      "journal": "practice",
+      "library": null,
+      "owns": [
+        "known-wrong values in the literature",
+        "convention-pairing hazards",
+        "verifier-soundness hazards",
+        "checker-soundness hazards",
+        "repair-pass discipline"
+      ],
+      "path": "journals/practice/traps.md",
+      "referenced_by": [
+        "accuracy-ledger",
+        "applicability-classifiers",
+        "build-verification",
+        "compose-time-pipeline",
+        "conventions",
+        "glossary",
+        "out-of-scope",
+        "reference-battery",
+        "residual-machinery",
+        "typed-compositions"
+      ],
+      "section": null,
+      "title": "Standing traps"
+    },
+    "typeclass-alphabet": {
+      "anchors": {
+        "aliases": "Aliases",
+        "analytic-structure": "HasAnalyticStructure — the constraint axis",
+        "axes": "Three axes and a bucket",
+        "discrete-structure": "DiscreteStructure — the combinatorial axis",
+        "quantity": "Quantity — the value axis",
+        "sampleable": "Sampleable — the shape axis"
+      },
+      "depends_on": [
+        "cert-obligations",
+        "computational-methods",
+        "forced-decisions",
+        "named-formulas",
+        "physics-graph",
+        "property-templates",
+        "topology-atlas"
+      ],
+      "journal": "oracle",
+      "library": "physics",
+      "owns": [
+        "observable output typeclasses",
+        "tolerance composition",
+        "analytic witnesses",
+        "typeclass aliases"
+      ],
+      "path": "journals/oracle/registry/typeclass-alphabet.md",
+      "referenced_by": [
+        "accuracy-ledger",
+        "applicability-classifiers",
+        "build-verification",
+        "cert-obligations",
+        "computational-methods",
+        "named-formulas",
+        "physics-graph",
+        "property-templates",
+        "representation-substrate",
+        "residual-definitions",
+        "topology-atlas"
+      ],
+      "section": "registry",
+      "title": "The typeclass alphabet"
+    },
+    "typed-compositions": {
+      "anchors": {
+        "chemical-surface": "Chemical and surface",
+        "coverage": "Property to composition",
+        "declared-gap": "The declared gap",
+        "electronic": "Electronic",
+        "magnetic": "Magnetic",
+        "mechanical": "Mechanical",
+        "optical": "Optical",
+        "purpose": "What this page proves",
+        "structural": "Structural",
+        "thermal": "Thermal",
+        "thermodynamic": "Thermodynamic",
+        "transport": "Transport"
+      },
+      "depends_on": [
+        "accuracy-ledger",
+        "cert-obligations",
+        "computational-methods",
+        "named-formulas",
+        "properties",
+        "property-templates",
+        "residual-definitions",
+        "traps"
+      ],
+      "journal": "oracle",
+      "library": "physics",
+      "owns": [
+        "per-observable compositions",
+        "property coverage claim",
+        "unregistered composition formulas"
+      ],
+      "path": "journals/oracle/registry/typed-compositions.md",
+      "referenced_by": [
+        "build-verification",
+        "generic-dynamics",
+        "properties",
+        "property-templates"
+      ],
+      "section": "registry",
+      "title": "Target observables as typed compositions"
     },
     "unified-state": {
       "anchors": {
@@ -53,23 +2449,658 @@
         "state as type not value"
       ],
       "path": "journals/oracle/state/unified-state.md",
-      "referenced_by": [],
+      "referenced_by": [
+        "born-oppenheimer-levels",
+        "build-sequence",
+        "capability-slices",
+        "compose-time-pipeline",
+        "coupling-structure",
+        "crystal-inputs",
+        "gamma-hat",
+        "generic-dynamics",
+        "glossary",
+        "learnable-structure-contract",
+        "library-landscape",
+        "multiscale-state",
+        "physics-graph",
+        "pino-bridge",
+        "product",
+        "purpose-and-scope",
+        "representation-substrate",
+        "residual-definitions",
+        "traps"
+      ],
       "section": "state",
       "title": "The unified state"
     }
   },
   "topics": {
+    "CouplingChannel record": {
+      "page": "coupling-structure"
+    },
+    "CouplingSpec record": {
+      "page": "coupling-structure"
+    },
+    "CoverageBound record": {
+      "page": "coupling-structure"
+    },
+    "Environment record schema": {
+      "page": "crystal-inputs"
+    },
+    "Import signature": {
+      "page": "pino-bridge"
+    },
+    "KernelExt extension family": {
+      "page": "coupling-structure"
+    },
+    "MVP anchor consequences": {
+      "page": "mvp-system"
+    },
+    "MVP build column": {
+      "page": "build-sequence"
+    },
+    "MVP buildable fraction": {
+      "page": "capability-slices"
+    },
+    "MVP design-grade targets": {
+      "page": "accuracy-ledger"
+    },
+    "MVP discipline": {
+      "page": "purpose-and-scope"
+    },
+    "MVP exit criterion": {
+      "page": "build-sequence"
+    },
+    "MVP vocabulary totals": {
+      "page": "capability-slices"
+    },
+    "PSD closure assumptions": {
+      "page": "coupling-structure"
+    },
+    "Poisson and friction operator blocks": {
+      "page": "generic-dynamics"
+    },
+    "ResidualGenerator record": {
+      "page": "residual-machinery"
+    },
+    "ResidualKey and ContributionFacets schema": {
+      "page": "residual-definitions"
+    },
+    "TheoryContext placement": {
+      "page": "coupling-structure"
+    },
+    "Validate signature": {
+      "page": "pino-bridge"
+    },
+    "accuracy residue": {
+      "page": "accuracy-ledger"
+    },
+    "adiabatic driving contract": {
+      "page": "multiscale-state"
+    },
+    "adjoint synthesis and tape scheduling": {
+      "page": "compose-time-pipeline"
+    },
+    "always-cheap discipline": {
+      "page": "compose-time-pipeline"
+    },
+    "always-true applicability stubs": {
+      "page": "applicability-classifiers"
+    },
+    "analytic witnesses": {
+      "page": "typeclass-alphabet"
+    },
+    "anchor class": {
+      "page": "named-formulas"
+    },
+    "applicability decidability": {
+      "page": "named-formulas"
+    },
+    "applicability decidability gate": {
+      "page": "build-sequence"
+    },
+    "applicability predicate contract": {
+      "page": "applicability-classifiers"
+    },
+    "applicability predicate storage": {
+      "page": "applicability-classifiers"
+    },
+    "architectural-before-soft principle": {
+      "page": "residual-loss-design"
+    },
+    "arena and index graph representation": {
+      "page": "physics-graph"
+    },
+    "atomic species universe": {
+      "page": "canonical-vocabularies"
+    },
+    "axis coverage of an imported datum": {
+      "page": "pino-bridge"
+    },
+    "battery seeding waves": {
+      "page": "reference-battery"
+    },
+    "build language neutrality": {
+      "page": "build-sequence"
+    },
+    "build phases": {
+      "page": "build-sequence"
+    },
+    "bundle contents": {
+      "page": "observable-bundles"
+    },
+    "canonical serialization rule": {
+      "page": "representation-substrate"
+    },
+    "capability selection discipline": {
+      "page": "capability-slices"
+    },
+    "carrier diffusion slice": {
+      "page": "capability-slices"
+    },
+    "cert evidence aggregation": {
+      "page": "cert-obligations"
+    },
+    "certificate artifact": {
+      "page": "cert-obligations"
+    },
+    "certification is first-class": {
+      "page": "architectural-principles"
+    },
+    "checker-soundness hazards": {
+      "page": "traps"
+    },
     "citation syntax": {
       "page": "agent-contract"
+    },
+    "closed-vocabulary versioning": {
+      "page": "canonical-vocabularies"
+    },
+    "coefficient-provenance contract": {
+      "page": "coupling-structure"
+    },
+    "column-vocabulary harvest rule": {
+      "page": "formula-registry"
+    },
+    "command-line placement": {
+      "page": "library-landscape"
+    },
+    "command-line verbs": {
+      "page": "product"
+    },
+    "compose-time pipeline stages": {
+      "page": "compose-time-pipeline"
+    },
+    "composition over duplication": {
+      "page": "architectural-principles"
+    },
+    "composition-validity refusals": {
+      "page": "cert-obligations"
+    },
+    "comprehensive spec diamond-first build": {
+      "page": "purpose-and-scope"
+    },
+    "compression plan selection": {
+      "page": "compose-time-pipeline"
+    },
+    "consistency pair": {
+      "page": "named-formulas"
+    },
+    "content-addressed identity discipline": {
+      "page": "representation-substrate"
+    },
+    "convention-pairing hazards": {
+      "page": "traps"
+    },
+    "corrected canonical forms": {
+      "page": "named-formulas"
+    },
+    "count phrasing": {
+      "page": "conventions"
+    },
+    "coupling coverage policy": {
+      "page": "coupling-structure"
+    },
+    "coupling target shapes": {
+      "page": "coupling-structure"
+    },
+    "crystal-structure prediction slice": {
+      "page": "capability-slices"
+    },
+    "curated coefficient seed": {
+      "page": "accuracy-ledger"
+    },
+    "curriculum category gate": {
+      "page": "residual-definitions"
+    },
+    "curriculum gate": {
+      "page": "build-verification"
+    },
+    "data and generated files": {
+      "page": "conventions"
+    },
+    "defect-species universe": {
+      "page": "multiscale-state"
+    },
+    "density-matrix compression plan space": {
+      "page": "gamma-hat"
+    },
+    "density-matrix encoding vocabulary": {
+      "page": "gamma-hat"
+    },
+    "density-matrix memory budget at MVP scale": {
+      "page": "gamma-hat"
+    },
+    "density-matrix node identity": {
+      "page": "gamma-hat"
+    },
+    "density-matrix read and write paths": {
+      "page": "gamma-hat"
+    },
+    "density-matrix scorer-only boundary": {
+      "page": "gamma-hat"
+    },
+    "deployment shape": {
+      "page": "product"
+    },
+    "design variable boundary": {
+      "page": "product"
+    },
+    "design-grade": {
+      "page": "accuracy-ledger"
+    },
+    "device-mesh universe": {
+      "page": "multiscale-state"
+    },
+    "diamond high-temperature failure mode": {
+      "page": "mvp-system"
+    },
+    "diamond primitive cell": {
+      "page": "mvp-system"
+    },
+    "differentiability vocabulary": {
+      "page": "named-formulas"
+    },
+    "downstream device target": {
+      "page": "purpose-and-scope"
+    },
+    "dressing certificates": {
+      "page": "residual-machinery"
+    },
+    "dressing tiers": {
+      "page": "born-oppenheimer-levels"
+    },
+    "dressing-staleness bound": {
+      "page": "born-oppenheimer-levels"
+    },
+    "driver responsibilities": {
+      "page": "boundary"
+    },
+    "energy and entropy functionals": {
+      "page": "generic-dynamics"
+    },
+    "engineering scope placement": {
+      "page": "library-landscape"
+    },
+    "environment argument": {
+      "page": "product"
+    },
+    "equivalence pairs and consistency pairs": {
+      "page": "residual-definitions"
+    },
+    "error-estimate obligation": {
+      "page": "representation-substrate"
+    },
+    "evaluation cost vocabulary": {
+      "page": "named-formulas"
+    },
+    "evidence attestation DAG": {
+      "page": "representation-substrate"
+    },
+    "evidence never verdicts": {
+      "page": "product"
     },
     "fact placement rule": {
       "page": "agent-contract"
     },
+    "fidelity generators": {
+      "page": "residual-machinery"
+    },
+    "first end-to-end capability gate": {
+      "page": "build-verification"
+    },
+    "formula record schema": {
+      "page": "named-formulas"
+    },
+    "formula row bands": {
+      "page": "named-formulas"
+    },
+    "four supervisory sources": {
+      "page": "residual-loss-design"
+    },
+    "four-level Born-Oppenheimer hierarchy": {
+      "page": "born-oppenheimer-levels"
+    },
     "frontmatter schema": {
       "page": "agent-contract"
     },
+    "gauge fixing and the electrostatic partition": {
+      "page": "generic-dynamics"
+    },
+    "generator subtypes": {
+      "page": "residual-machinery"
+    },
+    "gradient sink selection": {
+      "page": "boundary"
+    },
+    "graph acyclicity guarantee": {
+      "page": "physics-graph"
+    },
+    "graph node kinds and output roles": {
+      "page": "physics-graph"
+    },
+    "graph realization of the closed vocabularies": {
+      "page": "physics-graph"
+    },
+    "heat diffusion slice": {
+      "page": "capability-slices"
+    },
+    "implementation role requirements": {
+      "page": "forced-decisions"
+    },
+    "implementation-vocabulary index": {
+      "page": "glossary"
+    },
+    "import as compiler input": {
+      "page": "product"
+    },
+    "interface library remit": {
+      "page": "library-landscape"
+    },
+    "invariant synthesis attachment": {
+      "page": "build-sequence"
+    },
+    "invariant-generator routine": {
+      "page": "coupling-structure"
+    },
+    "known-wrong values in the literature": {
+      "page": "traps"
+    },
+    "label-presence mask": {
+      "page": "residual-loss-design"
+    },
+    "label-versus-residual tension": {
+      "page": "residual-loss-design"
+    },
+    "ledger-tracked observable counts": {
+      "page": "accuracy-ledger"
+    },
+    "library boundary rules": {
+      "page": "library-landscape"
+    },
+    "linear-response primitives": {
+      "page": "observable-bundles"
+    },
+    "loss balancing policy": {
+      "page": "residual-loss-design"
+    },
+    "loss convergence honesty": {
+      "page": "residual-loss-design"
+    },
+    "loud at compose time absent at runtime": {
+      "page": "architectural-principles"
+    },
+    "macro continuum-field state schema": {
+      "page": "multiscale-state"
+    },
+    "manifest field schema": {
+      "page": "formula-registry"
+    },
+    "material scope": {
+      "page": "purpose-and-scope"
+    },
+    "method argument types": {
+      "page": "computational-methods"
+    },
+    "method signatures": {
+      "page": "computational-methods"
+    },
+    "minimum primitives": {
+      "page": "architectural-principles"
+    },
+    "minimum viable demonstration": {
+      "page": "purpose-and-scope"
+    },
+    "moment closures for electron temperature and current density": {
+      "page": "multiscale-state"
+    },
+    "monoclinic frame guard": {
+      "page": "accuracy-ledger"
+    },
+    "no-inline-math rule": {
+      "page": "named-formulas"
+    },
+    "numerics-agnostic seam": {
+      "page": "architectural-principles"
+    },
+    "obligation firing gate": {
+      "page": "build-verification"
+    },
+    "observable output typeclasses": {
+      "page": "typeclass-alphabet"
+    },
+    "one compile pipeline over one substrate": {
+      "page": "architectural-principles"
+    },
+    "one-shot-dressing substrate requirement": {
+      "page": "forced-decisions"
+    },
+    "operator architecture motivation": {
+      "page": "learnable-structure-contract"
+    },
+    "operator library remit": {
+      "page": "library-landscape"
+    },
+    "operator-oracle seam obligations": {
+      "page": "learnable-structure-contract"
+    },
+    "oracle library remit": {
+      "page": "purpose-and-scope"
+    },
+    "oracle loop exclusion": {
+      "page": "purpose-and-scope"
+    },
+    "oracle runtime exclusions": {
+      "page": "library-landscape"
+    },
+    "oracle-file contents": {
+      "page": "product"
+    },
+    "oracle-file rules": {
+      "page": "product"
+    },
+    "out-of-scope refusal mechanism": {
+      "page": "out-of-scope"
+    },
+    "overloaded-token register": {
+      "page": "glossary"
+    },
+    "page style": {
+      "page": "conventions"
+    },
+    "per-observable accuracy regime": {
+      "page": "accuracy-ledger"
+    },
+    "per-observable compositions": {
+      "page": "typed-compositions"
+    },
+    "per-residual error composition": {
+      "page": "residual-definitions"
+    },
+    "per-stage sidecars": {
+      "page": "physics-graph"
+    },
+    "per-tier generator structure": {
+      "page": "generic-dynamics"
+    },
+    "periodicity structure": {
+      "page": "crystal-inputs"
+    },
+    "persistent sidecar map": {
+      "page": "representation-substrate"
+    },
+    "physics graph schema": {
+      "page": "physics-graph"
+    },
+    "physics-informed loss survey": {
+      "page": "residual-loss-design"
+    },
+    "polar predicate split": {
+      "page": "applicability-classifiers"
+    },
+    "polarization sign guards": {
+      "page": "accuracy-ledger"
+    },
+    "polyglot implementation shape": {
+      "page": "forced-decisions"
+    },
+    "polynomial-sufficiency flag": {
+      "page": "coupling-structure"
+    },
+    "product consumers": {
+      "page": "product"
+    },
+    "product identity": {
+      "page": "product"
+    },
+    "product principles": {
+      "page": "product"
+    },
+    "program purpose": {
+      "page": "purpose-and-scope"
+    },
+    "property catalogue": {
+      "page": "properties"
+    },
+    "property category to bundle map": {
+      "page": "properties"
+    },
+    "property coverage claim": {
+      "page": "typed-compositions"
+    },
+    "property-targeted crystal design goal": {
+      "page": "purpose-and-scope"
+    },
+    "reference archive format": {
+      "page": "reference-battery"
+    },
+    "reference-cache backend": {
+      "page": "cert-obligations"
+    },
+    "reference-data contents": {
+      "page": "reference-battery"
+    },
+    "reference-row schema": {
+      "page": "reference-battery"
+    },
+    "refusal is absence": {
+      "page": "product"
+    },
+    "regime as a view across levels": {
+      "page": "born-oppenheimer-levels"
+    },
+    "regimes as extractions": {
+      "page": "generic-dynamics"
+    },
+    "registration gate": {
+      "page": "build-verification"
+    },
+    "registration-time adjoint gate": {
+      "page": "residual-machinery"
+    },
+    "registry count discipline": {
+      "page": "formula-registry"
+    },
+    "repair-pass discipline": {
+      "page": "traps"
+    },
+    "research-stream provenance vocabulary": {
+      "page": "formula-registry"
+    },
+    "residual evaluation cadence": {
+      "page": "residual-loss-design"
+    },
+    "residual factory": {
+      "page": "residual-machinery"
+    },
+    "residual granularity discipline": {
+      "page": "residual-definitions"
+    },
+    "residual sampling policy": {
+      "page": "residual-loss-design"
+    },
+    "rewrite admission rule": {
+      "page": "compose-time-pipeline"
+    },
+    "runtime cost classes": {
+      "page": "compose-time-pipeline"
+    },
+    "runtime gate sequence": {
+      "page": "build-verification"
+    },
+    "runtime symbolic exclusion": {
+      "page": "architectural-principles"
+    },
+    "schema versioning discipline": {
+      "page": "representation-substrate"
+    },
+    "scope exclusions": {
+      "page": "out-of-scope"
+    },
+    "scope versus inventory precedence": {
+      "page": "properties"
+    },
+    "score not solve": {
+      "page": "product"
+    },
+    "seam exclusions": {
+      "page": "learnable-structure-contract"
+    },
+    "seam smoke test": {
+      "page": "build-verification"
+    },
+    "seeded-value provenance status": {
+      "page": "accuracy-ledger"
+    },
+    "selection surfaces": {
+      "page": "product"
+    },
+    "site decoration": {
+      "page": "crystal-inputs"
+    },
+    "slow configurational state schema": {
+      "page": "multiscale-state"
+    },
+    "slow-kinetic formula set": {
+      "page": "multiscale-state"
+    },
+    "source-weight curriculum": {
+      "page": "residual-loss-design"
+    },
+    "sparse-set backend policy": {
+      "page": "representation-substrate"
+    },
+    "stage boundaries": {
+      "page": "compose-time-pipeline"
+    },
     "state as type not value": {
       "page": "unified-state"
+    },
+    "state emission obligations": {
+      "page": "learnable-structure-contract"
+    },
+    "state input obligation": {
+      "page": "product"
     },
     "state seven-tuple": {
       "page": "unified-state"
@@ -77,8 +3108,149 @@
     "state slot vocabulary": {
       "page": "unified-state"
     },
+    "static consistency set": {
+      "page": "build-verification"
+    },
+    "static slot schema": {
+      "page": "product"
+    },
+    "structural and swept Environment partition": {
+      "page": "crystal-inputs"
+    },
+    "sub-method registration": {
+      "page": "computational-methods"
+    },
+    "substrate primitives": {
+      "page": "representation-substrate"
+    },
+    "swept-environment validity windows": {
+      "page": "applicability-classifiers"
+    },
+    "symmetry indicator group": {
+      "page": "topology-atlas"
+    },
+    "target property scope": {
+      "page": "properties"
+    },
+    "template collapse discipline": {
+      "page": "property-templates"
+    },
+    "template overlap resolution": {
+      "page": "property-templates"
+    },
+    "template signatures": {
+      "page": "property-templates"
+    },
+    "the 19 residual categories": {
+      "page": "residual-definitions"
+    },
+    "the defect-population and continuum residual categories": {
+      "page": "multiscale-state"
+    },
+    "the eleven observable bundles": {
+      "page": "observable-bundles"
+    },
+    "the exported surface contract": {
+      "page": "pino-bridge"
+    },
+    "the layered compute DAG": {
+      "page": "residual-machinery"
+    },
+    "the micro-to-macro homogenisation map": {
+      "page": "multiscale-state"
+    },
+    "the refined emergence axiom": {
+      "page": "multiscale-state"
+    },
+    "the ten cert obligations": {
+      "page": "cert-obligations"
+    },
+    "the twelve computational methods": {
+      "page": "computational-methods"
+    },
+    "the two loops": {
+      "page": "product"
+    },
+    "the two-generator equation of motion": {
+      "page": "generic-dynamics"
+    },
+    "the unified three-tier residual contract": {
+      "page": "multiscale-state"
+    },
+    "theory-context vocabularies": {
+      "page": "canonical-vocabularies"
+    },
+    "three-tier state stratification": {
+      "page": "multiscale-state"
+    },
+    "tight-binding warm start": {
+      "page": "forced-decisions"
+    },
+    "tolerance composition": {
+      "page": "typeclass-alphabet"
+    },
+    "tolerance ledger": {
+      "page": "cert-obligations"
+    },
+    "top-level inputs": {
+      "page": "crystal-inputs"
+    },
+    "topological equivalence signal": {
+      "page": "topology-atlas"
+    },
+    "topology atlas entry": {
+      "page": "topology-atlas"
+    },
+    "topology cost split": {
+      "page": "topology-atlas"
+    },
+    "trained-operator failure modes": {
+      "page": "training-stages"
+    },
+    "training stage ordering": {
+      "page": "training-stages"
+    },
+    "two-loop symmetry": {
+      "page": "learnable-structure-contract"
+    },
+    "typeclass aliases": {
+      "page": "typeclass-alphabet"
+    },
+    "typed Merkle DAG": {
+      "page": "representation-substrate"
+    },
+    "typed indexed universe": {
+      "page": "representation-substrate"
+    },
+    "typed signatures principle": {
+      "page": "architectural-principles"
+    },
+    "uncertainty encodings": {
+      "page": "reference-battery"
+    },
+    "unregistered composition formulas": {
+      "page": "typed-compositions"
+    },
+    "verdict discipline": {
+      "page": "conventions"
+    },
+    "verifier-soundness hazards": {
+      "page": "traps"
+    },
+    "verifying is cheaper than solving": {
+      "page": "purpose-and-scope"
+    },
     "vocabulary rule": {
       "page": "agent-contract"
+    },
+    "what each template produces": {
+      "page": "property-templates"
+    },
+    "where the oracle attaches": {
+      "page": "training-stages"
+    },
+    "worked example gate": {
+      "page": "build-verification"
     }
   }
 }

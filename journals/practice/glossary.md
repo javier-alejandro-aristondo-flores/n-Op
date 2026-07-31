@@ -43,7 +43,7 @@ cannot drift.
 
 There are two keys into the corpus, and they answer different questions.
 
-- **By topic.** `generated/corpus.json` maps every owned topic to the page that owns it.
+- **By topic.** [corpus-index] maps every owned topic to the page that owns it.
   If you know what the *subject* is called, that map answers in one hop and it is
   emitted, so it is never wrong.
 - **By name.** This page maps the names that appear in code, in typed pseudocode and in

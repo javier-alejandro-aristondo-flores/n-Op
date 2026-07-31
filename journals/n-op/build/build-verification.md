@@ -96,7 +96,7 @@ chain runs ([capability-slices#structure-prediction]). Three parts, in order.
 
 The data-backed arm runs against a recovered hybrid-level strain hypersurface of
 diamond — HSE06 with gap-tuned exact exchange, six lattice-distortion families to
-±10%, with stress tensors — in `data/diamond-strain-sweep/`. It is **simulation
+±10%, with stress tensors — in [strain-sweep]. It is **simulation
 output, not measured reference data**, which is why it sits beside the reference data
 rather than inside it: the reference battery is not a cache of computed results
 ([reference-battery#boundaries]).

@@ -38,6 +38,10 @@ EMITTED = ROOT / "generated" / "corpus.json"
 # exemption nobody is told about is how the previous corpus grew holes it reported
 # as green. Note these are the three pages a reader consults *about* words, which is
 # why they are the three that need to quote them.
+# The contract shows paths because showing the layout is its job, and one page names
+# the checkers as programs to run rather than as data to cite.
+PATH_EXEMPT = {"agent-contract", "conventions", "traps"}
+
 EXEMPT = {
     "agent-contract": "specifies the vocabulary, so it must name what it forbids",
     "traps":          "warns that short tokens collide with physics, by example",
@@ -56,7 +60,12 @@ HEADING_RE = re.compile(r"^#{1,6}\s+(.*?)\s*$", re.MULTILINE)
 # against real prose, and deleted it for crying wolf; this is the precise version.
 ORDINAL_RE = re.compile(r"(?<![\w-])([a-z0-9][a-z0-9-]{2,})[\s`]*§\s*\d")
 LINENUM_RE = re.compile(r"\b[\w./-]+\.(?:md|csv|py)\s*:\s*\d+\b")
-PATHCITE_RE = re.compile(r"\bjournals/[\w./-]+\.md\b")
+# Every repo path, not only a page. The rule "cite the id, never the path" was
+# enforced for pages and unenforced for data artifacts — one citation form checked
+# and an equivalent form left to accumulate, which is exactly the asymmetry that let
+# 289 backticked page ids go unverified in the previous corpus. Four references had
+# already slipped through before this was widened.
+PATHCITE_RE = re.compile(r"\b(?:journals|data|log|generated|tools)/[\w./-]+")
 TABLE_ROW_RE = re.compile(r"^\s*\|.*\|\s*$")
 TABLE_SEP_RE = re.compile(r"^\s*\|[\s:|-]+\|\s*$")
 UNESCAPED_PIPE = re.compile(r"(?<!\\)\|")
@@ -202,8 +211,10 @@ def check_citations(pages: list[dict], errs: list[str], pending: list[str],
                             f"declared anchor instead")
         if LINENUM_RE.search(text):
             errs.append(f"{rel}: line-number citation — line refs rot on every edit")
-        if PATHCITE_RE.search(text):
-            errs.append(f"{rel}: cites a page by path — cite the id")
+        if p["fm"].get("id") not in PATH_EXEMPT and PATHCITE_RE.search(text):
+            hit = PATHCITE_RE.search(text).group(0)
+            errs.append(f"{rel}: names the path {hit!r} — cite the id, so a move is "
+                        f"one edit to the map and not one per page")
         cited = {c for c, _ in CITE_RE.findall(text)}
         for edge in sorted(declared - cited):
             errs.append(f"{rel}: depends-on names {edge!r} but the body never cites it "
@@ -386,6 +397,8 @@ def main() -> int:
     print(f"structure {'OK (partial)' if partial else 'OK'} · {len(pages)} pages, "
           f"{len(owner)} owned topics, {len(corpus['open_questions'])} open questions")
     # A clean run must state its own holes, or it is measuring the checker.
+    print(f"  exempt from the path sweep: {sorted(PATH_EXEMPT)} "
+          f"(they show the layout or name a program to run)")
     print("  exempt from the vocabulary sweep, and why:")
     for pid, why in sorted(EXEMPT.items()):
         print(f"    {pid:<16} {why}")

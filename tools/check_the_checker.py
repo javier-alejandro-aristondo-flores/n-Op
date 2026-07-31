@@ -86,9 +86,15 @@ PROBES: list[tuple[str, str, str, str]] = [
     ("line-number citation",
      "A page that exists", "See journals/practice/agent-contract.md:42. A page exists",
      "line-number citation"),
-    ("path citation",
+    ("path citation — a page",
      "A page that exists", "See journals/practice/agent-contract.md. A page exists",
-     "by path"),
+     "names the path"),
+    # The rule was enforced for pages and not for data artifacts: one citation form
+    # checked, an equivalent form left to accumulate. Four references had already
+    # slipped through before the pattern was widened.
+    ("path citation — a data artifact",
+     "A page that exists", "The registry is at data/registry-manifest.csv. A page exists",
+     "names the path"),
     ("table arity mismatch",
      "| a | b |", "| a | b | c |", "cells, header"),
     ("history marker",

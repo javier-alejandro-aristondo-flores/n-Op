@@ -30,6 +30,35 @@ Read this first. Read the per-subject files for evidence.
 
 ---
 
+## Auditor 3 — complete. Read `IMPLEMENTABILITY.md` first.
+
+Auditor 2 asked whether the corpus is **true**. Auditor 3 asked whether it is **enough**, and
+the answer changes what happens next.
+
+| Pass | Question | Result | File |
+|---|---|---|---|
+| **A — implementability** | Can a competent implementer build the oracle from this corpus alone? | **No.** 75 findings — 61 ABSENT, 14 UNDERSPECIFIED. Four auditors, no contact, **four independent convergences** including one found by all three | `IMPLEMENTABILITY.md` |
+| **B — physical completeness** | Does the oracle check every law a crystal must satisfy? | **Substantially yes** — two planned attack angles died on grounding. One real gap survives: the refusal set overlaps the target operating envelope and nothing aggregates it | `findings/a3-physics-completeness.md` |
+| **C — the six physics questions** | — | **All six closed** with a recommendation to ratify or reject. Two contradict Javier's recorded design intent and say so at the head | `DECISIONS.md` |
+
+**The four load-bearing holes:** there is **no unit system anywhere in the corpus**; the core
+types (`ObservableRef`, `Layer0Type`, `AxisLabel`, `canonical_node_bytes`) are names without
+definitions; the manifest names 132 formulas and gives a writable body for **19**; and
+*"refusal is absence"* — the corpus's own headline principle — **has no mechanism connecting a
+failed obligation to a missing check.**
+
+**Verification:** 121 of 122 quotations grounded by content, the remainder a regex; 13 of 13
+instrument controls pass; **zero fabrications**. Two further instrument bugs were found and
+fixed mid-verification — blockquotes used for both evidence and commentary, and markdown
+table-cell pipe escaping — which between them had falsely condemned 114 quotations. **The
+instrument was wrong, not the auditors**, for the sixth and seventh time in this program.
+
+**The honest caveat:** pass A primed for absence, so 61 is a *census of named holes*, not a
+percentage. The only true rate is the registry's stratified sample — **3 of 20 rows
+implementable**.
+
+---
+
 ## The nine defect classes
 
 Ranked by how much of the corpus each touches. The classes matter more than the

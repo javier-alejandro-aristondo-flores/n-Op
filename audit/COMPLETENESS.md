@@ -23,11 +23,16 @@ measured defects and **both are wrong**. The corpus is correct on each.
 
 **The 24-vs-17 tolerance gap does not exist.** 25 tolerance-shaped symbols appear across
 `journals/`, against a 17-row tolerance ledger. That looked like eight residuals governed by
-nothing. It is not: `cert-obligations.md:127-128` **explicitly declares** that `τ_n`, `τ_p`,
-`τ_PO`, `τ_E`, `τ_hop`, `τ_iv` and `τ_alloy` are *physical times, not tolerances*, and that
-"a `τ_x` is a tolerance only if it appears in the table below." 17 ledger rows + 7 declared
-physical times + the `τ_x` placeholder = 25. **All accounted for. Zero undefined tolerance
-symbols.**
+nothing. It is not: `cert-obligations.md:127-128` **explicitly declares** that seven of them
+are *physical times, not tolerances* — the carrier lifetimes, the polar-optical and
+intervalley scattering times, the hopping and alloy-scattering times — and that a token in
+that family "is a tolerance only if it appears in the table below." 17 ledger rows + 7
+declared physical times + the generic placeholder = 25. **All accounted for. Zero undefined
+tolerance names.**
+
+**But the disambiguation is itself the defect**, and it is recorded as finding 6 below: that
+paragraph has to exist only because the tolerances are named with symbols instead of English,
+which is what the corpus's own vocabulary rule forbids.
 
 **The uncertainty column does have a declared convention.**
 `reference-battery.md:82-99` declares it precisely: an absolute value in the Value's units
@@ -152,6 +157,119 @@ differentiability" is plausibly correct — but `—` is declared for the *refer
 `Uncertainty` column and **nowhere for these two**. A reader cannot tell "not applicable"
 from "not yet assigned", and those are the two states `reference-battery.md:90` goes out of
 its way to separate elsewhere.
+
+## Finding 6 · Every one of the 17 tolerance names is a symbol, which the corpus's own central rule forbids
+
+**Severity: high · Confidence: certain**
+
+This is defect class 1 in its purest form: a rule that resolves and is not enforced.
+
+`agent-contract.md` states the rule and states why it exists:
+
+> **no corpus-invented name may be a serial or a symbol.**
+>
+> Everything the corpus invents is spelled out in English. Standard deviation is the name;
+> `σ` is not. `direct` and `adjoint` are names; `D1` and `D2` are not. […] Corpus tags and
+> physics symbols were drawn from one alphabet, and **two checkers were written for that and
+> then deleted because no rule could separate them. Spelling the corpus half out separates
+> them by construction.**
+
+`cert-obligations.md:122` then opens its tolerance table: *"**Canonical names** and default
+values for every tolerance and error bound in the oracle library."* **All 17 of those
+canonical names are Greek symbols.** They are corpus inventions, not physics: nothing outside
+this corpus calls a metastability band `δ_meta` or a nudged-elastic-band force tolerance
+`τ_NEB`.
+
+**The collision the rule predicts has already happened, and was patched with prose.**
+Immediately above the table, `cert-obligations.md:125-128`:
+
+> `ε` is reserved for permittivity in the physics formulas. **`τ` is not a reserved tolerance
+> prefix** — `τ_n`, `τ_p`, `τ_PO`, `τ_E`, `τ_hop`, `τ_iv` and `τ_alloy` are physical times,
+> and a `τ_x` is a tolerance only if it appears in the table below.
+
+That paragraph is the finding. It exists **only** because the names are symbols, and the
+contract says explicitly that this remedy was already tried and abandoned — a disambiguation
+rule is what the two deleted checkers were. English names make the paragraph unnecessary by
+construction, which is the contract's entire argument.
+
+**Why nothing fires.** `check_structure.py`'s vocabulary sweep matches tokens against the
+**retired-vocabularies list**. It has no rule for *"is this invented name a symbol?"* — that
+is a semantic judgement, not a list lookup. So all 17 pass green, exactly as the signature
+column's unit promise passes with zero of 134 rows carrying a unit.
+
+**Scale:** 57 occurrences across 6 pages.
+
+**Proposed names**, each derived from the row's own stated meaning in the ledger:
+
+| corpus token | English name |
+|---|---|
+| `δ_sym` | `symmetry-projection-residual` |
+| `δ_PSD` | `negative-eigenvalue-guard` |
+| `τ_SCF,strict` | `self-consistent-field-convergence-strict` |
+| `τ_SCF,train` | `self-consistent-field-convergence-training` |
+| `τ_L3L4` | `equilibrium-to-nonequilibrium-fixed-point` |
+| `τ_equiv` | `equivalence-pair-agreement` |
+| `τ_method` | `consistency-pair-model-gap` |
+| `δ_meta` | `metastability-band` |
+| `τ_adj` | `adjoint-registration-gate` |
+| `τ_cond` | `fixed-point-conditioning-guard` |
+| `τ_trunc` | `truncated-solve-gradient-error` |
+| `δ_surrogate` | `surrogate-validity-margin` |
+| `τ_battery` | `reference-battery-agreement` |
+| `δ_plan` | `compression-plan-truncation-target` |
+| `τ_NEB` | `nudged-elastic-band-force-convergence` |
+| `τ_cons` | `conservation-residual` |
+| `τ_interp` | `lowering-runtime-agreement` |
+
+**Held, not applied.** 57 sites across the certification chapter is the largest single edit
+this audit would make, and the `GAP` → `UNSEEDED` incident already demonstrated what a blind
+substitution does to prose. It lands cell by cell, and **the disambiguation paragraph is
+deleted in the same commit** — leaving it is what would make the rename cosmetic.
+
+**Two residual-category names carry the same defect**: `EOM/γ̂` and `EOM/Π_h`. The other seven
+(`EOM/R`, `EOM/P`, `EOM/h`, `EOM/A`, `EOM/Z`, `EOM/Continuum`, `EOM/DefectPopulation`) name
+either standard physics symbols or English words, and are not part of this finding.
+
+## Finding 7 · The obligation-to-formula governance relation is not representable from the data
+
+**Severity: high · Confidence: certain**
+
+**Obligations bind by typeclass axis, not by name.** `cert-obligations.md:60` says so
+explicitly — one checker "serve[s] every formula that presents that axis" rather than naming
+each. The ten obligations bind to `Sampleable` (1, 6), `Quantity` (2), `HasAnalyticStructure`
+(3), `Integrable` (5), `DiscreteStructure` (7), a content-side lookup (4, 8), a surrogate
+input-domain test (9), and the registration adjoint gate (10).
+
+**No formula row declares which typeclass axes it presents.** The manifest's nine columns are
+`# · Name · Signature · Bundle · Tier · Diff · Path · Source · Depends on`. Measured across
+all 134 rows:
+
+| axis | occurrences in the manifest |
+|---|--:|
+| `Sampleable` · `Quantity` · `Integrable` · `HasAnalyticStructure` · `DiscreteStructure` · `Differentiable` · `Response` · `Restrictable` · `FieldOnGrid` | **0 each** |
+
+Controls: `bandgap` returns 2, a fabricated token returns 0 — the sweep fires. The axis names
+appear on exactly **one** page in the corpus, `typeclass-alphabet.md`, which is where they are
+*defined*; they are attached to no formula anywhere.
+
+**The consequence.** For 9 of the 10 obligations you cannot determine, from the corpus, which
+formulas they govern. The single exception is obligation 10, reachable through the `Diff`
+column, which encodes differentiability. **The governance relation is not underspecified — it
+is absent**, and no check can be written against a relation that no artifact records.
+
+This is the structural cause beneath two findings the register already carries separately:
+obligation 9 "names a set of formulas that does not exist", and the manifest "has no
+`applicability` column". Both are instances of the same missing edge.
+
+**What it is not.** This does *not* say the obligations are wrong or that formulas go
+unchecked in practice. It says the scope of each obligation is not machine-determinable, so
+the claim "obligation N covers the right rows" is currently unfalsifiable — which is the same
+shape as every other finding in defect class 1.
+
+**A correction is a schema decision, not an edit**: either the manifest gains a typeclass-axis
+column, or each obligation states its scope as a predicate over columns that do exist
+(`Bundle`, `Tier`, `Diff`). It is Javier's call which, and it is recorded rather than proposed
+because the two options have different downstream costs.
 
 ---
 

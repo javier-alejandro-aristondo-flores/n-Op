@@ -56,7 +56,7 @@ strings known absent.
 | POS | `Neither kind has a page id` | found |
 | POS | `Nickel's Curie point at 627 K` | found |
 | POS | `Allen–Heine–Cardona` — **en-dash class** | found |
-| POS | `δ_meta` — **Unicode class** | found |
+| POS | the metastability-band token `δ_meta` — **Unicode class** | found |
 | NEG | `zzqx wobbling flange of the metriplectic hamster` | absent |
 | NEG | `the PBE diamond gap is stated as 3.1 eV` — struck fabrication | absent |
 | NEG | `Nickel's Curie point at 727 K` — today's false positive | absent |
@@ -154,7 +154,8 @@ quoted text was real and the consequence claimed from it was over-stated twice.
   dispatch* to literature verification. That is Step 2, and this pass is its gate.
 - **Grade (u), 58 findings** — do not land on this evidence. Not quarantined as false;
   untested. They need the registry-shaped instrument.
-- **Physics-gated items land never** — the `A` slot's identity, `δ_meta`'s currency, the
+- **Physics-gated items land never** — the vector-potential slot's identity, the
+  metastability band's currency, the
   continuity sign convention and whether the state needs a second current field, and
   whether the oracle stays absent at inference remain Javier's decisions.
 

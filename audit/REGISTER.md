@@ -203,13 +203,13 @@ A corpus that validates on its flagship material first will clear all four.
 
 ### 8 · Gates that cannot fire
 
-- **`τ_battery`**: 3σ bands that include zero on positive-definite quantities, on all
+- **The reference-battery agreement gate** (`τ_battery`): 3σ bands that include zero on positive-definite quantities, on all
   four high-temperature thermal conductivities — the rows with the thinnest provenance
   are the rows whose gate cannot trip. 34 of 48 multiplicative cells give a *negative*
   standard deviation under the declared formula.
-- **`τ_cond`** on registry row 5: the fixed point is 1×1, so its reciprocal condition
+- **The fixed-point conditioning guard** (`τ_cond`) on registry row 5: the fixed point is 1×1, so its reciprocal condition
   number is exactly 1 for every nonzero value. Structurally incapable of firing.
-- **`τ_method`**: a range (10–20%) is not a tolerance, and **zero pairs declare one** —
+- **The consistency-pair model gap** (`τ_method`): a range (10–20%) is not a tolerance, and **zero pairs declare one** —
   the manifest has no column that could carry it.
 - **`Pending`**: a verdict nothing produces. The corpus's one genuinely pending case
   looked for a fourth verdict in the wrong enum and never reached for it.
@@ -222,9 +222,9 @@ A corpus that validates on its flagship material first will clear all four.
 |---|---|---|
 | 1 | Continuity sign + missing `1/q` | Actively trains the operator backwards; 5.06×10³× the signal it teaches |
 | 2 | Degeneracy tripwire disabled by its own premise | Removes the only check on the corpus's central structural claim |
-| 3 | `τ_battery` inert on the weakest rows | The gate cannot fire exactly where provenance is thinnest |
+| 3 | Reference-battery agreement inert on the weakest rows | The gate cannot fire exactly where provenance is thinnest |
 | 4 | The `A` slot's identity is unfixed | Typed "external" while carrying an equation of motion and owning its energy — an external field is prescribed, not evolved |
-| 5 | `δ_meta` calibrated in the wrong currency | Under the corpus's own default functional diamond scores a large violation — reproducing the failure the band exists to prevent |
+| 5 | The metastability band calibrated in the wrong currency | Under the corpus's own default functional diamond scores a large violation — reproducing the failure the band exists to prevent |
 | 6 | Rotational sum rule wrong as written | Frame-dependent; nonzero on correct force constants, for the MVP material |
 | 7 | "Refusal is absence" unimplemented | The product's central promise: no enum, no stage, and the reason is discarded where it is created |
 | 8 | The gauge derivation contradicts its own adjective | Transversality derived from *time-independent* freedom against a *time-dependent* obstruction; partition right, derivation wrong |
@@ -291,7 +291,7 @@ Safe to apply. Each is checkable from the corpus alone.
   says both: typed "external EM vector potential", yet given an equation of motion,
   its energy counted in the system energy, and read by minimal coupling. These are
   different physics and the choice changes what the `EOM/A` residual means.
-- **`δ_meta`'s currency.** Curated-experimental or DFT-computed. **Now measured, not
+- **The metastability band's currency** (`δ_meta`). Curated-experimental or DFT-computed. **Now measured, not
   estimated:** diamond's PBE distance above hull is **138.297 meV/atom** (Materials
   Project `mp-66`, `gga_gga+u`, retrieved 2026-07-31), corroborated to ~1 meV/atom by an
   independent 1997 calculation reporting 131. Against a 50 meV/atom band the residual
@@ -307,7 +307,8 @@ Safe to apply. Each is checkable from the corpus alone.
   lives in **GGA exchange on the intra-layer covalent energetics**.
   Note for the laws subject: `findings/laws.md` asserts diamond "reads 0" against this
   band — true only in the experimental currency, not the one the residual consumes.
-- **`τ_NEB`'s currency**, which turns out to be the same shape of question. `1e-3` is
+- **The nudged-elastic-band force-convergence tolerance's currency** (`τ_NEB`), which turns
+  out to be the same shape of question. `1e-3` is
   *exactly* VASP's default `EDIFFG` — and in VASP the **sign** selects the currency:
   positive is an energy change in eV, negative is a force in eV/Å. The corpus carries no
   sign. Read as force it is **50× tighter** than both the ASE and Quantum ESPRESSO

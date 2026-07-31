@@ -2,9 +2,10 @@
 
 Every edit below is mechanical, was verified against a primary source or the corpus's own
 declaration, and required no physics judgement. **Physics-gated items are untouched** and
-remain Javier's: the `A` slot's identity, `δ_meta`'s currency, the continuity sign
-convention and whether the state needs a second current field, `τ_NEB`'s currency, whether
-the oracle stays absent at inference, and stage ordering.
+remain Javier's: the vector-potential slot's identity, the metastability band's currency,
+the continuity sign convention and whether the state needs a second current field, the
+nudged-elastic-band force-convergence tolerance's currency, whether the oracle stays absent
+at inference, and stage ordering.
 
 Landed as one commit on `audit2-mechanical-corrections`, so reverting is one command.
 

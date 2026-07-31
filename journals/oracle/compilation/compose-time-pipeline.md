@@ -28,7 +28,6 @@ depends-on:
   - representation-substrate
   - generic-dynamics
   - born-oppenheimer-levels
-  - canonical-vocabularies
   - named-formulas
   - computational-methods
   - property-templates

@@ -41,7 +41,6 @@ depends-on:
   - accuracy-ledger
   - training-stages
   - learnable-structure-contract
-  - boundary
 open-questions:
   - id: sampling-policy-record-home
     anchor: sampling

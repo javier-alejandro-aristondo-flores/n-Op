@@ -121,6 +121,12 @@ PROBES: list[tuple[str, str, str, str]] = [
      "missing 'summary'"),
     ("anchor on a data artifact",
      "[agent-contract#shape]", "[registry#some-anchor]", "has no anchors"),
+    ("name index points at a page that never uses the name",
+     "## A heading", "## A heading\n\n| `FooRecord` | see [agent-contract] |\n|---|---|",
+     "never uses it"),
+    ("depends-on edge that the body never cites",
+     "depends-on: [agent-contract]", "depends-on: [agent-contract, glossary]",
+     "never cites it"),
     ("stale emitted corpus.json",
      None, None, "stale"),
     # Structural probes: these plant a whole file rather than mutating the victim,
@@ -210,6 +216,13 @@ def main() -> int:
                     continue
                 victim.write_text(text.replace(find, repl, 1), encoding="utf-8")
 
+            # A negative probe asserts the CONTENT is clean. Since the digest now
+            # hashes page bodies, the harness's own mutation registers as staleness —
+            # which is the digest working, not a finding about the content. So
+            # regenerate first and then judge.
+            if expect is None:
+                subprocess.run([sys.executable, str(work / "tools" / "check_structure.py")],
+                               capture_output=True, cwd=work)
             out = run(work)
             if expect is None:                     # negative probe: must stay clean
                 if "OK" in out:

@@ -14,7 +14,6 @@ anchors:
   overlap-resolution: "Overlap resolution"
 depends-on:
   - computational-methods
-  - named-formulas
   - typed-compositions
   - typeclass-alphabet
   - topology-atlas

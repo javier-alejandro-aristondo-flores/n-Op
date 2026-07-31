@@ -20,6 +20,7 @@ partial run that read like a clean one would be worse than no run at all.
 """
 from __future__ import annotations
 
+import hashlib
 import json
 import re
 import sys
@@ -203,6 +204,33 @@ def check_citations(pages: list[dict], errs: list[str], pending: list[str],
             errs.append(f"{rel}: line-number citation — line refs rot on every edit")
         if PATHCITE_RE.search(text):
             errs.append(f"{rel}: cites a page by path — cite the id")
+        cited = {c for c, _ in CITE_RE.findall(text)}
+        for edge in sorted(declared - cited):
+            errs.append(f"{rel}: depends-on names {edge!r} but the body never cites it "
+                        f"— the reverse index would overstate coupling")
+
+
+NAME_ROW = re.compile(r"^\s*\|\s*`([A-Za-z][A-Za-z0-9_]*)`\s*\|[^|]*\[([a-z0-9][a-z0-9-]*)\]")
+
+
+def check_name_index(pages: list[dict], errs: list[str]) -> None:
+    """A row that says 'this name is specified there' must be true of there.
+
+    Every such row already carries a *valid* citation — it resolves, it is in
+    depends-on, it passes every other rule. What is unchecked is the proposition
+    the row asserts about the target's contents. That is the structural blind
+    spot: the rules validate pointers, and a name index is a set of claims.
+    """
+    by_id = {p["fm"].get("id"): p for p in pages}
+    for p in pages:
+        for line in p["body"].splitlines():
+            m = NAME_ROW.match(line)
+            if not m:
+                continue
+            token, target = m.groups()
+            if target in by_id and token not in by_id[target]["body"]:
+                errs.append(f"{p['rel']}: name index says `{token}` is specified on "
+                            f"[{target}], and that page never uses it")
 
 
 def check_tables(pages: list[dict], errs: list[str]) -> None:
@@ -272,6 +300,16 @@ def check_vocabulary(pages: list[dict], schema: dict, errs: list[str]) -> None:
 
 
 def emit(pages: list[dict], owner: dict, schema: dict) -> dict:
+    # A digest of the pages this index was built from, so a READER can tell it is
+    # current. The checker already detects staleness; a reader consulting the index
+    # directly could not — and a stale index does not fail quietly here, it
+    # manufactures false findings, because a missing topic is documented as meaning
+    # "no page claims this" rather than "the index is behind". Content-hashed, not
+    # timestamped, so regeneration stays a no-op.
+    digest = hashlib.sha256()
+    for p in sorted(pages, key=lambda x: x["rel"]):
+        digest.update(p["rel"].encode())
+        digest.update(p["path"].read_bytes())
     libs = schema.get("libraries", {})
     referenced_by: dict[str, set] = {p["fm"]["id"]: set() for p in pages}
     for p in pages:
@@ -279,6 +317,7 @@ def emit(pages: list[dict], owner: dict, schema: dict) -> dict:
             if t in referenced_by:
                 referenced_by[t].add(p["fm"]["id"])
     return {
+        "source_digest": digest.hexdigest()[:16],
         "pages": {
             p["fm"]["id"]: {
                 "path": p["rel"], "title": p["fm"].get("title"),
@@ -318,6 +357,7 @@ def main() -> int:
     check_frontmatter(pages, schema, errs)
     owner = check_topics(pages, errs)
     check_citations(pages, errs, pending, schema, partial)
+    check_name_index(pages, errs)
     check_tables(pages, errs)
     check_vocabulary(pages, schema, errs)
 

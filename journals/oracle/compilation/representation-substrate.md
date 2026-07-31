@@ -30,7 +30,6 @@ depends-on:
   - compose-time-pipeline
   - generic-dynamics
   - canonical-vocabularies
-  - typeclass-alphabet
   - residual-definitions
   - residual-machinery
   - cert-obligations

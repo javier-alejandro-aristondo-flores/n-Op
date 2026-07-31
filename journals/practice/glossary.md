@@ -10,7 +10,6 @@ anchors:
   overloaded: "Tokens that need a qualifier"
 depends-on:
   - agent-contract
-  - conventions
   - traps
   - physics-graph
   - residual-definitions

@@ -29,7 +29,7 @@ open-questions:
 ## What the manifest is
 
 The manifest is the machine-readable table of named formulas: one row per
-formula, at `data/registry-manifest.csv`. It is canonical for every per-row
+formula, at [registry]. It is canonical for every per-row
 value. [named-formulas] states what a row *means* — the record, the tag
 vocabularies, the registration rules — and this page states what the table
 *looks like*.

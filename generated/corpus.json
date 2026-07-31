@@ -565,7 +565,6 @@
         "learnable-structure-contract",
         "library-landscape",
         "purpose-and-scope",
-        "residual-loss-design",
         "training-stages"
       ],
       "section": null,
@@ -697,7 +696,6 @@
         "architectural-principles",
         "build-verification",
         "capability-slices",
-        "compose-time-pipeline",
         "coupling-structure",
         "glossary",
         "multiscale-state",
@@ -834,7 +832,6 @@
       "depends_on": [
         "applicability-classifiers",
         "born-oppenheimer-levels",
-        "canonical-vocabularies",
         "cert-obligations",
         "computational-methods",
         "coupling-structure",
@@ -954,7 +951,6 @@
       "path": "journals/practice/conventions.md",
       "referenced_by": [
         "cert-obligations",
-        "glossary",
         "mvp-system",
         "traps"
       ],
@@ -1259,7 +1255,6 @@
         "canonical-vocabularies",
         "cert-obligations",
         "compose-time-pipeline",
-        "conventions",
         "coupling-structure",
         "generic-dynamics",
         "multiscale-state",
@@ -1529,9 +1524,7 @@
         "formula-registry",
         "glossary",
         "mvp-system",
-        "observable-bundles",
         "physics-graph",
-        "property-templates",
         "purpose-and-scope",
         "residual-loss-design",
         "residual-machinery",
@@ -1552,7 +1545,6 @@
         "born-oppenheimer-levels",
         "formula-registry",
         "multiscale-state",
-        "named-formulas",
         "residual-definitions",
         "traps"
       ],
@@ -1836,7 +1828,6 @@
       "depends_on": [
         "cert-obligations",
         "computational-methods",
-        "named-formulas",
         "topology-atlas",
         "typeclass-alphabet",
         "typed-compositions"
@@ -1991,7 +1982,6 @@
         "product",
         "residual-definitions",
         "residual-machinery",
-        "typeclass-alphabet",
         "unified-state"
       ],
       "journal": "oracle",
@@ -2133,7 +2123,6 @@
       "depends_on": [
         "accuracy-ledger",
         "applicability-classifiers",
-        "boundary",
         "learnable-structure-contract",
         "named-formulas",
         "pino-bridge",
@@ -2463,7 +2452,6 @@
         "named-formulas",
         "physics-graph",
         "property-templates",
-        "representation-substrate",
         "residual-definitions",
         "topology-atlas"
       ],
@@ -2557,6 +2545,7 @@
       "title": "The unified state"
     }
   },
+  "source_digest": "d1c79133021df2c5",
   "topics": {
     "CouplingChannel record": {
       "page": "coupling-structure"

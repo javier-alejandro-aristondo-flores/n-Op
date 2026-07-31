@@ -10,7 +10,6 @@ anchors:
   contents: "What each bundle holds"
   linear-response-primitives: "Rows that feed several bundles"
 depends-on:
-  - named-formulas
   - formula-registry
   - born-oppenheimer-levels
   - multiscale-state

@@ -72,6 +72,23 @@ dimensionally inconsistent — carrier density in `m⁻³` added to current dive
 `A·m⁻³`, terms that differ by exactly one factor of charge. **That is not a typo; it is what
 happens when no unit discipline exists to catch it.**
 
+**Re-derived by hand, independently, with a firing control.** `SI units`, `atomic units`,
+`Hartree atomic`, `unit convention`, `base units` and `all units` each return **zero files**.
+The control fires — `eV` appears in 7 files and `meV/atom` in 3 — so unit vocabulary is
+reachable by search and the absence is real. Meanwhile the registry *requires* what it never
+defines:
+
+> | `signature` | typed inputs to output, with units |
+
+**And the corpus knows the hazard.** Its only use of the phrase is a trap warning:
+
+> The 4π in the source term rides the unit system. *Breaks:* factor-4π errors across the
+> electromagnetic sector. — advisory
+
+The corpus identifies the unit system as load-bearing, names a specific factor-4π failure
+mode across an entire physical sector, and **still never declares which system it uses.**
+That is stronger than the finding as originally reported.
+
 ### 2 · The core types are names without definitions
 
 `ObservableRef`, `Layer0Type`, `AxisLabel`, `EvidenceOps`, `InputKind`, `EnvField`,

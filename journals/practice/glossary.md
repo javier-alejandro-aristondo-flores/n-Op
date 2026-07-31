@@ -11,24 +11,25 @@ anchors:
 depends-on:
   - agent-contract
   - traps
+  - accuracy-ledger
+  - applicability-classifiers
+  - born-oppenheimer-levels
+  - cert-obligations
+  - compose-time-pipeline
+  - computational-methods
+  - coupling-structure
+  - crystal-inputs
+  - generic-dynamics
+  - multiscale-state
+  - named-formulas
+  - observable-bundles
   - physics-graph
+  - pino-bridge
+  - property-templates
+  - representation-substrate
   - residual-definitions
   - residual-machinery
-  - multiscale-state
-  - cert-obligations
-  - pino-bridge
-  - compose-time-pipeline
-  - applicability-classifiers
   - topology-atlas
-  - born-oppenheimer-levels
-  - unified-state
-  - canonical-vocabularies
-  - observable-bundles
-  - named-formulas
-  - coupling-structure
-  - representation-substrate
-  - generic-dynamics
-  - accuracy-ledger
 open-questions: []
 ---
 # Glossary
@@ -51,6 +52,14 @@ There are two keys into the corpus, and they answer different questions.
   specify them. Those names are not the same strings as the topics, which is why the
   topic map does not answer here.
 
+**Every row asserts one thing: the name in the left cell appears on the page in the
+right cell.** That is a claim about the target's *contents*, not about whether the
+citation resolves — a row can satisfy every rule in the schema and still be false, which
+is how this index drifted before anything checked it. The left cell is therefore the name
+**as its own page writes it**, including that page's spelling and capitalization; where
+this page's own style would spell it differently, the page it points at wins, because a
+name not written the way a reader will search for it is not an index entry.
+
 If a name is missing from both, no page claims it. That is a finding, not a lookup
 failure: decide which page should own it and add the topic there
 ([agent-contract#placement]).
@@ -59,77 +68,98 @@ failure: decide which page should own it and add the topic there
 
 | Name | Specified in |
 |---|---|
-| `PhysicsGraph` | [physics-graph] |
-| `Node` | [physics-graph] |
-| `NodeKind` | [physics-graph] |
-| `InputKind` | [physics-graph] |
-| `OutputRole` | [physics-graph] |
-| `FormulaApply` | [physics-graph] |
-| `ResidualLeaf` | [physics-graph] |
-| `CompressionPlan` | [physics-graph] |
-| `ResidualKey` | [residual-definitions] |
-| `ContributionFacets` | [residual-definitions] |
-| `CategoryTag` | [residual-definitions] |
-| `ResidualVector` | [residual-definitions] |
-| curriculum gating defaults | [residual-definitions] |
-| `AxisLabel` | [residual-machinery] |
-| `ResidualGenerator` | [residual-machinery] |
-| `IterationSnapshot` | [residual-machinery] |
-| `OneShotCert` | [residual-machinery] |
-| `IterativeResult` | [residual-machinery] |
-| `StateTier` | [multiscale-state] |
-| `DefectSpecies` | [multiscale-state] |
-| defect population, the slow-tier fiber | [multiscale-state] |
-| `DeviceMesh` and `MacroState` | [multiscale-state] |
-| homogenization map | [multiscale-state] |
-| the slow- and macro-tier equation-of-motion residual families | [multiscale-state] |
-| `CertEvidence` | [cert-obligations] |
-| `SqliteReferenceCache` | [cert-obligations] |
-| `GroundTruthBridgeGenerator` | [pino-bridge] |
-| `RoaringCoverageMask` | [pino-bridge] |
-| `UnifiedState`, the bridge-surface name for the micro state | [pino-bridge] |
-| the operator seam itself | [pino-bridge] |
-| symbolic lift | [compose-time-pipeline] |
-| symmetry quotient | [compose-time-pipeline] |
-| invariant synthesis | [compose-time-pipeline] |
-| algebraic simplification | [compose-time-pipeline] |
-| lowering and adjoint synthesis | [compose-time-pipeline] |
-| runtime kernel application | [compose-time-pipeline] |
-| the always-cheap discipline | [compose-time-pipeline] |
+| `PhysicsGraph` | [physics-graph#the-graph] |
+| `Node` | [physics-graph#node] |
+| `NodeKind` | [physics-graph#node-kinds] |
+| `InputKind` | [physics-graph#node-kinds] |
+| `MethodInvoke` | [physics-graph#node-kinds] |
+| `FormulaApply` | [physics-graph#node-kinds] |
+| `OutputRole` | [physics-graph#output-role] |
+| `ResidualLeaf` | [physics-graph#output-role] |
+| `CompressionPlan` | [physics-graph#sidecars] |
+| `ResidualKey` | [residual-definitions#residualkey] |
+| `ContributionFacets` | [residual-definitions#facets] |
+| `CategoryTag` | [residual-definitions#categorytag] |
+| the curriculum category gate | [residual-definitions#curriculum-gate] |
+| `ResidualVector` | [compose-time-pipeline#runtime-kernel-application] |
+| `CertEvidence` | [compose-time-pipeline#runtime-kernel-application] |
+| `AxisLabel` | [residual-machinery#generator-record] |
+| `ResidualGenerator` | [residual-machinery#generator-record] |
+| `IterationSnapshot` | [residual-machinery#dressing-certs] |
+| `OneShotCert` | [residual-machinery#dressing-certs] |
+| `IterativeResult` | [residual-machinery#dressing-certs] |
+| `DefectSpecies` | [multiscale-state#defect-species] |
+| the slow-state schema | [multiscale-state#slow-state-schema] |
+| `EOM/DefectPopulation` | [multiscale-state#eom-defect-population] |
+| `EOM/Continuum` | [multiscale-state#eom-continuum] |
+| `DeviceMesh` | [multiscale-state#device-mesh] |
+| `MacroState` | [multiscale-state#macro-state-schema] |
+| the homogenisation map | [multiscale-state#homogenisation-map] |
+| `SqliteReferenceCache` | [cert-obligations#reference-cache] |
+| `RoaringCoverageMask` | [cert-obligations#reference-cache] |
+| `GroundTruthBridgeGenerator` | [pino-bridge#import] |
+| `UnifiedState` | [pino-bridge#validate] |
+| symbolic lift | [compose-time-pipeline#symbolic-lift] |
+| symmetry quotient | [compose-time-pipeline#symmetry-quotient] |
+| invariant synthesis | [compose-time-pipeline#invariant-synthesis] |
+| algebraic simplification | [compose-time-pipeline#algebraic-simplification] |
+| lowering and adjoint synthesis | [compose-time-pipeline#lowering-and-adjoint-synthesis] |
+| runtime kernel application | [compose-time-pipeline#runtime-kernel-application] |
+| the always-cheap discipline | [compose-time-pipeline#always-cheap] |
 | applicability classifier | [applicability-classifiers] |
 | topology atlas | [topology-atlas] |
-| Born-Oppenheimer levels | [born-oppenheimer-levels] |
-| state component | [unified-state] |
+| `DiscreteStructure` | [topology-atlas#entry] |
+| the four Born–Oppenheimer levels | [born-oppenheimer-levels] |
 | observable bundle | [observable-bundles] |
-| `CrystalSymmetryGroup` | [canonical-vocabularies] |
-| `IrrepLabel` | [canonical-vocabularies] |
-| cost tier | [named-formulas] |
-| differentiability tag | [named-formulas] |
-| `CouplingChannel` | [coupling-structure] |
-| `StatePiece` | [coupling-structure] |
-| `InvariantTerm` | [coupling-structure] |
-| `generate-invariants` | [coupling-structure] |
-| `GeneratorOutput` | [coupling-structure] |
-| `CouplingSpec` | [coupling-structure] |
-| `MechanismRange` | [coupling-structure] |
-| `polynomial_sufficient` | [coupling-structure] |
-| `KernelExt` | [coupling-structure] |
+| `CrystalSymmetryGroup` | [coupling-structure] |
+| `IrrepLabel` | [representation-substrate#clusters] |
+| evaluation cost | [named-formulas#cost-tiers] |
+| differentiability | [named-formulas#diff-tags] |
+| `CouplingChannel` | [coupling-structure#channel-record] |
+| `StatePiece` | [coupling-structure#channel-record] |
+| `StateComponent` | [coupling-structure#channel-record] |
+| `SubDofTag` | [coupling-structure#channel-record] |
+| `InvariantTerm` | [coupling-structure#invariant-generator] |
+| `generate-invariants` | [coupling-structure#invariant-generator] |
+| `GeneratorOutput` | [coupling-structure#generator-contract] |
+| `CouplingSpec` | [coupling-structure#couplingspec] |
+| `MechanismRange` | [coupling-structure#mechanism-range-table] |
+| `polynomial_sufficient` | [coupling-structure#mechanism-range-table] |
+| `KernelExt` | [coupling-structure#kernel-ext] |
 | `GaugeRule` | [coupling-structure] |
-| `CoverageBound` | [coupling-structure] |
-| `TheoryContext` | [coupling-structure] |
-| `SubDofTag` | [coupling-structure] |
+| `CoverageBound` | [coupling-structure#coverage-policy] |
+| `TheoryContext` | [coupling-structure#theory-context-placement] |
+| `ProvenanceLedger` | [coupling-structure#provenance-contract] |
+| `AntisymmForm` | [coupling-structure#target-shapes] |
+| `PSDSymmForm` | [coupling-structure#target-shapes] |
 | `ContentAddress` | [representation-substrate] |
-| `Universe` | [representation-substrate] |
-| `SparseSet` | [representation-substrate] |
-| `PersistentMap` | [representation-substrate] |
-| `MerkleDAG` | [representation-substrate] |
-| `EvidenceBearing` | [representation-substrate] |
-| `EvidenceDAG` | [representation-substrate] |
-| `SymbolicTensorOps` | [representation-substrate] |
-| `PredicateOps` | [representation-substrate] |
-| `GroupOps` | [representation-substrate] |
-| the two-generator dynamics form | [generic-dynamics] |
-| ledger-tracked observables, and the ledger count | [accuracy-ledger] |
+| `Universe` | [representation-substrate#primitives] |
+| `SparseSet` | [representation-substrate#primitives] |
+| `PersistentMap` | [representation-substrate#primitives] |
+| `MerkleDAG` | [representation-substrate#primitives] |
+| `EvidenceBearing` | [representation-substrate#clusters] |
+| `SymbolicTensorOps` | [representation-substrate#op-signatures] |
+| `PredicateOps` | [representation-substrate#op-signatures] |
+| `GroupOps` | [representation-substrate#op-signatures] |
+| `EvidenceOps` | [representation-substrate#op-signatures] |
+| `PeriodicityStructure` | [crystal-inputs#periodicity-structure] |
+| `SiteDecoration` | [crystal-inputs#site-decoration] |
+| `ResponseKernel` | [computational-methods] |
+| the two-generator form | [generic-dynamics#generic-form] |
+| ledger-tracked observables | [accuracy-ledger#observable-counts] |
+| `AlgebraicOf` | [property-templates#signatures] |
+| `ClassifyOf` | [property-templates#signatures] |
+| `HarmonicStiffnessHessianOf` | [property-templates#signatures] |
+| `KineticEvolutionOf` | [property-templates#signatures] |
+| `PathStationaryOf` | [property-templates#signatures] |
+| `ResponseOfTo` | [property-templates#signatures] |
+| `SecondDerivativeOf` | [property-templates#signatures] |
+| `SelfConsistentChargeBalanceOf` | [property-templates#signatures] |
+| `SelfConsistentRenormalizationOf` | [property-templates#signatures] |
+| `SpectralAggregateOf` | [property-templates#signatures] |
+| `SpectrumOf` | [property-templates#signatures] |
+| `StateReadoutOf` | [property-templates#signatures] |
+| `SymmetryAdaptedHamiltonianOf` | [property-templates#signatures] |
 
 ## Tokens that need a qualifier
 

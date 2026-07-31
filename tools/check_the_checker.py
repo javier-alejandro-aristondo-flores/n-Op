@@ -133,6 +133,17 @@ PROBES: list[tuple[str, str, str, str]] = [
     ("depends-on edge that the body never cites",
      "depends-on: [agent-contract]", "depends-on: [agent-contract, glossary]",
      "never cites it"),
+    # Frontmatter carries prose, so it can carry a tag. And a retired marker that is
+    # also a proper noun stays correct when written in full — the corpus retired the
+    # missing-data marker and kept the software names.
+    ("retired tag in frontmatter",
+     "open-questions: []",
+     "open-questions:\n  - id: q\n    anchor: here\n    summary: \"A bare `GAP` row.\"",
+     "retired tag"),
+    ("qualified proper noun is NOT a retired tag",
+     "open-questions: []",
+     "open-questions:\n  - id: q\n    anchor: here\n    summary: \"The `GAP` computer-algebra system.\"",
+     None),
     ("stale emitted corpus.json",
      None, None, "stale"),
     # Structural probes: these plant a whole file rather than mutating the victim,

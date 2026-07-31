@@ -42,6 +42,10 @@ EMITTED = ROOT / "generated" / "corpus.json"
 # the checkers as programs to run rather than as data to cite.
 PATH_EXEMPT = {"agent-contract", "conventions", "traps"}
 
+# Tokens whose bare form is retired but which remain correct as part of a proper
+# noun. The corpus retired the missing-data marker and kept the software names.
+QUALIFIED = {"GAP": ("computer-algebra", "Gaussian Approximation")}
+
 EXEMPT = {
     "agent-contract": "specifies the vocabulary, so it must name what it forbids",
     "traps":          "warns that short tokens collide with physics, by example",
@@ -302,9 +306,16 @@ def check_vocabulary(pages: list[dict], schema: dict, errs: list[str]) -> None:
         # contains C2; an unbacked D1 is a deformation potential. Neither is a
         # retired tag, and a looser rule would flag both — which is how the old
         # corpus's version of this check came to be deleted for crying wolf.
-        body = FENCE_RE.sub("", p["body"])
-        for span in INLINE_CODE_RE.findall(body):
-            tok = span.strip("` ").strip()
+        # Frontmatter too: an open question's summary is prose and can carry a tag.
+        region = FENCE_RE.sub("", p["body"]) + "\n" + p["fm_text"]
+        for m in INLINE_CODE_RE.finditer(region):
+            tok = m.group(0).strip("` ").strip()
+            # A retired marker that is also an external proper noun is legitimate
+            # when written in full — the corpus keeps the software names and retires
+            # only the bare marker. Judge by what follows it.
+            trailer = region[m.end():m.end() + 48].lstrip()
+            if tok in QUALIFIED and trailer.startswith(QUALIFIED[tok]):
+                continue
             if tok in retired:
                 opts = " or ".join(f"{new!r} ({fam})" for fam, new in retired[tok])
                 errs.append(f"{rel}: retired tag `{tok}` — use {opts}")

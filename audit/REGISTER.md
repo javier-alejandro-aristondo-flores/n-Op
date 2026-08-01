@@ -38,7 +38,7 @@ the answer changes what happens next.
 | Pass | Question | Result | File |
 |---|---|---|---|
 | **A — implementability** | Can a competent implementer build the oracle from this corpus alone? | **No.** 75 findings — 61 ABSENT, 14 UNDERSPECIFIED. Four auditors, no contact, **four independent convergences** including one found by all three | `IMPLEMENTABILITY.md` |
-| **B — physical completeness** | Does the oracle check every law a crystal must satisfy? | **Substantially yes** — two planned attack angles died on grounding. One real gap survives: the refusal set overlaps the target operating envelope and nothing aggregates it | `findings/a3-physics-completeness.md` |
+| **B — physical completeness** | Does the oracle check every law a crystal must satisfy? | **Mixed.** Three planned angles died on grounding — the corpus's coverage of its own target environment is genuinely strong. But the **seven-slot closure claim fails twice**, and one of those failures corrected a pass C recommendation | `findings/a3-physics-completeness.md` |
 | **C — the six physics questions** | — | **All six closed** with a recommendation to ratify or reject. Two contradict Javier's recorded design intent and say so at the head | `DECISIONS.md` |
 
 **The four load-bearing holes:** there is **no unit system anywhere in the corpus**; the core
@@ -53,9 +53,22 @@ fixed mid-verification — blockquotes used for both evidence and commentary, an
 table-cell pipe escaping — which between them had falsely condemned 114 quotations. **The
 instrument was wrong, not the auditors**, for the sixth and seventh time in this program.
 
+**The state type is incomplete in three independent ways**, found by three separate routes and
+landing on the same object: no second current field (so the hole density has no equation of
+motion at all); no conjugate momentum for the electromagnetic field (so the `EOM/A` residual
+has no computable right-hand side); and no isotope, only atomic number — in a **diamond-first**
+build whose flagship material has the largest known isotope effect, and whose own `traps.md`
+**enforces** an isotope declaration the state cannot carry. **Reopen the state type once, for
+all three.**
+
 **The honest caveat:** pass A primed for absence, so 61 is a *census of named holes*, not a
 percentage. The only true rate is the registry's stratified sample — **3 of 20 rows
 implementable**.
+
+**One correction landed against this audit's own work.** Pass C called the vector-potential fix
+*"one word."* Pass B's angle 3 showed it is not — deleting `external` leaves the equation of
+motion undefined. The audit caught itself, which is the only reason to run the angle that was
+predicted to find nothing.
 
 ---
 

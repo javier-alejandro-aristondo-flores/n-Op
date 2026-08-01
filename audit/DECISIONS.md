@@ -141,8 +141,50 @@ energy conserves.
 *caller* supplies a complete state. A self-consistent field is exactly the kind of hard
 channel the operator exists to produce.
 
-**Cheapest possible fix for the largest structural payoff:** one word, and the second reading's
-permanent false positive never appears.
+### Correction — this is not a one-word fix
+
+An earlier draft of this section called it *"the cheapest possible fix: one word."* **That was
+wrong**, and pass B's angle 3 is what caught it. Deleting *"external"* is necessary and not
+sufficient, because **the vector potential has no conjugate momentum.**
+
+Every other dynamical slot arrives as a canonical pair — positions with momenta, the cell with
+its momentum, each carrying its own symplectic block and its own residual category. `A` arrives
+alone. Yet the corpus asserts its Maxwell block is *canonical*, which is a claim about a
+conjugate pair:
+
+> Canonical blocks (symplectic `(R,P)`, `(h,Π_h)`; Lie–Poisson `γ̂`; Maxwell `A`)
+
+In the Coulomb gauge the corpus fixes, the transverse field's canonical momentum is the
+transverse electric field. **It is independent initial data** — `A` and `E_⊥` are the two
+quadratures of each mode, and `E_⊥` is not recoverable from `A` at an instant. So it is not
+emergent under the corpus's own axiom, it belongs to no other tier, and it is not one of the
+seven.
+
+The energy functional makes this self-evident: it is written as a functional of `A` alone and
+its integrand contains `E_⊥`. `B = ∇×A` is recoverable; `E_⊥` is not. **So `E_EM[A]` is not a
+functional of `A`, `δE/δx` has no computable value on that block, and the `EOM/A` residual has
+no right-hand side.**
+
+Verified by hand: `conjugate` occurs exactly twice in the corpus — once as `conjugate-gradient`,
+an optimiser and a false friend, and once as the cell-metric conjugate. Control fires — `Π_h`
+returns its slot, its symplectic block, its residual category and its kinetic-energy term, the
+full complement of a carried conjugate momentum. `A` has none of them.
+
+**Revised recommendation: delete "external" *and* add an eighth slot** carrying the transverse
+electric field as `A`'s conjugate momentum. The one-word version leaves the equation of motion
+undefined.
+
+### This is the second of three independent holes in the state type
+
+Three findings, three different routes, all landing on the same object:
+
+| Hole | Route | What the state cannot represent |
+|---|---|---|
+| No second current field | pass C, §1 above | Bipolar transport — and `p` has no equation of motion at all |
+| No conjugate momentum for the field | pass B, angle 3 | The transverse field's other quadrature, so `EOM/A` has no right-hand side |
+| No isotope, only atomic number | pass B, angle 3 | ¹²C versus ¹³C — in a **diamond-first** build, where the mass difference is 8.3%, phonon frequencies scale as `M^(−1/2)`, and `traps.md` **enforces** an isotope declaration on every thermal-conductivity reference row that the state type cannot carry |
+
+**The state type should be reopened once, for all three, rather than patched three times.**
 
 ---
 

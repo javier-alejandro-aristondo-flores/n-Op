@@ -116,6 +116,39 @@ def _spin_parity(frame: Frame) -> float:
     return float(min(abs(m - n) for n in candidates))
 
 
+def _occupation_bounds(frame: Frame) -> float:
+    """`0 <= f_nk <= 1` -- the Pauli exclusion principle, per spin channel.
+
+    The deviation is the largest excursion outside the unit interval, in either
+    direction. A correct calculation satisfies this exactly, so any nonzero value is a
+    parser bug (reading the wrong column, or a spin-degenerate occupancy of 2 recorded
+    where the schema expects 1) rather than a physical result.
+    """
+    worst = 0.0
+    for occ in frame.occupations:
+        worst = max(worst, float(np.max(occ) - 1.0), float(-np.min(occ)))
+    return max(worst, 0.0)
+
+
+def _kpoint_weight_normalisation(frame: Frame) -> float:
+    """`Sum_k w_k = 1` -- the Brillouin-zone measure integrates to one.
+
+    Cheap, and it guards every k-integrated quantity at once: unnormalised weights make
+    the electron count, the density of states and every transport integral wrong by the
+    same silent factor, while each of them individually still looks plausible.
+
+    **This check has a noise floor set by the producing file, not by the calculation,
+    and it is the only one of these that does.** The weights are exact rationals -- `n/N`
+    over the mesh -- but VASP prints them to eight decimals, so the parsed values sum to
+    slightly under one. Measured on a 7x7x7 mesh with 172 irreducible points: the printed
+    values sum to 0.99999935, a deviation of 6.5e-7, and the exact rationals sum to 1.
+    The floor therefore grows with the k-point count, at roughly 4e-9 per point. Any
+    tolerance placed on this residual must sit above that, and a value at the floor is
+    the file's precision rather than a defect.
+    """
+    return float(abs(np.sum(frame.kpoint_weights) - 1.0))
+
+
 INVARIANT_CHECKS: tuple[InvariantCheck, ...] = (
     InvariantCheck(
         name="net-force-vanishes",
@@ -156,6 +189,22 @@ INVARIANT_CHECKS: tuple[InvariantCheck, ...] = (
         category=CategoryTag.STATIC_SNAPSHOT,
         unit="bohr_magneton",
         written="an odd electron count forces an odd integer magnetisation",
+    ),
+    InvariantCheck(
+        name="occupations-within-unit-interval",
+        reads=("occupations",),
+        evaluate=_occupation_bounds,
+        category=CategoryTag.POSITIVITY,
+        unit="dimensionless",
+        written="0 <= f_nk <= 1",
+    ),
+    InvariantCheck(
+        name="kpoint-weights-sum-to-one",
+        reads=("kpoint_weights",),
+        evaluate=_kpoint_weight_normalisation,
+        category=CategoryTag.ALGEBRAIC_SUM_RULES,
+        unit="dimensionless",
+        written="Sum_k w_k = 1",
     ),
 )
 

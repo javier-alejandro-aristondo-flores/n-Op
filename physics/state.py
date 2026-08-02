@@ -142,5 +142,10 @@ class Frame:
     magnetic_moment: float | None = None
     #: volume as *reported* by the producing calculation (not recomputed from the cell)
     reported_volume: float | None = None
+    #: total energy of the cell, eV. Extensive -- it scales with cell size, so it is only
+    #: ever compared between frames of the same cell content. Carried because the
+    #: equilibrium volume has two independent routes, the minimum of E(V) and the zero of
+    #: the mean stress, and their disagreement is a measurable basis-set diagnostic.
+    total_energy: float | None = None
     #: free-form provenance, carried but never interpreted
     provenance: dict = field(default_factory=dict)

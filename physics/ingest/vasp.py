@@ -88,6 +88,7 @@ def read_frame(path: str | Path) -> Frame:
         n_electrons=_float_or_none(vr.parameters.get("NELECT")),
         magnetic_moment=moment,
         reported_volume=float(structure.volume),
+        total_energy=_float_or_none(vr.final_energy),
         provenance={
             "path": str(path),
             "ispin": ispin,

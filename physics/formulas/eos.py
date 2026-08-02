@@ -30,6 +30,8 @@ from dataclasses import dataclass
 
 import numpy as np
 
+from ..units import EV_PER_ANGSTROM3_TO_GPA
+
 
 @dataclass(frozen=True)
 class EquationOfState:
@@ -53,11 +55,6 @@ class EquationOfState:
         return float((4.0 * self.equilibrium_volume) ** (1.0 / 3.0))
 
 
-#: eV/angstrom^3 -> GPa. The elementary charge is *exact* since the 2019 SI redefinition,
-#: e = 1.602176634e-19 C, so this conversion is exact too: 1 eV/A^3 = 160.2176634 GPa.
-#: (The pre-2019 CODATA-2014 value 160.21766208 is stale by 8e-9 relative -- immaterial for
-#: a bulk modulus, and still wrong.)
-EV_PER_ANGSTROM3_TO_GPA = 160.2176634
 
 
 def birch_murnaghan_energy(volume, energy_min, volume_0, bulk_modulus, bulk_prime):

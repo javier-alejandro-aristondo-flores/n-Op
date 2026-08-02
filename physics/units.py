@@ -52,6 +52,13 @@ GPA_TO_KBAR = 10.0
 EV_TO_MEV = 1000.0
 MEV_TO_EV = 1.0e-3
 
+# An energy density in eV/angstrom^3 is a pressure, and every elastic constant and bulk
+# modulus arrives that way before it is reported in GPa. The elementary charge is *exact*
+# since the 2019 SI redefinition, e = 1.602176634e-19 C, so this conversion is exact too.
+# (The pre-2019 CODATA-2014 value 160.21766208 is stale by 8e-9 relative -- immaterial to a
+# bulk modulus, and still wrong.)
+EV_PER_ANGSTROM3_TO_GPA = 160.2176634
+
 
 def stress_kbar_to_gpa(value):
     """VASP stress (kB) -> canonical stress (GPa).

@@ -72,6 +72,25 @@ def read_family(family_dir: str | Path, sub_run: str = PBE) -> list[SeriesPoint]
     return sorted(points, key=lambda p: p.volume)
 
 
+def read_all_families(cache_dir: str | Path, sub_run: str = PBE) -> list[SeriesPoint]:
+    """Every extracted family under `cache_dir`, as one series.
+
+    The elastic fit wants *all* unique shapes rather than one family: a single family
+    explores one direction of strain space, and the cubic constants are only jointly
+    determined by normal and shear strains together. Families that have not been
+    extracted are simply absent -- this returns what is on disk, and the caller decides
+    whether that is enough by looking at how many points survive its strain window.
+    """
+    cache_dir = Path(cache_dir)
+    if not cache_dir.is_dir():
+        raise FileNotFoundError(f"{cache_dir} is not a directory")
+
+    points: list[SeriesPoint] = []
+    for family in sorted(p for p in cache_dir.iterdir() if p.is_dir()):
+        points.extend(read_family(family, sub_run))
+    return points
+
+
 def energy_volume_curve(points: list[SeriesPoint]) -> tuple[list[float], list[float]]:
     """Volumes and total energies, for the points that reported an energy."""
     have = [p for p in points if p.frame.total_energy is not None]

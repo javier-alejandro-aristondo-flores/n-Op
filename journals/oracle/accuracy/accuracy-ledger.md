@@ -40,6 +40,7 @@ depends-on:
   - compose-time-pipeline
   - multiscale-state
   - traps
+  - build-sequence
 open-questions:
   - id: mesh-uncertainty-floor-undeclared
     anchor: observable-regimes
@@ -97,8 +98,8 @@ cannot meet design-grade, the gap is named rather than narrowed.
 Two counts circulate and they are not the same number.
 
 - **Catalog observables** — 52. The observables of the derivation catalog.
-- **Ledger-tracked observables** — 59. Everything this ledger carries an accuracy regime
-  for: the 52 catalog observables plus seven more.
+- **Ledger-tracked observables** — 60. Everything this ledger carries an accuracy regime
+  for: the 52 catalog observables plus eight more.
 
 A document quoting "52" means the catalog sense.
 
@@ -170,6 +171,7 @@ question `figures-of-merit-count`.
 | 57 | \|F_hkl\|² diffraction intensity (row 132) | peak positions exact given the cell and ion positions; ±10% on intensity ratios | kinematic limit, with no extinction or multiple scattering; the Debye-Waller factor comes from the phonon density of states |
 | 58 | Raman response (row 133) | shifts ±0.2 meV, zone-centre grade; activities factor ~2 | the shifts ride #9; the activities are the new linear-response output |
 | 59 | radiative recombination (row 134) | order of magnitude on the coefficient | negligible in the ultra-wide-gap device balance, given the tiny intrinsic carrier density; a photoluminescence validation channel only |
+| 60 | equilibrium lattice constant a₀ | **±1%, against experiment, in the computed currency** | the relaxed geometry: the first output of the structure slice and the input every other row is evaluated on. The regime is the accuracy class of the functional, not of the measurement — a semi-local functional lands within about 1% on a covalent solid, and the diamond sweep measures **PBE +0.196% and a gap-calibrated hybrid −0.575%** against the experimental anchor. The battery's ±0.001 Å is diffraction precision and is provenance, not a target: used as a gate it would refuse both functionals by 7× and 20×. Whichever functional produces a₀ must be named beside it, because the two differ by more than this regime is wide |
 
 ## MVP design-grade targets
 
@@ -189,6 +191,21 @@ has passed — no code exists yet.
 | κ at 1100 K | **±35% falling to ±15%** with the four-phonon correction | path-met — registry rows 121, 122; battery row κ at 1100 K |
 | formation energy at 300 K | **±0.2 eV** | path-met — registry rows 30 and the finite-size correction 31–33; battery cohesive-energy and graphite-boundary anchors |
 | mobility at 300 K | **factor 2** | path-met with caveats — battery time-of-flight electron and hole mobilities |
+| maximum phonon energy at 300 K | **±5%**, the optical branch of regime #9 | path-met — registry row 9; battery row `phonon-max-energy`, diamond |
+| equilibrium lattice constant | **±1%** in the computed currency, regime #60 | **anchor-met, path-open** — battery row `lattice-constant-a`, diamond, but **no registry row emits an equilibrium geometry**. It is read off where the hydrostatic part of the structural residual vanishes across a volume series, which is a readout of an existing residual rather than a formula, and no row names that readout |
+
+Every quantity the MVP's closing run evaluates ([build-sequence#exit-criterion]) appears
+above. The last two were added when that run was first built against real data: both are
+named in the closing run, and neither had a headline target.
+
+**Two of these targets are stated in a currency the battery is not.** The lattice constant
+and the metastability band are both anchored to measurements and consumed as computed
+numbers, and for both the functional's error is larger than the measurement's uncertainty —
+7× and 20× for the lattice constant under the two functionals in the diamond sweep. A target
+must therefore name the currency it is valued in, and a measurement's uncertainty is never
+a target: it says how well the world was observed, not how well a method must reproduce it.
+The converse hazard is the one the practice journal already carries
+([traps#target-is-not-measurement]); this is the same confusion running the other way.
 
 The reference battery checks these at the MVP anchors ([cert-obligations#reference-cache]).
 

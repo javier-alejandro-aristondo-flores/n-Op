@@ -337,6 +337,7 @@
         "what-this-is": "What this ledger is"
       },
       "depends_on": [
+        "build-sequence",
         "cert-obligations",
         "compose-time-pipeline",
         "coupling-structure",
@@ -607,6 +608,7 @@
       ],
       "path": "journals/n-op/build/build-sequence.md",
       "referenced_by": [
+        "accuracy-ledger",
         "build-verification",
         "generic-dynamics",
         "named-formulas",
@@ -2547,7 +2549,7 @@
       "title": "The unified state"
     }
   },
-  "source_digest": "1cb0988173cb1819",
+  "source_digest": "2a1b0b429ec1f82f",
   "topics": {
     "CouplingChannel record": {
       "page": "coupling-structure"

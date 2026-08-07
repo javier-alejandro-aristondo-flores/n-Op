@@ -37,6 +37,9 @@ open-questions:
   - id: environment-schema-at-the-seam
     anchor: conditioning-inputs
     summary: "The seam obliges the operator to accept the environment record as named typed conditioning channels, but no page fixes that record's field list, units or admissible ranges — so the obligation names a channel whose contents cannot be checked."
+  - id: operator-code-governed-by-an-absent-spec
+    anchor: scope
+    summary: "The operator library's modules cite the numbered sections of a specification that is not in this base — thirty references across ten files, to sections 3, 4.4, 5, 6.2, 6.4, 6.5, 6.6, 7.1, 7.6 and 8. They are legitimate external citations under the citation rule, and they resolve to nothing a reader here can open. Two files also cite this page's seam-purity anchor directly, and those two are the whole of the correspondence between the operator journal and the operator library. The twin-tree layout therefore places code beside pages it was not written against: the adjacency is structural and is not evidence of specification. Which corpus pages, if any, those sections correspond to is unestablished, and establishing it requires the absent document rather than inference from subject matter."
 ---
 # The learnable-structure contract
 

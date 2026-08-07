@@ -699,7 +699,7 @@ defect was in what the calibration *established*. *Rule:* coverage is **derived 
 checker's source**, never from a list kept beside it; a list of what is covered drifts
 exactly like the thing it describes. *Breaks:* the whole evidence chain, silently, because
 a calibration is the one artifact whose incompleteness nothing downstream can detect. —
-enforced, `tools/check_the_checker.py`
+enforced, `apparatus/tools/check_the_checker.py`
 
 ### A checker inherits the soundness of its premise
 

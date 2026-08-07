@@ -10,9 +10,11 @@ structure prediction, electron-cloud diffusion, and heat diffusion. The specific
 comprehensive; the build is diamond-first.
 
 The specification came first and still dominates. The oracle library has begun —
-`physics/` scores real VASP output against invariants, equations of state and elastic
-constants, under 42 tests — and four go/no-go studies in `feasibility/` have measured
-whether the operator has a signal worth learning. The other two libraries are empty.
+`programs/oracle/` scores real VASP output against invariants, equations of state and
+elastic constants, under 42 tests — and four go/no-go studies in
+`apparatus/feasibility/` have measured whether the operator has a signal worth learning.
+The operator library answers one of them: it learns strain → HSE06(0.27) electronic
+structure for diamond, and beats the baseline it contains. The loops library is empty.
 
 ## Start here
 
@@ -20,38 +22,51 @@ whether the operator has a signal worth learning. The other two libraries are em
 front door, for a person or an agent. It is short, and it is the specification the
 checker parses, so it cannot drift from what is enforced.
 
-Then, to find anything: **`generated/corpus.json`**. Its `topics` map answers *"which
-page owns this?"* in one hop, for every one of 302 topics. It is emitted, never
+Then, to find anything: **`apparatus/generated/corpus.json`**. Its `topics` map answers
+*"which page owns this?"* in one hop, for every one of 302 topics. It is emitted, never
 hand-written.
 
 ## The shape
 
-n-Op is the project. Beneath it sit three **libraries**, each serving to build it.
+**The specification and the implementation are twin trees.** A journal and the library it
+specifies carry the same name, so the same subpath under the other root reaches the work
+that realizes it — `journals/oracle/accuracy/` against `programs/oracle/accuracy/`, and
+`tests/oracle/accuracy/` beside them.
 
 | | |
 |---|---|
-| **`physics/`** | the oracle library — encodes the laws, scores a candidate state against them, and never solves, completes, or judges |
-| **`informed-operator/`** | the operator library — the neural operator, which consumes the oracle's residuals during one training stage |
-| **`interface/`** | the loops library — training, design search, active learning |
-
-`informed-operator/` and `interface/` are empty; the specification for them is the corpus.
-`physics/` is under way — see `journals/` for what it is required to do, and the tests for
-what it currently does.
+| **`programs/oracle/`** | the oracle library — encodes the laws, scores a candidate state against them, and never solves, completes, or judges |
+| **`programs/operator/`** | the operator library — the neural operator, which consumes the oracle's residuals during one training stage |
+| **`programs/loops/`** | the loops library — training, design search, active learning |
 
 ```
 journals/          the specification — 50 pages
   oracle/          state · laws · compilation · certification · registry · accuracy · seams
   operator/        seam · structure · training · loss
-  interface/       the loops boundary
+  loops/           the loops boundary
   n-op/            purpose · build
   practice/        agent-contract · conventions · traps · glossary
-log/timeline.md    the research record — the only place history is kept
-audit/             the corpus audit — can the oracle be built from this specification?
-feasibility/       four go/no-go studies — is there a signal worth building it for?
-generated/         corpus.json, emitted; regenerating it is a no-op
-data/              the registry, the reference battery, the diamond sweeps
-tools/             the checkers, and the calibrations that prove they are looking
+programs/          the implementation, mirroring journals/ section for section
+  oracle/          state · laws · certification · registry · accuracy · seams
+  operator/        seam · training · structure (empty) · models · the lifecycle modules
+  loops/           empty; the specification for it is the corpus
+tests/             mirrors programs/, section for section
+apparatus/         everything that checks or feeds the two trees
+  apparatus/log/timeline.md  the research record — the only place history is kept
+  audit/           the corpus audit — can the oracle be built from this specification?
+  feasibility/     four go/no-go studies — is there a signal worth building it for?
+  generated/       corpus.json, emitted; regenerating it is a no-op
+  data/            the registry, the reference battery, the diamond sweeps
+  tools/           the checkers, and the calibrations that prove they are looking
 ```
+
+**The mirror is section-level and not enforced.** A section directory with no code is an
+empty directory, not a finding — `programs/operator/structure/` is empty against five
+pages. Sections appear on the implementation side only where the correspondence is real,
+so a library organized on a different axis than its journal keeps that axis and its files
+sit flat. `programs/operator/` decomposes by data-and-experiment lifecycle rather than by
+the anatomy its journal describes, and filing one into the other would assert a
+correspondence the corpus does not state.
 
 ## How it holds together
 
@@ -71,19 +86,21 @@ two checkers were written for that collision and then deleted because no rule co
 separate them. Spelling the corpus half out separates them by construction.
 
 **Pages carry no history.** They state what is true, in the present tense. Research
-advancement is recorded in `log/timeline.md`, which is a compliance record and carries
+advancement is recorded in `apparatus/log/timeline.md`, which is a compliance record and carries
 date, finding, evidence, attribution, and what each entry superseded.
 
-**What is not yet known is declared where it is missing.** 61 open questions live in the
+**What is not yet known is declared where it is missing.** 62 open questions live in the
 frontmatter of the page that owns the affected topic; the corpus-wide register is emitted
 from them, so it cannot disagree with the pages it summarizes.
 
 ## Checking
 
 ```
-python tools/check_structure.py          regenerate the index, then check
-python tools/check_structure.py --check  check only; fails if the index is stale
-python tools/check_the_checker.py        prove the checker is looking
+python apparatus/tools/check_structure.py          regenerate the index, then check
+python apparatus/tools/check_structure.py --check  check only; fails if the index is stale
+python apparatus/tools/check_the_checker.py        prove the checker is looking
+python apparatus/tools/check_no_licensed_content.py   prove no pseudopotential leaked
+python -m pytest                                   42 tests over the oracle library
 ```
 
 **Green is not evidence a check ran.** This project has shipped two copies of the corpus
@@ -109,3 +126,8 @@ Anything the log marks as no longer present is readable from the tag that holds 
 ```
 git show pre-restructure-main:<path>
 ```
+
+Those paths predate the twin-tree layout, so they are the old ones — `physics/…`,
+`informed-operator/…`, `tools/…`, and the six directories now under `apparatus/`. A tag
+holds the tree as it stood; it does not follow a later rename. `git log --follow <new
+path>` crosses the move for a file that was tracked before it.

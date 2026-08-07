@@ -31,12 +31,30 @@ they cannot disagree. Changing a rule means changing that block.
 **libraries**, each serving to build it. There is no other word for these: not
 *module*, not *component*, not *subsystem*.
 
+**The specification and the implementation are twin trees.** A journal and the library
+it specifies carry the same name, so the same subpath under the other root reaches the
+work that realizes it. The mapping is stated here rather than only in the schema block
+below, because a diagram that names different directories than the mapping does is the
+navigation failure this shape exists to remove.
+
 ```
 n-Op
-├── physics/            the oracle library
-├── informed-operator/  the operator library
-└── interface/          the loops library
+├── journals/           the specification
+│   ├── oracle/           <-> programs/oracle/      the oracle library
+│   ├── operator/         <-> programs/operator/    the operator library
+│   ├── loops/            <-> programs/loops/       the loops library
+│   ├── n-op/             cross-cutting: the project itself
+│   └── practice/         cross-cutting: how to work here
+├── programs/           the implementation
+├── tests/              mirrors programs/, section for section
+└── apparatus/          audit · feasibility · data · generated · log · tools
 ```
+
+The mirror is **section-level and not enforced**: a section directory with no code yet is
+an empty directory, not a finding. Sections appear on the implementation side only where
+the correspondence is real, so where the trees diverge the divergence is visible instead of
+asserted. A library organized on a different axis than its journal keeps that axis, and its
+files sit flat at the library root.
 
 The specification is a set of **journals**. A journal is one cohesive corpus on one
 topic, made of **sections**, made of **pages**. A page is one file. Headings inside a
@@ -79,7 +97,7 @@ entry may equal the id. Thirty-one percent of the previous corpus failed this, w
 is why the invariant could not fire there.
 
 `referenced-by` is **not** a frontmatter key. The reverse edges are emitted into
-`generated/corpus.json`. Nothing in a page is ever restamped by a tool.
+`apparatus/generated/corpus.json`. Nothing in a page is ever restamped by a tool.
 
 ## Citing
 
@@ -116,7 +134,7 @@ still outside it.
 ## Where a fact goes
 
 1. Name the topic.
-2. Find its owner in `generated/corpus.json` — the `topics` map answers this in one
+2. Find its owner in `apparatus/generated/corpus.json` — the `topics` map answers this in one
    hop.
 3. That page is where the edit goes.
 4. If no page owns it, decide which page *should*, and add the topic to that page's
@@ -159,7 +177,7 @@ an `a.k.a.`, which is where a literature search starts anyway.
 *"no longer"*, *"used to"*, *"retired"*, *"closed on <date>"*. Pages state what is
 true, in the present tense, and nothing about how they got that way.
 
-History is not destroyed — it is centralized. `log/timeline.md` is the only place
+History is not destroyed — it is centralized. `apparatus/log/timeline.md` is the only place
 research advancement is recorded, and it is a compliance artifact. Each entry carries
 **date · finding · evidence link · attribution · what it superseded**.
 
@@ -208,16 +226,16 @@ citations:
 # have broken them. Changing where a file lives is one edit here, not N across the
 # corpus.
 data-artifacts:
-  registry: data/registry-manifest.csv
-  reference-data: data/reference-data/
-  strain-sweep: data/diamond-strain-sweep/
-  research-log: log/timeline.md
-  corpus-index: generated/corpus.json
+  registry: apparatus/data/registry-manifest.csv
+  reference-data: apparatus/data/reference-data/
+  strain-sweep: apparatus/data/diamond-strain-sweep/
+  research-log: apparatus/log/timeline.md
+  corpus-index: apparatus/generated/corpus.json
 
 libraries:
-  oracle: physics
-  operator: informed-operator
-  interface: interface
+  oracle: programs/oracle
+  operator: programs/operator
+  loops: programs/loops
   n-op: ~                    # cross-cutting: the project itself
   practice: ~                # cross-cutting: how to work here
 
@@ -227,7 +245,7 @@ forbidden-markers:
   markup: ["~~", "## Changelog"]
 
 owned-terms:
-  library: "one of physics / informed-operator / interface. Never module, component, subsystem."
+  library: "one of oracle / operator / loops. Never module, component, subsystem."
   journal: "a cohesive corpus on one topic"
   section: "a group of pages within a journal"
   page: "one file"

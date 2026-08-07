@@ -126,8 +126,8 @@ file, or from [accuracy-ledger#seed-provenance], never from a page that quotes o
 is not a seeded value — a row whose provenance does not resolve is `UNSEEDED`, which is
 a thing the corpus knows how to say.
 
-**Generated files are outputs.** `generated/corpus.json` is emitted from page
-frontmatter by `tools/check_structure.py`. It is never hand-edited and never audited: a
+**Generated files are outputs.** `apparatus/generated/corpus.json` is emitted from page
+frontmatter by `apparatus/tools/check_structure.py`. It is never hand-edited and never audited: a
 finding "in" a generated file is a finding in the pages it was generated from, and
 editing the output only hides it until the next run.
 

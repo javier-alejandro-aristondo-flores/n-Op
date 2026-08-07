@@ -10,7 +10,7 @@ The emission discipline the corpus fixes and this module enforces:
     every independent component is its own scalar with its own content-addressed key,
     and the oracle never preaggregates.
 
-So a residual map is `dict[ResidualKey, float]` and nothing here sums, weights, normalises
+So a residual map is `dict[ResidualKey, float]` and nothing here sums, weights, normalizes
 or thresholds. Aggregation belongs to the consumer.
 """
 

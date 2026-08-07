@@ -52,7 +52,7 @@ open-questions:
 
 n-Op pairs a **compiled oracle for crystalline matter** with a **neural operator
 trained against it**. The oracle is handed a candidate state of a crystal under stated
-operating conditions and returns a granular, itemised account of how far that
+operating conditions and returns a granular, itemized account of how far that
 candidate is from satisfying each law it is supposed to satisfy — many independent
 named checks, each a number, each traceable to a published formula. The operator is
 the fast learner that produces the candidate states.
@@ -130,7 +130,7 @@ n-Op does not build a faster solver. It builds a *grader* cheap enough and compl
 enough that the learned half can be disciplined by it at every step
 ([product#score-not-solve], [pino-bridge#surface]). The grader never solves for
 anything; its only job is to measure disagreement with the laws. That division of
-labour is what makes the learned half safe to use: its known weakness — drift under
+labor is what makes the learned half safe to use: its known weakness — drift under
 long rollouts, and extrapolation — is exactly the thing the grader exposes, cheaply,
 at every step.
 
@@ -154,7 +154,7 @@ than a better solver.
   of problems whose solutions are *verifiable* in polynomial time; NP-hard means at
   least as hard as everything in it.
 - **Quantum hardware does not rescue it.** Kitaev established that the k-local
-  Hamiltonian problem is QMA-complete. Quantum Merlin–Arthur is the quantum analogue
+  Hamiltonian problem is QMA-complete. Quantum Merlin–Arthur is the quantum analog
   of NP — a quantum verifier checking a quantum witness — so the hardness survives the
   change of machine rather than dissolving with it.
 
@@ -170,7 +170,7 @@ P versus NP. It is cited here as a limit on the oracle **technique**, not as a c
 about this system. Detached from that qualification it reads as something far stronger
 than was ever argued.
 
-The loop this produces is not a search. Its honest analogue is counterexample-guided
+The loop this produces is not a search. Its honest analog is counterexample-guided
 inductive synthesis, with a gradient in place of the counterexample. Where in training
 the oracle attaches, and why it cannot come first, is
 [training-stages#why-this-order].

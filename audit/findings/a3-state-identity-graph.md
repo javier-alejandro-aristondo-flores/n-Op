@@ -94,7 +94,7 @@ absence is of a *slot or argument*, not of the notation.
 
 ---
 
-### S3 — the vector-potential slot gets no discretisation and no compression plan, in `unified-state.md`
+### S3 — the vector-potential slot gets no discretization and no compression plan, in `unified-state.md`
 
 **Verdict:** ABSENT
 
@@ -122,12 +122,12 @@ state is instantaneous, so an implementer cannot tell whether the slot holds one
 — and `A` enters the graph as `Input(StateSlot(...))`, not as an operator-typed node, so
 no stage reaches it. This is *adjacent to* the confessed `state-wire-schema` question but
 is not it: that question asks for dtype, unit, index order and memory layout, all of
-which presuppose an array. What is missing here is prior — which discretisation family
+which presuppose an array. What is missing here is prior — which discretization family
 `A` is an array *of*, and which stage decides.
 
 **Control.** Searched `grep -rn "vector potential" journals/` → 4 hits: the slot
 declaration and gauge statement in `unified-state.md`, one operator-library line naming
-it as a discretisation problem, one capability-slice mention. None is a representation.
+it as a discretization problem, one capability-slice mention. None is a representation.
 Control that fires: `grep -rn "density matrix" journals/` returns dozens of hits
 including an encoding table and a byte budget, so the search style finds slot
 representations where they exist.
@@ -251,7 +251,7 @@ and every macro field is a fiber over it:
 allocating a mesh needs the axis count, the extent of each axis, the cell spacing, and
 where those come from — the `PeriodicityStructure`, the `Environment`, the compile
 request, or a mesh file. None is stated. The page then specifies a great deal that rests
-on the mesh existing: a finite-volume discretisation, per-cell centroid, volume and face
+on the mesh existing: a finite-volume discretization, per-cell centroid, volume and face
 list, Scharfetter–Gummel face fluxes and a per-cell Péclet estimate quoting "a ~10 nm
 cell". That figure is the only quantitative handle on cell size anywhere, and it appears
 inside a worked example rather than as a mesh parameter. The claim "structured-tensor" and
@@ -260,7 +260,7 @@ the form `enumerate(product(axes))` fix the mesh's *shape* and leave its *size* 
 
 **Control.** Searched `grep -rn "mesh-axes" journals/` → 1 hit, quoted above. Searched
 `grep -rn "cell spacing\|mesh size\|number of cells\|mesh resolution" journals/` → 0 hits.
-Control that fires: `grep -rn "Monkhorst" journals/` returns a fully parameterised
+Control that fires: `grep -rn "Monkhorst" journals/` returns a fully parameterized
 reciprocal-space mesh — "an 8×8×8 Monkhorst–Pack mesh gives" — so the corpus does write
 mesh parameters where it has them, and this search style finds them.
 
@@ -327,7 +327,7 @@ mask:
 absent *from the compiled kernel*, decided once at compile time, whereas a masked sample is
 a check that exists in the kernel and is invalid for this call. An implementer therefore
 cannot express the outcome. The three candidate encodings — omit the key from the map, emit
-a sentinel value, or record it in `CertEvidence` — are behaviourally different for the
+a sentinel value, or record it in `CertEvidence` — are behaviorally different for the
 consumer, and the fourth member's own type is undefined (`CertEvidence` occurs three times
 in the corpus, every one a use), so the third candidate cannot even be checked.
 
@@ -336,7 +336,7 @@ as already carrying the mask path → **1 hit**, and it is a disclaimer: "It is 
 applicability mask over a training batch, and it is not a". The single occurrence of the word
 on the cited page denies being the thing cited for. Searched `grep -rn "CertEvidence"
 journals/` → 3 hits, all use sites.
-Control that fires: `grep -rn "RoaringCoverageMask" journals/` returns a named, serialised,
+Control that fires: `grep -rn "RoaringCoverageMask" journals/` returns a named, serialized,
 byte-level mask format, so the corpus does specify mask representations where it has them.
 
 ---
@@ -432,7 +432,7 @@ left out, and this search reaches that vocabulary.
 
 ---
 
-### S12 — nothing canonicalises the float-valued identity descriptors before an exact hash, in `crystal-inputs.md`
+### S12 — nothing canonicalizes the float-valued identity descriptors before an exact hash, in `crystal-inputs.md`
 
 **Verdict:** ABSENT
 
@@ -445,8 +445,8 @@ and the substrate forbids any tolerance on identity:
 
 > **Normative.** `Address` equality is **exact**. No tolerance, no quantization, no
 
-**What is missing.** A canonicalisation step between them. The serialization rule's only
-float treatment is rule 11, which normalises not-a-number and negative zero and nothing
+**What is missing.** A canonicalization step between them. The serialization rule's only
+float treatment is rule 11, which normalizes not-a-number and negative zero and nothing
 else. Under exact hashing, three ordinary situations produce distinct fingerprints for one
 crystal: a permuted or sign-flipped choice of lattice vectors; a rotated setting of the same
 cell; and a value differing in the last bit because it came from a different DFT code's
@@ -456,7 +456,7 @@ Bravais lattice and space group are all in the same descriptor, and a canonical 
 reduction is the standard remedy — but no page requires one, and no page says whether the
 lattice vectors or only the discrete labels enter the hash. The `make-theory-context` smart
 constructor shows the corpus is alert to exactly this hazard for a *discrete* field — it
-normalises the hybrid-functional double representation "so two byte-distinct encodings of
+normalizes the hybrid-functional double representation "so two byte-distinct encodings of
 the same physics can never produce two" addresses. There is no counterpart for the
 continuous fields.
 
@@ -465,7 +465,7 @@ continuous fields.
 hits. Control that fires: `grep -rn "Wyckoff" journals/` → 6 hits and
 `grep -rn "space group" journals/` → 4 hits, so the search reaches crystallographic-setting
 vocabulary in this corpus; the absent term is the reduction, not the subject matter. Second
-control: `grep -rn "canonical serialization" journals/` → 5 hits, so the serialisation
+control: `grep -rn "canonical serialization" journals/` → 5 hits, so the serialization
 discipline is reachable and simply does not cover this.
 
 ---
@@ -555,14 +555,14 @@ storage and its extension rule:
 lines above — and no page enumerates it. The comment points at the typeclass alphabet, but
 that page defines four *typeclasses* (`Quantity`, `Sampleable`, `HasAnalyticStructure`,
 `DiscreteStructure`) and four aliases, which is not a closed set of dense-ordinal members: a
-node's type is a parameterised value (`gamma-hat.md` speaks of "nodes whose `type` is the
+node's type is a parameterized value (`gamma-hat.md` speaks of "nodes whose `type` is the
 density-matrix typeclass", and no such member exists in the alphabet), and three of the four
 aliases are confessed unexpanded. An implementer cannot allocate the universe, cannot assign
-ordinals, cannot serialise a node under rule 7 — which demands "a 32-bit ordinal" drawn from
+ordinals, cannot serialize a node under rule 7 — which demands "a 32-bit ordinal" drawn from
 "the vocabulary indexing the sum" — and therefore cannot compute any node address.
 
 **Control.** Searched `grep -rn "Layer0Type" journals/` → 2 hits, both quoted. Control that
-fires: `grep -rn "CategoryTag" journals/` — the neighbouring member of the same cluster row —
+fires: `grep -rn "CategoryTag" journals/` — the neighboring member of the same cluster row —
 returns its enumeration, "The `CategoryTag` enum is the closed set of these **19 residual
 categories**", so members of that cluster *are* enumerated elsewhere and this search style
 finds them.
@@ -588,7 +588,7 @@ observables sharing a bundle. An implementer building the runtime kernel's third
 therefore cannot derive the map's key from the node that produces the value. Nor is
 `ObservableRef` in the vocabularies cluster, so it has no ordinal policy, no schema version
 and no extension rule, while the reference cache stores it as text — "ObservableRef
-serialization" — under a canonicalisation the corpus never states.
+serialization" — under a canonicalization the corpus never states.
 
 **Control.** Searched `grep -rn "ObservableRef" journals/` → 7 hits, every one a use site
 (two signatures in `pino-bridge.md`, one output type in `compose-time-pipeline.md`, two in
@@ -629,7 +629,7 @@ rule's leaf for `(α=x, β=y, R=shell 3)` and its leaf for `(α=z, β=z, R=shell
 producer and the same axis-label tuple, hence the same key, and the map that must hold both
 holds one. An implementer must either widen the key with a value tuple the corpus does not
 define or abandon the granularity promise. The `AxisLabel` universe is separately
-un-enumerable: its only characterisation ends in an ellipsis, while its cluster row demands
+un-enumerable: its only characterization ends in an ellipsis, while its cluster row demands
 dense ordinals.
 
 **Control.** Searched `grep -rn "axis tuple" journals/` → 7 hits, all requiring per-tuple
@@ -704,12 +704,12 @@ does spell out its orders where it has fixed them, and this search style finds t
 
 ---
 
-### S20 — `CompressionPlan` is an open sum that must serialise as a closed ordinal, and its selection carries no numbers, in `physics-graph.md`
+### S20 — `CompressionPlan` is an open sum that must serialize as a closed ordinal, and its selection carries no numbers, in `physics-graph.md`
 
 **Verdict:** ABSENT
 
 **The obligation.** The plan is a sidecar value, so it is stored in a `PersistentMap` and
-canonicalised under rule 7, which requires "discriminator drawn from the vocabulary indexing
+canonicalized under rule 7, which requires "discriminator drawn from the vocabulary indexing
 the sum, serialized as a 32-bit ordinal". The sum is written as:
 
 > CompressionPlan =
@@ -723,7 +723,7 @@ the sum, serialized as a 32-bit ordinal". The sum is written as:
 **What is missing.** Three separate things.
 
 *Closure.* The trailing `| …` makes the member list open, which cannot be reconciled with the
-dense-ordinal serialisation the substrate requires. An implementer must decide whether the sum
+dense-ordinal serialization the substrate requires. An implementer must decide whether the sum
 is closed at five, and the answer determines whether the ordinal is stable across versions.
 
 *Payloads.* `sparsity-pattern`, `params` and `ranks` are named and never typed;
@@ -831,7 +831,7 @@ shapes.
   aliases at `typeclass-alphabet.md`'s `three-aliases-never-expanded`.
 - **Equality saturation has no cost bound.** Rejected: confessed at
   `algebraic-simplification-performance`.
-- **The tape materialisation schedule is "a bounded heuristic".** Rejected as
+- **The tape materialization schedule is "a bounded heuristic".** Rejected as
   UNDERSPECIFIED-but-adequate: the corpus states the problem is NP-complete on a general DAG,
   names the closed-form chain case, and requires the choice to be recorded. An implementer can
   pick a heuristic and ship; two implementers differ only in performance, not in emitted
@@ -839,7 +839,7 @@ shapes.
 - **`CertEvidence` has no schema.** Rejected as a standalone finding in this unit: it is the
   certification workstream's, and a separate sweep covers that page. It appears inside S9 only
   because it is the last candidate home for the per-sample mask.
-- **Serialisation format of the state file and the output maps for the `validate` verb.**
+- **Serialization format of the state file and the output maps for the `validate` verb.**
   Rejected: subsumed by `state-wire-schema` on the input side, and the output side is a thin
   wrapper over `Map<ResidualKey, Scalar>`, whose gap is already S17.
 

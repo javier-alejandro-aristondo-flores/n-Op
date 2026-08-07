@@ -1,0 +1,32 @@
+
+=== branch-trunk: grouped cross-validation (gap_weight per fold from selection) ===
+  fold 0: weight 0.5
+  fold 1: weight 0.5
+  fold 2: weight 0.5
+  fold 3: weight 0.5
+  fold 4: weight 0.5
+  gap 4.8 meV   field 41.1 meV   DOS 3.74%
+  small strain -> large strain           w=2.0  gap     8.9  field   61.9  DOS  2.69%
+  axis+skew families -> general stretch  w=2.0  gap    25.0  field   52.0  DOS  1.99%
+
+=== spectral: grouped cross-validation (gap_weight per fold from selection) ===
+  fold 0: weight 0.5
+  fold 1: weight 0.5
+  fold 2: weight 0.5
+  fold 3: weight 0.5
+  fold 4: weight 0.5
+  gap 2.2 meV   field 41.1 meV   DOS 2.83%
+  small strain -> large strain           w=2.0  gap     5.6  field   60.7  DOS  3.37%
+  axis+skew families -> general stretch  w=2.0  gap    25.3  field   77.3  DOS  4.54%
+
+=== ensemble, conformal calibration, symmetry ===
+  best on cross-validation: spectral
+  ensemble member 0 trained
+  ensemble member 1 trained
+  ensemble member 2 trained
+  ensemble member 3 trained
+  ensemble member 4 trained
+  conformal half-width 6.2 meV, empirical coverage 0.960 (nominal 0.90, target 0.85-0.95)
+  Gamma degeneracy, symmetrised: 81.626 meV (raw 81.626); FAILS the 1 meV test
+
+wrote exam tables to /home/javier/Projects/Physics/Programs/n-Op/informed-operator/results

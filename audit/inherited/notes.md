@@ -79,7 +79,7 @@ the same argument to recur wherever a closed item is deleted, and answer it the 
   `N_b`, not `N_PW²`). Do not delete either blindly — merge the cost detail into
   `oracle/state/gamma-hat#read-write-paths` and leave a citation behind.
 - `computational-overview:229-240` restates the four γ̂ resolutions and labels itself
-  "Summarised here; `gamma-hat §4` is canonical". Collapse to a citation.
+  "Summarized here; `gamma-hat §4` is canonical". Collapse to a citation.
 - `gamma-hat §5` (row 39) restates `gamma-budget`'s two numbers without its derivation.
 - **Fine as-is:** `unified-state:55-62` and `multiscale-state §1-2` state the tier split
   from the micro and multi-tier sides respectively. That is one fact viewed from two
@@ -702,8 +702,8 @@ or (b) `rationale` dissolves entirely, §2 → `purpose-and-scope#why-a-grader`,
 not a page — but this is a structure decision above my scope, so I have dispositioned the
 rows to their content targets and left the page question here. **Either way §2 and §6 must
 be relocated before the page is touched.** §2 is the program's central justification and
-§6 is the only argued defence of the choice of learner; both currently sit on a page that
-is orphaned (`referenced-by: []`), self-labelled a historical snapshot, and therefore the
+§6 is the only argued defense of the choice of learner; both currently sit on a page that
+is orphaned (`referenced-by: []`), self-labeled a historical snapshot, and therefore the
 single most likely thing in the corpus to be deleted wholesale by someone reading its
 header.
 
@@ -712,7 +712,7 @@ header.
 **1. Vacuous ownership is 23 pages, not 18.** The plan counts pages whose `canonical-for`
 topic string equals the id exactly. The checker's uniqueness key is
 `" ".join(topic.lower().split())` (`check_book_structure.py:197`) — case- and
-whitespace-normalised but **not hyphen-normalised** — so a page can own the spelling of its
+whitespace-normalized but **not hyphen-normalized** — so a page can own the spelling of its
 own id with spaces and be invisible to both the plan's count and any string test. Five such
 pages exist; two are in my scope:
 
@@ -728,7 +728,7 @@ The last three are outside my scope; the surveyors for registry, seams, and gove
 should confirm rather than take this from me. **The consequence for Phase 2 is specific:**
 plan §8 states the fix as "every page owns ≥1 topic distinct from its id." Implemented as a
 string comparison, that rule passes all five of these pages unchanged. The check must
-normalise hyphens, whitespace, and case before comparing — otherwise the fix ships with the
+normalize hyphens, whitespace, and case before comparing — otherwise the fix ships with the
 defect it was written to close. Probe A separately confirms there is no vacuous-ownership
 check today at all: a page owning *exactly* its own id runs green.
 
@@ -787,7 +787,7 @@ Flagging so the two dispositions are reconciled rather than each assuming the ot
 
 ### Ordering hazards for the builder
 
-1. **Row 105 before row 124.** The Cap-1 acceptance test is labelled the "first end-to-end
+1. **Row 105 before row 124.** The Cap-1 acceptance test is labeled the "first end-to-end
    gate" but lives on `capability-slices`, not `build-verification`. If `build-order` is
    merged into `build-sequence` first, the gate set is briefly split across three pages.
 2. **Rows 81–84 before anything touches `1.5`.** The operator-side content (why a neural
@@ -961,7 +961,7 @@ Registry rows 7 and 8 already **admit** the pattern in their own `Depends on` co
 **9. What I swept and dismissed.**
 - **Superseded values behind changelogs** (the brief's top-risk trap): **absent from Group A/B/C**. Zero numeric physical values in 12,194 words — verified by unit-pattern grep across all three files (one hit, a formula). All three changelogs record *formula* corrections, not value supersessions. I seeded nothing from these pages; the three value-shaped Contradiction rows above (C2, C3) came from comparing the appendix's *methods* to `9.1-accuracy-ledger` and the registry CSV, in that direction.
 - **The retired `D3`/`D0` differentiability legend** (`11.8`): does not appear in my scope. Zero `D0`–`D4` tags in any of the three files.
-- **Strikethroughs, `superseded`, `retired`, `formerly`, `no longer`**: zero occurrences outside the three changelog blocks. The only history-flavoured phrase in live prose is "three historical symbols" at `11.1:15`, which is A3 — a live notation hazard, not a remnant.
+- **Strikethroughs, `superseded`, `retired`, `formerly`, `no longer`**: zero occurrences outside the three changelog blocks. The only history-flavored phrase in live prose is "three historical symbols" at `11.1:15`, which is A3 — a live notation hazard, not a remnant.
 - **Vacuous ownership**: confirmed for all three pages (`canonical-for` names only the page's own id). Probe 5 proves the duplicate-topic invariant *works* — so this is not a broken check, it is three pages standing outside a working check. Nothing in my scope has ever been tested for duplicate ownership, which is why rows A9, A14, A17, A31, A46, A47, A48, B7, B12, B33, B34, C12, C50, C54, C55, C58, C59 (17 `delete`-for-duplication rows) had to be found by reading rather than by running anything.
 
 ---
@@ -1141,7 +1141,7 @@ are wrong.
   earlier saturation.
 - **Contradiction C13 (GaN `Ξ_c`/`Ξ_v` vs `a_V`).** I could not establish whether the two
   sources use the same sign and reference conventions. I logged it rather than dismissing it
-  because the ledger's neighbouring entries carry two explicit **SIGN GUARD** blocks
+  because the ledger's neighboring entries carry two explicit **SIGN GUARD** blocks
   (`9.1-accuracy-ledger.md:229-247`) on exactly this failure mode for polarization bowing and
   pyroelectric coefficients, which suggests the corpus has been bitten by convention
   mismatches before.
@@ -1195,7 +1195,7 @@ Note R1.0 states this math "lives in `physics/research/` catalogs"; **that is fa
   (§9) deletes it. But `11.7`'s vocabulary list and `11.8`'s table are keyed to *literature*
   names (`fowler-nordheim`, `richardson-dushman`, `padovani-stratton`, `kane-zener`,
   `makov-payne-correction`, `freysoldt-correction`, `lany-zunger-correction`,
-  `Schottky-Mott-alignment`), and only that CSV maps them to the behaviour-named registry rows.
+  `Schottky-Mott-alignment`), and only that CSV maps them to the behavior-named registry rows.
   Delete it first and the mined prose becomes unresolvable. Worse: `makov-payne-correction`
   maps **ambiguously** — "`-isotropic-cubic` (row 31) **or** `-isotropic-general` (row 89) — the
   old name was ambiguous across both" — so that one needs a human decision, not a lookup.

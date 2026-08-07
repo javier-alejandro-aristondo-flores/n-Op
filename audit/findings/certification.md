@@ -15,7 +15,7 @@ principal's numbers did not reproduce and are corrected in B3 and B5 — in both
 
 ---
 
-## Judgement in one line
+## Judgment in one line
 
 The certification layer does not fail at the margin. Its central product promise — *refusal is
 absence* — has **no implementing mechanism at any of the three stages that would have to carry
@@ -343,7 +343,7 @@ is invoked twice on `cert-obligations.md`, once over `relaxed` formulas and once
 learned correction that is not a registry row, and neither invocation is in the other's range.
 F3 reached it from the registry side, concluding the obligation must split. All three want the
 same object: **9b, ranging over things whose validity is a declared domain rather than a
-theorem.** Out-of-scope is that, generalised.
+theorem.** Out-of-scope is that, generalized.
 
 **What would refute this.** A statement that obligation 3 applies where no closed form exists, which would contradict its own stated scope ("analytic limits, **where closed-form answers exist**"); or a page attributing out-of-scope refusals to some obligation other than 3 or 9. Neither exists.
 
@@ -460,7 +460,7 @@ exactly the object whose scale varies most: it is built by assembling diagonal k
 their off-diagonal cross-kernels across mechanisms, so its spectral range is a property of the
 assembly, not of the physics.
 
-**What would refute this.** A statement that `M`'s blocks share a unit system, or a declared non-dimensionalisation of the state. `generic-dynamics.md:47-50` binds `M` to the seven-tuple of `unified-state#slots`, whose slots are heterogeneous; no page declares a common scale.
+**What would refute this.** A statement that `M`'s blocks share a unit system, or a declared non-dimensionalization of the state. `generic-dynamics.md:47-50` binds `M` to the seven-tuple of `unified-state#slots`, whose slots are heterogeneous; no page declares a common scale.
 
 **Proposed correction.** `λ_min(M_block) ≥ −δ_PSD · λ_max(M_block)`, with `δ_PSD` redeclared as
 relative. Two notes on cost and on completeness, both of which the principal's version
@@ -473,7 +473,7 @@ compressed:
   states.
 - **Completeness.** The relative form is invariant under *uniform* rescaling `M → cM`, which is
   the failure mode that matters. It is **not** invariant under per-slot rescaling, because
-  neither form is. Fully fixing that needs a per-slot non-dimensionalisation of the state, which
+  neither form is. Fully fixing that needs a per-slot non-dimensionalization of the state, which
   is a larger change and should be recorded as such rather than folded into a tolerance edit.
 
 ---
@@ -516,7 +516,7 @@ natural tolerance is not `1e-8` of anything but a fraction of one electron.
 **Proposed correction.** Four tolerances, one per invariant, each with its own scale: energy
 relative to the composition's characteristic energy; particle number as an absolute fraction of
 one electron; momentum relative to a zone-boundary crystal momentum; spin relative to ħ/2. Or,
-if one number is genuinely wanted, state the non-dimensionalisation that makes it one number,
+if one number is genuinely wanted, state the non-dimensionalization that makes it one number,
 which is a real piece of work and is currently missing.
 
 ---
@@ -704,7 +704,7 @@ written, three of five rows carry a gate that is decoration.
 1. **States what it bounds, with its units implied by the formula**: `‖J⁻¹‖·‖r_stop‖` — an
    inverse-Jacobian bound times a stopping residual, which carries the units of the gradient
    error it estimates.
-2. **Distinguishes itself from the neighbouring tolerance and says how**: "the error `τ_cond`
+2. **Distinguishes itself from the neighboring tolerance and says how**: "the error `τ_cond`
    cannot see, because `τ_cond` bounds the Jacobian's conditioning while `τ_trunc` bounds
    `‖J⁻¹‖·‖r_stop‖`."
 3. **Cites real theorems with locations**: Ehrhardt and Roberts, *IMA J. Appl. Math.* 89(1)
@@ -752,7 +752,7 @@ Those are tolerances by any definition, and by the tolerance ledger's own exhaus
 
 **The count.** 17 ledger rows + 59 accuracy regimes + `τ_soft` and `δ` from the manifest (F6) +
 the unnamed degeneracy-tripwire threshold (F11) = **78**, of which the canonical table holds
-**17**, or **22%**. The rule that would flag this is explicitly labelled unenforceable in the
+**17**, or **22%**. The rule that would flag this is explicitly labeled unenforceable in the
 same paragraph, which is honest, but the consequence is that the corpus's canonical tolerance
 table is missing three-quarters of its subject and nothing will ever say so.
 
@@ -817,7 +817,7 @@ That is the correct meet on a three-element chain and it is the wrong verdict.
 **Two independent paths reach the empty leaf set**, and only the first was in the original
 draft.
 
-*Path 1 — no pinned targets.* Obligation 4's comparison is realised through `Import`
+*Path 1 — no pinned targets.* Obligation 4's comparison is realized through `Import`
 (`pino-bridge.md:95-97`): "Its residual-leaf outputs serve the reference-battery obligation."
 `Import` is a **compiler input** (`product.md:226-229`): "a targets file handed to the
 compiler, not a runtime argument." And `product.md:201-203` states that a check the oracle
@@ -962,7 +962,7 @@ differentiability axis at all.**
 **9a — relaxation validity**, ranging over `relaxed`. Three clauses, all computable from what
 a `relaxed` row has:
 
-1. *Parameterised declaration.* The provenance cell names a relaxation **and its numeric
+1. *Parameterized declaration.* The provenance cell names a relaxation **and its numeric
    parameter** — the log-sum-exp temperature, the sigmoid width, the softmin `τ_soft`. A
    family name without a parameter fails, because the bias depends on the parameter and no
    bound can be formed without it. (See F5: not one of the six passes this today.)
@@ -970,7 +970,7 @@ a `relaxed` row has:
    elementary and exact: for `LSE_τ(x₁…x_n) = τ ln Σᵢ exp(xᵢ/τ)`,
    `max x ≤ LSE_τ ≤ max x + τ ln n`, so `0 ≤ LSE_τ − max x ≤ τ ln n` uniformly, and the
    witness is the triple `(τ, n, τ ln n)`. Rows 45, 46, 67 and the softmin half of 85 are all
-   in this family. Row 50's soft cutoff needs the width `δ` and the local neighbour density
+   in this family. Row 50's soft cutoff needs the width `δ` and the local neighbor density
    near `r_cut`. Row 84's mean-field/Gumbel-Softmax relaxation of a discrete cluster expansion
    admits **no** uniform bound of this kind, and that row must therefore declare a *measured*
    envelope instead of a derived one — naming that difference is the point of the clause, not
@@ -1081,7 +1081,7 @@ Verbatim from `data/registry-manifest.csv`, `Source` column:
 | 85 `structure-uniqueness-CSP` | `softmin over the set plus a sigmoid on (d−d_min) with declared width` | no symbol, no value |
 
 The bias of every one of these depends on the parameter — `τ ln n` for the log-sum-exp family,
-the neighbour density within `δ` of `r_cut` for the soft cutoff. A declaration naming the
+the neighbor density within `δ` of `r_cut` for the soft cutoff. A declaration naming the
 family alone fixes no bound. So the gate as written passes six rows of which none is gateable,
 which is the same shape as `traps#checker-not-looking`: the gate runs green and is not looking
 at the thing that matters.
@@ -1091,7 +1091,7 @@ the obligation that ranges over nothing.
 
 **What would refute this.** Any of the six rows carrying a numeric relaxation parameter. Verified against the manifest's `Source` column verbatim, row by row; the table in this finding is the complete population.
 
-**Proposed correction.** The gate requires a *parameterised* declaration — family plus numeric
+**Proposed correction.** The gate requires a *parameterized* declaration — family plus numeric
 value, or family plus a named ledger symbol that has a value in the tolerance ledger. This is
 clause 1 of the proposed 9a.
 
@@ -1204,7 +1204,7 @@ have been consistent: there is no stage that refuses, so each page invented its 
 | `crystal-inputs.md:119-122` | "A sample whose swept scalar leaves the box is **masked out, or trips the relevant certification obligation**, rather than being scored against a kernel that does not cover it" |
 | `applicability-classifiers.md:133-140` | the window is "**re-evaluated per training sample** in the loss mask" — masked |
 
-Three behaviours with three different consequences. **Recompile** produces a new kernel with a
+Three behaviors with three different consequences. **Recompile** produces a new kernel with a
 new hash and a new certificate. **Mask** produces silence — the sample contributes nothing, no
 verdict, no witness. **Trip an obligation** produces a `Failed` leaf. Only the third is a
 refusal in either of the corpus's two regimes; the first creates a new artifact and the second
@@ -1352,7 +1352,7 @@ what a reader reaches for first and it does not exist for this check.
 **Severity: moderate. Confidence: high.**
 
 Obligation 8's clause is "per-entry provenance travels with the verdict"
-(`cert-obligations.md:74`). Travelling is not checking. Nothing in obligation 4 or 8 requires
+(`cert-obligations.md:74`). Traveling is not checking. Nothing in obligation 4 or 8 requires
 a reference row's `Source` to be external to the corpus, and nothing checks the `Source class`
 column against the `Source` cell.
 
@@ -1381,7 +1381,7 @@ rather than 2 declare `experimental`.)*
 `reference-battery.md:75-76` requires the `Source` field to be "a DOI, paper title and page
 reference; or a computational provenance, meaning functional, k-mesh and cutoff." **None of the
 eight is either.** A row declaring `experimental` while pointing at an internal page passes
-obligation 8, because its provenance travelled.
+obligation 8, because its provenance traveled.
 
 Note the second row in the table above is self-defeating in a way the others are not:
 `bandgap-indirect` for diamond declares `Source class = experimental` and its own `Source` cell
@@ -1711,12 +1711,12 @@ and **split on gallium oxide** — centrosymmetric, yet Fröhlich-dominated."
 
 `purpose-and-scope.md:206-207` puts three gate dielectrics in scope — "gate dielectrics
 (Al₂O₃, HfO₂, and AlN as a dielectric)" — and sapphire, which is α-Al₂O₃, among the substrates.
-`out-of-scope.md:107-109` confirms the crystalline polymorphs are modelled: "α-alumina,
+`out-of-scope.md:107-109` confirms the crystalline polymorphs are modeled: "α-alumina,
 monoclinic hafnia and aluminium nitride as a dielectric".
 
 Two of those three split exactly as β-Ga₂O₃ does — centrosymmetric and strongly polar:
 
-| Material | Space group | Inversion centre | `is-noncentrosymmetric` | Polar in the Born-charge sense | `is-polar-material` |
+| Material | Space group | Inversion center | `is-noncentrosymmetric` | Polar in the Born-charge sense | `is-polar-material` |
 |---|---|---|---|---|---|
 | α-Al₂O₃ (corundum, sapphire) | `R-3c` (167), point group `-3m` | yes | **false** | strong IR-active `A₂ᵤ`/`Eᵤ` modes; ε_static ≈ 9–11 against ε_∞ ≈ 3.1, i.e. large LO–TO splitting | **true** |
 | monoclinic HfO₂ | `P2₁/c` (14), point group `2/m` | yes | **false** | large Born charges; ε_static ≈ 16–25 against ε_∞ ≈ 4–5 | **true** |
@@ -1737,7 +1737,7 @@ general consequence of the two definitions. Both statements of the rule invite t
 neither mentions the dielectrics.
 
 **What would refute this.** Either oxide being non-polar or noncentrosymmetric. `R-3c` and
-`P2₁/c` both contain an inversion centre — corundum's lack of piezoelectricity follows from it —
+`P2₁/c` both contain an inversion center — corundum's lack of piezoelectricity follows from it —
 and both oxides have ε_static substantially above ε_∞, which by the Lyddane–Sachs–Teller
 relation `ε_static/ε_∞ = Π(ω_LO/ω_TO)²` requires LO–TO splitting, hence nonzero Born charges.
 
@@ -1745,7 +1745,7 @@ relation `ε_static/ε_∞ = Π(ω_LO/ω_TO)²` requires LO–TO splitting, henc
 the split as a consequence of the definitions rather than as a list: *the two predicates diverge
 for every centrosymmetric material with heteropolar bonds, which in this corpus is β-Ga₂O₃,
 α-Al₂O₃ and monoclinic HfO₂.* One clause, and it converts an enumeration a reader can
-under-generalise into a rule they cannot.
+under-generalize into a rule they cannot.
 
 **Positive note, since this section is otherwise the best-reasoned passage in my subject.** The
 β-Ga₂O₃ analysis is correct in every particular, including the direction of each failure mode,
@@ -1783,7 +1783,7 @@ defective:
   its presence there tells a builder to implement a per-sample numeric re-evaluation that has
   nothing to read.
 - If the gate is genuinely temperature-windowed — defensible physics, since a phase can be
-  dynamically unstable harmonically and stabilised anharmonically at high `T` — then the
+  dynamically unstable harmonically and stabilized anharmonically at high `T` — then the
   *claim* needs a temperature range, and no page provides one. That is the same missing range
   set as **F9**'s second-order problem.
 
@@ -1827,7 +1827,7 @@ aggregation rule is exactly the meet. The defect is the identity element (F1), n
 `C2/m`, no spontaneous polarization, no piezoelectricity, no pyroelectricity, and at the same
 time strongly polar-phonon with a multi-mode Fröhlich interaction as its dominant mobility
 limiter — is correct, and the split it motivates is the right one. `C2/m` contains an inversion
-centre; polarity in the Born-charge sense is a property of the bonds. This is the best-reasoned
+center; polarity in the Born-charge sense is a property of the bonds. This is the best-reasoned
 passage in my subject.
 
 **FMA contraction independently breaks `τ_interp`.** *Rejected — this was a claim in the
@@ -1973,10 +1973,10 @@ Beyond the seven in §2, these were examined and not written up:
   is relative, so it is at least dimensionally coherent — which is more than `δ_PSD` manages —
   and 1e-6 on a sampled projection is defensible. It has no stated basis, which B0 counts.
 - **Obligation 1's "trivial-irrep projector" duplicates the coupling-derived check at
-  `:102-105`.** Examined; the second is explicitly the specialised form of the first for
+  `:102-105`.** Examined; the second is explicitly the specialized form of the first for
   generator-produced nodes, and the page says so. Not a defect.
 - **`τ_L3L4`'s "at most 5 iterations" is a policy smuggled into a tolerance row.** True, and
-  minor; it is a real observation about ledger hygiene but does not change any behaviour, and
+  minor; it is a real observation about ledger hygiene but does not change any behavior, and
   B0's policy count already captures the pattern.
 - **The SQLite cache's write-once discipline conflicts with tombstoning.** Read carefully;
   `:231-233` is coherent — an update writes a new row and the obsolete one is tombstoned through

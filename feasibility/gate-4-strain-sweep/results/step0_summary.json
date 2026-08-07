@@ -1,0 +1,18 @@
+{
+ "n_points": 1179,
+ "n_runs": 2358,
+ "failures": [],
+ "valleys": {
+  "delta_z": 103,
+  "delta_x": 104,
+  "delta_y": 105
+ },
+ "stray": [
+  "1-scale-all-axes-uniformly",
+  "2-stretch-one-axis-or-two-axes",
+  "3-skew-one-plane",
+  "4-skew-two-planes",
+  "5-skew-three-planes",
+  "6-stretch-all-three-axes"
+ ]
+}

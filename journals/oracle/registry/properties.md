@@ -3,12 +3,12 @@ id: properties
 title: "Target properties"
 owns:
   - target property scope
-  - property catalogue
+  - property catalog
   - property category to bundle map
   - scope versus inventory precedence
 anchors:
   scope-vs-inventory: "Scope, not inventory"
-  catalogue: "The catalogue"
+  catalog: "The catalog"
   bundle-map: "Category to bundle"
   categories: "The nine categories"
 depends-on:
@@ -39,10 +39,10 @@ deciding something; an inventory is a statement of fact about an artifact, and
 editing it requires changing the artifact. Any other precedence rule lets a page
 claim a capability into existence.
 
-## The catalogue
+## The catalog
 
 One row per targeted property. [typed-compositions#coverage] carries the typed
-composition that realises each of them, and that pairing — one row here, one
+composition that realizes each of them, and that pairing — one row here, one
 composition there — is what makes the coverage claim checkable rather than
 asserted.
 
@@ -124,20 +124,20 @@ top of an accurate structure, so errors here propagate everywhere downstream.
 How electrons populate the available energy levels and distribute themselves
 through the crystal. These quantities decide whether a material is a metal,
 semiconductor or insulator, and they feed almost every other category — optical,
-magnetic, transport and chemical behaviour all trace back here.
+magnetic, transport and chemical behavior all trace back here.
 
 ### Optical
 
 How the material responds to light: which photon energies it absorbs, how its
 refractive index changes with frequency, and how excited electrons release energy
-when they relax. These govern colour, transparency, and any photonic or
+when they relax. These govern color, transparency, and any photonic or
 optoelectronic application.
 
 ### Mechanical
 
 How the material deforms and resists deformation under applied force. These
 tensors and scalars describe stiffness, compressibility, and the yielding and
-hardness behaviour that determine whether a material survives a given mechanical
+hardness behavior that determine whether a material survives a given mechanical
 environment.
 
 ### Thermal

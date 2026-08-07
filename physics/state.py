@@ -138,7 +138,7 @@ class Frame:
     kpoint_weights: np.ndarray | None = None
     #: electron count the run was set up with
     n_electrons: float | None = None
-    #: net magnetic moment in bohr magnetons; None when the run was not spin-polarised
+    #: net magnetic moment in bohr magnetons; None when the run was not spin-polarized
     magnetic_moment: float | None = None
     #: volume as *reported* by the producing calculation (not recomputed from the cell)
     reported_volume: float | None = None

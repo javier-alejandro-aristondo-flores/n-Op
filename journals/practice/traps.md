@@ -276,7 +276,7 @@ the load-bearing indirect gap. — enforced, [accuracy-ledger#ahc-zpr]
 
 The crystal-physical frame is `e₂∥b`, `e₃∥c`, `e₁ = a*`, so the second and third
 diagonal components are the `[010]` and `[001]` directions — but **plane-normal**
-measurements lie along `a*` and `c*` and must never be relabelled `[100]` and `[001]`.
+measurements lie along `a*` and `c*` and must never be relabeled `[100]` and `[001]`.
 The high-field third axis is `c*`, about 13.8° off `[001]`. A fourth frame is live in
 the reference data: the elastic tensors are seeded in `x∥a y∥b z∥c*`, whose first axis
 is the *real* `a`, not `a*`; the two differ by 13.83°, so the `C₁₁` seeded there is not
@@ -524,7 +524,7 @@ systematically optimistic for the flagship device's channel material. — enforc
 Degenerate p-type diamond breaks both: the Einstein relation becomes a declared
 model-form error, and the Lyddane-Sachs-Teller dielectric constant with Fröhlich
 screening must be gated on carrier density below degeneracy. *Breaks:* standard heavily
-doped contact layers modelled with the wrong diffusion constant and an out-of-validity
+doped contact layers modeled with the wrong diffusion constant and an out-of-validity
 dielectric function. — enforced, [multiscale-state#moment-closures],
 [out-of-scope#exclusions]
 

@@ -1,0 +1,15 @@
+{
+ "dos_full_percent": 3.217903065434216,
+ "dos_complete_percent": 3.1291271018015427,
+ "parameters": 18561,
+ "epochs": [
+  300,
+  300,
+  300,
+  300,
+  300
+ ],
+ "noise_floor_mev": 0.0105,
+ "significance_mev": 20.0,
+ "quick": false
+}

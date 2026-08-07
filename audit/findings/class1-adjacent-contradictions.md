@@ -83,7 +83,7 @@ Full reads unless noted. Discursive pages first, per the brief.
 
 ## 3. Findings — 18
 
-Ordered by strength. Severity is my judgement of how hard the incompatibility is to talk
+Ordered by strength. Severity is my judgment of how hard the incompatibility is to talk
 away.
 
 ---
@@ -220,13 +220,13 @@ The page's second table carries one-line definitions and names no page:
 
 Nine of the ten rows in that table cite no page at all (only the `GAP` row does). The
 middle column is exactly "its own one-line definition" — the thing the page says it does
-not carry, and the thing the "a pointer cannot drift" defence does not cover, because
+not carry, and the thing the "a pointer cannot drift" defense does not cover, because
 these are not pointers.
 
 **Which is correct:** the table has to exist — it is the overloaded-token register the
 page `owns`. The absolute claim in the lead is what needs narrowing to the first table.
 
-**Defence considered:** "below" could scope to the first table only, whose header is
+**Defense considered:** "below" could scope to the first table only, whose header is
 literally "Specified in". But "**No term is defined here**" says *here*, not *in the table
 below*, and the page knowingly hosts both artifacts.
 
@@ -289,7 +289,7 @@ the Index column *is* the axes, and the Slow row is short one.
 **Which is correct:** the body. This is structurally the **same defect as the calibration
 instance** — a summary enumeration silently dropping one member the body carries.
 
-**Defence considered:** charge states are attached to species in the `DefectSpecies`
+**Defense considered:** charge states are attached to species in the `DefectSpecies`
 universe (line 124–128), so "(species, site)" could be shorthand. But the residual's own
 index is `[D,q,site]`, and the key is built from the axes.
 
@@ -332,7 +332,7 @@ list, then uses it as a block key twelve lines below that list. The block's cont
 map from old serials to current names — is also, by the page's own definition, "how they
 got that way".
 
-**Defence, and it is real:** the table has a present-tense function. `traps.md` requires
+**Defense, and it is real:** the table has a present-tense function. `traps.md` requires
 that "a label lifted from outside this corpus is translated, never copied", and this table
 is the translator. Fenced blocks are also invisible to prose sweeps
 (`conventions.md` line 55). So the substance is defensible; the *name* is the violation.
@@ -421,14 +421,14 @@ under the label of one of them; the owner page keeps them in separate bullets.
 
 ### F16 — `oracle/compilation/physics-graph.md`, *The one data structure* vs *Why it is the data structure*  · MEDIUM
 
-> **lines 59–62:** "Every other *thing* in the oracle … is a kind of node, a labelled
+> **lines 59–62:** "Every other *thing* in the oracle … is a kind of node, a labeled
 > subset of nodes, or **a per-stage sidecar indexed by node id**."
 
 > **lines 111–113:** "Per-node decorations … live in per-stage sidecars **instead of on the
 > node**"
 
 > **lines 254–256:** "**Closure.** Every closed vocabulary is either a typing rule for a
-> node kind, a labelled subset of nodes, or **an annotation field on a node**. Nothing in
+> node kind, a labeled subset of nodes, or **an annotation field on a node**. Nothing in
 > the oracle lives outside the graph."
 
 The same trichotomy appears twice with different third members. The page then states
@@ -455,7 +455,7 @@ Two lines later, a count over the manifest. It is also restated in the band tabl
 **line 270**: "| 103–104 | the two architectural markers |" — a second copy of the second
 copy, and precisely the failure the rule describes.
 
-**Defence considered:** the rule permits "names individual rows where a rule needs an
+**Defense considered:** the rule permits "names individual rows where a rule needs an
 example", and both markers are named individually. But "**Two** rows are architectural
 markers" is a closed claim about manifest membership that no reader can check against the
 page, which is what the rule exists to prevent.
@@ -653,7 +653,7 @@ therefore valid against the real tree.
 ### A4. Every quoted half re-verified against the real tree
 
 All 20 quotation pairs — both halves of every finding plus the calibration instance —
-were re-checked by substring match against the real files with line wrapping normalised,
+were re-checked by substring match against the real files with line wrapping normalized,
 because several quotations span a line break.
 
 **20 of 20 verified. 0 failures.**

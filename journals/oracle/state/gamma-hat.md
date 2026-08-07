@@ -100,18 +100,18 @@ construction and the self-consistent step. The two paths differ:
 ```
 READ PATH (dominates evaluation)
     interface ──destructor──▶ tensor-network substrate
-    lazy materialisation; no term staging, no bundle sync
+    lazy materialization; no term staging, no bundle sync
 
 WRITE PATH (construction, self-consistent step)
     interface ▶ term algebra ▶ planner ▶ encoding ▶ substrate
 ```
 
-The asymmetry is what the encoding is optimised for, and the costs say why. On the read path,
+The asymmetry is what the encoding is optimized for, and the costs say why. On the read path,
 applying the operator is a matrix-matrix product against the `N_PW × N_b` factors; extracting the
 density is a set of outer products; the trace is a set of inner products. **Every one of those
 costs is set by the rank `N_b`, not by `N_PW²`** — which is the same fact the memory budget
 below states in bytes. On the write path, construction is staged through the planner, and the
-self-consistency gradient is handled by the implicit-differentiation adjoint synthesised at
+self-consistency gradient is handled by the implicit-differentiation adjoint synthesized at
 lowering rather than by unrolling the iteration.
 
 Under the always-cheap pipeline the read path is what the runtime kernel does, and the write path
@@ -119,7 +119,7 @@ is absorbed into lowering.
 
 Self-consistency — the case where the Hamiltonian depends on the density matrix — is *structured*
 by the coalgebraic fixed-point form but **solved by the implicit-differentiation adjoint**
-synthesised at lowering ([compose-time-pipeline#lowering-and-adjoint-synthesis]). Convergence iteration happens by explicit
+synthesized at lowering ([compose-time-pipeline#lowering-and-adjoint-synthesis]). Convergence iteration happens by explicit
 iteration above the substrate, never inside it.
 
 ## Strategies that are lowering internals
@@ -128,12 +128,12 @@ Several representation strategies that might look like architectural peers are, 
 always-cheap framing, lowering tactics applied to nodes whose type is the density-matrix
 typeclass:
 
-| Strategy | Realisation |
+| Strategy | Realization |
 |---|---|
 | Codata / coalgebraic interface | the `Node` interface itself ([physics-graph#node]); destructors are method invocations |
 | Typed term algebra (staging) | an internal of symbolic lift and algebraic simplification — the compose-time symbolic intermediate representation |
 | E-graph with equality saturation | an optional offline rewrite oracle; not on the runtime path |
-| Pullback bundle of synchronised encodings | single-slot for version 1, one canonical encoding per node; the bundle is the multi-slot version 2 generalisation |
+| Pullback bundle of synchronized encodings | single-slot for version 1, one canonical encoding per node; the bundle is the multi-slot version 2 generalization |
 | Tensor network with cost-aware contraction | a lowering primitive for the low-rank and block-diagonal forms |
 
 ## Node identity is exact
@@ -174,13 +174,13 @@ N_PW² × 16 B × N_k  ≈  1000² × 16 × 29  ≈  460 MB
 
 on the same mesh — which is exactly why the encoding forbids densifying. The factor of 16 bytes
 is one complex double per element. **The slot choice is a feasibility boundary, not an
-optimisation.**
+optimization.**
 
 The k-blocks are **mutually independent**: embarrassingly parallel, and independently
 addressable. The block-diagonal form is therefore a parallelism decision as much as a storage
 one.
 
-**Warm-start initialiser.** A three-nearest-neighbour sp³d⁵ tight-binding model for carbon gives
+**Warm-start initializer.** A three-nearest-neighbor sp³d⁵ tight-binding model for carbon gives
 a `~18 × 18` Hamiltonian per k-point — kilobytes — which seeds the self-consistent-field inner
 loop ([forced-decisions#tb-warm-start]). It is **not a separate residual path**.
 

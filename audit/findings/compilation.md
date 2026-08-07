@@ -48,7 +48,7 @@ equality, `Universe` member equality, `SparseSet` membership, `PersistentMap` lo
 aggregate, group multiplication, symmetry projector. **Not one row is a physics operation.**
 There is no eigensolve, no Brillouin-zone integral, no quadrature, no self-consistent loop.
 (b) is a sound claim about the substrate's own contribution to the hot path; (a) reads it as a
-claim about the physics and generalises to "every runtime hot path".
+claim about the physics and generalizes to "every runtime hot path".
 
 The physics contradicts (a) directly:
 
@@ -70,7 +70,7 @@ The physics contradicts (a) directly:
 A per-sample stage billed at "microseconds–milliseconds" (`compose-time-pipeline.md:366`) cannot
 contain a formula whose single evaluation is bounded at ten minutes.
 
-**The corpus's real defence is good and is stated 310 lines later.** The three-class table at
+**The corpus's real defense is good and is stated 310 lines later.** The three-class table at
 `:384-391` confines the per-sample core to equation-of-motion residual evaluation and moves
 solves into "on-request spectral" and "per-composition reference". That relocation is physically
 sound — scoring `‖dx/dt − (L δE/δx + M δS/δx)‖²` at a *supplied* state needs one Hamiltonian
@@ -315,7 +315,7 @@ cell)`") points the other way.
 > `ResidualKey`**."
 
 So an `Import` deliberately creates a second `ResidualLeaf` carrying **the same key** as the target's
-standard residual leaf. This is not inferred; it is the specified behaviour. And the two leaves are
+standard residual leaf. This is not inferred; it is the specified behavior. And the two leaves are
 required to behave in opposite ways:
 
 - standard residual — "**participates in the loss**" (`residual-machinery.md:138-139`);
@@ -387,7 +387,7 @@ Against:
 - `:45-47`, the declared open question — "no bound on saturation time or e-graph size".
 
 "Offline" has a settled meaning in this literature: ahead-of-time, not per-invocation. Under that
-reading, saturation runs once ever to produce a rule set, its cost is amortised over the project,
+reading, saturation runs once ever to produce a rule set, its cost is amortized over the project,
 and the declared open question is nearly moot. Under the other reading — "out-of-band within the
 per-composition stage" — saturation runs on every composition and its unbounded cost lands
 squarely in the compile budget the corpus advertises as "seconds–minutes".
@@ -533,7 +533,7 @@ changes", and "once per composition" is simply the wrong answer.
 `compose-time-pipeline.md:271-289` states conditions for the implicit-differentiation adjoint —
 conditioning of the fixed-point Jacobian, gated by `τ_cond` at registration
 (`residual-machinery.md:186-190`). Nothing states a validity condition for the **spectral** adjoint,
-though `:126` synthesises one from an eigendecomposition node. The standard reverse-mode
+though `:126` synthesizes one from an eigendecomposition node. The standard reverse-mode
 eigendecomposition derivative carries `1/(λ_i − λ_j)` terms and is undefined at degeneracy.
 
 **Refutations that landed.** I claimed initially that eigenvalue degeneracy is unaddressed corpus-wide.
@@ -544,7 +544,7 @@ does not exist". `accuracy-ledger.md:114` separately tightens the gap tolerance 
 crossings". The corpus knows about crossings and has a mechanism.
 
 **What survives.** Two gaps, both narrow but real:
-1. **An `exceptionSet` is a set of points; the hazard is a neighbourhood.** At an exact crossing the
+1. **An `exceptionSet` is a set of points; the hazard is a neighborhood.** At an exact crossing the
    derivative does not exist and the exception set handles it. At a *near* crossing the derivative exists,
    is `O(1/Δλ)`, and is numerically catastrophic — and no tolerance covers it. `τ_cond`
    (`residual-machinery.md:186-190`) guards *fixed-point* Jacobians only, and `τ_cond` is given no numeric
@@ -569,7 +569,7 @@ open question rather than leaving it between two mechanisms. Optionally state th
 
 | # | Investigated | Outcome |
 |---|---|---|
-| N1 | **Group-theory numbers wrong.** `{1,2,3}` irrep dims, "up to 4 under SOC", "48× fewer", "order at most 192" | **All correct.** O_h single-valued irreps are dims 1,1,2,3,3; the cubic double group adds Γ₆(2), Γ₇(2), **Γ₈(4)** — so 4 is right. Wedge: |O_h| = 48, achieved for diamond (Fd-3m); for zincblende T_d (order 24) time reversal supplies the remaining factor 2, so "up to 48×" holds. **192 = 48 × 2 (double) × 2 (time reversal)** — the max crystallographic double point group augmented by time reversal, which is exactly the spin-doubled grey setting the corpus works in (`topology-atlas.md:50-52`, `representation-substrate.md:125-128` "time-reversal twist"). Internally coherent |
+| N1 | **Group-theory numbers wrong.** `{1,2,3}` irrep dims, "up to 4 under SOC", "48× fewer", "order at most 192" | **All correct.** O_h single-valued irreps are dims 1,1,2,3,3; the cubic double group adds Γ₆(2), Γ₇(2), **Γ₈(4)** — so 4 is right. Wedge: |O_h| = 48, achieved for diamond (Fd-3m); for zincblende T_d (order 24) time reversal supplies the remaining factor 2, so "up to 48×" holds. **192 = 48 × 2 (double) × 2 (time reversal)** — the max crystallographic double point group augmented by time reversal, which is exactly the spin-doubled gray setting the corpus works in (`topology-atlas.md:50-52`, `representation-substrate.md:125-128` "time-reversal twist"). Internally coherent |
 | N2 | **"No numerics run here" (Stage 2) is false because symmetry detection carries a tolerance** | **Killed.** The space group is *given*, not detected — `crystal-inputs.md:50` lists "the Bravais lattice and space group" as fields of `PeriodicityStructure`. No coordinate-tolerance symmetry finding occurs |
 | N3 | **The graph's acyclicity contradicts `residual-machinery`'s "one cycle crosses the strata"** | **Reconciled.** They are different graphs: the cycle is in "the compute DAG over the whole **registry**" (`residual-machinery.md:108-111`), not the physics graph, and it is closed by a fixed-point iteration which by `physics-graph.md:70-74` lives inside one node. *Minor residue:* `physics-graph.md:76-82` disambiguates `graph` against the **page index** only; the layered compute DAG is a third graph the paragraph does not cover. Low severity, noted not filed |
 | N4 | **`ResidualKey` is a content hash of the leaf's subgraph, so rewrites change the operator's loss keys** | **Killed.** `ResidualKey = (producer, axes)` — structural, not value- or subgraph-derived. Stable across recompiles exactly as `residual-definitions.md:227-228` claims. (The *opposite* problem is F6) |
@@ -650,7 +650,7 @@ evidence than a blind sweep and should be read as such.
 check. My method is demonstrably strong on wrong assertions and unproven on absences, which is
 exactly the profile that lets a missing validity range survive an audit. F4 and F12 are both
 absence findings and were found by asking "what condition would this need?" rather than by reading —
-that question is the only defence I have against class 3 and it does not scale.
+that question is the only defense I have against class 3 and it does not scale.
 
 **A second, real miss to record.** My citation sweep verified 5 of 7 works (Zhang/egglog fully —
 all four numbers; Naumann fully, including that the NP-complete problem *is* the store-vs-recompute
@@ -696,7 +696,7 @@ appear verbatim.
 mathematics. The argument is correct: `≈_ε` is a tolerance relation, non-transitive, inducing a covering by
 maximal cliques rather than a partition, and clique cover is NP-hard. The four consequences (no canonical
 representative, dedup dies, `O(1)` equality dies, union-find dies) all follow. The two rejected alternatives
-are correctly characterised — quantized addressing does buy dedup at the cost of injectivity and adds a grid
+are correctly characterized — quantized addressing does buy dedup at the cost of injectivity and adds a grid
 artifact at cell boundaries; ball addressing does relocate rather than dissolve the non-transitivity. **I
 tried to break it with the brief's own case** — the same physical quantity computed two ways, agreeing to
 tolerance, hashing differently — and the corpus's answer holds: they are two `ResidualLeaf` nodes and their
@@ -732,7 +732,7 @@ topics, 51 open questions) and nothing I did changes it.
    this today: "enforced" is a prose claim, not a checked one.
 4. **Two identity notions on one object** (F5). `NodeId` (arena index) and `ContentAddress` (hash-cons
    identity) both name graph nodes; sidecars use the first and cross stages that rewrite the arena. This is
-   the compile-side analogue of the `tolerance-in-the-address` trap and probably belongs beside it.
+   the compile-side analog of the `tolerance-in-the-address` trap and probably belongs beside it.
 4b. **A key too coarse for the distinctions built on top of it** (F6). `ResidualKey = (producer, axes)`
    omits the inputs, and three separate mechanisms — bare-versus-dressed chains, `Import`'s cert-only
    leaves, and the `ContributionFacets` vocabulary — are each specified as if the key could tell them

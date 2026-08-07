@@ -1,0 +1,18 @@
+{
+  "ispin_corpus": {
+    "active": {
+      "2": 199
+    },
+    "commented_only": 0,
+    "absent": 0
+  },
+  "flagged_pairs": 27,
+  "setup_errors": 0,
+  "populations": {
+    "mag-quarter": 14,
+    "odd-nelect-no-mag": 13
+  },
+  "headline_in_gap_before": 0.7590185870654542,
+  "headline_in_gap_after": 0.7590185870654542,
+  "excluded_configs": []
+}

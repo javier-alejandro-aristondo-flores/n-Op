@@ -51,7 +51,7 @@ certify stability; one heterostructure check — c-BN on diamond — by lattice 
 | Facet | Content |
 |---|---|
 | State slots | cell vectors, ion positions, species labels; the one-body density matrix at zero temperature, for the Born–Oppenheimer energy ([unified-state#slots]) |
-| Levels | quantum-electronic-substrate (the Born–Oppenheimer energy as a minimisation over the density matrix) then born-oppenheimer-surface (relaxation on positions and cell) ([born-oppenheimer-levels#hierarchy]) |
+| Levels | quantum-electronic-substrate (the Born–Oppenheimer energy as a minimization over the density matrix) then born-oppenheimer-surface (relaxation on positions and cell) ([born-oppenheimer-levels#hierarchy]) |
 | Methods | variational-minimization · functional-differentiation · algebraic-combination · symmetry-projection · spectral-decomposition · convex-optimization (hull check only) |
 | Templates | `SymmetryAdaptedHamiltonianOf` · `SecondDerivativeOf` · `ClassifyOf` · `StateReadoutOf` · `AlgebraicOf` |
 | Formulas | 57 elastic-stability-criteria · 60 elastic-constants · 61 bulk-modulus · 62 sound-velocity-isotropic · 85 structure-uniqueness · 30 defect-formation-energy · 44 surface-grand-potential · 52 alloy-lattice-interpolation · 54 critical-thickness-force-balance (c-BN on diamond) · 67 phase-diagram-convex-hull · 124 temperature-pressure-aware hull, whose metastability band reads zero for metastable diamond |

@@ -36,8 +36,8 @@ order. This index is the reading order.
 | **S13** | a curriculum phase turns on a consistency pair one leg of which is dormant | missing information | medium |
 | **S10** | determinism contracted in one direction only, and not on the side doing the arithmetic | missing information | medium |
 | **S11** | key-set drift across recompiles is unowned | missing information | medium |
-| **S12** | "discretisation invariance" asserted flatly; a fourth silent failure omitted from a list claiming completeness | false claim | medium |
-| **S19** | the adjoint cost claim drops the compilation page's qualification and generalises across two tiers | false claim | low-med |
+| **S12** | "discretization invariance" asserted flatly; a fourth silent failure omitted from a list claiming completeness | false claim | medium |
+| **S19** | the adjoint cost claim drops the compilation page's qualification and generalizes across two tiers | false claim | low-med |
 | **S14** | `Validate`'s fourth return value stated two ways | contradiction | low-med |
 
 ### S1 — The retired token `coverage-mask` survives in the persisted schema, in the content address, in the glossary's live-name table, and in a **fourth** sense the retirement never enumerated
@@ -74,7 +74,7 @@ implementer reads when wiring the actual training data.
 Three consequences, in descending order of how quietly they fail.
 
 **(a) The seam page names a column that does not exist.** `pino-bridge.md:126-128` says the
-serialised bytes "are stored in the **axis-coverage column** of the reference cache's entry
+serialized bytes "are stored in the **axis-coverage column** of the reference cache's entry
 table" and cites `[cert-obligations#reference-cache]`. That table has no `axis-coverage`
 column; it has `coverage_mask`.
 
@@ -119,7 +119,7 @@ sense its own name and add it to the retirement note; fix `pino-bridge`'s column
 
 ```
 flat-index(axes) = enumerate(product(axes))   -- lexicographic over axis values
-RoaringAxisCoverage = serialised Roaring bitmap of selected flat-index positions
+RoaringAxisCoverage = serialized Roaring bitmap of selected flat-index positions
 ```
 
 A Roaring bitmap is a set of integers. Its meaning is entirely carried by the index those
@@ -132,8 +132,8 @@ over axis values" presupposes a total order on k-points, on atomic pairs, on she
 stated anywhere. Two implementations that both correctly implement the instruction can
 produce incompatible bitmaps, and each will validate.
 
-This is not a hypothetical gap in a corpus that elsewhere takes canonicalisation seriously:
-`representation-substrate.md:155-183` gives an eleven-rule canonical serialisation covering
+This is not a hypothetical gap in a corpus that elsewhere takes canonicalization seriously:
+`representation-substrate.md:155-183` gives an eleven-rule canonical serialization covering
 records, sequences, sets, maps, sum types, group actions, optionals and floats. Rule 4 covers
 the *outer* product (`Sequences … elements in declared order`), so the axis order is fixed.
 The *inner* value sets are covered by rule 5 — "sorted by **address bytes** … so order cannot
@@ -247,7 +247,7 @@ two load-bearing types are genuinely unowned:
 `cert-obligations.md:213`). It is: one of the three legal values of `Validate`'s `request`
 parameter; the key of the `values` map, i.e. the *entire observable output channel of the
 seam*; the sole identifier of an `Import` target; a field of the generator record; and a
-serialised column in the persisted reference cache. No page says what one is, whether it names
+serialized column in the persisted reference cache. No page says what one is, whether it names
 a registry row, a bundle member or a ledger observable, or how a consumer obtains a valid one.
 S3 is a direct consequence of this gap.
 
@@ -425,7 +425,7 @@ Calibrate is at position 3 and Cooldown at position 4. The substitutions are Cal
 written — renaming Cooldown to Calibrate — produces `Warmup/Refine/Polish/Calibrate` against
 `Warm-up/Refine/Calibrate/Polish`, in which **both** contested names now appear in both
 schedules at swapped positions. Following the instruction correctly makes the corpus worse.
-This is the corpus's own named hazard class, realised inside a declared open question.
+This is the corpus's own named hazard class, realized inside a declared open question.
 
 Separately, "Consumers of this gate name three phases where it names four" no longer describes
 the corpus: `residual-loss-design` names four. The only surviving three-phase claim is S8.
@@ -434,7 +434,7 @@ the corpus: `residual-loss-design` names four. The only surviving three-phase cl
 `README.md`, `data/` and `tools/` for all six phase names: 20 hits, of which the only use
 outside the two defining tables and their own prose is `multiscale-state.md:286` — "Curriculum
 band: **Refine**, `[0.10, 0.60)`" — which disambiguates by carrying the interval, and is
-therefore clean. So the collision is currently latent rather than realised. It is a hazard
+therefore clean. So the collision is currently latent rather than realized. It is a hazard
 armed and not yet fired.
 
 **Proposed correction.** Rename one of the two `Polish` phases. `residual-loss-design`'s
@@ -513,7 +513,7 @@ adjoint values through the shared region, which is `k` sweeps' worth of work.
 
 **Why this is a seam finding rather than a laws finding.** The whole granularity contract
 exports `cograds : Optional<Map<ResidualKey, Cotangent>>` (`pino-bridge.md:57`) — one
-state-shaped cotangent per key, i.e. the materialised Jacobian — and
+state-shaped cotangent per key, i.e. the materialized Jacobian — and
 `learnable-structure-contract.md:118-126` then has the *loop* linearly combine them into one
 state-shaped cotangent before handing it to the operator. The seam is arranged so the operator
 pays one vector–Jacobian product and the oracle pays `k` reverse sweeps, and the corpus states
@@ -592,14 +592,14 @@ three in full.
 
 ---
 
-### S12 — "Discretisation invariance" is stated as a property neural operators have; the operator-learning literature says otherwise, and `training-stages` omits it from the failure list that claims to be complete
+### S12 — "Discretization invariance" is stated as a property neural operators have; the operator-learning literature says otherwise, and `training-stages` omits it from the failure list that claims to be complete
 
 **Severity: medium. Confidence: medium-high.**
 
 `learnable-structure-contract.md:60`, the second row of the five-property "why an operator"
 table:
 
-> **Discretisation invariance** | supercell size and reciprocal-space mesh density vary across
+> **Discretization invariance** | supercell size and reciprocal-space mesh density vary across
 > the problem. A mesh-bound model is retrained per mesh; **one set of weights carries across
 > meshes**
 
@@ -608,21 +608,21 @@ Operators: a Framework for Alias-free Operator Learning* (arXiv:2305.19913; Neur
 introduces "operator aliasing, which measures inconsistency between neural operators and their
 discrete representations", and reports that "aliasing introduces errors when handling
 different discretisations and grids and loss of crucial continuous structures" — i.e. that
-standard neural operators, Fourier neural operators included, are *not* discretisation-invariant
+standard neural operators, Fourier neural operators included, are *not* discretization-invariant
 as implemented. (Verified from the paper's abstract; I could not run further searches, see §3.)
 
 The *contract* built on this row is fine — `#evaluate-at-points` contracts point-evaluation,
 which branch-trunk operators satisfy exactly. The defect is in the justification and, more
 consequentially, in the omission:
 
-`training-stages.md:120-138` lists three shortfalls of the trained operator and characterises
+`training-stages.md:120-138` lists three shortfalls of the trained operator and characterizes
 the list as complete and as the page's honest half — "all three failures are **silent**". Mesh
 sensitivity from aliasing is a fourth failure of exactly that character: a plausible number
 comes back on a mesh the model was not trained at, with nothing marking it. It bears directly
 on the seam's self-described "single most load-bearing requirement", which is evaluation at
 points off the training grid.
 
-**What would refute this.** A statement elsewhere that the discretisation-invariance claim is
+**What would refute this.** A statement elsewhere that the discretization-invariance claim is
 approximate, or a demonstration that the specific architecture family chosen is alias-free
 (Raonić et al.'s convolutional neural operators are a candidate). Architecture is explicitly
 unconstrained by the seam (`learnable-structure-contract.md:68-72`), so no such demonstration
@@ -657,7 +657,7 @@ rather than obvious: the category does light up, at half strength, with nothing 
 right. Killed. I also expected `Positivity`'s `ω² ≥ 0`, which the curriculum turns on in
 *Warmup*, to depend on the `T3` row 13 `SCPH-self-consistent-phonons`; it does not — row 9
 `phonon-dispersion` is `T1`/`D2` and produces `ω_λ(q)`, with SCPH a higher-fidelity
-renormalisation on top. Killed.
+renormalization on top. Killed.
 
 ---
 
@@ -672,13 +672,13 @@ deviation. `product.md` ("The static slot schema") exports it per key — "for e
 producing registry row, the axis coordinates, the closed-enum tags […] and **the error scale —
 a standard deviation**" — and states the intended use explicitly:
 
-> Consumers who want cross-slot comparability compute the standardised score `z = value / σ`
+> Consumers who want cross-slot comparability compute the standardized score `z = value / σ`
 > **themselves** — that is a join against the schema, not a product output.
 
 The operator's side never joins. `residual-loss-design.md#balancing` and `#defaults` set the
 per-residual weights `λ_i(t)` entirely from GradNorm across the four source families and
-neural-tangent-kernel-initialised fixed weights within the residual family. Neither `σ`, nor
-`combineTol`, nor `characteristic-scale`, nor any normalisation by a declared scale appears
+neural-tangent-kernel-initialized fixed weights within the residual family. Neither `σ`, nor
+`combineTol`, nor `characteristic-scale`, nor any normalization by a declared scale appears
 anywhere in the loss design.
 
 This matters on the page's own terms. `residual-loss-design.md:155` states the failure mode:
@@ -696,10 +696,10 @@ nothing downstream reads it.
 `residual-definitions.md:241` says *facets* are "never the basis for a per-residual loss
 weight", which is about `(category, bundle, dressing)` and not about σ; and
 `residual-machinery.md:80-82` says `characteristic-scale` is "an error-model input, **never a
-fitted weight**" — a declared σ used as `1/σ` normalisation is not a *fitted* weight, so the
+fitted weight**" — a declared σ used as `1/σ` normalization is not a *fitted* weight, so the
 rule permits exactly the use that is missing. The channel is open and unused.
 
-**Proposed correction.** Either normalise residual terms by the exported per-key σ before
+**Proposed correction.** Either normalize residual terms by the exported per-key σ before
 balancing, and say so; or state why the design deliberately declines to, given that the oracle
 computes the quantity specifically to be consumed this way.
 
@@ -726,7 +726,7 @@ passing mention of the operator's mask.
 
 And the oracle's unit of compilation is finer than one batch element.
 `product.md` ("Three rules about files"): "**One file per crystal identity.** A kernel is
-specialised to one periodicity structure, site decoration and environment."
+specialized to one periodicity structure, site decoration and environment."
 
 Now the third mask forces the question. `applicability-classifiers.md` (predicate contract):
 
@@ -790,8 +790,8 @@ quantity into `relaxed`:
 The general technique is sound. The example does not instantiate it, because the quantity it
 names is one-signed.
 
-The indirect gap minimises `E_c(k_c) − E_v(k_v)` over **all** pairs `(k_v, k_c)`; the direct gap
-minimises the same expression over the **diagonal** pairs `k_v = k_c`. The diagonal is a subset
+The indirect gap minimizes `E_c(k_c) − E_v(k_v)` over **all** pairs `(k_v, k_c)`; the direct gap
+minimizes the same expression over the **diagonal** pairs `k_v = k_c`. The diagonal is a subset
 of all pairs, so
 
 ```
@@ -817,7 +817,7 @@ indirect […] the load-bearing indirect gap". This is the one example the page 
 technique it calls strongest, on the material the build is first for.
 
 **What would refute this.** A definition of the direct gap on which it can fall below the
-indirect gap. There is none — the minimisation domains are nested by construction. Or a reading
+indirect gap. There is none — the minimization domains are nested by construction. Or a reading
 on which "signed" means "one-signed"; but the page's own gloss, "the discrete fact becomes the
 sign of a differentiable scalar", forecloses it.
 
@@ -877,7 +877,7 @@ re-reading the field list:
 | a local-error estimator for step-size control | none |
 | whether the tangent map is autonomous — its signature `(state_tier, env, adiabatic-params) → tangent_tier` carries no time argument, while `env` is a per-call argument that varies within its stamped box (`product.md`, "Environment-box validity") | none states whether `env` and `adiabatic-params` may vary along a trajectory or must be frozen |
 | the time unit of the emitted tangent | none, and `unified-state.md:76` declares per-slot units unspecified — so the derivative's units are undetermined at the point of use |
-| consistent initial conditions for the algebraic subsystem | the `index-≤1 witness` (`pino-bridge.md:146`) bounds the index, which is what makes a solve tractable; index-1 systems still require consistent initialisation, and nothing says who computes it |
+| consistent initial conditions for the algebraic subsystem | the `index-≤1 witness` (`pino-bridge.md:146`) bounds the index, which is what makes a solve tractable; index-1 systems still require consistent initialization, and nothing says who computes it |
 
 **Separating this from the declared gap.** `pino-bridge.md:34-37` honestly declares that "the
 manifest record, the refusal enum, and the scorer-versus-evolver exactness obligation" are
@@ -995,7 +995,7 @@ metriplectic systems as a whole. The review's statement that non-canonical prese
 
 ---
 
-### S19 — The adjoint cost claim drops the qualification the compilation page was careful to add, and then generalises it across two tiers
+### S19 — The adjoint cost claim drops the qualification the compilation page was careful to add, and then generalizes it across two tiers
 
 **Severity: low-medium. Confidence: high.** *Re-instantiation of inherited `oracle-compilation` C5 on a seam page.*
 
@@ -1063,7 +1063,7 @@ killed myself.*
   the natural reading, the sentence is true. Killed.
 - **The two-loop symmetry does no work.** `learnable-structure-contract#loop-agnostic` grounds
   loop-agnosticism in a symmetry between the training and design loops, and the design loop
-  optimises the candidate directly against `cograds` (`product#design-variable-boundary`) and
+  optimizes the candidate directly against `cograds` (`product#design-variable-boundary`) and
   need never exercise the seam's vector–Jacobian obligation at all. So the symmetry is thinner
   than claimed — but the *conclusion* (the contract names no loop) is independently true and
   the requirements list is unaffected. Rhetorical weakness, not a defect. Killed.
@@ -1130,7 +1130,7 @@ but I will not assert that without the text.
 
 **The branches.** If the three guarantees are all proved for the named integrator, S-BUG
 below does not arise and only the unmapped `bound` token stands. If energy conservation
-belongs to a different integrator, then `pino-bridge` names a family that cannot honour the
+belongs to a different integrator, then `pino-bridge` names a family that cannot honor the
 `conserve`/`L`-block obligation it exports, and a consumer matching "term for term" as
 instructed would choose wrongly. If no guarantee in the family is stated as a bound, the
 obligation vocabulary has a third token with no referent and the "term for term" claim is
@@ -1210,7 +1210,7 @@ Reported, not written — `log/timeline.md` has a single writer.
    registers the retired type as live, and a fourth sense exists that the retirement never
    enumerated (S1).
 2. The axis-coverage flat index is an identity-bearing construction with no stated ordering,
-   in a corpus that canonicalises every other identity-bearing serialisation (S2).
+   in a corpus that canonicalizes every other identity-bearing serialization (S2).
 3. `Import` cannot key its leaf under the `ResidualKey` schema the seam exports (S3).
 4. `Polish` denotes two different 30% windows, and the declared open question that covers the
    phase-name disagreement mis-describes it in a way that makes following the instruction

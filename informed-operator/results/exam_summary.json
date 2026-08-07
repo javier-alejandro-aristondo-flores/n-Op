@@ -1,0 +1,35 @@
+{
+ "best_family": "spectral",
+ "conformal_half_width_mev": 6.205072686278558,
+ "conformal_coverage": 0.9597156398104265,
+ "conformal_nominal": 0.9,
+ "conformal_calibration_size": 287,
+ "degeneracy_symmetrised": {
+  "isotropic_shapes": 55,
+  "max_splitting_mev": 81.62587756911913,
+  "median_splitting_mev": 26.95613640840951,
+  "passes_1mev": false,
+  "anisotropic_max_splitting_mev": 3192.925346098741
+ },
+ "degeneracy_raw": {
+  "isotropic_shapes": 55,
+  "max_splitting_mev": 81.62596821784973,
+  "median_splitting_mev": 26.95612771606548,
+  "passes_1mev": false,
+  "anisotropic_max_splitting_mev": 3204.4551204338063
+ },
+ "ensemble_size": 5,
+ "epochs": 300,
+ "noise_floor_mev": 0.0105,
+ "significance_mev": 20.0,
+ "weights_used": {
+  "cv_fold_0": 0.5,
+  "cv_fold_1": 0.5,
+  "cv_fold_2": 0.5,
+  "cv_fold_3": 0.5,
+  "cv_fold_4": 0.5,
+  "small strain -> large strain": 2.0,
+  "axis+skew families -> general stretch": 2.0
+ },
+ "disclosure": "the two structured splits were compared at three gap weights before the weight was reselected on inner folds; their numbers are correspondingly optimistic"
+}

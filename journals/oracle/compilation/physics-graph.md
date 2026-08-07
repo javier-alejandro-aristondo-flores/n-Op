@@ -58,7 +58,7 @@ compose-time pipeline produces ([compose-time-pipeline]), what the runtime kerne
 evaluates, what the certification obligations traverse
 ([cert-obligations#the-ten-obligations]), and what the operator library trains against. Every other *thing* in the oracle — formulas,
 methods, templates, observables, residuals, bundles, applicability classifiers, the
-topology atlas — is a kind of node, a labelled subset of nodes, or a per-stage sidecar
+topology atlas — is a kind of node, a labeled subset of nodes, or a per-stage sidecar
 indexed by node id.
 
 ## Acyclic, and why that word is load-bearing
@@ -252,7 +252,7 @@ place for it to be wrong.
 ## Why it is the data structure
 
 - **Closure.** Every closed vocabulary ([canonical-vocabularies#scope]) is either a typing
-  rule for a node kind, a labelled subset of nodes, or an annotation field on a node.
+  rule for a node kind, a labeled subset of nodes, or an annotation field on a node.
   Nothing in the oracle lives outside the graph.
 - **Composition.** Composing observables *is* composing subgraphs. Property templates
   ([property-templates#what-a-template-is]) are graph-construction macros, and coupling

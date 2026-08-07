@@ -1,0 +1,146 @@
+{
+  "models": {
+    "deep_occ": {
+      "n": 119878,
+      "M0": 1.175846245786895,
+      "M1": 1.175846245786895,
+      "M2": 0.5047057072208873,
+      "M2_groupfit": 0.4581970949506622,
+      "M2L": 0.1810074023045885,
+      "M3": 0.4759167947955162
+    },
+    "band_edges": {
+      "n": 93809,
+      "M0": 0.9037586455850461,
+      "M1": 0.2768834205549528,
+      "M2": 0.3385142792715944,
+      "M2_groupfit": 0.1763182969214249,
+      "M2L": 0.16233472397981713,
+      "M3": 0.24198967388618156
+    },
+    "in_gap": {
+      "n": 2883,
+      "M0": 0.6900870557712921,
+      "M1": 0.4546205938751401,
+      "M2": 0.7590185870654542,
+      "M2_groupfit": 0.37370744315526816,
+      "M2L": 0.34716078633789055,
+      "M3": 0.6512224036622618
+    },
+    "high_unocc": {
+      "n": 38998,
+      "M0": 1.4743372814075366,
+      "M1": 0.2803072269112399,
+      "M2": 0.2803072269112399,
+      "M2_groupfit": 0.24405001104718643,
+      "M2L": 0.2358830724963043,
+      "M3": 0.14329694189091904
+    },
+    "ALL": {
+      "n": 255568,
+      "M0": 1.1160415909591528,
+      "M1": 0.7010828642807688,
+      "M2": 0.4123304506667844,
+      "M2_groupfit": 0.4123304506667844,
+      "M2L": 0.1844013965109683,
+      "M3": 0.3412732860675282
+    }
+  },
+  "subsets": {
+    "in_gap_clean": 0.6741149802082026,
+    "in_gap_clean_n": 2007,
+    "in_gap_suspect": 0.9535408918171713,
+    "in_gap_suspect_n": 876
+  },
+  "correlation": {
+    "IPR in-gap": {
+      "r": -0.30073519557449896,
+      "r2": 0.09044165785723214,
+      "n": 2883
+    },
+    "dopant weight in-gap": {
+      "r": -0.2734265378593565,
+      "r2": 0.07476207160575411,
+      "n": 2883
+    },
+    "IPR all": {
+      "r": 0.14633624639519072,
+      "r2": 0.021414297009033967,
+      "n": 255568
+    },
+    "dopant weight all": {
+      "r": 0.09895545329943688,
+      "r2": 0.009792181737697032,
+      "n": 255568
+    }
+  },
+  "dos_residual_pct": {
+    "sigma=0.1": {
+      "M0": 74.82901379879046,
+      "M1": 61.62913845748225,
+      "M2": 55.999469376564974,
+      "M3": 53.14600304529118
+    },
+    "sigma=0.3": {
+      "M0": 54.05798714496285,
+      "M1": 40.38993767301569,
+      "M2": 32.698960500217424,
+      "M3": 30.97973816826033
+    },
+    "sigma=0.5": {
+      "M0": 43.40640585312305,
+      "M1": 30.779280844141777,
+      "M2": 23.0486356009306,
+      "M3": 21.743654440105118
+    }
+  },
+  "diagnostics": {
+    "ambiguous": 549,
+    "reordered": 58459,
+    "total": 256000,
+    "gap_unresolved_runs": 19,
+    "gap_unresolved_configs": [
+      "pair_defects/N-H/C8-C1-were_replaced",
+      "pair_defects/N-H/C8-C53-were_replaced",
+      "single_defect/IA-element-single-impurity/H",
+      "triads_defects/H-B-Si/C8-C53-C1-were_replaced/config1",
+      "triads_defects/H-B-Si/C8-C53-C1-were_replaced/config2",
+      "triads_defects/H-B-Si/C8-C53-C1-were_replaced/config3",
+      "triads_defects/H-B-Si/C8-C55-C1-were_replaced/config1",
+      "triads_defects/H-B-Si/C8-C55-C1-were_replaced/config2",
+      "triads_defects/H-B-Si/C8-C55-C1-were_replaced/config3",
+      "triads_defects/H-N-O/c8-c53-c1/config1",
+      "triads_defects/H-N-O/c8-c53-c1/config2/sigma00001",
+      "triads_defects/H-N-O/c8-c53-c1/config3/sigma00001",
+      "triads_defects/H-N-O/c8-c55-c1/config1",
+      "triads_defects/H-N-O/c8-c55-c1/config2",
+      "triads_defects/H-N-O/c8-c55-c1/config3",
+      "triads_defects/Li-B-P/c8-c53-c1/config2",
+      "triads_defects/Li-B-P/c8-c53-c1/config3",
+      "triads_defects/Li-B-P/c8-c55-c1/config1",
+      "triads_defects/Li-B-P/c8-c55-c1/config3"
+    ]
+  },
+  "global_fits": {
+    "M2_a": -0.8223981857299805,
+    "M2_b": 1.4839019775390625,
+    "M2L_occ": [
+      0.09938423666013646,
+      -0.07356659007679044
+    ],
+    "M2L_unocc": [
+      0.07007906562105079,
+      0.8405580666929416
+    ]
+  },
+  "host_gap": {
+    "pbe_median": 4.602830410003662,
+    "hse_median": 5.744157791137695,
+    "n_resolved_configs": 62
+  },
+  "alignment_control_deep_shift_eV": 1.8409527275297377,
+  "settings": {
+    "HOST_MULT": 2.0,
+    "MIN_HOST_GAP": 2.0
+  }
+}

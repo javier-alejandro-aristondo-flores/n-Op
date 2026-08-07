@@ -1,7 +1,7 @@
 # The decision docket — auditor 3, pass C
 
 Six questions the audit marked **physics-gated**: Javier's alone, because each needs a
-judgement no amount of corpus-reading settles. This file does not leave them blank. Each
+judgment no amount of corpus-reading settles. This file does not leave them blank. Each
 carries the corpus text it rests on, what is actually true, both branches costed, and **a
 recommendation to ratify or reject**.
 
@@ -34,7 +34,7 @@ both currents correctly and knows they differ:
 
 > Drift-diffusion gives `j_n = q·μ_n(E,T)·n·E + q·D_n·∇n` for electrons and `j_p = q·μ_p·p·E − q·D_p·∇p` for holes: **only the diffusion term changes sign between carriers, never the drift term.**
 
-But the homogenisation map writes a single balance:
+But the homogenization map writes a single balance:
 
 > (DD) ∂_t n + ∇·j = G − R,   j_n = q·μ_n·n·E + q·D_n·∇n
 
@@ -166,7 +166,7 @@ functional of `A`, `δE/δx` has no computable value on that block, and the `EOM
 no right-hand side.**
 
 Verified by hand: `conjugate` occurs exactly twice in the corpus — once as `conjugate-gradient`,
-an optimiser and a false friend, and once as the cell-metric conjugate. Control fires — `Π_h`
+an optimizer and a false friend, and once as the cell-metric conjugate. Control fires — `Π_h`
 returns its slot, its symplectic block, its residual category and its kinetic-energy term, the
 full complement of a carried conjugate momentum. `A` has none of them.
 
@@ -261,7 +261,7 @@ r2SCAN 115, LDA 20) all disagree with 25.
 
 > | `τ_NEB` | `PathStationaryOf` climbing-image nudged-elastic-band force convergence | `1e-3` |
 
-Every neighbouring row in that same table carries a unit: `1e-6 relative`, `1e-9 absolute`,
+Every neighboring row in that same table carries a unit: `1e-6 relative`, `1e-9 absolute`,
 `1e-8 Ha`, `1e-4 Ha`, `50 meV/atom`. **This row is the only bare numeral in its own table.**
 
 ### What is actually true
@@ -353,7 +353,7 @@ should not be paid silently.
 
 > **3 · Inference.** The operator runs alone. It calls no oracle.
 
-And it names the consequence as its most-emphasised limitation:
+And it names the consequence as its most-emphasized limitation:
 
 > **The oracle does not fix extrapolation.** It constrains training, so the model is
 > pushed toward states that satisfy the laws. It is absent at inference and cannot flag
@@ -403,7 +403,7 @@ reads as an oversight rather than a decision.
 
 ## Still held from auditor 2 — not physics, still Javier's
 
-These need a decision but not a physics judgement.
+These need a decision but not a physics judgment.
 
 | Item | Scale | The condition on it |
 |---|---|---|

@@ -121,7 +121,7 @@ CORRUPTIONS = [
     ("occupations-within-unit-interval",
      dict(occupations=[np.tile([1.3, 1.3, 1.0, 0.4], (10, 1))]), 0.3, set()),
     # Weights are read by the electron count too, and no reweighting breaks the
-    # normalisation while leaving the count intact -- so this one is declared.
+    # normalization while leaving the count intact -- so this one is declared.
     ("kpoint-weights-sum-to-one",
      dict(kpoint_weights=np.full(10, 1.1 / 10)), 0.1,
      {"occupations-sum-to-electron-count"}),

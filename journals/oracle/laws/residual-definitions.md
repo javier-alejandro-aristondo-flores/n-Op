@@ -55,7 +55,7 @@ open-questions:
 ## Granularity
 
 Residuals are the physics-informed loss terms the operator library trains
-against. In the physics graph ([physics-graph#output-role]) they are realised as
+against. In the physics graph ([physics-graph#output-role]) they are realized as
 nodes with `OutputRole = ResidualLeaf(key)`.
 
 The emission discipline is **granular**: every independent component is its own
@@ -101,7 +101,7 @@ The two **cross-tier** siblings share the same
   - `EOM/DefectPopulation` — slow-tier defect-population kinetics,
     `‖d[D]^q/dt − (G − [D]^q·k_ann)‖²`.
   - `EOM/Continuum` — macro-tier continuum-field balance,
-    `‖∂_t field − RHS(fields; homogenized coeffs)‖²`, generalising the
+    `‖∂_t field − RHS(fields; homogenized coeffs)‖²`, generalizing the
     device-scale partial-differential-equation residual.
 
 ### Structural axes of GENERIC — 3 categories
@@ -119,14 +119,14 @@ The two **cross-tier** siblings share the same
  10. `Positivity` — `M ⪰ 0`, `f ∈ [0,1]`, `ρ ≥ 0`, `ω² ≥ 0`, `σ ⪰ 0`,
      `|S_i| = 1`.
      - `ω² ≥ 0` is **applicability-gated** to phases claimed dynamically
-       stable, so it does not penalise the legitimate saddle and transition
+       stable, so it does not penalize the legitimate saddle and transition
        configurations a trajectory must traverse.
      - The electron-temperature bound `T_e ≥ T_L` reads registry row 72
        (`hot-carrier-temperature-balance`), and the avalanche
        breakdown-integral guard `max(0, ∫α dx − 1)²` reads registry row 75
        (`avalanche-multiplication`). Both read existing rows; neither adds one.
      - **γ̂ admissibility** — ensemble N-representability, the state-level
-       analogue of `f ∈ [0,1]`: `γ̂† = γ̂` and `0 ⪯ γ̂ ⪯ 1`, evaluated as
+       analog of `f ∈ [0,1]`: `γ̂† = γ̂` and `0 ⪯ γ̂ ⪯ 1`, evaluated as
        per-block spectral bounds on the block-diagonal reciprocal-space
        encoding ([gamma-hat#encoding-vocabulary]). The extreme eigenvalues of
        each block are cheap to extract, which makes the bound affordable per
@@ -165,7 +165,7 @@ the pair, not two tags:
   versus by Kubo is one.
 - A **consistency pair** binds a cheap model to a microscopic reference with
   **no** agreement theorem — Callaway/Slack thermal conductivity against
-  iterative Boltzmann transport, cheap-Chynoweth ionisation against
+  iterative Boltzmann transport, cheap-Chynoweth ionization against
   Boltzmann/Monte-Carlo — and trips only on *excess beyond a declared model-gap
   tolerance* `τ_method` ([cert-obligations#tolerance-ledger]). A legitimate
   model gap is therefore not scored as a bug.
@@ -192,7 +192,7 @@ Disjoint by the *type* of input the constraint reads:
      mass-action and carbide formation; and the three slow-tier
      thermodynamic-consistency identities — Gibbs adsorption `dγ/dμ = −Γ`,
      charge–Fermi Maxwell `dE_form/dE_F = q`, and the Clausius–Clapeyron
-     analogue `d ln[D]/d(1/T)` against `S_form`
+     analog `d ln[D]/d(1/T)` against `S_form`
      ([multiscale-state#slow-kinetics]).
 
 Categories 16 and 17 stay disjoint because they consume type-distinct inputs —

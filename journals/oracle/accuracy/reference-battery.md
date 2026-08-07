@@ -115,7 +115,7 @@ calculation already satisfies, and each follows from a conservation law.
 | `σ_ij = σ_ji` | the stress tensor is symmetric | conservation of angular momentum |
 | `Σ_nk w_k f_nk = NELECT` | occupations, weighted over bands and k-points, sum to the electron count | electrons are conserved |
 | `det(A) = V` | the lattice-matrix determinant equals the reported volume | arithmetic |
-| spin parity | an odd electron count forces an odd integer magnetisation | you cannot pair every electron |
+| spin parity | an odd electron count forces an odd integer magnetization | you cannot pair every electron |
 
 Closed form, one pass per frame, and **no anchor is required** — the calculation is
 checked against itself rather than against a curated value.

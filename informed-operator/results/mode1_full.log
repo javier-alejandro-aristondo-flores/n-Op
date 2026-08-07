@@ -1,0 +1,31 @@
+== Mode 1, orbit-grouped cross-validation ==
+  fold 0: fit  678  stop  226  test  227  epochs  300  inner   35.92 meV
+  fold 1: fit  678  stop  227  test  226  epochs  300  inner   35.79 meV
+  fold 2: fit  678  stop  227  test  226  epochs  300  inner   35.23 meV
+  fold 3: fit  678  stop  227  test  226  epochs  300  inner   35.31 meV
+  fold 4: fit  678  stop  227  test  226  epochs  300  inner   35.86 meV
+
+per-eigenvalue error by band group (k-weighted, meV)
+          group   mae_mev  share_of_states
+            all    34.585            1.000
+   deep valence    14.216            0.222
+   valence edge    22.061            0.278
+conduction edge    32.536            0.037
+high conduction    52.009            0.463
+
+indirect-gap MAE, meV  (noise floor 0.0105 meV, significance 20 meV)
+model                                         all   top quartile      worst
+B0 identity                                1223.1         1182.5     1380.6
+B1 equilibrium stretch                      161.8          185.8      318.5
+B1gap equilibrium gap constant               47.5           90.3      201.2
+B2 per-shape stretch (sees answer)          126.7          137.7      224.3
+B3 learned stretch                          126.2          138.6      225.0
+operator (Mode 1)                            56.8           64.2      140.2
+
+density-of-states residual   full window 3.22%   complete sub-window 3.13%
+
+== the structured splits ==
+  small strain -> large strain             operator    93.8 meV   B1gap    73.3 meV   DOS  4.40%
+  axis+skew families -> general stretch    operator    89.8 meV   B1gap    83.7 meV   DOS  5.07%
+
+wrote Mode 1 tables to /home/javier/Projects/Physics/Programs/n-Op/informed-operator/results

@@ -163,7 +163,7 @@ stated anywhere in the corpus but absent from this table is a defect in this tab
 in the other page — and nothing enforces that. Separating a tolerance from a physical
 time mechanically would need a namespace the corpus does not have, `tol_adj` against
 `τ_adj`, and narrowing by value shape does not separate a `1e-12` second relaxation time
-from a `1e-12` tolerance. So the rule is labelled as a rule rather than implied to be
+from a `1e-12` tolerance. So the rule is labeled as a rule rather than implied to be
 checkable: **when you add a tolerance, add it here.**
 
 ## Composition-validity refusals
@@ -196,7 +196,7 @@ coefficient or row pair.
   zincblende-reference spontaneous polarization with an improper `e₃₁` breaks the
   cancellation the ±5% interface-polarization target rests on and corrupts the
   two-dimensional-electron-gas sheet density; the magnitudes, the cancellation and the
-  scope restriction to aluminium-gallium-nitride on gallium nitride are
+  scope restriction to aluminum-gallium-nitride on gallium nitride are
   [accuracy-ledger#polarization-coefficients]. The curated III-nitride coefficients are
   `ZB-proper`.
 

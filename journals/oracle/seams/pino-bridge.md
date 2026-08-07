@@ -84,7 +84,7 @@ Import(named-target  : ObservableRef,
 
 Per-target ingestion. Each call wraps **one** external datum — a VASP energy, an
 experimental mobility curve, a curated battery row — as a
-`GroundTruthBridgeGenerator`, the dataset analogue of the residual generator
+`GroundTruthBridgeGenerator`, the dataset analog of the residual generator
 ([residual-machinery#generator-record]).
 
 At the symbolic-lift stage ([compose-time-pipeline#symbolic-lift]) the generator
@@ -107,12 +107,12 @@ objects, they live in the operator library, and they carry their own names. All
 three multiply into the same loss term, so one name shared across them yields a
 loss that is wrong and reports clean.
 
-The wire format is a serialised **Roaring bitmap** over a flat index built from
+The wire format is a serialized **Roaring bitmap** over a flat index built from
 the generator's `axes` ([residual-definitions#residualkey]):
 
 ```
 flat-index(axes) = enumerate(product(axes))   -- lexicographic over axis values
-RoaringAxisCoverage = serialised Roaring bitmap of selected flat-index positions
+RoaringAxisCoverage = serialized Roaring bitmap of selected flat-index positions
 ```
 
 - **Sparse from the start.** Coverage is overwhelmingly sparse: a battery row
@@ -123,7 +123,7 @@ RoaringAxisCoverage = serialised Roaring bitmap of selected flat-index positions
   the set operations the cert evaluator needs — *"which `(k, n)` pairs are
   covered by some battery row?"* — and an industry-standard format with bindings
   in every candidate language.
-- **Persisted form.** The serialised bytes are stored in the axis-coverage
+- **Persisted form.** The serialized bytes are stored in the axis-coverage
   column of the reference cache's entry table, and are part of the content
   address of a cache entry ([cert-obligations#reference-cache]).
 

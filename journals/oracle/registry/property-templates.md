@@ -35,7 +35,7 @@ of instantiations.
 tuples*.**
 
 The alternative — one entry per observable — makes the vocabulary grow with the
-catalogue, and every compiler pass, typing rule and certification obligation
+catalog, and every compiler pass, typing rule and certification obligation
 grows with it. A template that admits a new observable by taking a new argument
 tuple admits it for free.
 

@@ -41,10 +41,8 @@ depends-on:
   - accuracy-ledger
   - training-stages
   - learnable-structure-contract
+  - point-set-policy
 open-questions:
-  - id: sampling-policy-record-home
-    anchor: sampling
-    summary: "A sampling policy is a cadence, a sampler and an optional importance function, and nothing carries all three: the oracle's generator record has one flat four-valued field fusing a sampler, two importance schemes and an evaluation-scope value, with no cadence field at all, so the importance function has no typed home on either side of the seam."
   - id: compared-against-versus-supervisory-sources
     anchor: four-sources
     summary: "The per-generator compared-against enum has four values and this page has four supervisory sources, and they are not the same four: two enum values are compute-side and none names a physics residual. Whether the two enumerations are meant to align is unstated."
@@ -84,9 +82,9 @@ project has: it has many observable-level residuals at widely different evaluati
 costs.
 
 **Neural operators.** Fourier neural operators learn a map between function spaces by
-stacking integral-kernel layers parametrised in Fourier space; the base loss is purely
+stacking integral-kernel layers parametrized in Fourier space; the base loss is purely
 data. Physics-informed variants add a residual term at sampled grid points and improve
-out-of-distribution generalisation, most visibly when training data is scarce. The
+out-of-distribution generalization, most visibly when training data is scarce. The
 residual is computed in real space by differentiable spectral derivatives.
 
 Branch-trunk operators encode the input function in a branch network and the evaluation
@@ -94,7 +92,7 @@ location in a trunk network, and take their inner product. Physics-informed vari
 add an equation residual by autodiff through the trunk. They struggle when the input
 function is high-dimensional in a way that is not low-rank.
 
-**Machine-learned interatomic potentials.** These are the closest neighbours of what
+**Machine-learned interatomic potentials.** These are the closest neighbors of what
 this project does for materials, even though they are potentials rather than operator
 learners.
 
@@ -116,7 +114,7 @@ rather than to design around them.
 
 **Multi-fidelity operators.** Multi-fidelity branch-trunk operators, cascaded
 physics-informed networks, and composite-loss models converge on one pattern: **share
-the physics residual across fidelities, specialise the data loss per fidelity.** That
+the physics residual across fidelities, specialize the data loss per fidelity.** That
 pattern is what the four-source regime below is built on.
 
 ## Architectural before soft
@@ -143,12 +141,12 @@ somewhere.
 |---|---|---|---|
 | Fixed weights | hand-tuned | few terms, similar scales | none |
 | Uncertainty weighting | weight is the reciprocal of twice a learned variance | multi-task supervised, when scales differ in magnitude | negligible |
-| GradNorm | adjust weights so per-task gradient norms equalise | multi-task; reduces task interference | one gradient norm per task per step |
+| GradNorm | adjust weights so per-task gradient norms equalize | multi-task; reduces task interference | one gradient norm per task per step |
 | Neural-tangent-kernel balancing | weights from the spectrum of the per-loss kernel block | physics-informed networks; addresses spectral bias | quadratic in sample count, so subsampled |
 | Self-adaptive weighting | trainable per-collocation-point weights, ascended | regions of high residual | one extra parameter per point |
 | Learning-rate annealing | heuristic from per-loss gradient magnitudes | startup | low |
 | Lagrangian dual ascent | residual as constraint, multipliers ascended | when hard constraints are required | medium, and can be unstable |
-| Relative-loss balancing with random lookback | normalised relative losses | robust training | low |
+| Relative-loss balancing with random lookback | normalized relative losses | robust training | low |
 
 Empirical consensus across the benchmark literature:
 
@@ -162,7 +160,7 @@ Empirical consensus across the benchmark literature:
   instability is real.
 
 **The policy here is hybrid**: GradNorm across the four source families for outer
-balancing, and fixed weights inside the residual family, initialised from the
+balancing, and fixed weights inside the residual family, initialized from the
 neural-tangent-kernel spectrum. That keeps the four-source balance principled without
 exploding the parameter count.
 
@@ -249,11 +247,13 @@ Cadence says how often. Sampling says **which points**.
 | Curriculum | easy-to-hard; start with the smooth, cheap residuals |
 
 A **sampling policy** is three things: a cadence, a sampler, and an optional importance
-function over candidate points. **Nothing carries all three.** The oracle's generator
-record ([residual-machinery#generator-record]) carries one flat four-valued field that
-fuses a sampler, two importance schemes and one evaluation-scope value, and it has no
-cadence field at all. The cadence is this library's, above. The importance function has
-no typed home on either side.
+function over candidate points. **One record carries all three**, and it belongs to this
+library ([point-set-policy#the-record]). The oracle's generator record
+([residual-machinery#generator-record]) carries one flat four-valued field that fuses a
+sampler, two importance schemes and one evaluation-scope value, and it has no cadence
+field at all — so the oracle's field is a partial statement of the sampler, the cadence is
+this library's as set out above, and the importance function's typed home is the point-set
+policy ([point-set-policy#importance]).
 
 ## The four supervisory sources
 
@@ -357,7 +357,7 @@ Pareto trade-off between them. Three fixes are documented:
 
 1. **Noise-aware label loss.** A Huber term scaled by the instrument standard
    deviation lets the residual win inside the experimental noise band.
-2. **Constrained-optimisation framing.** Residuals as constraints, labels as
+2. **Constrained-optimization framing.** Residuals as constraints, labels as
    objective, under the Karush-Kuhn-Tucker conditions. Principled and expensive.
 3. **Hierarchy through weights.** The noise band is absorbed by inverse-variance
    weighting in an uncertainty-based balancing scheme.
@@ -405,7 +405,7 @@ Settable defaults, gathered. Each is the recommendation of a section above.
 
 - **Outer balancing.** GradNorm across the four source families, treating the residual
   family as one task.
-- **Inner balancing.** Kernel-initialised fixed weights per residual, multiplied by
+- **Inner balancing.** Kernel-initialized fixed weights per residual, multiplied by
   the curriculum schedule. Optional per-point self-adaptive weights for `per-step`
   residuals whose landscape is non-uniform.
 - **Experimental term.** Huber, scaled by a stated standard deviation — which of the
@@ -424,7 +424,7 @@ Settable defaults, gathered. Each is the recommendation of a section above.
 
 - **Do not use Lagrangian dual ascent for hard constraints** in the four-source
   regime. It is too unstable when the sources disagree.
-- **Do not residualise a relation that can be made architectural.** If the constraint
+- **Do not residualize a relation that can be made architectural.** If the constraint
   is expressible in the architecture, put it there.
 - **Do not use a single uniform weight** across terms. It is the most common cause of
   physics-informed training failure in the benchmark literature.

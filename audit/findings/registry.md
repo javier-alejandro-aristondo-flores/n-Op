@@ -85,7 +85,7 @@ carrying the English vocabulary. I searched `data/`, `generated/` and
 a checker to read it, and add `Source`/`provenance` to the column-vocabulary
 check — `VOCABULARY.md:65-68` notes it was skipped, "which is how an undefined
 vocabulary survived on 132 rows". **Do not apply the bijection blind:** it is a
-mechanical relabelling, so any row mis-assigned under the old legend stays
+mechanical relabeling, so any row mis-assigned under the old legend stays
 mis-assigned under the new one. F10–F14 below are rows in exactly that state.
 
 ---
@@ -114,7 +114,7 @@ other way to combine its inputs"; an implementation built from that page cannot
 express `typed-compositions`' own worked compositions for hardness, ionic
 diffusion, catalytic activity, absorption, refractive index, carrier mobility,
 formation energy, free energy, stress–strain, adsorption energy, surface energy
-or thermal expansion — twelve of the thirty-five catalogue properties.
+or thermal expansion — twelve of the thirty-five catalog properties.
 
 **Severity** high. **Confidence** certain.
 
@@ -198,8 +198,8 @@ entry is *"Optical absorption is `(2ω/c)·Im(√ε)` — the factor of two is p
 the form."* The slab factor of two is the same hazard and is not among the five.
 
 Downstream: γ feeds manifest rows 44 (`surface-grand-potential-γ`), 45
-(`wulff-shape`) and 86 (`bi-slab-grand-potential`), and `SurfaceEnergy` realises
-two catalogue properties.
+(`wulff-shape`) and 86 (`bi-slab-grand-potential`), and `SurfaceEnergy` realizes
+two catalog properties.
 
 **Severity** high. **Confidence** high.
 
@@ -218,7 +218,7 @@ determined by its inputs.
 ### F5 — Two of the nine "research" names fail the page's own transcription test, and one of them is pinned by the corpus already.
 
 **Claim.** `typed-compositions#declared-gap` splits eighteen names 9/9 and says
-*"**Research** means a modelling choice with literature behind it, and the
+*"**Research** means a modeling choice with literature behind it, and the
 choice has to be made and cited before a row exists."*
 
 **Evidence, `harmonic-transition-rate-normalization`.** Classified research,
@@ -249,7 +249,7 @@ stated ground for the difference.
 searches or nine transcriptions, and the page presents the split as the actionable
 output of the open question. **Confidence** high.
 
-**What would refute it.** A modelling choice inside either name that I have
+**What would refute it.** A modeling choice inside either name that I have
 missed — for `htst-rate`, a quantum or anharmonic correction the corpus intends;
 for the normalization, a convention about whether the saddle product runs over
 `3N−1` or `3N` modes. The second is real and is the one thing worth citing, but
@@ -258,7 +258,7 @@ analogous convention for `jump-diffusivity` explicitly ("the geometric prefactor
 convention is the trap").
 
 **Proposed correction.** Move both to transcription, or state per row which
-modelling choice is open. Note this changes the open question's own summary
+modeling choice is open. Note this changes the open question's own summary
 ("Nine are transcription plus tag assignment; nine need literature").
 
 ---
@@ -411,7 +411,7 @@ battery that fills the cache, and that is a different operation performed at a
 different time. The row's `Depends on` cell says `DFT battery`, naming the
 populating step rather than the evaluation.
 
-The corpus draws exactly this distinction elsewhere, in the neighbouring
+The corpus draws exactly this distinction elsewhere, in the neighboring
 paragraph, and applies it to the other column only:
 
 > *"A row that also takes continuous arguments is **not** a pure read, however
@@ -499,7 +499,7 @@ residual factory reads this column to set sampling frequency.
 
 **Severity** medium-high. **Confidence** medium-high — I have verified the
 internal inconsistency (dependency against justification against legend)
-mechanically; the wall-clock claim rests on my judgement of DFPT cost rather
+mechanically; the wall-clock claim rests on my judgment of DFPT cost rather
 than on a measurement, and I did not have an undergraduate to send at it.
 
 **What would refute it.** A statement that these rows *read* precomputed
@@ -709,10 +709,10 @@ only extremum rows without such a note.
 
 ---
 
-### F20 — Two catalogue properties named "free energy" resolve to different thermodynamic potentials.
+### F20 — Two catalog properties named "free energy" resolve to different thermodynamic potentials.
 
-**Claim.** `properties#catalogue` lists one property, `Thermodynamic | Free
-energy`. `typed-compositions#thermodynamic` realises it as
+**Claim.** `properties#catalog` lists one property, `Thermodynamic | Free
+energy`. `typed-compositions#thermodynamic` realizes it as
 `FreeEnergy(T) = AlgebraicOf({E_BO, F_vib, F_el}, formula =
 helmholtz-free-energy-decomposition)` — the **Helmholtz** free energy.
 `observable-bundles#contents` lists the `thermodynamics` bundle as holding
@@ -720,7 +720,7 @@ helmholtz-free-energy-decomposition)` — the **Helmholtz** free energy.
 `gibbs-free-energy-phase` `(E_0, ω(q), T, P) → G(T,P)`.
 
 **Evidence.** F and G are different potentials at different fixed variables
-(F at fixed V, G at fixed P) and differ by PV. One catalogue property resolves
+(F at fixed V, G at fixed P) and differ by PV. One catalog property resolves
 to F through the coverage table and to G through the bundle contents, with no
 page reconciling them. The corpus operates at finite pressure — row 68 is the
 Clausius–Clapeyron slope and row 124 is a temperature- **and pressure**-aware
@@ -728,7 +728,7 @@ hull — so the two are not interchangeable here.
 
 **Severity** medium. **Confidence** high.
 
-**Proposed correction.** Split the catalogue property, or state which potential
+**Proposed correction.** Split the catalog property, or state which potential
 "Free energy" denotes and give the other its own row.
 
 ---
@@ -820,7 +820,7 @@ occur, while `glossary.md` declares itself *"An index, not a second definition"*
 typeclass axes:
 
 > *"**Quantity — the value axis.** Units, equality within a tolerance, and
-> behaviour under a change of units or basis. **Every numeric output is a
+> behavior under a change of units or basis. **Every numeric output is a
 > `Quantity`.**"*
 >
 > ```
@@ -941,7 +941,7 @@ so a third party can check each.
 Control on the parser: `` `(Z*[I,α,β], Δw[I], Ω) → P_sp[α]` `` parses to inputs
 `['Z*[I,α,β]', 'Δw[I]', 'Ω']`, output `['P_sp[α]']`; `` `(C_ij, ρ) → v_L, v_T` ``
 to `['C_ij', 'ρ']` and `['v_L', 'v_T']`. Character-class control: `μ0`/`μ₀`,
-`E_0`/`E₀`, `v_g`/`v-g` all normalise equal, so a subscript variant cannot hide a
+`E_0`/`E₀`, `v_g`/`v-g` all normalize equal, so a subscript variant cannot hide a
 collision from the sweep.
 
 **Independent corroboration, from a reader who had never seen this finding.** The
@@ -1465,7 +1465,7 @@ surface-resolved bundle has to infer the object five times.
 
 *Three — the topology band is un-implementable from the corpus.* Rows 96–102 take
 eight structured inputs and **not one is defined**. `topology-atlas.md` is the
-page that owns them and it does define two neighbouring objects — its atlas record
+page that owns them and it does define two neighboring objects — its atlas record
 carries `EBRs : elementary band representations` and `compatibility :
 compatibility-relation matrix` (lines 32–33) — so the page had the opportunity and
 the form, and the signatures' own inputs are not among them. `AZ_class` is the
@@ -1527,7 +1527,7 @@ is equal.
 **And the corpus's MVP material is the one case where they coincide.** Diamond is
 monatomic, so the unweighted sum is correct for it and any implementation checked
 against diamond passes. The materials where it fails are the rest of the
-programme:
+program:
 
 | material | masses | `√(M_J)` spread the naive form drops |
 |---|---|---|
@@ -1712,13 +1712,13 @@ capability slice. That raises F17's blast radius considerably and is why the
 eponym sweep was told to settle it against the primary papers.
 
 **Pair 2 — the second member is not registered.**
-*"cheap-Chynoweth ionisation against Boltzmann/Monte-Carlo"*. Row 74
+*"cheap-Chynoweth ionization against Boltzmann/Monte-Carlo"*. Row 74
 `impact-ionization-coefficient` (a.k.a. Chynoweth) is `cheap`. Searching all 134
 rows for `Monte`, `monte`, `Boltzmann` or `boltzmann` in either the name or the
 provenance returns exactly **one** row — row 35 `defect-boltzmann-population`,
 which is Boltzmann *statistics*, not Boltzmann transport, and is a defect
-population rather than an ionisation rate. There is no Monte-Carlo or
-Boltzmann-transport ionisation row. The pair has one member.
+population rather than an ionization rate. There is no Monte-Carlo or
+Boltzmann-transport ionization row. The pair has one member.
 
 **Pair 3 — neither member is registered.**
 The equivalence-pair example is *"Conductivity by Boltzmann transport versus by
@@ -1804,13 +1804,13 @@ All four below were checked against the **real** `data/registry-manifest.csv`, n
 the planted copy, and all four survive. Credit for finding them belongs to the
 calibration undergraduate.
 
-### F37 — Row 55 cannot form its output: it needs a neighbour set, and under periodic boundaries that needs the cell vectors and a cutoff.
+### F37 — Row 55 cannot form its output: it needs a neighbor set, and under periodic boundaries that needs the cell vectors and a cutoff.
 
 Row 55 `bond-valence-sum`, real signature `(R_I, R0, b) → BVS_atom`, provenance
 cell `S2` — no parenthetical at all.
 
 The bond-valence sum is `BVS_I = Σ_j exp((R₀ − R_Ij)/b)`, a sum **over the
-neighbours j of atom I**, of **bond lengths** `R_Ij`.
+neighbors j of atom I**, of **bond lengths** `R_Ij`.
 
 **The manifest settles what `R_I` denotes, and it is not a bond length.** Two
 other rows use the same token: row 132 `xrd-structure-factor`,
@@ -1822,7 +1822,7 @@ other rows use the same token: row 132 `xrd-structure-factor`,
 So on row 55 `R_I` is a set of atomic positions, and the bond lengths the formula
 needs must be built from them. Under periodic boundaries that requires the cell
 vectors `h` (minimum image, or a supercell expansion) and a coordination cutoff
-to decide which neighbours are bonded. Row 55 carries neither. **Row 132 — the
+to decide which neighbors are bonded. Row 55 carries neither. **Row 132 — the
 one other row taking `R_I` — takes `h` alongside it. Row 55 does not.**
 
 **The corpus supplies exactly these on the adjacent row and not on this one.**
@@ -1847,7 +1847,7 @@ A Madelung constant is not a function of the lattice alone. It requires the
 **formal site charges** — for a structure with more than one inequivalent site
 there is a constant per site, and it scales with the charge assignment — and it
 is defined only relative to a chosen **reference length**. Rock-salt is quoted as
-1.747565 against the nearest-neighbour distance and 3.495 against the cubic
+1.747565 against the nearest-neighbor distance and 3.495 against the cubic
 lattice parameter: the same structure, two numbers differing by a factor of two,
 both correct under their own convention.
 
@@ -1966,10 +1966,10 @@ its threshold, remain open — gap G3.
 
 **`typed-compositions`' coverage claim — mechanically verified.** The page
 asserts *"every identifier it names is defined in a block on this page"* and
-pairs each catalogue property with a composition. Parsing both pages: 35
-catalogue properties, 35 coverage rows, **set-identical, no duplicates, no
+pairs each catalog property with a composition. Parsing both pages: 35
+catalog properties, 35 coverage rows, **set-identical, no duplicates, no
 gaps**; 37 distinct identifiers named in the coverage table, **all 37 defined**
-in code blocks on the page. The claim holds as stated. (`SurfaceEnergy` realises
+in code blocks on the page. The claim holds as stated. (`SurfaceEnergy` realizes
 two properties and is defined once, as the page says.)
 
 **The `fixpoint-adjoint` retag — all five rows are genuine fixed points.** The
@@ -2179,7 +2179,7 @@ Rev. B volume, or one look at any DFPT review's reference list, closes it.
 | part | content |
 |---|---|
 | **what it would settle** | Does PRB **96**, 161201 (2017) state a validity threshold of about 0.4 of the Debye temperature for a multiplicative four-phonon correction, and does it report a diamond-specific overprediction figure (the inherited lead records 31% at 1000 K)? |
-| **the conclusion without it** | The threshold is probably **not** the paper's. Its title claim is that four-phonon scattering *significantly reduces* intrinsic conductivity, and the group's related work emphasises that four-phonon scattering matters well below 0.4Θ_D for materials with large acoustic–optical gaps. A floor at 0.4Θ_D would contradict the source it cites. The citation itself is verified real and correctly attributed (§2). |
+| **the conclusion without it** | The threshold is probably **not** the paper's. Its title claim is that four-phonon scattering *significantly reduces* intrinsic conductivity, and the group's related work emphasizes that four-phonon scattering matters well below 0.4Θ_D for materials with large acoustic–optical gaps. A floor at 0.4Θ_D would contradict the source it cites. The citation itself is verified real and correctly attributed (§2). |
 | **the branches** | **If 0.4Θ_D is the paper's:** F16 stands as written — the domain is real but not evaluable, because diamond's Θ_D is contested between 1860 K and 2230 K. **If it is not the paper's:** F16 strengthens to a false claim — a validity domain attributed to a source that does not state it — and row 121's correction becomes applicable over a wider range than the row admits, which changes the 300–750 K conductivity anchors. |
 | **what depends on it** | F16's severity and class. F15 is independent. The accuracy ledger's Θ_D open question is coupled to the first branch only. |
 
@@ -2327,7 +2327,7 @@ sweep is inspectable:
 | dual-bundle rows | count of slashed `Bundle` values | 40, matching `residual-machinery.md:64` |
 | all 18 declared-gap names absent from the manifest | set difference against the `Name` column | confirmed absent |
 | every coverage-table identifier defined on its page | regex parse of `typed-compositions` code blocks | 37 named, 37 defined, none missing |
-| catalogue ↔ coverage correspondence | set comparison of `properties#catalogue` against `typed-compositions#coverage` | 35 ↔ 35, set-identical, no duplicates |
+| catalog ↔ coverage correspondence | set comparison of `properties#catalog` against `typed-compositions#coverage` | 35 ↔ 35, set-identical, no duplicates |
 | `applicability-classifiers` resolves | `ls journals/*/*/` | exists at `journals/oracle/certification/` |
 | checker scope | read of `tools/check_structure.py` | globs `journals/**/*.md`; `data/` never opened; `python3 tools/check_structure.py` → `structure OK · 45 pages, 273 owned topics, 51 open questions` |
 | row-band map against the manifest | band ranges in `named-formulas#row-bands` against row numbers and `Source` cells | consistent; rows 128–134 all carry `2026-07 gap-audit` provenance as the band claims |
@@ -2401,7 +2401,7 @@ Reported, not written — `log/timeline.md` has a single writer.
 
 **Second run.**
 
-6. **The anchor-class field's stated purpose is unrealised across the whole
+6. **The anchor-class field's stated purpose is unrealized across the whole
    registry** — no constructible consistency pair exists, and all three the
    corpus names by hand fail, including the thermal-conductivity pair it names
    twice and by row number (F36). Converges with the tolerance-ledger subject's
@@ -2428,7 +2428,7 @@ Reported, not written — `log/timeline.md` has a single writer.
     `multiscale-state` independently restates all agree with the manifest.
 
 **Method — a scoring rule for blind arms, and it is the one item here that
-generalises beyond this subject.**
+generalizes beyond this subject.**
 
 13. **A plant is an edit; an absence is not editable.** An absence finding reads
     identically in the planted copy and the real one, so it can be neither a
@@ -2436,7 +2436,7 @@ generalises beyond this subject.**
     Partition every blind-arm return into EDIT and ABSENCE findings *before*
     scoring; score against EDIT only; route ABSENCE findings into the normal
     findings file after checking each against the **real** artifact. Skipping
-    that check is unsafe in both directions: an absence may be an artefact of a
+    that check is unsafe in both directions: an absence may be an artifact of a
     plant that removed something, and it may equally be a real defect the arm
     found for free. This calibration produced four real corpus defects (F37–F40)
     that would have inflated the score had they been counted as detections —
@@ -2454,7 +2454,7 @@ Stated plainly so the gap is not mistaken for a clean result.
 
 ### Second run — what was staffed
 
-Eight undergraduates were spawned, which is the full authorisation. The
+Eight undergraduates were spawned, which is the full authorization. The
 concurrent-subagent pool was saturated fleet-wide on the first two attempts at
 the eighth; it was held and retried until a slot freed, so all eight ran.
 
@@ -2466,7 +2466,7 @@ the eighth; it was held and retried until a slot freed, so all eight ran.
 | 4 | electronic structure, phonons, linear response, topology, sum rules | 1–13, 88, 91–102, 120, 126, 133 |
 | 5 | carrier transport, scattering, thermal transport | 14–29, 63, 64, 121, 122, 127 |
 | 6 | defects, recombination, high field, degradation, radiation | 30–43, 70–76, 81–83, 105–112, 123, 129–131, 134 |
-| 7 | surfaces, interfaces, barriers, tunnelling, mechanics, thermodynamics, polarization | 44–62, 65–69, 77–80, 84–87, 95, 113–119, 124, 125, 128, 132 |
+| 7 | surfaces, interfaces, barriers, tunneling, mechanics, thermodynamics, polarization | 44–62, 65–69, 77–80, 84–87, 95, 113–119, 124, 125, 128, 132 |
 | 8 | blind calibration | 24-row planted subset |
 
 Clusters 4–7 partition all 132 substantive rows with no gaps and no overlaps, and
@@ -2491,7 +2491,7 @@ corrections (rows 30–34, 37, 42, 43, 89–91), and the calibration. **Six did
 not**: electronic structure and topology (rows 1–6, 96–102, 120); phonons, sum
 rules and linear-response primitives (7–13, 88, 91–94, 126, 133); carrier
 transport and scattering (14–22, 63, 64, 127); thermal transport (23–29, 121,
-122); surfaces, interfaces, barriers and tunnelling (44–54, 77–80, 86);
+122); surfaces, interfaces, barriers and tunneling (44–54, 77–80, 86);
 polarization, piezoelectricity and the two-dimensional electron gas (113–119,
 128); mechanics, static validity and thermodynamics (55–62, 65–69, 84, 85, 87,
 95, 124, 125, 132); high-field and degradation (70–76, 81–83, 105–112, 129–131).

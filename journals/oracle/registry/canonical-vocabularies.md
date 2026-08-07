@@ -32,7 +32,7 @@ the record and its four axes; this page owns the ten closed vocabularies those
 axes are built from.
 
 They are a genuinely separate axis, not a restatement of one the corpus already
-has. The nearest neighbour is the dressing-method selector inside
+has. The nearest neighbor is the dressing-method selector inside
 `SelfConsistentRenormalizationOf` ([property-templates#signatures]), which
 chooses self-consistent phonons, GW, an iterated Bethe–Salpeter solve or a
 polaron treatment — but that is a *per-observable* choice about how one quantity

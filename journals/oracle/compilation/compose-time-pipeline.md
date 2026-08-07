@@ -70,27 +70,27 @@ what lets every runtime hot path stay logarithmic or better and call no solver
 
 That lever has a name, and the name carries a result.
 
-**The first Futamura projection:** specialising an interpreter to a fixed program
+**The first Futamura projection:** specializing an interpreter to a fixed program
 yields a compiled program (Futamura, *Partial Evaluation of Computation Process — An
 Approach to a Compiler-Compiler*, Systems·Computers·Controls 2(5), 1971, 45–50).
 
 This library is that construction. The general physics evaluator is the interpreter;
 the `(PeriodicityStructure, SiteDecoration, Environment)` tuple
 ([crystal-inputs#top-level-inputs]) is the fixed program; the compiled kernel is the
-specialised residue. **Compile in seconds, call in microseconds** is therefore the
-expected shape of a partial evaluator, not an optimisation anyone had to hope would
+specialized residue. **Compile in seconds, call in microseconds** is therefore the
+expected shape of a partial evaluator, not an optimization anyone had to hope would
 work.
 
 Two things follow that are otherwise easy to mistake for taste.
 
-- **The compose-time and runtime split is the specialisation boundary**, not a
+- **The compose-time and runtime split is the specialization boundary**, not a
   convenience. Everything symbolic happens on the side where the fixed program is
   known; everything numeric happens on the side where only the varying input remains.
   That is why the boundary falls exactly where it does — the compose-time and runtime
   boundary below states which stage sits on which side — and why a decision cannot be
-  moved across it without changing what is being specialised.
-- **A runtime structural branch is a specialisation failure.** If the kernel still has
-  to ask a question whose answer was fixed at compose time, the specialiser left work
+  moved across it without changing what is being specialized.
+- **A runtime structural branch is a specialization failure.** If the kernel still has
+  to ask a question whose answer was fixed at compose time, the specializer left work
   undone. That is the reason structural branching on the hot path is barred rather than
   merely discouraged, and it is why every predicate this library evaluates is settled
   before codegen.
@@ -133,7 +133,7 @@ reduce the work the runtime stage will do.
 `MethodInvoke(symmetry-projection, …)` nodes are inserted at the boundaries.
 
 **Hardware consequence.** The blocks are *small* — cubic point groups give irrep
-dimensions in `{1, 2, 3}`, up to 4 under spin–orbit coupling. That favours a
+dimensions in `{1, 2, 3}`, up to 4 under spin–orbit coupling. That favors a
 cache-resident dense solve per block and is a **poor fit for wide-SIMD or GPU
 execution unless many blocks are batched together**. It is the one place where the
 symmetry reduction and the target hardware pull in opposite directions.

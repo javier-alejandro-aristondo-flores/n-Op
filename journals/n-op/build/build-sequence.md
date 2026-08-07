@@ -56,7 +56,7 @@ language would move a language decision onto the critical path.
 | 1 | **Numeric substrate** (`core`): coefficient and derivative layout, the automatic-differentiation engine, staged code generation, tensor algebra, mesh integration over k-meshes and tetrahedra | `core` implemented and tested against analytic references | in |
 | 2 | **Physical primitives** (`shared`): pair sums under periodic boundaries, Ewald electrostatics, kinetic density, density from orbitals, Hellmann–Feynman forces, density-functional stress, and the tight-binding carbon Hamiltonian builder ([forced-decisions#tb-warm-start]) | Physical-primitive library, tested at analytic limits | in |
 | 3 | **Input concepts** (`inputs`): typed constructors and readers for the periodicity structure, the site decoration and the environment record ([crystal-inputs#top-level-inputs]) | Round-trip-preserving system descriptions | in |
-| 4 | **Unified state** (`state`): the state container, its per-level components, and enumerate, serialise and hash ([unified-state#slots]) | State encoding complete | in |
+| 4 | **Unified state** (`state`): the state container, its per-level components, and enumerate, serialize and hash ([unified-state#slots]) | State encoding complete | in |
 | 5 | **Methods vocabulary** (`methods`): the computational methods and sub-method dispatch ([computational-methods#the-alphabet]) | Computational vocabulary, tested per method | in |
 | 6 | **Templates** (`abstract-properties`): the property templates as typed factories ([property-templates#signatures]) | Template machinery, tested with multiple argument tuples | open |
 | 7 | **Formula registry** (`formulas`): the registry rows with typed signatures and citations, the manifest, and the **applicability-decidability gate** ([named-formulas#applicability-decidability]) | Closed registry; every algebraic combination named and typed | in |
@@ -75,7 +75,7 @@ named again:
   registration rather than evaluated at runtime.
 - **Fidelity of the assembled operators (phase 8).** The generated invariant terms are
   attached to the aggregators, not evaluated beside them, so an invariant that is
-  synthesised but never attached is a build error rather than a silent omission.
+  synthesized but never attached is a build error rather than a silent omission.
 
 Recommended start order: the substrate phases before any concrete observable, then the
 operator, canonical and observable phases, then residuals, certification and dynamics,

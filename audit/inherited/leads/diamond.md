@@ -399,12 +399,12 @@ low-T calorimetric / high-T limit), because they are different numbers, then cit
 diamond is 1332.5 cm⁻¹; 1332.5 × 0.1239842 = **165.21 meV**, matching the CSV to well
 within σ. Standard citation: S. A. Solin, A. K. Ramdas, "Raman spectrum of diamond",
 *Phys. Rev. B* **1**, 1687–1698 (1970) — its polarization study is what established the
-1332 cm⁻¹ line as the zone-centre optical phonon of Γ₂₅⁺ (F_2g) symmetry.
+1332 cm⁻¹ line as the zone-center optical phonon of Γ₂₅⁺ (F_2g) symmetry.
 **Confidence: high** on the number and the mode.
 
 **But the row is named `phonon-max-energy`, and Γ is not the maximum of diamond's
 dispersion.** Diamond's LO branch **overbends** — it rises above the Γ frequency away from
-zone centre. Measured:
+zone center. Measured:
 
 - J. Kulda, B. Dorner, B. Roessli, H. Sterner, R. Bauer, Th. May, K. Karch, P. Pavone,
   D. Strauch, "A neutron-scattering study of the overbending of the [100] LO phonon mode in

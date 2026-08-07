@@ -101,7 +101,7 @@ positive, caught before it was reported.**
 
 **2 · Crossref's fuzzy search retrieves same-surname strangers.** A "coordinate mismatch"
 verdict built on a single shared surname produced **12 false defects** in one run — "Guo"
-retrieved a filled-skutterudite study, "Yan" retrieved electrospun nanofibres, "Zhang"
+retrieved a filled-skutterudite study, "Yan" retrieved electrospun nanofibers, "Zhang"
 retrieved a terahertz topological insulator. The verdict was removed: **this method now
 never claims a defect from a fuzzy match.**
 
@@ -119,6 +119,6 @@ Fiorentini-Bernardini-Ambacher respectively. Neither is a defect.
 ## Coverage statement
 
 **15 of 49 citations were checked by a method with working controls. 1 is wrong.** The
-remaining 34 are unverified, and the reason is an instrument limit rather than a judgement
+remaining 34 are unverified, and the reason is an instrument limit rather than a judgment
 about them. Reporting this as "citations verified" would be exactly the failure the
 `target-is-not-measurement` trap describes.

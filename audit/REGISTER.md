@@ -2,7 +2,7 @@
 
 Written 2026-07-31 at the point the fleet hit a hard session limit. Eight findings files
 are on disk in `audit/findings/` — 126,901 words, **223 structured findings**. **This
-file is the synthesis, which existed nowhere else.** It is the principal's judgement:
+file is the synthesis, which existed nowhere else.** It is the principal's judgment:
 severity ranking, the cross-cutting defect classes, the correction split, and what is
 owed.
 
@@ -136,13 +136,13 @@ Distinct from under-specification and far more urgent.
 - **Carrier continuity** is dimensionally inconsistent (missing `1/q`, sides differ by
   6.2×10¹⁸) *and* sign-flipped. A correct trajectory scores `‖(2/q)∇·J‖²`; a frozen
   trajectory scores **four times better in the transport-dominated limit** (4.0008 at
-  the operating point — asymptotic, not exact); **the loss minimiser is reversed
+  the operating point — asymptotic, not exact); **the loss minimizer is reversed
   transport.** The spurious term is **5.06×10³×** the source scale it exists to teach —
   measured against *both* denominators, since the corpus's own Chynoweth parameters make
   avalanche and recombination comparable at 1 MV/cm rather than orders apart.
   *An earlier draft of this register said ~10⁴, which used the weaker denominator alone.*
   The ratio has a **doping-independent closed form** — `v_sat·τ/L` against recombination,
-  `1/(α·L)` against impact ionisation — so it **grows linearly under mesh refinement**,
+  `1/(α·L)` against impact ionization — so it **grows linearly under mesh refinement**,
   and the one knob that would shrink it is the one the Péclet argument requires to stay
   fine. A ten-form control sweep found the corpus states carrier continuity **exactly
   once**, so there is no correct statement elsewhere and the loose-gloss reading is
@@ -184,8 +184,8 @@ Distinct from under-specification and far more urgent.
 - **`N_PW ≈ 1000`** at 400 eV is **181** by exact G-vector enumeration for diamond's
   primitive cell — the page's figure is **5.5×** the true count. Reaching 1000 needs
   1146 eV, or a 9.7-atom cell. At the true count densified storage is **15.2 MB**, so
-  the section's "feasibility boundary, not an optimisation" conclusion is an
-  optimisation argument at MVP scale.
+  the section's "feasibility boundary, not an optimization" conclusion is an
+  optimization argument at MVP scale.
   *Two numbers appear in the evidence and they are one result, not a discrepancy:* the
   smooth formula `V·G_max³/(6π²)` gives 206, which is **asymptotic** — biased high on a
   tiny cell, accurate on a large one. Verified in both directions: on a 1155 Å³ box it
@@ -194,7 +194,7 @@ Distinct from under-specification and far more urgent.
   trustworthy exactly where it was tested and biased high exactly where the corpus
   applies it, in the predicted direction and magnitude.
 - **The k-mesh names one scheme and quotes the other's count.** *"An 8×8×8
-  Monkhorst–Pack mesh gives ~29 irreducible k-points."* 29 is the **Γ-centred** count;
+  Monkhorst–Pack mesh gives ~29 irreducible k-points."* 29 is the **Γ-centered** count;
   the shifted mesh the Monkhorst–Pack name denotes gives **60**. Verified two
   independent ways — from-scratch orbit enumeration with a Burnside cross-check, and
   `spglib` against the real diamond cell — agreeing to the integer at N = 4, 6, 8.
@@ -209,7 +209,7 @@ Distinct from under-specification and far more urgent.
 ### 7 · Provenance that migrated between objects
 
 - **Ga₂O₃'s 25 eV became GaN's "nitrogen".** Traced to one deleted table listing five
-  materials with one number each; the ledger reproduced three verbatim and relabelled
+  materials with one number each; the ledger reproduced three verbatim and relabeled
   two. Gallium oxide contains no nitrogen — provably a migration, not a coincidence.
 - **7.37 eV/atom is graphite's cohesive energy, carried on diamond's row.** Confirmed
   three independent ways. The value survives as a loose bound; the provenance does not.
@@ -236,7 +236,7 @@ obvious test strategy: **verify on diamond first.**
   ones. Diamond is centrosymmetric so the gate refuses it correctly; **c-BN is zincblende,
   noncentrosymmetric, and not polar**, so the gate licenses a spontaneous polarization
   that is zero by symmetry — and c-BN is an active MVP heterostructure check.
-- **The image-force permittivity is unlabelled.** Diamond is non-polar so static and
+- **The image-force permittivity is unlabeled.** Diamond is non-polar so static and
   high-frequency coincide and it is harmless; for the polar hosts the two differ by up to
   3.4×, i.e. up to +86% on the barrier lowering, against a ±0.1 eV target the ledger says
   is worth a factor of e⁴ in contact resistance.
@@ -278,7 +278,7 @@ A corpus that validates on its flagship material first will clear all four.
 
 ## Corrections — the split
 
-### Mechanical (no physics judgement required)
+### Mechanical (no physics judgment required)
 
 Safe to apply. Each is checkable from the corpus alone.
 
@@ -289,7 +289,7 @@ Safe to apply. Each is checkable from the corpus alone.
 - The 773 K / 880 K contradiction — the ledger cites a correction it declares invalid
   at that temperature. Preferred fix: drop `Θ_D` from row 121 entirely and use the
   cited paper's own directly-computed 900 K.
-- "24 rows" → 23, with the itemisation made consistent.
+- "24 rows" → 23, with the itemization made consistent.
 - `Polish` denoting two disjoint intervals across the seam; and the open question that
   mis-states its own defect (following it correctly makes it worse).
 - Stale present-tense examples: registry rows 46/50 described as a live hazard after
@@ -360,14 +360,14 @@ Safe to apply. Each is checkable from the corpus alone.
   apart. And an energy test cannot certify what the obligation's own name asserts — a
   climbing-image band is stationary in energy at the saddle by construction, so `ΔE` can
   pass while the perpendicular force is still large.
-- **Whether the oracle stays absent at inference.** The corpus's most-emphasised
+- **Whether the oracle stays absent at inference.** The corpus's most-emphasized
   limitation is a consequence of that choice, not a property of the oracle.
 - **Stage ordering.** Seven of seven papers checked prescribe residuals throughout; the
   corpus's own curriculum column agrees, and the page admits "nothing reconciles them."
 
 ---
 
-## Acquisition list — prioritised
+## Acquisition list — prioritized
 
 Each entry states what buying it resolves, before buying it.
 
@@ -443,7 +443,7 @@ The calibration misses converge on one axis, and they name it:
 
 **The fleet reads for numbers that look wrong and for references that disagree. It does
 not reliably read for sentences that disagree with themselves.** And the automated gates
-are blind in the *same* direction — a sentence contradicting its neighbour still has
+are blind in the *same* direction — a sentence contradicting its neighbor still has
 valid links, a resolving citation and a single owner, so every structural check passes it.
 
 That is **defect class 1**, the class this register already calls dominant. The estimate,
@@ -491,7 +491,7 @@ it says the class is dense, not that the class has been enumerated.
 | tail (registry- and table-heavy) | 27 | 23 | 10 | 0.37 |
 | **corpus-wide, measured** | **45** | **41** | **18** | **0.40** |
 
-**The predicted decline did not materialise.** The first sweep read the corpus's most
+**The predicted decline did not materialize.** The first sweep read the corpus's most
 discursive prose first and warned the rate would fall on registry and table-heavy pages.
 It barely did — 0.37 against 0.44. And its extrapolation, *"somewhere near 40 adjacent
 contradictions"*, is now a measured **41**.
@@ -529,7 +529,7 @@ cross-page classes and are logged, not resolved.
 Both were paid for by near-misses and both belong in the practice journal.
 
 1. **A finding rests on the primary text, never a summary of it. If the claim is
-   arithmetic, do the arithmetic.** A fetch summariser reported "no order-72 groups"
+   arithmetic, do the arithmetic.** A fetch summarizer reported "no order-72 groups"
    while its own enumerated table contained one, and the counts summed to exactly the
    corpus's figure. Both corpus numbers were correct. Taking the summary would have
    filed a fabricated finding against a corpus whose history includes a fabricated
@@ -606,14 +606,14 @@ defect list, and any agent reporting a defect must name the file it verified aga
 **What this implies for the rest of this register.** Every other finding in this file was
 either verified by the principal directly against `journals/` or arrived from an agent
 working on the real corpus. The audit's own controls caught this one — it was found by
-the postdoc who planted the defects, reading the register and recognising its own work.
+the postdoc who planted the defects, reading the register and recognizing its own work.
 That is the system functioning, but only because the plants happened to be handed back to
 their author. **Had they been sent to any other subject, nothing in the program as
 designed would have caught them.** That gap is not closed.
 
 ### Second incident — the sweeper burned its own blind control, and disclosed it
 
-Distinct from the first, and it travelled the opposite direction. The class-1
+Distinct from the first, and it traveled the opposite direction. The class-1
 adjacent-contradiction sweeper reported, unprompted:
 
 > *"The disclosure you didn't ask for: I initiated that contact."*
@@ -663,7 +663,7 @@ design — which is itself the lesson.
    the *root*. Discipline at any single level cannot fix it. *The blind still protects the
    sweep, not the scoring: a completed blind sweep stays valid even if the scorer is later
    contaminated, provided the scorer never influenced the sweeper.*
-2. **A blind corpus must be mtime-normalised.** Modified files carried timestamps
+2. **A blind corpus must be mtime-normalized.** Modified files carried timestamps
    minutes newer than untouched ones; a single `ls -la` would have handed the sweeper the
    answer set.
 3. **Diff the control set against the plant set before dispatch.** One plant deleted the

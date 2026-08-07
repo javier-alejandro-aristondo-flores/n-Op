@@ -9,7 +9,7 @@ which the structural residual vanishes:
     stress route     V0 is where P(V) = 0         -- the zero of the mean stress
 
 **They must agree, and they do not.** Their gap is a real, understood quantity: the Pulay
-stress, an incomplete-basis-set artefact of computing stress at fixed plane-wave cutoff
+stress, an incomplete-basis-set artifact of computing stress at fixed plane-wave cutoff
 while the cell changes. It is not noise and not a bug in either route. On the diamond
 sweep it is measured at **+0.109% (PBE) and +0.122% (HSE06)**, and the agreement between
 two very different functionals is what shows it to be a property of the shared 550 eV
@@ -48,7 +48,7 @@ class EquationOfState:
     def cubic_lattice_constant(self) -> float:
         """Conventional cubic `a` from the primitive volume: `V = a^3 / 4` for fcc.
 
-        Only meaningful for a face-centred-cubic primitive cell, which the diamond
+        Only meaningful for a face-centered-cubic primitive cell, which the diamond
         structure has. The caller is responsible for that being true; nothing here can
         check it, and a wrong answer would be plausible rather than obviously wrong.
         """

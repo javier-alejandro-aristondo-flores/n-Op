@@ -1,5 +1,5 @@
 # Diamond defect corpus — one row per VASP run. 199 rows.
-# spin_sum_rule: ok | FAIL-fractional (non-integer magnetisation) | FAIL-parity (odd electron count, even magnetisation)
+# spin_sum_rule: ok | FAIL-fractional (non-integer magnetization) | FAIL-parity (odd electron count, even magnetization)
 # Generated 2026-07-21 from the recovered archives; see 04-data-health-gaps-and-caveats.md
 run_directory	archive	level	aexx	hfscreen	encut	sigma	nsw	ionic_steps	reached_accuracy	clean_exit	defect_order	n_substituted	species	nelect	magnetization	spin_sum_rule	gap_eV	frac_occ_states	E_final_eV	elapsed_s	cores
 Pure/Converged_for_doping_analyze/GGA-PBE	Pure	GGA-PBE	0.0000		460	0.1	40	1	yes	yes	pure	0	C	255.9999605	-2.2e-06	ok	4.111	0	-581.97197666	32.86	112

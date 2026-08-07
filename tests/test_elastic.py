@@ -55,7 +55,7 @@ def test_undeformed_cell_has_zero_strain():
 def test_uniform_dilation_is_pure_normal_strain():
     """A cell scaled by (1+d) gives e1=e2=e3=d+d^2/2 exactly, and no shear.
 
-    The quadratic piece is not a rounding artefact -- Green-Lagrange strain is finite, and
+    The quadratic piece is not a rounding artifact -- Green-Lagrange strain is finite, and
     a fit that assumed the linear form would be wrong in the third significant figure at
     the windows used here.
     """
@@ -178,7 +178,7 @@ def test_the_difference_from_the_published_fit_is_purely_hydrostatic(sweep):
     untouched and `d(C11+2C12) = 3d`, so the whole discrepancy is `3d` in `3B`.
 
     Which value is right is settled by the independent equation-of-state route below, and
-    it favours the one computed here. So this is pinned as a known, structured difference
+    it favors the one computed here. So this is pinned as a known, structured difference
     rather than asserted away or silently accepted.
     """
     fit = fit_elastic_constants(*sweep, strain_window=0.011)

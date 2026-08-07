@@ -36,7 +36,7 @@ difference living **entirely in the hydrostatic combination**: with `dC11 = dC12
 `C11 - C12` is untouched and the whole discrepancy appears as `3d` in `C11 + 2C12`. Every
 shear quantity agrees; only the bulk modulus moves, by 5.7 GPa.
 
-**The independent route favours the value computed here.** An equation-of-state fit at
+**The independent route favors the value computed here.** An equation-of-state fit at
 PBE's own equilibrium, corrected back to the experimental reference by `B0' * dP`,
 predicts 442.1 GPa. This fit gives 443.6 -- agreement to **0.34%**. The published elastic
 value of 449.3 reconciles to 1.6% against the same prediction. The two routes share no
@@ -57,7 +57,7 @@ from ..units import EV_PER_ANGSTROM3_TO_GPA
 
 
 def reference_cell(lattice_constant: float = 3.567) -> np.ndarray:
-    """The undeformed 2-atom face-centred-cubic cell, rows as lattice vectors.
+    """The undeformed 2-atom face-centered-cubic cell, rows as lattice vectors.
 
     `(0,a/2,a/2), (a/2,0,a/2), (a/2,a/2,0)` -- the convention the sweep's own index states,
     with reference volume `a^3/4`. The default is the **experimental** constant, because

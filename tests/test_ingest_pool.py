@@ -111,7 +111,7 @@ def test_the_invariants_on_a_real_relaxed_frame(frame):
     assert by_name["occupations-sum-to-electron-count"] < 1e-4
     assert by_name["lattice-determinant-equals-volume"] < 1e-9
 
-    # Non-spin-polarised run: no moment reported, so the parity check must refuse.
+    # Non-spin-polarized run: no moment reported, so the parity check must refuse.
     assert len(cert.refusals) == 1
     assert cert.refusals[0].mode is RefusalMode.INPUT_CHANNEL_ABSENT
     assert cert.refusals[0].key.producer.name == "spin-parity"

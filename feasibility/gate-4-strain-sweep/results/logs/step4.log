@@ -1,0 +1,59 @@
+points 1131, symmetry orbits 658
+band set complete to 8.36 eV above the VBM at worst, 12.10 eV typically
+
+== PBE density of states, sigma = 0.3 eV, grouped CV ==
+model      residual %       sd   complete window    worst
+L0             33.83%    12.09            29.34%    62.27
+L0mean         20.82%     7.83            19.65%    48.77
+L1             18.89%     6.16            17.74%    44.05
+L2             12.73%     5.91            11.73%    42.17
+L3              5.26%     3.52             4.78%    21.48
+
+PBE residual against strain magnitude (%)
+   ||E|| bin     n       L0   L0mean       L1       L2       L3
+   0.00-0.02    56     7.38    28.03    27.90    17.50     1.32
+   0.02-0.04   118    19.04    21.62    21.14    12.29     2.55
+   0.04-0.06   137    29.57    18.34    17.06    12.02     4.10
+   0.06-0.08   281    32.08    15.66    14.34    10.17     4.54
+   0.08-0.10   288    38.87    19.97    17.47    12.03     6.07
+   0.10-0.12   197    43.85    25.27    22.16    14.26     7.40
+   0.12-0.15    54    49.97    33.01    28.59    22.05     9.77
+
+PBE where the L1 residual concentrates (share of total absolute residual)
+  deep valence  < -10 eV    24.69%
+  valence  -10..-2 eV       21.25%
+  valence edge  -2..0        2.14%
+  in gap  0..4 eV            2.53%
+  conduction edge 4..7       8.49%
+  conduction  > 7 eV        40.90%
+
+== HSE density of states, sigma = 0.3 eV, grouped CV ==
+model      residual %       sd   complete window    worst
+L0             33.17%    11.93            31.16%    59.57
+L0mean         20.89%     7.25            21.58%    44.99
+L1             19.18%     5.96            19.70%    38.50
+L2             13.13%     6.06            13.14%    43.67
+L3              5.46%     3.73             5.27%    22.46
+
+HSE residual against strain magnitude (%)
+   ||E|| bin     n       L0   L0mean       L1       L2       L3
+   0.00-0.02    56     7.51    28.53    28.44    18.61     1.41
+   0.02-0.04   118    19.11    22.16    21.83    13.23     2.54
+   0.04-0.06   137    30.21    19.00    17.97    12.69     4.36
+   0.06-0.08   281    31.74    16.37    15.24    10.47     4.69
+   0.08-0.10   288    38.10    20.04    17.64    12.33     6.30
+   0.10-0.12   197    42.31    24.40    21.54    14.34     7.76
+   0.12-0.15    54    45.86    30.16    26.89    22.07    10.00
+
+HSE where the L1 residual concentrates (share of total absolute residual)
+  deep valence  < -10 eV    31.96%
+  valence  -10..-2 eV       22.93%
+  valence edge  -2..0        2.13%
+  in gap  0..4 eV            0.92%
+  conduction edge 4..7       5.76%
+  conduction  > 7 eV        36.30%
+
+== cost of the NBANDS = 8 truncation, on the eight 96-band runs ==
+  full window      mean 0.00%  max 0.00%
+  complete window  mean 0.000%  max 0.000%
+  (the first number is what truncation costs; the second is what remains inside the window the ladder is judged on)

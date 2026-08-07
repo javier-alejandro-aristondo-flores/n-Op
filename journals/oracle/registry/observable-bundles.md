@@ -83,7 +83,7 @@ Representative contents. The authoritative per-row assignment is the manifest's
   chemical-potential references, the Clausius–Clapeyron slope.
 - **`non-equilibrium-operating`** — self-heating operating temperature, the
   coupled electromagnetic–thermal solve, hot-carrier temperature balance, impact
-  ionization, avalanche, tunnelling currents (Fowler–Nordheim,
+  ionization, avalanche, tunneling currents (Fowler–Nordheim,
   Richardson–Dushman, Padovani–Stratton), non-equilibrium Green's-function
   transmission.
 - **`static-validity`** — bond-valence sum,
@@ -99,10 +99,10 @@ Representative contents. The authoritative per-row assignment is the manifest's
   gate-dielectric lifetime pair (`tddb-thermochemical-e-model`, row 130, and
   `dielectric-crystallization-jmak`, row 131).
 
-Four rows carry a behaviour name where the literature carries a person's name,
+Four rows carry a behavior name where the literature carries a person's name,
 and the person is kept in the row's provenance cell instead:
 `barrier-from-workfunction-affinity`, `radius-ratio-coordination-class`,
-`elastic-stability-criteria`, `plastic-strain-fatigue-life`. The behaviour name
+`elastic-stability-criteria`, `plastic-strain-fatigue-life`. The behavior name
 is what a reader can bind to an object without knowing the literature; the
 person's name is what a literature search needs, and the provenance cell is where
 a literature search starts ([formula-registry#provenance]).
@@ -120,5 +120,5 @@ residuals they drive.
 Born–Oppenheimer hierarchy. The distinction matters because these four rows are
 correct as they stand: a consumer that takes the bundle vocabulary from the
 eleven-row table above, rather than from the field's full vocabulary, finds four
-rows carrying a value it does not recognise and reports four correct rows as
+rows carrying a value it does not recognize and reports four correct rows as
 defects ([traps#vocabulary-has-an-owner]).

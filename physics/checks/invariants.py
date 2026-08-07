@@ -47,7 +47,7 @@ class InvariantCheck:
     name: str
     #: frame attributes that must be non-None for the check to be evaluable
     reads: tuple[str, ...]
-    #: frame -> raw deviation (never squared, never normalised, never thresholded)
+    #: frame -> raw deviation (never squared, never normalized, never thresholded)
     evaluate: Callable[[Frame], float]
     category: CategoryTag
     unit: str
@@ -80,7 +80,7 @@ def _stress_symmetry(frame: Frame) -> float:
 def _electron_count(frame: Frame) -> float:
     """`Sum_nk w_k f_nk = NELECT` -- occupations sum to the electron count.
 
-    Calibrated against a known-good spin-polarised run: with two spin channels and
+    Calibrated against a known-good spin-polarized run: with two spin channels and
     k-weights summing to 1, the raw weighted sum equals NELECT with no spin factor.
     A collinear run with a single channel carries a factor of two, applied here rather
     than assumed away.
@@ -103,7 +103,7 @@ def _volume_consistency(frame: Frame) -> float:
 
 
 def _spin_parity(frame: Frame) -> float:
-    """Spin parity -- "an odd electron count forces an odd integer magnetisation".
+    """Spin parity -- "an odd electron count forces an odd integer magnetization".
 
     The deviation is the distance from the reported moment to the nearest integer of the
     *required* parity: odd integers when the electron count is odd, even integers when it
@@ -133,7 +133,7 @@ def _occupation_bounds(frame: Frame) -> float:
 def _kpoint_weight_normalisation(frame: Frame) -> float:
     """`Sum_k w_k = 1` -- the Brillouin-zone measure integrates to one.
 
-    Cheap, and it guards every k-integrated quantity at once: unnormalised weights make
+    Cheap, and it guards every k-integrated quantity at once: unnormalized weights make
     the electron count, the density of states and every transport integral wrong by the
     same silent factor, while each of them individually still looks plausible.
 
@@ -188,7 +188,7 @@ INVARIANT_CHECKS: tuple[InvariantCheck, ...] = (
         evaluate=_spin_parity,
         category=CategoryTag.STATIC_SNAPSHOT,
         unit="bohr_magneton",
-        written="an odd electron count forces an odd integer magnetisation",
+        written="an odd electron count forces an odd integer magnetization",
     ),
     InvariantCheck(
         name="occupations-within-unit-interval",

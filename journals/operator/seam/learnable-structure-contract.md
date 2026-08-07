@@ -42,7 +42,7 @@ open-questions:
 
 ## What this contract fixes
 
-The **minimum observable behaviour the oracle library requires of the operator at
+The **minimum observable behavior the oracle library requires of the operator at
 their shared boundary** — and nothing about its interior.
 
 Coupling between the two libraries is confined to what crosses the bridge
@@ -56,11 +56,11 @@ five properties this problem needs and a fixed-width predictor cannot supply.
 
 | Property | Why it matters here |
 |---|---|
-| **Function-valued outputs** | the one-body density matrix is a function of two spatial points; the vector potential is a function of space and time; conductivity against temperature is a curve; the phonon density of states is a spectrum. A fixed-width output layer has to choose a discretisation and bake it in |
-| **Discretisation invariance** | supercell size and reciprocal-space mesh density vary across the problem. A mesh-bound model is retrained per mesh; one set of weights carries across meshes |
+| **Function-valued outputs** | the one-body density matrix is a function of two spatial points; the vector potential is a function of space and time; conductivity against temperature is a curve; the phonon density of states is a spectrum. A fixed-width output layer has to choose a discretization and bake it in |
+| **Discretization invariance** | supercell size and reciprocal-space mesh density vary across the problem. A mesh-bound model is retrained per mesh; one set of weights carries across meshes |
 | **Evaluation at arbitrary points** | the oracle scores residuals at axis points lying nowhere on the training grid. Interpolating after the fact is a second model with its own error |
 | **Nonlocal kernels** | electronic structure is nonlocal — long-range Coulomb, collective phonon modes. An integral kernel couples the whole cell in one layer; a local stencil needs depth to move information across it |
-| **Amortised solution map** | what is learned is the map from topology and partial properties to the rest of the state, not one solution. A new material is a forward pass, not a new solve |
+| **Amortized solution map** | what is learned is the map from topology and partial properties to the rest of the state, not one solution. A new material is a forward pass, not a new solve |
 
 The load-bearing one is evaluation at arbitrary points, and it is a contracted
 requirement below.
@@ -109,11 +109,11 @@ symmetry-quotiented axis grids fixed at compose time
 coordinates, the operator returns that channel's values **at exactly those points**.
 Emission on a fixed internal mesh with caller-side interpolation does not satisfy this.
 
-This is discretisation invariance made concrete, and it is the single most load-bearing
+This is discretization invariance made concrete, and it is the single most load-bearing
 requirement of the seam: if the operator could answer only on its training grid, the
-residual could not be scored where the physics asks. How the kernel realises it
+residual could not be scored where the physics asks. How the kernel realizes it
 internally — spectral trunk, point branch, anything else — is unconstrained. Only the
-query behaviour is contracted.
+query behavior is contracted.
 
 ## Vector–Jacobian product at the state boundary
 
@@ -140,7 +140,7 @@ Only flat numeric arrays cross the boundary — no framework tensors with attach
 no lazy graphs, no callbacks.
 
 Inference-mode emission is deterministic, bitwise, for fixed inputs and fixed identity,
-so content-addressed caching holds. Hashing applies the float normalisation of
+so content-addressed caching holds. Hashing applies the float normalization of
 [representation-substrate#serialization]: canonical quiet not-a-number, negative zero
 mapped to positive zero. A not-a-number or an infinity in an emitted state is already a
 finiteness violation upstream of any hash.
@@ -186,9 +186,9 @@ depends on it.
 ## What the oracle does not ask about
 
 - Internal architecture: layer types, trunk-and-branch decomposition, how
-  hybridisation is realised.
+  hybridization is realized.
 - Training numeric types, mixed precision, sharding, internal memory layout.
-- Optimiser, schedules, initialisation, regularisation.
+- Optimizer, schedules, initialization, regularization.
 - How the operator declares, lowers, fuses or caches its own structures.
 - Where weights live or how checkpoints are stored. Only the content hash is visible.
 - Anything about the loop. Loop-drivability is the whole statement.

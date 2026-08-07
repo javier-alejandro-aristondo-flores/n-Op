@@ -71,10 +71,10 @@ that drives either of them lives outside both ([purpose-and-scope#no-loops]).
 
 "Verify whether a crystal is valid" means, precisely: **produce the slot-by-slot
 evidence from which validity is judged.** The oracle measures disagreement with the
-laws at full granularity and hands over the itemised result. It never renders a
+laws at full granularity and hands over the itemized result. It never renders a
 verdict — no verdict bit, no score rollup, no thresholds, no aggregation across slots.
 Judgment belongs to the consumer looking at the evidence. For a scientific instrument
-this is the honest contract: it measures; it does not editorialise.
+this is the honest contract: it measures; it does not editorialize.
 
 ## Consumers
 
@@ -141,7 +141,7 @@ One file on disk, four things inside.
 
 ## Three rules about files
 
-- **One file per crystal identity.** A kernel is specialised to one periodicity
+- **One file per crystal identity.** A kernel is specialized to one periodicity
   structure, site decoration and environment ([crystal-inputs#top-level-inputs]). "The
   oracle" as a general object is the *compiler*; each file is the oracle *for one
   instance*. Searches over discrete identity space produce many files — cheap under
@@ -182,7 +182,7 @@ quantities, an optional cotangent map populated only when gradients were request
 and the content hash of the producing kernel.
 
 Slot keys are structured values and residual values are **raw**: the oracle never
-normalises, weights, sums, or judges across slots
+normalizes, weights, sums, or judges across slots
 ([residual-definitions#granularity]).
 
 ## The static slot schema
@@ -193,7 +193,7 @@ error scale — a standard deviation ([residual-definitions#error-budget]).
 
 This makes an oracle-file self-describing: a consumer can enumerate its contents with
 no other resource. It also fixes a boundary. Consumers who want cross-slot
-comparability compute the standardised score `z = value / σ` **themselves** — that is
+comparability compute the standardized score `z = value / σ` **themselves** — that is
 a join against the schema, not a product output.
 
 ## Refusal is absence
@@ -238,9 +238,9 @@ in the interface library, never in the product ([purpose-and-scope#no-loops]).
 ## The design-variable boundary
 
 Within one oracle-file the **continuous** variables — cell, positions, and composition
-fraction where the registry treats it as an axis — are directly optimisable through
+fraction where the registry treats it as an axis — are directly optimizable through
 the baked gradients. The **discrete** variables — species, decoration, symmetry family
-— are the compiler's specialisation axis: searching them means enumerate-and-compile
+— are the compiler's specialization axis: searching them means enumerate-and-compile
 (many files, cached by content) or an external search over that discrete space.
 
 Static, instantaneous-property design works on today's contract. **Lifetime design** —
@@ -255,7 +255,7 @@ Three verbs, minimal by principle.
   file, produces one oracle-file.
 - `inspect` — oracle-file produces its static schema and identity, enumerated.
 - `validate` — oracle-file plus a state file, plus environment and request flags,
-  produces the keyed-float maps, serialised.
+  produces the keyed-float maps, serialized.
 
 In-program loading of the oracle-file is the **primary** consumption path; the command
 line is the same function with file handles. Nothing interactive, nothing stateful, no

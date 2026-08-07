@@ -69,7 +69,7 @@ rather than excluded, in a corpus that otherwise excludes explicitly — so a re
 tell whether it was considered and dropped, or never considered.
 
 **Scope caution, stated honestly.** Noise figures are a real device metric but plausibly
-secondary to breakdown, thermal and reliability behaviour, all of which *are* covered. This
+secondary to breakdown, thermal and reliability behavior, all of which *are* covered. This
 finding is about the corpus's own consistency of practice, not a claim that noise physics is
 required.
 
@@ -238,7 +238,7 @@ quantity it produces. The GENERIC structure the corpus is built on requires `E[x
 lacking `E_⊥` cannot supply one.
 
 **Control.** Searched `grep -rn "Π_A" journals/` → 0 hits. Searched `grep -rn "conjugate"
-journals/` → 2 hits: `conjugate-gradient`, an optimiser, and `EOM/Π_h — same form on the
+journals/` → 2 hits: `conjugate-gradient`, an optimizer, and `EOM/Π_h — same form on the
 cell-metric conjugate`. So the corpus uses the concept of a conjugate momentum slot exactly
 once, and applies it to `h` rather than to `A`. Searched `grep -rn "E_⊥" journals/` → 2 hits,
 both inside `generic-dynamics.md`, both inside the energy functional, never as a state slot.
@@ -300,7 +300,7 @@ they described the same system.
 **Not emergent, and not another tier's.** Isotopic mass is not recoverable by coarse-graining
 from positions, momenta and atomic numbers on any timescale — it is independent input data. It
 is not a slow, history-dependent quantity (it does not evolve at all), and it is not a
-device-scale homogenised field. It fails every branch of the emergence axiom, so by the corpus's
+device-scale homogenized field. It fails every branch of the emergence axiom, so by the corpus's
 own partition it must be first-class micro state. It is absent from the seven slots, and also
 from all three top-level inputs: `SiteDecoration` carries species drawn from the elemental
 vocabulary above, `Environment` has no isotope field, and `TheoryContext`'s pseudopotential map
@@ -309,7 +309,7 @@ is keyed by `AtomicSpecies`.
 **Why it matters here specifically, rather than in principle.** Diamond is this corpus's MVP
 material, and diamond has the largest isotope effect on thermal conductivity of any known solid;
 thermal conductivity is one of the corpus's headline observables, carried by registry rows 25,
-121 and 122, and it is the coefficient the macro tier's heat equation homogenises. This is not a
+121 and 122, and it is the coefficient the macro tier's heat equation homogenizes. This is not a
 precision correction — it is a ~50% effect on a headline number, larger than most of the
 accuracy targets in the ledger.
 
@@ -318,7 +318,7 @@ accuracy targets in the ledger.
 Searched `grep -rn "mass number\|atomic mass\|nuclide" journals/` → 0 hits. Searched
 `grep -rn "M_I" journals/` → 1 hit, the energy functional. Control that fires:
 `grep -rn "mass" journals/` returns effective-mass tensors, mass densities, mass-weighted
-dynamical matrices, mass-action and the `√(2Mω)` vertex-normalisation trap — 13 lines across
+dynamical matrices, mass-action and the `√(2Mω)` vertex-normalization trap — 13 lines across
 8 files —
 so mass vocabulary is thoroughly reachable by search, and the absence of isotopic mass is real
 rather than a search failure. Second control: `grep -rn "atomic weight" journals/` fires in
@@ -346,7 +346,7 @@ DOI [10.1103/PhysRevB.47.14850](https://doi.org/10.1103/PhysRevB.47.14850).
 
 The planned attack was that ion positions and momenta are classical fields while hydrogen —
 named in this corpus as its own silent killer, with a redistribution row and a desorption row —
-is a light nucleus whose delocalisation and tunneling are large, so the nuclear wavefunction is
+is a light nucleus whose delocalization and tunneling are large, so the nuclear wavefunction is
 a degree of freedom the seven slots cannot carry.
 
 **Grounded first.** `nuclear quantum` returns 0 hits; `path integral` returns 1 hit and it is
@@ -365,7 +365,7 @@ The relevant corpus row runs at that temperature:
 muonium jump rates in diamond by quantum transition-state theory in the path-integral centroid
 formalism, over a range extending to about 1000 K — *Phys. Rev. Lett.* **99**, 205504 (2007),
 DOI [10.1103/PhysRevLett.99.205504](https://doi.org/10.1103/PhysRevLett.99.205504). Their
-quantum effective barriers are renormalised relative to the zero-temperature classical
+quantum effective barriers are renormalized relative to the zero-temperature classical
 calculation and decrease with rising temperature, and the quantum and classical rates converge
 at high temperature, as the classical limit requires. Their classical barriers for the BC→T
 transition, 1.6–2.1 eV, bracket the corpus's own 1.7 eV. The corpus's number is the right kind
@@ -376,13 +376,13 @@ Two honest qualifications. First, the study's convergence statement is qualitati
 available to me; I did not obtain a tabulated quantum-to-classical ratio at 773 K, so I am
 reporting agreement in direction and magnitude rather than a verified numeric bound. Second, the
 exclusion is worded for *tunneling*, and the effect the literature actually shows is
-vibrational-mode quantisation of the barrier — a different mechanism that the wording does not
+vibrational-mode quantization of the barrier — a different mechanism that the wording does not
 name. That is a scoping imprecision in an exclusion, not a missing degree of freedom, so it goes
 to by-catch rather than becoming a finding.
 
 **Withdrawn.** The corpus already treats nuclear motion quantum-mechanically where it matters
 for thermodynamics — phonon spectra with Bose–Einstein occupations, the quasi-harmonic
-approximation, zero-point renormalisation — and classically where it integrates. That is the
+approximation, zero-point renormalization — and classically where it integrates. That is the
 standard and defensible division, not an omission.
 
 ### P8 — the non-equilibrium distributions: emergence is defended, and the regime where it fails is refused
@@ -470,7 +470,7 @@ The line in the Coverage table above reading *"The seven slots as irreducible de
 ## By-catch — angle 3
 
 - The tunneling exclusion is scoped to *tunneling* while the effect the hydrogen literature
-  shows at 600–1000 K is vibrational-mode quantisation of the barrier. The exclusion's reasoning
+  shows at 600–1000 K is vibrational-mode quantization of the barrier. The exclusion's reasoning
   is right; its wording names the smaller of the two mechanisms.
 - No page states whether the barriers entering the Arrhenius rows are bare electronic barriers
   on `E_BO` or zero-point-corrected free-energy barriers. `generic-dynamics.md` puts
@@ -481,6 +481,6 @@ The line in the Coverage table above reading *"The seven slots as irreducible de
   `SubDofTag = charge` "already admitted on the species labels". The member is used and not
   enumerated.
 - The macro mesh's worked cell size of ~10 nm is far below diamond's phonon mean free path, so
-  the homogenised Fourier closure `D_thermal = κ/(C_p·ρ_m)` with a bulk `κ` is being applied
+  the homogenized Fourier closure `D_thermal = κ/(C_p·ρ_m)` with a bulk `κ` is being applied
   across cells where transport is ballistic. Off this angle's question, but it bears on the
-  homogenisation map's validity.
+  homogenization map's validity.

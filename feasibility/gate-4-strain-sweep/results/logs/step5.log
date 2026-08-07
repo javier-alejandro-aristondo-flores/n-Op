@@ -1,0 +1,47 @@
+== the correction, over 1,131 distinct shapes ==
+quantity                     mean         sd        min        max      range
+slope_occ                  0.1102     0.0027     0.1017     0.1198     0.0181
+intercept_occ              0.0857     0.0185     0.0433     0.1237     0.0805
+slope_unocc                0.0941     0.0059     0.0806     0.1124     0.0318
+intercept_unocc            0.9045     0.0595     0.7735     1.0664     0.2930
+gap_difference             1.2231     0.0597     1.0556     1.3806     0.3250
+direct_gap_difference      1.4607     0.0464     1.2830     1.5952     0.3122
+
+Gate 2 measured, at one geometry: slope_occ ~ 0.10, slope_unocc ~ 0.07, intercept_unocc ~ 0.84
+
+coefficient noise floor from symmetry twins
+quantity                 rms spread   max spread  drift range    ratio
+slope_occ                  0.000000     0.000000     0.018105 1395224.9
+intercept_occ              0.000001     0.000006     0.080452  76764.3
+slope_unocc                0.000000     0.000001     0.031836 451053.2
+intercept_unocc            0.000001     0.000009     0.292965 251373.8
+gap_difference             0.000002     0.000029     0.325010 158097.3
+
+coefficients against strain magnitude
+   ||E|| bin     n       slope_occ     slope_unocc intercept_unocc  gap_difference
+   0.00-0.02    56          0.1106          0.0983          0.8284          1.2575
+   0.02-0.04   118          0.1105          0.0972          0.8545          1.2577
+   0.04-0.06   137          0.1102          0.0954          0.8800          1.2460
+   0.06-0.08   281          0.1103          0.0934          0.9185          1.2368
+   0.08-0.10   288          0.1097          0.0922          0.9270          1.2198
+   0.10-0.12   197          0.1100          0.0933          0.9215          1.1826
+   0.12-0.15    54          0.1110          0.0964          0.8993          1.1487
+
+is the drift structured, or scatter? (R^2 of a linear fit on the 6 strains)
+  slope_occ              R^2 = 0.9676   |d/d(trace)| =   0.0380 per unit strain
+  slope_unocc            R^2 = 0.5524   |d/d(trace)| =   0.0623 per unit strain
+  intercept_unocc        R^2 = 0.1085   |d/d(trace)| =   0.2754 per unit strain
+  gap_difference         R^2 = 0.1514   |d/d(trace)| =   0.3306 per unit strain
+
+band matching: PROCAR character overlap on the ten most strained cells
+  stretch-x-and-y-axes-by-plus-0.100             min overlap 0.5293  mean 0.9946
+  stretch-x-plus-0.080-y-plus-0.080-z-plus-0.080 min overlap 0.3215  mean 0.9905
+  stretch-x-and-y-axes-by-plus-0.095             min overlap 0.9769  mean 0.9993
+  stretch-x-minus-0.080-y-plus-0.080-z-plus-0.08 min overlap 0.9576  mean 0.9985
+  stretch-x-plus-0.080-y-minus-0.080-z-plus-0.08 min overlap 0.9576  mean 0.9985
+  stretch-x-plus-0.080-y-plus-0.080-z-minus-0.08 min overlap 0.9576  mean 0.9985
+  stretch-x-minus-0.080-y-minus-0.080-z-plus-0.0 min overlap 0.1240  mean 0.9942
+  stretch-x-minus-0.080-y-plus-0.080-z-minus-0.0 min overlap 0.1240  mean 0.9942
+  stretch-x-plus-0.080-y-minus-0.080-z-minus-0.0 min overlap 0.1240  mean 0.9942
+  stretch-x-and-y-axes-by-minus-0.100            min overlap 0.7182  mean 0.9985
+  worst same-index character overlap over those cells: 0.1240

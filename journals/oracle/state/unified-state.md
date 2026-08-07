@@ -41,7 +41,7 @@ The vector potential is carried in the Weyl gauge `A₀ ≡ 0`, transverse `∇�
 the electrostatic sector lives in the matter functionals. The normative
 gauge-and-partition statement is [generic-dynamics].
 
-The seven slot labels are a closed vocabulary, realised as a typed indexed universe
+The seven slot labels are a closed vocabulary, realized as a typed indexed universe
 ([representation-substrate]). Downstream code addresses a slot by that universe's
 dense ordinal handle, never by raw symbol.
 
@@ -58,9 +58,9 @@ the integration pathology this formulation exists to avoid.
 
 Quantities **not** recoverable on the micro timescale or scale are first-class state
 in a tier of their own, not emergent: slow, history-dependent defect populations and
-composition vectors, evolving over hours to years; and homogenised device-scale
+composition vectors, evolving over hours to years; and homogenized device-scale
 fields on a device mesh. Both couple to the micro tier only parametrically — by
-adiabatic driving or by homogenisation — so neither introduces a constraint manifold.
+adiabatic driving or by homogenization — so neither introduces a constraint manifold.
 [multiscale-state] owns the tiers and the emergence axiom they rest on;
 [born-oppenheimer-levels] owns which level each belongs to.
 
@@ -81,4 +81,4 @@ plane-wave cutoff, band count and irreducible point count.
 The operator seam requires emitted candidates to match "per-slot array shapes and
 layouts, units, and the gauge conventions recorded there", pointing here. The gauge
 conventions are above. The rest of that sentence is this gap, and it is stated rather
-than left to be discovered by whoever tries to serialise a state.
+than left to be discovered by whoever tries to serialize a state.

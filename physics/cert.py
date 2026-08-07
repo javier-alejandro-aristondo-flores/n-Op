@@ -44,7 +44,7 @@ class RefusalMode(Enum):
 
     #: A channel the check reads is not present in the supplied frame, so the check
     #: cannot be evaluated -- as distinct from evaluating to zero. The spin-parity
-    #: check on a non-spin-polarised run is exactly this: no moment is reported, so
+    #: check on a non-spin-polarized run is exactly this: no moment is reported, so
     #: there is nothing to test parity against. Reporting 0.0 here would assert that
     #: the frame *passed*, which is the specific lie this mode exists to prevent.
     INPUT_CHANNEL_ABSENT = "input-channel-absent"

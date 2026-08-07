@@ -62,7 +62,7 @@ Ordered by severity. Every finding states what would refute it.
 
 ---
 
-### F1 — The `0.4 Θ_D` four-phonon criterion is attributed to a paper that never uses the word "Debye", and the paper's own second material refutes the generalisation by a factor of 2.3 **[primary]** **[principal: identified; this verification is mine]**
+### F1 — The `0.4 Θ_D` four-phonon criterion is attributed to a paper that never uses the word "Debye", and the paper's own second material refutes the generalization by a factor of 2.3 **[primary]** **[principal: identified; this verification is mine]**
 
 **Severity: high. Confidence: high — primary text, with a stated control.**
 
@@ -90,7 +90,7 @@ about diamond, verbatim, so the extraction is not the reason "Debye" is missing:
 > κ of diamond and silicon by 31% and 26% as compared to experimental values, respectively."
 
 What the paper actually states is a **per-material temperature**, not a Debye fraction. And it
-states **two** of them — which is what kills the generalisation:
+states **two** of them — which is what kills the generalization:
 
 | material | FLR's stated threshold | Θ_D | implied fraction |
 |---|---|---|---|
@@ -110,7 +110,7 @@ silicon Debye temperature that reconciles the two materials under a single fract
 them would require Θ_D(Si) ≈ 1470 K, which is more than twice any published value.
 
 So the criterion is circular in one direction and false in the other: back-derived from an unsourced
-number, then generalised into a universal rule the cited paper neither states nor supports.
+number, then generalized into a universal rule the cited paper neither states nor supports.
 
 **This resolves the 773 K contradiction constructively** (my draft V6, now retired as a separate
 finding). Regime row 12 says the correction is *needed* above ≈0.4 Θ_D = 880 K; the MVP target row
@@ -124,7 +124,7 @@ cited paper's own directly-stated per-material thresholds — ~900 K for diamond
 and change the 773 K MVP row to name the three-phonon path. This removes the dependence on the
 UNSEEDED Debye temperature entirely, which is the reason to prefer it over re-deriving the fraction.
 
-**What would refute it, and the strongest defence available.** Three things, in descending order of
+**What would refute it, and the strongest defense available.** Three things, in descending order of
 plausibility:
 
 1. **The cell's `Slack-like` qualifier.** The full cell reads *"S1 (Slack-like 4-phonon
@@ -301,8 +301,8 @@ from *materials* to *sublattices*:
 | source table | ledger row 42 | what changed |
 |---|---|---|
 | diamond 37–50 eV | "about 37 eV for **carbon**" | material → its only element; harmless |
-| **GaN** ~20 eV | "about 20 eV on the **gallium sublattice**" | whole-compound value relabelled as one sublattice |
-| **β-Ga₂O₃** ~25 eV | "about 25 eV for **nitrogen**" | **gallium oxide's value relabelled onto an element gallium oxide does not contain** |
+| **GaN** ~20 eV | "about 20 eV on the **gallium sublattice**" | whole-compound value relabeled as one sublattice |
+| **β-Ga₂O₃** ~25 eV | "about 25 eV for **nitrogen**" | **gallium oxide's value relabeled onto an element gallium oxide does not contain** |
 
 **Gallium oxide is Ga₂O₃. It contains no nitrogen.** That is what makes this provably a migration
 rather than a coincidence: no measurement of "nitrogen in gallium oxide" exists to be quoted,
@@ -380,7 +380,7 @@ citation with a journal — `transport:19` Davydov, `transport:25` and `:43` Sla
 the identifier rule excludes (`phonon-frequencies:12–15`, the Grüneisen rows, `arXiv 2211.03960`).
 24 − 6 + 4 = 22.
 
-So the itemised section under the count is enumerating a set the stated rule does not define.
+So the itemized section under the count is enumerating a set the stated rule does not define.
 
 **What would refute it.** A statement of the identifier clause somewhere in `journals/`. I did not
 find one; the clause appears only in the inherited audit note.
@@ -434,7 +434,7 @@ anisotropy as an explicit component index rather than a name variant (see F7).
 
 ### F7 — Crystallographic direction is carried in the Environment column, in four notations, one of which the corpus's own frame guard forbids
 
-**Severity: high. Confidence: high on the structure; the *labelling correctness* is a shaped gap (G2).**
+**Severity: high. Confidence: high on the structure; the *labeling correctness* is a shaped gap (G2).**
 
 `reference-battery#row-schema` states Environment is *"a serialization of the record
 [crystal-inputs#environment] owns"*. That record's fields are temperature, pressure, chemical
@@ -485,7 +485,7 @@ returned zero — see §5. The number in my draft was right; the probe that conf
 frame guard:
 
 > His **plane-normal** measurements `λ₍₁₀₀₎` and `λ₍₀₀₁₎` lie along `a*` and `c*` and must
-> **never** be relabelled `[100]` and `[001]`.
+> **never** be relabeled `[100]` and `[001]`.
 
 `transport-coefficients.csv:47–48` records `300 K [100]` = 10.9 and `300 K [001]` = 14 W/m·K — the
 bare-bracket form the guard forbids — while `material-constants.csv:37–39` uses the plane-normal
@@ -974,7 +974,7 @@ calorimetric Debye temperatures must agree. They do, at ~2240 K, and the calorim
 2219 ± 20. **The seeded 2200 ± 50 K is well supported as a T → 0 Debye temperature.**
 
 **What this does not rescue.** The row states **no method and no temperature** — its Environment cell
-is a bare `—` — and it is consumed in a criterion about *high-temperature* behaviour, where the
+is a bare `—` — and it is consumed in a criterion about *high-temperature* behavior, where the
 T → 0 value is the wrong one. So the defect is real but it is **not** the one registered: it is a
 missing method/temperature qualifier and a category mismatch at the consumer, not an over-tight σ.
 
@@ -1003,7 +1003,7 @@ silently deleting the entire 47-run hydrostatic family.
 So the sentence does not err in the safe direction. It errs in the direction of the worse failure,
 and the failure is undocumented. It is now **F16**, at moderate-high severity.
 
-**The generalisable lesson**, which is why this entry stays: I dismissed the item on a judgement
+**The generalizable lesson**, which is why this entry stays: I dismissed the item on a judgment
 about *direction of error* without having enumerated the ways a reader could instantiate the method I
 was comparing against. "Numeric de-duplication works" was true of one key and false of another, and
 I had checked only the one that made the corpus look wrong in a harmless way.
@@ -1011,7 +1011,7 @@ I had checked only the one that made the corpus look wrong in a harmless way.
 ### N3 — `phonon-max-energy`'s wrong-consumer finding lost its consumer in the restructure
 
 `leads/diamond.md` §7 establishes that the diamond `phonon-max-energy` row is named for the
-dispersion maximum but seeded with the **zone-centre** Raman value (165.21 meV), while diamond's LO
+dispersion maximum but seeded with the **zone-center** Raman value (165.21 meV), while diamond's LO
 branch overbends ~1.5 meV above Γ — so the true maximum is ~166.7 meV, three times the row's σ above
 its value. The ledger reproduces this itself, so the corpus already knows.
 
@@ -1051,7 +1051,7 @@ provenance grounds alone.
 
 *Note the interaction with F10:* the 0 K diamond–graphite difference implied by the thermochemistry
 is 25.1 meV/atom, which is the seeded value exactly. So the row is defensible as a **0 K** quantity
-while being labelled 300 K — which is a fourth reading nobody enumerated, and the one that makes the
+while being labeled 300 K — which is a fourth reading nobody enumerated, and the one that makes the
 number land.
 
 ### N6 — `Arabov arXiv 2603.29484` is real **[principal: checked]**
@@ -1079,7 +1079,7 @@ citation is real, correctly paginated, and about the right quantity. **I am not 
 What remains open is narrower and is a shaped gap (G4): whether Lee's −0.19 eV is the isochoric
 component or the total. The adjacent row 41 (`bandgap-shift-total-700K`, −0.45 eV) already carries
 an explicit "NOT isochoric-only; do not compose" guard, so the corpus is alert to the distinction on
-the neighbouring row.
+the neighboring row.
 
 ---
 
@@ -1123,10 +1123,10 @@ disk exactly (§6). The only residue in my subject is F17b, the "cert reference 
 
 | part | content |
 |---|---|
-| **what it would settle** | Are the β-Ga₂O₃ conductivity values labelled `[100]` and `[001]` measurements along those crystallographic directions, or along the plane normals `a*` and `c*` (13.83° away)? |
+| **what it would settle** | Are the β-Ga₂O₃ conductivity values labeled `[100]` and `[001]` measurements along those crystallographic directions, or along the plane normals `a*` and `c*` (13.83° away)? |
 | **the conclusion without it** | Undetermined. The corpus uses the bare-bracket notation its own frame guard forbids for exactly this quantity, and the plane-normal notation for the permittivity rows of the same crystal. The structural defect (F7) stands regardless. |
 | **the branches** | **True directions:** the labels are right and F7 reduces to a notation and key-placement defect. **Plane normals:** the values are attached to the wrong directions in a material with 2.5× anisotropy, and this is the relabel the corpus explicitly forbids — a false-claim finding on two seeded rows. |
-| **what depends on it** | The *labelling* half of F7 only. The structural half — 42 of 179 Environment cells — is independent. |
+| **what depends on it** | The *labeling* half of F7 only. The structural half — 42 of 179 Environment cells — is independent. |
 
 ### G3 — the FLR supplemental material
 
@@ -1203,7 +1203,7 @@ the clean file, then planted eight defects in scratch copies and re-ran it.
 | D5 | a geometry cell corrupted to non-numeric | ✔ **but as an uncaught `ValueError`, not a reported finding** |
 | D6 | a duplicated shape's γ moved inside the linear-response window | ✔ |
 | D7 | `source_archive_file` pointed at the wrong archive | ✘ **missed** |
-| D8 | `kind_of_shape_change` mislabelled | ✘ **missed** |
+| D8 | `kind_of_shape_change` mislabeled | ✘ **missed** |
 
 **What the misses mean.** My method is a geometry-and-duplicate-structure checker. It never reads
 the provenance columns and never cross-checks the family label against the geometry. **Anything I
@@ -1250,7 +1250,7 @@ data hazard, and only re-running it — not re-reading it — exposed either. Th
 **Three of the checks I certified clean were produced by methods that could not have supported the
 certification.** Two had the right answer underneath; one concealed a finding. The gate on my own
 transcript is therefore materially weaker than the six-of-eight above suggests, and I am reporting
-that rather than resolving it in my favour. Every §6 line now states the method precisely enough to
+that rather than resolving it in my favor. Every §6 line now states the method precisely enough to
 be re-run and disagreed with.
 
 ### What was not calibrated

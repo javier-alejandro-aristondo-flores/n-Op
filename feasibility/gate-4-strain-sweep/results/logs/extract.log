@@ -1,0 +1,7 @@
+1-scale-all-axes-uniformly.tar.gz: 7s, 848 files, 0.11 GB, licensed skipped 95
+2-stretch-one-axis-or-two-axes.tar.gz: 6s, 2291 files, 0.22 GB, licensed skipped 256
+3-skew-one-plane.tar.gz: 8s, 4453 files, 0.38 GB, licensed skipped 497
+4-skew-two-planes.tar.gz: 24s, 8559 files, 0.68 GB, licensed skipped 954
+5-skew-three-planes.tar.gz: 22s, 12017 files, 0.93 GB, licensed skipped 1339
+6-stretch-all-three-axes.tar.gz: 65s, 21236 files, 1.61 GB, licensed skipped 2364
+DONE runs=2364 written=21236 bytes=1.61 GB licensed_skipped=2364

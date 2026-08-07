@@ -1,0 +1,70 @@
+{
+ "triplicates_are_copies": true,
+ "orbit_count": 213,
+ "noise": [
+  {
+   "observable": "PBE indirect gap",
+   "orbits": 213,
+   "max_spread_mev": 0.03500000000267178,
+   "median_spread_mev": 0.0009999999992515995,
+   "p95_spread_mev": 0.024999999999231193,
+   "rms_mev": 0.010542781167227077
+  },
+  {
+   "observable": "HSE indirect gap",
+   "orbits": 213,
+   "max_spread_mev": 0.03899999999923409,
+   "median_spread_mev": 0.0,
+   "p95_spread_mev": 0.02539999999981999,
+   "rms_mev": 0.01087638610250154
+  },
+  {
+   "observable": "PBE direct gap at Gamma",
+   "orbits": 213,
+   "max_spread_mev": 0.030000000002416982,
+   "median_spread_mev": 0.0009999999992515995,
+   "p95_spread_mev": 0.01499999999987611,
+   "rms_mev": 0.006293300708242121
+  },
+  {
+   "observable": "HSE direct gap at Gamma",
+   "orbits": 213,
+   "max_spread_mev": 0.03400000000119974,
+   "median_spread_mev": 0.0,
+   "p95_spread_mev": 0.0176000000009501,
+   "rms_mev": 0.006520822552543742
+  },
+  {
+   "observable": "PBE valence splitting at Gamma",
+   "orbits": 213,
+   "max_spread_mev": 0.22100000000158104,
+   "median_spread_mev": 0.0010000000010002008,
+   "p95_spread_mev": 0.03180000000110312,
+   "rms_mev": 0.02002205356875001
+  },
+  {
+   "observable": "HSE valence splitting at Gamma",
+   "orbits": 213,
+   "max_spread_mev": 0.2469999999998862,
+   "median_spread_mev": 0.0,
+   "p95_spread_mev": 0.030999999999903324,
+   "rms_mev": 0.020959383928171527
+  },
+  {
+   "observable": "PBE Delta energies (sorted triple)",
+   "orbits": 213,
+   "max_spread_mev": 0.11000000000072063,
+   "median_spread_mev": 0.001000000000139778,
+   "p95_spread_mev": 0.02500000000100755,
+   "rms_mev": 0.013039484997939171
+  },
+  {
+   "observable": "HSE Delta energies (sorted triple)",
+   "orbits": 213,
+   "max_spread_mev": 0.12199999999928934,
+   "median_spread_mev": 0.0,
+   "p95_spread_mev": 0.026000000000081513,
+   "rms_mev": 0.01398506916768402
+  }
+ ]
+}

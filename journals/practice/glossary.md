@@ -94,7 +94,7 @@ failure: decide which page should own it and add the topic there
 | `EOM/Continuum` | [multiscale-state#eom-continuum] |
 | `DeviceMesh` | [multiscale-state#device-mesh] |
 | `MacroState` | [multiscale-state#macro-state-schema] |
-| the homogenisation map | [multiscale-state#homogenisation-map] |
+| the homogenization map | [multiscale-state#homogenization-map] |
 | `SqliteReferenceCache` | [cert-obligations#reference-cache] |
 | `RoaringCoverageMask` | [cert-obligations#reference-cache] |
 | `GroundTruthBridgeGenerator` | [pino-bridge#import] |

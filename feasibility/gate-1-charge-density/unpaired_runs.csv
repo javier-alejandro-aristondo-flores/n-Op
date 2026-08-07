@@ -1,0 +1,6 @@
+config_key,functional,path
+Pure/converged_without_stress,GGA-PBE,Pure/converged_without_stress
+single_defects_new-only/Transition-Metals/Mn,HSE06,single_defects_new-only-HSE06/Transition-Metals/Mn/hse06
+single_defects_new-only/Transition-Metals/Mn/sigma-0.0001,GGA-PBE,single_defects_new-only-GGA-PBE/Transition-Metals/Mn/sigma-0.0001
+triads_defects/H-N-O/c8-c53-c1/config2,GGA-PBE,triads_defects/H-N-O/c8-c53-c1/config2
+triads_defects/H-N-O/c8-c53-c1/config3,GGA-PBE,triads_defects/H-N-O/c8-c53-c1/config3

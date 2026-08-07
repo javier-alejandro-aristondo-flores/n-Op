@@ -200,7 +200,7 @@ The seam is exercised through its own entry points ([pino-bridge#validate]):
 - Validate with gradients skipped populates label values for about ten silicon
   observables.
 - Validate with gradients computed returns finite per-residual scalars and finite
-  cotangents of the declared shape, on a randomly initialised state.
+  cotangents of the declared shape, on a randomly initialized state.
 - Import accepts a synthetic payload in the format the plane-wave reference code
   emits, and returns ground-truth bridge generators with their coverage masks.
 

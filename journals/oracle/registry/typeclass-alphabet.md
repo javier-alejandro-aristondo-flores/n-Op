@@ -49,7 +49,7 @@ implementation language is undecided ([forced-decisions#implementation-language]
 
 ## Quantity — the value axis
 
-Units, equality within a tolerance, and behaviour under a change of units or
+Units, equality within a tolerance, and behavior under a change of units or
 basis. Every numeric output is a `Quantity`.
 
 ```

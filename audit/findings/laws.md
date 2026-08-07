@@ -30,11 +30,11 @@ What changed on resumption:
 
 Four literature arms are running at the time of writing and their results are marked where
 they land. §6 names exactly what remains unchecked. **This is still not a clean verdict
-over the subject; it is a judgement over the part I closed, with the boundary stated.**
+over the subject; it is a judgment over the part I closed, with the boundary stated.**
 
 ---
 
-## 0 · Judgement
+## 0 · Judgment
 
 **The physics on these pages is mostly right. The claim the pages exist to make is not
 established, and the corpus cannot currently tell the difference.**
@@ -55,7 +55,7 @@ degeneracy condition forbids — `M·δE/δx = 0` makes *both* parts energy-cons
 single-generator escape is granted to the Born–Oppenheimer level and to none of these
 (L2, L3). Optical is misattributed to the dissipative operator while every other page
 computes it from the reversible response (L13). These are not presentational slips; they
-are the difference between a derivation and a relabelling.
+are the difference between a derivation and a relabeling.
 
 **For at least two of those rows it is worse than undefended — it is impossible.** An
 independent line of work returned a three-line impossibility proof for the Magnetic row:
@@ -150,7 +150,7 @@ emitted contributions. They do not: six overlaps, and the page's only disjointne
 argument covers one of the 171 pairs. The sharpest is that `ω² ≥ 0` and "dynamical
 stability" are one condition in two categories, scored at two curriculum gates, where
 **only one copy carries the applicability gate** — so the gate installed to stop the
-oracle penalising legitimate transition states is bypassed by its own duplicate from
+oracle penalizing legitimate transition states is bypassed by its own duplicate from
 training fraction 0.60, and the `traps` entry marked *enforced* against that hazard names
 the anchor of the gated copy only. Two further members of the 19 do not denote what the
 rest do: `EOM/Z` is ill-typed on an immutable discrete slot (L6, and the page's own
@@ -170,7 +170,7 @@ safeguard does not cover the failure it is offered against.
 And in the smallest, earliest category — `Positivity`, one of only two live from training
 fraction 0.00 — two of six members are bare symbols the corpus binds nowhere (L18). Each
 has a reading, supported by the corpus's own usage elsewhere, under which the residual
-penalises correct physics: bare `ρ` means the *signed* charge density at five of five
+penalizes correct physics: bare `ρ` means the *signed* charge density at five of five
 sites in this corpus, and `σ ⪰ 0` reads either as the stress tensor, which is negative
 under any compression, or as the conductivity tensor, which is positive semidefinite only
 in its symmetric part.
@@ -184,7 +184,7 @@ partition names that same non-existent channel as an owner of the longitudinal e
 sector**, while seventeen lines earlier the page puts the ion–ion energy inside `E_KS`. One
 of the two is wrong, in a passage whose stated purpose is to prove nothing is
 double-counted — and the convention that would resolve it is written down once, for the
-neighbouring channel, and never generalised.
+neighboring channel, and never generalized.
 
 **One finding here is not mine and I am carrying it because it lives on my page** (L20).
 The `Normative` gauge sentence derives transversality `∇·A = 0` from the "remaining
@@ -286,7 +286,7 @@ linear response of the reversible flow) are plausibly extractions of a dynamical
 equation. `ConvexOptimization(objective = lower-convex-envelope)`,
 `PathStationaryOf(method = climbing-image-NEB)`, `ClassifyOf(classifier =
 space-group-detection)` and `ComparisonOf(metric = atom-matching)` are hull
-computations, path optimisations, classifications and comparisons. None is a readout of
+computations, path optimizations, classifications and comparisons. None is a readout of
 a trajectory or a fixed point of the two-generator equation.
 
 **What would refute this.** A page anywhere in the corpus that writes, for even one
@@ -299,7 +299,7 @@ names on `generic-dynamics` itself, the `build-verification` gate, or unrelated
 **Proposed correction.** Either (a) write the reduction, per regime, on
 `generic-dynamics` or a new page, and repoint line 127; or (b) retract the pointer and
 downgrade the claim to what the corpus can support — that each regime is *expressible*
-in the method alphabet, and that the GENERIC form is the organising narrative rather
+in the method alphabet, and that the GENERIC form is the organizing narrative rather
 than a derived one. (a) is the honest version of the current claim; (b) is honest about
 the current evidence. What is not defensible is the present state, in which the strong
 claim cites a page carrying the weak one.
@@ -383,13 +383,13 @@ the first is the physics.
 Markov generator is neither in general: it is non-symmetric (rates differ in the two
 directions unless the equilibrium distribution is uniform), and its spectrum is
 non-positive rather than non-negative, so if any sign convention makes it semidefinite it
-is `−W`, not `W`. Detailed balance makes `W` *symmetrisable* by a diagonal similarity —
+is `−W`, not `W`. Detailed balance makes `W` *symmetrizable* by a diagonal similarity —
 not symmetric.
 
 This is not confined to a table cell. `multiscale-state:262-272` builds the slow-tier
 residual on it:
 
-> This is the slow-tier specialisation of `‖dx_i/dt − (L·δE/δx_i + M·δS/δx_i)‖²`.
+> This is the slow-tier specialization of `‖dx_i/dt − (L·δE/δx_i + M·δS/δx_i)‖²`.
 > Generation and annihilation are both branches of the single dissipative
 > master-equation generator: **`M` is the rate matrix**, from the chemical and surface
 > extraction of [generic-dynamics#operators]. The slow tier has **no reversible
@@ -673,7 +673,7 @@ on a mismatch: `if ¬polynomial_sufficient(c) ∧ ¬kernel_tag_matches_range(c):
 "kernel tag ≠ mechanism_range"`. The MVP's own channel is therefore unconstructible.
 
 The result holds under the alternative reading too. In a charge-neutral crystal the
-monopole `1/q²` head is cancelled by the compensating background and what survives is the
+monopole `1/q²` head is canceled by the compensating background and what survives is the
 dipole–dipole term, which is homogeneous of degree **0** in `q` but *direction-dependent*
 at `q → 0` — the non-analytic term that produces longitudinal-optical/transverse-optical
 splitting. `MechanismRange` carries only a scalar `pole_order` and cannot express a
@@ -717,11 +717,11 @@ statements is wrong**, and the page never reconciles them:
   ion–ion sector is homeless: excluded from `E_EM` by the partition and assigned to a
   channel absent from the 15-row table.
 
-The page knows how to state the disambiguation, because it states it for the neighbouring
+The page knows how to state the disambiguation, because it states it for the neighboring
 channel: `:179-182` says the electron-phonon channel contributes "the linear-order
 cross-term … and the **beyond-reference part** of `E_coupling` — **not** the full
 electron–ion energy." **No analogous sentence exists for ion-ion.** So the convention that
-would resolve the double-count is stated once, for one channel, and not generalised.
+would resolve the double-count is stated once, for one channel, and not generalized.
 
 *This is desk-provable and independent of whether the channel is constructible*, which
 makes it the part of L7 that survives even if the schema is extended.
@@ -870,7 +870,7 @@ now closed** — see the addendum. Previously marked pending undergraduate retur
 > `Algebraic/Symmetries` — Onsager reciprocity; Maxwell relations; space-group
 > equivariance of response tensors.
 
-No equation. Onsager reciprocity in the presence of a magnetic field or a magnetisation
+No equation. Onsager reciprocity in the presence of a magnetic field or a magnetization
 is `L_ij(B) = L_ji(−B)` (Onsager 1931; Casimir 1945), **not** `L_ij = L_ji`. The corpus
 carries `A` (the electromagnetic vector potential) as a state slot, lists `Magnetic` as
 one of the nine regimes, and carries a `Zeeman` coupling channel. A residual implementing
@@ -1061,7 +1061,7 @@ the absorption mechanism.
 
 ---
 
-### L14 — The curriculum fractions are inherited from a different schedule, and the rationale given for Warmup admits a trivial minimiser
+### L14 — The curriculum fractions are inherited from a different schedule, and the rationale given for Warmup admits a trivial minimizer
 
 **Severity: medium. Confidence: high on provenance; medium on the training consequence
 (stated caveat below).**
@@ -1094,14 +1094,14 @@ Warmup admits `Conservation` + `Positivity` only. Consider the frozen trajectory
 `x(t) = x(0)` with an admissible `x(0)`: every conserved quantity is constant, so every
 `Conservation` residual is exactly zero; every `Positivity` bound holds, so every
 `Positivity` residual is exactly zero. **The Warmup objective has a trivial global
-minimiser that is maximally wrong dynamically** — "predict that nothing changes." The two
+minimizer that is maximally wrong dynamically** — "predict that nothing changes." The two
 categories chosen to run before the dynamics turns on are precisely the two that a frozen
 prediction satisfies perfectly. They are not "hard physical constraints" that shape the
 dynamics; they are constraints the absence of dynamics satisfies.
 
 **Caveat, stated because it is load-bearing.** This does not by itself predict a training
 failure, because data supervision runs concurrently: `residual-loss-design:329` gives
-Warm-up *"cheap high, residual weights moderate"*, so labelled data provides gradient
+Warm-up *"cheap high, residual weights moderate"*, so labeled data provides gradient
 during the same window. The defect is in the oracle's **stated rationale** — which
 presents these two categories as doing work they cannot do — and in the fact that the
 oracle publishes this as the normative default schedule. A reader who follows the
@@ -1124,7 +1124,7 @@ papers (see §4).**
 
 `coupling-structure:369-373`:
 
-> The curated zero-point-renormalisation amplitudes feeding the `coth` path
+> The curated zero-point-renormalization amplitudes feeding the `coth` path
 > ([accuracy-ledger#ahc-zpr]) are the **isochoric** electron-phonon values, tagged
 > `isochoric`: **GaN −189 meV and AlN −399 meV (Engel PRB 106 094316 (2022); Miglio npj
 > Comput. Mater. 6 167 (2020))**, diamond −345 meV indirect (Antonius PRL 112 215501
@@ -1143,7 +1143,7 @@ Engel reports −171 and −377, an 8–10% difference. The diamond row loses tw
 the band spread −320…−366 and Engel's −323.
 
 This is detectable inside the corpus without opening a paper, because the ledger states
-both numbers. It is the corpus's own named hazard realised on my page —
+both numbers. It is the corpus's own named hazard realized on my page —
 `traps:743-754`, *"A number quoted without its complement … when a result is a
 comparison, quote **both arms**"* — and it is the mis-citation class the brief warns the
 2026-06-10 re-audit missed.
@@ -1179,7 +1179,7 @@ most weakened this subject**. I have re-verified every overlap against the prima
 myself and re-derived the two physics implications — what is mine and what is theirs is
 marked per item. The sweep's own calibration is reported in §5.)*
 
-**The schema makes multiple categorisation unrepresentable.** `residual-definitions:216-235`:
+**The schema makes multiple categorization unrepresentable.** `residual-definitions:216-235`:
 
 ```
 ResidualKey = (producer : Producer, axes : Tuple<AxisLabel>)
@@ -1246,14 +1246,14 @@ The two copies **gate at different training fractions**, and the gate is cumulat
 gated, with the reason stated (`:121-123`):
 
 > `ω² ≥ 0` is **applicability-gated** to phases claimed dynamically stable, so it does
-> not penalise the legitimate saddle and transition configurations a trajectory must
+> not penalize the legitimate saddle and transition configurations a trajectory must
 > traverse.
 
 The `Static/Snapshot` copy at `:183` carries **no gate**. So from fraction 0.60 the
-ungated duplicate penalises exactly the configurations the gate was installed to protect.
+ungated duplicate penalizes exactly the configurations the gate was installed to protect.
 **The gate installed to prevent a spurious penalty is bypassed by the duplicate.**
 
-**And the penalised object is one the corpus computes by name, so this is concrete rather
+**And the penalized object is one the corpus computes by name, so this is concrete rather
 than hypothetical.** `typed-compositions:230-241`:
 
 ```
@@ -1282,7 +1282,7 @@ GENERIC — 3 categories", which covers categories 8–10. The duplicate at `:18
 under `constraint-categories` (`:177`). **The enforced pointer resolves correctly, names
 a site that does carry the rule, and still fails — because the hazard has a second
 instance outside the anchor it names.** This is a new shape of the register's
-"enforced-as-prose" class: not an unmechanised marker, but a correctly-aimed one with an
+"enforced-as-prose" class: not an unmechanized marker, but a correctly-aimed one with an
 uncovered second copy. It is why my §6 seam sweep passed this entry: I checked that the
 pointer's target carries the rule, which it does.
 
@@ -1506,7 +1506,7 @@ the **charge density**. That is the corpus's own answer to what bare `ρ` means.
 charge density is **signed**: `multiscale-state:403` defines it as `ρ = q(p − n + N_D⁺ −
 N_A⁻)`, which is negative throughout the p-side of every junction and throughout every
 inversion layer. Under the reading the corpus's own usage supplies, **`ρ ≥ 0` is a
-`Positivity` residual that penalises correct physics over half of every device the corpus
+`Positivity` residual that penalizes correct physics over half of every device the corpus
 targets.**
 
 The charitable reading — `ρ` as the electron number density — does not survive contact
@@ -1525,7 +1525,7 @@ unclaimed non-negative density left for `ρ` to be.
   `reference-battery:115`.
 - **Conductivity.** Then `σ ⪰ 0` is *incomplete rather than false*, and incomplete in the
   way L11 already identified. What the second law gives is `E·σ·E ≥ 0`, a condition on the
-  **symmetric part**. With a magnetic field or a magnetisation the conductivity tensor
+  **symmetric part**. With a magnetic field or a magnetization the conductivity tensor
   acquires an antisymmetric Hall part, its eigenvalues are complex, and a literal
   `λ_min(σ) ≥ 0` check is not a well-defined test. Same root cause as L11: the corpus
   never carries the field-reversal structure of transport symmetry.
@@ -1541,9 +1541,9 @@ unbound symbols.
 It also interacts with L14, and I state the interaction because it cuts both ways. L14
 shows Warmup's two categories are exactly zeroed by a frozen trajectory. That argument
 presumes the `Positivity` bounds hold on an admissible state. Under the charge-density
-reading they do not — so Warmup is no longer trivially minimised, but only because the
+reading they do not — so Warmup is no longer trivially minimized, but only because the
 residual is nonzero on correct states. **Both branches are bad, and they are the only two:
-either Warmup's objective has a trivial global minimiser (L14), or it is minimised by
+either Warmup's objective has a trivial global minimizer (L14), or it is minimized by
 driving the charge density non-negative everywhere, which destroys the depletion region.**
 
 **Controls run, because this finding rests on absences.**
@@ -1659,7 +1659,7 @@ Either way `:132-137` does not do the work it says it does. **This is the load-b
 sentence for L4**: it is what the corpus offers in place of a construction, and it is
 offered specifically to reconcile the degeneracy conditions with the "degeneracy verified"
 build artifact. L4 shows no construction covers the generated cross-terms; L19 shows the
-scoping argument that would have localised the claim does not cover them either, on the
+scoping argument that would have localized the claim does not cover them either, on the
 reading the page itself uses.
 
 **Scope limit, stated so the finding is not read wider than it is.** Not every coupling is
@@ -1933,7 +1933,7 @@ kinetics, not the Markovian assumption built into the GENERIC friction operator 
 which the `LongRangeDynamical` / `MomentumFrequency` `KernelExt` route can violate. The
 general case remains open.
 
-**Judgement on resumption: not load-bearing enough to spend an undergraduate on, and I am
+**Judgment on resumption: not load-bearing enough to spend an undergraduate on, and I am
 stating the reason rather than leaving it as an open pending.** Three things decide it.
 (i) The corpus declares the one case where it bites — deep-defect kinetics — so this is a
 *scope* question, not an undeclared gap of the kind the brief targets. (ii) A memory
@@ -1962,15 +1962,15 @@ four that failed (L2, L3, L13). The five that survive, with the comparison made:
 - **Transport** (`:123`) — *"BTE on emergent carrier distribution: `L` (streaming) + `M`
   (collisions)."* Correct — this is the textbook GENERIC decomposition of the Boltzmann
   equation. *Caveat, not raised as a finding:* the collision operator is
-  symmetric-positive-semidefinite in the **linearised** case under the
+  symmetric-positive-semidefinite in the **linearized** case under the
   equilibrium-weighted inner product (by detailed balance / the H-theorem); the row does
-  not say "linearised". The nonlinear collision integral is also GENERIC-expressible, so
+  not say "linearized". The nonlinear collision integral is also GENERIC-expressible, so
   the row is defensible either way, and I did not raise it.
 - **Thermodynamic** (`:124`) — *"min `F` at fixed `(T, V, N)`; convex hull of `{F_φ}`."*
   Correct.
 - **Chemical/surface, second clause** (`:125`) — *"minimum-energy-path search on
   `E_BO`"*: the endpoints and the saddle **are** critical points of `E`, so those are
-  genuine extractions. The *path search* itself is an optimisation over a space of paths
+  genuine extractions. The *path search* itself is an optimization over a space of paths
   and is not a readout of the equation — but the row does not claim it is a dynamics, so
   I left this inside L3 rather than raising it separately.
 
@@ -1998,11 +1998,11 @@ declares aggregation the operator's business (`residual-definitions:270-274`).
 `characteristic-scale` (`residual-machinery:78`) is declared an **error-budget** input,
 explicitly not a weight (`residual-definitions:344-346`), and
 `residual-machinery:144` distinguishes it from the per-datum quantity. I found no page
-that non-dimensionalises residuals before summation. Whether that hole is real belongs to
+that non-dimensionalizes residuals before summation. Whether that hole is real belongs to
 whoever owns the loss and the seam, not to the laws — flagged, not chased.
 
 **Status on resumption: still nobody's.** I re-checked the six other findings files for
-it and it appears in none — `state.md:548` is the nearest neighbour and is a different
+it and it appears in none — `state.md:548` is the nearest neighbor and is a different
 defect (`‖Δx‖` undefined on a heterogeneous state, not residual summation across
 dimensions). So this referral was made and never landed. Recording it here so it is not
 lost a second time: **the referral is open, and it is a candidate for the loss subject
@@ -2037,7 +2037,7 @@ on its own; noted so the sweep is visible.
 All three arose from the same blockage in the first session: the **source-verification arm
 was not running**. The undergraduate assigned to it could not be launched (the session
 subagent pool refused five dispatch attempts), the web-search budget was exhausted
-(200/200), and direct fetches of the two publisher/catalogue routes I tried returned HTTP
+(200/200), and direct fetches of the two publisher/catalog routes I tried returned HTTP
 403 and an empty record respectively.
 
 **Status on resumption: that arm is now running.** The undergraduate launched successfully
@@ -2116,7 +2116,7 @@ rather than merely fires.
 
 | # | class | planted | caught by | check previously exercised on |
 |---|---|---|---|---|
-| P1 | false (sign/physics) | the two degeneracy glosses swapped — `L·δS/δx = 0` labelled "conserves energy", `M·δE/δx = 0` labelled "conserves entropy" | derivation: `dS/dt\|_L = ⟨δS, LδE⟩ = −⟨LδS, δE⟩ = 0` iff `LδS = 0`, so that condition is the **entropy** one; and PSD of `M` gives `dS/dt\|_M = ⟨δS, MδS⟩ ≥ 0`, so `M` cannot "conserve entropy" — a second-law contradiction | L2, L4 (same derivation) |
+| P1 | false (sign/physics) | the two degeneracy glosses swapped — `L·δS/δx = 0` labeled "conserves energy", `M·δE/δx = 0` labeled "conserves entropy" | derivation: `dS/dt\|_L = ⟨δS, LδE⟩ = −⟨LδS, δE⟩ = 0` iff `LδS = 0`, so that condition is the **entropy** one; and PSD of `M` gives `dS/dt\|_M = ⟨δS, MδS⟩ ≥ 0`, so `M` cannot "conserve entropy" — a second-law contradiction | L2, L4 (same derivation) |
 | P2 | false (formula) | f-sum prefactor `(2/π)` → `(π/2)`, an error of `(π/2)² ≈ 2.47×` | prefactor re-derivation against `∫₀^∞ ω ε₂ dω = (π/2)ω_p²` | ran on the **unaltered** text and returned "correct" — see below |
 | P3 | contradiction | `Positivity` lists `L ⪰ 0` instead of `M ⪰ 0` | symbol cross-consistency: `L` is declared antisymmetric (`generic-dynamics:44`); a real antisymmetric operator has `xᵀLx = 0` for all real `x`, so `L ⪰ 0` holds only for `L = 0` | L4, L7 |
 | P4 | missing information | the `ω² ≥ 0` applicability gate deleted | enforced-pointer check: `traps:394-398` names `residual-definitions#structural-categories` as its **enforcement site**; with the bullet gone the pointer is a dangling promise | L1 (same check, on `typed-compositions`) |
@@ -2276,7 +2276,7 @@ directional expressions; **12 correct, 3 defective**.
 | `∂γ̂/∂t = −(i/ℏ)[Ĥ_KS, γ̂]` | `gd:142` | **correct** von Neumann sign — verified against `iℏ ∂ρ/∂t = [H, ρ]` |
 | `L_γ̂·δS_el/δγ̂ = [δS_el/δγ̂, γ̂] = 0` | `gd:145` | **correct** as a vanishing statement (prefactor issue is L10, sign is not at stake) |
 | `T_e ≥ T_L` | `rd:124` | **correct** direction — carriers are heated by the field |
-| `max(0, ∫α dx − 1)²` | `rd:126` | **correct** — penalises the excess past the breakdown condition, zero below it |
+| `max(0, ∫α dx − 1)²` | `rd:126` | **correct** — penalizes the excess past the breakdown condition, zero below it |
 | `max(0, ΔG_form − ΔG_hull − δ_meta)²` | `rd:189-192` | **correct** — `ΔG_form − ΔG_hull ≥ 0` by construction of a lower envelope, so the band gives exactly zero inside it; diamond at +25 against `δ_meta = 50` reads 0, agreeing with `cert-obligations:141` |
 | `S × (S × H_eff)` — **no sign given** | `gd:121` | **DEFECT** (L2). `S×(S×H) = S(S·H) − H\|S\|²`, so relaxation *toward* `H_eff` requires the leading minus; the reader has a 50/50 choice and the wrong one relaxes away from the field |
 | Onsager reciprocity — **no equation at all** | `rd:152` | **DEFECT** (L11). Without `L_ij(B) = L_ji(−B)` the naive symmetric form scores correct physics as a violation whenever `B ≠ 0` |
@@ -2357,7 +2357,7 @@ place; category 16's *"no environment field"* against `applicability-classifiers
 which declares the `ω² ≥ 0` gate **environment-swept**, and against
 `generic-dynamics:118`, which makes `C_ij` an isothermal quantity. And the schema check:
 `ContributionFacets.category` is scalar-typed on a map keyed by `ResidualKey` with facets
-excluded from identity (`:216-235`), so multiple categorisation is unrepresentable and one
+excluded from identity (`:216-235`), so multiple categorization is unrepresentable and one
 of two bad branches is forced at every overlap.
 
 **Class 2 and 3 — the scoping sentence, checked rather than assumed (L19).** My first pass
@@ -2436,7 +2436,7 @@ lesson is the most useful thing in this report.**
 cannot discharge an `enforced` marker, because the marker is a claim about the corpus, not
 about one anchor; and verifying that a section exists cannot discharge its content.
 
-**This is the brief's own diagnosis, realised in my method rather than in the corpus.**
+**This is the brief's own diagnosis, realized in my method rather than in the corpus.**
 The brief opens by saying every existing check in this repository validates *links* and
 none asks whether a claim is true. My traps-seam sweep was a link check. I built the
 corpus's characteristic defect into my own instrument and then reported the result as an
@@ -2487,7 +2487,7 @@ Reported, not written — `log/timeline.md` has a single writer.
 
 1. **The corpus's central claim has no derivation, and its only mechanical gate tests a
    weaker proposition** (L1). This is the most consequential item in my subject and it is
-   a new realisation of the dangling-promise class on the highest-stakes pointer in the
+   a new realization of the dangling-promise class on the highest-stakes pointer in the
    corpus.
 2. **"Enforced by construction" was verified and fails** (L4): typed targets give
    antisymmetry and PSD, which do not imply either degeneracy condition; and the sole
@@ -2575,11 +2575,11 @@ rather than merely a defect:
   partition the state differently, so a condition scoped this way has a different extent
   under each reading — and the corpus's most important structural guarantee sits on it.
   The corpus already has an owned-term rule that no token may name two things; **this is
-  the same failure at the level of a phrase**, and the slash is what hides it. Generalises
+  the same failure at the level of a phrase**, and the slash is what hides it. Generalizes
   beyond this instance: any `A / B` written as a gloss should be checked for whether `A`
   and `B` are actually coextensive.
 - *The overloaded-token register has no symbol entries at all* (L18). Its ten rows are
   words. `σ` carries seven senses in this corpus and `ρ` five — collisions larger than
   several the register does list — and symbol collisions are outside its reach by
-  construction, not by judgement. Either the register admits symbols or the corpus needs a
+  construction, not by judgment. Either the register admits symbols or the corpus needs a
   second mechanism for them.

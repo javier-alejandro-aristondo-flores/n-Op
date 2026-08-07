@@ -4,7 +4,7 @@ Read this before running any audit against this corpus. Every rule below was pai
 specific error in the 2026-07-31 cohesion audit, and each names the error so you can judge
 whether it applies to what you are doing.
 
-The single sentence: **the evidence layer held; the layer that summarised it did not.**
+The single sentence: **the evidence layer held; the layer that summarized it did not.**
 Findings resting on primary text and arithmetic were substantially correct. Every error —
 without exception — was introduced by a relay, a summary, or an uncalibrated instrument.
 
@@ -33,7 +33,7 @@ numbers were then read against the real corpus, returning the wrong text — and
 defect (`cert-obligations.md` writing "Adiabatic-Hedin-Coulomb" where
 `coupling-structure.md` correctly writes "Allen–Heine–Cardona") was dismissed as a plant.
 
-Normalise away only what legitimately differs between a quotation and its source: markdown
+Normalize away only what legitimately differs between a quotation and its source: markdown
 emphasis, line wrapping, non-breaking spaces, the several dash codepoints, trailing
 punctuation the quoter added. **Collapse newlines on both sides** — the corpus wraps where a
 quotation does not.
@@ -75,11 +75,11 @@ up is precisely the failure calibration exists to prevent. Publish every dispute
 **with the rule that produced it** — "24 rows with no author and no year" has been 23, 24,
 28 and 29 depending on who counted, and none of those was dishonest.
 
-## 6 · Isolation is architectural, not behavioural
+## 6 · Isolation is architectural, not behavioral
 
 A calibration arm **cannot live anywhere in the scorer's tree, at any depth.**
 
-Contamination travelled two different directions in one run. A sub-subagent two levels down
+Contamination traveled two different directions in one run. A sub-subagent two levels down
 routed its full contents past its own parent to the fleet root. Separately — and this was
 self-disclosed, not detected — a sweeper *peer-to-peer* commissioned plants from a
 calibration arm it did not serve, then burned the blind control by diffing its scratchpad
@@ -90,7 +90,7 @@ Discipline at any single level cannot fix a transitive leak. **The fix is channe
 separation:** a calibration result reports a score and a method verdict, *never* a defect
 list; any agent reporting a defect must name the file it verified against.
 
-Additional requirements if you run a blind arm: mtime-normalise the corpus (a single
+Additional requirements if you run a blind arm: mtime-normalize the corpus (a single
 `ls -la` hands over the answer set); diff the control set against the plant set before
 dispatch (one plant deleted the value a control depended on); seal the sweeper's prompt
 before the answer key exists and keep the timestamps.

@@ -1,0 +1,8 @@
+  small strain -> large strain           w= 0.0  gap    85.0 meV  (B1gap   73.3)   DOS  3.95%
+  small strain -> large strain           w= 1.0  gap     8.4 meV  (B1gap   73.3)   DOS  3.11%
+  small strain -> large strain           w= 5.0  gap     8.1 meV  (B1gap   73.3)   DOS  4.65%
+  axis+skew families -> general stretch  w= 0.0  gap    89.8 meV  (B1gap   83.7)   DOS  4.76%
+  axis+skew families -> general stretch  w= 1.0  gap    25.9 meV  (B1gap   83.7)   DOS  1.95%
+  axis+skew families -> general stretch  w= 5.0  gap    20.7 meV  (B1gap   83.7)   DOS  2.25%
+
+wrote gap_term_variant.csv

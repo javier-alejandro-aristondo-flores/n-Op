@@ -4,10 +4,10 @@ Units 4, 5 and 6: symbolic lift, symmetry quotient, invariant synthesis, algebra
 simplification, lowering and codegen. Read at `HEAD = 476aad7`.
 
 **Quotation convention.** Every blockquote is copied out of the live file and then
-whitespace-normalised — hard line wraps joined with a single space — and markdown
+whitespace-normalized — hard line wraps joined with a single space — and markdown
 emphasis markers (`**`, `*`) stripped. Nothing else is altered: backticks, em-dashes,
 en-dashes, `×`, `≤`, `⟺`, `¬`, `∧`, `χ`, `ρ`, `Σ` and every other Unicode character are
-as they appear on disk. This is the same normalisation the brief's own example
+as they appear on disk. This is the same normalization the brief's own example
 blockquote uses.
 
 **Counts.** ABSENT 14 · UNDERSPECIFIED 6 · DETERMINED ≈22 (listed in Coverage, not
@@ -53,7 +53,7 @@ the input to the stage, not a refinement of it.
 field-vocabulary table), none establishing a column. Control that fires: the same page's
 field list does carry `differentiability`, and `grep -o "D1\|D2\|D3" data/registry-manifest.csv`
 finds that column populated per row — so the manifest does carry the coded per-row fields
-it declares, and the absence of this one is not a search artefact.
+it declares, and the absence of this one is not a search artifact.
 
 ---
 
@@ -101,7 +101,7 @@ order, and the page makes the order part of a version:
 initial order, an ordering heuristic, or a canonical sort key over atoms. Because a
 predicate's `Address` is the hash of its canonical root, two implementations that pick
 different orders produce different addresses for the *same* predicate, and the
-re-canonicalisation machinery above has no fixed point to canonicalise toward.
+re-canonicalization machinery above has no fixed point to canonicalize toward.
 
 **Control.** Searched `grep -rni "variable order\|variable ordering" journals/` → 0 hits;
 `grep -rn "atom order" journals/` → 3 hits, all about versioning the order, none stating
@@ -178,7 +178,7 @@ the absence of any mesh-valued input at all.
 
 ---
 
-### C6 — operator block-diagonalisation has no irrep interface, no basis convention, and no commutation test, in `compose-time-pipeline.md`
+### C6 — operator block-diagonalization has no irrep interface, no basis convention, and no commutation test, in `compose-time-pipeline.md`
 
 **Verdict:** UNDERSPECIFIED
 
@@ -297,11 +297,11 @@ addressed and cached:
 
 **What is missing.** The step from a projector to a basis. `P` is a linear idempotent;
 its image is a subspace, and extracting a *list* of basis vectors requires a stated
-choice — orthogonalisation scheme, pivot order, normalisation, and the ordering of the
+choice — orthogonalization scheme, pivot order, normalization, and the ordering of the
 returned list. Nothing states one. Since `Address` equality is exact over canonical bytes
 by construction, two implementations that pick different (individually correct) bases
 produce different `generator-hash` and `output_hash` values for identical physics, and the
-cache-collapse claim rests on a canonicalisation the corpus never fixes. Missing with it:
+cache-collapse claim rests on a canonicalization the corpus never fixes. Missing with it:
 the map from a numeric projector to `symbolic-form : SymbolicTensor` — the generator's
 declared output is a symbolic tensor DAG, and no rule converts projector columns into one
 — and `IrrepCoefficientTable`, the type of `InvariantTerm.irrep-coefficients`, which is
@@ -313,8 +313,8 @@ whether they are applied before or after the Reynolds average.
 **Control.** Searched `grep -rn "IrrepCoefficientTable" journals/` → 1 hit, the field
 declaration itself. Searched `grep -rni "orthogonalis\|orthogonaliz\|Gram-Schmidt\|row echelon\|canonical basis" journals/` → 0 hits. Control that fires:
 `grep -rn "canonical serialization rule\|canonicalized" journals/` → the substrate spells
-out an eleven-clause canonicalisation for bytes, so the corpus does specify
-canonicalisation where it has decided one; for the invariant basis it has not.
+out an eleven-clause canonicalization for bytes, so the corpus does specify
+canonicalization where it has decided one; for the invariant basis it has not.
 
 ---
 
@@ -332,7 +332,7 @@ cross-formula subexpression elimination, tearing and alias elimination — and t
 are congruence closure rather than rules at all; no e-matching pattern, left-hand side or
 right-hand side is written anywhere. (ii) The termination rule: no iteration cap, node
 cap, or saturation criterion. (iii) **Extraction** — the procedure that picks one term out
-of the saturated e-graph, and the cost function it minimises. Extraction is what decides
+of the saturated e-graph, and the cost function it minimizes. Extraction is what decides
 which program is emitted, and it is not mentioned anywhere in the corpus. The declared
 open question `algebraic-simplification-performance` is a *budget* statement — "no bound
 on saturation time or e-graph size is committed anywhere" — and the page's own line, "This
@@ -408,7 +408,7 @@ the bullet above (`compose-time-pipeline` and the pass list in `physics-graph`),
 algorithmic. Searched `grep -rn "sparsity-pattern\|sparsity pattern" journals/` → 4 hits,
 all naming it as a plan payload or as this stage's output. Control that fires:
 `grep -rn "Roaring" journals/` → the corpus does specify a concrete wire format for its
-other sparse structure, down to "serialised Roaring bitmap" and a lexicographic flat index.
+other sparse structure, down to "serialized Roaring bitmap" and a lexicographic flat index.
 
 ---
 
@@ -549,7 +549,7 @@ gated targets where it has decided them.
 **What is missing.** The heuristic. The paragraph establishes that one is needed and names
 neither it nor its family. "Bounded" is not given a bound: no memory budget, no slot
 count, no cost model that the store-versus-recompute choice is scored against — and
-`revolve` is parameterised precisely by a checkpoint count that nothing here supplies.
+`revolve` is parameterized precisely by a checkpoint count that nothing here supplies.
 "With its choice recorded" has no record format. The object being scheduled is also
 undeclared: the sidecar is `LoweringSidecar.materialization : Map<TapeNodeId, Store |
 Recompute>` and neither the tape nor `TapeNodeId` is defined anywhere — the physics graph

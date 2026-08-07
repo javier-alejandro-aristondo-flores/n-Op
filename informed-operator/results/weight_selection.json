@@ -1,0 +1,9 @@
+{
+ "cv_fold_0": 0.5,
+ "cv_fold_1": 0.5,
+ "cv_fold_2": 0.5,
+ "cv_fold_3": 0.5,
+ "cv_fold_4": 0.5,
+ "small strain -> large strain": 2.0,
+ "axis+skew families -> general stretch": 2.0
+}

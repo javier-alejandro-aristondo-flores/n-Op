@@ -47,7 +47,7 @@ open-questions:
     summary: "No numeric per-observable mesh-uncertainty floor is declared anywhere in the corpus. Transport observables computed from a Boltzmann solve need roughly 50-cubed-equivalent sampling of the Brillouin zone, and the MVP's 8×8×8 mesh is factor-two-grade for transport even with exact inputs. Row 2 of the regime table needs that floor as a number before any transport regime below factor two can be claimed."
   - id: alloy-polarization-bowing-unseeded
     anchor: polarization-bowing
-    summary: "The aluminium-gallium-nitride polarization bowing coefficient and the piezoelectric-tensor bowings are UNSEEDED. Until they are seeded, mid-composition interface-polarization claims carry a widened uncertainty, and the sign guard between the ledger's minus-b form and the reference file's plus-b form is live. Seeding is gated on a paywalled pin-read of the two primary sources."
+    summary: "The aluminum-gallium-nitride polarization bowing coefficient and the piezoelectric-tensor bowings are UNSEEDED. Until they are seeded, mid-composition interface-polarization claims carry a widened uncertainty, and the sign guard between the ledger's minus-b form and the reference file's plus-b form is live. Seeding is gated on a paywalled pin-read of the two primary sources."
   - id: diamond-static-permittivity-unseeded
     anchor: seed-provenance
     summary: "The diamond static permittivity, 5.7 ± 0.05, is UNSEEDED: no primary measurement was found, and every trail ends in an unreferenced compilation. It is load-bearing — it is the permittivity in the image-force-lowering formula of regime row 31. Two closes are available: name a measurement, or derive it from the long-wavelength refractive index and cite that. The row does not state a frequency window, and the derivation only works at the right one — the infrared index gives 5.66, the visible index gives 5.84."
@@ -65,7 +65,7 @@ open-questions:
     summary: "The diamond cohesive energy, 7.37 eV/atom, matches the standard tabulated figure for graphite (7.374) to three decimals and diamond (7.346) only to within 24 meV. Both sit inside the stated ±0.05 eV/atom, so the value is defensible either way — but the provenance may be another allotrope's number, and 24–28 meV/atom is the same size as the diamond-graphite formation-energy row it has to be consistent with, and half this row's own uncertainty."
   - id: aln-high-temperature-conductivity-absence
     anchor: seed-provenance
-    summary: "The aluminium-nitride 1100 K thermal-conductivity row states that no single-crystal measurement above 500 K exists, and the 300 K row of the same file cites Slack et al., J. Phys. Chem. Solids 48, 641 (1987) — a paper whose measurements are reported to extend far above 500 K. Either the absence claim is too strong or the citation is being read wrongly. This matters in the opposite direction from a wrong value: an unnecessary refusal costs coverage silently, and nothing will ever fire on it."
+    summary: "The aluminum-nitride 1100 K thermal-conductivity row states that no single-crystal measurement above 500 K exists, and the 300 K row of the same file cites Slack et al., J. Phys. Chem. Solids 48, 641 (1987) — a paper whose measurements are reported to extend far above 500 K. Either the absence claim is too strong or the citation is being read wrongly. This matters in the opposite direction from a wrong value: an unnecessary refusal costs coverage silently, and nothing will ever fire on it."
   - id: figures-of-merit-count
     anchor: observable-counts
     summary: "The count of figures of merit is asserted as 16 in three places, and the corpus's only enumeration of them has 15 rows. Either one is missing from the enumeration or the count is wrong."
@@ -113,7 +113,7 @@ question `figures-of-merit-count`.
 | # | Observable | Accuracy regime | Cheap vs faithful |
 |---|---|---|---|
 | 1 | bandgap_direct | ±0.1 eV, ±0.05 near alloy band crossings | hybrid density functional or quasi-particle correction required; the one-shot gap dressing is registry row 120, `ΔE_g=ZPR·coth(Θ/2T)`; the `slope-kind` tag guards against double-counting the strain path ([cert-obligations#composition-refusals]) |
-| 2 | band_structure E_n(k) | RMS 50 meV within 2 eV of the edges | three-nearest-neighbour tight binding or Wannier-Fourier interpolation, cheap; a **Wannierization quality gate** on held-out k-points, which can fail quietly on entangled conduction bands. **Mesh convergence, quantified:** mobility, electronic conductivity and impact ionization from a Boltzmann solve need about **50³-equivalent k-sampling**, and the MVP's **8×8×8, 29-point irreducible mesh is factor-2-grade for transport** even with exact inputs. Irreducible-zone reduction helps *cost*, not convergence; interpolation is the only path off factor two. **No numeric per-observable mesh-uncertainty floor is declared** — `mesh-uncertainty-floor-undeclared` |
+| 2 | band_structure E_n(k) | RMS 50 meV within 2 eV of the edges | three-nearest-neighbor tight binding or Wannier-Fourier interpolation, cheap; a **Wannierization quality gate** on held-out k-points, which can fail quietly on entangled conduction bands. **Mesh convergence, quantified:** mobility, electronic conductivity and impact ionization from a Boltzmann solve need about **50³-equivalent k-sampling**, and the MVP's **8×8×8, 29-point irreducible mesh is factor-2-grade for transport** even with exact inputs. Irreducible-zone reduction helps *cost*, not convergence; interpolation is the only path off factor two. **No numeric per-observable mesh-uncertainty floor is declared** — `mesh-uncertainty-floor-undeclared` |
 | 3 | effective_mass_tensor | ±10%, transport-relevant | parabolic or k·p; non-parabolicity grows with temperature |
 | 4 | density_of_states g(E) | ±5% within ±k_BT of E_F | tetrahedron or Gaussian at 50 meV |
 | 5 | fermi_level E_F(T,n_d) | ±5 meV | charge-neutrality bisection |
@@ -124,13 +124,13 @@ question `figures-of-merit-count`.
 | 10 | phonon_DOS F(ω) | ±5% | derived from #9 |
 | 11 | mode_gruneisen γ_λ(q) | ±15% | a single averaged γ is acceptable as the cheap path |
 | 12 | phonon_lifetimes τ_λ(q,T) | ±20%, giving conductivity ±10% | the four-phonon correction is needed above `≈0.4 Θ_D` and is registry row 121. For diamond that threshold is about 880 K on the seeded Debye temperature — a number that is itself UNSEEDED and method-contested, so the threshold moves with it |
-| 13 | thermal_conductivity κ(T) | ±20% at 300 K for diamond, anchored; ±25% at 773 K; ±35% falling to ±15% at 1100 K with the four-phonon correction | relaxation-time three-phonon **underestimates** diamond by 30–50% near 300 K, so the anchor is the iterative solution near 2200, **not** the relaxation-time value near 1800. In the other direction, three-phonon **overpredicts** the nitrides at high temperature — measured gallium nitride falls as `T^−1.2` to `T^−1.5` — so both branches are carried, three-phonon as the upper and measured as the lower. **Aluminium nitride above 500 K is theory-only.** Diamond above 300 K and β-Ga₂O₃ at high temperature are interpolations at ±40%; see the thermal-conductivity battery below |
-| 14 | thermal_expansion α_αβ(T) | ±10% for diamond; **III-nitride uncertainty widened, no design-grade path** | quasi-harmonic validity is per-material and does not follow a Debye-scaled rule ([traps]): diamond holds to about 800 °C, gallium nitride and aluminium nitride both fail by 500 °C. The III-nitride high-temperature hole is [out-of-scope#exclusions]; V2 is a first-order self-consistent-phonon dressing. It propagates into the gap through the strain path, into the shear modulus, and into the temperature-pressure hull |
+| 13 | thermal_conductivity κ(T) | ±20% at 300 K for diamond, anchored; ±25% at 773 K; ±35% falling to ±15% at 1100 K with the four-phonon correction | relaxation-time three-phonon **underestimates** diamond by 30–50% near 300 K, so the anchor is the iterative solution near 2200, **not** the relaxation-time value near 1800. In the other direction, three-phonon **overpredicts** the nitrides at high temperature — measured gallium nitride falls as `T^−1.2` to `T^−1.5` — so both branches are carried, three-phonon as the upper and measured as the lower. **Aluminum nitride above 500 K is theory-only.** Diamond above 300 K and β-Ga₂O₃ at high temperature are interpolations at ±40%; see the thermal-conductivity battery below |
+| 14 | thermal_expansion α_αβ(T) | ±10% for diamond; **III-nitride uncertainty widened, no design-grade path** | quasi-harmonic validity is per-material and does not follow a Debye-scaled rule ([traps]): diamond holds to about 800 °C, gallium nitride and aluminum nitride both fail by 500 °C. The III-nitride high-temperature hole is [out-of-scope#exclusions]; V2 is a first-order self-consistent-phonon dressing. It propagates into the gap through the strain path, into the shear modulus, and into the temperature-pressure hull |
 | 15 | e-ph self-energy Σ_ep | ±0.05 eV non-polar, ±0.1 eV polar, on the temperature shift | registry row 120. Per-material **isochoric** zero-point renormalization is the `coth` amplitude and lattice expansion is the strain row's job. Omitting the diamond renormalization mis-states the intrinsic carrier density by a factor 11 at 800 K — see the curated zero-point renormalizations below |
-| 16 | carrier_mobility_electron μ_n | ±20% at 300 K, ±30% at 800 K | relaxation-time Boltzmann. **Alloy-disorder scattering (registry row 127) is dominant for the aluminium-gallium-nitride channel** — without it the alloy mobility is systematically optimistic. Aluminium nitride intrinsic 871 perpendicular / 619 parallel, best measured 426; the widely quoted "≈300" is doped or defective material, not intrinsic |
+| 16 | carrier_mobility_electron μ_n | ±20% at 300 K, ±30% at 800 K | relaxation-time Boltzmann. **Alloy-disorder scattering (registry row 127) is dominant for the aluminum-gallium-nitride channel** — without it the alloy mobility is systematically optimistic. Aluminum nitride intrinsic 871 perpendicular / 619 parallel, best measured 426; the widely quoted "≈300" is doped or defective material, not intrinsic |
 | 17 | carrier_mobility_hole μ_p | ±20%, critical for p-type diamond | as #16 |
 | 18 | saturation_velocity v_sat | ±15% | Shockley or Caughey-Thomas |
-| 19 | impact_ionization α_ii | **factor 2 or worse**, per material: diamond ×2.5 and contested, **gallium nitride ≥×3** with published prefactors spanning more than four orders, 4H silicon carbide ×1.3, β-Ga₂O₃ ×3, **aluminium nitride measured is UNSEEDED and cert-refused** with only an electron-only Monte-Carlo value | the Chynoweth form `α=a·exp(−b/E)` is registry row 74, with the curated triples in the high-field coefficient table below. It misses the hot-electron tail; the tail correction ships as identity until external anchors exist (#49) |
+| 19 | impact_ionization α_ii | **factor 2 or worse**, per material: diamond ×2.5 and contested, **gallium nitride ≥×3** with published prefactors spanning more than four orders, 4H silicon carbide ×1.3, β-Ga₂O₃ ×3, **aluminum nitride measured is UNSEEDED and cert-refused** with only an electron-only Monte-Carlo value | the Chynoweth form `α=a·exp(−b/E)` is registry row 74, with the curated triples in the high-field coefficient table below. It misses the hot-electron tail; the tail correction ships as identity until external anchors exist (#49) |
 | 20 | breakdown_field E_b | **per material: diamond ±20%, gallium nitride ±15%**, at or below 500 °C. The chain: a factor-2 uncertainty in the Chynoweth prefactor propagates to 10–20% in `E_b`, amplified by field non-uniformity, and `E_b` enters the Baliga figure **cubed**, so the figure carries about ±60% for diamond. **Above 500 °C is cert-refused frontier** | **`E_b` rises with temperature** — the coefficient is positive, +5×10⁻⁴/K for diamond and +7×10⁻⁴/K for 4H silicon carbide (registry row 123). Ultra-wide-gap breakdown *hardens* with temperature; the falling quantity it is easily confused with is mobility. The distribution-tail anchor data are absent, so above 500 °C is **not** a met target |
 | 21 | hall_factor r_H | ±10% | a constant near 1.18 is acceptable |
 | 22 | seebeck S | ±15% | Mott formula |
@@ -146,7 +146,7 @@ question `figures-of-merit-count`.
 | 32 | contact_resistivity ρ_c | ±50%; the measured spread is orders | dominated by φ_B |
 | 33 | interface_trap_density D_it | factor 2 | dangling bonds plus strain |
 | 34 | tunneling_transmission T_WKB | ±20% in the logarithm | Fowler-Nordheim closed form |
-| 35 | spontaneous and piezoelectric polarization | ±5% on the interface difference, **aluminium-gallium-nitride on gallium nitride only**; ±10–20% on the absolute spontaneous polarization | the Born-charge composition path, registry rows 113–114. The ±5% holds by an **accidental cancellation** between the spurious reference term and the proper-versus-improper `e₃₁` error, which are large, opposite in sign and nearly cancelling — **not** by generic reference cancellation. It requires a zincblende-reference spontaneous polarization paired with a **proper** `e₃₁` and no reference correction ([cert-obligations#composition-refusals]), and **fails for high-indium alloys**, which are cert-refused. Off-axis holography refutes the reference-frame bowing curvature for indium-gallium-nitride and validates the local frame, which narrows where the cancellation may be relied on; the aluminium-gallium-nitride anchor is untouched |
+| 35 | spontaneous and piezoelectric polarization | ±5% on the interface difference, **aluminum-gallium-nitride on gallium nitride only**; ±10–20% on the absolute spontaneous polarization | the Born-charge composition path, registry rows 113–114. The ±5% holds by an **accidental cancellation** between the spurious reference term and the proper-versus-improper `e₃₁` error, which are large, opposite in sign and nearly canceling — **not** by generic reference cancellation. It requires a zincblende-reference spontaneous polarization paired with a **proper** `e₃₁` and no reference correction ([cert-obligations#composition-refusals]), and **fails for high-indium alloys**, which are cert-refused. Off-axis holography refutes the reference-frame bowing curvature for indium-gallium-nitride and validates the local frame, which narrows where the cancellation may be relied on; the aluminum-gallium-nitride anchor is untouched |
 | 36 | elastic_tensor C_ijkl | ±5% | stress-strain or perturbation theory |
 | 37 | bulk and shear modulus | ±5% | Voigt average |
 | 38 | sound_velocity v_s | ±5% | Christoffel |
@@ -169,7 +169,7 @@ question `figures-of-merit-count`.
 | 55 | time-dependent dielectric breakdown (row 130) | order of magnitude | thermochemical field model per film; a lifetime figure of merit, not a precision target |
 | 56 | crystallized fraction (row 131) | factor ~3 on the rate | history-dependent for a deposited film; the onset window, about 700 °C for alumina, is the load-bearing output |
 | 57 | \|F_hkl\|² diffraction intensity (row 132) | peak positions exact given the cell and ion positions; ±10% on intensity ratios | kinematic limit, with no extinction or multiple scattering; the Debye-Waller factor comes from the phonon density of states |
-| 58 | Raman response (row 133) | shifts ±0.2 meV, zone-centre grade; activities factor ~2 | the shifts ride #9; the activities are the new linear-response output |
+| 58 | Raman response (row 133) | shifts ±0.2 meV, zone-center grade; activities factor ~2 | the shifts ride #9; the activities are the new linear-response output |
 | 59 | radiative recombination (row 134) | order of magnitude on the coefficient | negligible in the ultra-wide-gap device balance, given the tiny intrinsic carrier density; a photoluminescence validation channel only |
 | 60 | equilibrium lattice constant a₀ | **±1%, against experiment, in the computed currency** | the relaxed geometry: the first output of the structure slice and the input every other row is evaluated on. The regime is the accuracy class of the functional, not of the measurement — a semi-local functional lands within about 1% on a covalent solid, and the diamond sweep measures **PBE +0.196% and a gap-calibrated hybrid −0.575%** against the experimental anchor. The battery's ±0.001 Å is diffraction precision and is provenance, not a target: used as a gate it would refuse both functionals by 7× and 20×. Whichever functional produces a₀ must be named beside it, because the two differ by more than this regime is wide |
 
@@ -282,7 +282,7 @@ interchanged.
 - The **crystal-physical frame** is `e₂∥b`, `e₃∥c`, `e₁ = a*`. Klimm's tensor components
   are therefore `λ₂₂ ≡ [010]` and `λ₃₃ ≡ [001]`.
 - His **plane-normal** measurements `λ₍₁₀₀₎` and `λ₍₀₀₁₎` lie along `a*` and `c*` and must
-  **never** be relabelled `[100]` and `[001]`.
+  **never** be relabeled `[100]` and `[001]`.
 - The **high-field frame** of Ghosh and Singisetti has `c*` as its third axis, about 13.8°
   off `[001]`, which is why the critical-field and impact-ionization entries below are
   tagged `c*` rather than `[001]`.
@@ -348,20 +348,20 @@ which is larger than the ±5% polarization budget at the operating point.
 ### Alloy polarization bowing
 
 **Spontaneous polarization and the piezoelectric tensor are not linear in composition for
-aluminium-gallium-nitride.** The quadratic-bowing form is
+aluminum-gallium-nitride.** The quadratic-bowing form is
 
 ```
 P_sp(x) = x·P_AlN + (1−x)·P_GaN − b_P·x(1−x)
 ```
 
 with the analogous form per piezoelectric component. The nonlinearity exceeds the ±5%
-interface-polarization target at mid-to-high aluminium fraction.
+interface-polarization target at mid-to-high aluminum fraction.
 
 **Sign guard.** In this `−b_P` form, **`b_P` is negative** — the bowing is always upward.
 The reference file states the same physics in the opposite convention, `+b·x(1−x)` with
 **b positive**, expected near `+0.019–0.021 C/m²`. The two are equivalent through the
 double negative, and **lifting the file's `+b` straight into this form flips the bowing**
-and corrupts interface charge at mid-to-high aluminium fraction.
+and corrupts interface charge at mid-to-high aluminum fraction.
 
 `b_P` and the piezoelectric bowings are UNSEEDED — `alloy-polarization-bowing-unseeded`. Until they
 are seeded, mid-composition polarization-difference claims carry a widened uncertainty in
@@ -369,14 +369,14 @@ are seeded, mid-composition polarization-difference claims carry a widened uncer
 
 ### Elastic constants
 
-GPa. Gallium nitride is pinned to Polian and aluminium nitride to McNeil; the
-surface-acoustic-wave aluminium-nitride set is excluded.
+GPa. Gallium nitride is pinned to Polian and aluminum nitride to McNeil; the
+surface-acoustic-wave aluminum-nitride set is excluded.
 
 | Quantity | GaN | AlN | source |
 |---|---|---|---|
 | C₁₁/C₁₂/C₁₃/C₃₃/C₄₄ | 390/145/106/398/105 | 410.5/148.5/98.9/388.5/124.6 | Polian JAP 79 (1996); McNeil JACerS 76 (1993) |
 | bulk modulus; density (g/cm³) | 210; 6.15 | 210; 3.23 | Ioffe NSM archive |
-| aluminium-gallium-nitride interpolation | linear Vegard within 4.7% bowing, largest on C₄₄, **except C₁₃, which is superlinear in composition** — `elastic-tensors.csv` carries the rule. **C₁₃ is the weak link**: it has the largest experiment-against-experiment and experiment-against-theory spread, and it is the constant the piezoelectric and elastic-stability paths are most sensitive to | — | Łopuszyński arXiv 1110.1346 |
+| aluminum-gallium-nitride interpolation | linear Vegard within 4.7% bowing, largest on C₄₄, **except C₁₃, which is superlinear in composition** — `elastic-tensors.csv` carries the rule. **C₁₃ is the weak link**: it has the largest experiment-against-experiment and experiment-against-theory spread, and it is the constant the piezoelectric and elastic-stability paths are most sensitive to | — | Łopuszyński arXiv 1110.1346 |
 
 ### Carrier transport coefficients
 
@@ -388,7 +388,7 @@ surface-acoustic-wave aluminium-nitride set is excluded.
 | Fröhlich coupling; ω_LO | 0.40; 92 meV | 0.58; 110–114 meV | Mora-Ramos cond-mat/9812021; Davydov PRB 58 12899 (1998) |
 | Debye temperature | ~600 K | ~1000 K, measured 971 | Slack; Zheng PRMat 3 014601 (2019); Wang Powder Diffr. 29(4) 352 (2014) |
 | alloy disorder potential; mobility minimum | 1.8 eV; minimum at x≈0.5–0.6, about 7× below gallium nitride | — | Pant APL 121 (2022) |
-| alloy conductivity dip | minimum at x≈0.6–0.71; dilute −46.5% for 1% aluminium into gallium nitride, −75.8% for 1% gallium into aluminium nitride | — | Dagli, Mengle & Kioupakis arXiv 1910.05440 (2019) |
+| alloy conductivity dip | minimum at x≈0.6–0.71; dilute −46.5% for 1% aluminum into gallium nitride, −75.8% for 1% gallium into aluminum nitride | — | Dagli, Mengle & Kioupakis arXiv 1910.05440 (2019) |
 
 ## What the seeded values rest on
 
@@ -401,7 +401,7 @@ canonical for the values and for the `Source` cells themselves.
 the word for that is `UNSEEDED`. A value carried forward because it has always been there
 is the failure this section exists to prevent.
 
-**Declared absences — the mechanism working.** Aluminium-nitride hole mobility is a
+**Declared absences — the mechanism working.** Aluminum-nitride hole mobility is a
 genuine absence: the acceptor is deep and the equilibrium hole density is below
 `10¹⁰ cm⁻³`. Its electron Caughey-Thomas quartet is a declared acquisition task, paywalled
 rather than missing. The β-Ga₂O₃ electron quartet has no consensus published fit. These
@@ -423,10 +423,10 @@ three rows are `UNSEEDED` by design and the cert refuses on them, which is corre
 | `debye-temperature` | AlN | Wang et al., *Powder Diffr.* **29**(4) 352 (2014), DOI 10.1017/S0885715614000542 |
 | `lattice-constant-a` | diamond | Hom, Kiszenick & Post, *J. Appl. Cryst.* **8** 457 (1975) — `a = 3.566986 Å` at 25 °C, relative uncertainty 2.6×10⁻⁶. The seeded ±0.001 Å is about 400× looser than the measurement |
 | `bandgap-indirect` | diamond | Clark, Dean & Harris, *Proc. R. Soc. Lond. A* **277** 312 (1964), the origin of the 5.47 eV figure. A modern re-measurement of the phonon-assisted absorption edge, *Diamond Relat. Mater.* **132** 109638 (2022), reports 5.480 ± 0.004 eV near 0 K; whether that agrees with a 5.47 eV 300 K value at the stated ±0.01 depends on the shift between those temperatures, which is what that paper re-measured |
-| `phonon-max-energy` | diamond | Solin & Ramdas, *Phys. Rev. B* **1** 1687 (1970) — the zone-centre Raman mode at 1332.5 cm⁻¹, which is 165.21 meV. **The row is named for the dispersion maximum and this is the zone-centre value**, and diamond's longitudinal optical branch overbends: Kulda et al., *Phys. Rev. B* **66** 241202 (2002) measure the overbending at 1.5 meV along Γ–X, so the true maximum is near 166.7 meV, three times the row's stated uncertainty above its value |
+| `phonon-max-energy` | diamond | Solin & Ramdas, *Phys. Rev. B* **1** 1687 (1970) — the zone-center Raman mode at 1332.5 cm⁻¹, which is 165.21 meV. **The row is named for the dispersion maximum and this is the zone-center value**, and diamond's longitudinal optical branch overbends: Kulda et al., *Phys. Rev. B* **66** 241202 (2002) measure the overbending at 1.5 meV along Γ–X, so the true maximum is near 166.7 meV, three times the row's stated uncertainty above its value |
 | `formation-energy-vs-graphite` | diamond | Berman & Simon, *Z. Elektrochem.* **59** 333 (1955). The eponym resolves, but their line is a pressure-temperature boundary stated valid above 1200 K, and the row is a 300 K energy — a derivation, not a quotation. The three defensible readings differ by more than the stated ±5 meV/atom: the standard enthalpy difference is 19.6, the Gibbs difference 30.1, and the boundary line through `P·ΔV` gives 29.8 |
 | `cohesive-energy` | diamond | Brewer, LBL-3720, through the standard textbook table. **The trail may point at the wrong allotrope** — `diamond-cohesive-energy-allotrope` |
-| `mobility-electron-best-exp` | β-Ga₂O₃ | four primaries, three matching exactly: Zhang APL 112 173502 (2018) for the two-dimensional gas at 180; Zhang APL Materials 7 022506 (2019) for 176 by vapour-phase epitaxy; Peterson APL 125 182103 (2024) for 200 in a doped drift layer; Galazka J. Cryst. Growth 529 125297 (2020) for bulk Czochralski at 80–152, where 152 is the top of a range rather than a headline |
+| `mobility-electron-best-exp` | β-Ga₂O₃ | four primaries, three matching exactly: Zhang APL 112 173502 (2018) for the two-dimensional gas at 180; Zhang APL Materials 7 022506 (2019) for 176 by vapor-phase epitaxy; Peterson APL 125 182103 (2024) for 200 in a doped drift layer; Galazka J. Cryst. Growth 529 125297 (2020) for bulk Czochralski at 80–152, where 152 is the top of a range rather than a headline |
 | `bulk-modulus`, `mass-density` | AlN, GaN | the Ioffe NSM archive — a real database, named without a locator, and one that names no primary reference of its own |
 
 **Method stated where a source belongs.** Four rows carry a *method* in the `Source`
@@ -436,7 +436,7 @@ cell. A method says how a number was made, not what it can be checked against.
 |---|---|---|
 | `thermal-conductivity` at 773 and 1100 K | AlN | three-phonon Boltzmann with a Slack extrapolation, theory-only. The 1100 K cell adds that no single-crystal measurement above 500 K exists — `aln-high-temperature-conductivity-absence` |
 | `pyroelectric-coefficient` | GaN | first-principles plus heterostructure measurements, thin data |
-| `displacement-threshold-Ed` | β-Ga₂O₃ | `literature`, carried from an appendix that states the value as a bare parenthetical with no citation. The modern literature reports this quantity **per site** — two inequivalent gallium and three inequivalent oxygen sites — with a strong dependence on recoil direction (He et al., *Acta Mater.* **276** 120087 (2024)), so a single scalar is a modelling choice rather than a measurement |
+| `displacement-threshold-Ed` | β-Ga₂O₃ | `literature`, carried from an appendix that states the value as a bare parenthetical with no citation. The modern literature reports this quantity **per site** — two inequivalent gallium and three inequivalent oxygen sites — with a strong dependence on recoil direction (He et al., *Acta Mater.* **276** 120087 (2024)), so a single scalar is a modeling choice rather than a measurement |
 | `thermal-conductivity` at 773 and 1100 K | diamond | an internal audit pointer — `diamond-thermal-conductivity-provenance` and `diamond-thermal-conductivity-citation-material` |
 
 **UNSEEDED — no source found.** Two diamond rows, and neither is minor.
@@ -452,13 +452,13 @@ Cert-refused or frontier until provenanced.
 
 - Diamond electron and hole impact-ionization coefficients have never been separated;
   the cert treats the single pair as both.
-- Aluminium nitride: measured impact ionization is absent, with only an electron-only
+- Aluminum nitride: measured impact ionization is absent, with only an electron-only
   Monte-Carlo value; hole impact ionization is absent; the electron Caughey-Thomas
   quartet is paywalled; hole mobility is a genuine absence.
 - β-Ga₂O₃ hole impact ionization is absent, and refusing it is correct
   ([out-of-scope#exclusions]).
 - The normalized breakdown-field temperature coefficient in K⁻¹ is absent for gallium
-  nitride and aluminium nitride — only a device breakdown-voltage slope exists. Its sign
+  nitride and aluminum nitride — only a device breakdown-voltage slope exists. Its sign
   is confirmed positive.
 - The perpendicular Born charge and the sign of `e₁₅` are unresolved; the literature is
   split on the sign.

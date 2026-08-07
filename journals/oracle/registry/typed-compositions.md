@@ -42,15 +42,15 @@ open-questions:
 
 ## What this page proves
 
-Every property in the catalogue ([properties#catalogue]) written as a typed
+Every property in the catalog ([properties#catalog]) written as a typed
 composition. That is the validation that the closed vocabulary covers the target
 scope: if a targeted property cannot be written as a composition of methods
 ([computational-methods]), templates ([property-templates]) and named formulas
 ([named-formulas]), the vocabulary is short something, and the gap is visible
 here rather than discovered during implementation.
 
-The coverage table below is the claim in checkable form. It pairs each catalogue
-property with the composition identifiers that realise it, and every identifier
+The coverage table below is the claim in checkable form. It pairs each catalog
+property with the composition identifiers that realize it, and every identifier
 it names is defined in a block on this page.
 
 **All target observables resolve to typed compositions over the closed
@@ -60,7 +60,7 @@ without.
 
 ## Property to composition
 
-| Property | Realised by |
+| Property | Realized by |
 |---|---|
 | Lattice parameters | `LatticeParameters` |
 | Bond lengths | `BondLengths` |
@@ -99,7 +99,7 @@ without.
 | Catalytic activity | `CatalyticActivity` |
 | Surface energy | `SurfaceEnergy` |
 
-`SurfaceEnergy` realises two catalogue properties and is defined once, in the
+`SurfaceEnergy` realizes two catalog properties and is defined once, in the
 chemical and surface section.
 
 ## Structural
@@ -341,5 +341,5 @@ where the pinned form matters most, because [traps#thermal-expansion-form] pins
 the *tensor* form including the compliance-not-stiffness trap that makes the
 naive version dimensionally wrong.
 
-**Research** means a modelling choice with literature behind it, and the choice
+**Research** means a modeling choice with literature behind it, and the choice
 has to be made and cited before a row exists.

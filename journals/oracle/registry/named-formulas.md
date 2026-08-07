@@ -265,7 +265,7 @@ range covers; the per-row provenance is the manifest's own
 
 | Rows | Package |
 |---|---|
-| 1–87 | the base catalogue, grounded in the five research streams |
+| 1–87 | the base catalog, grounded in the five research streams |
 | 88–102 | linear-response and topology-atlas extensions |
 | 103–104 | the two architectural markers |
 | 105–112 | slow-tier degradation and radiation |

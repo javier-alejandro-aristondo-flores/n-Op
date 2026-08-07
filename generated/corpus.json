@@ -32,12 +32,6 @@
       "summary": "What the operator is trained to produce is stated two incompatible ways in the material this base is built from — predicting the time evolution of the state, versus returning the state channels the caller did not supply given a crystal identity and the properties already known. The oracle side is unaffected; the operator side cannot be described until this is settled."
     },
     {
-      "anchor": "sampling",
-      "id": "sampling-policy-record-home",
-      "page": "residual-loss-design",
-      "summary": "A sampling policy is a cadence, a sampler and an optional importance function, and nothing carries all three: the oracle's generator record has one flat four-valued field fusing a sampler, two importance schemes and an evaluation-scope value, with no cadence field at all, so the importance function has no typed home on either side of the seam."
-    },
-    {
       "anchor": "four-sources",
       "id": "compared-against-versus-supervisory-sources",
       "page": "residual-loss-design",
@@ -62,6 +56,72 @@
       "summary": "The seam obliges the operator to accept the environment record as named typed conditioning channels, but no page fixes that record's field list, units or admissible ranges — so the obligation names a channel whose contents cannot be checked."
     },
     {
+      "anchor": "identity",
+      "id": "strategy-in-the-content-hash",
+      "page": "evaluation-strategies",
+      "summary": "The seam requires one stable content hash per operator instance over architecture, weights and version, and this page requires the strategy declaration to enter it. Whether a strategy counts as architecture is a statement the seam has to make, and it does not yet make it — so two instances differing only in strategy may currently share a hash."
+    },
+    {
+      "anchor": "kernel-classes",
+      "id": "kernel-class-completeness",
+      "page": "evaluation-strategies",
+      "summary": "Four structure classes are stated, and the page that specifies the integral kernel is unwritten. Whether the classes are exhaustive, and whether an integral kernel may declare more than one, are decided by that page and assumed here."
+    },
+    {
+      "anchor": "declaration",
+      "id": "approximation-error-magnitude",
+      "page": "evaluation-strategies",
+      "summary": "An approximate pairing declares its error class and not a bound. For the stationary projection of a general integral kernel no computable bound is stated anywhere, so the declaration names the defect without sizing it, and a consumer cannot rank two approximate pairings against each other."
+    },
+    {
+      "anchor": "error-declaration",
+      "id": "stacked-error-composition",
+      "page": "integral-transform",
+      "summary": "Each transform declares its own quadrature error, and nothing composes the declarations across a stack of transforms. A three-transform stack therefore has three per-application error statements and no end-to-end one, so a residual scored on its output cannot be attributed between physics and quadrature."
+    },
+    {
+      "anchor": "measure",
+      "id": "transform-cotangent-through-weights",
+      "page": "integral-transform",
+      "summary": "The seam takes one state-shaped cotangent and requires it be backpropagated to internal parameters. Where the quadrature weights are themselves differentiable in a predicted quantity, the transform has two routes to the parameters and no page states whether both are taken."
+    },
+    {
+      "anchor": "state-dependent",
+      "id": "measure-gradient-route",
+      "page": "integration-domain",
+      "summary": "The real-space quadrature weights are a function of the cell vectors, which the operator predicts, so the weights are differentiable in a predicted quantity. Whether a gradient is taken through the weights or they are frozen per step is unfixed, and the two differ by a volume term that grows with the strain the sweep reaches."
+    },
+    {
+      "anchor": "weights",
+      "id": "brillouin-weight-provenance",
+      "page": "integration-domain",
+      "summary": "Orbit multiplicities for the irreducible wedge are fixed by the oracle's symmetry quotient at compose time, and no page states whether the operator receives them across the seam or recomputes them. Recomputing invites two answers to one question; receiving them adds a channel the seam does not currently carry."
+    },
+    {
+      "anchor": "boundaries",
+      "id": "transform-stack-owner",
+      "page": "operator-decomposition",
+      "summary": "The integral transform excludes the pointwise linear term, the bias, the nonlinearity, the lifting and the projection, and no page owns them. A stack of transforms is therefore not a specified object: the five constituents describe one application of one transform, and what composes several is unfixed."
+    },
+    {
+      "anchor": "function",
+      "id": "function-carrier-representation",
+      "page": "operator-decomposition",
+      "summary": "A function is sampled values against an integration domain, and a spectral evaluation strategy's natural carrier is basis coefficients rather than samples. Which carriers a function may take, and which constituent converts between them, is unfixed — and the conversion is lossy in one direction."
+    },
+    {
+      "anchor": "intermediate",
+      "id": "point-count-budget",
+      "page": "point-set-policy",
+      "summary": "A policy chooses a point set at every stage of a stack of transforms, and nothing bounds how the count varies from stage to stage. A policy that refines at each stage multiplies the cost of every stage after it, and no constituent holds the budget that would stop it."
+    },
+    {
+      "anchor": "the-record",
+      "id": "policy-under-batch",
+      "page": "point-set-policy",
+      "summary": "The seam requires a leading batch dimension with independent elements, and an importance function ranking candidate points by residual magnitude ranks them per sample. Whether a batch shares one point set or carries one per element is unfixed, and the two differ in cost by the batch size."
+    },
+    {
       "anchor": "curriculum-pointer",
       "id": "two-curriculum-schedules",
       "page": "training-stages",
@@ -77,7 +137,7 @@
       "anchor": "polarization-bowing",
       "id": "alloy-polarization-bowing-unseeded",
       "page": "accuracy-ledger",
-      "summary": "The aluminium-gallium-nitride polarization bowing coefficient and the piezoelectric-tensor bowings are UNSEEDED. Until they are seeded, mid-composition interface-polarization claims carry a widened uncertainty, and the sign guard between the ledger's minus-b form and the reference file's plus-b form is live. Seeding is gated on a paywalled pin-read of the two primary sources."
+      "summary": "The aluminum-gallium-nitride polarization bowing coefficient and the piezoelectric-tensor bowings are UNSEEDED. Until they are seeded, mid-composition interface-polarization claims carry a widened uncertainty, and the sign guard between the ledger's minus-b form and the reference file's plus-b form is live. Seeding is gated on a paywalled pin-read of the two primary sources."
     },
     {
       "anchor": "seed-provenance",
@@ -113,7 +173,7 @@
       "anchor": "seed-provenance",
       "id": "aln-high-temperature-conductivity-absence",
       "page": "accuracy-ledger",
-      "summary": "The aluminium-nitride 1100 K thermal-conductivity row states that no single-crystal measurement above 500 K exists, and the 300 K row of the same file cites Slack et al., J. Phys. Chem. Solids 48, 641 (1987) — a paper whose measurements are reported to extend far above 500 K. Either the absence claim is too strong or the citation is being read wrongly. This matters in the opposite direction from a wrong value: an unnecessary refusal costs coverage silently, and nothing will ever fire on it."
+      "summary": "The aluminum-nitride 1100 K thermal-conductivity row states that no single-crystal measurement above 500 K exists, and the 300 K row of the same file cites Slack et al., J. Phys. Chem. Solids 48, 641 (1987) — a paper whose measurements are reported to extend far above 500 K. Either the absence claim is too strong or the citation is being read wrongly. This matters in the opposite direction from a wrong value: an unnecessary refusal costs coverage silently, and nothing will ever fire on it."
     },
     {
       "anchor": "observable-counts",
@@ -227,7 +287,7 @@
       "anchor": "registration-gate",
       "id": "adjoint-drift-monitoring",
       "page": "residual-machinery",
-      "summary": "The gate validates the formula's adjoint once, at registration. The composition's adjoint is synthesised later, per composition, over a graph the simplification stage has already rewritten, and nothing revalidates the second."
+      "summary": "The gate validates the formula's adjoint once, at registration. The composition's adjoint is synthesized later, per composition, over a graph the simplification stage has already rewritten, and nothing revalidates the second."
     },
     {
       "anchor": "registration-gate",
@@ -275,7 +335,7 @@
       "anchor": "moment-closures",
       "id": "hole-transport-anchors",
       "page": "multiscale-state",
-      "summary": "Hole mobility, hole impact-ionisation coefficient and hole saturation velocity are anchored for few hosts. The hole schema is committed; the coefficients are a per-composition data gap, and every bipolar macro composition is unanchored until it closes."
+      "summary": "Hole mobility, hole impact-ionization coefficient and hole saturation velocity are anchored for few hosts. The hole schema is committed; the coefficients are a per-composition data gap, and every bipolar macro composition is unanchored until it closes."
     },
     {
       "anchor": "slow-kinetics",
@@ -876,6 +936,7 @@
         "forced-decisions",
         "gamma-hat",
         "glossary",
+        "integration-domain",
         "learnable-structure-contract",
         "multiscale-state",
         "named-formulas",
@@ -1080,6 +1141,41 @@
       "section": "state",
       "title": "Crystal inputs"
     },
+    "evaluation-strategies": {
+      "anchors": {
+        "admissibility": "Which pairings are exact",
+        "declaration": "The declaration record",
+        "families": "The named operator families are cells of this table",
+        "identity": "The declaration is part of identity",
+        "kernel-classes": "The structure classes an integral kernel declares",
+        "scope": "What an evaluation strategy is",
+        "strategies": "The five strategies"
+      },
+      "depends_on": [
+        "integral-transform",
+        "integration-domain",
+        "learnable-structure-contract",
+        "operator-decomposition",
+        "residual-loss-design"
+      ],
+      "journal": "operator",
+      "library": "informed-operator",
+      "owns": [
+        "the evaluation-strategy field",
+        "integral-kernel structure classes",
+        "the strategy admissibility table",
+        "the strategy declaration record",
+        "strategy identity",
+        "operator families as strategy cells"
+      ],
+      "path": "journals/operator/structure/evaluation-strategies.md",
+      "referenced_by": [
+        "integral-transform",
+        "operator-decomposition"
+      ],
+      "section": "structure",
+      "title": "Evaluation strategies"
+    },
     "forced-decisions": {
       "anchors": {
         "implementation-language": "The implementation language",
@@ -1281,10 +1377,92 @@
       ],
       "path": "journals/practice/glossary.md",
       "referenced_by": [
+        "operator-decomposition",
         "traps"
       ],
       "section": null,
       "title": "Glossary"
+    },
+    "integral-transform": {
+      "anchors": {
+        "error-declaration": "Declaring the quadrature error",
+        "exclusions": "What the transform does not own",
+        "measure": "Applying the weights",
+        "resampling": "Resampling is the whole job",
+        "scope": "What the integral transform is",
+        "signature": "The signature",
+        "support": "The nonlocality budget",
+        "tier-coupling": "Two domains is a change of scale"
+      },
+      "depends_on": [
+        "evaluation-strategies",
+        "integration-domain",
+        "learnable-structure-contract",
+        "multiscale-state",
+        "operator-decomposition",
+        "pino-bridge",
+        "point-set-policy",
+        "residual-definitions"
+      ],
+      "journal": "operator",
+      "library": "informed-operator",
+      "owns": [
+        "the integral-transform constituent",
+        "the transform signature",
+        "the resampling responsibility",
+        "the nonlocality budget",
+        "quadrature-error declaration",
+        "cross-domain tier coupling",
+        "transform exclusions"
+      ],
+      "path": "journals/operator/structure/integral-transform.md",
+      "referenced_by": [
+        "evaluation-strategies",
+        "integration-domain",
+        "operator-decomposition",
+        "point-set-policy"
+      ],
+      "section": "structure",
+      "title": "The integral transform"
+    },
+    "integration-domain": {
+      "anchors": {
+        "invariance": "Discretization invariance is a property of the weights",
+        "scope": "What an integration domain is",
+        "sharing": "Referenced, never owned",
+        "state-dependent": "The real-space domain is state-dependent",
+        "symmetry": "The symmetry quotient",
+        "the-four": "The four integration domains",
+        "weights": "Where a quadrature weight comes from"
+      },
+      "depends_on": [
+        "compose-time-pipeline",
+        "integral-transform",
+        "learnable-structure-contract",
+        "multiscale-state",
+        "operator-decomposition",
+        "representation-substrate",
+        "unified-state"
+      ],
+      "journal": "operator",
+      "library": "informed-operator",
+      "owns": [
+        "the integration-domain constituent",
+        "quadrature weight sourcing",
+        "the four integration domains",
+        "integration-domain sharing",
+        "the discretization-invariance mechanism",
+        "state-dependent domain geometry"
+      ],
+      "path": "journals/operator/structure/integration-domain.md",
+      "referenced_by": [
+        "evaluation-strategies",
+        "integral-transform",
+        "operator-decomposition",
+        "point-set-policy"
+      ],
+      "section": "structure",
+      "title": "The integration domain"
     },
     "learnable-structure-contract": {
       "anchors": {
@@ -1327,6 +1505,11 @@
       "path": "journals/operator/seam/learnable-structure-contract.md",
       "referenced_by": [
         "boundary",
+        "evaluation-strategies",
+        "integral-transform",
+        "integration-domain",
+        "operator-decomposition",
+        "point-set-policy",
         "residual-loss-design",
         "training-stages"
       ],
@@ -1380,7 +1563,7 @@
         "emergence-axiom": "The refined emergence axiom",
         "eom-continuum": "The continuum residual",
         "eom-defect-population": "The defect-population residual",
-        "homogenisation-map": "The homogenisation map",
+        "homogenization-map": "The homogenization map",
         "macro-state-schema": "The macro field set",
         "moment-closures": "Moment closures",
         "residual-contract": "The unified three-tier residual contract",
@@ -1416,7 +1599,7 @@
         "device-mesh universe",
         "macro continuum-field state schema",
         "moment closures for electron temperature and current density",
-        "the micro-to-macro homogenisation map",
+        "the micro-to-macro homogenization map",
         "the defect-population and continuum residual categories",
         "the unified three-tier residual contract"
       ],
@@ -1429,10 +1612,13 @@
         "crystal-inputs",
         "generic-dynamics",
         "glossary",
+        "integral-transform",
+        "integration-domain",
         "learnable-structure-contract",
         "mvp-system",
         "named-formulas",
         "observable-bundles",
+        "operator-decomposition",
         "out-of-scope",
         "pino-bridge",
         "residual-definitions",
@@ -1573,6 +1759,48 @@
       "section": "registry",
       "title": "Observable bundles"
     },
+    "operator-decomposition": {
+      "anchors": {
+        "boundaries": "What crosses each boundary",
+        "discretization-contract": "The integral transform is a discretization contract",
+        "five-constituents": "The five constituents",
+        "function": "What a function is here",
+        "qualifier": "Why the integral kernel carries a qualifier",
+        "scope": "What this page fixes",
+        "swappability": "Swappable, and what it costs",
+        "unwritten": "What is not written here"
+      },
+      "depends_on": [
+        "evaluation-strategies",
+        "glossary",
+        "integral-transform",
+        "integration-domain",
+        "learnable-structure-contract",
+        "multiscale-state",
+        "point-set-policy",
+        "residual-loss-design",
+        "unified-state"
+      ],
+      "journal": "operator",
+      "library": "informed-operator",
+      "owns": [
+        "operator interior decomposition",
+        "the five learnable constituents",
+        "constituent boundary rules",
+        "the discretization-contract principle",
+        "function representation",
+        "integral-kernel qualifier"
+      ],
+      "path": "journals/operator/structure/operator-decomposition.md",
+      "referenced_by": [
+        "evaluation-strategies",
+        "integral-transform",
+        "integration-domain",
+        "point-set-policy"
+      ],
+      "section": "structure",
+      "title": "The operator's interior decomposition"
+    },
     "out-of-scope": {
       "anchors": {
         "exclusions": "What the oracle library does not model",
@@ -1709,6 +1937,7 @@
         "build-verification",
         "compose-time-pipeline",
         "glossary",
+        "integral-transform",
         "learnable-structure-contract",
         "multiscale-state",
         "physics-graph",
@@ -1722,6 +1951,39 @@
       ],
       "section": "seams",
       "title": "The pino-bridge exports"
+    },
+    "point-set-policy": {
+      "anchors": {
+        "defaults": "Defaults",
+        "importance": "The importance function",
+        "intermediate": "Point sets between transforms",
+        "scope": "What a point-set policy is",
+        "the-record": "The record",
+        "who-supplies": "Who supplies the terminal point set"
+      },
+      "depends_on": [
+        "integral-transform",
+        "integration-domain",
+        "learnable-structure-contract",
+        "operator-decomposition",
+        "residual-loss-design"
+      ],
+      "journal": "operator",
+      "library": "informed-operator",
+      "owns": [
+        "the point-set-policy constituent",
+        "the cadence-sampler-importance record",
+        "intermediate point-set selection",
+        "the importance function's typed home"
+      ],
+      "path": "journals/operator/structure/point-set-policy.md",
+      "referenced_by": [
+        "integral-transform",
+        "operator-decomposition",
+        "residual-loss-design"
+      ],
+      "section": "structure",
+      "title": "The point-set policy"
     },
     "product": {
       "anchors": {
@@ -1797,7 +2059,7 @@
     "properties": {
       "anchors": {
         "bundle-map": "Category to bundle",
-        "catalogue": "The catalogue",
+        "catalog": "The catalog",
         "categories": "The nine categories",
         "scope-vs-inventory": "Scope, not inventory"
       },
@@ -1810,7 +2072,7 @@
       "library": "physics",
       "owns": [
         "target property scope",
-        "property catalogue",
+        "property catalog",
         "property category to bundle map",
         "scope versus inventory precedence"
       ],
@@ -2014,6 +2276,7 @@
         "forced-decisions",
         "gamma-hat",
         "glossary",
+        "integration-domain",
         "learnable-structure-contract",
         "library-landscape",
         "multiscale-state",
@@ -2087,6 +2350,7 @@
         "gamma-hat",
         "generic-dynamics",
         "glossary",
+        "integral-transform",
         "learnable-structure-contract",
         "multiscale-state",
         "named-formulas",
@@ -2131,6 +2395,7 @@
         "learnable-structure-contract",
         "named-formulas",
         "pino-bridge",
+        "point-set-policy",
         "residual-definitions",
         "residual-machinery",
         "training-stages"
@@ -2154,6 +2419,9 @@
       "path": "journals/operator/loss/residual-loss-design.md",
       "referenced_by": [
         "boundary",
+        "evaluation-strategies",
+        "operator-decomposition",
+        "point-set-policy",
         "residual-definitions",
         "training-stages"
       ],
@@ -2271,7 +2539,7 @@
         "training stage ordering",
         "where the oracle attaches",
         "valuation oracle distinction",
-        "the synthesis analogue",
+        "the synthesis analog",
         "quantum search refusal",
         "trained-operator failure modes"
       ],
@@ -2534,9 +2802,11 @@
         "crystal-inputs",
         "gamma-hat",
         "generic-dynamics",
+        "integration-domain",
         "learnable-structure-contract",
         "library-landscape",
         "multiscale-state",
+        "operator-decomposition",
         "physics-graph",
         "pino-bridge",
         "product",
@@ -2549,7 +2819,7 @@
       "title": "The unified state"
     }
   },
-  "source_digest": "2a1b0b429ec1f82f",
+  "source_digest": "99adb96e0bea8830",
   "topics": {
     "CouplingChannel record": {
       "page": "coupling-structure"
@@ -2725,6 +2995,9 @@
     "computational hardness argument": {
       "page": "purpose-and-scope"
     },
+    "constituent boundary rules": {
+      "page": "operator-decomposition"
+    },
     "content-addressed identity discipline": {
       "page": "representation-substrate"
     },
@@ -2742,6 +3015,9 @@
     },
     "coupling target shapes": {
       "page": "coupling-structure"
+    },
+    "cross-domain tier coupling": {
+      "page": "integral-transform"
     },
     "crystal-structure prediction slice": {
       "page": "capability-slices"
@@ -2869,6 +3145,9 @@
     "frontmatter schema": {
       "page": "agent-contract"
     },
+    "function representation": {
+      "page": "operator-decomposition"
+    },
     "gauge fixing and the electrostatic partition": {
       "page": "generic-dynamics"
     },
@@ -2899,8 +3178,20 @@
     "import as compiler input": {
       "page": "product"
     },
+    "integral-kernel qualifier": {
+      "page": "operator-decomposition"
+    },
+    "integral-kernel structure classes": {
+      "page": "evaluation-strategies"
+    },
+    "integration-domain sharing": {
+      "page": "integration-domain"
+    },
     "interface library remit": {
       "page": "library-landscape"
+    },
+    "intermediate point-set selection": {
+      "page": "point-set-policy"
     },
     "invariant synthesis attachment": {
       "page": "build-sequence"
@@ -2986,6 +3277,12 @@
     "operator architecture motivation": {
       "page": "learnable-structure-contract"
     },
+    "operator families as strategy cells": {
+      "page": "evaluation-strategies"
+    },
+    "operator interior decomposition": {
+      "page": "operator-decomposition"
+    },
     "operator library remit": {
       "page": "library-landscape"
     },
@@ -3067,7 +3364,7 @@
     "program purpose": {
       "page": "purpose-and-scope"
     },
-    "property catalogue": {
+    "property catalog": {
       "page": "properties"
     },
     "property category to bundle map": {
@@ -3078,6 +3375,12 @@
     },
     "property-targeted crystal design goal": {
       "page": "purpose-and-scope"
+    },
+    "quadrature weight sourcing": {
+      "page": "integration-domain"
+    },
+    "quadrature-error declaration": {
+      "page": "integral-transform"
     },
     "quantum search refusal": {
       "page": "training-stages"
@@ -3211,6 +3514,9 @@
     "state slot vocabulary": {
       "page": "unified-state"
     },
+    "state-dependent domain geometry": {
+      "page": "integration-domain"
+    },
     "static consistency set": {
       "page": "build-verification"
     },
@@ -3219,6 +3525,9 @@
     },
     "steppable-form manifest fields": {
       "page": "pino-bridge"
+    },
+    "strategy identity": {
+      "page": "evaluation-strategies"
     },
     "structural and swept Environment partition": {
       "page": "crystal-inputs"
@@ -3250,11 +3559,23 @@
     "the 19 residual categories": {
       "page": "residual-definitions"
     },
+    "the cadence-sampler-importance record": {
+      "page": "point-set-policy"
+    },
     "the defect-population and continuum residual categories": {
       "page": "multiscale-state"
     },
+    "the discretization-contract principle": {
+      "page": "operator-decomposition"
+    },
+    "the discretization-invariance mechanism": {
+      "page": "integration-domain"
+    },
     "the eleven observable bundles": {
       "page": "observable-bundles"
+    },
+    "the evaluation-strategy field": {
+      "page": "evaluation-strategies"
     },
     "the evolver hand-off": {
       "page": "pino-bridge"
@@ -3262,23 +3583,56 @@
     "the exported surface contract": {
       "page": "pino-bridge"
     },
+    "the five learnable constituents": {
+      "page": "operator-decomposition"
+    },
+    "the four integration domains": {
+      "page": "integration-domain"
+    },
+    "the importance function's typed home": {
+      "page": "point-set-policy"
+    },
+    "the integral-transform constituent": {
+      "page": "integral-transform"
+    },
+    "the integration-domain constituent": {
+      "page": "integration-domain"
+    },
     "the layered compute DAG": {
       "page": "residual-machinery"
     },
-    "the micro-to-macro homogenisation map": {
+    "the micro-to-macro homogenization map": {
       "page": "multiscale-state"
+    },
+    "the nonlocality budget": {
+      "page": "integral-transform"
     },
     "the pipeline as partial evaluation": {
       "page": "compose-time-pipeline"
     },
+    "the point-set-policy constituent": {
+      "page": "point-set-policy"
+    },
     "the refined emergence axiom": {
       "page": "multiscale-state"
     },
-    "the synthesis analogue": {
+    "the resampling responsibility": {
+      "page": "integral-transform"
+    },
+    "the strategy admissibility table": {
+      "page": "evaluation-strategies"
+    },
+    "the strategy declaration record": {
+      "page": "evaluation-strategies"
+    },
+    "the synthesis analog": {
       "page": "training-stages"
     },
     "the ten cert obligations": {
       "page": "cert-obligations"
+    },
+    "the transform signature": {
+      "page": "integral-transform"
     },
     "the twelve computational methods": {
       "page": "computational-methods"
@@ -3324,6 +3678,9 @@
     },
     "training stage ordering": {
       "page": "training-stages"
+    },
+    "transform exclusions": {
+      "page": "integral-transform"
     },
     "typeclass aliases": {
       "page": "typeclass-alphabet"

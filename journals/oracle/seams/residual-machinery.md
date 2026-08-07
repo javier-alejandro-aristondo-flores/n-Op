@@ -34,7 +34,7 @@ depends-on:
 open-questions:
   - id: adjoint-drift-monitoring
     anchor: registration-gate
-    summary: "The gate validates the formula's adjoint once, at registration. The composition's adjoint is synthesised later, per composition, over a graph the simplification stage has already rewritten, and nothing revalidates the second."
+    summary: "The gate validates the formula's adjoint once, at registration. The composition's adjoint is synthesized later, per composition, over a graph the simplification stage has already rewritten, and nothing revalidates the second."
   - id: dormant-row-cert-encoding
     anchor: registration-gate
     summary: "A dormant row's gate is deferred rather than passed and must be recorded as such, but adjoint-cert has four cases and none of them is deferred."
@@ -113,7 +113,7 @@ and the runtime evaluates stratum by stratum.
 One cycle crosses the strata: the operating-condition observables and the
 coupled-field balance are mutually dependent through the self-heating operating
 temperature. It is closed by a **same-pass fixed-point iteration at the layer
-barrier**, not by nested optimisation — both sides are evaluated in the same
+barrier**, not by nested optimization — both sides are evaluated in the same
 forward pass, and the truncation that the iteration cap introduces is estimated
 rather than assumed away (see the fidelity generators below).
 
@@ -190,7 +190,7 @@ wrong rather than absent, and the first check cannot see it — both sides solve
 against the same bad Jacobian and agree.
 
 `fixpoint-adjoint` is a **refinement of `adjoint`**, not an alternative to it.
-It names how the adjoint is synthesised — by the implicit-function theorem over
+It names how the adjoint is synthesized — by the implicit-function theorem over
 a converged fixed point — and it runs `adjoint`'s gate plus one more. It is
 never an exemption from validating the adjoint. **The escape hatch is
 `relaxed`**: it is the tag for a genuinely non-smooth row, and it forces either
@@ -225,12 +225,12 @@ this page defines.
 
 Under the always-cheap discipline, most `adjoint` generators with a fixed-point
 solve in their forward pass are wired to the **implicit-differentiation adjoint
-synthesised at the lowering stage**
+synthesized at the lowering stage**
 ([compose-time-pipeline#lowering-and-adjoint-synthesis]); the gate verifies that
-synthesised adjoint, not a hand-written backward.
+synthesized adjoint, not a hand-written backward.
 
 **What the gate does not cover.** It runs once, at registration, against the
-*formula's* adjoint. The *composition's* adjoint is synthesised later, per
+*formula's* adjoint. The *composition's* adjoint is synthesized later, per
 composition, over a graph the simplification stage has already rewritten.
 Nothing revalidates the second against the first. The rewrite-admission rule
 ([compose-time-pipeline#rewrite-admission]) makes a rewrite's *value* discrepancy

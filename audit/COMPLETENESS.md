@@ -18,7 +18,7 @@ them.
 
 ## What this sweep killed first — two of its own premises
 
-Recorded before the findings, because the plan that authorised this work asserted both as
+Recorded before the findings, because the plan that authorized this work asserted both as
 measured defects and **both are wrong**. The corpus is correct on each.
 
 **The 24-vs-17 tolerance gap does not exist.** 25 tolerance-shaped symbols appear across
@@ -84,7 +84,7 @@ it unfindable.
 
 **Severity: medium · Confidence: certain · Mechanical**
 
-`agent-contract.md` retires `GAP` in favour of `UNSEEDED`. Eight cells in
+`agent-contract.md` retires `GAP` in favor of `UNSEEDED`. Eight cells in
 `transport-coefficients.csv` still carry it:
 
 | property | column |
@@ -143,7 +143,7 @@ produces are real: `dft` against `dft-lda` against `dft-hse`; `derived` against
 nothing at all.
 
 This field is **load-bearing for provenance**, which is why it matters more than its size
-suggests: the register's live question about a GaN row labelled `experimental` while being
+suggests: the register's live question about a GaN row labeled `experimental` while being
 an extrapolation past its source's measured range is only answerable if this vocabulary
 means something.
 
@@ -194,7 +194,7 @@ construction, which is the contract's entire argument.
 
 **Why nothing fires.** `check_structure.py`'s vocabulary sweep matches tokens against the
 **retired-vocabularies list**. It has no rule for *"is this invented name a symbol?"* — that
-is a semantic judgement, not a list lookup. So all 17 pass green, exactly as the signature
+is a semantic judgment, not a list lookup. So all 17 pass green, exactly as the signature
 column's unit promise passes with zero of 134 rows carrying a unit.
 
 **Scale:** 57 occurrences across 6 pages.

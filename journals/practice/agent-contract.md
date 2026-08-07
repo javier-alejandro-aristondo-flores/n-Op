@@ -159,7 +159,7 @@ an `a.k.a.`, which is where a literature search starts anyway.
 *"no longer"*, *"used to"*, *"retired"*, *"closed on <date>"*. Pages state what is
 true, in the present tense, and nothing about how they got that way.
 
-History is not destroyed — it is centralised. `log/timeline.md` is the only place
+History is not destroyed — it is centralized. `log/timeline.md` is the only place
 research advancement is recorded, and it is a compliance artifact. Each entry carries
 **date · finding · evidence link · attribution · what it superseded**.
 

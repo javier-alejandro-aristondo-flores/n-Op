@@ -166,7 +166,7 @@ holding only `polynomial_invariants` can never silently treat a partial
 short-range basis as the complete coupling.
 
 The generator is the **constructive** direction of the irrep machinery that the
-compose-time pipeline already uses **decompositionally** to block-diagonalise
+compose-time pipeline already uses **decompositionally** to block-diagonalize
 operators by irrep ([compose-time-pipeline#symmetry-quotient]). Same module, same
 primitives, new direction.
 
@@ -264,7 +264,7 @@ provenance contract below rests on that separation.
   the spec author chooses the cutoff per channel.
 - **No channel-correlation primitive in V1.** If two physical mechanisms
   genuinely correlate — a cross-term in `M` between two scattering processes
-  that are not independent — they are modelled as *one* `CouplingChannel` with a
+  that are not independent — they are modeled as *one* `CouplingChannel` with a
   larger tensor product, not two channels plus a correlation parameter. This
   keeps the V1 algebra additive.
 - **Kernel extensions add as one more summand.** When a channel carries a
@@ -322,7 +322,7 @@ make-coupling-channel(channel : CouplingChannel) → CouplingChannel
 It returns the channel with its `applicability` validated as first-order
 decidable on typeclass tags — the registration-time invariant of
 [named-formulas#applicability-decidability]. The channel's identity is
-`Address[CouplingChannel]` under the canonical-serialisation rule of
+`Address[CouplingChannel]` under the canonical-serialization rule of
 [representation-substrate#serialization]: domain-separated and
 schema-versioned, so identical channels collapse to one address.
 
@@ -366,7 +366,7 @@ active on the same observable**; an `isochoric`-tagged slope composes with row
 63 freely. The tag is a first-class field on the coefficient, so the check is a
 tag comparison at compose time, not a reviewer's caveat.
 
-The curated zero-point-renormalisation amplitudes feeding the `coth` path
+The curated zero-point-renormalization amplitudes feeding the `coth` path
 ([accuracy-ledger#ahc-zpr]) are the **isochoric** electron-phonon values, tagged
 `isochoric`: GaN −189 meV and AlN −399 meV (Engel PRB 106 094316 (2022); Miglio
 npj Comput. Mater. 6 167 (2020)), diamond −345 meV indirect (Antonius PRL 112
@@ -434,9 +434,9 @@ because the relativistic treatment determines whether the group carries the spin
 SU(2) factor.
 
 A `make-theory-context(raw) → TheoryContext` smart constructor, mirroring
-`make-coupling-channel`, **must** normalise and validate before any
+`make-coupling-channel`, **must** normalize and validate before any
 `Address[TheoryContext]` is taken. This is load-bearing for content addressing,
-not optional: it normalises the hybrid-functional double representation — a
+not optional: it normalizes the hybrid-functional double representation — a
 hybrid is always `XCFunctionalTag.Hybrid` with `ManyBodyLevel.KohnSham`, never
 `HybridAsManyBody` — and enforces pseudopotential/run relativistic consistency,
 so two byte-distinct encodings of the same physics can never produce two
@@ -535,7 +535,7 @@ so it is carried explicitly:
 
 ```
 record MechanismRange =
-  | ShortRange                          -- analytic / exponentially-localised mediator
+  | ShortRange                          -- analytic / exponentially-localized mediator
   | LongRangeStatic(pole_order : Nat)   -- 1/|q|^p, ω-independent
                                         --   (Fröhlich p = 2, van der Waals, bare-Coulomb head)
   | LongRangeDynamical                  -- frequency-dependent screening: poles in ω
@@ -684,6 +684,6 @@ positivity obligation keeps a cheap per-evaluation guard
 with no structural guarantee would, at registration, solve the semidefinite
 feasibility program *"find `c` with `Σ c_i B_i ⪰ 0`"* — interior point,
 `O(dim^{3.5})`, microseconds to milliseconds and at registration only,
-block-diagonalisable along the irrep decomposition per Gatermann–Parrilo 2004
+block-diagonalizable along the irrep decomposition per Gatermann–Parrilo 2004
 (DOI 10.1016/j.jpaa.2003.12.011). Infeasibility rejects the channel. No MVP
 channel needs it; it is specified for forward compatibility.

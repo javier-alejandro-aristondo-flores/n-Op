@@ -5,7 +5,7 @@ owns:
   - training stage ordering
   - where the oracle attaches
   - valuation oracle distinction
-  - the synthesis analogue
+  - the synthesis analog
   - quantum search refusal
   - trained-operator failure modes
 anchors:
@@ -59,7 +59,7 @@ decision oracle. That distinction is the whole reason the seam carries what it c
 ([learnable-structure-contract#vector-jacobian-product]): one bit gives a learner no
 direction, and a residual with a gradient does.
 
-The honest computational analogue of the informed epoch is
+The honest computational analog of the informed epoch is
 **counterexample-guided inductive synthesis** — a learner proposes, an independent
 checker answers, and the answer drives the next proposal — **with a gradient in place
 of the counterexample**. That names what the oracle contributes better than

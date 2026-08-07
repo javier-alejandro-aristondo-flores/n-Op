@@ -60,7 +60,7 @@ Every row carries a provenance value. Seven are admissible:
 
 | Value | The row came from |
 |---|---|
-| `observable-catalog` | the observable catalogue |
+| `observable-catalog` | the observable catalog |
 | `crystal-structure-prediction` | structure prediction and heterostructure work |
 | `defects-and-interfaces` | defects, surfaces and interfaces |
 | `non-equilibrium-high-field` | non-equilibrium and high-field transport |
@@ -68,7 +68,7 @@ Every row carries a provenance value. Seven are admissible:
 | `extension` | completing a vocabulary the streams left partial, rather than mined from a stream |
 | `topology-atlas` | derived from the topology atlas ([topology-atlas]) |
 
-The first five are **research streams** — the bodies of work the base catalogue
+The first five are **research streams** — the bodies of work the base catalog
 was mined from. A row grounded in more than one is written as a sum, for example
 `observable-catalog + defects-and-interfaces`.
 

@@ -1,0 +1,55 @@
+60 configurations contribute in-gap states
+Tier A 27 feats | Tier B 19 | Tier C raw 169 | 47 dopant-set groups
+targets: 59 occupied-side, 56 unoccupied-side
+
+anchors: global 0.3737 eV | oracle 0.1583 eV | gap 0.2154 eV
+folds: grouped 47 | plain LOO 60
+
+=== ladder (leave-one-dopant-set-out) ===
+  A-lin                0.4313 eV   gap closed  -26.7%
+  B-lin                0.3621 eV   gap closed   +5.4%
+  AB-lin               0.5246 eV   gap closed  -70.1%
+  AB-rf                0.3295 eV   gap closed  +20.5%
+  AB-gb                0.3452 eV   gap closed  +13.2%
+  AB-knn               0.3423 eV   gap closed  +14.6%
+  C-lin (k=19)         0.3984 eV   gap closed  -11.4%
+  C-rf (k=19)          0.3750 eV   gap closed   -0.6%
+  ABC-lin (k=19)       0.3885 eV   gap closed   -6.8%
+
+=== Tier C capacity sweep ===
+  k=2   0.3811 eV (gap closed   -3.4%)   shuffled control 0.4125 eV
+  k=4   0.3828 eV (gap closed   -4.2%)   shuffled control 0.4138 eV
+  k=6   0.3821 eV (gap closed   -3.9%)   shuffled control 0.4188 eV
+  k=8   0.3828 eV (gap closed   -4.2%)   shuffled control 0.4238 eV
+  k=12  0.3945 eV (gap closed   -9.7%)   shuffled control 0.4279 eV
+  k=20  0.3944 eV (gap closed   -9.6%)   shuffled control 0.4324 eV
+
+=== leakage check: grouped vs plain LOO ===
+  A-lin    grouped 0.4313 | plain LOO 0.4030 | leakage inflation +0.0282 eV
+  B-lin    grouped 0.3621 | plain LOO 0.3611 | leakage inflation +0.0009 eV
+  AB-rf    grouped 0.3295 | plain LOO 0.3131 | leakage inflation +0.0164 eV
+
+shuffled-target control on best model (AB-rf): 0.4557 eV (gap closed -38.1%)
+
+[checkpoint] ladder + sweep saved to /Pool/Diamond_Defect_Corpus/pbe_hse_offset/ladder_results.json
+
+=== permutation importance, AB-rf (46 features, baseline 0.3281 eV at 100 trees) ===
+  ...10/46 features
+  ...20/46 features
+  ...30/46 features
+  ...40/46 features
+  B_ingap_E_mean_frac      +0.0071 eV
+  B_ingap_E_max            +0.0063 eV
+  A_dnval_sum              +0.0063 eV
+  B_max_disp               +0.0060 eV
+  B_magmom                 +0.0057 eV
+  B_ipr_max                +0.0039 eV
+  B_ingap_E_min            +0.0034 eV
+  A_chi_sum                +0.0029 eV
+
+=== chemical clustering of the unoccupied offset ===
+  by group         within/total variance = 0.640 (14 buckets) -> clusters
+  by period        within/total variance = 0.935 (5 buckets) -> NO clustering
+  by defect order  within/total variance = 0.991 (3 buckets) -> NO clustering
+
+wrote /Pool/Diamond_Defect_Corpus/pbe_hse_offset/ladder_results.json and /Pool/Diamond_Defect_Corpus/pbe_hse_offset/offsets_per_config.csv

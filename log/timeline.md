@@ -116,7 +116,7 @@ concrete types.
 The Dreyer ±5%-on-polarization-difference result was established to hold by an
 **accidental cancellation** between the spurious zincblende-reference term and the
 proper/improper piezoelectric-constant error — large, opposite in sign, nearly
-cancelling — and **not** by generic reference-cancellation. Two consequences follow
+canceling — and **not** by generic reference-cancellation. Two consequences follow
 and are both live: the self-consistent-pairing certificate, and the refusal for
 high-indium indium-gallium-nitride on gallium nitride.
 
@@ -131,7 +131,7 @@ high-indium indium-gallium-nitride on gallium nitride.
 
 `τ` is not a reserved tolerance prefix — 48 correct uses across six pages are physical
 times — and narrowing by value shape does not separate a 1e-12 s relaxation time from
-a 1e-12 tolerance. Verdict: this is a review rule, and it is labelled as one.
+a 1e-12 tolerance. Verdict: this is a review rule, and it is labeled as one.
 
 - **Evidence** — [cert-obligations#tolerance-ledger]; [traps#practice].
 - **Attribution** — corpus tooling work. MISSING: no agent or person named.
@@ -331,9 +331,9 @@ gates, and the image-force reconciliation.
 ### 2026-06-10 · Frenkel-pair yield was dimensionally invalid
 
 Without the macroscopic displacement cross-section (atoms per volume times the
-displacement cross-section, in inverse centimetres), the bare product of defects per
+displacement cross-section, in inverse centimeters), the bare product of defects per
 displacement, surviving fraction and dose fluence is a **fluence** in inverse square
-centimetres — not a concentration. The expression could not have been right in any
+centimeters — not a concentration. The expression could not have been right in any
 units.
 
 - **Evidence** — [multiscale-state#eom-defect-population]; [traps#units].
@@ -473,7 +473,7 @@ carried; no waiver now stands.
 A post-remediation sweep in three parallel inventory passes. Verifier-soundness holes
 closed: density-matrix admissibility must be *scored* rather than assumed; the gauge
 and electrostatic partition; and the two-predicate polar split, which is the rule that
-keeps β-gallium-oxide coherent. Seven registry rows added. The forward wave programme —
+keeps β-gallium-oxide coherent. Seven registry rows added. The forward wave program —
 waves three through five, the reduced metals schema, and the decision about a Curie
 point falling inside the operating window — was promoted to the reference battery.
 
@@ -484,9 +484,9 @@ against:
 | | |
 |---|---|
 | **A** | Verifier-soundness holes — states the oracle could wrongly accept. **A1** density-matrix admissibility never scored · **A2** vector-potential gauge and the electrostatic double-count · **A3** the two "polar" predicates conflated |
-| **B** | Missing or incorrect physics for the named scope. **B1** pyroelectricity absent · **B2** gate-dielectric degradation package empty · **B3** aluminium-gallium-nitride nonlinear polarization interpolation unstated · **B4** experimental structure channels unmapped · **B5** radiation modelled as displacement only · **B6** dangling radiative branch and hydrogen-only redistribution · **B7** research-file physics errors · **B8** un-reconciled numeric contradictions across research files |
+| **B** | Missing or incorrect physics for the named scope. **B1** pyroelectricity absent · **B2** gate-dielectric degradation package empty · **B3** aluminium-gallium-nitride nonlinear polarization interpolation unstated · **B4** experimental structure channels unmapped · **B5** radiation modeled as displacement only · **B6** dangling radiative branch and hydrogen-only redistribution · **B7** research-file physics errors · **B8** un-reconciled numeric contradictions across research files |
 | **C** | Consistency faults, mechanical. **C1**–**C12**: stale README and audit-prompt counts, the atomic-species set for the minimum viable product, scope reconciliation, the "17 named tags" slip (19 is canon), uncertainty-column holes against the refusal rule, mixed uncertainty conventions, the count check, and empty research-source frontmatter (deferred) |
-| **D** | Data gaps — the per-material research programme. **D0** diamond battery missing · **D1** wave two = β-gallium-oxide · **D2** wave three = cubic boron nitride and 4H silicon carbide · **D3** no wave covered contact metals, substrates beyond silicon carbide, or dielectrics · **D4** standing acquisitions |
+| **D** | Data gaps — the per-material research program. **D0** diamond battery missing · **D1** wave two = β-gallium-oxide · **D2** wave three = cubic boron nitride and 4H silicon carbide · **D3** no wave covered contact metals, substrates beyond silicon carbide, or dielectrics · **D4** standing acquisitions |
 | **E** | Standing open registers — confirmed complete |
 
 - **Evidence** — [traps#verifier-soundness]; [reference-battery#wave-programme];
@@ -570,7 +570,7 @@ normalization.
 
 ### 2026-07-07 · Non-collinear spin density-functional theory re-attributed
 
-The construction was labelled "Vignale–Rasolt"; that is *current* density-functional
+The construction was labeled "Vignale–Rasolt"; that is *current* density-functional
 theory. The correct attribution is von Barth–Hedin and Kübler. Vignale–Rasolt is
 retained, correctly, for the orbital-current functional in the relativistic synthesis.
 
@@ -837,7 +837,7 @@ wrong.
 - **Attribution** — dataset recovery. MISSING: no agent named.
 - **Supersedes** — the 877-point byte-salvage count and its "family 4 lost" conclusion.
 
-### 2026-07-16 · The diamond strain hypersurface characterised as operator feedstock
+### 2026-07-16 · The diamond strain hypersurface characterized as operator feedstock
 
 1,179 rows at hybrid level (screened-exchange functional with gap-tuned exact
 exchange), **1,131 distinct strain shapes after de-duplication**, six lattice-distortion
@@ -911,7 +911,7 @@ identifier, with generated apparatus replacing roughly 10,500 lines of duplicati
 ### 2026-07-21 · Exact identity, measured error — one rule closing six open faces
 
 The collision: identity is exact — an address is the hash of canonical bytes, with
-floats normalised so that numerically equal values share an address — while every
+floats normalized so that numerically equal values share an address — while every
 object also carries a tolerance that composes. Approximate equality is a **tolerance**
 relation and is not transitive, so it induces a covering by maximal cliques rather than
 a partition. No partition means no canonical representative, nothing to hash, and
@@ -1169,7 +1169,7 @@ tag.
 
 ### 2026-07-21 · The differentiability tag that collided with a physical defect renamed
 
-The tag spelled `DX` collided with the DX centre — the deep-donor configuration this
+The tag spelled `DX` collided with the DX center — the deep-donor configuration this
 corpus analyses in aluminium-gallium-nitride and aluminium nitride — so searching for
 the tag returned the physics and searching for the physics returned the tag. Eight rows
 were retagged in the same pass; the crystal-structure-uniqueness row moved off the
@@ -1246,7 +1246,7 @@ nothing.
 - **Attribution** — corpus tooling work. MISSING: no agent named; the source record
   dated this "approximately" 2026-07-21.
 - **Supersedes** — the hard-coded nine-symbol list. **Note:** the stale description of
-  the old behaviour survived on the obligations page after the rebuild, which is the
+  the old behavior survived on the obligations page after the rebuild, which is the
   restatement failure again.
 
 ### 2026-07-21 · A parser bug made the data checker report clean while pages invoked unregistered formulas
@@ -1317,7 +1317,7 @@ moment closure.
 ### 2026-07-21 · Serial page identifiers and eponymous formula names replaced by descriptive ones
 
 38 page identifiers carrying chapter-and-number serials were renamed to descriptive
-phrases. About 25 registry formulas were renamed by behaviour rather than by person —
+phrases. About 25 registry formulas were renamed by behavior rather than by person —
 for example, a vibronic coupling factor became the lattice-relaxation phonon quanta, and
 a field-activated ionization rate became the impact-ionization coefficient. The token
 `GAP` was found to mean three different things.
@@ -1325,7 +1325,7 @@ a field-activated ionization rate became the impact-ionization coefficient. The 
 - **Evidence** — [traps#practice]; [agent-contract#vocabulary]; commits `2f1d22f`, `be77d5b`.
   EVIDENCE-DIES: the old-to-new maps were kept in `retired-ids.csv` and
   `retired-names.csv`, both of which this restructure deletes. Before they go, the
-  literature-name-to-behaviour-name mapping they carry is the *only* bridge from the
+  literature-name-to-behavior-name mapping they carry is the *only* bridge from the
   published names (Fowler-Nordheim, Richardson-Dushman, Padovani-Stratton, Kane-Zener,
   Makov-Payne, Freysoldt, Lany-Zunger, Schottky-Mott) to the registry rows. One of them,
   the Makov-Payne correction, maps **ambiguously** onto two rows and needs a human
@@ -1576,7 +1576,7 @@ under it.
 - **Attribution** — the 2026-07-22 adversarial re-audit. MISSING: no agent named.
 - **Supersedes** — the exponent-two value for diamond.
 
-### 2026-07-22 · Two errors partly cancelled into a plausible answer
+### 2026-07-22 · Two errors partly canceled into a plausible answer
 
 In the gallium-nitride high-electron-mobility-transistor hot-carrier example, a
 hundred-fold Joule-density fix was applied to the producing line and not to the
@@ -2048,7 +2048,7 @@ parenthetical the CSV carried. The β-gallium-oxide best experimental electron m
 traces to four named papers, three matching exactly. Diamond's lattice constant resolves
 to Hom, Kiszenick & Post, *J. Appl. Cryst.* **8**, 457 (1975) at 3.566986 Å, from which
 the mass density follows exactly; the maximum phonon energy to Solin & Ramdas, *Phys.
-Rev. B* **1**, 1687 (1970) for the zone-centre value and Kulda et al., *Phys. Rev. B*
+Rev. B* **1**, 1687 (1970) for the zone-center value and Kulda et al., *Phys. Rev. B*
 **66**, 241202 (2002) for the true maximum; the indirect gap to the Clark-Dean-Harris
 lineage, *Proc. R. Soc. A* **277**, 312 (1964); the graphite-referenced formation energy
 to Berman & Simon, *Z. Elektrochem.* **59**, 333 (1955).
@@ -2207,7 +2207,7 @@ Four of those are worse than the others, because the dying page is cited from an
 artifact that **outranks canon**: two registry rows cite chapter-11 sections as the
 justification for their signatures, one reference-data row names a chapter-11 page as
 its source, and the retired-name maps are the only bridge from published literature
-names to the corpus's behaviour-based formula names. Nothing checks a citation from a
+names to the corpus's behavior-based formula names. Nothing checks a citation from a
 data file into a page, so these will dangle silently rather than fail.
 
 - **Evidence** — `restructure/GATE.md`; `restructure/merged/notes.md`;
@@ -2220,3 +2220,185 @@ data file into a page, so these will dangle silently rather than fail.
   never sourced.
 
 
+
+### 2026-08-02 · Gate 1: the charge-density target is dead, and a trivial lookup already beats the published state of the art
+
+Across 81 defect configurations sharing an identical geometry between their PBE and
+HSE06 runs, the normalized mean absolute error between the two charge densities is
+**0.784% ± 0.030%**. That sits inside the marginal 0.5–2% band, where the decision rule
+permits proceeding only if the spread across configurations is a substantial fraction of
+the mean — and it is not: the standard deviation is **3.8%** of the mean, and pure
+diamond with no dopant at all sits at 0.775%, statistically indistinguishable from the
+doped population. The correction is a near-constant property of the carbon host, not
+something that varies with the defect being modeled.
+
+Three independent checks agree. Only **1.8%** of the integrated density difference lies
+within 2 Å of the dopant against 3.4% of the cell volume, so the defect region carries
+*less* than its share and there is no localized residual to specialize on. A
+one-dimensional lookup on the local PBE density, fitted once on pure diamond and
+transferred untouched, drops the error to **0.52–0.65%** — at ChargE3Net's published
+0.523% — leaving under 0.55% of total signal for an operator to win. The measurement is
+not noise: two independent PBE runs of pure diamond differ by 0.108%, so the functional
+signal is about seven times the floor. Real and small is still small.
+
+- **Evidence** — `feasibility/gate-1-charge-density/VERDICT.md`, and the four plots and
+  `summary.json` it cites. MISSING: the analysis code was never written to disk, so this
+  result can be checked against what it reports but not regenerated.
+- **Attribution** — the feasibility campaign, gate 1.
+- **Supersedes** — the proposal to build the operator against the charge-density field.
+
+### 2026-08-02 · Gate 2: the hybrid correction is an energy-dependent stretch, not a scissor shift, and localization does not predict it
+
+Across 255,568 matched states in 81 clean pairs, a two-constant rigid model leaves
+**0.759 eV** on the 2,883 states lying inside the gap — three times the 0.25 eV proceed
+threshold, and worse than applying no correction at all, because the globally fitted
+occupied constant is dominated by deep valence states. The reason is visible directly:
+the shift is near-linear in energy, roughly **0.10·E** occupied and **0.07·E + 0.84**
+unoccupied, so the valence band is *stretched* by about a tenth rather than held fixed
+while the conduction band is lifted. Consistent with that, after the best rigid shift
+**32.7%** of the HSE06 curve's integral remains unmatched at 0.3 eV broadening.
+
+The proposed mechanism is not supported. Once the occupied/unoccupied confound is
+removed, the residual shows no usable correlation with either inverse participation ratio
+or weight on the dopant atoms — **R² ≤ 0.015** in every channel. What is learnable is the
+per-configuration offset, worth about 0.22 eV of the 0.374 eV in-gap residual above an
+irreducible 0.158 eV within-configuration scatter.
+
+- **Evidence** — `feasibility/gate-2-eigenvalue-correction/VERDICT.md`;
+  `per_state_table.csv.gz` and `final_results.json` beside it. MISSING: the analysis code
+  was never written to disk.
+- **Attribution** — the feasibility campaign, gate 2.
+- **Supersedes** — the hypothesis that the PBE→HSE06 correction is a rigid scissor shift,
+  and the hypothesis that localized states shift more.
+
+### 2026-08-02 · Gate 3: the per-configuration offset is not predictable, and a free four-parameter formula shrank the prize
+
+Under leave-one-dopant-set-out cross-validation the best of eight models closes **20.5%**
+of the 0.2154 eV oracle gap, below the 30% threshold. It is not a linear-model artifact:
+gradient-boosted and nearest-neighbor models fail alongside it, and both linear tiers
+score *worse* than predicting a constant. Tier C — built specifically to give the project
+its one chance at positive evidence — returned nothing, scoring −0.6% to −11.4% and
+getting monotonically worse as more components were retained, which is the shape of noise
+rather than of signal. Permutation importance finds no mechanism either, and the noise
+floor was measured rather than assumed: the top-ranked feature is worth
+**0.0021 ± 0.0025 eV**, with one of six draws negative, so the reported +0.0071 eV
+headline was a 2σ draw and no descriptor is distinguishable from zero.
+
+Set against that, adding the missing linear-in-energy row cuts density-of-states
+deformation from 32.7% to **14.8%** at σ = 0.3 eV — four global parameters beating a
+162-parameter per-configuration model. By the gate's own stated standard, that changed the
+architecture decision.
+
+- **Evidence** — `feasibility/gate-3-offset-predictability/VERDICT.md`;
+  `ladder_results.json` and `dos_table.md` beside it. MISSING: the analysis code was never
+  written to disk.
+- **Attribution** — the feasibility campaign, gate 3.
+- **Supersedes** — the expectation that dopant chemistry, PBE scalars, or the PBE spectrum
+  predict the per-configuration offset.
+
+### 2026-08-03 · Gate 4: strain response is large, and textbook deformation-potential theory already explains four-fifths of it
+
+The diamond strain sweep reaches **14.85%** Green–Lagrange strain, so the corpus samples
+the nonlinear regime rather than only linear response. The response is large: the PBE
+indirect gap runs from 4.81 eV to **0.441 eV**, and in 44 of 1,131 shapes the conduction
+minimum moves to Γ and diamond becomes direct-gap. A linear model of that is worthless —
+it scores 632 meV against a 638 meV no-information anchor.
+
+But deformation-potential theory with valley minimization and Bir–Pikus degeneracy
+splitting — five parameters, all published physics — reaches **115.8 meV**, capturing 82%
+of the variation, and is by a wide margin the best extrapolator in the ladder: **69.7 meV**
+on a family holdout against 884.8 for gradient-boosted trees and 33,894 for a generic
+quadratic. Nothing cheap reaches the noise floor and nothing cheap beats the physics. The
+decision variable is **R2 = 148.9 meV**, 7.4× the gate's threshold, but only 2.7% of the
+observable's 4.36 eV span.
+
+No decision row fired cleanly: every scalar clause of the full-ambition row is met and its
+density-of-states clause fails on both halves — after a quadratic-invariant map the
+residual is 12.7% against a required 15%, and it concentrates in the deep valence and high
+conduction rather than at the gap edges. The verdict is the reframed proceed, not the
+headline one.
+
+- **Evidence** — `feasibility/gate-4-strain-sweep/VERDICT.md`, and the committed tables,
+  figures and eleven programs beside it, which reproduce its published numbers from this
+  repository.
+- **Attribution** — the feasibility campaign, gate 4.
+- **Supersedes** — the expectation that the strain target would either die to a cheap
+  baseline or justify the operator as its headline.
+
+### 2026-08-03 · The PBE→HSE06 gap correction drifts with strain, by five orders of magnitude more than noise
+
+Equilibrium scissor and stretch corrections are routinely applied to strained structures.
+Measured across 1,131 distinct shapes at both functionals, that practice mis-corrects
+diamond by **47.5 meV on average and 201 meV at worst**. The correction falls at
+**−9.1 meV per 1% of strain magnitude**, from 1.292 eV extrapolated to zero strain to
+1.201 eV at ‖E‖ = 0.10, with a **325 meV** total spread — against a noise floor of
+**0.002 meV** measured from symmetry twins, a ratio of 1.6 × 10⁵.
+
+The drift is structured but not simply: second-order strain invariants explain only
+**R² = 0.37**, and it is not a volume effect, with the trace alone giving 0.15 and the
+deviator alone 0.14. Gate 2's coefficients, measured on 64-atom defect supercells at a
+single geometry, are reproduced in shape on a 2-atom primitive cell across 1,131
+geometries.
+
+This is the campaign's citable physical result, and it needs no operator.
+
+- **Evidence** — `feasibility/gate-4-strain-sweep/VERDICT.md`, the step 5 section;
+  `results/step5_coefficients.csv` and `results/step5_drift_vs_strain.csv` beside it.
+- **Attribution** — the feasibility campaign, gate 4, step 5.
+- **Supersedes** — the implicit assumption that a hybrid correction measured at
+  equilibrium transfers to strained geometries.
+
+### 2026-08-03 · The operator's interior is five constituents, and the integral transform is the one that owns discretization
+
+The seam fixed the operator library's boundary and the loss fixed what it is trained
+against. Nothing named what sits between an integral kernel and a function, so the
+interior had no specification at all. A new `structure` section of the operator journal
+supplies one in five pages, and the corpus goes from 45 pages and 273 topics to **50 and
+302**.
+
+The load-bearing finding is that **the integral transform is not a container holding an
+integral kernel and a function — it is the discretization contract between them.** The
+container reading assumes the discretization is already given; once it is, the transform
+collapses to a matrix-vector product and there is nothing left in it. The discretization
+is chosen, not given, and six responsibilities follow from owning that choice: resampling,
+quadrature weights, evaluation strategy, the nonlocality budget, quadrature-error
+declaration, and cross-tier coupling. The claim is bounded rather than absolute — fix one
+discretization permanently and five of the six evaporate.
+
+Three consequences are worth more than the decomposition itself.
+
+**The named operator families are cells of one table, not four architectures.** A Fourier
+neural operator is the fast Fourier transform on a stationary integral kernel over a
+regular periodic grid; a branch-trunk operator is the outer product on a separable one; a
+graph neural operator is a neighborhood subsample on a general one. Under the
+architecture reading, *"the same integral kernel under two strategies"* is not a question
+that can be posed. The table has more cells than it has named families, and an unnamed
+cell is an experiment that has not been run.
+
+**The real-space integration domain is state-dependent.** Its geometry is the cell
+vectors, a slot of the state the operator predicts, so the quadrature weight is the
+determinant of a predicted array and a gradient can reach the learnable structure through
+the measure rather than only through the integral kernel. The strain sweep reaches nearly
+15% Green–Lagrange strain, so a frozen weight is not approximately right either.
+
+**Three vocabulary collisions were latent and are now named.** `kernel` is reserved for
+the compiled oracle artifact across 160 uses, so the neural operator's is always the
+*integral kernel*; `layer` is reserved for the physical or epitaxial layer, so a stack of
+transforms cannot borrow it; `component` is spent twice over. The five things are
+**constituents**, a token with no prior use in the corpus.
+
+One open question closes: a sampling policy is a cadence, a sampler and an importance
+function, and one record now carries all three.
+
+- **Evidence** — `journals/operator/structure/`, five pages; `python tools/check_structure.py`
+  reporting 50 pages, 302 owned topics, 61 open questions; `python tools/check_the_checker.py`
+  at 34 probes caught, 0 missed, 0 error sites unreached. The structure run is calibrated
+  rather than merely green: six planted defect classes — duplicate topic, undeclared anchor,
+  missing dependency edge, history marker, unescaped table pipe, uncited dependency edge —
+  were each caught **on their own error text**, with a negative control left clean. The first
+  calibration pass credited three of the six falsely, because `--check` fails on a stale index
+  before it reaches the planted defect.
+- **Attribution** — the operator-interior design session.
+- **Supersedes** — the position that the operator's interior could not be specified until
+  the integral-kernel research landed. It specifies what the transform *requires* of an
+  integral kernel, which is a structure-class declaration, and requires nothing else.

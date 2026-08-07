@@ -188,7 +188,7 @@ way to say "deferred".**" — nothing says so; that page reaches for a fourth va
 **Verdict:** ABSENT
 
 **The obligation.** The page owns "certificate artifact" and states it twice, differently.
-As a serialised term:
+As a serialized term:
 
 > The certificate emitted for any prediction is an **inert s-expression** carrying scalar
 > verdicts plus numeric witnesses for the failures. It executes nothing and decides
@@ -205,14 +205,14 @@ And the file that consumers hold carries a third thing ([product#oracle-file-con
 
 **What is missing.** No grammar for the s-expression: no atom set, no node names, no
 ordering, no encoding of the "scalar verdicts", no encoding of the "numeric witnesses", no
-statement of whether it is the serialisation of the attestation DAG or an independent
+statement of whether it is the serialization of the attestation DAG or an independent
 rendering. The page announces machinery over it — "a schema, a deterministic text
 renderer, a freeze fixture with a tamper tripwire, and a high-precision oracle
 cross-check" — and specifies none of the four. A deterministic renderer with no stated
 term order is not implementable, and a freeze fixture with no byte form has nothing to
 freeze.
 
-**Control.** Searched `grep -rn "s-expression\|sexp\|S-expression" journals/` → 1 hit, the sentence quoted above; the token appears nowhere else in the corpus. Control that fires: the corpus does specify serialisation at byte level where it chooses to — `grep -rn "big-endian" journals/` → 2 hits in `representation-substrate.md` giving `Nat`/`Int`/`Float` layouts, and the SQLite DDL above is given column by column. So the search style reaches byte-level format statements where they exist.
+**Control.** Searched `grep -rn "s-expression\|sexp\|S-expression" journals/` → 1 hit, the sentence quoted above; the token appears nowhere else in the corpus. Control that fires: the corpus does specify serialization at byte level where it chooses to — `grep -rn "big-endian" journals/` → 2 hits in `representation-substrate.md` giving `Nat`/`Int`/`Float` layouts, and the SQLite DDL above is given column by column. So the search style reaches byte-level format statements where they exist.
 
 ---
 
@@ -394,7 +394,7 @@ and the first argument of the second export:
 `ObservableMap` in the runtime kernel's output tuple, so it is simultaneously a wire type,
 a database column, and a selection argument — and an implementer cannot write any of the
 three. Whether it names a registry row, a bundle member, a `(row, axis-tuple)` pair, or
-a catalogue property is undecidable from use sites: `Import`'s "named-target" and
+a catalog property is undecidable from use sites: `Import`'s "named-target" and
 `request`'s "a subset of observables" pull in different directions.
 
 The glossary states the consequence of its own absence explicitly — "If a name is missing
@@ -485,7 +485,7 @@ compiled against different registry versions collide in the cache.
 
 ---
 
-### X15 — the environment-box stamp has no type and its out-of-box behaviour is an unresolved disjunction, in `crystal-inputs.md`
+### X15 — the environment-box stamp has no type and its out-of-box behavior is an unresolved disjunction, in `crystal-inputs.md`
 
 **Verdict:** ABSENT
 
@@ -506,7 +506,7 @@ joint, what a field absent from the box means, and where the box lives in the ar
 all unstated. Since the box is stamped on the kernel and the kernel's file format does not
 exist (X13), it has no location either.
 
-*The behaviour.* "masked out, **or** trips the relevant certification obligation" is a
+*The behavior.* "masked out, **or** trips the relevant certification obligation" is a
 disjunction with no decision rule. These are opposite outcomes — one silently drops a
 sample from a training batch, the other emits a `Failed` leaf — and an implementer must
 pick one.
@@ -520,7 +520,7 @@ the ten mentions the environment box.
 mentions the box. The box is downstream of both and independent of them: even with the
 partition settled and every field typed, none of the three gaps above closes.
 
-**Control.** Searched `grep -rniE "certified envelope|environment box|validity box|range set" journals/` → 5 hits, being the sentence above, the two pages pointing at it, and `product.md`'s "certified envelope" and "validity box". No hit gives a type or a decision rule. Control that fires: the same search style for a stamp the corpus *does* type — `grep -rn "coverage_mask   BLOB" journals/` → 1 hit giving column, type and serialisation for the axis-coverage stamp. So a per-field typed stamp is something this corpus writes when it has decided one.
+**Control.** Searched `grep -rniE "certified envelope|environment box|validity box|range set" journals/` → 5 hits, being the sentence above, the two pages pointing at it, and `product.md`'s "certified envelope" and "validity box". No hit gives a type or a decision rule. Control that fires: the same search style for a stamp the corpus *does* type — `grep -rn "coverage_mask   BLOB" journals/` → 1 hit giving column, type and serialization for the axis-coverage stamp. So a per-field typed stamp is something this corpus writes when it has decided one.
 
 ---
 
@@ -535,7 +535,7 @@ this page:
 >   file, produces one oracle-file.
 > - `inspect` — oracle-file produces its static schema and identity, enumerated.
 > - `validate` — oracle-file plus a state file, plus environment and request flags,
->   produces the keyed-float maps, serialised.
+>   produces the keyed-float maps, serialized.
 
 **What is missing.**
 
@@ -548,7 +548,7 @@ addresses is written on a command line is not addressed.
 compiler input — "a targets file handed to the compiler" — so the targets file is the wire
 form of the `Import` signature, and it has no encoding.
 
-*Output encoding.* "produces the keyed-float maps, serialised" and "enumerated" name no
+*Output encoding.* "produces the keyed-float maps, serialized" and "enumerated" name no
 format. Keys are content addresses; whether they render as hex, base64 or names is
 unstated.
 
@@ -657,7 +657,7 @@ Combined with X18 this makes the substrate's identity layer — the thing the pa
 common value, even though the rule itself is written out in eleven numbered clauses and is
 otherwise the most completely specified thing in the corpus.
 
-**Control.** Searched `grep -rn "domain_separator\|domain separator\|DomainId\|domain-separat" journals/` → 8 hits: the address formula, the rule clause, two field declarations, and four assertions that some address is domain-separated. No tag value, no domain list. Control that fires: the same page states the neighbouring constants concretely — `grep -rn "SHA-256, 256 bits" journals/` → 1 hit, "The digest is SHA-256, 256 bits wide, truncated nowhere in storage", and clause 11 gives the float normalisation exactly. So the search reaches constants on this page where they were written.
+**Control.** Searched `grep -rn "domain_separator\|domain separator\|DomainId\|domain-separat" journals/` → 8 hits: the address formula, the rule clause, two field declarations, and four assertions that some address is domain-separated. No tag value, no domain list. Control that fires: the same page states the neighboring constants concretely — `grep -rn "SHA-256, 256 bits" journals/` → 1 hit, "The digest is SHA-256, 256 bits wide, truncated nowhere in storage", and clause 11 gives the float normalization exactly. So the search reaches constants on this page where they were written.
 
 ---
 
@@ -673,7 +673,7 @@ it is declared a closed universe with dense ordinals:
 
 > | **vocabularies** — `StateComponent`, `SubDofTag`, `IrrepLabel`, `OutputRole`, `NodeKind`, `InputKind`, `CategoryTag`, `AxisLabel`, `BundleId`, `Layer0Type` | `Universe[T]` instances with dense ordinals | closed universes get `DenseU32`; open universes get `DenseU64` with an append-only registry |
 
-and it is the realisation of the typeclass alphabet in the graph
+and it is the realization of the typeclass alphabet in the graph
 ([physics-graph#vocabulary-realization]):
 
 > | the typeclass alphabet ([typeclass-alphabet#axes]) | the `type` field on every node |
@@ -692,7 +692,7 @@ each other's escape route.
 `IrrepLabel` is in the same position: named once in the cluster table, pointed at from the
 glossary, and enumerated nowhere.
 
-**Control.** Searched `grep -rn "Layer0Type\|IrrepLabel" journals/` → 3 hits total: the node field, the cluster row, and the glossary pointer for `IrrepLabel`. Control that fires: the same search for the neighbouring members of that same cluster list — `grep -rn "NodeKind =\|OutputRole =" journals/` → both enumerated in full in `physics-graph.md`, and `AtomicSpecies`'s membership is given outright in `canonical-vocabularies.md` as `{C, B, N, Al, Ga, O, H}`. So the search reaches enumerated universes in the same table where the corpus wrote them.
+**Control.** Searched `grep -rn "Layer0Type\|IrrepLabel" journals/` → 3 hits total: the node field, the cluster row, and the glossary pointer for `IrrepLabel`. Control that fires: the same search for the neighboring members of that same cluster list — `grep -rn "NodeKind =\|OutputRole =" journals/` → both enumerated in full in `physics-graph.md`, and `AtomicSpecies`'s membership is given outright in `canonical-vocabularies.md` as `{C, B, N, Al, Ga, O, H}`. So the search reaches enumerated universes in the same table where the corpus wrote them.
 
 ---
 
@@ -711,7 +711,7 @@ and the evidence instance is named:
 
 **What is missing.** `S.Op`, `S.Attrs[op]` and `S.Arities[op]` are given for none of the
 four ops, and `EvidencePayload` — the leaf type — is named twice and defined nowhere. An
-implementer cannot construct a node, cannot canonicalise one, and therefore cannot compute
+implementer cannot construct a node, cannot canonicalize one, and therefore cannot compute
 the root `Address` that `cert-obligations` says *is* the artifact the operator library
 consumes. The same absence applies to `PredicateOps` and `GroupOps`; `SymbolicTensorOps`
 is the only one whose generators are listed, and even there the attribute records are not.

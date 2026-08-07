@@ -19,7 +19,7 @@ false positives above were competent literature work aimed at a premise nobody g
 
 ## Method
 
-For every quotation in `audit/findings/*.md`: normalise, then search the live tree for
+For every quotation in `audit/findings/*.md`: normalize, then search the live tree for
 the literal string.
 
 **By content, never by coordinate.** No `file.md:NN` reference is trusted — a deletion in
@@ -27,7 +27,7 @@ a modified copy offsets every line after it, and that is precisely how one real 
 (the `Adiabatic-Hedin-Coulomb` / `Allen–Heine–Cardona` eponym clash) was once wrongly
 dismissed as a plant. The coordinate is recorded; the *string* is the test.
 
-Normalisation collapses only what legitimately differs between a quotation and its
+Normalization collapses only what legitimately differs between a quotation and its
 source: markdown emphasis the auditor added, line wrapping, non-breaking spaces, the
 several dash codepoints that render alike, and trailing punctuation the auditor supplied.
 **Unicode is otherwise preserved** — the en-dash class is exactly where a naive sweep goes

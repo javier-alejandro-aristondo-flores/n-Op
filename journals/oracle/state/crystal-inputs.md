@@ -86,7 +86,7 @@ its field set is a public interface rather than an implementation detail.
 | `radiation_dose` | `Fluence` (cm⁻²) | read by the Frenkel-pair yield |
 | `displacement_threshold` | `Energy` (eV), per host | read by the displacement count |
 | `vibration_spectrum` | `PSD`, amplitude against frequency over 100 Hz – 10 kHz | read by vibration-induced vacancy generation |
-| `p_O2` | `Pressure` (Pa) | a specialisation of the pressure slot, not an independent field |
+| `p_O2` | `Pressure` (Pa) | a specialization of the pressure slot, not an independent field |
 
 Only the last five fields carry a declared type and unit anywhere in the corpus. The first eight
 are recoverable as *names* — they are used in signatures and in prose across the corpus — but
@@ -151,6 +151,6 @@ shape of the `Reference` baseline above.
 **`Crystal` is not defined.** It is used across the corpus and introduced nowhere. Two readings
 fit every use site: `Crystal` is the pair `(PeriodicityStructure, SiteDecoration)`, or it is the
 full triple including `Environment`. The pairing with a separate `Environment` argument at every
-call site favours the first, since the second would make the signature redundant in its own
+call site favors the first, since the second would make the signature redundant in its own
 second argument — but that is an inference from call sites, not a statement, and the type stays
 open until one is written down here.

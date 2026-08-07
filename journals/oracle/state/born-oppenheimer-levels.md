@@ -56,7 +56,7 @@ The kinetics level introduces distributions over phase space, which are not reco
 single micro seven-tuple. That irreducible state is concrete, and it is two tiers rather than one
 ([multiscale-state#three-tiers]):
 
-- the **macro continuum-field tier** — homogenised lattice temperature, potential, carrier
+- the **macro continuum-field tier** — homogenized lattice temperature, potential, carrier
   densities and current density on a device mesh, with the full distribution kept emergent by
   moment closure ([multiscale-state#macro-state-schema]);
 - the **slow, configurational tier** — history-dependent defect populations on an hours-to-years
@@ -66,7 +66,7 @@ The micro seven-tuple is the tier of the two lowest levels.
 
 ## Dressing tiers
 
-Within `quantum-electronic-substrate`, corrections that dress the bare substrate are organised
+Within `quantum-electronic-substrate`, corrections that dress the bare substrate are organized
 into implementation tiers. **These are version-1-versus-version-2 implementation scope, not a
 runtime hierarchy.** Dressing is a lowering choice for specific `MethodInvoke` nodes, and the
 `dressing` tag on `ContributionFacets` is a **provenance label, not a loss-weighting axis**. That
@@ -76,7 +76,7 @@ is a structural fact rather than a convention — the graph is what makes it tru
 | Tier | Contents | Certificate |
 |---|---|---|
 | `substrate` | the bare substrate | — |
-| `one-shot-dressing` | closed-form dressing, pure functions, no iteration: G₀W₀ quasi-particle energies; first-order self-consistent phonons; the linear-response sub-stage producing Born effective charges, high-frequency permittivity and susceptibility; the longitudinal-to-transverse-optical non-analytic correction; one-shot diagonalisation; one-shot topological invariants | `OneShotCert` ([residual-machinery#dressing-certs]) |
+| `one-shot-dressing` | closed-form dressing, pure functions, no iteration: G₀W₀ quasi-particle energies; first-order self-consistent phonons; the linear-response sub-stage producing Born effective charges, high-frequency permittivity and susceptibility; the longitudinal-to-transverse-optical non-analytic correction; one-shot diagonalization; one-shot topological invariants | `OneShotCert` ([residual-machinery#dressing-certs]) |
 | `iterative-dressing` | iterative fixed-point dressing: self-consistent GW; full self-consistent phonons (SCPH) and the stochastic self-consistent harmonic approximation (SSCHA); temperature-dependent effective potentials (TDEP); dynamical mean-field theory (DMFT); iterative Bethe–Salpeter variants; the self-consistent polaron. Deferred to version 2 in code and specified for forward compatibility; each member gets a bespoke lowering rather than a shared primitive | `IterativeResult` ([residual-machinery#dressing-certs]) |
 | `property-machinery` | the rest of the physics graph | — |
 

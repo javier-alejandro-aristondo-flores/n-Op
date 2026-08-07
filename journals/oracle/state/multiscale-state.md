@@ -11,7 +11,7 @@ owns:
   - device-mesh universe
   - macro continuum-field state schema
   - moment closures for electron temperature and current density
-  - the micro-to-macro homogenisation map
+  - the micro-to-macro homogenization map
   - the defect-population and continuum residual categories
   - the unified three-tier residual contract
 anchors:
@@ -25,7 +25,7 @@ anchors:
   device-mesh: "The device mesh"
   macro-state-schema: "The macro field set"
   moment-closures: "Moment closures"
-  homogenisation-map: "The homogenisation map"
+  homogenization-map: "The homogenization map"
   eom-continuum: "The continuum residual"
   residual-contract: "The unified three-tier residual contract"
 depends-on:
@@ -49,7 +49,7 @@ open-questions:
     summary: "Discrete- versus continuous-adjoint of the finite-volume operator, for differentiating the continuum residual. The mesh format is committed; the adjoint binding is not, and it inherits the compile-time-to-runtime automatic-differentiation seam."
   - id: hole-transport-anchors
     anchor: moment-closures
-    summary: "Hole mobility, hole impact-ionisation coefficient and hole saturation velocity are anchored for few hosts. The hole schema is committed; the coefficients are a per-composition data gap, and every bipolar macro composition is unanchored until it closes."
+    summary: "Hole mobility, hole impact-ionization coefficient and hole saturation velocity are anchored for few hosts. The hole schema is committed; the coefficients are a per-composition data gap, and every bipolar macro composition is unanchored until it closes."
   - id: niel-displacement-coefficients
     anchor: slow-kinetics
     summary: "The recombination efficiency as a function of lattice temperature, and the NIEL-derived displacement cross-section per host, particle type and energy. No closed form exists in the corpus — only the coupling structure and a curated provenance-ledger slot. Frenkel-pair yield cannot be evaluated without them. A data-acquisition task, not an invention task."
@@ -80,12 +80,12 @@ tier of their own:
   timescale these are *frozen*: they evolve over hours to years, set by Arrhenius barriers of
   2–7 eV, and they carry the integrated thermal and irradiation history. A frozen-in population
   is distinguishable from an equilibrium one only if the frozen-in one is stored.
-- **Homogenised / device-scale** — a different *scale*. The continuum fields `T_L(r)`, `φ(r)`,
+- **Homogenized / device-scale** — a different *scale*. The continuum fields `T_L(r)`, `φ(r)`,
   `n(r)`, `p(r)`, `j(r)` on a device mesh, which are not derivable from a single unit cell.
 
 Because the added tiers are independent **by timescale or by scale**, they create **no algebraic
 constraint** with the micro seven-tuple. They evolve on their own clean flow and couple only
-parametrically — by adiabatic driving or by homogenisation. The constraint-manifold pathology
+parametrically — by adiabatic driving or by homogenization. The constraint-manifold pathology
 that [unified-state#emergence] guards against arises only for quantities redundant on the *same*
 timescale and scale, and those stay emergent: the full distribution is never promoted.
 
@@ -100,7 +100,7 @@ timescale and scale, and those stay emergent: the full distribution is never pro
 The slow and macro tiers are **adiabatic parameters** of the micro tier. The micro seven-tuple
 fast-equilibrates at fixed slow and macro state under the environment record
 ([crystal-inputs#environment]); the slow and macro state then drift under *time-averaged* micro
-quantities or under *homogenised coefficients* that the micro tier supplies.
+quantities or under *homogenized coefficients* that the micro tier supplies.
 
 In the level hierarchy ([born-oppenheimer-levels#hierarchy]) the slow tier is a configurational
 layer above `non-equilibrium-kinetics`, and the macro tier is that level's spatial fluid-limit
@@ -157,7 +157,7 @@ and they are the reason the promotion is safe:
 1. The species labels stay immutable ([unified-state#slots]) — atomic-number identity does not
    change as a vacancy forms.
 2. Occupancy is the right physical quantity: a vacancy is occupancy going to zero. The static
-   `SiteDecoration.occupancy` becomes the **initial condition** `s(t=0)` — the as-synthesised or
+   `SiteDecoration.occupancy` becomes the **initial condition** `s(t=0)` — the as-synthesized or
    frozen-in population.
 3. As a separate adiabatic-parameter fiber on a different timescale, it ties **no** constraint
    manifold back to the micro tier. That is the condition the emergence axiom protects, met
@@ -203,7 +203,7 @@ environment record ([crystal-inputs#environment]).
 
 - **`platelet-nucleation-allen-cahn`** (row 107) — `(c_platelet, c_Ns, T) → dc_platelet/dt`.
   `k_nuc·c_Ns² − k_dis·c_platelet`, `k_nuc = ν₀·exp(−E_nuc/kT)`, `E_nuc ≈ 3.5 eV`. The
-  substitutional-nitrogen-to-A-centre half-life is years at 500 °C and hours at 1000 °C.
+  substitutional-nitrogen-to-A-center half-life is years at 500 °C and hours at 1000 °C.
   milliseconds · adjoint · Allen–Cahn · degradation, defect-resolved.
 
 - **`vibration-induced-vacancy-generation`** (row 108) — `(ρ_dis, σ_stress, f_vib, v_dis, b) →
@@ -265,7 +265,7 @@ slow-tier sibling of the seven micro categories ([residual-definitions#eom-categ
 EOM/DefectPopulation[D,q,site] = ‖ dc_D^q/dt|_predicted − ( G^q_total[D] − c_D^q·k_ann^q[D] ) ‖²
 ```
 
-This is the slow-tier specialisation of `‖dx_i/dt − (L·δE/δx_i + M·δS/δx_i)‖²`. Generation and
+This is the slow-tier specialization of `‖dx_i/dt − (L·δE/δx_i + M·δS/δx_i)‖²`. Generation and
 annihilation are both branches of the single dissipative master-equation generator: `M` is the
 rate matrix, from the chemical and surface extraction of [generic-dynamics#operators]. The slow tier has
 no reversible bracket.
@@ -288,7 +288,7 @@ equation-of-motion residuals.
 
 ## The adiabatic driving contract
 
-Each slow rate is parameterised by **time-averaged** micro quantities:
+Each slow rate is parameterized by **time-averaged** micro quantities:
 
 | Slow rate | Driven by the time-averaged micro quantity |
 |---|---|
@@ -309,7 +309,7 @@ slow state as a fixed parameter. That is the `SelfConsistentChargeBalanceOf` clo
 ([property-templates#what-each-produces]) consuming the slow defect list, with Shockley–Read–Hall lifetime
 `τ_n = 1/(σ_n·v_th·N_T)`.
 
-The coupling is bidirectional and the two directions have different owners: the homogenisation
+The coupling is bidirectional and the two directions have different owners: the homogenization
 map reads slow defect density into the macro recombination term (macro from slow), while the
 back-reaction — carrier-driven defect generation, the irradiation source term — is macro into
 slow. The rate law in both directions is the slow tier's.
@@ -327,14 +327,14 @@ address, and a Merkle-directed-acyclic-graph diff costs the changed frontier onl
 Mesh generation and refinement are committed as **structured-tensor** for version 1, the
 `enumerate(product(axes))` form above. Adaptive hot-spot refinement defers to version 2.
 
-**Discretisation is finite-volume.** Each balance equation is read in integral conservation form
+**Discretization is finite-volume.** Each balance equation is read in integral conservation form
 
 ```
 ∂_t ∫_c φ dV + Σ_f Flux_f·A_f = ∫_c Source dV
 ```
 
-with face fluxes built from the homogenised coefficients. The mesh is **conservative** — the
-face flux out of a cell is the flux into its neighbour — so the `Conservation` residual
+with face fluxes built from the homogenized coefficients. The mesh is **conservative** — the
+face flux out of a cell is the flux into its neighbor — so the `Conservation` residual
 ([residual-definitions#constraint-categories]) holds discretely.
 
 ## The macro field set
@@ -387,15 +387,15 @@ micro-supplied. The faithful tier verifies against the Boltzmann-transport curre
 
 **Degenerate-statistics caveat — a declared model-form error.** The Einstein relation above is
 the **nondegenerate** form. Boron-doped p⁺ diamond contact layers, and degenerate n⁺ III-nitride
-layers, run at 10²⁰–10²¹ cm⁻³, where Fermi–Dirac statistics make the generalised relation
+layers, run at 10²⁰–10²¹ cm⁻³, where Fermi–Dirac statistics make the generalized relation
 `D/μ = (k_B·T/q)·F_{1/2}(η)/F_{−1/2}(η)` with `η = (E_F − E_C)/k_B·T` the correct one. Version 1
 carries the nondegenerate form, and the discrepancy is entered as a **declared model-form-error
 term** in the `combineTol` budget ([residual-definitions#error-budget]) on any composition whose carrier
-density crosses the host's degeneracy threshold. The generalised variant is a gated refinement
+density crosses the host's degeneracy threshold. The generalized variant is a gated refinement
 sharing the same closed form, so it introduces no new method. The same threshold gate carries the
 plasmon-phonon and Lyddane–Sachs–Teller exclusion ([out-of-scope#exclusions]).
 
-## The homogenisation map
+## The homogenization map
 
 The three macro balance equations are
 
@@ -408,12 +408,12 @@ The three macro balance equations are
 Each row below maps a **micro per-composition output** to a **macro coefficient or term** by an
 explicit relation evaluated at the local cell state:
 
-| Micro output | Homogenisation relation | Macro coefficient or term | Equation |
+| Micro output | Homogenization relation | Macro coefficient or term | Equation |
 |---|---|---|---|
 | lattice thermal conductivity (rows 25 and 121) | `D_thermal(r) = κ(T_L(r))/(C_p·ρ_m)`; face flux `q_f = −κ(T_L,f)·(∇T_L)_f` | heat diffusion | (H) |
 | conductivity and low-field mobility (`mobility-impurity-phonon`) | `σ(r) = q·n·μ₀(T_L(r), N_D)`; drift `μ(E,T) = μ₀[1 + (μ₀\|E\|/v_sat)^β]^(−1/β)` at `E(r) = −∇φ`; face flux by Scharfetter–Gummel; Einstein `D = μk_BT/q`, nondegenerate | drift and diffusion terms | (DD) |
 | saturation velocity | saturated regime `j_drift = q·n·v_sat`, decoupling current from field | saturated drift | (DD) |
-| impact-ionisation coefficient (Chynoweth `a·exp(−b/E)`) | `G_av(r) = α_n(\|E\|)·n·v_n + α_p(\|E\|)·p·v_p` at the local field; breakdown `M = 1/(1 − ∫α dx)` (row 75) | avalanche source | (DD) |
+| impact-ionization coefficient (Chynoweth `a·exp(−b/E)`) | `G_av(r) = α_n(\|E\|)·n·v_n + α_p(\|E\|)·p·v_p` at the local field; breakdown `M = 1/(1 − ∫α dx)` (row 75) | avalanche source | (DD) |
 | Shockley–Read–Hall and generation-recombination rates | `S_carrier = G_av + G_opt − R_SRH(n, p; defect density(r))`, where `R_SRH` reads the **slow tier's** per-cell defect density | generation minus recombination | (DD) |
 | Joule heating | `Q(r) = j(r)·E(r) = −j·∇φ`, the energy-conserving dissipative cross-coupling | heat source | (H) |
 | temperature-dependent permittivity | `ε(r) = ε(material, T_L(r))` | Poisson operator | (P) |
@@ -423,20 +423,20 @@ explicit relation evaluated at the local cell state:
 `(T_L, E, n, p)`, applied per cell. They are *error-tagged*: a cheap closed form and a faithful
 Boltzmann-transport form, tied by an `Algebraic/MethodEquivalence` residual, with the tag carried
 on the `dressing` facet. They are *cached* by content address, at `O(log₃₂ n)` lookup, and never
-re-solved — this is what honours the no-solver-call-in-hot-paths rule. And they are split across
+re-solved — this is what honors the no-solver-call-in-hot-paths rule. And they are split across
 compile and runtime ([compose-time-pipeline#boundary]): the compile-time stages fix the coefficient
 *form*, hash-consed into the kernel, and the runtime kernel evaluates the cached closed form at
 the operator-supplied per-cell fields.
 
 ## The continuum residual
 
-Generalising registry row 71, for each macro field and cell:
+Generalizing registry row 71, for each macro field and cell:
 
 ```
-EOM/Continuum[field, c] = ‖ ∂_t field(c) − RHS_field({fields(c')}_{c' ∈ stencil(c)}; homogenised coeffs) ‖²
+EOM/Continuum[field, c] = ‖ ∂_t field(c) − RHS_field({fields(c')}_{c' ∈ stencil(c)}; homogenized coeffs) ‖²
 ```
 
-with `RHS_field` the finite-volume discretisation:
+with `RHS_field` the finite-volume discretization:
 
 | Field | Right-hand side per cell `c` |
 |---|---|
@@ -456,7 +456,7 @@ j_f = (qD/Δx)·[ n_{c⁺}·B(Δψ) − n_{c⁻}·B(−Δψ) ],   Δψ = q(φ_{c
 with `B` the Bernoulli function. At the ultra-wide-bandgap operating point the cell Péclet
 number `Pe = qEΔx/k_BT ≈ 40` — 1 MV/cm across a ~10 nm cell against 25 mV of thermal voltage —
 and there a centrally differenced flux makes **the residual operator itself wrong at the
-operating point**. The operator would then be scored against a discretisation artifact rather
+operating point**. The operator would then be scored against a discretization artifact rather
 than against the physics. Scharfetter–Gummel is closed-form and differentiable, with one
 removable singularity at `Δψ → 0` guarded by the series `B(t) ≈ 1 − t/2`, so it preserves
 continuous differentiability and the no-runtime-solver rule. The interface heat flux and the
@@ -478,7 +478,7 @@ residual and cotangent. It never solves the partial differential equation.
 ## The unified three-tier residual contract
 
 The three schemas are **not unifiable into one tensor** — they carry three distinct
-discretisations — which is why the state is stratified rather than flattened:
+discretizations — which is why the state is stratified rather than flattened:
 
 | Tier | State | Index | Category | Reversible part | Dissipative part |
 |---|---|---|---|---|---|

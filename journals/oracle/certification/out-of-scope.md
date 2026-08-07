@@ -29,7 +29,7 @@ the enforcement site another page's hazard points at.
 - **Flexoelectricity in centrosymmetric materials** — below the numerical-noise floor;
   order-of-magnitude only.
 - **Magneto-thermal coupling in heavy contact metals** — formally present in the
-  entropy, not modelled.
+  entropy, not modeled.
 - **Deep-defect non-Markovian dynamics** — a Markov master-equation closure is assumed.
 - **Polaron localization beyond Fröhlich.**
 - **Full non-equilibrium Green's-function tunneling, full self-consistent phonon theory,
@@ -62,16 +62,16 @@ the enforcement site another page's hazard points at.
 - **III-nitride high-temperature thermal expansion** — quasi-harmonic validity is
   **per-material and does not follow a Debye-temperature-scaled rule** ([traps], which
   names this page as its enforcement site): diamond holds through about 800 °C, while
-  gallium nitride and aluminium nitride both fail by about 500 °C, which is the design
+  gallium nitride and aluminum nitride both fail by about 500 °C, which is the design
   point. V1 has **no design-grade path**, only the per-material widened uncertainty in
   [accuracy-ledger#observable-regimes]. This propagates into the gap's temperature
   dependence through the strain path, into the shear modulus, and into the
   temperature-pressure hull for the flagship polar materials. V2 is a first-order
   self-consistent-phonon correction as a second `one-shot-dressing`.
-- **Alloy-disorder mobility in aluminium-gallium-nitride beyond the closed-form Harrison
+- **Alloy-disorder mobility in aluminum-gallium-nitride beyond the closed-form Harrison
   term** — the `is-alloy`-gated row 127 ships in V1; a full configurationally-averaged
   disorder treatment is V2.
-- **Measured avalanche and p-type transport in pure aluminium nitride, and
+- **Measured avalanche and p-type transport in pure aluminum nitride, and
   measurement-grade high-temperature conductivity for it.** V1 **cert-refuses**
   measured-avalanche and p-type claims for this material and flags its high-temperature
   conductivity as theory-only. What is missing, and with what uncertainty, is
@@ -83,7 +83,7 @@ the enforcement site another page's hazard points at.
   ultraviolet luminescence is free-electron to self-trapped-hole recombination and
   **not** a band-edge transition, and must not be read as one. **The refusal is the
   correct output.**
-- **Absolute Berry-phase and Wannier-centre polarization** — the path-integral evaluator
+- **Absolute Berry-phase and Wannier-center polarization** — the path-integral evaluator
   for spontaneous polarization is deferred to V2. V1 uses the Born-charge composition
   path (registry rows 113–114, ±5%, [accuracy-ledger#polarization-coefficients]); the
   absolute modern-theory integral needs a Berry-phase sub-stage that is not in the closed
@@ -105,7 +105,7 @@ the enforcement site another page's hazard points at.
   interlayer channel. Decide it in only if a two-dimensional-substrate use case
   materializes.
 - **Amorphous atomic-layer-deposited gate films** — the oracle library models the
-  *crystalline* polymorphs, α-alumina, monoclinic hafnia and aluminium nitride as a
+  *crystalline* polymorphs, α-alumina, monoclinic hafnia and aluminum nitride as a
   dielectric. As-deposited amorphous films have no `PeriodicityStructure` and are out of
   scope as hosts. Their *crystallization* — the driver of the leakage spike above about
   700 °C — **is** in scope, as the slow-tier Johnson-Mehl-Avrami-Kolmogorov row 131, and

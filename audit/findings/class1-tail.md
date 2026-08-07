@@ -2,9 +2,9 @@
 
 **Quoting convention.** Every quote is byte-exact except that where the source hard-wraps
 a sentence across lines, the newline is rendered as a single space. Nothing is elided,
-paraphrased, or emphasised beyond what the source itself marks. All 63 quoted strings in
+paraphrased, or emphasized beyond what the source itself marks. All 63 quoted strings in
 this report were mechanically confirmed present in the corpus under whitespace
-normalisation before the report was written.
+normalization before the report was written.
 
 ---
 
@@ -129,11 +129,11 @@ All 26 listed pages read fully, plus the coupling-structure tail. Nothing skippe
 - **`canonical-vocabularies.md`** — "the ten vocabularies" against the ten table rows
   (matches); "Each of the ten is a `Universe` instance" against the atomic-species section;
   "exactly four certification obligations" against the four named; the hybrid-functional
-  normalisation rule against `ManyBodyLevel`'s member list (Hybrid correctly absent).
+  normalization rule against `ManyBodyLevel`'s member list (Hybrid correctly absent).
 - **`observable-bundles.md`** — "the eleven bundles" against the eleven table rows; "twelve
   admissible values in all" against eleven names plus `linear-response-primitive`; "Four
-  rows carry a behaviour name" against the four listed; rows 91–94 against "four rows
-  carrying a value it does not recognise".
+  rows carry a behavior name" against the four listed; rows 91–94 against "four rows
+  carrying a value it does not recognize".
 - **`topology-atlas.md`** — "All four are lookups or integer linear algebra" against the
   four cheap parts listed; the five-field atlas entry against "Every field is
   combinatorial"; the cheap/expensive split against "for every composition rather than for
@@ -467,7 +467,7 @@ argues against.
 and exactly one mask appears in it — `m_o`, on the three data terms. The residual term
 `Σ_i λ_i(t) · residual_i(ŷ ; state)` carries no mask at all, though the
 `sample-applicability-mask` is defined precisely as "whether a given generator applies to that
-sample". The claim that all three multiply into the same term is not realised by the formula
+sample". The claim that all three multiply into the same term is not realized by the formula
 the page prints.
 
 **Which is correct:** All three are needed — the argument for it is specific and correct
@@ -506,7 +506,7 @@ property and reference *solves* costing seconds to minutes. A straight-line nume
 does not take minutes and does not solve.
 
 **Which is correct:** The three-class table. The earlier sentence describes only the
-per-sample core; it should say so, as the neighbouring claim does ("every runtime hot path").
+per-sample core; it should say so, as the neighboring claim does ("every runtime hot path").
 
 **What would refute this finding:** Reading "no solver invoked from scratch" as permitting
 warm-started solves, which the page does not state.
@@ -652,7 +652,7 @@ tuple — which is why this is WEAK.
   path being "construction and the self-consistent step". Rejected: "construction" reads as
   building the internal encoding of an arrived state.
 - **`crystal-inputs.md`**, `pressure` typed `UNSEEDED` against `p_O2` typed `Pressure` (Pa) and
-  described as "a specialisation of the pressure slot". Rejected: the pressure slot's note
+  described as "a specialization of the pressure slot". Rejected: the pressure slot's note
   ("carried as pressure or as volume") genuinely leaves its type open.
 - **`crystal-inputs.md`**, "the predicates are first-order decidable on field presence alone"
   against every predicate taking a `Crystal` argument. Rejected as reconcilable: "alone" reads
@@ -682,10 +682,10 @@ tuple — which is why this is WEAK.
   Rejected: "optional" carries it, though it strains "Each is the recommendation of a section
   above".
 - **`observable-bundles.md`**, "the four rows below" (rows 91–94) against "Four rows carry a
-  behaviour name" (a different four). Rejected: two disjoint sets of four; both can be true.
+  behavior name" (a different four). Rejected: two disjoint sets of four; both can be true.
   A genuine reader hazard, not a contradiction.
 - **`learnable-structure-contract.md`**, "Only flat numeric arrays cross the boundary" against
-  accepting the environment record. Rejected: marshalling as per-channel flat arrays is
+  accepting the environment record. Rejected: marshaling as per-channel flat arrays is
   available.
 - **`training-stages.md`**, "none of the three preconditions holds" where the third listed item
   (amplitude amplification) is a technique rather than a precondition. Rejected: wording, not

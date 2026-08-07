@@ -41,7 +41,7 @@ These are met by a **polyglot of domain-specific languages** filling four roles:
 
 | Role | What it must satisfy | Runs |
 |---|---|---|
-| Compiler host | A type system strong enough to make the operator-indexed graph and its composition rules compile-time facts; equality saturation over the project's own node type; one derived canonical serialiser, because identity *is* the hash ([representation-substrate#serialization]); adjoint synthesis as a typed pass over the project's own intermediate representation | compose time |
+| Compiler host | A type system strong enough to make the operator-indexed graph and its composition rules compile-time facts; equality saturation over the project's own node type; one derived canonical serializer, because identity *is* the hash ([representation-substrate#serialization]); adjoint synthesis as a typed pass over the project's own intermediate representation | compose time |
 | Runtime host | Ingests generated source and compiles it natively, so the hot path crosses no foreign-function boundary; owns the optional GPU code generation; dense linear algebra for the apply loop | runtime |
 | Group-theory engine | Generates and validates character tables and projectors for the finite groups the symmetry quotient needs; results are baked in | offline |
 | Proof assistant | Machine-checked proofs of the injectivity and algebraic-law obligations, beside the implementation | offline |
@@ -51,7 +51,7 @@ These are met by a **polyglot of domain-specific languages** filling four roles:
 Two structural facts make the split safe rather than merely convenient. First, the
 boundary between *lowering* and *runtime kernel application* is a narrow, natural
 language seam: the compiler emits a kernel, the runtime applies it, and no substrate
-object ever serialises across — what crosses is the generated kernel once, then flat
+object ever serializes across — what crosses is the generated kernel once, then flat
 arrays in and keyed arrays out. Second, the group-theory engine and the proof
 assistant are **offline leaves**: they run at build and specification time, on no hot
 path, so they add no interop risk. Only two of the four roles are live at all.
@@ -70,8 +70,8 @@ against the requirement column above.
 
 ## Tight binding as a warm start
 
-A three-nearest-neighbour sp³d⁵ tight-binding model for carbon is used as a
-**warm-start initialiser** for the self-consistent-field inner loop.
+A three-nearest-neighbor sp³d⁵ tight-binding model for carbon is used as a
+**warm-start initializer** for the self-consistent-field inner loop.
 
 **It is not a separately evaluated formula and not an independent residual.** It seeds
 an iteration whose converged result is what gets scored; nothing in the residual map

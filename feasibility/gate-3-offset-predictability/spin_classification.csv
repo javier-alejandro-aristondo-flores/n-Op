@@ -1,0 +1,82 @@
+config_key,dopants,prior_flag,flag_notes,pbe_ispin_active,pbe_ispin_commented,pbe_nupdown,pbe_effective_ispin,hse_ispin_active,hse_ispin_commented,hse_nupdown,hse_effective_ispin,nelect,odd_electron,pbe_magmom,hse_magmom,disposition,population
+Pure/Converged_for_doping_analyze,pure,clean,,2,,,2,2,,,2,256.0,False,0.0,0.0,clean,clean
+pair_defects/B-Li/C8-C1-were_replaced,BLi,spin-suspect,mag-quarter,2,,,2,2,,,2,252.0,False,0.25,-0.0009,"legitimate - flag was wrong, run stays",mag-quarter
+pair_defects/B-Li/C8-C53-were_replaced,BLi,clean,,2,,,2,2,,,2,252.0,False,2.0,2.0,clean,clean
+pair_defects/B-P/C8-C1-were_replaced,BP,clean,,2,,,2,2,,,2,256.0,False,-0.0,-0.0,clean,clean
+pair_defects/B-P/C8-C53-were_replaced,BP,clean,,2,,,2,2,,,2,256.0,False,0.0,0.0,clean,clean
+pair_defects/B-S/C8-C1-were_replaced,BS,spin-suspect,mag-quarter|mag-quarter,2,,,2,2,,,2,257.0,True,0.25,0.25,"legitimate - flag was wrong, run stays",mag-quarter
+pair_defects/B-S/C8-C53-were_replaced,BS,spin-suspect,odd-nelect-no-mag|odd-nelect-no-mag,2,,,2,2,,,2,257.0,True,-0.0,0.0,"legitimate - flag was wrong, run stays",odd-nelect-no-mag
+pair_defects/B-Se/C8-C1-were_replaced,BSe,spin-suspect,mag-quarter|mag-quarter,2,,,2,2,,,2,257.0,True,-0.25,-0.25,"legitimate - flag was wrong, run stays",mag-quarter
+pair_defects/B-Se/C8-C53-were_replaced,BSe,spin-suspect,odd-nelect-no-mag|odd-nelect-no-mag,2,,,2,2,,,2,257.0,True,-0.0,0.0,"legitimate - flag was wrong, run stays",odd-nelect-no-mag
+pair_defects/N-H/C8-C1-were_replaced,HN,clean,,2,,,2,2,,,2,254.0,False,2.0,2.0,clean,clean
+pair_defects/N-H/C8-C53-were_replaced,HN,clean,,2,,,2,2,,,2,254.0,False,2.0,2.0,clean,clean
+pair_defects/N-Li/C8-C1-were_replaced,LiN,clean,,2,,,2,2,,,2,254.0,False,2.0,2.0,clean,clean
+pair_defects/N-Li/C8-C53-were_replaced,LiN,clean,,2,,,2,2,,,2,254.0,False,1.9983,2.0,clean,clean
+pair_defects/N-S/C8-C1-were_replaced,NS,spin-suspect,mag-quarter|mag-quarter,2,,,2,2,,,2,259.0,True,0.25,0.25,"legitimate - flag was wrong, run stays",mag-quarter
+pair_defects/N-S/C8-C53-were_replaced,NS,spin-suspect,odd-nelect-no-mag,2,,,2,2,,,2,259.0,True,0.0001,0.0,"legitimate - flag was wrong, run stays",odd-nelect-no-mag
+pair_defects/N-Si/C8-C1-were_replaced,NSi,spin-suspect,odd-nelect-no-mag|odd-nelect-no-mag,2,,,2,2,,,2,257.0,True,-0.0,-0.0,"legitimate - flag was wrong, run stays",odd-nelect-no-mag
+pair_defects/N-Si/C8-C53-were_replaced,NSi,spin-suspect,odd-nelect-no-mag|odd-nelect-no-mag,2,,,2,2,,,2,257.0,True,0.0,0.0,"legitimate - flag was wrong, run stays",odd-nelect-no-mag
+single_defect/IA-element-single-impurity/H,H,clean,,2,,,2,2,,,2,253.0,True,2.9999,3.0,clean,clean
+single_defect/IA-element-single-impurity/Li,Li,clean,,2,,,2,2,,,2,253.0,True,3.0,3.0,clean,clean
+single_defect/IA-element-single-impurity/Na,Na,clean,,2,,,2,2,,,2,253.0,True,2.9999,3.0,clean,clean
+single_defect/IIA-element-single-impurity/Be,Be,clean,,2,,,2,2,,,2,254.0,False,-0.0,0.0,clean,clean
+single_defect/IIA-element-single-impurity/Mg,Mg,clean,,2,,,2,2,,,2,254.0,False,2.0,2.0,clean,clean
+single_defect/IIIA-element-single-imputiry/B,B,spin-suspect,odd-nelect-no-mag|odd-nelect-no-mag,2,,,2,2,,,2,255.0,True,-0.0,0.0,"legitimate - flag was wrong, run stays",odd-nelect-no-mag
+single_defect/IVA-element-single-impurity/Si,H,clean,,2,,,2,2,,,2,256.0,False,-0.0,-0.0,clean,clean
+single_defect/VA-element-single-impurity/As,As,clean,,2,,,2,2,,,2,257.0,True,0.0006,0.2509,clean,clean
+single_defect/VA-element-single-impurity/N,N,spin-suspect,odd-nelect-no-mag|odd-nelect-no-mag,2,,,2,2,,,2,257.0,True,0.0,0.0,"legitimate - flag was wrong, run stays",odd-nelect-no-mag
+single_defect/VA-element-single-impurity/P,P,spin-suspect,mag-quarter|mag-quarter,2,,,2,2,,,2,257.0,True,0.25,0.25,"legitimate - flag was wrong, run stays",mag-quarter
+single_defect/VA-element-single-impurity/Sb,Sb,spin-suspect,mag-quarter|mag-quarter,2,,,2,2,,,2,257.0,True,0.25,0.25,"legitimate - flag was wrong, run stays",mag-quarter
+single_defect/VIA-element-single-impurity/O,O,clean,,2,,,2,2,,,2,258.0,False,-0.0,-0.0,clean,clean
+single_defect/VIA-element-single-impurity/S,S,spin-suspect,mag-quarter|mag-quarter,2,,,2,2,,,2,258.0,False,0.25,0.25,"legitimate - flag was wrong, run stays",mag-quarter
+single_defect/VIA-element-single-impurity/Se,Se,spin-suspect,mag-quarter|mag-quarter,2,,,2,2,,,2,258.0,False,0.25,0.25,"legitimate - flag was wrong, run stays",mag-quarter
+single_defect/VIA-element-single-impurity/Te,Te,clean,,2,,,2,2,,,2,258.0,False,-0.5,-0.5,clean,clean
+single_defect/VIIA-element-single-impurity/Br,Br,clean,,2,,,2,2,,,2,259.0,True,-1.0,-1.0,clean,clean
+single_defect/VIIA-element-single-impurity/Cl,Cl,spin-suspect,mag-quarter,2,,,2,2,,,2,259.0,True,-0.25,-1.0007,"legitimate - flag was wrong, run stays",mag-quarter
+single_defect/VIIA-element-single-impurity/F,F,clean,,2,,,2,2,,,2,259.0,True,1.0,1.0,clean,clean
+single_defect/VIIA-element-single-impurity/I,I,clean,,2,,,2,2,,,2,259.0,True,0.5,0.5,clean,clean
+single_defects_new-only/IA-impurity/K,K,spin-suspect,odd-nelect-no-mag|odd-nelect-no-mag,2,,,2,2,,,2,259.0,True,0.0,0.0,"legitimate - flag was wrong, run stays",odd-nelect-no-mag
+single_defects_new-only/IIA-impurity/Ba,Ba,clean,,2,,,2,2,,,2,262.0,False,2.0,2.0,clean,clean
+single_defects_new-only/III-A/Al,Al,spin-suspect,mag-quarter|mag-quarter,2,,,2,2,,,2,255.0,True,0.25,0.25,"legitimate - flag was wrong, run stays",mag-quarter
+single_defects_new-only/III-A/Ga,Ga,spin-suspect,odd-nelect-no-mag|odd-nelect-no-mag,2,,,2,2,,,2,265.0,True,0.0,0.0,"legitimate - flag was wrong, run stays",odd-nelect-no-mag
+single_defects_new-only/III-A/In,In,spin-suspect,odd-nelect-no-mag|odd-nelect-no-mag,2,,,2,2,,,2,265.0,True,-0.0,-0.0,"legitimate - flag was wrong, run stays",odd-nelect-no-mag
+single_defects_new-only/III-A/Tl,Tl,spin-suspect,odd-nelect-no-mag|odd-nelect-no-mag,2,,,2,2,,,2,265.0,True,-0.0,-0.0,"legitimate - flag was wrong, run stays",odd-nelect-no-mag
+single_defects_new-only/IV-A/Ge,Ge,clean,,2,,,2,2,,,2,266.0,False,0.0,0.0,clean,clean
+single_defects_new-only/IV-A/Pb,Pb,clean,,2,,,2,2,,,2,266.0,False,-0.0,0.0,clean,clean
+single_defects_new-only/IV-A/Sn,Sn,clean,,2,,,2,2,,,2,266.0,False,-0.0,0.0,clean,clean
+single_defects_new-only/Transition-Metals/Ag,Ag,clean,,2,,,2,2,,,2,269.0,True,-1.5,-3.0,clean,clean
+single_defects_new-only/Transition-Metals/Cd,Cd,clean,,2,,,2,2,,,2,264.0,False,2.0,2.0,clean,clean
+single_defects_new-only/Transition-Metals/Cr,Cr,clean,,2,,,2,2,,,2,264.0,False,2.0,2.0,clean,clean
+single_defects_new-only/Transition-Metals/Cu,Cu,clean,,2,,,2,2,,,2,269.0,True,1.5,3.0,clean,clean
+single_defects_new-only/Transition-Metals/Fe,Fe,clean,,2,,,2,2,,,2,266.0,False,0.0,-0.0,clean,clean
+single_defects_new-only/Transition-Metals/Mo,Mo,clean,,2,,,2,2,,,2,264.0,False,2.0,2.0,clean,clean
+single_defects_new-only/Transition-Metals/Ru,Ru,clean,,2,,,2,2,,,2,266.0,False,-0.0,-0.0,clean,clean
+single_defects_new-only/Transition-Metals/Tc,Tc,clean,,2,,,2,2,,,2,265.0,True,1.0,1.0,clean,clean
+single_defects_new-only/Transition-Metals/Ti,Ti,clean,,2,,,2,2,,,2,262.0,False,-0.0,0.0,clean,clean
+single_defects_new-only/Transition-Metals/V,V,clean,,2,,,2,2,,,2,263.0,True,-1.0,-1.0,clean,clean
+single_defects_new-only/VA/Bi,Bi,spin-suspect,odd-nelect-no-mag|odd-nelect-no-mag,2,,,2,2,,,2,267.0,True,0.0,-0.0,"legitimate - flag was wrong, run stays",odd-nelect-no-mag
+single_defects_new-only/VIA/Po,Po,clean,,2,,,2,2,,,2,268.0,False,0.0,-0.0,clean,clean
+triads_defects/B-N-S/C8-C53-C1-were_replaced/config1,BNS,clean,,2,,,2,2,,,2,258.0,False,-0.0,-0.0,clean,clean
+triads_defects/B-N-S/C8-C53-C1-were_replaced/config2,BNS,spin-suspect,mag-quarter|mag-quarter,2,,,2,2,,,2,258.0,False,-0.25,-0.25,"legitimate - flag was wrong, run stays",mag-quarter
+triads_defects/B-N-S/C8-C53-C1-were_replaced/config3,BNS,clean,,2,,,2,2,,,2,258.0,False,0.0,0.0,clean,clean
+triads_defects/B-N-S/C8-C55-C1-were_replaced/config1,BNS,clean,,2,,,2,2,,,2,258.0,False,-0.0,-0.0,clean,clean
+triads_defects/B-N-S/C8-C55-C1-were_replaced/config2,BNS,spin-suspect,mag-quarter|mag-quarter,2,,,2,2,,,2,258.0,False,-0.25,-0.25,"legitimate - flag was wrong, run stays",mag-quarter
+triads_defects/B-N-S/C8-C55-C1-were_replaced/config3,BNS,clean,,2,,,2,2,,,2,258.0,False,0.0,0.0,clean,clean
+triads_defects/H-B-Si/C8-C53-C1-were_replaced/config1,BHSi,clean,,2,,,2,2,,,2,252.0,False,1.9924,2.0,clean,clean
+triads_defects/H-B-Si/C8-C53-C1-were_replaced/config2,BHSi,spin-suspect,mag-quarter|mag-quarter,2,,,2,2,,,2,252.0,False,-0.25,-0.25,"legitimate - flag was wrong, run stays",mag-quarter
+triads_defects/H-B-Si/C8-C53-C1-were_replaced/config3,BHSi,clean,,2,,,2,2,,,2,252.0,False,-0.0,0.0,clean,clean
+triads_defects/H-B-Si/C8-C55-C1-were_replaced/config1,BHSi,clean,,2,,,2,2,,,2,252.0,False,0.0,0.0,clean,clean
+triads_defects/H-B-Si/C8-C55-C1-were_replaced/config2,BHSi,clean,,2,,,2,2,,,2,252.0,False,0.0,0.0,clean,clean
+triads_defects/H-B-Si/C8-C55-C1-were_replaced/config3,BHSi,clean,,2,,,2,2,,,2,252.0,False,1.5,2.0018,clean,clean
+triads_defects/H-N-O/c8-c53-c1/config1,HNO,clean,,2,,,2,2,,,2,256.0,False,1.9696,2.0001,clean,clean
+triads_defects/H-N-O/c8-c53-c1/config2/sigma00001,HNO,spin-suspect,mag-quarter,2,,,2,2,,,2,256.0,False,-0.25,-0.0005,"legitimate - flag was wrong, run stays",mag-quarter
+triads_defects/H-N-O/c8-c53-c1/config3/sigma00001,HNO,clean,,2,,,2,2,,,2,256.0,False,2.0,2.0,clean,clean
+triads_defects/H-N-O/c8-c55-c1/config1,HNO,clean,,2,,,2,2,,,2,256.0,False,2.0,2.0,clean,clean
+triads_defects/H-N-O/c8-c55-c1/config2,HNO,clean,,2,,,2,2,,,2,256.0,False,0.0,-0.0,clean,clean
+triads_defects/H-N-O/c8-c55-c1/config3,HNO,clean,,2,,,2,2,,,2,256.0,False,0.0,0.0,clean,clean
+triads_defects/Li-B-P/c8-c53-c1/config1,BLiP,clean,,2,,,2,2,,,2,253.0,True,1.0,1.0,clean,clean
+triads_defects/Li-B-P/c8-c53-c1/config2,BLiP,spin-suspect,odd-nelect-no-mag|odd-nelect-no-mag,2,,,2,2,,,2,253.0,True,0.0,0.0,"legitimate - flag was wrong, run stays",odd-nelect-no-mag
+triads_defects/Li-B-P/c8-c53-c1/config3,BLiP,clean,,2,,,2,2,,,2,253.0,True,2.5,3.0018,clean,clean
+triads_defects/Li-B-P/c8-c55-c1/config1,BLiP,clean,,2,,,2,2,,,2,253.0,True,2.75,3.0009,clean,clean
+triads_defects/Li-B-P/c8-c55-c1/config2,BLiP,clean,,2,,,2,2,,,2,253.0,True,0.75,0.9995,clean,clean
+triads_defects/Li-B-P/c8-c55-c1/config3,BLiP,clean,,2,,,2,2,,,2,253.0,True,1.0,1.0,clean,clean

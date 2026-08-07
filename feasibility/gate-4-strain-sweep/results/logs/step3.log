@@ -1,0 +1,77 @@
+points after de-duplication: 1131
+symmetry orbits: 658
+top-quartile strain threshold: ||E|| > 0.0961
+  done pbe_indirect_gap
+  done pbe_direct_gap_gamma
+  done pbe_valence_splitting_total
+  done hse_indirect_gap
+  done hse_direct_gap_gamma
+  done hse_valence_splitting_total
+
+PBE indirect_gap -- grouped CV, MAE in meV
+model         all   top quartile      worst
+M0         638.44         947.64    2551.98
+M1         632.16         900.15    2295.86
+M2         115.83         148.89    1075.23
+M3b        285.01         362.76    1573.58
+M3         294.47         344.11    1852.38
+M4         107.25         172.66    1283.19
+
+PBE direct_gap_gamma -- grouped CV, MAE in meV
+model         all   top quartile      worst
+M0         594.58         672.06    2324.40
+M1         562.58         607.97    2369.51
+M2          76.72          92.09     398.35
+M3b        239.01         278.78    1383.56
+M3         252.18         285.23    1770.19
+M4         120.33         145.98    1034.03
+
+PBE valence_splitting_total -- grouped CV, MAE in meV
+model         all   top quartile      worst
+M0         590.05        1121.52    2667.79
+M1         645.73         916.15    2140.31
+M2         107.22         243.58     624.42
+M3b        159.37         201.72    1300.77
+M3         160.56         200.61    1275.05
+M4          57.63         108.66     692.65
+
+HSE indirect_gap -- grouped CV, MAE in meV
+model         all   top quartile      worst
+M0         667.28        1015.42    2752.54
+M1         663.73         946.35    2434.89
+M2         116.55         149.23    1054.29
+M3b        296.97         378.48    1647.33
+M3         308.06         357.55    1942.98
+M4         110.99         177.44    1463.51
+
+HSE direct_gap_gamma -- grouped CV, MAE in meV
+model         all   top quartile      worst
+M0         627.71         712.94    2502.80
+M1         590.51         636.90    2545.55
+M2         116.15         158.54    2060.07
+M3b        253.18         295.26    1476.94
+M3         266.14         302.10    1892.08
+M4         126.92         154.25    1121.00
+
+HSE valence_splitting_total -- grouped CV, MAE in meV
+model         all   top quartile      worst
+M0         648.79        1233.30    2869.05
+M1         705.85         998.65    2289.86
+M2         116.42         258.54     652.96
+M3b        172.50         213.20    1367.09
+M3         173.79         212.52    1353.27
+M4          61.21         114.88     709.56
+
+M2 and M4 residual against strain magnitude (PBE indirect gap, grouped CV)
+     ||E|| bin     n        M0        M1        M2       M3b        M3        M4
+     0.00-0.02    56   1181.71   1211.42     67.55    392.83    418.67     69.62 
+     0.02-0.04   118    885.22    919.35     88.62    249.83    253.75     69.03 
+     0.04-0.06   137    489.42    509.73     80.03    198.37    208.05     78.90 
+     0.06-0.08   281    315.00    313.51    130.13    253.63    273.84     80.20 
+     0.08-0.10   288    468.51    465.89    118.89    286.39    307.72    111.09 
+     0.10-0.12   197    965.66    899.19    146.72    326.43    312.70    146.94 
+     0.12-0.15    54   1309.48   1285.28    112.69    474.80    444.15    277.19 
+
+structured splits (PBE indirect gap), MAE in meV
+  small strain -> large strain             M0=   945.2 M1=   993.4 M2=   158.2 M3b=   764.4 M3=   757.5 M4=   514.7
+  axis+skew families -> general stretch    M0=   905.8 M1=   944.6 M2=    69.7 M3b=   506.5 M3= 33894.0 M4=   884.8

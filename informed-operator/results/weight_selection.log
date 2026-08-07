@@ -1,0 +1,49 @@
+== per-fold selection for grouped cross-validation (nested) ==
+  fold 0
+    weight 0.00  inner gap   58.31 meV  inner field  46.59 meV
+    weight 0.50  inner gap    8.11 meV  inner field  47.39 meV
+    weight 2.00  inner gap    4.92 meV  inner field  62.15 meV
+    selected gap_weight = 2.0 on 180 inner-scoring shapes
+  fold 1
+    weight 0.00  inner gap   55.26 meV  inner field  44.80 meV
+    weight 0.50  inner gap    8.36 meV  inner field  46.59 meV
+    weight 2.00  inner gap    4.85 meV  inner field  63.11 meV
+    selected gap_weight = 2.0 on 181 inner-scoring shapes
+  fold 2
+    weight 0.00  inner gap   51.85 meV  inner field  47.18 meV
+    weight 0.50  inner gap    8.83 meV  inner field  47.76 meV
+    weight 2.00  inner gap    3.85 meV  inner field  63.52 meV
+    selected gap_weight = 2.0 on 181 inner-scoring shapes
+  fold 3
+    weight 0.00  inner gap   57.19 meV  inner field  45.04 meV
+    weight 0.50  inner gap   16.15 meV  inner field  52.17 meV
+    weight 2.00  inner gap    5.56 meV  inner field  62.77 meV
+    selected gap_weight = 2.0 on 181 inner-scoring shapes
+  fold 4
+    weight 0.00  inner gap   58.28 meV  inner field  45.06 meV
+    weight 0.50  inner gap   17.91 meV  inner field  50.82 meV
+    weight 2.00  inner gap    5.03 meV  inner field  61.89 meV
+    selected gap_weight = 2.0 on 181 inner-scoring shapes
+
+== selection for the two structured splits ==
+  small strain -> large strain
+    weight 0.00  inner gap   65.10 meV  inner field  44.22 meV
+    weight 0.50  inner gap   21.95 meV  inner field  45.28 meV
+    weight 2.00  inner gap    7.74 meV  inner field  62.30 meV
+    selected gap_weight = 2.0 on 113 inner-scoring shapes
+  axis+skew families -> general stretch
+    weight 0.00  inner gap   72.60 meV  inner field  49.82 meV
+    weight 0.50  inner gap   13.80 meV  inner field  53.81 meV
+    weight 2.00  inner gap    4.19 meV  inner field  68.56 meV
+    selected gap_weight = 2.0 on 114 inner-scoring shapes
+
+== chosen ==
+  cv_fold_0                                  gap_weight = 2.0
+  cv_fold_1                                  gap_weight = 2.0
+  cv_fold_2                                  gap_weight = 2.0
+  cv_fold_3                                  gap_weight = 2.0
+  cv_fold_4                                  gap_weight = 2.0
+  small strain -> large strain               gap_weight = 2.0
+  axis+skew families -> general stretch      gap_weight = 2.0
+
+wrote weight_selection.csv / .json to /home/javier/Projects/Physics/Programs/n-Op/informed-operator/results

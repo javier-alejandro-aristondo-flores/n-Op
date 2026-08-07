@@ -56,7 +56,7 @@ This belongs at the front because it bounds what every subject's clean verdict i
 mine included.
 
 My method caught **five of five** defects that were wrong *values* or *cross-page
-disagreements*, and **zero of one** defect that was a sentence contradicting its neighbour
+disagreements*, and **zero of one** defect that was a sentence contradicting its neighbor
 in plain prose. The register's own calibration table shows the same shape in other subjects,
 described in their own words: *"audits structure and sign, not magnitudes"*, *"misses prose
 surrounding an equation"*, *"all three misses one class: prose using no ML vocabulary"*.
@@ -87,13 +87,13 @@ the ten that carry weight, ranked by consequence rather than by confidence.
 
 | # | finding | class | why it ranks here |
 |---|---|---|---|
-| 1 | **S1** · carrier continuity: missing `1/q`, sign-flipped, `p` row unexecutable | 4 + 2 | Trains the operator backwards. Frozen beats correct 4:1; the exact minimiser is reversed transport. Spurious term is **~5×10³ ×** the generation-recombination signal against both generation channels, **doping-independent and worse under mesh refinement** |
+| 1 | **S1** · carrier continuity: missing `1/q`, sign-flipped, `p` row unexecutable | 4 + 2 | Trains the operator backwards. Frozen beats correct 4:1; the exact minimizer is reversed transport. Spurious term is **~5×10³ ×** the generation-recombination signal against both generation channels, **doping-independent and worse under mesh refinement** |
 | 2 | **S16** · three-tier residual contract has no interface | 3 | Two of nineteen categories have no argument through which their state can arrive; no `∂_t x` reaches any `EOM/*`, and the corpus gives three incompatible accounts of where one comes from |
 | 3 | **S8–S11** · emergence axiom void as argued | 1 | The load-bearing rationale for the whole stratification. Conclusion survives on a different, sound argument; the stated one is contradicted by both tiers the refinement admitted |
 | 4 | **S2** · one `j` slot for three incompatible currents | 3 | Bipolar transport unscoreable. **A structural gap filed as a data gap** — buying every missing coefficient would not fix it |
-| 5 | **S3** · `N_PW ≈ 1000` is **181** (exact) / 206 (smooth formula) | 4 | Both memory budgets rest on it, and it inverts the section's "feasibility boundary, not an optimisation" thesis. Formula validated to 0.15% against exact enumeration and 0.08% against a real VASP run |
+| 5 | **S3** · `N_PW ≈ 1000` is **181** (exact) / 206 (smooth formula) | 4 | Both memory budgets rest on it, and it inverts the section's "feasibility boundary, not an optimization" thesis. Formula validated to 0.15% against exact enumeration and 0.08% against a real VASP run |
 | 6 | **S24** · gauge derivation invalid; `A` slot defined twice | 4 + 2 | The partition is correct and the relayed consequences do not follow — but the derivation cannot work, and `A` is typed *external* while carrying an equation of motion and a term in the system energy |
-| 7 | **S19** · slow tier carries the redundancy its own definition forbids | 1 | `charge_dist[D]` is a normalisation of `conc[D,q]`. Third instance of the S8 pattern, in the tier defined by its absence |
+| 7 | **S19** · slow tier carries the redundancy its own definition forbids | 1 | `charge_dist[D]` is a normalization of `conc[D,q]`. Third instance of the S8 pattern, in the tier defined by its absence |
 | 8 | **S22** · slow tier's declared timescale excludes six of its own barriers | 4 | Stated floor completes in 1.1 s, ceiling in 10²⁵ years. Nothing owns ns→hours, where the corpus's own "severe" degradation path lives |
 | 9 | **S5** · "three physically orthogonal inputs" is false | 4 | Diamond and c-BN — the corpus's own anchor pair — share a periodicity structure and differ in space group. The kernel cache is keyed on the assumption |
 | 10 | **S20** · promotion story covers one of six slow fields | 3 | `s(t=0)` is required by every slow-tier trajectory and is specified for at most a subset of one field |
@@ -172,8 +172,8 @@ through the principal; I verified it independently and it is correct. It is the 
 the finding that closes the escape route, so it belongs in the record with its origin
 named.)*
 
-The obvious defence of the `n` row is that `A_f` is an inward face normal. Test that
-defence against the two rows that sit beside it in the same table:
+The obvious defense of the `n` row is that `A_f` is an inward face normal. Test that
+defense against the two rows that sit beside it in the same table:
 
 | row | `:443-449` right-hand side | reduces correctly under |
 |---|---|---|
@@ -187,12 +187,12 @@ vanishes exactly on Poisson ✓. The same substitution turns the `n` row into
 `∂_t n = −(1/q)∇·j + (G−R)` ✗. Flipping to inward normals repairs `n` and breaks the
 other two.
 
-**No single convention makes all three rows right.** The defence is unavailable, and the
+**No single convention makes all three rows right.** The defense is unavailable, and the
 `n` row is a defect on the face of the table rather than an unstated convention.
 
 That is three independent confirmations: the PDE is dimensionally wrong, the PDE is
-sign-wrong against its own closure, and the discretisation is sign-wrong against its own
-neighbours.
+sign-wrong against its own closure, and the discretization is sign-wrong against its own
+neighbors.
 
 **(c) The `p` row is unexecutable.** "the same, with the hole sign" is an instruction to
 take whatever sign the `n` row carries and apply the hole convention. But the `n` row
@@ -213,7 +213,7 @@ wrong answer) sitting on top of a class-4 defect.
 | `∂_t n = −(1/q)∇·J + (G−R)` — **reversed transport** | **exactly 0** |
 
 So a frozen trajectory scores **four times better** than a correct one, and the loss's
-exact minimiser is a trajectory whose transport runs backwards. The gradient is not
+exact minimizer is a trajectory whose transport runs backwards. The gradient is not
 noisy — it points away from the physics.
 
 **(e) The size of the spurious term, and a form that does not depend on the doping.**
@@ -248,7 +248,7 @@ which the spurious term is small, and the one knob that would shrink it is the o
 Péclet argument at `:456-458` requires to stay fine.
 
 **Control on the denominator.** A ratio is only as good as what sits underneath it, so I
-checked whether the second generation channel — impact ionisation, which is field-driven and
+checked whether the second generation channel — impact ionization, which is field-driven and
 could plausibly dominate at 1 MV/cm — shrinks it. I used **the corpus's own Chynoweth
 parameters**, `accuracy-ledger:286`: diamond `a = 1.93×10⁵ cm⁻¹`, `b = 7.59×10⁶ V/cm`,
 `v_sat = 1.5×10⁷ cm/s` (Hiraiwa & Kawarada, *J. Appl. Phys.* **114**, 034506 (2013)).
@@ -268,7 +268,7 @@ transport / SRH        =  (n·v_sat/L) / (n/τ)        =  v_sat·τ / L   =  1.0
 transport / avalanche  =  (n·v_sat/L) / (α·n·v_sat)  =  1 / (α·L)     =  1.03×10⁴
 ```
 
-One is the recombination length over the cell size; the other is the **ionisation length**
+One is the recombination length over the cell size; the other is the **ionization length**
 over the cell size. Both are ~10⁴ at the corpus's operating point, arriving there by
 different physics. Against **both channels together** the ratio is
 
@@ -420,7 +420,7 @@ contradicts the k-point count (see below).
 **The other two numbers in the same paragraph are right, which is what pins the cell.**
 I recomputed both:
 
-- **29 irreducible k-points for an 8×8×8 Γ-centred Monkhorst–Pack mesh on the fcc
+- **29 irreducible k-points for an 8×8×8 Γ-centered Monkhorst–Pack mesh on the fcc
   lattice: confirmed exactly** by explicit orbit counting under the 48 operations of `O_h`
   (4×4×4 → 8, 6×6×6 → 16, 8×8×8 → 29). This is the *fcc primitive* count; a simple-cubic
   8-atom cell would not give 29.
@@ -444,9 +444,9 @@ The page's arithmetic is internally correct (`1000×40×16×29 = 18.6 MB`;
 `1000²×16×29 = 464 MB` — both reproduce). Only the input is wrong.
 
 **This matters beyond tidiness**, because the page's conclusion is a *feasibility* claim:
-"**The slot choice is a feasibility boundary, not an optimisation**" (`gamma-hat:176-177`).
+"**The slot choice is a feasibility boundary, not an optimization**" (`gamma-hat:176-177`).
 At the corrected numbers the densified matrix is ~15 MB — trivially affordable — so at MVP
-scale the encoding choice is an optimisation after all, and the feasibility argument only
+scale the encoding choice is an optimization after all, and the feasibility argument only
 returns at supercell scale, which is exactly the budget the page declares missing
 (`gamma-hat:187-190`). The correction does not change the *design*; it changes the stated
 reason for it, and the stated reason is the page's thesis.
@@ -499,7 +499,7 @@ the cutoff that actually gives 1000 (~1146 eV) and say why the MVP needs it.
 `multiscale-state:204-207`, formula `platelet-nucleation-allen-cahn` (registry row 107):
 
 > `k_nuc·c_Ns² − k_dis·c_platelet`, `k_nuc = ν₀·exp(−E_nuc/kT)`, `E_nuc ≈ 3.5 eV`. The
-> substitutional-nitrogen-to-A-centre half-life is **years at 500 °C and hours at 1000 °C**.
+> substitutional-nitrogen-to-A-center half-life is **years at 500 °C and hours at 1000 °C**.
 
 The ratio of Arrhenius rates between two temperatures depends only on `E_a` — the
 prefactor cancels:
@@ -524,7 +524,7 @@ half-life — is wrong, and the page gives no way to tell which. This feeds `EOM
 (`multiscale-state:265`) and the degradation bundle, so it is a scored quantity.
 
 Separately, the formula is named for **platelet** nucleation but its rate law is the
-substitutional-nitrogen → A-centre reaction; whether platelets nucleate directly from
+substitutional-nitrogen → A-center reaction; whether platelets nucleate directly from
 `N_s` or at a later aggregation stage is a literature question I have put to a directed
 check that did not return before the session limit (gap **G1**, §3); the naming mismatch is visible from the page alone and does not wait on it.
 
@@ -702,7 +702,7 @@ This is the same root cause as the laws postdoc's L5 (`audit/findings/laws.md:23
 which found `δ_PSD = 1e-9 absolute` unusable for want of a unit convention on `M` and cited
 this same `unified-state` gap. **Two independent findings in two subjects trace to one
 missing declaration on my page.** I record that agreement rather than averaging it: the
-wire-schema open question is currently framed as a *serialisation* gap, and it is also a
+wire-schema open question is currently framed as a *serialization* gap, and it is also a
 *numerical* gap, blocking at least two error-model quantities.
 
 **What would refute it.** A stated tolerance and a stated state metric. I searched
@@ -872,7 +872,7 @@ it as the load-bearing argument for the whole stratification. Verified:
   own defect-supercell plan violates.
 
 **A separate, smaller defect in the same section.** `multiscale-state:291` heads the table
-"Each slow rate is parameterised by **time-averaged micro quantities**", and the driving
+"Each slow rate is parameterized by **time-averaged micro quantities**", and the driving
 vector at `:302` is
 
 ```
@@ -883,7 +883,7 @@ Three of those six are **not micro quantities**. `ρ_dis` (dislocation density),
 (oxide front) and `x_carbide` (carbide thickness) are all *slow-state fields*, listed as
 such at `:146-148`. So the "adiabatic driving contract" — the thing that certifies the
 coupling is parametric — includes the slow tier driving itself. That is fine as dynamics
-(`ds/dt = Φ(s;…)` is an ODE in `s`), but it is mis-labelled, and the table row at `:298`
+(`ds/dt = Φ(s;…)` is an ODE in `s`), but it is mis-labeled, and the table row at `:298`
 ("`G_V` feeding vacancy generation | dislocation density and dislocation velocity") files a
 slow-slow coupling under a micro-slow heading.
 
@@ -920,14 +920,14 @@ T_e ≥ T_L  ⟺  (2/3)(j·E)τ_E/(n k_B) ≥ 0  ⟺  j·E ≥ 0     (τ_E, n > 
 so the residual is an identity in the sign of `j·E`, a quantity computed from other state
 components. It fires or does not fire on the *reconstruction*, never on a prediction. It is
 a structurally null residual carrying the name of a physical constraint — the same shape the
-corpus already recognises for `Degeneracy` (`residual-definitions:109-112`, "identically zero
+corpus already recognizes for `Degeneracy` (`residual-definitions:109-112`, "identically zero
 by construction, so it is a generator-construction-bug tripwire and never a training-loss
 term") but without that classification.
 
-**(b) When it does fire, it is wrong to fire.** `j·E < 0` is realisable: wherever the
+**(b) When it does fire, it is wrong to fire.** `j·E < 0` is realizable: wherever the
 diffusion current opposes the local field (the depletion region of a forward-biased
 junction), and over any device delivering rather than dissipating power. In those regions
-the closure *correctly* returns `T_e < T_L`, and the residual would penalise a correct
+the closure *correctly* returns `T_e < T_L`, and the residual would penalize a correct
 trajectory. Carrier cooling below the lattice is a known feature of hydrodynamic transport
 models, not an unphysicality to be masked.
 
@@ -1091,7 +1091,7 @@ the principal** as a cross-subject contradiction with `pino-bridge`.
 
 `multiscale-state:336-338`:
 
-> The mesh is **conservative** — the face flux out of a cell is the flux into its neighbour — so
+> The mesh is **conservative** — the face flux out of a cell is the flux into its neighbor — so
 > the `Conservation` residual **holds discretely**.
 
 If the oracle computes each face flux once from the operator-supplied fields and applies it with
@@ -1113,7 +1113,7 @@ the right classification for this situation and applies it to `Degeneracy`
 generator-construction-bug tripwire and **never a training-loss term**"). Macro `Conservation` has
 the same structure and does not get the same treatment.
 
-**Where I am uncertain.** A charitable reading is that the sentence means "the discretisation is
+**Where I am uncertain.** A charitable reading is that the sentence means "the discretization is
 not itself a source of conservation error", which is true and worth saying. That reading is
 available but is not what the sentence says, and the distinction decides whether a Warmup-band
 training term is live or null. I am reporting it as class 2 — misinterpretable with consequences
@@ -1126,7 +1126,7 @@ oracle-computed one) and where the residual gets its signal.
 
 ---
 
-### S18 — The slow tier is presented as a GENERIC specialisation, but an irradiation source is not an entropy-gradient flow
+### S18 — The slow tier is presented as a GENERIC specialization, but an irradiation source is not an entropy-gradient flow
 
 **Severity: medium. Confidence: medium.**
 
@@ -1136,11 +1136,11 @@ oracle-computed one) and where the residual gets its signal.
 EOM/DefectPopulation[D,q,site] = ‖ dc_D^q/dt|_predicted − ( G^q_total[D] − c_D^q·k_ann^q[D] ) ‖²
 ```
 
-> This is the slow-tier specialisation of `‖dx_i/dt − (L·δE/δx_i + M·δS/δx_i)‖²`. Generation and
+> This is the slow-tier specialization of `‖dx_i/dt − (L·δE/δx_i + M·δS/δx_i)‖²`. Generation and
 > annihilation are both branches of the single dissipative master-equation generator: `M` is the
 > rate matrix … The slow tier has **no reversible bracket**.
 
-For this to be a *specialisation* rather than a coincidence of shape, one needs
+For this to be a *specialization* rather than a coincidence of shape, one needs
 `G_total − c·k_ann = M·δS/δc` for a positive-semidefinite `M` satisfying GENERIC's degeneracy
 condition `M·δE/δc = 0` — which `generic-dynamics:132-138` requires **per tier**.
 
@@ -1185,7 +1185,7 @@ degeneracy condition applies to `M` alone. This is a small change and it makes t
 charge_dist[D][q] = conc[D,q] / Σ_q' conc[D,q']
 ```
 
-identically. `charge_dist` is a normalisation of `conc`, carrying no independent information —
+identically. `charge_dist` is a normalization of `conc`, carrying no independent information —
 an **algebraic constraint among the slow tier's own state fields**. The page calls it "its
 dynamic refinement" (`:152`), but there is nothing left to refine once the charge index is
 present.
@@ -1228,7 +1228,7 @@ promotion — the slow-state fiber whose initial condition it becomes") and
 > species labels.** … Occupancy is the right physical quantity: a vacancy is occupancy going to
 > zero. The static `SiteDecoration.occupancy` becomes the **initial condition** `s(t=0)`.
 
-Check it against the schema it claims to initialise (`:141-148`):
+Check it against the schema it claims to initialize (`:141-148`):
 
 | slow field | is it an occupancy of a site? |
 |---|---|
@@ -1239,7 +1239,7 @@ Check it against the schema it claims to initialise (`:141-148`):
 | `carbide_thickness` | no |
 | `dislocation_density` | no |
 
-So the stated mechanism initialises at most a *subset of one* of six fields. **The initial
+So the stated mechanism initializes at most a *subset of one* of six fields. **The initial
 condition for the other five is specified nowhere**, and `s(t=0)` is a required input to every
 slow-tier trajectory the operator predicts and the oracle scores
 (`EOM/DefectPopulation`, `:265`).
@@ -1390,7 +1390,7 @@ and `:130-131` gives the element record:
 interstitials and antisites are single-site. A record with one `LatticeSite` field cannot type the
 majority of its own universe.
 
-**(b) Two members are parameterised families, so the universe is not enumerable as declared.**
+**(b) Two members are parameterized families, so the universe is not enumerable as declared.**
 `V_Ga–nH` (GaN) and `V_Al–nC_N` (AlN) carry a free integer `n` with **no stated bound**. A
 `Universe` with `carrier_kind = Closed` and `ordinal_policy = DenseU32` requires a finite member
 list with a dense ordinal assignment; a family indexed by an unbounded `n` has neither. (In the
@@ -1537,7 +1537,7 @@ latter. I searched `unified-state`, `generic-dynamics`, `residual-definitions` a
 dynamical, or a declared sum of both, and make `E_EM` and `EOM/A` agree with the choice.
 (ii) On `generic-dynamics`, replace the derivation with the construction it is actually
 describing: "`A` is the transverse radiation field in Coulomb gauge, `∇·A = 0`; the
-non-dynamical scalar potential is eliminated in favour of the instantaneous Coulomb
+non-dynamical scalar potential is eliminated in favor of the instantaneous Coulomb
 interaction, which the matter functionals own." Delete "Weyl" and delete the appeal to
 residual freedom. (iii) State how a uniform applied field enters, and name the route.
 
@@ -1583,7 +1583,7 @@ The two halves belong to different schemes. By explicit orbit enumeration over t
 operations of `O_h` (inversion included, so time reversal adds nothing), on the fcc
 reciprocal lattice:
 
-| mesh | Γ-centred (unshifted) | Monkhorst–Pack shifted |
+| mesh | Γ-centered (unshifted) | Monkhorst–Pack shifted |
 |---|---|---|
 | 4×4×4 | 8 | 10 |
 | 6×6×6 | 16 | 28 |
@@ -1597,7 +1597,7 @@ from-scratch orbit enumeration above; a Burnside cross-check; and `spglib` run a
 real diamond cell. Three routes, one answer — this finding does not rest on any single
 implementation.
 
-**29 is the Γ-centred count. 60 is the Monkhorst–Pack count.** The original prescription
+**29 is the Γ-centered count. 60 is the Monkhorst–Pack count.** The original prescription
 (Monkhorst & Pack, *Phys. Rev. B* **13**, 5188 (1976)) places points at
 `u_r = (2r − q − 1)/2q`, which for even `q` is offset half a step from Γ — the shifted mesh.
 The distinction is not pedantic in practice: VASP's `KPOINTS` file has separate `Gamma` and
@@ -1612,7 +1612,7 @@ treats the page's 18 MB as accidentally right:
 | | `N_PW` | `N_k` | orbital storage |
 |---|---|---|---|
 | page as written | 1000 | 29 | 18.6 MB |
-| corrected, Γ-centred | 181 | 29 | 3.4 MB |
+| corrected, Γ-centered | 181 | 29 | 3.4 MB |
 | corrected, if MP-shifted is meant | 181 | 60 | 6.9 MB |
 
 **On how this finding was arrived at, stated plainly because the route matters.** The
@@ -1627,7 +1627,7 @@ The withdrawal (W3) and this finding are both true, and they are not the same st
 of "any regular mesh". The page gives no such gloss, and it pairs the term with a specific
 integer, which is exactly the context where the loose sense stops being safe.
 
-**Proposed correction.** Say which mesh: either "an 8×8×8 **Γ-centred** mesh gives ~29
+**Proposed correction.** Say which mesh: either "an 8×8×8 **Γ-centered** mesh gives ~29
 irreducible k-points" or "an 8×8×8 Monkhorst–Pack mesh gives ~60", and carry the matching
 `N_k` through both budget lines. The first is the smaller change and is consistent with the
 numbers already on the page.
@@ -1663,9 +1663,9 @@ strengthened it), and the hole-schema misclassification (my S2, and the principa
 of it is better than mine and is now in the text).
 
 **One real finding the contamination handed us.** Whoever read the k-point plant did
-correct physics on top of it: 29 is the **Γ-centred** 8×8×8 count and 60 is the **shifted**
+correct physics on top of it: 29 is the **Γ-centered** 8×8×8 count and 60 is the **shifted**
 mesh. `gamma-hat:162` names "Monkhorst–Pack", whose prescription for even subdivisions is
-the shifted mesh, while quoting the Γ-centred count — see S25.
+the shifted mesh, while quoting the Γ-centered count — see S25.
 
 ### 2b · Investigated and rejected on the merits
 
@@ -1674,9 +1674,9 @@ the shifted mesh, while quoting the Γ-centred count — see S25.
 | N1 | **Scharfetter–Gummel is wrong.** | It is **correct**, and this is the strongest clean verdict in the subject. I derived it: assume `J_n` constant between nodes and `ψ` linear, use the integrating factor `e^{−ψ/V_T}`, integrate; the result is `J_n = (qD/h)[n_{i+1}B(Δ) − n_i B(−Δ)]` with `Δ = (ψ_{i+1}−ψ_i)/V_T`, which is `multiscale-state:453` term for term **including which node pairs with which Bernoulli argument** — the pairing is where transcriptions of this formula usually fail, and it is right here. `B(t) ≈ 1 − t/2` is the correct series for the removable singularity, and the guard is present at `:460-461`. A second check reached me through the principal and I am recording it because it is independent of mine and stronger: the closed form was **verified numerically against direct integration to 1.7×10⁻¹³**. Nothing to report — and the contrast with S1 is the point: the hard formula on this page is right and the easy one is not. |
 | N2 | **The Péclet number is wrong.** | It is **right**: 1 MV/cm × 10 nm = 1 V, against `k_BT/q = 25.85 mV` at 300 K, gives `Pe = 38.7 ≈ 40`. I checked it again at the corpus's own 500 °C harsh-environment point, where `k_BT/q = 66.6 mV` and `Pe = 15`. The conclusion (central differencing unusable) survives at both, so the 300 K choice is not load-bearing. Not a finding. |
 | N3 | **Drift-diffusion carrier sign convention is wrong.** | The claim at `multiscale-state:381` — "**only the diffusion term changes sign between carriers, never the drift term**" — is **correct** for `j_n = qμ_n nE + qD_n∇n`, `j_p = qμ_p pE − qD_p∇p` with `q > 0`. This is the standard textbook pair. Notable that the corpus got this right and the continuity sign wrong (S1). |
-| N4 | **The degenerate Einstein relation is wrong.** | `D/μ = (k_BT/q)·F_{1/2}(η)/F_{−1/2}(η)` with `η = (E_F − E_C)/k_BT` (`multiscale-state:390-392`) is the standard generalised Einstein relation. Correct. The surrounding treatment (nondegenerate form in v1, discrepancy entered as a declared model-form error) is honest and well-shaped. |
+| N4 | **The degenerate Einstein relation is wrong.** | `D/μ = (k_BT/q)·F_{1/2}(η)/F_{−1/2}(η)` with `η = (E_F − E_C)/k_BT` (`multiscale-state:390-392`) is the standard generalized Einstein relation. Correct. The surrounding treatment (nondegenerate form in v1, discrepancy entered as a declared model-form error) is honest and well-shaped. |
 | N5 | **The Poisson equation and the heat equation are wrong.** | Both correct. `∇·(ε∇φ) = −ρ` with `ρ = q(p − n + N_D⁺ − N_A⁻)`; `C_p ρ_m ∂_t T_L − ∇·(κ∇T_L) = j·E`. The finite-volume rows for `T_L` and `φ` also reduce correctly under the divergence theorem — I checked the `1/V_c` factors cancel as intended. Only the carrier rows are wrong (S1). |
-| N6 | **The homogenisation table has a wrong relation.** | Spot-checked eight rows: thermal diffusivity `κ/(C_pρ_m)`; `σ = qnμ₀`; Caughey–Thomas `μ(E) = μ₀[1+(μ₀E/v_sat)^β]^{−1/β}`; Chynoweth `a·exp(−b/E)`; multiplication factor `M = 1/(1−∫α dx)`; avalanche generation `α_n n v_n + α_p p v_p`; SRH lifetime `τ_n = 1/(σ_n v_th N_T)`; Robin interface condition `q_f = ΔT/TBR`. All standard and correctly written. |
+| N6 | **The homogenization table has a wrong relation.** | Spot-checked eight rows: thermal diffusivity `κ/(C_pρ_m)`; `σ = qnμ₀`; Caughey–Thomas `μ(E) = μ₀[1+(μ₀E/v_sat)^β]^{−1/β}`; Chynoweth `a·exp(−b/E)`; multiplication factor `M = 1/(1−∫α dx)`; avalanche generation `α_n n v_n + α_p p v_p`; SRH lifetime `τ_n = 1/(σ_n v_th N_T)`; Robin interface condition `q_f = ΔT/TBR`. All standard and correctly written. |
 | N7 | **The `frenkel-pair-yield` dimensional argument is wrong.** | It is **right and unusually careful**: `Φ [cm⁻²] × Σ_d [cm⁻¹] × N_d [1] = cm⁻³`, and the page explicitly says why the bare product without `Σ_d` would be a fluence rather than a density (`multiscale-state:246-249`). This is the corpus catching its own dimensional error, and it is worth saying so. |
 | N8 | **The 8×8×8 → 29 irreducible k-point count is wrong.** | **Confirmed correct** by explicit orbit enumeration under `O_h`. See S3 — this is what pins the cell and therefore establishes that `N_PW` is the wrong number, not the cell. |
 | N9 | **The hydrogen-diffusion range is wrong.** | `√(Dt)` with `D = 10⁻¹³ cm²/s` and `t = 1000 h` gives 6.0 µm, exactly as stated (`multiscale-state:198`). The implied `D₀ = 1.2×10⁻² cm²/s` at `E_diff = 1.7 eV` is physically ordinary. Internally consistent. |
@@ -1686,7 +1686,7 @@ the shifted mesh, while quoting the Γ-centred count — see S25.
 | N13 | **`EOM/Z` over an immutable slot.** | Real, but **already owned**: the laws postdoc's L6 (`audit/findings/laws.md:276+`) covers it with the same evidence. I add only that `unified-state:50` calls all seven slots "the irreducible **degrees of freedom**", which extends the contradiction onto my page — an immutable discrete label is not a degree of freedom. Reported as a note, not a separate finding. |
 | N14 | **Group order "at most 192" (`compose-time-pipeline:362`) is wrong** — the largest crystallographic point group is `O_h` with 48. | Withdrawn: 192 = 96 (the `O_h` double group) × 2 (antiunitary time reversal), which is defensible for magnetic double groups, and `coupling-structure:231` does work with "Fd-3m + time reversal". Also not my page. |
 | N15 | **`p_O2` listed as a 13th field while declared "not an independent field"** makes the count 13-or-12. | The page's internal counting is self-consistent (8 untyped + 5 typed = 13, and both sub-counts are stated correctly). The redundancy question is real and its check did not return (gap **G4**, §3); the *count* is not a defect either way. |
-| N16 | **`sp³d⁵` warm start should be 36×36 with spin.** | The page says 18×18, which is right for a spinless model, and a warm-start initialiser for an SCF inner loop is legitimately spinless. Logged as an ambiguity, not a defect, since `γ̂` is elsewhere a Pauli spinor and nothing states the initialiser drops spin. |
+| N16 | **`sp³d⁵` warm start should be 36×36 with spin.** | The page says 18×18, which is right for a spinless model, and a warm-start initializer for an SCF inner loop is legitimately spinless. Logged as an ambiguity, not a defect, since `γ̂` is elsewhere a Pauli spinor and nothing states the initializer drops spin. |
 
 ---
 
@@ -1704,8 +1704,8 @@ four are reachable, and none of them blocks the finding it attaches to.
 
 | check | what it would settle | the conclusion without it | branches | what depends on it |
 |---|---|---|---|---|
-| **G1** · does platelet nucleation proceed directly from substitutional N, or at a later aggregation stage? | whether `platelet-nucleation-allen-cahn` (`multiscale-state:204-207`) is named for the right reaction | the formula's **rate law** is the N_s → A-centre reaction while its **name** is platelet nucleation; the mismatch is visible without the literature | if platelets do nucleate from N_s, the name is fine and only the half-life pair is wrong; if not, the row conflates two stages and needs splitting | **S4's naming remark only.** S4's core result — that no prefactor reconciles 3.5 eV with years-at-500 °C and hours-at-1000 °C — is prefactor-independent arithmetic and does not wait on this |
-| **G2** · is the G₀W₀ quasi-particle shift's sensitivity to strain approximately constant over the validity radius? | whether the first-order staleness estimator is *numerically* adequate even though it is not a bound | it is not a bound regardless (S7a), and the units argument (S7b) and the undefined `‖Δx‖` (S7c) are independent of it | if the sensitivity is near-constant, S7 is a rigour defect with small practical consequence; if it varies strongly, the estimator also under-reports | **the severity of S7, not its validity.** S7(a)–(c) stand either way |
+| **G1** · does platelet nucleation proceed directly from substitutional N, or at a later aggregation stage? | whether `platelet-nucleation-allen-cahn` (`multiscale-state:204-207`) is named for the right reaction | the formula's **rate law** is the N_s → A-center reaction while its **name** is platelet nucleation; the mismatch is visible without the literature | if platelets do nucleate from N_s, the name is fine and only the half-life pair is wrong; if not, the row conflates two stages and needs splitting | **S4's naming remark only.** S4's core result — that no prefactor reconciles 3.5 eV with years-at-500 °C and hours-at-1000 °C — is prefactor-independent arithmetic and does not wait on this |
+| **G2** · is the G₀W₀ quasi-particle shift's sensitivity to strain approximately constant over the validity radius? | whether the first-order staleness estimator is *numerically* adequate even though it is not a bound | it is not a bound regardless (S7a), and the units argument (S7b) and the undefined `‖Δx‖` (S7c) are independent of it | if the sensitivity is near-constant, S7 is a rigor defect with small practical consequence; if it varies strongly, the estimator also under-reports | **the severity of S7, not its validity.** S7(a)–(c) stand either way |
 | **G3** · are carbide-growth prefactors for Ti/Mo/W in the ratios the stated thicknesses require (≈1 : 23 : 83)? | whether `carbide-growth-parabolic`'s four numbers are reproducible | the numbers **cannot be checked from the page**, because no prefactor is stated for any metal — which is the finding | if the literature ratios match, the values are right and only the *statement* is incomplete; if not, the values are wrong too | **S15's severity.** The "not reproducible from stated inputs" finding holds either way |
 | **G4** · is `p_O2` genuinely derivable from `chemical_potentials`, or an independent field? | whether the `Environment` record has a redundant thirteenth field | the record's **count** is internally consistent (N15), so this is a redundancy question, not a counting one | if derivable, `p_O2` should be removed or marked derived; if independent, the "not an independent field" note at `crystal-inputs` is wrong | **nothing.** N15 already rejects the counting finding on other grounds |
 
@@ -1768,7 +1768,7 @@ This was it.
 
 **The detection was an accident of routing, and that is the part to worry about.** These
 plants were caught only because they were handed back to the agent that wrote them. I
-recognised the five instantly — not by auditing them, but by recognising my own work. **Sent
+recognized the five instantly — not by auditing them, but by recognizing my own work. **Sent
 to any other subject, nothing in this program as designed would have found them.** No agent
 verifies a received finding against the file it names; no channel distinguishes a plant from
 a finding, because a plant that could be distinguished would not be testing anything. The
@@ -1791,7 +1791,7 @@ score:
 
 **P7 missing is the designed outcome and confirms the method's stated boundary.** It was
 built to require outside knowledge — Hellmann–Feynman forces are exact only for a complete
-or nuclear-position-independent basis; a finite atom-centred basis leaves Pulay terms — and
+or nuclear-position-independent basis; a finite atom-centered basis leaves Pulay terms — and
 to leave **no internal trace**. A method that reads for internal consistency cannot catch
 it. That is a known, bounded limitation, and it matches the register's pattern: two other
 subjects reported the same class of miss ("audits structure and sign, not magnitudes";
@@ -1810,7 +1810,7 @@ is that **the fleet's reading is tuned to values and to cross-references, and is
 plain prose asserting two incompatible things in one place.** That is not a marginal class.
 It is defect class 1 in the register's own taxonomy ("a claim that resolves but is not
 true"), and it is the class the corpus's checkers are structurally blind to, since a
-sentence contradicting its neighbour still has valid links. **A gate that catches five of
+sentence contradicting its neighbor still has valid links. **A gate that catches five of
 five value errors and zero of one adjacent prose contradiction is not an 83% gate; it is
 two gates, one of which is untested and one of which just failed its only trial.**
 
@@ -1860,7 +1860,7 @@ against published tables), the `N_PW` formula validated to 0.08% against a real 
 the two-channel scale ratio using the corpus's own Chynoweth parameters, and the ten-pattern
 control sweep for competing continuity statements. Every number in S1, S3 and S25 is one I
 computed, with the script preserved. Neither undergraduate had returned when this file was
-finalised, and **no finding in it is waiting on one** — if they return with a disagreement it
+finalized, and **no finding in it is waiting on one** — if they return with a disagreement it
 is a check on me, not a gap in the evidence.
 
 That is deliberate given how this session began. The five withdrawn findings in §2a reached
@@ -1870,12 +1870,12 @@ delegation.**
 
 The areas I am prepared to call clean on that basis are:
 
-- **The macro-tier constitutive relations and homogenisation map** — sixteen formulas
+- **The macro-tier constitutive relations and homogenization map** — sixteen formulas
   checked term by term against standard references (N3–N7). Every one correct. The macro
   tier's *physics content* is in good shape; its *bookkeeping* (S1, S2) is not, and the
   contrast is sharp enough to be worth stating: someone who knew the physics wrote the
   formulas, and the continuity signs were written by transcription.
-- **The finite-volume discretisation machinery** — conservation form, face fluxes, the
+- **The finite-volume discretization machinery** — conservation form, face fluxes, the
   Scharfetter–Gummel exponential fitting and its singularity guard, the Péclet argument
   (N1, N2, N5). Correct and unusually well-motivated.
 - **The `gamma-hat` sizing chain except `N_PW`** — cell, band count, k-point count,
@@ -1891,7 +1891,7 @@ cross-page contradictions, and **0 of 1 on an adjacent prose self-contradiction*
 clean verdict in this section rests on comparisons of the first two kinds — formulas
 against references, numbers against arithmetic, claims against their use sites. **None of
 it is evidence about the third kind.** The areas above are clean *of value and reference
-defects*; a sentence on any of those pages that contradicts its own neighbour in plain
+defects*; a sentence on any of those pages that contradicts its own neighbor in plain
 prose would not have been caught by what I ran, and P3 is the demonstration. This is not a
 hedge — it is the specific gate my calibration measured and failed, and it should be read
 as narrowing every clean verdict above rather than as a caveat attached to none of them.
@@ -1925,18 +1925,18 @@ Reported, not written — `log/timeline.md` has a single writer.
    foundations, not a defect report: two pages can drop a clause and get stronger.
 2. **Two independent audit subjects trace an unusable error-model quantity to one missing
    declaration** — the per-slot unit convention on `unified-state` (S7, and the laws
-   postdoc's L5). The wire-schema open question should be reclassified from a serialisation
+   postdoc's L5). The wire-schema open question should be reclassified from a serialization
    gap to a numerical one, because it currently blocks `δ_PSD` and the dressing-staleness
    term.
 3. **The `N_PW` correction inverts the stated justification for the density-matrix encoding**
-   (S3): at MVP scale the encoding is an optimisation, and the feasibility argument that the
+   (S3): at MVP scale the encoding is an optimization, and the feasibility argument that the
    page rests on returns only at supercell scale — which is the budget the page already
    declares missing. The design is unchanged; its rationale moves.
 
 4. **The carrier-continuity defect has a doping-independent size** (S1e). Against
-   recombination the ratio is `v_sat·τ/L`; against impact ionisation it is `1/(α·L)`. Both
+   recombination the ratio is `v_sat·τ/L`; against impact ionization it is `1/(α·L)`. Both
    cancel the carrier density, both are a *length over the cell size* — recombination length
-   and ionisation length respectively — and both land near 10⁴ at the corpus's operating
+   and ionization length respectively — and both land near 10⁴ at the corpus's operating
    point by independent physics. Against the two channels together the figure is **5.06×10³**
    (the estimate that reached me, 10⁴, counted one denominator). This converts the finding
    from a point estimate into a statement about the whole declared envelope: the ratio *grows*

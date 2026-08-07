@@ -1,0 +1,133 @@
+{
+  "n_pairs_total": 82,
+  "n_measured": 82,
+  "n_used": 81,
+  "n_dropped_zero": 1,
+  "dropped": [
+    "single_defects_new-only/Transition-Metals/Zr"
+  ],
+  "nmae_mean_pct": 0.7841442282198592,
+  "nmae_sd_pct": 0.030171504239536868,
+  "nmae_min_pct": 0.7511911675939835,
+  "nmae_max_pct": 0.9516219883270601,
+  "nmae_cv": 0.03847698312851364,
+  "clean_subset": {
+    "n": 54,
+    "mean_pct": 0.7838301641496714,
+    "sd_pct": 0.030247208055631473,
+    "min_pct": 0.7511911675939835,
+    "max_pct": 0.9516219883270601,
+    "cv": 0.03858898194922721
+  },
+  "radial": {
+    "near_0_1.6A": 0.01754642360903181,
+    "far_3A+": 0.010986559824485074,
+    "peak_over_farfield": 1.597080786828937,
+    "frac_signal_within_2A": 0.018433901517307682,
+    "frac_volume_within_2A": 0.0335483870967742,
+    "enrichment": 0.5494720644582096
+  },
+  "regression": {
+    "r2_all6": 0.16080464980328668,
+    "r2_best_pair": 0.10030815103311641,
+    "best_pair": [
+      "group",
+      "defect order"
+    ],
+    "r2_single": {
+      "atomic number": 0.02359213185257203,
+      "electronegativity": 0.004502357092751708,
+      "atomic radius": 0.0022489590817038607,
+      "group": 0.04675426699026797,
+      "period": 0.010735848044210905,
+      "defect order": 0.046389148815162096
+    },
+    "n": 80
+  },
+  "pointwise": [
+    {
+      "config": "single_defect/IA-element-single-impurity/H",
+      "dopants": "H",
+      "nmae_pct": 0.7714075037952268,
+      "explained_frac": 0.28584492370059367,
+      "residual_nmae_pct": 0.5509045847308148
+    },
+    {
+      "config": "single_defect/IA-element-single-impurity/Li",
+      "dopants": "Li",
+      "nmae_pct": 0.7684049576166074,
+      "explained_frac": 0.23718888342597122,
+      "residual_nmae_pct": 0.5861478437005436
+    },
+    {
+      "config": "single_defect/IA-element-single-impurity/Na",
+      "dopants": "Na",
+      "nmae_pct": 0.7629619268570121,
+      "explained_frac": 0.19536554079001522,
+      "residual_nmae_pct": 0.6139054574144
+    },
+    {
+      "config": "single_defect/IIA-element-single-impurity/Be",
+      "dopants": "Be",
+      "nmae_pct": 0.7678848405520492,
+      "explained_frac": 0.28759144976465556,
+      "residual_nmae_pct": 0.5470477260053841
+    },
+    {
+      "config": "single_defect/IIA-element-single-impurity/Mg",
+      "dopants": "Mg",
+      "nmae_pct": 0.7625765316665111,
+      "explained_frac": 0.21722607365164404,
+      "residual_nmae_pct": 0.5969250258337062
+    },
+    {
+      "config": "single_defect/IIIA-element-single-imputiry/B",
+      "dopants": "B",
+      "nmae_pct": 0.7703967407722596,
+      "explained_frac": 0.31096052996838686,
+      "residual_nmae_pct": 0.5308337619757999
+    },
+    {
+      "config": "single_defect/IVA-element-single-impurity/Si",
+      "dopants": "H",
+      "nmae_pct": 0.7685965817085784,
+      "explained_frac": 0.2138199606561514,
+      "residual_nmae_pct": 0.6042552908471978
+    },
+    {
+      "config": "single_defect/VA-element-single-impurity/As",
+      "dopants": "As",
+      "nmae_pct": 0.7775968667520367,
+      "explained_frac": 0.19707224671598378,
+      "residual_nmae_pct": 0.6243541051819033
+    },
+    {
+      "config": "single_defect/VA-element-single-impurity/N",
+      "dopants": "N",
+      "nmae_pct": 0.7844751416680206,
+      "explained_frac": 0.3350142458526534,
+      "residual_nmae_pct": 0.5216647936919553
+    },
+    {
+      "config": "single_defect/VA-element-single-impurity/P",
+      "dopants": "P",
+      "nmae_pct": 0.7734548455418192,
+      "explained_frac": 0.2133613858748027,
+      "residual_nmae_pct": 0.6084294477854353
+    },
+    {
+      "config": "single_defect/VA-element-single-impurity/Sb",
+      "dopants": "Sb",
+      "nmae_pct": 0.7875981500699064,
+      "explained_frac": 0.17377010902043022,
+      "residual_nmae_pct": 0.6507371336679695
+    },
+    {
+      "config": "single_defect/VIA-element-single-impurity/O",
+      "dopants": "O",
+      "nmae_pct": 0.7812150234342518,
+      "explained_frac": 0.2508927102340548,
+      "residual_nmae_pct": 0.5852138689292716
+    }
+  ]
+}

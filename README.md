@@ -9,7 +9,10 @@ The minimum viable demonstration is **diamond**, with three capabilities: crysta
 structure prediction, electron-cloud diffusion, and heat diffusion. The specification is
 comprehensive; the build is diamond-first.
 
-**No code has been written yet.** This repository is specification and research.
+The specification came first and still dominates. The oracle library has begun —
+`physics/` scores real VASP output against invariants, equations of state and elastic
+constants, under 42 tests — and four go/no-go studies in `feasibility/` have measured
+whether the operator has a signal worth learning. The other two libraries are empty.
 
 ## Start here
 
@@ -18,7 +21,7 @@ front door, for a person or an agent. It is short, and it is the specification t
 checker parses, so it cannot drift from what is enforced.
 
 Then, to find anything: **`generated/corpus.json`**. Its `topics` map answers *"which
-page owns this?"* in one hop, for every one of 273 topics. It is emitted, never
+page owns this?"* in one hop, for every one of 302 topics. It is emitted, never
 hand-written.
 
 ## The shape
@@ -31,19 +34,23 @@ n-Op is the project. Beneath it sit three **libraries**, each serving to build i
 | **`informed-operator/`** | the operator library — the neural operator, which consumes the oracle's residuals during one training stage |
 | **`interface/`** | the loops library — training, design search, active learning |
 
-All three are empty. The specification for them is the corpus.
+`informed-operator/` and `interface/` are empty; the specification for them is the corpus.
+`physics/` is under way — see `journals/` for what it is required to do, and the tests for
+what it currently does.
 
 ```
-journals/          the specification — 45 pages
+journals/          the specification — 50 pages
   oracle/          state · laws · compilation · certification · registry · accuracy · seams
-  operator/        seam · training · loss
+  operator/        seam · structure · training · loss
   interface/       the loops boundary
   n-op/            purpose · build
   practice/        agent-contract · conventions · traps · glossary
 log/timeline.md    the research record — the only place history is kept
+audit/             the corpus audit — can the oracle be built from this specification?
+feasibility/       four go/no-go studies — is there a signal worth building it for?
 generated/         corpus.json, emitted; regenerating it is a no-op
 data/              the registry, the reference battery, the diamond sweeps
-tools/             the checker, and the calibration that proves it is looking
+tools/             the checkers, and the calibrations that prove they are looking
 ```
 
 ## How it holds together
@@ -67,9 +74,9 @@ separate them. Spelling the corpus half out separates them by construction.
 advancement is recorded in `log/timeline.md`, which is a compliance record and carries
 date, finding, evidence, attribution, and what each entry superseded.
 
-**What is not yet known is declared where it is missing.** 51 open questions live in the
+**What is not yet known is declared where it is missing.** 61 open questions live in the
 frontmatter of the page that owns the affected topic; the corpus-wide register is emitted
-from them, so it cannot disagree with the pages it summarises.
+from them, so it cannot disagree with the pages it summarizes.
 
 ## Checking
 

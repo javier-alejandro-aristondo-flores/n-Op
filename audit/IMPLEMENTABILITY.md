@@ -32,7 +32,7 @@ have made the pass look fraudulent:
    verbatim corpus text.
 2. **Markdown table-cell pipe escaping.** The corpus writes `\|` inside table cells so the
    table does not break. A quotation of table content can never match until that escape is
-   normalised away. This falsely condemned a quotation that is present verbatim at
+   normalized away. This falsely condemned a quotation that is present verbatim at
    `cert-obligations.md`.
 
 Before the fixes: 27 of 65 quotations "absent" in one file. After: one, and it is a regex.
@@ -54,7 +54,7 @@ overlapping-but-different page sets. They independently landed on the same holes
 | The environment box has no type and no supplier | cert, state |
 
 Convergence between non-communicating readers is the strongest evidence this method
-produces. These four are not artefacts of one auditor's lens.
+produces. These four are not artifacts of one auditor's lens.
 
 ---
 
@@ -153,7 +153,7 @@ contract requires exists on no manifest schema.
 
 `X13` — the oracle-file, the thing consumers actually hold, **has no on-disk format**.
 `X16` — the three command-line verbs have no arguments, no input format, no output encoding
-and no failure behaviour. `X14` — *"file hash equals kernel hash"* names three hashes and
+and no failure behavior. `X14` — *"file hash equals kernel hash"* names three hashes and
 reconciles none of them.
 
 ---
@@ -169,7 +169,7 @@ stages; 9 determined against 20 findings in state and identity. Only the registr
 true rate, and it is **3 of 20**.
 
 Do not read this pass as *"85% of the corpus is missing."* Read it as *"here are 75 named,
-grounded, individually-checkable holes, and the load-bearing ones are at the centre rather
+grounded, individually-checkable holes, and the load-bearing ones are at the center rather
 than the edges."*
 
 ## Coverage not reached

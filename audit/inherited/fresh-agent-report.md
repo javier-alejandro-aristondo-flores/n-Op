@@ -118,7 +118,7 @@ names **13 fields**. **Five carry a declared type and unit:**
 | `radiation_dose` | `Fluence` (cm⁻²) |
 | `displacement_threshold` | `Energy` (eV), per host |
 | `vibration_spectrum` | `PSD`, amplitude vs frequency, 100 Hz – 10 kHz |
-| `p_O2` | `Pressure` (Pa) — a specialisation of the pressure slot, not an independent field |
+| `p_O2` | `Pressure` (Pa) — a specialization of the pressure slot, not an independent field |
 
 The other eight — `temperature`, `pressure`, `chemical_potentials`,
 `applied_electric_field`, `applied_magnetic_field`, `applied_stress`,
@@ -140,7 +140,7 @@ Two adjacent open questions matter for anyone landing this: `environment-structu
 (only `temperature` is classified) and `crystal-type` (`Crystal` is used in every applicability
 signature in the corpus and defined nowhere).
 
-This is the best behaviour I saw. A typed table with eight honest holes beats a complete table
+This is the best behavior I saw. A typed table with eight honest holes beats a complete table
 with eight guesses, and the holes are individually addressable.
 
 ---
@@ -157,7 +157,7 @@ unique-across-corpus, anchors-resolve-to-real-headings, every `[page]` and `[pag
 citation resolves, cited-id-in-`depends-on`, `depends-on` resolves, forbidden history markers,
 retired serial vocabularies, table arity with escaped pipes, section-ordinal / line-number /
 bare-path citations, referenced filesystem paths, orphan pages, and full cross-check of
-`generated/corpus.json` against the pages it claims to summarise.
+`generated/corpus.json` against the pages it claims to summarize.
 
 **Calibration, per `conventions.md` "Calibrate before certifying":**
 
@@ -195,7 +195,7 @@ rows, **the name does not appear on the page named.** Two severities:
 | `CrystalSymmetryGroup` | `canonical-vocabularies` | `representation-substrate`, `coupling-structure` |
 | `IrrepLabel` | `canonical-vocabularies` | `representation-substrate` |
 
-**Why the checker cannot catch this, and why that generalises.** Every one of these rows
+**Why the checker cannot catch this, and why that generalizes.** Every one of these rows
 contains a *valid* citation — `[multiscale-state]` resolves, is in `depends-on`, and passes
 every rule in the schema block. The rule set validates **the pointer**. The glossary's claim
 is a **proposition about the target's contents**, and nothing checks propositions. This is the
@@ -376,7 +376,7 @@ holds.
 - Adding a *citation* — one syntax, both halves checked, and the reverse edges are emitted
   rather than authored so I cannot corrupt them.
 - Knowing what NOT to write — the "Forbidden" section is short and absolute, and the
-  present-tense rule removes the hardest judgement call (whether to narrate a change).
+  present-tense rule removes the hardest judgment call (whether to narrate a change).
 
 **Where my confidence drops:**
 

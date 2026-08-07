@@ -47,7 +47,7 @@ is neither falsely supervised — predicting a band gap for a metal — nor pena
 quantity that is undefined rather than zero.
 
 **This is what makes the architecture compositional across crystal types.** One
-interface accepts diamond, gallium nitride, aluminium nitride, cubic boron nitride and
+interface accepts diamond, gallium nitride, aluminum nitride, cubic boron nitride and
 refractory metals, and each property's classifier decides whether it is a meaningful
 question for that crystal.
 
@@ -67,7 +67,7 @@ separately.
   through the Lyddane-Sachs-Teller relation. It is a property of the *bonds*, not of the
   point group.
 - **`is-noncentrosymmetric`** — the piezoelectric crystal classes, those with no
-  inversion centre. Gates the **polarization package**: spontaneous polarization,
+  inversion center. Gates the **polarization package**: spontaneous polarization,
   piezoelectric tensors, the two-dimensional-electron-gas sheet density, and
   pyroelectricity.
 
@@ -116,7 +116,7 @@ vocabulary those fields draw on.
 | Defect formation energy for species X | `defect-species-meaningful(X, Crystal)` | A boron substitutional in copper is not the defect it is in diamond |
 | Superconducting `T_c` | `is-superconductor(Crystal)` | A finite predicted `T_c` for most materials is wrong, not noisy |
 | Polar-optical (Fröhlich) scattering | `is-polar-material(Crystal)` | Nonzero Born charges and optical-mode splitting — a bond property, not a point group. False for diamond; **true for centrosymmetric β-Ga₂O₃**, where it is the dominant mobility limiter |
-| Polarization package — spontaneous polarization, `e_ij`, sheet density, pyroelectricity | `is-noncentrosymmetric(Crystal)` | Piezoelectric classes, no inversion centre. True for wurtzite III-nitrides; **false for β-Ga₂O₃ (`C2/m`) and diamond**. Independent of `is-polar-material` |
+| Polarization package — spontaneous polarization, `e_ij`, sheet density, pyroelectricity | `is-noncentrosymmetric(Crystal)` | Piezoelectric classes, no inversion center. True for wurtzite III-nitrides; **false for β-Ga₂O₃ (`C2/m`) and diamond**. Independent of `is-polar-material` |
 | Interface trap density `D_it` (row 116) | *(interface predicate — not in the vocabulary)* | Dangling bonds plus strain mismatch. **Not** point-group gated; applies to diamond and β-Ga₂O₃. Always-true stub |
 | Subthreshold swing (row 119) | `is-dielectric-layer(Crystal)` | Needs a gate-oxide capacitance, not an inversion-symmetry property |
 | Carbide formation rate at an interface | `interface-includes-carbide-former(Crystal)` | Platinum on diamond never forms a carbide; titanium on diamond does |

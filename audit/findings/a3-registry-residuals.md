@@ -23,7 +23,7 @@ The reference battery promises them on every value:
 
 And the typeclass alphabet makes units a method every numeric output must implement:
 
-> Units, equality within a tolerance, and behaviour under a change of units or
+> Units, equality within a tolerance, and behavior under a change of units or
 > basis. Every numeric output is a `Quantity`.
 
 **What is missing.** No page states what the canonical units *are*. `Units` is a type
@@ -57,7 +57,7 @@ Second control: `grep -c 'PRB\|PRL\|JAP\|APL\|Phys\.\|J\. ' data/reference-data/
 
 ---
 
-### R2 — the manifest is written in codes whose only decode table is labelled `retired-vocabularies`, in `agent-contract.md`
+### R2 — the manifest is written in codes whose only decode table is labeled `retired-vocabularies`, in `agent-contract.md`
 
 **Verdict:** UNDERSPECIFIED
 

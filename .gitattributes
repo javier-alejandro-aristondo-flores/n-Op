@@ -1,0 +1,16 @@
+# Binary research artifacts. Marked explicitly so git never attempts a text diff or a
+# three-way merge on them: a merged .npz would be a corrupt array that still looks like a
+# file. This is also where LFS filters would go if these ever start churning -- see below.
+*.npz  binary
+*.npy  binary
+*.gz   binary
+*.png  binary
+
+# Not moved to Git LFS, deliberately, and the reasoning is worth keeping next to the
+# decision. `git clone` fetches LFS objects by default, so with these files committed once
+# and never revised a clone downloads the same bytes either way -- LFS pays when one file
+# is rewritten many times, not when many files are written once. Against zero benefit it
+# would add a hard git-lfs dependency for anyone cloning, and a clone without it yields
+# pointer files rather than data, which is the wrong trade for a public research artifact.
+# Revisit if `results/` begins accumulating revisions: that is the condition that changes
+# the answer, and `git log --oneline -- '*/results/*' | wc -l` is the number to check.

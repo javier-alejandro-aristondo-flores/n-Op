@@ -344,12 +344,74 @@ equivariant DeepDFT on exactly our data regime** (single-host site-occupation: 0
 with higher-ℓ gains appearing on chemical diversity this corpus doesn't have. Revisit when III.1
 measurably plateaus *and* the supercomputer arrives.
 
-#### III.3 — GPWNO · **candidate pending drill (found in post-delivery audit; NOT an entry)**
-Gaussian Plane-Wave Neural Operator (arXiv:2402.04278): structure→density with a plane-wave
-global branch + Gaussian local basis — a named operator the original sweep missed, and one that
-shares the suite's batched-FFT primitive with the Fourier lineage. Recorded as a candidate only:
-the suite admits no undrilled members. Admission path = a feasibility drill on the same schema as
-the other ten (verified counts, in-house primitive spec, 6 GB math, floors, kills).
+#### III.3 — GPWNO · **IN-LOCAL, provisional — a complement to III.1, expected to land redundant**
+**Operator.** Gaussian Plane-Wave Neural Operator: Kim & Ahn, ICML 2024 (PMLR 235:23805;
+arXiv:2402.04278; public code, no license file). A plane-wave branch — factorized spectral
+convolution (F-FNO-style) over a fixed probe lattice in *fractional* coordinates, so the
+non-orthogonal-cell transform falls out for free — plus a Gaussian-type-orbital branch (16
+fixed-exponent Gaussians × real spherical harmonics l ≤ 3 per atom); ρ = ρ_PW + ρ_GTO, trained
+on random query points. Gate: passes — the output is a function on ℝ³ (the GTO part analytic;
+the PW part a kernel interpolation from a spectral lattice independent of the target grid; the
+VASP grid is only the supervised query set). Two caveats recorded: the PW readout is learned
+interpolation, not an analytic plane-wave sum (in-house variant: evaluate Σ f̂_λ e^{iλ·b·x}
+directly — 4–30 GMAC per structure, affordable — which hardens the gate argument); the hard probe
+mask makes ρ discontinuous at its radius (the paper admits it; use an envelope).
+**Why provisional.** The accuracy prior is weak: never independently reproduced; its headline wins
+are against DeepDFT runs 3–15× worse than DeepDFT's own authors obtain (QM9 0.73 vs equivariant
+DeepDFT's 0.28); ELECTRAFI (III.4) beats it 4× on its own benchmark. Its case here: ~0.3M
+parameters, comfortable on 6 GB, and the only member that tests a global-plane-wave + local-GTO
+basis split on a periodic corpus.
+**Data facts (verified by the drill and re-verified in the audit).** The Defect Set pseudo-density
+is *signed* near heavy cores (As run: min −150.5, max 717, grid mean 256.99998 = NELECT) —
+disable positivity clamps; mask radii per species across 57 dopants. Cell heights: Alloy
+2.953/5.650/11.928 Å, Strain Atlas 2.06 Å. Spectral check on the As run: 99.4% of the non-DC
+spectral power lies within a 20³ probe-lattice Nyquist, ~100% within 40³ — D = 40 is
+band-adequate for the plane-wave part; cores belong to the Gaussian branch.
+**The public code is not a usable reference on these cells** (read in source): fixed ±1 image
+enumeration, minimum-image Gaussian readout (non-periodic and discontinuous at the boundary at
+our cell heights — the widest Gaussian's neighbour image contributes ~12% at 2.06 Å), cubic probe
+lattice only, absolute cutoffs. The in-house build uses cell-height image enumeration for every
+edge type, sums Gaussian images, and allows an anisotropic probe lattice.
+**Build (beyond the shared primitives).** Gaussian-basis evaluation on (query, atom-image) pairs
+(~1 week); real spherical harmonics l ≤ 3; per-axis batched 1-D real FFTs of length D (a strict
+subset of the shared 3-D FFT — choose D ∈ {16, 32, 64} so radix-2 suffices under an own-FFT
+substrate; the probe lattice is free and need not match VASP's grids); streaming probe→query
+aggregation at inference (the hardest kernel). **The catch is the coefficient head:** the Gaussian
+coefficients must transform as irreducible representations → tensor-field-network-class l ≤ 3
+tensor products, the suite's expensive class (6–10 person-weeks). First build = the
+**fixed-frame variant (flagged adaptation)**: this corpus never rotates (cells fixed; symmetry
+lives in the orbit map), so an invariant graph network + MLP emits the 256 coefficients per atom
+directly — 1–2 weeks; forfeits the SE(3) claim, not the operator claim. Equivariant fallback:
+PaiNN-class l ≤ 1 with s,p Gaussians only. Effort 3–5 person-weeks on top of shared primitives.
+**Compute.** Fits 6 GB for every task at D ≤ 40 with batch 4–8 (64-atom Defect cell at D = 40:
+0.59 GB fp32); D = 80 only at batch 1. Tie the query radius to the probe spacing — the paper's
+absolute 2.5 Å cutoff at D = 40 on a 64-atom cell implies 11.7M probe→query edges (~4.7 GB) and
+does not fit. Defect Set per functional 0.5–1.5 days; Strain Atlas per functional 8–24 h; Alloy
+0.5–1.5 days; full-grid inference 1–6 s per structure.
+**Floors & kills.** SAD floor, **measured** (Defect Set, As): AECCAR1 vs CHGCAR NMAE 14.8% — the
+bonding signal is ≈ 13–15% (the all-electron-vs-pseudo gap, AECCAR2 vs CHGCAR, is 1.56%). Beat
+SAD by ≥ 5× (≤ 3% NMAE) or REJECT. **Kill benchmark = III.1 at matched budget** — same campaign,
+orbit-aware split, same 1,024-point query sampling, same (ρ, m) convention and electron-count
+projection, same wall-clock *and* same visit count (report both): ≤ 1.0× DeepDFT's NMAE → standing
+entry; 1.0–1.25× → stays only with ≥ 3× faster full-grid inference or a win on held-out-strain
+extrapolation; > 1.25× → REDUNDANT, retire. Prior expectation, recorded in advance so the outcome
+cannot be re-narrated: the 1.0–1.25× band or worse.
+**Risks.** The accuracy prior; unvalidatable against the public code; the equivariant-head cost;
+the plane-wave branch is not strain-equivariant (integer-mode filters see 10% different
+wavevectors at ±10% strain — held-out strain orbits must be tested explicitly); ~95 structures per
+functional vs the paper's ≥ 2,000 per family — orbit-aware early stopping is mandatory.
+
+#### III.4 — ELECTRAFI · **candidate pending drill (surfaced by the GPWNO drill; NOT an entry)**
+"Global Plane Waves From Local Gaussians: Periodic Charge Densities in a Blink" — Elsborg,
+Ærtebjerg, Thiede, Aspuru-Guzik, Vegge, Bhowmik (DeepDFT's group), arXiv:2601.19966, ICML 2026.
+Anisotropic real-space Gaussians whose closed-form Fourier transforms give the plane-wave
+coefficients analytically via Poisson summation; the full periodic density is a single inverse
+FFT — no grid probing, no image sums, no spherical-harmonic expansions. Reported to match or
+exceed the state of the art on periodic benchmarks (0.58% on the full Materials-Project set vs
+ChargE3Net's 0.54%) at up to 633× the speed. On paper the strongest Fourier-lineage
+structure→density candidate for the operator gate: its output is a band-limited function plus
+analytic Gaussians by construction. No code URL found. Admission path = its own drill; its
+DFT-initialization use case is out of scope here (the SCF fence, §0).
 
 ---
 
@@ -638,7 +700,8 @@ Identity (Δ-tasks; trig-upsampling for resolution) · global affine + **per-she
 filter** (≈ a one-layer linear Fourier operator — beating it certifies nonlinearity/anisotropy is
 earning its keep) · POD + k-nearest-neighbor interpolation (the memorization null; brutal on
 factorial sweeps) · **SAD** (superposed atomic densities — *already on disk as AECCAR1 for all 547
-runs*; built from POTCAR radials for the other blocks, artifacts never leaving `/Pool`) ·
+runs*; measured on a Defect Set run: 14.8% normalized MAE vs the pseudo-density, i.e. the
+bonding signal every structure→field member must beat; built from POTCAR radials for the other blocks, artifacts never leaving `/Pool`) ·
 **spectral Poisson** (exact Hartree via 4πρ(G)/|G|², e² = 14.39964 eV·Å, G=0 → 0, + per-campaign
 climatology for the exchange-correlation/local-ion remainder — doubles as pipeline calibration:
 if this floor misbehaves, the extraction conventions are broken; with the semilocal-XC ridge
@@ -725,7 +788,9 @@ reported.
    degeneracy measured *stronger* than claimed (exactly 0.00 meV on axis triples and shear
    orbits). One claim was found false and corrected (item 1: the k-mesh "refutation" had
    generalized a single-pair check to all nine). The audit also added the flagship prior-art
-   note (§2), the GPWNO candidate (§4/III.3), the conservation constraints (I.1, III.1, IV.1),
+   note (§2), the GPWNO candidate (§4/III.3 — since drilled: IN-LOCAL provisional, with its
+   drill surfacing ELECTRAFI as the next candidate, III.4), the conservation constraints (I.1,
+   III.1, IV.1),
    the Bader secondary metric (§9.4), transfer axes (f)–(g) (§9.5), the functional conformal
    extension (IV.3), and the VI.2 stretch candidate.
 
@@ -779,6 +844,10 @@ find ggapbe/angle_distortions -name CHGCAR | wc -l   # 125, headers uniform 64 6
 # j_chemistry.csv: 30,487 steps; <=5:236 | 6-10:345 | 11-20:413 | 21-50:392 | 51-100:99 | >100:15
 # runs.jsonl ibz_nk quartiles: 4 / 18 / 27 / 40 / 397 (n=1,482)
 # one vasprun.xml: 25 <calculation> = 25 forces varrays = 25 stress varrays = CSV nsteps
+
+# SAD floor measured (Defect Set, single_defect/.../As/GGA-PBE; replicated independently twice)
+#   NMAE(AECCAR1, CHGCAR) = 14.8% ; NMAE(AECCAR1, AECCAR2) = 13.5% ; NMAE(AECCAR2, CHGCAR) = 1.56%
+#   CHGCAR mean/N = 256.99998 = NELECT ; min -150.5 (pseudo-density is SIGNED near heavy cores)
 
 # Tensor-store size arithmetic: voxel sums from runs.jsonl grid fields
 #   core ~1.94e9 voxels x 4 B + curves/labels ~= 7.9 GB; + SAD cache 1.5 GB ~= 9.7 GB vs 124 GB free

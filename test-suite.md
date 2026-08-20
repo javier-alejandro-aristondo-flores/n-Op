@@ -10,6 +10,32 @@ traceable to a command in the verification appendix (§12).
 
 ## 0. Charter
 
+**The quantities, in plain words.** Each DFT run produces *fields* — a number at every point of a
+3-D grid over the crystal's repeating cell — plus a few curves and numbers:
+- **Charge density** (symbol ρ, "rho"; file CHGCAR): how much electron charge sits at each point.
+  The primary output of a DFT calculation.
+- **Electron localization field** (ELF; file ELFCAR): a number in [0, 1] at each point — high
+  where electrons are pinned down (bonds, lone pairs), low where they roam freely. It depends on
+  the wavefunctions, not only the density — which is why predicting it from the density alone is a
+  real question.
+- **Local potential** (V; file LOCPOT): the potential an electron feels at each point.
+- **Magnetization density** (m): spin-up minus spin-down density at each point; zero except in
+  magnetic systems.
+- **All-electron core / valence densities** (files AECCAR0 / AECCAR2): the density with the frozen
+  atomic cores put back. AECCAR1 is the superposition of free-atom densities — "no bonding
+  learned" — and serves as a floor.
+- **Density of states** (DOS): not a field but a curve over energy — how many electron states
+  exist at each energy. The gap between occupied and empty states is the **band gap**, a single
+  number.
+- **Cheap vs accurate functional** (PBE vs HSE): two levels of approximation in DFT. The cheap one
+  underestimates band gaps; the accurate "hybrid" one (HSE; its exact-exchange fraction is AEXX)
+  costs 10–100× more. The corpus has both at matched geometries in several places.
+- **Operator vs neural network**: an operator maps a function to a function — a whole field in, a
+  whole field out, evaluable at any point. An ordinary neural network maps a fixed list of numbers
+  to a number. Only operators are members here.
+Architecture acronyms are expanded where they first appear, and every operator heading below
+states its mapping in words.
+
 **What a member is (the operator gate).** A suite member maps between function spaces. It must
 have at least one of:
 
@@ -112,7 +138,7 @@ discretization-transfer protocols** — and the hydrogen model's MAE 0.019 becom
 calibration point from an easier system. Adjacent: V2Rho-FNO (arXiv:2603.15669) learns
 potential→density with an FNO — the reverse direction of this pattern's ρ→V probe.
 
-#### I.1 — Factorized Fourier Neural Operator (F-FNO) · **IN-LOCAL · flagship**
+#### I.1 — Factorized Fourier Neural Operator (F-FNO) · charge density → electron localization field (and → local potential) · **IN-LOCAL · flagship**
 **Operator.** F-FNO: Tran, Mathews, Xie, Ong, ICLR 2023 (arXiv:2111.13802); parent FNO: Li et al.,
 ICLR 2021 (arXiv:2010.08895). Gate: weights live on a fixed set of Fourier modes of the torus —
 the same parameters evaluate on any grid; the 80³→40³ half-grid map is *natively* spectral
@@ -136,7 +162,7 @@ suffices" and keep the task as a pipeline unit test — a finding, not a failure
 **Risks.** FFT-substrate decision (§0); Gibbs at bond/core discontinuities (log-compression + full
 Nyquist is the mitigation, CNO is the architectural hedge); correlated-sweep leakage.
 
-#### I.2 — Convolutional Neural Operator (CNO) · **IN-LOCAL**
+#### I.2 — Convolutional Neural Operator (CNO) · charge density → electron localization field (and → local potential; defect fields) · **IN-LOCAL**
 **Operator.** Raonić et al., NeurIPS 2023; alias-free formalism in Bartolucci et al. (ReNO),
 NeurIPS 2023. Gate: operator between bandlimited function spaces — convolutions of fixed physical
 support, sinc up/downsampling, activations applied at 2× sampling rate. On our periodic tori the
@@ -160,7 +186,7 @@ semilocal floor (the pattern rule, §2 — map effectively local).
 **Risks.** act2x is novel engineering; 547 samples vs 9M params (symmetry augmentation mandatory);
 low-frequency ρ→V tail favors the Fourier lineage.
 
-#### I.3 — Deep Equilibrium Fourier Operator (FNO-DEQ), with the weight-tied ladder · **IN-LOCAL · sequenced after I.1**
+#### I.3 — Deep Equilibrium Fourier Operator (FNO-DEQ), with the weight-tied ladder · charge density → electron localization field / local potential, computed as a fixed point · **IN-LOCAL · sequenced after I.1**
 **Operator.** DEQ: Bai, Kolter, Koltun, NeurIPS 2019. FNO-DEQ: Marwah et al., NeurIPS 2023
 (arXiv:2312.00234). Gate: the fixed point is a multi-channel field over the cell; the tied block
 is an FNO kernel-integral operator; the model is the implicitly defined operator input →
@@ -191,7 +217,7 @@ Residual-vs-error correlation logged (flags non-contractive learned maps).
 **Risks.** Fixed-point nonconvergence at 3-D scale; phantom-gradient bias at small n; solver and
 model failures entangle (the audit rule exists for this).
 
-#### I.4 — Galerkin Transformer with query-point decoding (merged GT + OFormer) · **IN-LOCAL**
+#### I.4 — Galerkin Transformer with query-point decoding (merged GT + OFormer) · charge density → electron localization field / local potential, by attention over grid points · **IN-LOCAL**
 **Operator.** Galerkin Transformer: Cao, NeurIPS 2021 (softmax-free attention as a learnable
 Petrov–Galerkin projection; tokens are grid samples with continuous coordinate features). OFormer:
 Li, Meidani, Farimani, TMLR 2023 — merged in, contributing exactly one thing: the cross-attention
@@ -227,7 +253,7 @@ Perovskite length sweep) are this pattern's native advantage: voxel centers are 
 coordinates, so no resampling exists anywhere in the pipeline. Leakage discipline is the orbit map
 (§9.2): exact symmetry degeneracy makes naive random splits test-on-train.
 
-#### II.1 — DeepONet, POD-DeepONet, PCA-Net · **IN-LOCAL · cheapest builds in the suite**
+#### II.1 — DeepONet, POD-DeepONet, PCA-Net · strain or lattice parameters → charge density field (and charge density → electron localization field, by projection) · **IN-LOCAL · cheapest builds in the suite**
 **Operators.** DeepONet: Lu, Jin, Pang, Zhang, Karniadakis, Nat. Mach. Intell. 3:218 (2021) —
 branch on parameters, trunk on fractional coordinates with integer-frequency Fourier features
 (exact periodicity); the trunk makes the output a genuine function queryable anywhere. POD-DeepONet:
@@ -257,12 +283,12 @@ the Strain Atlas has no combined shear+volume family, so the twin query composes
 seen jointly, on top of the basis-set systematic: scored as a *transfer probe*, never an accuracy
 headline.
 
-#### II.2 — MIONet (ρ, V) → ELF · **IN-LOCAL · add-on**
+#### II.2 — MIONet · (charge density, local potential) → electron localization field · **IN-LOCAL · add-on**
 Jin, Meng, Lu, SIAM J. Sci. Comput. 44(6):A3490 (2022). Two branches (ρ-projection, V-projection)
 + shared trunk; ≈ 0.6M params; rides II.1's entire stack and the same POD gate. Kill: if adding V
 improves ρ→ELF by ≤ 5%, V adds nothing — drop the task.
 
-#### II.3 — NOMAD (nonlinear manifold decoder) · **IN-LOCAL**
+#### II.3 — NOMAD (nonlinear manifold decoder) · strain or lattice parameters → charge density field, decoded point by point · **IN-LOCAL**
 Seidman, Kissas, Perdikaris, Pappas, NeurIPS 2022 (arXiv:2206.03551). Pointwise nonlinear decoder
 over output coordinates breaks the linear-reconstruction ceiling that limits POD-based members;
 < 0.5 GB at any grid; natively consumes the Strain Atlas's varying grids. Restricted to parametric
@@ -271,7 +297,7 @@ as a kill-gated baseline). **The operator badge is earned on grid transfer:** er
 ≤ 1.3× when evaluated on off-dominant grids (36/48-axis Strain Atlas cells); beat RBF/linear
 parameter-interpolation by ≥ 1.5×.
 
-#### II.4 — Parametric F-FNO (+ FNO-DEQ steady-state variant) · **IN-LOCAL**
+#### II.4 — Parametric F-FNO (+ FNO-DEQ steady-state variant) · strain or lattice parameters → charge density field · **IN-LOCAL**
 Parameters broadcast as constant channels into the I.1 backbone; the operator character is the
 resolution-invariant query, stated plainly (params→field is parametric regression at heart — the
 gate case is the weakest in the suite and the doc says so). Blocks: Strain Atlas (~1.2 GB, batch
@@ -293,7 +319,7 @@ C(T³): an operator with mesh-free queries. Grids supply supervision points, nev
 and this corpus exercises that claim directly (one member consumes 40³, 64³, 80³, and 48×96×216
 supervision). Voxel-to-voxel networks are excluded exactly here.
 
-#### III.1 — DeepDFT (invariant), with the PaiNN-equivariant upgrade as the stretch · **IN-LOCAL · anchor**
+#### III.1 — DeepDFT (invariant), with the PaiNN-equivariant upgrade as the stretch · atomic structure → charge density field (+ magnetization), queryable anywhere · **IN-LOCAL · anchor**
 **Operator.** Jørgensen & Bhowmik, npj Comput. Mater. 8:183 (2022) — both variants are in the
 paper; probe-point mechanism per the preamble.
 **Tasks.** (a) Defect Set structure→ρ(+m) — the highest-value slice (189 distinct fields, 57
@@ -334,7 +360,7 @@ samples — "SAD + learned isotropic corrections" (~1–2 kLoC). Full SALTED (λ
 periodic density fitting) is 6–10 kLoC — *not* a cheap floor; cited (Grisafi et al., ACS Cent.
 Sci. 2019; Lewis et al., JCTC 2021) and shelved.
 
-#### III.2 — ChargE3Net · **SUPER-LATER (capability-qualified)**
+#### III.2 — ChargE3Net · atomic structure → charge density field, rotation-equivariant · **SUPER-LATER (capability-qualified)**
 Koker et al., npj Comput. Mater. 10:161 (2024). Passes every scientific gate (same probe
 mechanism, E(3)-equivariant features to ℓ=4). Deferred on two grounds, both honest: (i) the
 in-house build is the suite's largest single item (spherical harmonics to ℓ=4, Wigner/CG tables,
@@ -344,7 +370,7 @@ equivariant DeepDFT on exactly our data regime** (single-host site-occupation: 0
 with higher-ℓ gains appearing on chemical diversity this corpus doesn't have. Revisit when III.1
 measurably plateaus *and* the supercomputer arrives.
 
-#### III.3 — GPWNO · **IN-LOCAL, provisional — a complement to III.1, expected to land redundant**
+#### III.3 — GPWNO · atomic structure → charge density field, via plane waves + Gaussians · **IN-LOCAL, provisional — a complement to III.1, expected to land redundant**
 **Operator.** Gaussian Plane-Wave Neural Operator: Kim & Ahn, ICML 2024 (PMLR 235:23805;
 arXiv:2402.04278; public code, no license file). A plane-wave branch — factorized spectral
 convolution (F-FNO-style) over a fixed probe lattice in *fractional* coordinates, so the
@@ -401,7 +427,7 @@ the plane-wave branch is not strain-equivariant (integer-mode filters see 10% di
 wavevectors at ±10% strain — held-out strain orbits must be tested explicitly); ~95 structures per
 functional vs the paper's ≥ 2,000 per family — orbit-aware early stopping is mandatory.
 
-#### III.4 — ELECTRAFI · **candidate pending drill (surfaced by the GPWNO drill; NOT an entry)**
+#### III.4 — ELECTRAFI · atomic structure → charge density field, via analytic plane-wave coefficients · **candidate pending drill (surfaced by the GPWNO drill; NOT an entry)**
 "Global Plane Waves From Local Gaussians: Periodic Charge Densities in a Blink" — Elsborg,
 Ærtebjerg, Thiede, Aspuru-Guzik, Vegge, Bhowmik (DeepDFT's group), arXiv:2601.19966, ICML 2026.
 Anisotropic real-space Gaussians whose closed-form Fourier transforms give the plane-wave
@@ -434,7 +460,7 @@ pristine PBE+HSE(0.25) pair — a single-point sanity probe for Defect-Set-train
 enters only as an auxiliary head or as a functional read-out of a predicted field/spectrum. The
 conformal wrapper is a wrapper, never a member.
 
-#### IV.1 — Residual Δ operator, ρ_PBE→ρ_HSE on the Strain Atlas · **IN-LOCAL · best local-first science in the suite**
+#### IV.1 — Residual Δ operator on the Strain Atlas · cheap-functional (PBE) charge density → accurate-functional (HSE) charge density · **IN-LOCAL · best local-first science in the suite**
 **Named lineage.** Δ-learning: Ramakrishnan, Dral, Rupp, von Lilienfeld, JCTC 11:2087 (2015).
 Multifidelity operator form: Howard, Perego, Karniadakis, Stinis, J. Comput. Phys. 493:112462
 (2023) — whose composite architecture *degenerates to the residual form here* because the
@@ -459,7 +485,7 @@ head must beat ≤ 24 meV on orbit-held-out data including the triaxial family �
 recomputed from EIGENVAL over all 1,339 pairs before any number is locked (the CSV join misses the
 low-gap tail). If the head only matches the scissor, that is the reported result.
 
-#### IV.2 — Spectral Δ: DOS_PBE(E) → DOS_HSE(E) on the Strain Atlas · **IN-LOCAL · secondary**
+#### IV.2 — Spectral Δ on the Strain Atlas · cheap-functional density-of-states curve → accurate-functional density-of-states curve · **IN-LOCAL · secondary**
 Energy-trunk function→function map (the DeepONet form from II.1/VI.1). Honesty clause: at 172
 irreducible k × 8 bands per side this is a *coarse spectral function*, not a converged DOS — the
 map is well-posed because both sides are identically sampled (rebuild recipe and smearing per
@@ -468,7 +494,7 @@ top band's minimum (only 4 conduction bands exist); gap-edge error is the primar
 identity DOS; **scissor-warped DOS** (shift conduction manifold by the campaign scissor); beat by
 ≥ 25% windowed error or record the floor as sufficient.
 
-#### IV.3 — Conformalized Quantile Regression wrapper · **IN-LOCAL · wrapper/floor, ~50 lines**
+#### IV.3 — Conformalized Quantile Regression wrapper · any prediction → the same prediction with a guaranteed-coverage interval · **IN-LOCAL · wrapper/floor, ~50 lines**
 Romano, Patterson, Candès, NeurIPS 2019. Two-quantile pinball head (τ = 0.05/0.95) +
 split-conformal offset, calibrated at the **orbit level** — the honest unit count is ~299
 exchangeable orbits, not 1,291 points. Calibration math, stated in the doc: n_cal ≈ 60 → 90%
@@ -482,7 +508,7 @@ uncertainty for the Pattern-IV field outputs, not just their scalar read-outs.
 
 ## 6. Pattern V — multi-channel completion (Paired Fields as one object)
 
-#### V.1 — Codomain Attention Neural Operator (CoDA-NO) · **IN-LOCAL**
+#### V.1 — Codomain Attention Neural Operator (CoDA-NO) · any subset of the fields → the missing fields · **IN-LOCAL**
 **Operator.** Rahman et al., NeurIPS 2024 (arXiv:2403.12553; official code in `neuraloperator`).
 Tokens are *channel functions* (ρ, m, ELF↑, ELF↓, V↑, V↓, core density, valence density);
 K/Q/V are produced by spectral blocks whose weights are shared across tokens — which is what makes
@@ -534,7 +560,7 @@ the paper's scarcity regime: the premise *applies*; K1/K3 test it rather than as
 
 ## 7. Pattern VI — spectrum as a function
 
-#### VI.1 — DOS-DeepONet (energy-trunk) · **IN-LOCAL; Relaxation Pool tier is a stretch**
+#### VI.1 — DOS-DeepONet (energy-trunk) · structure or strain parameters → density-of-states curve over energy · **IN-LOCAL; Relaxation Pool tier is a stretch**
 Branch on structure/strain parameters, trunk on energy: the output is DOS(E), a genuine function
 queryable at any E; the band gap is a derived functional (support-edge read-out), reported as a
 diagnostic only. Blocks, in order of label quality:
@@ -556,7 +582,7 @@ EIGENVAL + IBZKPT weights: Gaussian smearing σ = 0.15–0.2 eV (Strain Atlas), 
 normalized per cell; window aligned to the valence-band maximum. Gaps always from the occupancy
 walk, never from a DOS threshold.
 
-#### VI.2 — Band-structure operator, strain → E_n(k) · **stretch, pending one design decision**
+#### VI.2 — Band-structure operator · strain → energy bands as a function over the Brillouin zone · **stretch, pending one design decision**
 Branch on strain, trunk on (k, band index): 172 irreducible k × 8 bands × 2,582 spectra on the
 Strain Atlas — strictly richer than DOS and the operator-legitimate refinement of every gap
 read-out. Open question gating admission: band crossings (sorted-spectrum targets stay continuous

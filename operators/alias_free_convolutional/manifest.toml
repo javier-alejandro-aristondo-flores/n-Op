@@ -1,0 +1,18 @@
+name = "alias_free_convolutional"
+literature_name = "CNO (Convolutional Neural Operator)"
+citation = "Raonić et al. — NeurIPS 2023; alias-free formalism: Bartolucci et al. (ReNO), NeurIPS 2023"
+mapping = "charge density → electron localization field (and → local potential; defect fields)"
+suite_card = "test-suite.md §2, I.2 — IN-LOCAL"
+role = "the anti-aliasing hedge; first three-dimensional build of this architecture anywhere"
+
+[parts]
+encoder = "encoders.PointwiseLift"
+kernel = "kernels.compact_support.CompactSupportKernel (tabulated-on-grid)"
+composition = "compositions.MultiScale (U-shaped; output scale = the coarse grid)"
+readout = "readouts.PointwiseProjection"
+wrappers = "per task card"
+
+[depends_on]
+framework = true
+kernels = ["compact_support", "spectral"]
+shared_note = "the fused alias-free activation (tile-streamed, custom gradient rule) is this entry's hardest kernel; naive autodiff exhausts the 6 GB card"

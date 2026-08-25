@@ -1,0 +1,18 @@
+name = "deep_dft"
+literature_name = "DeepDFT (invariant; PaiNN-equivariant upgrade as stretch)"
+citation = "Jørgensen & Bhowmik — npj Comput. Mater. 8:183 (2022)"
+mapping = "atomic structure → charge density field (+ magnetization), queryable anywhere"
+suite_card = "test-suite.md §4, III.1 — IN-LOCAL, anchor"
+role = "the skip-DFT-entirely direction; independent machinery, buildable in parallel with the Fourier lineage"
+
+[parts]
+encoder = "encoders.AtomEmbedding (keyed by element AND pseudopotential title)"
+kernel = "kernels.compact_support.CompactSupportKernel (continuous-per-pair; directed edges; probes receive-only)"
+composition = "compositions.ExplicitStack"
+readout = "readouts.PointwiseProjection"
+wrappers = "Conserving (renormalize to electron count) per task card"
+
+[depends_on]
+framework = true
+kernels = ["compact_support"]
+shared_note = "scatter-add throughput on the own-autodiff substrate is this entry's schedule risk; probe sampling is importance-weighted and de-biased"

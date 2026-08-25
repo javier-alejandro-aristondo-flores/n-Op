@@ -1,0 +1,18 @@
+name = "nonlinear_manifold_decoder"
+literature_name = "NOMAD"
+citation = "Seidman, Kissas, Perdikaris, Pappas — NeurIPS 2022 (arXiv:2206.03551)"
+mapping = "strain or lattice parameters → charge density field, decoded point by point"
+suite_card = "test-suite.md §3, II.3 — IN-LOCAL"
+role = "breaks the linear-reconstruction ceiling of basis readouts; restricted to parametric tasks"
+
+[parts]
+encoder = "encoders.SensorEncoder"
+kernel = "kernels.low_rank.DenseKernel"
+composition = "compositions.ExplicitStack"
+readout = "readouts.NonlinearDecoder"
+wrappers = "per task card"
+
+[depends_on]
+framework = true
+kernels = ["low_rank"]
+packages = ["deep_operator_network"]

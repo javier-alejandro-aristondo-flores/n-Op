@@ -1,0 +1,6 @@
+# Principal-component variant: fixed bases on BOTH sides; the learned part is a small map
+# between coefficient spaces. Bhattacharya et al., SMAI-JCM 7:121 (2021). Its linear form
+# is simultaneously the suite floor that kills unearned nonlinearity.
+input_basis = { kind = "principal_component", rank = 128 }
+map = { width = 512, depth = 2 }
+output_basis = { kind = "principal_component", rank = 256 }

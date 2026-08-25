@@ -1,0 +1,4 @@
+# Proper-orthogonal variant: the output basis is fixed — the leading modes of the training
+# fields — and only the branch is learned. Lu et al., CMAME 393:114778 (2022).
+branch = { width = 256, depth = 3 }
+output_basis = { kind = "proper_orthogonal", rank = 192 }

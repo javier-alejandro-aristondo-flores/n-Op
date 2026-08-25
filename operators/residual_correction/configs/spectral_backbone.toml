@@ -1,0 +1,8 @@
+# Wave-2 form: the same wrappers over the factorized Fourier backbone, plus the transfer
+# protocol to the defect set's 56 chained pairs (freeze spectral weights, tune the ends and
+# the conditioning, add the spin-channel adapter).
+backbone = "factorized_fourier"
+conditioning = ["campaign", "exact_exchange_fraction"]
+conservation = "zero_mean"
+conformal = { level = 0.90, unit = "symmetry_orbit" }
+transfer = { target = "defect_chained_pairs", frozen = "spectral_weights" }

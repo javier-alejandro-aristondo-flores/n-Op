@@ -1,0 +1,18 @@
+name = "factorized_fourier"
+literature_name = "F-FNO (Factorized Fourier Neural Operator)"
+citation = "Tran, Mathews, Xie, Ong — ICLR 2023 (arXiv:2111.13802); parent FNO: Li et al., ICLR 2021 (arXiv:2010.08895)"
+mapping = "charge density → electron localization field (and → local potential)"
+suite_card = "test-suite.md §2, I.1 — IN-LOCAL, flagship"
+role = "flagship; forces the shared Fourier-transform primitive"
+
+[parts]
+encoder = "encoders.PointwiseLift"
+kernel = "kernels.spectral.SpectralKernel (factorized)"
+composition = "compositions.ExplicitStack (FixedPoint = the deep-equilibrium configuration)"
+readout = "readouts.PointwiseProjection (bounded electron-localization head)"
+wrappers = "per task card: Conserving on density/potential heads only"
+
+[depends_on]
+framework = true
+kernels = ["spectral"]
+shared_note = "the batched 3-D real Fourier transform with complex autodiff; substrate decision open (test-suite.md §0)"

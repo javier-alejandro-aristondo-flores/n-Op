@@ -1,0 +1,4 @@
+# Canonical Deep Operator Network: learned branch, learned trunk.
+# Numbers below are the drill's starting point (test-suite.md II.1), not final.
+branch = { width = 256, depth = 4 }
+trunk = { fourier_features = 48, width = 256, depth = 4, latent = 256 }

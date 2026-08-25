@@ -1,0 +1,7 @@
+# Energy-trunk variant: the trunk runs over energy instead of position — the output is the
+# density-of-states curve as a function. Curves are rebuilt from eigenvalues with the
+# suite-wide recipe (never read DOSCAR); smearing per campaign; gaps from the occupancy
+# walk. test-suite.md §7, VI.1.
+branch = { width = 256, depth = 3 }
+trunk = { domain = "energy", window_eV = [-10.0, 10.0], width = 128, depth = 4, latent = 128 }
+head = "softplus"

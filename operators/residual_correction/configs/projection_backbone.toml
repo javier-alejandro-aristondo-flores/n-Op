@@ -1,0 +1,8 @@
+# Wave-1 form: the correction learned on proper-orthogonal coefficients of the correction
+# field itself (basis fit on Δρ, not on ρ). Residual head zero-initialized — training starts
+# exactly at the measured identity floor (1.11–1.19% relative error).
+backbone = "deep_operator_network:proper_orthogonal"
+basis_target = "correction_field"
+conditioning = ["campaign", "exact_exchange_fraction"]
+conservation = "zero_mean"
+conformal = { level = 0.90, unit = "symmetry_orbit" }

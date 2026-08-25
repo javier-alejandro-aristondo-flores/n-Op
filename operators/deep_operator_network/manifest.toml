@@ -1,0 +1,18 @@
+name = "deep_operator_network"
+literature_name = "DeepONet; variants POD-DeepONet, PCA-Net, DOS-DeepONet"
+citation = "Lu, Jin, Pang, Zhang, Karniadakis — Nat. Mach. Intell. 3:218 (2021); POD variant: Lu et al., CMAME 393:114778 (2022); PCA-Net: Bhattacharya et al., SMAI-JCM 7:121 (2021)"
+mapping = "strain or lattice parameters → charge density field (projection variant: density → electron localization field; energy-trunk variant: parameters → density-of-states curve)"
+suite_card = "test-suite.md §3, II.1 + §7, VI.1 — IN-LOCAL, cheapest builds"
+role = "interface shakedown (wave 1); validates store, splits, and metrics before anything expensive exists"
+
+[parts]
+encoder = "encoders.SensorEncoder (branch); BasisProjectionEncoder for the fixed-basis variants"
+kernel = "kernels.low_rank.DenseKernel (zero integral layers is the honest description)"
+composition = "compositions.ExplicitStack"
+readout = "readouts.BasisExpansion (trunk; energy trunk in the energy_trunk configuration)"
+wrappers = "per task card"
+
+[depends_on]
+framework = true
+kernels = ["low_rank"]
+shared_note = "fp64 Gram proper-orthogonal decomposition in data/; the projection variant is gated by the measured basis-decay check (test-suite.md Stage-0)"

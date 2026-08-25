@@ -1,0 +1,19 @@
+name = "residual_correction"
+literature_name = "Δ-learning as a field operator, with conformalized quantile regression"
+citation = "Ramakrishnan et al., JCTC 11:2087 (2015); Howard, Perego, Karniadakis, Stinis, JCP 493:112462 (2023); Subramanian et al., NeurIPS 2023; Romano, Patterson, Candès, NeurIPS 2019"
+mapping = "cheap-functional (PBE) charge density → accurate-functional (HSE) charge density"
+suite_card = "test-suite.md §5, IV.1 + IV.3 — IN-LOCAL, best local-first science"
+role = "wave-1 science payload; interface shakedown together with the Deep Operator Network"
+
+[parts]
+encoder = "the backbone's"
+kernel = "the backbone's (low-rank first, spectral later — a configuration switch)"
+composition = "the backbone's"
+readout = "the backbone's"
+wrappers = "Residual (zero-initialized) + Conditioned (campaign / exact-exchange fraction) + Conserving (zero-mean correction, exact) + ConformalCalibrator (orbit-level, ~299 exchangeable units)"
+
+[depends_on]
+framework = true
+kernels = ["low_rank", "spectral"]
+packages = ["deep_operator_network", "factorized_fourier"]
+shared_note = "kill: explain at least 75% of the correction's energy, i.e. reach half the measured identity floor; the 31.7 meV spectral scissor guards any gap read-out"

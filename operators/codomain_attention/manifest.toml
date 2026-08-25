@@ -1,0 +1,19 @@
+name = "codomain_attention"
+literature_name = "CoDA-NO (Codomain Attention Neural Operator)"
+citation = "Rahman et al. — NeurIPS 2024 (arXiv:2403.12553)"
+mapping = "any subset of the fields → the missing fields"
+suite_card = "test-suite.md §6, V.1 — IN-LOCAL"
+role = "the multi-field completion experiment; strongest transfer headline (alloy held out; few-shot fine-tunes)"
+
+[parts]
+encoder = "encoders.VariableEncoding (per-field learned encodings; functional covariate in the encoding slot)"
+kernel = "kernels.codomain_attention.CodomainAttentionKernel over kernels.spectral.SpectralKernel (token-shared weights)"
+composition = "compositions.ExplicitStack"
+readout = "readouts.PointwiseProjection"
+wrappers = "per task card"
+
+[depends_on]
+framework = true
+kernels = ["codomain_attention", "spectral"]
+packages = ["factorized_fourier"]
+shared_note = "competitor for every kill gate: dedicated per-pair Fourier operators trained on the same 365-run block at equal total compute"

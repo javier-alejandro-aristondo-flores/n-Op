@@ -162,7 +162,7 @@ rather than inventing a fake integral to satisfy the template.
 |---|---|
 | `framework/` | the four abstract classes, the `NeuralOperator` template, `Layer`, the dense reference integral, and the discretization-invariance harness |
 | `kernels/spectral/` | translation-invariant kernels: full and factorized per-axis mode weights, mode truncation, physical-wavevector features from the reciprocal lattice, spectral resampling (truncation and zero-padding), and the batched three-dimensional real Fourier transform with autodiff through complex tensors |
-| `kernels/compact_support/` | small-support kernels in two parametrizations — tabulated at integer offsets on a grid (convolution) and continuous in the displacement (message passing) — plus periodic neighbour finding and the alias-free activation machinery |
+| `kernels/compact_support/` | small-support kernels in two parametrizations — tabulated at integer offsets on a grid (convolution) and continuous in the displacement (message passing) — plus periodic neighbor finding and the alias-free activation machinery |
 | `kernels/low_rank/` | separable kernels φ(x)·ψ(y) evaluated as inner products, and the dense kernel over a finite index set |
 | `kernels/codomain_attention/` | attention over the channel index, with weights shared across channel tokens |
 | `encoders/` | pointwise lift · sensor encoder · basis-projection encoder · atom embedding · variable encoding |
@@ -190,7 +190,7 @@ because they are reasons, and reasons do not belong in the modules.
 - **The Fourier-transform substrate is an open decision** (vendor-wrapped versus written in
   house); both cost figures are carried until it is made.
 - **Probe sampling is importance-weighted and de-biased**, because error mass concentrates in
-  atom-centred volumes.
+  atom-centered volumes.
 - **Density-of-states curves are rebuilt from eigenvalues**, never read from the pre-computed
   file; smearing is set per campaign.
 - **The conformal calibrator is not an operator.** It takes a trained predictor and a calibration
@@ -226,4 +226,4 @@ symmetry (the 48 exact grid operations of the diamond group, reporting median eq
    belongs in this file and in the `IMPLEMENTATION.md` documents.
 6. Data discipline is inherited from `test-suite.md` at the repository root: spin-block-aware
    parsing, densities divided by cell volume, orbit-aware splits, the exclusion registry, and
-   nothing volumetric or licence-derived ever leaving `/Pool`.
+   nothing volumetric or license-derived ever leaving `/Pool`.

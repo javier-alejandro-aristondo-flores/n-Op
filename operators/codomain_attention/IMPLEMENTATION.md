@@ -22,10 +22,10 @@ material no dedicated pairwise competitor can use.
 
 **One model, many maps.** Training by masking fields and reconstructing them subsumes
 density → localization, density → potential, and the inverse reads, and the deliverable includes
-the full any-to-any matrix with untrained directions labelled exploratory.
+the full any-to-any matrix with untrained directions labeled exploratory.
 
 **The alloy campaign is held out entirely** as the transfer test, with few-shot fine-tunes — the
-analogue of the paper's own transfer protocol, and the reason the corpus's heterogeneity is an
+counterpart of the paper's own transfer protocol, and the reason the corpus's heterogeneity is an
 asset here rather than a nuisance.
 
 **Half-grid handling introduces nothing.** The localization channel is zero-padded up at input and

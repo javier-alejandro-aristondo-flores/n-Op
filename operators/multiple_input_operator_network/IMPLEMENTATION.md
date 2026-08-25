@@ -5,7 +5,7 @@ Suite entry: `test-suite.md` §3, II.2.
 
 ## What it assembles
 
-Two sensor encoders, one per labelled input field, combined multiplicatively in the latent space,
+Two sensor encoders, one per labeled input field, combined multiplicatively in the latent space,
 read out through the shared trunk.
 
 ## Why it is shaped this way

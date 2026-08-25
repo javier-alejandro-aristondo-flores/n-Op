@@ -25,15 +25,15 @@ atoms and probes together. This is what collapsed the framework's two point repr
 one carrying a `roles` field.
 
 **Periodic images by cell height.** With a cutoff comparable to the shortest cell height, the
-minimum-image shortcut silently drops neighbours; images are enumerated per direction from the
+minimum-image shortcut silently drops neighbors; images are enumerated per direction from the
 cell heights with an exact distance filter.
 
 **The spin channel is this suite's own extension.** The literature predicts total density only;
 here a second channel carries magnetization, its loss normalized by the integrated absolute
 moment and masked where the calculation was spin-restricted.
 
-**Probe sampling is importance-weighted.** Error mass concentrates in atom-centred volumes, so
-the sampler mixes uniform and atom-centred draws and de-biases with inverse-proposal weights,
+**Probe sampling is importance-weighted.** Error mass concentrates in atom-centered volumes, so
+the sampler mixes uniform and atom-centered draws and de-biases with inverse-proposal weights,
 keeping the loss an unbiased estimate.
 
 ## Floors and kill thresholds

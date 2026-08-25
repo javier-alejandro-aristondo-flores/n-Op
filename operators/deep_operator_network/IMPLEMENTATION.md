@@ -19,7 +19,7 @@ with integer-frequency Fourier features for exact periodicity.
 the input is already finite-dimensional. The framework permits a composition with no layers
 rather than inventing a fake integral to satisfy the template.
 
-**The trunk is why varying grids cost nothing.** Voxel centres are exact fractional coordinates,
+**The trunk is why varying grids cost nothing.** Voxel centers are exact fractional coordinates,
 so the fifteen grid shapes of the strain campaign and the per-cell grids of the perovskite length
 sweep need no resampling anywhere in the pipeline. Grid shape touches only the sampler.
 
@@ -41,7 +41,7 @@ over energy, giving the density-of-states operator).
 ## Floors and kill thresholds
 
 Ridge from parameters to basis coefficients is the natural floor: kill any variant not at least
-twenty-five percent better on held-out strain families. Nearest-neighbour field copy in parameter
+twenty-five percent better on held-out strain families. Nearest-neighbor field copy in parameter
 space is brutal on factorial sweeps — require a factor of two. If the learned map beats the
 linear one by ten to fifteen percent or less, keep the linear model and drop the neural claim.
 

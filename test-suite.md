@@ -395,7 +395,7 @@ spectral power lies within a 20³ probe-lattice Nyquist, ~100% within 40³ — D
 band-adequate for the plane-wave part; cores belong to the Gaussian branch.
 **The public code is not a usable reference on these cells** (read in source): fixed ±1 image
 enumeration, minimum-image Gaussian readout (non-periodic and discontinuous at the boundary at
-our cell heights — the widest Gaussian's neighbour image contributes ~12% at 2.06 Å), cubic probe
+our cell heights — the widest Gaussian's neighbor image contributes ~12% at 2.06 Å), cubic probe
 lattice only, absolute cutoffs. The in-house build uses cell-height image enumeration for every
 edge type, sums Gaussian images, and allows an anisotropic probe lattice.
 **Build (beyond the shared primitives).** Gaussian-basis evaluation on (query, atom-image) pairs

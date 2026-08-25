@@ -30,7 +30,7 @@ projection rather than learned.
 
 **Conditioning, not pooling.** Three exact-exchange fractions appear across the corpus and they
 are three different targets. The default is per-campaign training; the single conditioned model is
-a labelled ablation, never a pooled claim.
+a labeled ablation, never a pooled claim.
 
 **Coverage is claimed at the orbit level.** Symmetry makes many strain points exactly equivalent,
 so the exchangeable unit for calibration is the symmetry orbit — roughly 299 of them, not 1,291

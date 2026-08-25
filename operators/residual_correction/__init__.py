@@ -4,7 +4,7 @@ from operators.framework import Operator
 
 
 class ResidualCorrection(Operator):
-    """Wraps a backbone with residual, conditioning, and conservation behaviour."""
+    """Wraps a backbone with residual, conditioning, and conservation behavior."""
 
 
     def __init__(self) -> None:

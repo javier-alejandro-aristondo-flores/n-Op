@@ -45,7 +45,7 @@ def Test_Every_Package_Imports():
         importlib.import_module(package_name)
 
 
-def Test_The_Behavioural_Classes_Are_Abstract():
+def Test_The_Behavioral_Classes_Are_Abstract():
     """Asserts that Operator, Kernel, and Composition cannot be instantiated."""
     from operators.framework import Composition, Kernel, Operator
 

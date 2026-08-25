@@ -1,11 +1,10 @@
-# Package metadata. The array/autodiff substrate is deliberately absent from the dependency
-# list: it is dictated in the implementation documents (the language question is settled as
-# Python; the backend question is not). Imports currently run from the repository root
-# (`import operators`); an editable install is added when the backend lands.
-
 [project]
 name = "operators"
 version = "0.0.1"
 description = "Neural operators over the n-Op DFT corpus, as one integral-transform framework"
 requires-python = ">=3.11"
 dependencies = []
+
+[tool.pytest.ini_options]
+python_files = ["test_*.py"]
+python_functions = ["Test_*"]

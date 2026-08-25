@@ -1,7 +1,4 @@
-"""The scaffold's only test: everything imports, and the abstract classes are abstract.
-
-Run from the repository root: python -m pytest operators/tests
-"""
+"""Checks that every package imports and that the framework's classes stay abstract."""
 
 import importlib
 import inspect
@@ -30,40 +27,45 @@ PACKAGES = [
     "operators.codomain_attention",
 ]
 
+ASSEMBLIES = {
+    "operators.factorized_fourier": "FactorizedFourier",
+    "operators.alias_free_convolutional": "AliasFreeConvolutional",
+    "operators.deep_operator_network": "DeepOperatorNetwork",
+    "operators.multiple_input_operator_network": "MultipleInputOperatorNetwork",
+    "operators.nonlinear_manifold_decoder": "NonlinearManifoldDecoder",
+    "operators.deep_dft": "DeepDft",
+    "operators.residual_correction": "ResidualCorrection",
+    "operators.codomain_attention": "CodomainAttention",
+}
 
-def test_every_package_imports():
-    for name in PACKAGES:
-        importlib.import_module(name)
+
+def Test_Every_Package_Imports():
+    """Imports every package listed in PACKAGES."""
+    for package_name in PACKAGES:
+        importlib.import_module(package_name)
 
 
-def test_the_behavioral_abstract_classes_are_abstract():
+def Test_The_Behavioural_Classes_Are_Abstract():
+    """Asserts that Operator, Kernel, and Composition cannot be instantiated."""
     from operators.framework import Composition, Kernel, Operator
 
     for abstract_class in (Operator, Kernel, Composition):
-        assert inspect.isabstract(abstract_class), f"{abstract_class.__name__} must be abstract"
+        assert inspect.isabstract(abstract_class)
 
 
-def test_representation_is_a_behavior_free_base_with_exactly_three_forms():
+def Test_Representation_Has_Exactly_Three_Forms():
+    """Asserts that the three function objects derive from Representation."""
     from operators.framework import Coefficients, GridFunction, PointSet, Representation
 
-    for form in (GridFunction, PointSet, Coefficients):
-        assert issubclass(form, Representation)
+    for concrete_form in (GridFunction, PointSet, Coefficients):
+        assert issubclass(concrete_form, Representation)
 
 
-def test_each_operator_package_exposes_one_assembly():
+def Test_Each_Operator_Package_Exposes_One_Assembly():
+    """Asserts that every operator package exports its assembly as an Operator."""
     from operators.framework import Operator
 
-    expected = {
-        "operators.factorized_fourier": "FactorizedFourier",
-        "operators.alias_free_convolutional": "AliasFreeConvolutional",
-        "operators.deep_operator_network": "DeepOperatorNetwork",
-        "operators.multiple_input_operator_network": "MultipleInputOperatorNetwork",
-        "operators.nonlinear_manifold_decoder": "NonlinearManifoldDecoder",
-        "operators.deep_dft": "DeepDft",
-        "operators.residual_correction": "ResidualCorrection",
-        "operators.codomain_attention": "CodomainAttention",
-    }
-    for package, class_name in expected.items():
-        module = importlib.import_module(package)
+    for package_name, class_name in ASSEMBLIES.items():
+        module = importlib.import_module(package_name)
         assembly = getattr(module, class_name)
         assert issubclass(assembly, Operator)

@@ -14,57 +14,216 @@ The named architectures differ **only** in how the kernel integral ∫κ·v·dν
 evaluated. This package is that observation made literal: a small framework holds the shared
 anatomy, and each named operator is a thin assembly of framework parts.
 
+**This document holds the design rationale. The code does not** — by house style, docstrings and
+comments in this project explain what code does and never why it exists. When you want to know
+why something is shaped the way it is, it is written here or in the operator's
+`IMPLEMENTATION.md`, never in the module.
+
+---
+
 ## The four abstract classes
 
 | Class | Role | Implementations |
 |---|---|---|
 | `Operator` | root interface: input representation → output representation on a requested discretization, with an optional conditioning vector | the `NeuralOperator` template; every encoder and readout; every wrapper |
-| `Representation` | a typed function object, **carrying its quadrature** (the measure dν as data) | `GridFunction` (labeled channels), `PointSet` (positions + optional values / species / roles), `Coefficients` |
-| `Kernel` | the learned κ plus its **fused** integration against the measures it declares support for | spectral · compact-support (stencil ≡ message passing, two parametrizations) · low-rank (the universal one) · codomain-attention · dense |
+| `Representation` | a typed function object, **carrying its quadrature** (the measure dν as data) | `GridFunction`, `PointSet`, `Coefficients` |
+| `Kernel` | the learned κ plus its **fused** integration against the measures it declares support for | spectral · compact-support · low-rank · codomain-attention · dense |
 | `Composition` | how layers chain — each implementation owns its topology and its backward strategy | explicit stack · weight-tied · fixed point · multi-scale |
 
-Concrete, deliberately not abstract: `Domain` (the periodic cell), `Discretization` (grid spec or
-query points), `Quadrature` (uniform-grid / counting), `Layer` (kernel + local linear term +
-activation mode ∈ {pointwise, alias-free} + residual flag), the wrappers (`Residual`,
-`Conditioned`, `Conserving`), and the `ConformalCalibrator` — which is **not** an Operator: it
-takes a calibration set and returns prediction intervals.
+Concrete, deliberately not abstract: `Domain` (the periodic cell), `Discretization` (a grid shape
+or explicit query points), `Quadrature` (uniform-grid or counting), `Layer` (kernel + local linear
+term + activation mode + residual flag), the wrappers, and the conformal calibrator.
 
-**Why the integral is not its own class in the forward path:** the fast algorithm exists only for
-a specific pairing of kernel structure with measure (translation-invariant × uniform grid → FFT;
-compact support × points → message passing). An abstract integral there would be bookkeeping or an
-O(N·M) footgun. Instead, the measure is explicit **data** on every representation, and
-`framework/integral.py` holds the dense O(N·M) reference — the correctness oracle every fused
-kernel must match on small problems before any full-size run.
+### Why these four, and not more
 
-## The operators (thin assemblies)
+The design began at seven abstract classes and lost three, each for a stated reason:
+
+- **Activation** became a *mode* on `Layer` (`pointwise` or `alias_free`) rather than a class.
+  Only one operator needs the alias-free form, and it needs it as a property of the layer, not as
+  a polymorphic object.
+- **Encoder and Readout** dissolved into `Operator`. Anything that maps a function to a function
+  already satisfies the root interface; a lift, a branch, a trunk, and a nonlinear decoder are all
+  just operators used in a particular position. This is also what lets the nonlinear manifold
+  decoder — whose output is *not* an integral — sit in the framework without a special case.
+- **A separate Integral class** was considered and rejected for the forward path. See below.
+
+### Why the integral is not its own class
+
+The integral has three ingredients, and they were given three different fates.
+
+**The measure became data.** The dν of ∫κ(x,y)·v(y)·dν(y) is genuinely independent of the kernel:
+it says where a function lives and how a sum over its points approximates an integral. Every
+`Representation` therefore carries a `Quadrature`. A grid function integrates with uniform weights
+(cell volume ÷ point count — which is exactly the ÷V_cell normalization the data pipeline already
+performs); an atomic structure integrates by counting over delta functions; a coefficient vector
+sums over a finite index set.
+
+That choice pays in four independent places: zero-mean projection of a correction field,
+renormalization of a predicted density to the electron count, the inner products of a low-rank
+kernel, and the attention scores of the codomain-attention operator — all read weights off the
+representation rather than re-deriving them.
+
+It also **unified two kernel families**: with the measure separated, the stencil kernel and the
+graph kernel are the same object — a compact-support κ(x−y) integrated against a uniform grid
+(→ convolution) or against a point set (→ message passing). Five families were hiding four.
+
+**The dense evaluation became the correctness oracle.** `framework/integral.py` holds the
+definition evaluated literally: loop over sources, evaluate κ, weigh by the quadrature, sum. It is
+O(sources × targets) and unusable at size, and every fused kernel must reproduce it on small
+problems (8³ grids, a few atoms) before it is trusted at full size. A fast kernel that has never
+been checked against the definition is not an implementation of the definition.
+
+**The production integral stayed fused inside each kernel.** The fast algorithm exists only for a
+specific *pairing* of kernel structure with measure: the Fourier path exists because the kernel is
+translation-invariant *and* the measure is a uniform grid; message passing exists because the
+kernel has compact support *and* the sources are points. An abstract `Integral.apply(kernel,
+measure)` would either dispatch on pairs straight back to those same fused routines — pure
+bookkeeping — or genuinely permit arbitrary pairs at O(N·M). The pairing *is* the architecture, so
+each kernel declares which representations it accepts and owns its own `Integrate`.
+
+### Conditioning is in the root signature
+
+`Operator.__call__` takes `condition` alongside the input and the output discretization. Per-sample
+covariates — the exchange-correlation functional, the exact-exchange fraction, strain parameters
+when they modulate rather than drive — reach encoders, layers, and wrappers through it. Two of the
+eight operators need it in two different ways (per-layer modulation for the correction operator,
+concatenated channels for the parametric Fourier operator); without it in the root signature every
+implementer rediscovers the same hole.
+
+### Why three representations, not four
+
+`PointMeasure` (atoms as an input structure) and `PointSamples` (values carried on query points)
+were separate until DeepDFT was walked through: its probe points join the message graph and
+receive messages at every layer, so the layer state is atoms and probes *together*. One `PointSet`
+with optional values and a `roles` field expresses that; two classes could not.
+
+### Representation fields
+
+| Class | Field | Meaning |
+|---|---|---|
+| `GridFunction` | `values` | shape (channels, n₁, n₂, n₃) |
+| | `channel_labels` | one physical name per channel — `charge_density`, `magnetization`, `electron_localization_up`, … |
+| | `quadrature` | uniform grid: weight = cell volume ÷ point count |
+| `PointSet` | `positions` | shape (n, 3), fractional coordinates |
+| | `values` | shape (n, channels) when features ride on the points; absent for a bare structure |
+| | `species` | per-point element identity when the points are atoms |
+| | `roles` | message-passing asymmetries — receive-only probe points |
+| `Coefficients` | `vector` | shape (k,) — sensor readings, basis coefficients, or parameters |
+
+Channel labels are not decoration: the multiple-input and codomain-attention operators must know
+which field is which, and the corpus's spin-block law makes channel sets vary from run to run
+(under spin polarization every field file doubles — density and magnetization, localization up and
+down, potential up and down).
+
+### Why compositions own their topology
+
+`Composition` is a class rather than a `for` loop because two of its four implementations carry
+state the chain rule cannot see. The fixed-point scheme applies one layer until the output stops
+changing, and needs a solver (Anderson acceleration) plus its own differentiation rule (phantom
+gradients, or the implicit-function adjoint). The multi-scale scheme is a directed graph with skip
+connections and filtered resampling between scales, not a chain, and must designate which scale
+the output leaves at.
+
+---
+
+## The operators
 
 | Package | Mapping, in words | Parts |
 |---|---|---|
 | `factorized_fourier` | charge density → electron localization field (and → local potential) | pointwise lift · spectral kernel (factorized) · explicit stack · pointwise projection |
-| `alias_free_convolutional` | charge density → electron localization field | pointwise lift · compact-support kernel (tabulated) · alias-free activation · multi-scale |
-| `deep_operator_network` | strain or lattice parameters → charge density field | sensor encoder · dense layers · basis-expansion readout (zero kernel layers — legitimate) |
+| `alias_free_convolutional` | charge density → electron localization field | pointwise lift · compact-support kernel · alias-free activation · multi-scale |
+| `deep_operator_network` | strain or lattice parameters → charge density field | sensor encoder · dense layers · basis-expansion readout |
 | `multiple_input_operator_network` | (charge density, local potential) → electron localization field | two sensor encoders · low-rank product · basis expansion |
 | `nonlinear_manifold_decoder` | strain or lattice parameters → charge density field | sensor encoder · dense layers · nonlinear decoder |
-| `deep_dft` | atomic structure → charge density field (+ magnetization) | atom embedding · compact-support kernel over atoms ∪ receive-only probes · pointwise projection |
-| `residual_correction` | cheap-functional (PBE) charge density → accurate-functional (HSE) charge density | wrappers (residual, conditioned, conserving) over a backbone; conformal calibrator |
+| `deep_dft` | atomic structure → charge density field (+ magnetization) | atom embedding · compact-support kernel over atoms ∪ probes · pointwise projection |
+| `residual_correction` | cheap-functional (PBE) charge density → accurate-functional (HSE) charge density | wrappers over a backbone; conformal calibrator |
 | `codomain_attention` | any subset of the fields → the missing fields | variable encoding · codomain-attention kernel over spectral kernels · pointwise projection |
 
-The deep-equilibrium variant is not a package: it is `factorized_fourier` with
-`composition = FixedPoint`. Conservation wrappers attach to **task heads** (a density output is
-renormalized to the electron count; a potential output has its uniform mode pinned), never to
-operators as such — see `tasks/`.
+Each package's own rationale, data, floors, and kill thresholds live in its `IMPLEMENTATION.md`.
+
+Two consequences of the framework worth stating plainly. The **deep-equilibrium variant is not a
+package**: it is `factorized_fourier` with `composition = FixedPoint`, which is what makes the
+planned explicit → weight-tied → implicit comparison a change of one component rather than three
+codebases. And **conservation attaches to task heads, not to operators**: a density output is
+renormalized to the electron count, a potential output has its uniform mode pinned, and an
+electron-localization output has neither — so the wrapper reads the task card.
+
+### Zero kernel layers is legitimate
+
+The branch–trunk operators map parameters to a field: sensor encoder → dense layers → basis
+readout, with no kernel integral anywhere. The framework permits a composition holding no layers
+rather than inventing a fake integral to satisfy the template.
+
+---
+
+## What goes where
+
+| Directory | Contents |
+|---|---|
+| `framework/` | the four abstract classes, the `NeuralOperator` template, `Layer`, the dense reference integral, and the discretization-invariance harness |
+| `kernels/spectral/` | translation-invariant kernels: full and factorized per-axis mode weights, mode truncation, physical-wavevector features from the reciprocal lattice, spectral resampling (truncation and zero-padding), and the batched three-dimensional real Fourier transform with autodiff through complex tensors |
+| `kernels/compact_support/` | small-support kernels in two parametrizations — tabulated at integer offsets on a grid (convolution) and continuous in the displacement (message passing) — plus periodic neighbour finding and the alias-free activation machinery |
+| `kernels/low_rank/` | separable kernels φ(x)·ψ(y) evaluated as inner products, and the dense kernel over a finite index set |
+| `kernels/codomain_attention/` | attention over the channel index, with weights shared across channel tokens |
+| `encoders/` | pointwise lift · sensor encoder · basis-projection encoder · atom embedding · variable encoding |
+| `compositions/` | explicit stack · weight-tied · fixed point · multi-scale |
+| `readouts/` | pointwise projection (bounded heads live here) · basis expansion (the trunk) · nonlinear decoder |
+| `wrappers/` | residual · conditioned · conserving · the conformal calibrator |
+| `data/` | corpus parsers, the derived tensor store, the split engine, and the floors |
+| `tasks/` | task cards — inputs, targets, loss, metrics, conservation law, covariates, split |
+
+### Notes that the code deliberately does not carry
+
+These are corpus and numerical facts that constrain implementations. They are recorded here
+because they are reasons, and reasons do not belong in the modules.
+
+- **Periodic images must be enumerated by cell height** (nᵢ = ⌈cutoff / heightᵢ⌉ with an exact
+  distance filter). The minimum-image shortcut is wrong in the alloy campaign's strongly skewed
+  monoclinic cell.
+- **The alias-free activation must be fused** — upsample ×2, apply the nonlinearity, downsample
+  ×2, tile-streamed with a custom gradient rule. Naive autodiff materializes the doubled grid and
+  exhausts the resident card's memory. This is a correctness-of-scale requirement, not an
+  optimization.
+- **The atom embedding is keyed by element *and* pseudopotential title.** Twelve elements ship
+  with two pseudopotential variants across campaigns, and conflating them mixes incompatible
+  references.
+- **The Fourier-transform substrate is an open decision** (vendor-wrapped versus written in
+  house); both cost figures are carried until it is made.
+- **Probe sampling is importance-weighted and de-biased**, because error mass concentrates in
+  atom-centred volumes.
+- **Density-of-states curves are rebuilt from eigenvalues**, never read from the pre-computed
+  file; smearing is set per campaign.
+- **The conformal calibrator is not an operator.** It takes a trained predictor and a calibration
+  set at the symmetry-orbit level (roughly 299 exchangeable units on the strain campaign, not
+  1,291 points) and returns interval-valued predictions.
+
+### The invariance harness
+
+Discretization invariance is the operator claim, so it is tested once at framework level rather
+than privately per architecture. The axes, each with its null, follow `test-suite.md` §9.5:
+resolution (train coarse via Fourier truncation — never strided subsampling, which aliases —
+evaluate fine, against trigonometric upsampling of the coarse truth); supercell (the 2-atom ↔
+64-atom twin shear grid, against the measured block gap between the campaigns' own truths); size
+(the held-out alloy cells, scored as skill against the superposed-atomic-densities floor); and
+symmetry (the 48 exact grid operations of the diamond group, reporting median equivariance error).
+
+---
 
 ## Rules of the package
 
 1. **One folder = one importable object named after the folder.** Spelled-out English names;
-   literature names and citations live in each folder's `manifest.toml` and docstring.
+   literature names and citations live in each folder's `manifest.toml` and `IMPLEMENTATION.md`.
 2. **Every fused kernel must match the dense reference integral** on small problems before it is
    trusted at size.
 3. **The interface is falsifiable, not decreed:** the first build wave (the branch–trunk family
    and the correction operator) is the designated shakedown and may amend the abstract classes
    with a recorded reason.
-4. **Backend-agnostic until dictated:** arrays are an opaque `Array` alias; the array/autodiff
+4. **Backend-agnostic until dictated:** arrays are an opaque `Array` alias; the array and autodiff
    substrate is specified in the implementation documents, not here.
-5. Data discipline is inherited from `test-suite.md` at the repository root: spin-block-aware
+5. **Code style:** variables `with_underscores_between`, functions `Start_With_A_Capital`,
+   datatypes `HaveNoSpaces`; docstrings and comments explain code only, never motivation, never
+   inline, never longer than one line; two blank lines between every function and class. Rationale
+   belongs in this file and in the `IMPLEMENTATION.md` documents.
+6. Data discipline is inherited from `test-suite.md` at the repository root: spin-block-aware
    parsing, densities divided by cell volume, orbit-aware splits, the exclusion registry, and
-   nothing volumetric or license-derived ever leaving `/Pool`.
+   nothing volumetric or licence-derived ever leaving `/Pool`.

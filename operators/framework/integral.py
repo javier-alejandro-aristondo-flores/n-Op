@@ -1,12 +1,4 @@
-"""The dense reference integral — the correctness oracle, never the production path.
-
-This is the definition, evaluated literally: loop over the sources y of ``v``, evaluate the
-kernel, weigh by the quadrature, sum. O(sources × targets), unusable at size, and exactly
-what every fused Kernel implementation must reproduce on small problems (8³ grids, a few
-atoms) before any full-size run. This is the project's calibrate-the-instruments rule
-applied to code: a fast kernel that has never been checked against the definition is not an
-implementation of the definition.
-"""
+"""Direct evaluation of the kernel integral by summation over source points."""
 
 from __future__ import annotations
 
@@ -16,14 +8,10 @@ from operators.framework.domain import Array, Discretization
 from operators.framework.representation import Representation
 
 
-def dense_reference_integral(
+def Dense_Reference_Integral(
     kernel_function: Callable[[Array, Array], Array],
-    v: Representation,
-    out: Discretization,
+    input_function: Representation,
+    output_discretization: Discretization,
 ) -> Array:
-    """∫ κ(x, y) · v(y) · dν(y), by direct summation with the representation's quadrature.
-
-    ``kernel_function`` maps (targets x, sources y) to κ values; the quadrature weights come
-    from ``v``. Returns the raw output values at ``out``.
-    """
-    raise NotImplementedError("implementation phase")
+    """Sums kernel values against the input's quadrature weights at every output point."""
+    raise NotImplementedError

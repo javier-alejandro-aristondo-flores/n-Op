@@ -1,24 +1,22 @@
 """The kernel of the integral transform, fused with its own integration."""
 
-from __future__ import annotations
-
-from abc import ABC, abstractmethod
+from abc import abstractmethod
+from typing import ClassVar, Protocol
 
 from operators.framework.domain import Discretization
 from operators.framework.representation import Coefficients, Representation
 
 
-class Kernel(ABC):
+class Kernel[In: Representation, Out: Representation](Protocol):
     """Integrates a learned kernel against the quadrature of a representation."""
 
-    supported_representations: tuple[type[Representation], ...]
+    supported_representations: ClassVar[tuple[type[Representation], ...]]
 
 
     @abstractmethod
     def Integrate(
         self,
-        input_function: Representation,
+        input_function: In,
         output_discretization: Discretization,
         condition: Coefficients | None = None,
-    ) -> Representation:
-        raise NotImplementedError
+    ) -> Out: ...

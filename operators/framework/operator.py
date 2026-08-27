@@ -1,37 +1,35 @@
 """The root interface, and the template chaining encoder, composition, and readout."""
 
-from __future__ import annotations
-
-from abc import ABC, abstractmethod
+from abc import abstractmethod
+from typing import Protocol
 
 from operators.framework.composition import Composition
 from operators.framework.domain import Discretization
 from operators.framework.representation import Coefficients, Representation
 
 
-class Operator(ABC):
+class Operator[In: Representation, Out: Representation](Protocol):
     """Maps one representation to another, evaluated on a requested discretization."""
 
 
     @abstractmethod
     def __call__(
         self,
-        input_function: Representation,
+        input_function: In,
         output_discretization: Discretization,
         condition: Coefficients | None = None,
-    ) -> Representation:
-        raise NotImplementedError
+    ) -> Out: ...
 
 
-class NeuralOperator(Operator):
+class NeuralOperator[In: Representation, Hidden: Representation, Out: Representation](Operator[In, Out]):
     """An operator assembled from an encoder, a composition of layers, and a readout."""
 
 
     def __init__(
         self,
-        encoder: Operator,
-        composition: Composition,
-        readout: Operator,
+        encoder: Operator[In, Hidden],
+        composition: Composition[Hidden],
+        readout: Operator[Hidden, Out],
     ) -> None:
         self.encoder = encoder
         self.composition = composition
@@ -40,8 +38,8 @@ class NeuralOperator(Operator):
 
     def __call__(
         self,
-        input_function: Representation,
+        input_function: In,
         output_discretization: Discretization,
         condition: Coefficients | None = None,
-    ) -> Representation:
+    ) -> Out:
         raise NotImplementedError

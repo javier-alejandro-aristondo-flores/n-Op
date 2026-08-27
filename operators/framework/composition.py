@@ -1,20 +1,18 @@
 """Schemes for chaining layers, each owning its topology and its backward pass."""
 
-from __future__ import annotations
-
-from abc import ABC, abstractmethod
+from abc import abstractmethod
+from typing import Protocol
 
 from operators.framework.representation import Coefficients, Representation
 
 
-class Composition(ABC):
+class Composition[R: Representation](Protocol):
     """Applies a scheme's layers to a representation in channel space."""
 
 
     @abstractmethod
     def Apply(
         self,
-        input_function: Representation,
+        input_function: R,
         condition: Coefficients | None = None,
-    ) -> Representation:
-        raise NotImplementedError
+    ) -> R: ...

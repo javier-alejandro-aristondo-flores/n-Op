@@ -1,9 +1,9 @@
 """Cheap-functional charge density to accurate-functional charge density."""
 
-from operators.framework import Operator
+from operators.framework import Coefficients, Discretization, GridFunction, Operator
 
 
-class ResidualCorrection(Operator):
+class ResidualCorrection(Operator[GridFunction, GridFunction]):
     """Wraps a backbone with residual, conditioning, and conservation behavior."""
 
 
@@ -11,5 +11,10 @@ class ResidualCorrection(Operator):
         raise NotImplementedError
 
 
-    def __call__(self, input_function, output_discretization, condition=None):
+    def __call__(
+        self,
+        input_function: GridFunction,
+        output_discretization: Discretization,
+        condition: Coefficients | None = None,
+    ) -> GridFunction:
         raise NotImplementedError

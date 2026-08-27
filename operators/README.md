@@ -21,7 +21,7 @@ why something is shaped the way it is, it is written here or in the operator's
 
 ---
 
-## The four abstract classes
+## The four contracts
 
 | Class | Role | Implementations |
 |---|---|---|
@@ -36,7 +36,7 @@ term + activation mode + residual flag), the wrappers, and the conformal calibra
 
 ### Why these four, and not more
 
-The design began at seven abstract classes and lost three, each for a stated reason:
+The design began at seven contracts and lost three, each for a stated reason:
 
 - **Activation** became a *mode* on `Layer` (`pointwise` or `alias_free`) rather than a class.
   Only one operator needs the alias-free form, and it needs it as a property of the layer, not as
@@ -160,7 +160,7 @@ rather than inventing a fake integral to satisfy the template.
 
 | Directory | Contents |
 |---|---|
-| `framework/` | the four abstract classes, the `NeuralOperator` template, `Layer`, the dense reference integral, and the discretization-invariance harness |
+| `framework/` | the four contracts, the `NeuralOperator` template, `Layer`, the dense reference integral, and the discretization-invariance harness |
 | `kernels/spectral/` | translation-invariant kernels: full and factorized per-axis mode weights, mode truncation, physical-wavevector features from the reciprocal lattice, spectral resampling (truncation and zero-padding), and the batched three-dimensional real Fourier transform with autodiff through complex tensors |
 | `kernels/compact_support/` | small-support kernels in two parametrizations — tabulated at integer offsets on a grid (convolution) and continuous in the displacement (message passing) — plus periodic neighbor finding and the alias-free activation machinery |
 | `kernels/low_rank/` | separable kernels φ(x)·ψ(y) evaluated as inner products, and the dense kernel over a finite index set |
@@ -209,6 +209,56 @@ symmetry (the 48 exact grid operations of the diamond group, reporting median eq
 
 ---
 
+## The type discipline
+
+Adopted 2026-08-26, before any implementation code exists, so every line that follows is written
+against a modern contract rather than retrofitted to one. The package floor is **Python 3.14**
+(annotations are natively lazy, so no `from __future__ import annotations` anywhere), and
+**pyright in strict mode is a test gate**: `Test_The_Package_Type_Checks_Strictly` runs it over
+the whole package, so a type error fails `pytest`. This is distinct from the standing "no style
+checker" decision — naming, docstring, and spacing rules remain enforced by review only.
+
+**The behavioral contracts are generic Protocols that implementations still inherit by name.**
+`Operator`, `Kernel`, and `Composition` are `Protocol` classes with `@abstractmethod` members,
+and `NeuralOperator` plus every assembly explicitly subclasses what it implements. Each half
+buys something real: the protocol half means conformance is checked structurally by pyright
+against full signatures, and the inheritance half keeps intent named in the class line and keeps
+runtime safety — Protocol's metaclass derives from ABCMeta, so instantiating a class with an
+unimplemented abstract member still raises.
+
+**The generic parameters carry the anatomy.** `Operator[In, Out]` states what a map eats and
+produces; `NeuralOperator[In, Hidden, Out]` types its parts as `encoder: Operator[In, Hidden]`,
+`composition: Composition[Hidden]`, `readout: Operator[Hidden, Out]`, so the checker proves the
+chain agrees before anything runs. Every assembly pins concrete forms in its class line —
+`DeepDft(NeuralOperator[PointSet, PointSet, GridFunction | PointSet])` — which makes the class
+line itself a statement of the operator's shape. Where `Out` is `GridFunction | PointSet` the
+output form is correlated with the requested discretization (`GridSpec` → `GridFunction`,
+`PointSpec` → `PointSet`); the `@overload` pairs that teach the checker this correlation are
+written with each operator's implementation, not before. `Kernel` keeps its
+`supported_representations` class attribute even though `Kernel[In, Out]` states the same thing
+statically — the generics inform the checker, the attribute informs runtime dispatch.
+
+**Aliases use the `type` statement** (`Array`, `Discretization`, `Quadrature`, `Activation`).
+These are lazy `TypeAliasType` objects and cannot be used with `isinstance` — runtime checks go
+against the concrete classes, or through `match`.
+
+**`Representation` declares `domain` but not `quadrature`, on purpose.** Mutable attributes are
+invariant to the checker, so a base-level `quadrature: Quadrature` would forbid the forms from
+narrowing it — and the narrowing is load-bearing: `GridFunction` pins `UniformGridQuadrature`
+(the spectral kernel's fast path exists only on a uniform grid) and `Coefficients` pins
+`CountingQuadrature`. The measure is therefore read off concrete- or union-typed values, where
+its type is exact, never off the base.
+
+**`Array` stays `type Array = Any`** until the substrate decision (array library + autodiff) is
+made. An Array protocol's member list *is* the substrate contract, so writing one now would
+prejudge that decision; it becomes a real `Protocol` the day the substrate lands, its members
+grown from what the framework actually uses.
+
+Value-like dataclasses are `frozen=True, slots=True`; `Layer` is `slots=True` and generic in the
+representation its kernel is endomorphic over.
+
+---
+
 ## Rules of the package
 
 1. **One folder = one importable object named after the folder.** Spelled-out English names;
@@ -216,8 +266,8 @@ symmetry (the 48 exact grid operations of the diamond group, reporting median eq
 2. **Every fused kernel must match the dense reference integral** on small problems before it is
    trusted at size.
 3. **The interface is falsifiable, not decreed:** the first build wave (the branch–trunk family
-   and the correction operator) is the designated shakedown and may amend the abstract classes
-   with a recorded reason.
+   and the correction operator) is the designated shakedown and may amend the contracts with a
+   recorded reason.
 4. **Backend-agnostic until dictated:** arrays are an opaque `Array` alias; the array and autodiff
    substrate is specified in the implementation documents, not here.
 5. **Code style:** variables `with_underscores_between`, functions `Start_With_A_Capital`,

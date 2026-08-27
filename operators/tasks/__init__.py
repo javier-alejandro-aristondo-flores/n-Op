@@ -1,11 +1,9 @@
 """Task cards naming the inputs, targets, loss, metrics, and split of one suite task."""
 
-from __future__ import annotations
-
 from dataclasses import dataclass
 
 
-@dataclass(frozen=True)
+@dataclass(frozen=True, slots=True)
 class TaskCard:
     """One suite task stated as data."""
 

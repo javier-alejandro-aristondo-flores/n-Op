@@ -1,1 +1,110 @@
-"""Operators that carry an input into channel space."""
+"""Encoders: maps from corpus representations into the channel space layers work in."""
+
+from typing import Any
+
+import numpy
+from numpy.typing import NDArray
+
+from operators.framework import Coefficients, Discretization, GridFunction, Operator
+from operators.framework.domain import Array
+from operators.substrate.network import MultilayerPerceptron
+
+
+class PointwiseLift(Operator[GridFunction, GridFunction]):
+    """Mixes input channels into a wider channel space at every grid point alike."""
+
+
+    def __init__(self, hidden_channels: int, input_channels: int, seed: int = 0) -> None:
+        generator = numpy.random.default_rng(seed)
+        scale = numpy.sqrt(2.0 / (hidden_channels + input_channels))
+        self.parameter_values: dict[str, NDArray[numpy.float64]] = {
+            "lift_weights": generator.normal(0.0, scale, size=(hidden_channels, input_channels)),
+            "lift_biases": numpy.zeros(hidden_channels),
+        }
+
+
+    def Forward(self, lifted: dict[str, Any], input_values: Any) -> Any:
+        flattened = input_values.reshape(input_values.shape[0], -1)
+        mixed = lifted["lift_weights"] @ flattened + lifted["lift_biases"][:, None]
+        return mixed.reshape(lifted["lift_weights"].shape[0], *input_values.shape[1:])
+
+
+    def __call__(
+        self,
+        input_function: GridFunction,
+        output_discretization: Discretization,
+        condition: Coefficients | None = None,
+    ) -> GridFunction:
+        produced = numpy.asarray(self.Forward(self.parameter_values, numpy.asarray(input_function.values)))
+        labels = tuple(f"hidden_{index}" for index in range(produced.shape[0]))
+        return GridFunction(produced, labels, input_function.domain, input_function.quadrature)
+
+
+    def Inspect(self) -> dict[str, Array]:
+        return dict(self.parameter_values)
+
+
+class SensorEncoder(Operator[Coefficients, Coefficients]):
+    """Reads a parameter vector through a perceptron into a latent vector."""
+
+
+    def __init__(self, layer_widths: tuple[int, ...], seed: int = 0) -> None:
+        self.network = MultilayerPerceptron(layer_widths, "sensor_encoder", seed)
+        self.parameter_values = self.network.parameter_values
+
+
+    def Forward(self, lifted: dict[str, Any], input_vector: Any) -> Any:
+        return self.network.Forward(lifted, input_vector)
+
+
+    def __call__(
+        self,
+        input_function: Coefficients,
+        output_discretization: Discretization,
+        condition: Coefficients | None = None,
+    ) -> Coefficients:
+        produced = self.network.Apply(numpy.asarray(input_function.vector, dtype=numpy.float64))
+        return Coefficients(vector=produced, domain=input_function.domain)
+
+
+    def Inspect(self) -> dict[str, Array]:
+        return dict(self.parameter_values)
+
+
+class BasisProjectionEncoder(Operator[GridFunction, Coefficients]):
+    """Projects a field onto a fixed orthonormal basis by quadrature-weighted inner products."""
+
+
+    def __init__(self, basis_modes: NDArray[numpy.float64], basis_mean: NDArray[numpy.float64]) -> None:
+        self.basis_modes = basis_modes
+        self.basis_mean = basis_mean
+        self.last_coefficients: NDArray[numpy.float64] | None = None
+
+
+    def __call__(
+        self,
+        input_function: GridFunction,
+        output_discretization: Discretization,
+        condition: Coefficients | None = None,
+    ) -> Coefficients:
+        flattened = numpy.asarray(input_function.values, dtype=numpy.float64).reshape(-1)
+        coefficients = self.basis_modes @ (flattened - self.basis_mean)
+        self.last_coefficients = coefficients
+        return Coefficients(vector=coefficients, domain=input_function.domain)
+
+
+    def Inspect(self) -> dict[str, Array]:
+        state: dict[str, Array] = {
+            "basis_mode_norms": numpy.linalg.norm(self.basis_modes, axis=1),
+            "basis_mean": self.basis_mean,
+        }
+        if self.last_coefficients is not None:
+            state["last_coefficients"] = self.last_coefficients
+        return state
+
+
+__all__ = [
+    "PointwiseLift",
+    "SensorEncoder",
+    "BasisProjectionEncoder",
+]

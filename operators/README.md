@@ -259,6 +259,28 @@ representation its kernel is endomorphic over.
 
 ---
 
+## Everything is inspectable
+
+A standing requirement from the project's original specification, restored to canon 2026-08-28
+after an audit found it had not survived the restructure: every quantity the framework computes
+must be reachable as data — weights, intermediate fields, spectral coefficients, attention
+scores, predictions. The convention is the one the tensor store already uses on disk: **named,
+plain-word arrays**.
+
+- Every concrete framework part (kernel, encoder, composition, readout, wrapper, assembly)
+  exposes `Inspection_State()` returning its learned arrays and its last forward pass's
+  intermediates as a dictionary of plain-word-named arrays.
+- The engine seam carries this as a facet obligation — named parameters, per-layer intermediate
+  representations on request, gradient access — so the in-house engine must satisfy the same
+  inspection contract the first open-source engine does.
+- A visualization module renders what the arrays hold (fields, curves, spectra, orbit maps).
+  Volumetric renders obey the egress rule: §9.1's quota — metrics plus at most five example
+  fields — governs what leaves `/Pool`.
+- Each operator's implementation specification carries an "Inspection surface" section naming
+  what that operator exposes beyond the shared contract.
+
+---
+
 ## Rules of the package
 
 1. **One folder = one importable object named after the folder.** Spelled-out English names;
@@ -277,3 +299,5 @@ representation its kernel is endomorphic over.
 6. Data discipline is inherited from `test-suite.md` at the repository root: spin-block-aware
    parsing, densities divided by cell volume, orbit-aware splits, the exclusion registry, and
    nothing volumetric or license-derived ever leaving `/Pool`.
+7. **Everything is inspectable:** weights, outputs, and intermediates are reachable as named
+   plain-word arrays through `Inspection_State()` on every part; see the section above.

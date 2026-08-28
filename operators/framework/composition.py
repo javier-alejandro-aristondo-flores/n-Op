@@ -3,10 +3,11 @@
 from abc import abstractmethod
 from typing import Protocol
 
+from operators.framework.inspectable import Inspectable
 from operators.framework.representation import Coefficients, Representation
 
 
-class Composition[R: Representation](Protocol):
+class Composition[R: Representation](Inspectable, Protocol):
     """Applies a scheme's layers to a representation in channel space."""
 
 

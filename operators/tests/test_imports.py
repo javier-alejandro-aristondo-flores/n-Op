@@ -22,6 +22,7 @@ PACKAGES = [
     "operators.readouts",
     "operators.wrappers",
     "operators.data",
+    "operators.inspection",
     "operators.metrics",
     "operators.tasks",
     "operators.factorized_fourier",
@@ -53,10 +54,10 @@ def Test_Every_Package_Imports() -> None:
 
 
 def Test_The_Behavioral_Classes_Are_Protocols() -> None:
-    """Asserts that Operator, Kernel, and Composition are abstract protocols."""
-    from operators.framework import Composition, Kernel, Operator
+    """Asserts that the behavioral contracts are abstract protocols."""
+    from operators.framework import Composition, Inspectable, Kernel, Operator
 
-    contracts: tuple[type[Any], ...] = (Operator, Kernel, Composition)
+    contracts: tuple[type[Any], ...] = (Operator, Kernel, Composition, Inspectable)
     for contract in contracts:
         assert is_protocol(contract)
         assert inspect.isabstract(contract)
@@ -80,6 +81,17 @@ def Test_Each_Operator_Package_Exposes_One_Assembly() -> None:
         module = importlib.import_module(package_name)
         assembly = getattr(module, class_name)
         assert Operator in assembly.__mro__
+
+
+def Test_Every_Assembly_Carries_The_Inspection_Contract() -> None:
+    """Asserts every assembly inherits Inspectable and answers Inspect."""
+    from operators.framework import Inspectable
+
+    for package_name, class_name in ASSEMBLIES.items():
+        module = importlib.import_module(package_name)
+        assembly = getattr(module, class_name)
+        assert Inspectable in assembly.__mro__
+        assert callable(getattr(assembly, "Inspect"))
 
 
 def Test_The_Package_Type_Checks_Strictly() -> None:

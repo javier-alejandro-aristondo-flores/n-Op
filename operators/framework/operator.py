@@ -4,11 +4,12 @@ from abc import abstractmethod
 from typing import Protocol
 
 from operators.framework.composition import Composition
-from operators.framework.domain import Discretization
+from operators.framework.domain import Array, Discretization
+from operators.framework.inspectable import Inspectable
 from operators.framework.representation import Coefficients, Representation
 
 
-class Operator[In: Representation, Out: Representation](Protocol):
+class Operator[In: Representation, Out: Representation](Inspectable, Protocol):
     """Maps one representation to another, evaluated on a requested discretization."""
 
 
@@ -43,3 +44,15 @@ class NeuralOperator[In: Representation, Hidden: Representation, Out: Representa
         condition: Coefficients | None = None,
     ) -> Out:
         raise NotImplementedError
+
+
+    def Inspect(self) -> dict[str, Array]:
+        state: dict[str, Array] = {}
+        for prefix, inspected in (
+            ("encoder", self.encoder.Inspect()),
+            ("composition", self.composition.Inspect()),
+            ("readout", self.readout.Inspect()),
+        ):
+            for name, value in inspected.items():
+                state[f"{prefix}.{name}"] = value
+        return state

@@ -1,6 +1,6 @@
 """Cheap-functional charge density to accurate-functional charge density."""
 
-from operators.framework import Coefficients, Discretization, GridFunction, Operator
+from operators.framework import Array, Coefficients, Discretization, GridFunction, Operator
 
 
 class ResidualCorrection(Operator[GridFunction, GridFunction]):
@@ -17,4 +17,8 @@ class ResidualCorrection(Operator[GridFunction, GridFunction]):
         output_discretization: Discretization,
         condition: Coefficients | None = None,
     ) -> GridFunction:
+        raise NotImplementedError
+
+
+    def Inspect(self) -> dict[str, Array]:
         raise NotImplementedError

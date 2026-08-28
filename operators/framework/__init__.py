@@ -10,6 +10,7 @@ from operators.framework.representation import (
     Representation,
     UniformGridQuadrature,
 )
+from operators.framework.inspectable import Inspectable
 from operators.framework.operator import NeuralOperator, Operator
 from operators.framework.kernel import Kernel
 from operators.framework.composition import Composition
@@ -28,6 +29,7 @@ __all__ = [
     "GridFunction",
     "PointSet",
     "Coefficients",
+    "Inspectable",
     "Operator",
     "NeuralOperator",
     "Kernel",

@@ -4,10 +4,11 @@ from abc import abstractmethod
 from typing import ClassVar, Protocol
 
 from operators.framework.domain import Discretization
+from operators.framework.inspectable import Inspectable
 from operators.framework.representation import Coefficients, Representation
 
 
-class Kernel[In: Representation, Out: Representation](Protocol):
+class Kernel[In: Representation, Out: Representation](Inspectable, Protocol):
     """Integrates a learned kernel against the quadrature of a representation."""
 
     supported_representations: ClassVar[tuple[type[Representation], ...]]

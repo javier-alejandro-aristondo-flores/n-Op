@@ -122,7 +122,9 @@ def Paired_Field_Examples(
 
 def Per_Channel_Statistics(fields: list[GridFunction]) -> tuple[NDArray[np.float64], NDArray[np.float64]]:
     """per-channel means and deviations over a list of same-channel fields"""
-    stacked = np.stack([np.asarray(field.values, dtype=np.float64).reshape(len(field.channel_labels), -1) for field in fields])
+    stacked = np.stack(
+        [np.asarray(field.values, dtype=np.float64).reshape(len(field.channel_labels), -1) for field in fields]
+    )
     means = stacked.mean(axis=(0, 2))
     deviations = stacked.std(axis=(0, 2))
     return means, np.maximum(deviations, 1e-12)

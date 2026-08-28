@@ -64,7 +64,9 @@ class BasisExpansion(Operator[Coefficients, Representation]):
     """a coordinate trunk evaluated against branch coefficients at any requested points"""
 
 
-    def __init__(self, latent_width: int, trunk_widths: tuple[int, ...], fourier_orders: int = 4, seed: int = 0) -> None:
+    def __init__(
+        self, latent_width: int, trunk_widths: tuple[int, ...], fourier_orders: int = 4, seed: int = 0
+    ) -> None:
         self.fourier_orders = fourier_orders
         feature_count = 3 + 6 * fourier_orders
         self.trunk = MultilayerPerceptron((feature_count, *trunk_widths, latent_width), "trunk", seed)
@@ -105,7 +107,8 @@ class BasisExpansion(Operator[Coefficients, Representation]):
         if isinstance(output_discretization, GridSpec):
             shape = output_discretization.shape
             point_count = shape[0] * shape[1] * shape[2]
-            quadrature = UniformGridQuadrature(abs(float(np.linalg.det(np.asarray(input_function.domain.lattice)))), point_count)
+            cell_volume = abs(float(np.linalg.det(np.asarray(input_function.domain.lattice))))
+            quadrature = UniformGridQuadrature(cell_volume, point_count)
             return GridFunction(produced.reshape(1, *shape), ("predicted_field",), input_function.domain, quadrature)
         return PointSet(positions=points, domain=input_function.domain, values=produced.reshape(-1, 1))
 

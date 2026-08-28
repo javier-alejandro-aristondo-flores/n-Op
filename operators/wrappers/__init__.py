@@ -85,7 +85,9 @@ class Conditioned(Operator[GridFunction, GridFunction]):
     """the inner operator's channels scaled and shifted from the conditioning vector"""
 
 
-    def __init__(self, inner: Operator[GridFunction, GridFunction], channels: int, condition_width: int, seed: int = 0) -> None:
+    def __init__(
+        self, inner: Operator[GridFunction, GridFunction], channels: int, condition_width: int, seed: int = 0
+    ) -> None:
         self.inner = inner
         generator = np.random.default_rng(seed)
         scale = 1.0 / np.sqrt(condition_width)

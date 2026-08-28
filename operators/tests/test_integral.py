@@ -1,7 +1,6 @@
 """the dense reference integral against closed forms"""
 
 import numpy as np
-
 from numpy.typing import NDArray
 
 from operators.framework import (

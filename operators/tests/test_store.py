@@ -134,9 +134,11 @@ def Test_A_Synthetic_Run_Extracts_Writes_And_Freshens(tmp_path: Path) -> None:
 @pytest.mark.pool
 def Test_The_Arsenic_Run_Extracts_Faithfully() -> None:
     """the recorded arsenic defect run extracted in memory, channel by channel"""
-    if not POOL_ROOT.exists():
-        pytest.fail("the corpus at /Pool/VASP_DATA is not mounted on this machine")
-    census_rows = [census_row for census_row in Read_Census(POOL_ROOT) if census_row.path.endswith("VA-element-single-impurity/As/GGA-PBE")]
+    census_rows = [
+        census_row
+        for census_row in Read_Census(POOL_ROOT)
+        if census_row.path.endswith("VA-element-single-impurity/As/GGA-PBE")
+    ]
     assert len(census_rows) == 1
     arrays, sidecar = Extract_Run(census_rows[0], POOL_ROOT)
     for name in (

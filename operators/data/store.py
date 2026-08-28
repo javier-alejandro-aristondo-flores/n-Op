@@ -231,7 +231,9 @@ def Extract_Run(census_row: CensusRow, pool_root: Path) -> tuple[dict[str, Store
         "row_hash": census_row.row_hash,
         "extractor_version": EXTRACTOR_VERSION,
         "fields": sorted(arrays),
-        "units": {name: UNIT_BY_FIELD.get(name.removesuffix("_up").removesuffix("_down"), "") for name in sorted(arrays)},
+        "units": {
+            name: UNIT_BY_FIELD.get(name.removesuffix("_up").removesuffix("_down"), "") for name in sorted(arrays)
+        },
         "pseudopotential_titles": list(titles),
         "unreadable_files": unreadable,
         "row": census_row.record,

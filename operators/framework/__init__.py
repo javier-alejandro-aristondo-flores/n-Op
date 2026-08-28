@@ -2,21 +2,9 @@
 
 # pyright: reportUnusedImport=false
 
-from operators.framework.domain import Array, Discretization, Domain, GridSpec, PointSpec
-from operators.framework.representation import (
-    Coefficients,
-    CountingQuadrature,
-    GridFunction,
-    PointSet,
-    Quadrature,
-    Representation,
-    UniformGridQuadrature,
-)
-from operators.framework.inspectable import Inspectable
-from operators.framework.operator import NeuralOperator, Operator
-from operators.framework.kernel import Kernel
 from operators.framework.composition import Composition
-from operators.framework.layer import Layer
+from operators.framework.domain import Array, Discretization, Domain, GridSpec, PointSpec
+from operators.framework.inspectable import Inspectable
 from operators.framework.integral import (
     Dense_Reference_Integral,
     Fractional_Grid_Coordinates,
@@ -32,4 +20,16 @@ from operators.framework.invariance import (
     Equivariance_Errors,
     K_Quality_Tier,
     Spectral_Truncation_Resample,
+)
+from operators.framework.kernel import Kernel
+from operators.framework.layer import Layer
+from operators.framework.operator import NeuralOperator, Operator
+from operators.framework.representation import (
+    Coefficients,
+    CountingQuadrature,
+    GridFunction,
+    PointSet,
+    Quadrature,
+    Representation,
+    UniformGridQuadrature,
 )

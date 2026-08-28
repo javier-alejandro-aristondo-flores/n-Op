@@ -75,13 +75,25 @@ def Resolve_Exclusion(identifier: str, census_rows: Sequence[CensusRow], pool_ro
                 return tuple(member for member in group if "length_distortions" in member)
         return tuple(path for path in paths if path == "ggapbe/length_distortions/a_1_b_1_c_1_alpha_1_beta_1_gamma_1")
     if identifier == "E4":
-        return tuple(path for path in paths if Campaign_Of(path) == "supercell_strains" and path.endswith("shear_xy_g0.010"))
+        return tuple(
+            path for path in paths if Campaign_Of(path) == "supercell_strains" and path.endswith("shear_xy_g0.010")
+        )
     if identifier == "E5":
-        return tuple(path for path in paths if Campaign_Of(path) == "supercell_strains" and path.endswith("shear_xy_g0.015"))
+        return tuple(
+            path for path in paths if Campaign_Of(path) == "supercell_strains" and path.endswith("shear_xy_g0.015")
+        )
     if identifier == "E6":
-        return tuple(census_row.path for census_row in census_rows if Campaign_Of(census_row.path) == "relaxation_pool" and not census_row.record.get("o_complete"))
+        return tuple(
+            census_row.path
+            for census_row in census_rows
+            if Campaign_Of(census_row.path) == "relaxation_pool" and not census_row.record.get("o_complete")
+        )
     if identifier == "E7":
-        return tuple(census_row.path for census_row in census_rows if Campaign_Of(census_row.path) == "perovskite_grid" and census_row.record.get("eig_gap") == 0.0)
+        return tuple(
+            census_row.path
+            for census_row in census_rows
+            if Campaign_Of(census_row.path) == "perovskite_grid" and census_row.record.get("eig_gap") == 0.0
+        )
     if identifier == "E8":
         return Fractional_Occupancy_Paths(census_rows, pool_root)
     if identifier == "E9":

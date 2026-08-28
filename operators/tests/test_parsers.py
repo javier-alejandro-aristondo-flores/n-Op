@@ -4,25 +4,24 @@ from pathlib import Path
 
 import numpy as np
 import pytest
-from numpy.typing import NDArray
 
 from operators.data import (
+    POOL_ROOT,
     Read_Eigenvalues,
     Read_Field_File,
     Read_Final_Magnetization,
     Read_Geometry,
     Read_Outcar_Echoes,
 )
+from operators.metrics import Normalized_Mean_Absolute_Error
 
-POOL = Path("/Pool/VASP_DATA")
+ARSENIC_DEFECT = POOL_ROOT / "diamond/single_defect/VA-element-single-impurity/As/GGA-PBE"
 
-ARSENIC_DEFECT = POOL / "diamond/single_defect/VA-element-single-impurity/As/GGA-PBE"
+MAGNESIUM_DEFECT = POOL_ROOT / "diamond/single_defect/IIA-element-single-impurity/Mg/gga-pbe"
 
-MAGNESIUM_DEFECT = POOL / "diamond/single_defect/IIA-element-single-impurity/Mg/gga-pbe"
+ALLOY_PIPELINE = POOL_ROOT / "alloy/1-Alloy/1-Alloy/3-HSE06/8-x-82.5"
 
-ALLOY_PIPELINE = POOL / "alloy/1-Alloy/1-Alloy/3-HSE06/8-x-82.5"
-
-STRAIN_REFERENCE = POOL / "diamond/2_atoms_4-10-2026/reference_2_atoms/GGA-PBE"
+STRAIN_REFERENCE = POOL_ROOT / "diamond/2_atoms_4-10-2026/reference_2_atoms/GGA-PBE"
 
 SYNTHETIC_TWO_BLOCK = """synthetic
    1.0
@@ -72,17 +71,6 @@ SYNTHETIC_EIGENVALUES = """   2   2   1    2
 """
 
 
-def Require_The_Pool() -> None:
-    """fails the calling test when the corpus partition is not mounted"""
-    if not POOL.exists():
-        pytest.fail("the corpus at /Pool/VASP_DATA is not mounted on this machine")
-
-
-def Normalized_Mean_Absolute_Error(candidate: NDArray[np.float64], reference: NDArray[np.float64]) -> float:
-    """mean absolute error over the mean absolute reference"""
-    return float(np.mean(np.abs(candidate - reference)) / np.mean(np.abs(reference)))
-
-
 def Test_A_Two_Block_File_Parses_Past_Augmentation(tmp_path: Path) -> None:
     """a synthetic spin-doubled file, and x-fastest grid ordering"""
     file_path = tmp_path / "CHGCAR"
@@ -119,7 +107,6 @@ def Test_Eigenvalues_Read_The_Spin_Polarized_Layout(tmp_path: Path) -> None:
 @pytest.mark.pool
 def Test_Charge_Mean_Equals_The_Electron_Count() -> None:
     """grid mean of raw charge against the electron-count echo, on two recorded runs"""
-    Require_The_Pool()
     for run in (ARSENIC_DEFECT, STRAIN_REFERENCE):
         field = Read_Field_File(run / "CHGCAR")
         echoes = Read_Outcar_Echoes(run / "OUTCAR")
@@ -129,7 +116,6 @@ def Test_Charge_Mean_Equals_The_Electron_Count() -> None:
 @pytest.mark.pool
 def Test_The_Half_Grid_Law_Holds() -> None:
     """the localization grid is exactly half the charge grid per axis, on two campaigns"""
-    Require_The_Pool()
     for run in (ARSENIC_DEFECT, ALLOY_PIPELINE):
         charge = Read_Field_File(run / "CHGCAR")
         localization = Read_Field_File(run / "ELFCAR")
@@ -140,7 +126,6 @@ def Test_The_Half_Grid_Law_Holds() -> None:
 @pytest.mark.pool
 def Test_The_Spin_Block_Law_Holds() -> None:
     """spin doubling on a magnetic run, single blocks on the controls"""
-    Require_The_Pool()
     for name in ("CHGCAR", "ELFCAR", "LOCPOT"):
         assert len(Read_Field_File(ARSENIC_DEFECT / name).blocks) == 2
     assert len(Read_Field_File(ARSENIC_DEFECT / "AECCAR1").blocks) == 1
@@ -150,7 +135,6 @@ def Test_The_Spin_Block_Law_Holds() -> None:
 @pytest.mark.pool
 def Test_The_Magnetization_Calibration_Replicates() -> None:
     """the magnetization block integrates to the recorded two-magneton moment"""
-    Require_The_Pool()
     field = Read_Field_File(MAGNESIUM_DEFECT / "CHGCAR")
     moment = float(np.mean(field.blocks[1]))
     assert abs(moment - 2.000000) < 1e-3
@@ -161,7 +145,6 @@ def Test_The_Magnetization_Calibration_Replicates() -> None:
 @pytest.mark.pool
 def Test_The_Superposed_Atomic_Density_Floor_Replicates() -> None:
     """the recorded atomic-superposition error levels, on the arsenic run"""
-    Require_The_Pool()
     charge = Read_Field_File(ARSENIC_DEFECT / "CHGCAR").blocks[0]
     superposed = Read_Field_File(ARSENIC_DEFECT / "AECCAR1").blocks[0]
     valence_reference = Read_Field_File(ARSENIC_DEFECT / "AECCAR2").blocks[0]
@@ -172,7 +155,6 @@ def Test_The_Superposed_Atomic_Density_Floor_Replicates() -> None:
 @pytest.mark.pool
 def Test_Eigenvalue_Headers_Match_The_Recorded_Run() -> None:
     """the arsenic run's eigenvalue header against its census row"""
-    Require_The_Pool()
     eigenvalues = Read_Eigenvalues(ARSENIC_DEFECT / "EIGENVAL")
     assert eigenvalues.electron_count == 257.0
     assert eigenvalues.kpoints.shape == (8, 3)

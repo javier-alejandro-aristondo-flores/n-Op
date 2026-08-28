@@ -6,8 +6,14 @@ from typing import Any
 import numpy as np
 import pytest
 
-from operators.data import POOL_ROOT
-from operators.substrate import Engine, Least_Squares_Solution, NumpyEngine, ParameterSet, Torch_Is_Available, TorchEngine
+from operators.substrate import (
+    Engine,
+    Least_Squares_Solution,
+    NumpyEngine,
+    ParameterSet,
+    Torch_Is_Available,
+    TorchEngine,
+)
 from operators.tasks import Card_Named
 from operators.training import Paired_Field_Examples, Strain_Charge_Pairs, Train
 
@@ -56,8 +62,6 @@ def Test_Training_Recovers_Linear_Regression(engine: Engine, tmp_path: Path) -> 
 @pytest.mark.pool
 def Test_The_Thread_Reproduces_The_Affine_Floor() -> None:
     """the two-parameter affine map, trained on live pairs, against the closed form"""
-    if not POOL_ROOT.exists():
-        pytest.fail("the corpus at /Pool/VASP_DATA is not mounted on this machine")
     sampled_rows: list[Any] = []
     for _, cheap_field, accurate_field in Strain_Charge_Pairs("validation", limit=24):
         cheap_values = np.asarray(cheap_field.values, dtype=np.float64).reshape(-1)[::977]
@@ -92,8 +96,6 @@ def Test_The_Thread_Reproduces_The_Affine_Floor() -> None:
 @pytest.mark.pool
 def Test_The_Paired_Loader_Assembles_Channels_Across_The_Half_Grid() -> None:
     """spin-doubled inputs, and half-grid localization targets"""
-    if not POOL_ROOT.exists():
-        pytest.fail("the corpus at /Pool/VASP_DATA is not mounted on this machine")
     card = Card_Named("charge_to_localization")
     example = next(iter(Paired_Field_Examples(card, role="evaluation", limit=1)))
     assert example.input_function.channel_labels == ("charge_density", "magnetization_density")

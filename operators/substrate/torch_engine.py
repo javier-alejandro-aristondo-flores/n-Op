@@ -49,7 +49,9 @@ class TorchEngine:
         return torch.tensor(value, dtype=torch.float64, device=self.device_name)
 
 
-    def Gradients(self, parameters: ParameterSet, forward: Callable[[dict[str, Any]], Any]) -> dict[str, NDArray[np.float64]]:
+    def Gradients(
+        self, parameters: ParameterSet, forward: Callable[[dict[str, Any]], Any]
+    ) -> dict[str, NDArray[np.float64]]:
         lifted = self.Lift(parameters.values, requires_gradient=True)
         loss = forward(lifted)
         loss.backward()

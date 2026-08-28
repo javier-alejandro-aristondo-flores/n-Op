@@ -5,10 +5,10 @@ from collections.abc import Callable, Sequence
 from pathlib import Path
 
 import numpy as np
-from numpy.typing import NDArray
 
 from operators.data.floors import (
     Apply_Per_Shell_Filter,
+    Field,
     Fit_Per_Shell_Filter,
     Hartree_Potential,
     Identity_And_Affine_Floors,
@@ -25,11 +25,9 @@ from operators.data.pod import Basis_Decay_Gate, Reconstruction_Error_Curve
 from operators.data.splits import ARTIFACT_DIRECTORY
 from operators.data.store import POOL_ROOT, Archive_Path, Read_Census
 from operators.framework import Spectral_Truncation_Resample
-from operators.metrics import Median_And_Interquartile
+from operators.metrics import Median_And_Interquartile, Relative_L2
 
 REPORT_PATH = Path(__file__).parent.parent / "stage0-report.md"
-
-type Field = NDArray[np.float64]
 
 
 def Fold_Of_Runs() -> dict[str, tuple[int, str]]:
@@ -82,11 +80,6 @@ def Mean_Removed(field: Field) -> Field:
     return field - field.mean()
 
 
-def Relative_Error(prediction: Field, truth: Field) -> float:
-    """relative L2 error of two flattened fields"""
-    return float(np.linalg.norm((prediction - truth).ravel()) / np.linalg.norm(truth.ravel()))
-
-
 def Cross_Fidelity_Lines(functional_pairs: Sequence[FunctionalPair]) -> list[str]:
     """the identity, affine and scissor floors on the strain pairs"""
     identity, affine, slopes = Identity_And_Affine_Floors(
@@ -126,7 +119,9 @@ def Pod_Lines(train: Sequence[str], campaign_of: dict[str, str]) -> list[str]:
     """basis-decay curves and the projection gate on the training block"""
     lines = ["## Basis decay and the projection gate (train folds of the cubic block)", ""]
     loaders: dict[str, Callable[[str], Field]] = {
-        "charge_density_80": lambda identifier: Load_Field(campaign_of[identifier], identifier, "charge_density").ravel(),
+        "charge_density_80": lambda identifier: Load_Field(
+            campaign_of[identifier], identifier, "charge_density"
+        ).ravel(),
         "electron_localization_up_40": lambda identifier: Load_Field(
             campaign_of[identifier], identifier, "electron_localization_up"
         ).ravel(),
@@ -139,7 +134,9 @@ def Pod_Lines(train: Sequence[str], campaign_of: dict[str, str]) -> list[str]:
         curve = Reconstruction_Error_Curve(snapshots)
         passes, rank = Basis_Decay_Gate(snapshots)
         checkpoints = ", ".join(
-            f"rank {rank_point}: {100 * curve[rank_point - 1]:.2f}%" for rank_point in (8, 16, 32, 64) if rank_point <= curve.shape[0]
+            f"rank {rank_point}: {100 * curve[rank_point - 1]:.2f}%"
+            for rank_point in (8, 16, 32, 64)
+            if rank_point <= curve.shape[0]
         )
         verdict = f"GO at rank {rank}" if passes else f"NO-GO (best rank ≤ {rank} stays above 3%)"
         lines.append(f"- {name} ({snapshots.shape[0]} snapshots): {checkpoints}; gate {verdict}")
@@ -173,8 +170,12 @@ def Shell_Filter_Lines(train: Sequence[str], evaluation: Sequence[str], campaign
         Load_Field(campaign_of[identifier], identifier, "electron_localization_up") for identifier in train_used
     ]
     localization_gains = Fit_Per_Shell_Filter(coarse_inputs, localization_targets)
-    potential_inputs = [Load_Field(campaign_of[identifier], identifier, "charge_density") for identifier in train_used[:60]]
-    potential_targets = [Mean_Removed(Spin_Mean_Potential(campaign_of[identifier], identifier)) for identifier in train_used[:60]]
+    potential_inputs = [
+        Load_Field(campaign_of[identifier], identifier, "charge_density") for identifier in train_used[:60]
+    ]
+    potential_targets = [
+        Mean_Removed(Spin_Mean_Potential(campaign_of[identifier], identifier)) for identifier in train_used[:60]
+    ]
     potential_gains = Fit_Per_Shell_Filter(potential_inputs, potential_targets)
     del potential_inputs, potential_targets, coarse_inputs, localization_targets
     localization_errors: list[float] = []
@@ -188,7 +189,7 @@ def Shell_Filter_Lines(train: Sequence[str], evaluation: Sequence[str], campaign
         fine = Load_Field(campaign, identifier, "charge_density")
         predicted_potential = Mean_Removed(Apply_Per_Shell_Filter(potential_gains, fine))
         truth_potential = Mean_Removed(Spin_Mean_Potential(campaign, identifier))
-        potential_errors.append(Relative_Error(predicted_potential, truth_potential))
+        potential_errors.append(Relative_L2(predicted_potential, truth_potential))
     localization_median, localization_iqr = Median_And_Interquartile(np.asarray(localization_errors))
     potential_median, potential_iqr = Median_And_Interquartile(np.asarray(potential_errors))
     return [
@@ -226,9 +227,9 @@ def Poisson_Lines(train: Sequence[str], evaluation: Sequence[str], campaign_of: 
             lattice = np.asarray(archive["lattice"], dtype=np.float64)
         truth = Mean_Removed(Spin_Mean_Potential("defect_set", identifier))
         hartree = Mean_Removed(Hartree_Potential(density, lattice))
-        hartree_only.append(Relative_Error(hartree, truth))
-        climatology_only.append(Relative_Error(climatology, truth))
-        combined.append(Relative_Error(hartree + climatology, truth))
+        hartree_only.append(Relative_L2(hartree, truth))
+        climatology_only.append(Relative_L2(climatology, truth))
+        combined.append(Relative_L2(hartree + climatology, truth))
     return [
         "## Spectral-Poisson floor (defect campaign; the units test)",
         "",

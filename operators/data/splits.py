@@ -62,7 +62,11 @@ def Alloy_Composition_Of(census_row: CensusRow) -> str:
 
 def Alloy_Units(census_rows: Sequence[CensusRow], excluded: frozenset[str]) -> list[SplitUnit]:
     """alloy runs grouped by configuration, satellites joining their seed"""
-    alloy_rows = [census_row for census_row in census_rows if Campaign_Of(census_row.path) == "alloy_ensemble" and census_row.path not in excluded]
+    alloy_rows = [
+        census_row
+        for census_row in census_rows
+        if Campaign_Of(census_row.path) == "alloy_ensemble" and census_row.path not in excluded
+    ]
     seed_configuration: dict[str, str] = {}
     for census_row in alloy_rows:
         if "GGA-PBE-relaxation" in census_row.path:
@@ -102,7 +106,8 @@ def Supercell_Units(census_rows: Sequence[CensusRow], excluded: frozenset[str]) 
     """full-field supercell runs grouped by exact shear orbit, or by point"""
     members: dict[str, tuple[str, list[str]]] = {}
     for census_row in census_rows:
-        if Campaign_Of(census_row.path) != "supercell_strains" or census_row.path in excluded or not Has_Full_Fields(census_row):
+        outside = Campaign_Of(census_row.path) != "supercell_strains" or census_row.path in excluded
+        if outside or not Has_Full_Fields(census_row):
             continue
         key, stratum = Supercell_Point_Key(census_row.path)
         members.setdefault(key, (stratum, []))[1].append(census_row.path)
@@ -149,7 +154,11 @@ def Defect_Units(census_rows: Sequence[CensusRow], excluded: frozenset[str]) -> 
 def Paired_Fields_Units(census_rows: Sequence[CensusRow], pool_root: Path) -> list[SplitUnit]:
     """the co-split units of the three full-field campaigns"""
     excluded = Hard_Excluded_Paths(census_rows, pool_root)
-    units = Alloy_Units(census_rows, excluded) + Supercell_Units(census_rows, excluded) + Defect_Units(census_rows, excluded)
+    units = (
+        Alloy_Units(census_rows, excluded)
+        + Supercell_Units(census_rows, excluded)
+        + Defect_Units(census_rows, excluded)
+    )
     return sorted(units, key=lambda unit: unit.key)
 
 
@@ -223,7 +232,8 @@ def Perovskite_Units(census_rows: Sequence[CensusRow], pool_root: Path) -> list[
         if Campaign_Of(census_row.path) != "perovskite_grid" or census_row.path in excluded:
             continue
         sweep = "angle" if "angle_distortions" in census_row.path else "length"
-        units.append(SplitUnit(f"perovskite_{census_row.path.rsplit('/', 1)[-1]}_{sweep}", "perovskite_grid", sweep, (census_row.path,)))
+        unit_key = f"perovskite_{census_row.path.rsplit('/', 1)[-1]}_{sweep}"
+        units.append(SplitUnit(unit_key, "perovskite_grid", sweep, (census_row.path,)))
     return sorted(units, key=lambda unit: unit.key)
 
 
@@ -244,7 +254,8 @@ def Twin_Shear_Map(census_rows: Sequence[CensusRow], pool_root: Path) -> dict[st
     twins: dict[str, dict[str, list[str]]] = {}
     for entry in atlas:
         if entry.family == "one_angle_shear":
-            twins.setdefault(entry.orbit, {"strain_atlas": [], "supercell_strains": []})["strain_atlas"].append(entry.run_path)
+            record = twins.setdefault(entry.orbit, {"strain_atlas": [], "supercell_strains": []})
+            record["strain_atlas"].append(entry.run_path)
     for unit in Supercell_Units(census_rows, Hard_Excluded_Paths(census_rows, pool_root)):
         orbit = unit.key.removeprefix("supercell_")
         if orbit in twins:
@@ -255,7 +266,9 @@ def Twin_Shear_Map(census_rows: Sequence[CensusRow], pool_root: Path) -> dict[st
     return twins
 
 
-def Write_Split_Artifacts(census_rows: Sequence[CensusRow], pool_root: Path, out_directory: Path = ARTIFACT_DIRECTORY) -> None:
+def Write_Split_Artifacts(
+    census_rows: Sequence[CensusRow], pool_root: Path, out_directory: Path = ARTIFACT_DIRECTORY
+) -> None:
     """the committed fold maps and twin map, as deterministic identifier lists"""
     out_directory.mkdir(parents=True, exist_ok=True)
     paired_units = Paired_Fields_Units(census_rows, pool_root)
@@ -317,7 +330,9 @@ def Unit_Report(census_rows: Sequence[CensusRow], pool_root: Path) -> dict[str, 
     }
 
 
-def Regenerated_Artifacts_Match(census_rows: Sequence[CensusRow], pool_root: Path, artifact_directory: Path = ARTIFACT_DIRECTORY) -> bool:
+def Regenerated_Artifacts_Match(
+    census_rows: Sequence[CensusRow], pool_root: Path, artifact_directory: Path = ARTIFACT_DIRECTORY
+) -> bool:
     """whether regenerating the artifacts reproduces the committed files"""
     with tempfile.TemporaryDirectory() as scratch:
         scratch_directory = Path(scratch)

@@ -6,7 +6,15 @@ from typing import Any
 import numpy as np
 from numpy.typing import NDArray
 
-from operators.framework import Array, Coefficients, Discretization, GridFunction, GridSpec, Kernel, UniformGridQuadrature
+from operators.framework import (
+    Array,
+    Coefficients,
+    Discretization,
+    GridFunction,
+    GridSpec,
+    Kernel,
+    UniformGridQuadrature,
+)
 
 
 class SpectralKernel(Kernel[GridFunction, GridFunction]):

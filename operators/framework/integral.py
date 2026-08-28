@@ -29,11 +29,13 @@ def Quadrature_Weights(representation: Representation) -> NDArray[np.float64]:
         quadrature = representation.quadrature
         values = np.asarray(representation.values)
         # one weight per grid point, the channels share it
-        return np.full(values.size // int(values.shape[0]), quadrature.cell_volume / quadrature.point_count, dtype=np.float64)
+        weight = quadrature.cell_volume / quadrature.point_count
+        return np.full(values.size // int(values.shape[0]), weight, dtype=np.float64)
     if isinstance(representation, PointSet):
         count = int(np.asarray(representation.positions).shape[0])
         if isinstance(representation.quadrature, UniformGridQuadrature):
-            return np.full(count, representation.quadrature.cell_volume / representation.quadrature.point_count, dtype=np.float64)
+            weight = representation.quadrature.cell_volume / representation.quadrature.point_count
+            return np.full(count, weight, dtype=np.float64)
         return np.ones(count, dtype=np.float64)
     if isinstance(representation, Coefficients):
         return np.ones(int(np.asarray(representation.vector).shape[0]), dtype=np.float64)

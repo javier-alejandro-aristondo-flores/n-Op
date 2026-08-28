@@ -8,9 +8,9 @@ import numpy as np
 from numpy.typing import NDArray
 
 from operators.data.orbits import Orbit_Map
-from operators.substrate import Cartesian_Wavevectors
 from operators.data.spectra import Occupancy_Walk_Gap
 from operators.data.store import POOL_ROOT, Archive_Path, CensusRow, Run_Identifier
+from operators.substrate import Cartesian_Wavevectors
 
 COULOMB_CONSTANT = 14.39964
 
@@ -93,7 +93,8 @@ def Fit_Per_Shell_Filter(
         input_modes = np.fft.fftn(input_field)
         target_modes = np.fft.fftn(target_field)
         # the counting sum accumulates each shell's cross term and power in one pass
-        cross += np.bincount(shells.ravel(), np.real(np.conj(input_modes) * target_modes).ravel(), minlength=shell_count)
+        cross_values = np.real(np.conj(input_modes) * target_modes).ravel()
+        cross += np.bincount(shells.ravel(), cross_values, minlength=shell_count)
         power += np.bincount(shells.ravel(), np.abs(input_modes.ravel()) ** 2, minlength=shell_count)
     gains = np.zeros(shell_count, dtype=np.float64)
     nonzero = power > 0

@@ -1,7 +1,6 @@
 """the invariance axes, exact resampling and the diamond operations and the nulls"""
 
 import numpy as np
-
 from numpy.typing import NDArray
 
 from operators.framework import (

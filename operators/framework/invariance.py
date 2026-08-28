@@ -4,7 +4,6 @@ from collections.abc import Callable
 from itertools import permutations, product
 
 import numpy as np
-
 from numpy.typing import NDArray
 
 from operators.framework.operator import Operator
@@ -12,7 +11,9 @@ from operators.framework.representation import Representation
 from operators.tasks import TaskCard
 
 
-def Spectral_Truncation_Resample(values: NDArray[np.float64], target_shape: tuple[int, int, int]) -> NDArray[np.float64]:
+def Spectral_Truncation_Resample(
+    values: NDArray[np.float64], target_shape: tuple[int, int, int]
+) -> NDArray[np.float64]:
     """grid to grid by exact Fourier truncation or zero-padding"""
     stacked = np.asarray(values, dtype=np.float64)
     spectrum = np.fft.fftn(stacked, axes=(1, 2, 3))
@@ -39,7 +40,10 @@ def Diamond_Conventional_Motif() -> tuple[tuple[float, float, float], ...]:
     # the two-atom basis repeated on each face-centering translation
     for base in ((0.0, 0.0, 0.0), (0.25, 0.25, 0.25)):
         for offset in centering:
-            combined = [float((base_component + offset_component) % 1.0) for base_component, offset_component in zip(base, offset)]
+            combined = [
+                float((base_component + offset_component) % 1.0)
+                for base_component, offset_component in zip(base, offset)
+            ]
             positions.append((combined[0], combined[1], combined[2]))
     return tuple(positions)
 
@@ -65,7 +69,9 @@ def Diamond_Grid_Operations() -> tuple[tuple[NDArray[np.int64], NDArray[np.float
     return tuple(operations)
 
 
-def Apply_Grid_Operation(values: NDArray[np.float64], matrix: NDArray[np.int64], translation: NDArray[np.float64]) -> NDArray[np.float64]:
+def Apply_Grid_Operation(
+    values: NDArray[np.float64], matrix: NDArray[np.int64], translation: NDArray[np.float64]
+) -> NDArray[np.float64]:
     """one exact symmetry operation on a compatible cubic grid"""
     stacked = np.asarray(values)
     extent = stacked.shape[1]
@@ -97,7 +103,9 @@ def Equivariance_Errors(
     return np.asarray(errors, dtype=np.float64)
 
 
-def Block_Gap_Null(primitive_values: NDArray[np.float64], supercell_values: NDArray[np.float64], tiles: tuple[int, int, int]) -> float:
+def Block_Gap_Null(
+    primitive_values: NDArray[np.float64], supercell_values: NDArray[np.float64], tiles: tuple[int, int, int]
+) -> float:
     """relative distance between the tiled primitive truth and the supercell truth"""
     primitive = np.asarray(primitive_values, dtype=np.float64)
     supercell = np.asarray(supercell_values, dtype=np.float64)
@@ -120,6 +128,8 @@ def K_Quality_Tier(irreducible_kpoint_count: int) -> str:
     return "below_gate"
 
 
-def Discretization_Invariance_Report(operator: Operator[Representation, Representation], task: TaskCard) -> dict[str, object]:
+def Discretization_Invariance_Report(
+    operator: Operator[Representation, Representation], task: TaskCard
+) -> dict[str, object]:
     """every invariance axis that applies to one operator on one task card"""
     raise NotImplementedError

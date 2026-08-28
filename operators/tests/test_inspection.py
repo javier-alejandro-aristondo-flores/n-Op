@@ -6,7 +6,6 @@ from pathlib import Path
 import numpy as np
 import pytest
 
-from operators.data import POOL_ROOT
 from operators.inspection import (
     Describe_Run,
     Exclusion_Summary,
@@ -75,8 +74,6 @@ def Test_Fold_Balance_Reads_The_Committed_Artifact() -> None:
 @pytest.mark.pool
 def Test_The_Catalog_Browses_The_Store() -> None:
     """campaigns, runs, descriptions and field loading against the live store"""
-    if not POOL_ROOT.exists():
-        pytest.fail("the corpus at /Pool/VASP_DATA is not mounted on this machine")
     campaigns = List_Campaigns()
     assert {"defect_set", "strain_atlas", "supercell_strains", "alloy_ensemble"} <= set(campaigns)
     assert len(List_Runs("defect_set")) == 196
@@ -95,8 +92,6 @@ def Test_The_Catalog_Browses_The_Store() -> None:
 @pytest.mark.pool
 def Test_The_Summary_Tables_Match_The_Records() -> None:
     """the orbit and exclusion tables reproduce the measured counts"""
-    if not POOL_ROOT.exists():
-        pytest.fail("the corpus at /Pool/VASP_DATA is not mounted on this machine")
     orbit_rows = Orbit_Summary()
     totals = [row for row in orbit_rows if row["family"] == "all"]
     assert totals[0]["orbits"] == 296 and totals[0]["runs"] == 2680

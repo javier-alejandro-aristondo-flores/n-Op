@@ -22,7 +22,8 @@ class ExplicitStack(Composition[GridFunction]):
         for layer in self.layers:
             # every layer answers on the grid it was handed
             grid_shape = np.asarray(current.values).shape[1:]
-            integrated = layer.kernel.Integrate(current, GridSpec((grid_shape[0], grid_shape[1], grid_shape[2])), condition)
+            grid_spec = GridSpec((grid_shape[0], grid_shape[1], grid_shape[2]))
+            integrated = layer.kernel.Integrate(current, grid_spec, condition)
             summed = np.asarray(layer.local_linear(current.values)) + np.asarray(integrated.values)
             if layer.activation == "alias_free":
                 raise NotImplementedError("the alias-free activation is the convolutional entry's own build")

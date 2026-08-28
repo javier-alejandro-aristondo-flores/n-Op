@@ -82,8 +82,6 @@ def Test_The_Occupancy_Walk_And_Rebuild_Are_Consistent() -> None:
 @pytest.mark.pool
 def Test_The_Gap_Walk_Matches_The_Census_Labels() -> None:
     """the occupancy walk reproduces the census gap on sampled live runs"""
-    if not POOL_ROOT.exists():
-        pytest.fail("the corpus at /Pool/VASP_DATA is not mounted on this machine")
     census_rows = [
         census_row
         for census_row in Read_Census(POOL_ROOT)

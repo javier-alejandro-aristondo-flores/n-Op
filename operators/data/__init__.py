@@ -2,7 +2,13 @@
 
 # pyright: reportUnusedImport=false
 
-from operators.data.exclusions import EXCLUSIONS, Excluded_Paths_For_Scope, Exclusion, Read_Byte_Alias_Groups, Resolve_Exclusion
+from operators.data.exclusions import (
+    EXCLUSIONS,
+    Excluded_Paths_For_Scope,
+    Exclusion,
+    Read_Byte_Alias_Groups,
+    Resolve_Exclusion,
+)
 from operators.data.floors import (
     Fit_Per_Shell_Filter,
     FunctionalPair,

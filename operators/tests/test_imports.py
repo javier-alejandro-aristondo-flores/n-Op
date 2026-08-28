@@ -98,8 +98,23 @@ def Test_Every_Assembly_Carries_The_Inspection_Contract() -> None:
 
 
 def Test_The_Names_Are_Prosaic() -> None:
-    """Asserts no cryptic identifiers anywhere in the package."""
+    """Asserts no cryptic identifiers and no placeholder counters anywhere in the package."""
     allowed_short_names = {"_", "In"}
+    placeholder_names = {
+        "index",
+        "row_index",
+        "column_index",
+        "item_index",
+        "entry_index",
+        "element_index",
+        "value_index",
+        "idx",
+        "tmp",
+        "val",
+        "arr",
+        "res",
+        "obj",
+    }
     package_root = Path(__file__).resolve().parent.parent
     offenses: list[str] = []
     for source_path in sorted(package_root.rglob("*.py")):
@@ -117,8 +132,11 @@ def Test_The_Names_Are_Prosaic() -> None:
             elif isinstance(node, ast.TypeVar):
                 found.append(node.name)
             for name in found:
+                line = getattr(node, "lineno", 0)
                 if len(name) <= 2 and name not in allowed_short_names:
-                    offenses.append(f"{source_path.name}:{getattr(node, 'lineno', 0)} name {name!r}")
+                    offenses.append(f"{source_path.name}:{line} name {name!r}")
+                elif name in placeholder_names:
+                    offenses.append(f"{source_path.name}:{line} placeholder {name!r}")
     assert offenses == [], offenses
 
 

@@ -106,12 +106,12 @@ def Tensor_Images(tensor: StrainTensor) -> Iterator[StrainTensor]:
     for permutation in permutations((0, 1, 2)):
         for signs in product((1.0, -1.0), repeat=3):
             image = [
-        [
-            signs[row_index] * signs[column_index] * matrix[permutation[row_index]][permutation[column_index]]
-            for column_index in range(3)
-        ]
-        for row_index in range(3)
-    ]
+                [
+                    signs[first_axis] * signs[second_axis] * matrix[permutation[first_axis]][permutation[second_axis]]
+                    for second_axis in range(3)
+                ]
+                for first_axis in range(3)
+            ]
             yield (image[0][0], image[1][1], image[2][2], image[0][1], image[0][2], image[1][2])
 
 

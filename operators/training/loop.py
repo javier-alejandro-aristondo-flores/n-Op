@@ -37,8 +37,8 @@ def Train(
     """Runs Adam over the batches and stores the loss curve as inspectable artifacts."""
     state = Fresh_Adam_State(parameters)
     losses: list[float] = []
-    for step_index in range(step_count):
-        batch = batches[step_index % len(batches)]
+    for training_step in range(step_count):
+        batch = batches[training_step % len(batches)]
         if isinstance(batch, np.ndarray):
             lifted_batch = engine.Lift_Constant(cast(NDArray[np.float64], batch))
         else:

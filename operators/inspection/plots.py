@@ -17,12 +17,12 @@ PYPLOT: Any = pyplot
 def Render_Field_Slices(field: NDArray[np.float64], path: Path, title: str) -> Path:
     """Draws the three central axis slices of one volumetric field to an image file."""
     figure, axes = PYPLOT.subplots(1, 3, figsize=(12.0, 4.0))
-    for axis_index in range(3):
-        center = field.shape[axis_index] // 2
-        plane = np.take(field, center, axis=axis_index)
-        image = axes[axis_index].imshow(plane.T, origin="lower")
-        axes[axis_index].set_title(f"{title}, axis {axis_index} center")
-        figure.colorbar(image, ax=axes[axis_index], shrink=0.8)
+    for sliced_axis in range(3):
+        center = field.shape[sliced_axis] // 2
+        plane = np.take(field, center, axis=sliced_axis)
+        image = axes[sliced_axis].imshow(plane.T, origin="lower")
+        axes[sliced_axis].set_title(f"{title}, axis {sliced_axis} center")
+        figure.colorbar(image, ax=axes[sliced_axis], shrink=0.8)
     figure.tight_layout()
     figure.savefig(path, dpi=120)
     PYPLOT.close(figure)

@@ -76,7 +76,7 @@ class SpectralKernel(Kernel[GridFunction, GridFunction]):
         )
         self.last_output_values = produced
         quadrature = input_function.quadrature
-        output_labels = tuple(f"channel_{index}" for index in range(self.output_channels))
+        output_labels = tuple(f"channel_{output_channel}" for output_channel in range(self.output_channels))
         return GridFunction(
             values=produced,
             channel_labels=output_labels,

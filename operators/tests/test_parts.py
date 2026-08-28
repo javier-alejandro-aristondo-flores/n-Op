@@ -28,7 +28,7 @@ GRID_QUADRATURE = UniformGridQuadrature(cell_volume=8.0, point_count=64)
 def Small_Field(channels: int, seed: int) -> GridFunction:
     """Builds a random four-cubed field with the cube quadrature."""
     generator = np.random.default_rng(seed)
-    labels = tuple(f"channel_{index}" for index in range(channels))
+    labels = tuple(f"channel_{channel}" for channel in range(channels))
     return GridFunction(generator.random((channels, 4, 4, 4)), labels, CUBE, GRID_QUADRATURE)
 
 

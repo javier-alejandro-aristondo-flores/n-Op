@@ -49,8 +49,8 @@ def Diamond_Grid_Operations() -> tuple[tuple[NDArray[np.int64], NDArray[np.float
     for permutation in permutations((0, 1, 2)):
         for signs in product((1, -1), repeat=3):
             matrix = np.zeros((3, 3), dtype=np.int64)
-            for row, (column, sign) in enumerate(zip(permutation, signs)):
-                matrix[row, column] = sign
+            for output_axis, (input_axis, sign) in enumerate(zip(permutation, signs)):
+                matrix[output_axis, input_axis] = sign
             for translation in candidate_translations:
                 mapped = {
                     tuple(np.mod(matrix @ np.asarray(atom) + translation, 1.0).round(6)) for atom in motif

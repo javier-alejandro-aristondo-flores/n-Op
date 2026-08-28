@@ -42,7 +42,7 @@ def Test_Stable_Fractions_Are_Deterministic_And_Distinct() -> None:
 
 def Test_Fold_Assignment_Balances_Within_Strata() -> None:
     """Asserts synthetic units spread evenly over the five folds."""
-    units = [SplitUnit(f"unit_{index}", "campaign", "stratum", (f"run_{index}",)) for index in range(10)]
+    units = [SplitUnit(f"unit_{unit_number}", "campaign", "stratum", (f"run_{unit_number}",)) for unit_number in range(10)]
     folds = Fold_Assignment(units)
     counts = Counter(folds.values())
     assert sorted(counts) == [0, 1, 2, 3, 4]

@@ -158,8 +158,8 @@ def Fold_Assignment(units: Sequence[SplitUnit], fold_count: int = FOLD_COUNT) ->
         by_stratum.setdefault(f"{unit.campaign}:{unit.stratum}", []).append(unit)
     for stratum_units in by_stratum.values():
         ordered = sorted(stratum_units, key=lambda unit: (Stable_Fraction(unit.key), unit.key))
-        for index, unit in enumerate(ordered):
-            assignment[unit.key] = index % fold_count
+        for position_in_order, unit in enumerate(ordered):
+            assignment[unit.key] = position_in_order % fold_count
     return assignment
 
 
@@ -192,12 +192,12 @@ def Strain_Holdout_Assignment(census_rows: Sequence[CensusRow]) -> dict[str, Orb
         ordered = sorted(orbits, key=lambda orbit: (Stable_Fraction(orbit), orbit))
         validation_count = max(1, round(0.1 * len(ordered)))
         test_count = max(1, round(0.1 * len(ordered)))
-        for index, orbit in enumerate(ordered):
+        for position_in_order, orbit in enumerate(ordered):
             if family == "reference":
                 by_orbit[orbit].assignment = "train"
-            elif index < validation_count:
+            elif position_in_order < validation_count:
                 by_orbit[orbit].assignment = "validation"
-            elif index < validation_count + test_count:
+            elif position_in_order < validation_count + test_count:
                 by_orbit[orbit].assignment = "test"
             else:
                 by_orbit[orbit].assignment = "train"

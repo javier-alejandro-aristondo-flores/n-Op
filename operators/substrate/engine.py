@@ -58,13 +58,13 @@ class NumpyEngine:
             gradient = np.zeros_like(value)
             flat_value = value.reshape(-1)
             flat_gradient = gradient.reshape(-1)
-            for entry_index in range(flat_value.shape[0]):
-                original = float(flat_value[entry_index])
-                flat_value[entry_index] = original + self.step_size
+            for perturbed_entry in range(flat_value.shape[0]):
+                original = float(flat_value[perturbed_entry])
+                flat_value[perturbed_entry] = original + self.step_size
                 loss_above = float(forward(dict(parameters.values)))
-                flat_value[entry_index] = original - self.step_size
+                flat_value[perturbed_entry] = original - self.step_size
                 loss_below = float(forward(dict(parameters.values)))
-                flat_value[entry_index] = original
-                flat_gradient[entry_index] = (loss_above - loss_below) / (2.0 * self.step_size)
+                flat_value[perturbed_entry] = original
+                flat_gradient[perturbed_entry] = (loss_above - loss_below) / (2.0 * self.step_size)
             gradients[name] = gradient
         return gradients

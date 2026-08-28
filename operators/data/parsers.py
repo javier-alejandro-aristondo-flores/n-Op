@@ -60,7 +60,7 @@ def Read_Geometry(lines: Sequence[str], start: int = 0) -> tuple[Geometry, int]:
     """Reads one POSCAR-style header and returns it with the index of the next line."""
     comment = lines[start].strip()
     scale = float(lines[start + 1].split()[0])
-    lattice_rows = [[float(token) for token in lines[start + 2 + row_index].split()[:3]] for row_index in range(3)]
+    lattice_rows = [[float(token) for token in line.split()[:3]] for line in lines[start + 2 : start + 5]]
     lattice = np.asarray(lattice_rows, dtype=np.float64)
     if scale < 0.0:
         scale = (-scale / float(abs(np.linalg.det(lattice)))) ** (1.0 / 3.0)
@@ -73,7 +73,7 @@ def Read_Geometry(lines: Sequence[str], start: int = 0) -> tuple[Geometry, int]:
     mode = lines[cursor].strip().lower()
     cursor += 1
     total = sum(species_counts)
-    coordinate_rows = [[float(token) for token in lines[cursor + position_index].split()[:3]] for position_index in range(total)]
+    coordinate_rows = [[float(token) for token in line.split()[:3]] for line in lines[cursor : cursor + total]]
     positions = np.asarray(coordinate_rows, dtype=np.float64)
     if mode.startswith(("c", "k")):
         positions = positions @ np.linalg.inv(lattice)

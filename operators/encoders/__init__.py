@@ -36,7 +36,7 @@ class PointwiseLift(Operator[GridFunction, GridFunction]):
         condition: Coefficients | None = None,
     ) -> GridFunction:
         produced = np.asarray(self.Forward(self.parameter_values, np.asarray(input_function.values)))
-        labels = tuple(f"hidden_{index}" for index in range(produced.shape[0]))
+        labels = tuple(f"hidden_{hidden_channel}" for hidden_channel in range(produced.shape[0]))
         return GridFunction(produced, labels, input_function.domain, input_function.quadrature)
 
 

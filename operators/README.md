@@ -169,6 +169,8 @@ rather than inventing a fake integral to satisfy the template.
 | `compositions/` | explicit stack · weight-tied · fixed point · multi-scale |
 | `readouts/` | pointwise projection (bounded heads live here) · basis expansion (the trunk) · nonlinear decoder |
 | `wrappers/` | residual · conditioned · conserving · the conformal calibrator |
+| `substrate/` | the seamed engine facets: arrays, differentiation, transforms, linear algebra, the in-house optimizer, and the perceptron primitive |
+| `training/` | split-aware loading from the store and the engine-facet training loop with curve artifacts |
 | `data/` | corpus parsers, the derived tensor store, the split engine, the exclusion registry, the orbit map, spectral derivations, the floors, and the Stage-0 report generator |
 | `metrics/` | comparison metrics — field errors, curve distances, and unit-level aggregates |
 | `inspection/` | the catalog over the store, the summary tables, and `plots.py` behind the rendering seam |
@@ -258,6 +260,37 @@ grown from what the framework actually uses.
 
 Value-like dataclasses are `frozen=True, slots=True`; `Layer` is `slots=True` and generic in the
 representation its kernel is endomorphic over.
+
+---
+
+## The substrate seams
+
+Decided 2026-08-26, built 2026-08-28: open-source engines serve now, behind in-house-owned,
+per-facet interfaces, so the stated destination — own automatic differentiation, own Fourier
+transform — arrives by swapping implementations behind stable seams rather than rewriting call
+sites. The facets live in `substrate/`: arrays (the structural `ArrayLike` contract both
+engines' arrays satisfy — the day `Array` stopped being `Any`), the engine (named parameters
+in, a scalar loss out, gradients back, plus constant lifting), the Fourier transform, linear
+algebra, and the optimizer.
+
+Three rules keep the seams honest. **Only `substrate/` may name the foreign engine** — a text
+seam test fails the suite if any production module mentions torch, exactly as `plots.py` is
+the one module allowed matplotlib. **The reference implementation is the conformance oracle**:
+the numpy engine differentiates by central finite differences — slow and correct — and every
+conformance case runs against all available engines, so a torch (or future in-house) engine
+earns its slot by matching the reference, never by assumption. The torch engine is reached
+through `importlib` as a declared-untyped surface, so the strict gate holds whether or not the
+package is installed, and its conformance rows skip with a named reason until it is. **What
+the engine cannot see is written once**: parts hold parameters as named numpy arrays and write
+their forward passes against the shared dunders and the dispatched operations, so the same
+code runs plain for inference and lifted for gradients. Adam is in-house from day one — it is
+twenty lines above the gradient dictionary and owing an engine for it would be borrowing what
+we already have.
+
+Two deliberate seam residues, recorded: the spectral kernel's forward is numpy-native (its
+engine-lifted form is the Fourier lineage's own build, per the wave order), and the low-rank
+kernel's learned core trains through the dense path first. The dense and low-rank kernels, the
+perceptron, and every encoder, readout, and wrapper are engine-lifted already.
 
 ---
 

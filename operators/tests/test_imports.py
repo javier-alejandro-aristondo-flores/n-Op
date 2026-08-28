@@ -27,6 +27,7 @@ PACKAGES = [
     "operators.metrics",
     "operators.substrate",
     "operators.tasks",
+    "operators.training",
     "operators.factorized_fourier",
     "operators.alias_free_convolutional",
     "operators.deep_operator_network",

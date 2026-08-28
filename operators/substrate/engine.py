@@ -30,6 +30,10 @@ class Engine(Protocol):
     ) -> dict[str, NDArray[numpy.float64]]: ...
 
 
+    @abstractmethod
+    def Lift_Constant(self, value: NDArray[numpy.float64]) -> Any: ...
+
+
 class NumpyEngine:
     """The reference engine: plain-array forwards, gradients by central differences."""
 
@@ -40,6 +44,10 @@ class NumpyEngine:
 
     def Evaluate(self, parameters: ParameterSet, forward: Callable[[dict[str, Any]], Any]) -> float:
         return float(forward(dict(parameters.values)))
+
+
+    def Lift_Constant(self, value: NDArray[numpy.float64]) -> Any:
+        return value
 
 
     def Gradients(

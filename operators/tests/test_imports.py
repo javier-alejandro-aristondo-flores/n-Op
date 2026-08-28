@@ -22,6 +22,7 @@ PACKAGES = [
     "operators.readouts",
     "operators.wrappers",
     "operators.data",
+    "operators.metrics",
     "operators.tasks",
     "operators.factorized_fourier",
     "operators.alias_free_convolutional",

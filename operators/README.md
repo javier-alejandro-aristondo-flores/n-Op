@@ -335,6 +335,13 @@ convenient, not by what the part knows.
 
 1. **One folder = one importable object named after the folder.** Spelled-out English names;
    literature names and citations live in each folder's `manifest.toml` and `IMPLEMENTATION.md`.
+   **The folder's `__init__.py` composes its parts into that object** — the package root is the
+   API, and crossing a package boundary you import from the root, never from a part
+   (`from operators.data import Read_Census`, never `from operators.data.store import ...`).
+   Parts may reach their siblings freely; a test may reach the part it unit-tests. There is no
+   `__all__` anywhere: the init's import block is the single declaration of the surface (one
+   `# pyright: reportUnusedImport=false` pragma stands where the checker would want each name
+   said twice). Enforced by `Test_Cross_Package_Imports_Use_The_Root`.
 2. **Every fused kernel must match the dense reference integral** on small problems before it is
    trusted at size.
 3. **The interface is falsifiable, not decreed:** the first build wave (the branch–trunk family
@@ -343,8 +350,11 @@ convenient, not by what the part knows.
 4. **Backend-agnostic until dictated:** arrays are an opaque `Array` alias; the array and autodiff
    substrate is specified in the implementation documents, not here.
 5. **Code style:** variables `with_underscores_between`, functions `Start_With_A_Capital`,
-   datatypes `HaveNoSpaces`; two blank lines between every function and class. Rationale belongs
-   in this file and in the `IMPLEMENTATION.md` documents.
+   datatypes `HaveNoSpaces`; two blank lines between every function and class; imports grouped
+   standard library, third party, operators — plain `import` lines before `from` lines within a
+   group, alphabetized; code lines stay under 120 columns (a line whose length lives inside one
+   string literal is excused). Rationale belongs in this file and in the `IMPLEMENTATION.md`
+   documents.
    **Names are prose:** every variable, function, parameter, and type parameter is a phrase
    that says what it names (`census_row`, `load_charge_density`, `x_coordinate`); established
    domain nouns (Operator, Quadrature, Kernel, …) keep their normal names; single- and

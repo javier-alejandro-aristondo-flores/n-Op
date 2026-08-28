@@ -1,4 +1,4 @@
-"""The exclusion registry: the ten recorded exclusions resolved against the census."""
+"""the ten recorded exclusions, resolved against the census"""
 
 import csv
 from collections.abc import Sequence
@@ -11,7 +11,7 @@ from operators.data.store import Campaign_Of, CensusRow
 
 @dataclass(frozen=True, slots=True)
 class Exclusion:
-    """One recorded exclusion with its scope tags."""
+    """one recorded exclusion with its scope tags"""
 
     identifier: str
     reason: str
@@ -33,7 +33,7 @@ EXCLUSIONS: tuple[Exclusion, ...] = (
 
 
 def Read_Byte_Alias_Groups(pool_root: Path) -> tuple[tuple[str, ...], ...]:
-    """Reads duplicates.csv into deduplicated groups of byte-identical run paths."""
+    """groups of byte-identical run paths, from the census duplicates file"""
     groups: set[tuple[str, ...]] = set()
     with (pool_root / "_census/duplicates.csv").open() as stream:
         for record in csv.DictReader(stream):
@@ -44,13 +44,14 @@ def Read_Byte_Alias_Groups(pool_root: Path) -> tuple[tuple[str, ...], ...]:
 
 
 def Fractional_Occupancy_Paths(census_rows: Sequence[CensusRow], pool_root: Path) -> tuple[str, ...]:
-    """Lists perovskite runs whose eigenvalue occupancies sit strictly between filled and empty."""
+    """perovskite runs whose occupancies sit strictly between filled and empty"""
     flagged: list[str] = []
     for census_row in census_rows:
         if Campaign_Of(census_row.path) != "perovskite_grid" or census_row.file_sizes.get("EIGENVAL", 0) == 0:
             continue
         occupancies = Read_Eigenvalues(pool_root / census_row.path / "EIGENVAL").occupancies
         ceiling = float(occupancies.max())
+        # the margin clears smearing noise while keeping real partial occupancies
         interior = (occupancies > 0.005) & (occupancies < ceiling - 0.005)
         if bool(interior.any()):
             flagged.append(census_row.path)
@@ -58,8 +59,9 @@ def Fractional_Occupancy_Paths(census_rows: Sequence[CensusRow], pool_root: Path
 
 
 def Resolve_Exclusion(identifier: str, census_rows: Sequence[CensusRow], pool_root: Path) -> tuple[str, ...]:
-    """Returns the run paths one exclusion names, resolved against the census."""
+    """the run paths one exclusion names, resolved against the census"""
     paths = [census_row.path for census_row in census_rows]
+    # the byte-alias groups decide this one, the name alone matches an unrelated branch too
     if identifier == "E1":
         copies: list[str] = []
         for group in Read_Byte_Alias_Groups(pool_root):
@@ -99,7 +101,7 @@ def Resolve_Exclusion(identifier: str, census_rows: Sequence[CensusRow], pool_ro
 
 
 def Excluded_Paths_For_Scope(scope: str, census_rows: Sequence[CensusRow], pool_root: Path) -> frozenset[str]:
-    """Unions every exclusion whose scope tags cover the given scope or all tasks."""
+    """every exclusion whose scope tags cover this scope, or all tasks, unioned"""
     excluded: set[str] = set()
     for exclusion in EXCLUSIONS:
         if "all_tasks" in exclusion.scopes or scope in exclusion.scopes:

@@ -1,10 +1,10 @@
-"""Atomic structure to charge density and magnetization fields, queried at any point."""
+"""atomic structure to charge density and magnetization, queried anywhere"""
 
 from operators.framework import GridFunction, NeuralOperator, PointSet
 
 
 class DeepDft(NeuralOperator[PointSet, PointSet, GridFunction | PointSet]):
-    """Assembles an atom embedding and message-passing layers over atoms and probes."""
+    """atom embedding and message passing over atoms and probes"""
 
 
     def __init__(self) -> None:

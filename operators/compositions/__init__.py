@@ -1,4 +1,4 @@
-"""Compositions: schemes for chaining layers, each owning its topology."""
+"""schemes for chaining layers, each owning its topology"""
 
 import numpy as np
 from numpy.typing import NDArray
@@ -9,7 +9,7 @@ from operators.substrate.operations import Gaussian_Error_Linear_Unit
 
 
 class ExplicitStack(Composition[GridFunction]):
-    """Applies layers one after another, each an activated kernel-plus-local sum."""
+    """layers one after another, each an activated kernel-plus-local sum"""
 
 
     def __init__(self, layers: tuple[Layer[GridFunction], ...]) -> None:
@@ -21,12 +21,14 @@ class ExplicitStack(Composition[GridFunction]):
         current = input_function
         norms: list[float] = []
         for layer in self.layers:
+            # every layer answers on the grid it was handed
             grid_shape = np.asarray(current.values).shape[1:]
             integrated = layer.kernel.Integrate(current, GridSpec((grid_shape[0], grid_shape[1], grid_shape[2])), condition)
             summed = np.asarray(layer.local_linear(current.values)) + np.asarray(integrated.values)
             if layer.activation == "alias_free":
                 raise NotImplementedError("the alias-free activation is the convolutional entry's own build")
             activated = np.asarray(Gaussian_Error_Linear_Unit(summed), dtype=np.float64)
+            # a residual layer can only add its input back when the channel count survived
             if layer.residual and activated.shape == np.asarray(current.values).shape:
                 activated = activated + np.asarray(current.values)
             norms.append(float(np.linalg.norm(activated)))

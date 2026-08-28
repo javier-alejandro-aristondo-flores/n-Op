@@ -1,4 +1,4 @@
-"""The multilayer perceptron primitive: named weight matrices with a smooth unit between."""
+"""the multilayer perceptron primitive, named weight matrices with a smooth unit between"""
 
 from typing import Any
 
@@ -9,7 +9,7 @@ from operators.substrate.operations import Gaussian_Error_Linear_Unit
 
 
 class MultilayerPerceptron:
-    """Chained linear maps with the smooth unit between, parameters held as named arrays."""
+    """chained linear maps with the smooth unit between, parameters held as named arrays"""
 
 
     def __init__(self, layer_widths: tuple[int, ...], name_prefix: str, seed: int = 0) -> None:
@@ -20,6 +20,7 @@ class MultilayerPerceptron:
         for layer_index in range(len(layer_widths) - 1):
             fan_in = layer_widths[layer_index]
             fan_out = layer_widths[layer_index + 1]
+            # the spread that keeps signal size steady across a layer in both directions
             scale = np.sqrt(2.0 / (fan_in + fan_out))
             self.parameter_values[f"{name_prefix}_layer_{layer_index}_weights"] = generator.normal(
                 0.0, scale, size=(fan_out, fan_in)
@@ -34,6 +35,7 @@ class MultilayerPerceptron:
             weights = lifted[f"{self.name_prefix}_layer_{layer_index}_weights"]
             biases = lifted[f"{self.name_prefix}_layer_{layer_index}_biases"]
             value = value @ weights.T + biases
+            # the last layer stays linear
             if layer_index != last_layer_index:
                 value = Gaussian_Error_Linear_Unit(value)
         return value

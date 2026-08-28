@@ -1,4 +1,4 @@
-"""Abstract classes of the integral transform, and the objects they are written in."""
+"""the integral transform's contracts and the objects they are written in"""
 
 from operators.framework.domain import Array, Discretization, Domain, GridSpec, PointSpec
 from operators.framework.representation import (

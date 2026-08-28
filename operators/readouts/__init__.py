@@ -1,4 +1,4 @@
-"""Readouts: maps from the channel space back to corpus fields, queryable anywhere."""
+"""maps from the channel space back to corpus fields, queryable anywhere"""
 
 from typing import Any
 
@@ -22,7 +22,7 @@ from operators.substrate.operations import Softplus
 
 
 class PointwiseProjection(Operator[GridFunction, GridFunction]):
-    """Mixes hidden channels down to output channels, optionally through the bounded head."""
+    """hidden channels mixed down to output channels, optionally through the bounded head"""
 
 
     def __init__(self, output_channels: int, hidden_channels: int, bounded: bool = False, seed: int = 0) -> None:
@@ -40,6 +40,7 @@ class PointwiseProjection(Operator[GridFunction, GridFunction]):
         mixed = lifted["projection_weights"] @ flattened + lifted["projection_biases"][:, None]
         mixed = mixed.reshape(lifted["projection_weights"].shape[0], *input_values.shape[1:])
         if self.bounded:
+            # one over one plus a square lands in zero to one without ever touching either end
             softened = Softplus(mixed)
             return 1.0 / (1.0 + softened * softened)
         return mixed
@@ -61,7 +62,7 @@ class PointwiseProjection(Operator[GridFunction, GridFunction]):
 
 
 class BasisExpansion(Operator[Coefficients, Representation]):
-    """Evaluates a coordinate trunk against branch coefficients at any requested points."""
+    """a coordinate trunk evaluated against branch coefficients at any requested points"""
 
 
     def __init__(self, latent_width: int, trunk_widths: tuple[int, ...], fourier_orders: int = 4, seed: int = 0) -> None:
@@ -73,7 +74,8 @@ class BasisExpansion(Operator[Coefficients, Representation]):
 
 
     def Coordinate_Features(self, points: NDArray[np.float64]) -> NDArray[np.float64]:
-        """Builds periodic coordinate features: raw fractions and integer-frequency waves."""
+        """raw fractional coordinates and integer-frequency waves"""
+        # integer frequencies keep the features periodic across the cell boundary
         feature_blocks = [points]
         for order in range(1, self.fourier_orders + 1):
             angle = 2.0 * np.pi * order * points
@@ -100,6 +102,7 @@ class BasisExpansion(Operator[Coefficients, Representation]):
         produced = np.asarray(
             self.Forward(self.parameter_values, branch_vector, trunk_features), dtype=np.float64
         )
+        # the same trunk answers a grid and a bare list of points, only the wrapper differs
         if isinstance(output_discretization, GridSpec):
             shape = output_discretization.shape
             point_count = shape[0] * shape[1] * shape[2]

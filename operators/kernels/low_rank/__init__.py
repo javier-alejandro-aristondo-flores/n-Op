@@ -1,4 +1,4 @@
-"""Kernels of separable form: dense index maps and feature inner products."""
+"""kernels of separable form, dense index maps and feature inner products"""
 
 from collections.abc import Callable
 from typing import Any
@@ -20,7 +20,7 @@ from operators.framework.integral import Output_Points, Quadrature_Weights, Sour
 
 
 class DenseKernel(Kernel[Coefficients, Coefficients]):
-    """A learned matrix over finite index sets, integrating by plain contraction."""
+    """a learned matrix over finite index sets, integrated by plain contraction"""
 
     supported_representations = (Coefficients,)
 
@@ -58,7 +58,7 @@ class DenseKernel(Kernel[Coefficients, Coefficients]):
 
 
 class LowRankKernel(Kernel[Representation, Coefficients]):
-    """A feature-product kernel: output features against a learned core against input features."""
+    """output features against a learned core against input features"""
 
     supported_representations = (GridFunction, PointSet, Coefficients)
 
@@ -94,6 +94,7 @@ class LowRankKernel(Kernel[Representation, Coefficients]):
         targets = Output_Points(output_discretization)
         kernel_values = self.Kernel_Matrix(targets, sources)
         self.last_kernel_values = kernel_values
+        # the quadrature is paid here, exactly as the dense reference pays it
         integrated = kernel_values @ (values * weights[:, None])
         return Coefficients(vector=integrated.reshape(-1), domain=input_function.domain)
 
@@ -106,5 +107,5 @@ class LowRankKernel(Kernel[Representation, Coefficients]):
 
 
 def Point_Spec_Over_Indices(index_count: int) -> PointSpec:
-    """Names the output discretization of a finite index set."""
+    """the output discretization of a finite index set"""
     return PointSpec(np.arange(index_count, dtype=np.float64).reshape(-1, 1))

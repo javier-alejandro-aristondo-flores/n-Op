@@ -1,4 +1,4 @@
-"""The derived tensor store: census-driven extraction of runs into per-run archives."""
+"""the derived tensor store, census-driven extraction of runs into per-run archives"""
 
 import argparse
 import hashlib
@@ -69,12 +69,12 @@ type StoreArray = NDArray[np.float32] | NDArray[np.float64] | NDArray[np.str_]
 
 
 class StoreError(Exception):
-    """Raised when the store is asked to do something its rules forbid."""
+    """raised when the store is asked to do something its rules forbid"""
 
 
 @dataclass(frozen=True, slots=True)
 class CensusRow:
-    """One run from the census, with its raw record and line hash."""
+    """one run from the census, with its raw record and line hash"""
 
     path: str
     corpus: str
@@ -84,7 +84,7 @@ class CensusRow:
 
 
 def Read_Census(pool_root: Path) -> tuple[CensusRow, ...]:
-    """Reads runs.jsonl into census rows with per-line hashes."""
+    """the census file as rows, each carrying the hash of its own line"""
     census_rows: list[CensusRow] = []
     for line in (pool_root / CENSUS_NAME).read_text().splitlines():
         if not line.strip():
@@ -104,7 +104,7 @@ def Read_Census(pool_root: Path) -> tuple[CensusRow, ...]:
 
 
 def Campaign_Of(path: str) -> str:
-    """Maps a run path to its campaign name, or uncatalogued."""
+    """the campaign a run path belongs to, or uncatalogued"""
     for prefix, campaign in CAMPAIGN_PREFIXES:
         if path.startswith(prefix):
             return campaign
@@ -112,18 +112,19 @@ def Campaign_Of(path: str) -> str:
 
 
 def Run_Identifier(path: str) -> str:
-    """Returns the sixteen-character content identifier of a run path."""
+    """the sixteen-character content identifier of a run path"""
     return hashlib.sha1(path.encode()).hexdigest()[:16]
 
 
 def Guard_Volumetric_Destination(destination: Path, pool_root: Path) -> None:
-    """Raises unless the destination resolves inside the corpus partition."""
+    """raises unless the destination resolves inside the corpus partition"""
     if not destination.resolve().is_relative_to(pool_root.resolve()):
         raise StoreError(f"volumetric write outside the corpus partition refused: {destination}")
 
 
 def Spin_Pair_Entries(name: str, field: FieldFile, divisor: float) -> dict[str, NDArray[np.float32]]:
-    """Names one block plainly or two blocks as up and down channels."""
+    """one block named plainly, or two named up and down"""
+    # a spin-polarized run writes every field twice
     blocks = [(block / divisor).astype(np.float32) for block in field.blocks]
     if len(blocks) == 1:
         return {name: blocks[0]}
@@ -131,7 +132,8 @@ def Spin_Pair_Entries(name: str, field: FieldFile, divisor: float) -> dict[str, 
 
 
 def Charge_Entries(field: FieldFile, volume: float) -> dict[str, NDArray[np.float32]]:
-    """Names the charge block and, when present, the magnetization block."""
+    """the charge block, and the magnetization block when there is one"""
+    # the file holds charge times cell volume, so the volume comes back out here
     entries = {"charge_density": (field.blocks[0] / volume).astype(np.float32)}
     if len(field.blocks) > 1:
         entries["magnetization_density"] = (field.blocks[1] / volume).astype(np.float32)
@@ -139,7 +141,8 @@ def Charge_Entries(field: FieldFile, volume: float) -> dict[str, NDArray[np.floa
 
 
 def Geometry_Entries(geometry: Geometry) -> dict[str, StoreArray]:
-    """Returns the lattice, fractional positions, and per-atom species symbols."""
+    """lattice, fractional positions and per-atom species symbols"""
+    # the per-species counts expand into one symbol per atom
     symbols = [symbol for symbol, count in zip(geometry.species, geometry.species_counts) for _ in range(count)]
     return {
         "lattice": geometry.lattice,
@@ -149,13 +152,13 @@ def Geometry_Entries(geometry: Geometry) -> dict[str, StoreArray]:
 
 
 def Extract_Run(census_row: CensusRow, pool_root: Path) -> tuple[dict[str, StoreArray], dict[str, object]]:
-    """Extracts one run's arrays and sidecar record from its corpus files."""
+    """one run's arrays and sidecar record, out of its corpus files"""
     run_directory = pool_root / census_row.path
     arrays: dict[str, StoreArray] = {}
     geometry: Geometry | None = None
 
     def Present(name: str) -> bool:
-        """Returns whether the census and the filesystem agree the file is usable."""
+        """whether the census and the filesystem agree the file is usable"""
         return census_row.file_sizes.get(name, 0) > 0 and (run_directory / name).is_file()
 
     if Present("CHGCAR"):
@@ -170,6 +173,7 @@ def Extract_Run(census_row: CensusRow, pool_root: Path) -> tuple[dict[str, Store
     for file_name, field_name in aeccar_names.items():
         if Present(file_name):
             field = Read_Field_File(run_directory / file_name)
+            # every volumetric file repeats the same geometry, so the first one read wins
             geometry = geometry or field.geometry
             arrays[field_name] = (field.blocks[0] / Cell_Volume(field.geometry.lattice)).astype(np.float32)
     if Present("ELFCAR"):
@@ -190,6 +194,7 @@ def Extract_Run(census_row: CensusRow, pool_root: Path) -> tuple[dict[str, Store
         raise StoreError(f"no geometry source in {census_row.path}")
     arrays.update(Geometry_Entries(geometry))
     arrays["cell_volume"] = np.asarray(Cell_Volume(geometry.lattice), dtype=np.float64)
+    # a truncated file costs the run its own arrays, not the whole extraction
     unreadable: list[str] = []
     if Present("EIGENVAL"):
         try:
@@ -230,7 +235,7 @@ def Extract_Run(census_row: CensusRow, pool_root: Path) -> tuple[dict[str, Store
 
 
 def Write_Run(arrays: dict[str, StoreArray], sidecar: dict[str, object], pool_root: Path) -> Path:
-    """Writes one run's archive and sidecar into the store, returning the archive path."""
+    """one run's archive and sidecar written into the store, at the returned path"""
     campaign_directory = pool_root / STORE_NAME / cast(str, sidecar["campaign"])
     Guard_Volumetric_Destination(campaign_directory, pool_root)
     campaign_directory.mkdir(parents=True, exist_ok=True)
@@ -242,15 +247,16 @@ def Write_Run(arrays: dict[str, StoreArray], sidecar: dict[str, object], pool_ro
 
 
 def Sidecar_Paths(pool_root: Path) -> tuple[Path, ...]:
-    """Lists every sidecar file currently in the store."""
+    """every sidecar file currently in the store"""
     store_directory = pool_root / STORE_NAME
     if not store_directory.exists():
         return ()
+    # the per-campaign manifest sits among them and is not one
     return tuple(sorted(path for path in store_directory.glob("*/*.json") if path.name != "manifest.json"))
 
 
 def Stale_Report(pool_root: Path) -> dict[str, list[str]]:
-    """Compares the store against the census and the extractor version."""
+    """the store compared against the census and the extractor version"""
     expected: dict[str, str] = {}
     for census_row in Read_Census(pool_root):
         expected[Run_Identifier(census_row.path)] = census_row.row_hash
@@ -273,7 +279,7 @@ def Stale_Report(pool_root: Path) -> dict[str, list[str]]:
 
 
 def Build_One(census_row: CensusRow, pool_root: Path) -> tuple[str, str | None]:
-    """Extracts and writes one run, returning its identifier and any error text."""
+    """one run extracted and written, with its identifier and any error text"""
     try:
         arrays, sidecar = Extract_Run(census_row, pool_root)
         Write_Run(arrays, sidecar, pool_root)
@@ -283,7 +289,7 @@ def Build_One(census_row: CensusRow, pool_root: Path) -> tuple[str, str | None]:
 
 
 def Write_Manifests(pool_root: Path) -> None:
-    """Writes one manifest per campaign mapping identifiers to run paths and fields."""
+    """one manifest per campaign, identifiers to run paths and fields"""
     by_campaign: dict[str, dict[str, object]] = {}
     for sidecar_path in Sidecar_Paths(pool_root):
         sidecar = cast(dict[str, object], json.loads(sidecar_path.read_text()))
@@ -306,8 +312,9 @@ def Build_Store(
     processes: int = 1,
     rebuild: bool = False,
 ) -> dict[str, object]:
-    """Builds every missing or stale run archive and returns the build report."""
+    """every missing or stale run archive built, with the build report"""
     report = Stale_Report(pool_root)
+    # a rebuild ignores the report and takes everything the filters leave
     wanted = set(report["missing"]) | set(report["stale"]) if not rebuild else None
     selected: list[CensusRow] = []
     for census_row in Read_Census(pool_root):
@@ -343,7 +350,7 @@ def Build_Store(
 
 
 def Main(argv: list[str] | None = None) -> int:
-    """Runs the store builder from the command line."""
+    """the store builder from the command line"""
     parser = argparse.ArgumentParser(description="Build the derived tensor store on the corpus partition.")
     parser.add_argument("--campaign", default=None)
     parser.add_argument("--limit", type=int, default=None)

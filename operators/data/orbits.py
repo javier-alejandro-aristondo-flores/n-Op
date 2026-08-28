@@ -1,4 +1,4 @@
-"""The strain-atlas orbit map: exact symmetry classes of the two-atom strain points."""
+"""the strain-atlas orbit map, exact symmetry classes of the two-atom strain points"""
 
 from collections.abc import Iterator, Sequence
 from dataclasses import dataclass
@@ -13,12 +13,12 @@ type StrainTensor = tuple[float, float, float, float, float, float]
 
 
 class OrbitError(Exception):
-    """Raised when a strain-atlas run path cannot be interpreted."""
+    """raised when a strain-atlas run path cannot be interpreted"""
 
 
 @dataclass(frozen=True, slots=True)
 class StrainAssignment:
-    """One strain-atlas run resolved to its point, family, functional, and orbit."""
+    """one strain-atlas run resolved to its point, family, functional and orbit"""
 
     run_path: str
     point: str
@@ -29,18 +29,19 @@ class StrainAssignment:
 
 
 def Strain_Functional(path: str) -> str:
-    """Names the run's functional from its last path segment."""
+    """the run's functional, read off its last path segment"""
+    # the run's own directory names it, parent directories say nothing
     return "accurate" if "HSE" in path.rsplit("/", 1)[-1] else "cheap"
 
 
 def Strain_Point_Name(path: str) -> str:
-    """Returns the point directory naming the strain applied."""
+    """the point directory naming the strain applied"""
     segments = path.split("/")
     return "reference" if "reference_2_atoms" in path else segments[-2]
 
 
 def Strain_Family(point: str) -> str:
-    """Classifies a point name into its sweep family."""
+    """a point name sorted into its sweep family"""
     if point == "reference":
         return "reference"
     if point.startswith("uniax_"):
@@ -61,7 +62,7 @@ def Strain_Family(point: str) -> str:
 
 
 def Strain_Tensor_Of(point: str, isotropic_strain: float | None) -> StrainTensor:
-    """Builds the six-component strain tensor a point name encodes."""
+    """the six-component strain tensor a point name encodes"""
     family = Strain_Family(point)
     diagonal = [0.0, 0.0, 0.0]
     shear = {"xy": 0.0, "xz": 0.0, "yz": 0.0}
@@ -97,7 +98,8 @@ def Strain_Tensor_Of(point: str, isotropic_strain: float | None) -> StrainTensor
 
 
 def Tensor_Images(tensor: StrainTensor) -> Iterator[StrainTensor]:
-    """Yields the tensor's images under the 48 signed axis permutations."""
+    """the tensor's images under the 48 signed axis permutations"""
+    # written out in full so a permutation can act on both axes at once
     matrix = [
         [tensor[0], tensor[3], tensor[4]],
         [tensor[3], tensor[1], tensor[5]],
@@ -116,19 +118,20 @@ def Tensor_Images(tensor: StrainTensor) -> Iterator[StrainTensor]:
 
 
 def Rounded(tensor: StrainTensor) -> StrainTensor:
-    """Rounds every component to four decimals and normalizes negative zero."""
+    """every component to four decimals, with negative zero flattened"""
     values = tuple(round(component, 4) + 0.0 for component in tensor)
     return cast(StrainTensor, values)
 
 
 def Canonical_Orbit(tensor: StrainTensor) -> str:
-    """Formats the lexicographically largest signed-permutation image of the tensor."""
+    """the lexicographically largest signed-permutation image, as a name"""
+    # rounding on both sides, so images that differ only in floating dust land together
     canonical = max(Rounded(image) for image in Tensor_Images(Rounded(tensor)))
     return "_".join(f"{component:+.4f}" for component in canonical)
 
 
 def Reference_Axis_Length(census_rows: Sequence[CensusRow]) -> float:
-    """Reads the unstrained axis length from the reference runs' census geometry."""
+    """the unstrained axis length, from the reference run's census geometry"""
     for census_row in census_rows:
         if "reference_2_atoms" in census_row.path:
             return cast(list[float], census_row.record["p_abc"])[0]
@@ -136,13 +139,14 @@ def Reference_Axis_Length(census_rows: Sequence[CensusRow]) -> float:
 
 
 def Orbit_Map(census_rows: Sequence[CensusRow]) -> tuple[StrainAssignment, ...]:
-    """Assigns every strain-atlas run to its point, family, functional, and orbit."""
+    """every strain-atlas run assigned to its point, family, functional and orbit"""
     strain_rows = [census_row for census_row in census_rows if Campaign_Of(census_row.path) == "strain_atlas"]
     reference_length = Reference_Axis_Length(strain_rows)
     assignments: list[StrainAssignment] = []
     for census_row in strain_rows:
         point = Strain_Point_Name(census_row.path)
         isotropic_strain: float | None = None
+        # an isotropic point names a volume, so its strain is read back off the cell it produced
         if Strain_Family(point) == "isotropic":
             axis_length = cast(list[float], census_row.record["p_abc"])[0]
             isotropic_strain = round(axis_length / reference_length - 1.0, 4)
@@ -153,6 +157,7 @@ def Orbit_Map(census_rows: Sequence[CensusRow]) -> tuple[StrainAssignment, ...]:
                 point=point,
                 family=Strain_Family(point),
                 functional=Strain_Functional(census_row.path),
+                # the later sweep lives under new, and adds no orbit of its own
                 auxiliary="/new/" in census_row.path,
                 orbit=Canonical_Orbit(tensor),
             )

@@ -1,4 +1,4 @@
-"""The seamed substrate: in-house facets over interchangeable array and gradient engines."""
+"""in-house facets over interchangeable array and gradient engines"""
 
 from operators.substrate.arrays import ArrayLike
 from operators.substrate.engine import Engine, NumpyEngine, ParameterSet

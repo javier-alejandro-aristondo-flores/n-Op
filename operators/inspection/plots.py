@@ -1,4 +1,4 @@
-"""Rendering: axis slices and curves drawn from inspection arrays alone."""
+"""axis slices and curves, drawn from inspection arrays alone"""
 
 from pathlib import Path
 from typing import Any
@@ -7,15 +7,17 @@ import matplotlib
 import numpy as np
 from numpy.typing import NDArray
 
+# a file-writing backend, chosen before pyplot is imported so no display is needed
 matplotlib.use("Agg")
 
 from matplotlib import pyplot
 
+# one untyped name for the whole foreign surface
 PYPLOT: Any = pyplot
 
 
 def Render_Field_Slices(field: NDArray[np.float64], path: Path, title: str) -> Path:
-    """Draws the three central axis slices of one volumetric field to an image file."""
+    """the three central axis slices of one volumetric field, as an image file"""
     figure, axes = PYPLOT.subplots(1, 3, figsize=(12.0, 4.0))
     for sliced_axis in range(3):
         center = field.shape[sliced_axis] // 2
@@ -37,7 +39,7 @@ def Render_Curves(
     horizontal_label: str,
     vertical_label: str,
 ) -> Path:
-    """Draws named curves over one shared horizontal axis to an image file."""
+    """named curves over one shared horizontal axis, as an image file"""
     figure, axes = PYPLOT.subplots(figsize=(8.0, 5.0))
     for name, values in curves.items():
         axes.plot(horizontal, values, label=name)

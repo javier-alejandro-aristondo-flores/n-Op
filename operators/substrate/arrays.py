@@ -1,4 +1,4 @@
-"""The structural array contract every engine's arrays satisfy."""
+"""the structural array contract every engine's arrays satisfy"""
 
 from typing import Any, Protocol, runtime_checkable
 
@@ -7,7 +7,7 @@ import numpy as np
 
 @runtime_checkable
 class ArrayLike(Protocol):
-    """Anything with a shape and a numpy view; both engines' arrays qualify."""
+    """anything with a shape and a numpy view, which both engines' arrays have"""
 
     @property
     def shape(self) -> tuple[int, ...]: ...

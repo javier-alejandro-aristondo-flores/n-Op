@@ -1,1 +1,1 @@
-"""Concrete kernels, one per pairing of kernel structure with measure."""
+"""concrete kernels, one per pairing of structure with measure"""

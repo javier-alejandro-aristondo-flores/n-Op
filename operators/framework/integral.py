@@ -1,4 +1,4 @@
-"""Direct evaluation of the kernel integral by summation over source points."""
+"""direct evaluation of the kernel integral by summation over source points"""
 
 from collections.abc import Callable
 
@@ -16,17 +16,19 @@ from operators.framework.representation import (
 
 
 def Fractional_Grid_Coordinates(shape: tuple[int, ...]) -> NDArray[np.float64]:
-    """Returns the fractional coordinates of a uniform grid in value-flattening order."""
+    """fractional coordinates of a uniform grid, in value-flattening order"""
     axes = [np.arange(extent, dtype=np.float64) / extent for extent in shape]
+    # ij indexing is the order the field values flatten in
     grids = np.meshgrid(*axes, indexing="ij")
     return np.stack([grid.reshape(-1) for grid in grids], axis=1)
 
 
 def Quadrature_Weights(representation: Representation) -> NDArray[np.float64]:
-    """Returns the integration weight carried by every sample of a representation."""
+    """the integration weight carried by every sample"""
     if isinstance(representation, GridFunction):
         quadrature = representation.quadrature
         values = np.asarray(representation.values)
+        # one weight per grid point, the channels share it
         return np.full(values.size // int(values.shape[0]), quadrature.cell_volume / quadrature.point_count, dtype=np.float64)
     if isinstance(representation, PointSet):
         count = int(np.asarray(representation.positions).shape[0])
@@ -39,7 +41,7 @@ def Quadrature_Weights(representation: Representation) -> NDArray[np.float64]:
 
 
 def Source_Points_And_Values(input_function: Representation) -> tuple[NDArray[np.float64], NDArray[np.float64]]:
-    """Returns the sample points and per-point channel values of a representation."""
+    """sample points and per-point channel values"""
     if isinstance(input_function, GridFunction):
         stacked_values = np.asarray(input_function.values)
         points = Fractional_Grid_Coordinates(stacked_values.shape[1:])
@@ -50,13 +52,14 @@ def Source_Points_And_Values(input_function: Representation) -> tuple[NDArray[np
         return np.asarray(input_function.positions), np.asarray(input_function.values)
     if isinstance(input_function, Coefficients):
         vector = np.asarray(input_function.vector, dtype=np.float64)
+        # a finite index set carries its own index as its coordinate
         points = np.arange(vector.shape[0], dtype=np.float64).reshape(-1, 1)
         return points, vector.reshape(-1, 1)
     raise TypeError(f"no sampling rule for {type(input_function).__name__}")
 
 
 def Output_Points(output_discretization: Discretization) -> NDArray[np.float64]:
-    """Returns the evaluation points a discretization requests."""
+    """the evaluation points a discretization requests"""
     if isinstance(output_discretization, GridSpec):
         return Fractional_Grid_Coordinates(output_discretization.shape)
     return np.asarray(output_discretization.points, dtype=np.float64)
@@ -67,15 +70,17 @@ def Dense_Reference_Integral(
     input_function: Representation,
     output_discretization: Discretization,
 ) -> NDArray[np.float64]:
-    """Sums kernel values against the input's quadrature weights at every output point."""
+    """kernel values summed against the input's quadrature weights at every output point"""
     sources, values = Source_Points_And_Values(input_function)
     weights = Quadrature_Weights(input_function)
     targets = Output_Points(output_discretization)
     kernel_values = np.asarray(kernel_function(targets, sources), dtype=np.float64)
     weighted = np.asarray(values, dtype=np.float64) * weights[:, None]
     if kernel_values.ndim == 2:
+        # a scalar kernel treats every channel alike
         integrated = np.einsum("mn,nc->mc", kernel_values, weighted)
     elif kernel_values.ndim == 4:
+        # a four-axis kernel mixes channels while it integrates
         integrated = np.einsum("mnoc,nc->mo", kernel_values, weighted)
     else:
         raise ValueError(f"kernel values must have two or four axes, not {kernel_values.ndim}")

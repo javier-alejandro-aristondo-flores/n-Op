@@ -1,4 +1,4 @@
-"""The floor suite: the physics and memorization baselines every operator must beat."""
+"""the physics and memorization baselines every operator must beat"""
 
 from collections.abc import Callable, Sequence
 from dataclasses import dataclass
@@ -19,7 +19,7 @@ type Field = NDArray[np.float64]
 
 @dataclass(frozen=True, slots=True)
 class FunctionalPair:
-    """One same-geometry cheap and accurate run pair with its store identifiers."""
+    """one same-geometry cheap and accurate run pair, by store identifier"""
 
     point: str
     cheap_identifier: str
@@ -27,20 +27,21 @@ class FunctionalPair:
 
 
 def Archive_Path(campaign: str, identifier: str, pool_root: Path = POOL_ROOT) -> Path:
-    """Returns the store archive path of one run."""
+    """the store archive path of one run"""
     return pool_root / "_derived" / campaign / f"{identifier}.npz"
 
 
 def Load_Field(campaign: str, identifier: str, name: str, pool_root: Path = POOL_ROOT) -> Field:
-    """Loads one named field of one run as float64."""
+    """one named field of one run, in double precision"""
     with np.load(Archive_Path(campaign, identifier, pool_root)) as archive:
         return np.asarray(archive[name], dtype=np.float64)
 
 
 def Strain_Pairs(census_rows: Sequence[CensusRow]) -> tuple[FunctionalPair, ...]:
-    """Returns the strain atlas's same-geometry functional pairs."""
+    """the strain atlas's same-geometry functional pairs"""
     by_point: dict[str, dict[str, str]] = {}
     for entry in Orbit_Map(census_rows):
+        # the directory above the functional is the geometry the two runs share
         point = entry.run_path.rsplit("/", 1)[0]
         by_point.setdefault(point, {})[entry.functional] = entry.run_path
     functional_pairs: list[FunctionalPair] = []
@@ -56,13 +57,14 @@ def Identity_And_Affine_Floors(
     functional_pairs: Sequence[FunctionalPair],
     load_charge_density: Callable[[str], Field],
 ) -> tuple[NDArray[np.float64], NDArray[np.float64], NDArray[np.float64]]:
-    """Returns per-pair identity errors, affine errors, and affine slopes."""
+    """per-pair identity errors, affine errors and affine slopes"""
     identity: list[float] = []
     affine: list[float] = []
     slopes: list[float] = []
     for functional_pair in functional_pairs:
         cheap = load_charge_density(functional_pair.cheap_identifier).ravel()
         accurate = load_charge_density(functional_pair.accurate_identifier).ravel()
+        # a pair whose two runs used different grids has no pointwise comparison
         if cheap.shape != accurate.shape:
             continue
         scale = float(np.linalg.norm(accurate))
@@ -75,7 +77,8 @@ def Identity_And_Affine_Floors(
 
 
 def Shell_Index_Grid(shape: tuple[int, ...]) -> NDArray[np.int64]:
-    """Returns the rounded integer-mode shell radius at every full-spectrum entry."""
+    """the rounded integer-mode shell radius at every full-spectrum entry"""
+    # the distance to the nearest end of the axis, which is the mode's magnitude
     axes = [np.minimum(np.arange(extent), extent - np.arange(extent)) for extent in shape]
     grids = np.meshgrid(*axes, indexing="ij")
     radius = np.sqrt(sum(np.asarray(grid, dtype=np.float64) ** 2 for grid in grids))
@@ -86,7 +89,7 @@ def Fit_Per_Shell_Filter(
     train_inputs: Sequence[Field],
     train_targets: Sequence[Field],
 ) -> NDArray[np.float64]:
-    """Fits one real gain per spectral shell by least squares over the training fields."""
+    """one real gain per spectral shell, by least squares over the training fields"""
     shells = Shell_Index_Grid(train_inputs[0].shape)
     shell_count = int(shells.max()) + 1
     cross = np.zeros(shell_count, dtype=np.float64)
@@ -94,6 +97,7 @@ def Fit_Per_Shell_Filter(
     for input_field, target_field in zip(train_inputs, train_targets):
         input_modes = np.fft.fftn(input_field)
         target_modes = np.fft.fftn(target_field)
+        # the counting sum accumulates each shell's cross term and power in one pass
         cross += np.bincount(shells.ravel(), np.real(np.conj(input_modes) * target_modes).ravel(), minlength=shell_count)
         power += np.bincount(shells.ravel(), np.abs(input_modes.ravel()) ** 2, minlength=shell_count)
     gains = np.zeros(shell_count, dtype=np.float64)
@@ -103,7 +107,7 @@ def Fit_Per_Shell_Filter(
 
 
 def Apply_Per_Shell_Filter(gains: NDArray[np.float64], input_field: Field) -> Field:
-    """Applies a fitted per-shell gain to one input field."""
+    """a fitted per-shell gain applied to one input field"""
     shells = Shell_Index_Grid(input_field.shape)
     filtered = np.fft.fftn(input_field) * gains[shells]
     return np.real(np.fft.ifftn(filtered))
@@ -114,7 +118,7 @@ def Superposed_Atomic_Density_Errors(
     campaign: str,
     pool_root: Path = POOL_ROOT,
 ) -> NDArray[np.float64]:
-    """Returns per-run normalized errors of the stored atomic superposition against the density."""
+    """per-run normalized error of the stored atomic superposition against the density"""
     errors: list[float] = []
     for identifier in identifiers:
         with np.load(Archive_Path(campaign, identifier, pool_root)) as archive:
@@ -131,7 +135,7 @@ def Scissor_Floor(
     campaign: str,
     pool_root: Path = POOL_ROOT,
 ) -> dict[str, float]:
-    """Recomputes the gap shift and the linear-scissor residual from stored eigenvalues."""
+    """the gap shift and the linear-scissor residual, from stored eigenvalues"""
     cheap_gaps: list[float] = []
     accurate_gaps: list[float] = []
     for functional_pair in functional_pairs:
@@ -164,18 +168,19 @@ def Scissor_Floor(
 
 
 def Hartree_Potential(charge_density: Field, lattice: Field) -> Field:
-    """Solves the periodic Poisson equation spectrally, pinning the uniform mode to zero."""
+    """periodic Poisson solve, uniform mode pinned to zero"""
     wavevectors = Cartesian_Wavevectors(lattice, charge_density.shape)
     squared = np.sum(wavevectors**2, axis=-1)
     density_modes = np.fft.fftn(charge_density) / charge_density.size
     potential_modes = np.zeros_like(density_modes)
+    # a periodic cell has no zero-mode potential, the neutralizing background cancels it
     nonzero = squared > 0
     potential_modes[nonzero] = 4.0 * np.pi * COULOMB_CONSTANT * density_modes[nonzero] / squared[nonzero]
     return np.real(np.fft.ifftn(potential_modes * charge_density.size))
 
 
 def Spectral_Gradient_Magnitude_And_Laplacian(field: Field, lattice: Field) -> tuple[Field, Field]:
-    """Returns the gradient magnitude and the Laplacian by spectral differentiation."""
+    """gradient magnitude and Laplacian, by spectral differentiation"""
     wavevectors = Cartesian_Wavevectors(lattice, field.shape)
     modes = np.fft.fftn(field)
     gradient_squared = np.zeros_like(field)
@@ -187,13 +192,13 @@ def Spectral_Gradient_Magnitude_And_Laplacian(field: Field, lattice: Field) -> t
 
 
 def Ridge_Fit(features: Field, targets: Field, regularization: float = 1e-6) -> Field:
-    """Fits ridge coefficients with an intercept column appended."""
+    """ridge coefficients, with an intercept column appended"""
     design = np.concatenate([features, np.ones((features.shape[0], 1))], axis=1)
     normal = design.T @ design + regularization * np.eye(design.shape[1])
     return np.asarray(np.linalg.solve(normal, design.T @ targets), dtype=np.float64)
 
 
 def Ridge_Apply(coefficients: Field, features: Field) -> Field:
-    """Applies fitted ridge coefficients to features."""
+    """fitted ridge coefficients applied to features"""
     design = np.concatenate([features, np.ones((features.shape[0], 1))], axis=1)
     return design @ coefficients

@@ -1,4 +1,4 @@
-"""Wrappers: conservation, residual, and conditioning behavior around inner operators."""
+"""conservation, residual and conditioning behavior around inner operators"""
 
 from typing import Literal
 
@@ -11,7 +11,7 @@ from operators.framework.integral import Quadrature_Weights
 
 
 class Conserving(Operator[GridFunction, GridFunction]):
-    """Projects an inner operator's output onto its exact conservation law."""
+    """an inner operator's output projected onto its exact conservation law"""
 
 
     def __init__(
@@ -33,13 +33,16 @@ class Conserving(Operator[GridFunction, GridFunction]):
         produced = self.inner(input_function, output_discretization, condition)
         values = np.asarray(produced.values, dtype=np.float64)
         weights = Quadrature_Weights(produced)
+        # a uniform grid gives every point the same weight, so one of them is the whole rule
         weight_each = float(weights[0])
         if self.law == "zero_mean":
+            # channel by channel, so no channel borrows another's offset
             corrected = values - values.mean(axis=(1, 2, 3), keepdims=True)
             self.last_correction_scale = np.asarray([float(values.mean())])
         else:
             if condition is None:
                 raise ValueError("renormalization needs the electron count as the condition")
+            # one scale puts the integrated density back on the electron count
             target_integral = float(np.asarray(condition.vector)[0])
             integral = float(values.sum() * weight_each)
             scale = target_integral / integral
@@ -56,7 +59,7 @@ class Conserving(Operator[GridFunction, GridFunction]):
 
 
 class Residual(Operator[GridFunction, GridFunction]):
-    """Adds the inner operator's output to its input, starting exactly at the identity."""
+    """the inner operator's output added back to its input"""
 
 
     def __init__(self, inner: Operator[GridFunction, GridFunction]) -> None:
@@ -81,7 +84,7 @@ class Residual(Operator[GridFunction, GridFunction]):
 
 
 class Conditioned(Operator[GridFunction, GridFunction]):
-    """Scales and shifts the inner operator's channels from the conditioning vector."""
+    """the inner operator's channels scaled and shifted from the conditioning vector"""
 
 
     def __init__(self, inner: Operator[GridFunction, GridFunction], channels: int, condition_width: int, seed: int = 0) -> None:
@@ -104,6 +107,7 @@ class Conditioned(Operator[GridFunction, GridFunction]):
         if condition is None:
             return produced
         condition_vector = np.asarray(condition.vector, dtype=np.float64)
+        # one plus the learned scale, so untrained weights leave the channels alone
         channel_scales = 1.0 + self.parameter_values["condition_scale_weights"] @ condition_vector
         channel_shifts = self.parameter_values["condition_shift_weights"] @ condition_vector
         values = np.asarray(produced.values, dtype=np.float64)

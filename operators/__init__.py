@@ -1,1 +1,1 @@
-"""Neural operators over the n-Op corpus, built as one integral-transform framework."""
+"""neural operators over the n-Op corpus as one integral transform"""

@@ -1,4 +1,4 @@
-"""Proper orthogonal decomposition by the Gram method in double precision."""
+"""proper orthogonal decomposition by the Gram method, in double precision"""
 
 from dataclasses import dataclass
 
@@ -10,7 +10,7 @@ type Snapshots = NDArray[np.float64]
 
 @dataclass(frozen=True, slots=True)
 class PodBasis:
-    """A mean field with orthonormal modes and their singular values."""
+    """a mean field with orthonormal modes and their singular values"""
 
     mean: NDArray[np.float64]
     modes: NDArray[np.float64]
@@ -18,35 +18,39 @@ class PodBasis:
 
 
 def Gram_Pod(snapshots: Snapshots, rank: int | None = None) -> PodBasis:
-    """Builds the decomposition from the snapshot Gram matrix."""
+    """the decomposition, built from the snapshot Gram matrix"""
     mean = snapshots.mean(axis=0)
     centered = snapshots - mean
+    # the Gram matrix is one per snapshot pair, far smaller than one per voxel pair
     gram = centered @ centered.T
     solution = np.linalg.eigh(gram)
     descending_order = np.argsort(solution.eigenvalues)[::-1]
+    # a Gram eigenvalue is a square, so rounding can only push it below zero
     eigenvalues = np.maximum(np.asarray(solution.eigenvalues, dtype=np.float64)[descending_order], 0.0)
     eigenvectors = np.asarray(solution.eigenvectors, dtype=np.float64)[:, descending_order]
     keep = eigenvalues > (float(eigenvalues[0]) * 1e-14 if float(eigenvalues[0]) > 0 else -1.0)
     if rank is not None:
         keep = keep & (np.arange(eigenvalues.shape[0], dtype=np.int64) < rank)
     singular_values = np.sqrt(eigenvalues[keep])
+    # the snapshots carry the eigenvectors back into field space
     modes = (centered.T @ eigenvectors[:, keep]) / singular_values
     return PodBasis(mean=mean, modes=modes.T, singular_values=singular_values)
 
 
 def Project(basis: PodBasis, fields: Snapshots) -> NDArray[np.float64]:
-    """Returns the mode coefficients of fields under the basis."""
+    """mode coefficients of fields under the basis"""
     return (fields - basis.mean) @ basis.modes.T
 
 
 def Reconstruct(basis: PodBasis, coefficients: NDArray[np.float64]) -> Snapshots:
-    """Returns fields rebuilt from mode coefficients."""
+    """fields rebuilt from mode coefficients"""
     return coefficients @ basis.modes + basis.mean
 
 
 def Reconstruction_Error_Curve(snapshots: Snapshots) -> NDArray[np.float64]:
-    """Returns the relative reconstruction error of the block at every rank."""
+    """relative reconstruction error of the block at every rank"""
     basis = Gram_Pod(snapshots)
+    # the energy left after a rank is what that rank fails to reconstruct
     energies = basis.singular_values**2
     residual_energy = energies.sum() - np.cumsum(energies)
     total = float(np.linalg.norm(snapshots))
@@ -54,8 +58,9 @@ def Reconstruction_Error_Curve(snapshots: Snapshots) -> NDArray[np.float64]:
 
 
 def Basis_Decay_Gate(snapshots: Snapshots, error_bound: float = 0.03) -> tuple[bool, int]:
-    """Returns whether some rank at or below half the block reaches the error bound."""
+    """whether some rank at or below half the block reaches the error bound"""
     curve = Reconstruction_Error_Curve(snapshots)
+    # past half the snapshots a basis is memorizing rather than compressing
     half = snapshots.shape[0] // 2
     reachable = np.where(curve[:half] <= error_bound)[0]
     if reachable.size == 0:

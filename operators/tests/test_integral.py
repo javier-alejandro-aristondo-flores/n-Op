@@ -1,4 +1,4 @@
-"""Checks the dense reference integral against closed forms."""
+"""the dense reference integral against closed forms"""
 
 import numpy as np
 
@@ -19,12 +19,12 @@ CUBE = Domain(lattice=np.eye(3) * 2.0)
 
 
 def Constant_Kernel(targets: NDArray[np.float64], sources: NDArray[np.float64]) -> NDArray[np.float64]:
-    """Returns one for every target and source pair."""
+    """one, for every target and source pair"""
     return np.ones((np.asarray(targets).shape[0], np.asarray(sources).shape[0]))
 
 
 def Test_A_Constant_Kernel_Integrates_The_Field() -> None:
-    """Asserts the constant kernel returns the field integral at every output point."""
+    """a constant kernel returns the field's integral at every output point"""
     values = np.arange(16.0).reshape(1, 4, 2, 2)
     field = GridFunction(
         values=values,
@@ -39,13 +39,13 @@ def Test_A_Constant_Kernel_Integrates_The_Field() -> None:
 
 
 def Test_A_Dot_Kernel_Sums_Points_Analytically() -> None:
-    """Asserts a coordinate-dot kernel over counted points matches the closed form."""
+    """a coordinate-dot kernel over counted points, against the closed form"""
     positions = np.asarray([[1.0, 0.0, 0.0], [0.0, 2.0, 0.0]])
     point_values = np.asarray([[3.0], [5.0]])
     cloud = PointSet(positions=positions, domain=CUBE, values=point_values, quadrature=CountingQuadrature())
 
     def Dot_Kernel(targets: NDArray[np.float64], sources: NDArray[np.float64]) -> NDArray[np.float64]:
-        """Returns the coordinate dot product of every pair."""
+        """the coordinate dot product of every pair"""
         return np.asarray(targets) @ np.asarray(sources).T
 
     result = Dense_Reference_Integral(Dot_Kernel, cloud, PointSpec(np.asarray([[1.0, 1.0, 0.0]])))
@@ -53,12 +53,12 @@ def Test_A_Dot_Kernel_Sums_Points_Analytically() -> None:
 
 
 def Test_A_Channel_Mixing_Kernel_Uses_The_Four_Axis_Path() -> None:
-    """Asserts a swap-channel kernel routes values across channels."""
+    """a swap-channel kernel routes values across channels"""
     positions = np.asarray([[0.0, 0.0, 0.0]])
     cloud = PointSet(positions=positions, domain=CUBE, values=np.asarray([[2.0, 7.0]]))
 
     def Swap_Kernel(targets: NDArray[np.float64], sources: NDArray[np.float64]) -> NDArray[np.float64]:
-        """Returns the channel-swap matrix for every pair."""
+        """the channel-swap matrix, for every pair"""
         pairs = (np.asarray(targets).shape[0], np.asarray(sources).shape[0])
         return np.broadcast_to(np.asarray([[0.0, 1.0], [1.0, 0.0]]), (*pairs, 2, 2))
 
@@ -67,11 +67,11 @@ def Test_A_Channel_Mixing_Kernel_Uses_The_Four_Axis_Path() -> None:
 
 
 def Test_Coefficients_Integrate_As_A_Weighted_Sum() -> None:
-    """Asserts an index-selecting kernel reads coefficients like a matrix product."""
+    """an index-selecting kernel reads coefficients like a matrix product"""
     coefficients = Coefficients(vector=np.asarray([2.0, 4.0, 8.0]), domain=CUBE)
 
     def Selector_Kernel(targets: NDArray[np.float64], sources: NDArray[np.float64]) -> NDArray[np.float64]:
-        """Returns one only where the source index matches the target row."""
+        """one only where the source index matches the target row"""
         return (np.asarray(targets) == np.asarray(sources).T).astype(np.float64)
 
     result = Dense_Reference_Integral(Selector_Kernel, coefficients, PointSpec(np.asarray([[1.0], [2.0]])))
@@ -79,7 +79,7 @@ def Test_Coefficients_Integrate_As_A_Weighted_Sum() -> None:
 
 
 def Test_Quadrature_Weights_Read_The_Measure() -> None:
-    """Asserts grid weights are the cell volume per point and counting weights are one."""
+    """grid weights are cell volume per point, counting weights are one"""
     field = GridFunction(
         values=np.zeros((1, 2, 2, 2)),
         channel_labels=("charge_density",),

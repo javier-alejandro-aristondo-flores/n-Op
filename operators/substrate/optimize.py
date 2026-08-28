@@ -1,4 +1,4 @@
-"""The in-house Adam optimizer over named parameter and gradient dictionaries."""
+"""the in-house Adam optimizer over named parameter and gradient dictionaries"""
 
 from dataclasses import dataclass
 
@@ -10,7 +10,7 @@ from operators.substrate.engine import ParameterSet
 
 @dataclass(slots=True)
 class AdamState:
-    """Running first and second gradient moments with the step count."""
+    """running first and second gradient moments with the step count"""
 
     first_moments: dict[str, NDArray[np.float64]]
     second_moments: dict[str, NDArray[np.float64]]
@@ -18,7 +18,7 @@ class AdamState:
 
 
 def Fresh_Adam_State(parameters: ParameterSet) -> AdamState:
-    """Returns zeroed moments matching the parameter shapes."""
+    """zeroed moments matching the parameter shapes"""
     return AdamState(
         first_moments={name: np.zeros_like(value) for name, value in parameters.values.items()},
         second_moments={name: np.zeros_like(value) for name, value in parameters.values.items()},
@@ -35,13 +35,14 @@ def Adam_Step(
     second_decay: float = 0.999,
     stabilizer: float = 1e-8,
 ) -> ParameterSet:
-    """Applies one Adam update, mutating the state and returning the new parameters."""
+    """one Adam update, mutating the state and returning new parameters"""
     state.step_count += 1
     updated: dict[str, NDArray[np.float64]] = {}
     for name, value in parameters.values.items():
         gradient = gradients[name]
         state.first_moments[name] = first_decay * state.first_moments[name] + (1.0 - first_decay) * gradient
         state.second_moments[name] = second_decay * state.second_moments[name] + (1.0 - second_decay) * gradient**2
+        # the moments start at zero, so early steps are divided by how far the decay has run
         corrected_first = state.first_moments[name] / (1.0 - first_decay**state.step_count)
         corrected_second = state.second_moments[name] / (1.0 - second_decay**state.step_count)
         updated[name] = value - learning_rate * corrected_first / (np.sqrt(corrected_second) + stabilizer)

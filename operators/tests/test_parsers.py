@@ -1,4 +1,4 @@
-"""Checks the corpus readers on synthetic files and on recorded live-corpus invariants."""
+"""the corpus readers on synthetic files, and on recorded live-corpus invariants"""
 
 from pathlib import Path
 
@@ -73,18 +73,18 @@ SYNTHETIC_EIGENVALUES = """   2   2   1    2
 
 
 def Require_The_Pool() -> None:
-    """Fails the calling test when the corpus partition is not mounted."""
+    """fails the calling test when the corpus partition is not mounted"""
     if not POOL.exists():
         pytest.fail("the corpus at /Pool/VASP_DATA is not mounted on this machine")
 
 
 def Normalized_Mean_Absolute_Error(candidate: NDArray[np.float64], reference: NDArray[np.float64]) -> float:
-    """Returns mean absolute error divided by the mean absolute reference value."""
+    """mean absolute error over the mean absolute reference"""
     return float(np.mean(np.abs(candidate - reference)) / np.mean(np.abs(reference)))
 
 
 def Test_A_Two_Block_File_Parses_Past_Augmentation(tmp_path: Path) -> None:
-    """Reads a synthetic spin-doubled file and checks x-fastest grid ordering."""
+    """a synthetic spin-doubled file, and x-fastest grid ordering"""
     file_path = tmp_path / "CHGCAR"
     file_path.write_text(SYNTHETIC_TWO_BLOCK)
     field = Read_Field_File(file_path)
@@ -98,14 +98,14 @@ def Test_A_Two_Block_File_Parses_Past_Augmentation(tmp_path: Path) -> None:
 
 
 def Test_Cartesian_Selective_Geometry_Converts_To_Fractional(tmp_path: Path) -> None:
-    """Reads a Cartesian header behind a selective-dynamics line."""
+    """a Cartesian header behind a selective-dynamics line"""
     geometry, _ = Read_Geometry(SYNTHETIC_CARTESIAN.splitlines())
     assert geometry.species == ("X",)
     assert np.allclose(geometry.positions, [[0.5, 0.5, 0.5]])
 
 
 def Test_Eigenvalues_Read_The_Spin_Polarized_Layout(tmp_path: Path) -> None:
-    """Reads a synthetic two-spin EIGENVAL and checks both channels."""
+    """a synthetic two-spin eigenvalue file, both channels read"""
     file_path = tmp_path / "EIGENVAL"
     file_path.write_text(SYNTHETIC_EIGENVALUES)
     eigenvalues = Read_Eigenvalues(file_path)
@@ -118,7 +118,7 @@ def Test_Eigenvalues_Read_The_Spin_Polarized_Layout(tmp_path: Path) -> None:
 
 @pytest.mark.pool
 def Test_Charge_Mean_Equals_The_Electron_Count() -> None:
-    """Asserts grid-mean of raw charge equals the NELECT echo on two recorded runs."""
+    """grid mean of raw charge against the electron-count echo, on two recorded runs"""
     Require_The_Pool()
     for run in (ARSENIC_DEFECT, STRAIN_REFERENCE):
         field = Read_Field_File(run / "CHGCAR")
@@ -128,7 +128,7 @@ def Test_Charge_Mean_Equals_The_Electron_Count() -> None:
 
 @pytest.mark.pool
 def Test_The_Half_Grid_Law_Holds() -> None:
-    """Asserts the ELF grid is exactly half the charge grid per axis on two campaigns."""
+    """the localization grid is exactly half the charge grid per axis, on two campaigns"""
     Require_The_Pool()
     for run in (ARSENIC_DEFECT, ALLOY_PIPELINE):
         charge = Read_Field_File(run / "CHGCAR")
@@ -139,7 +139,7 @@ def Test_The_Half_Grid_Law_Holds() -> None:
 
 @pytest.mark.pool
 def Test_The_Spin_Block_Law_Holds() -> None:
-    """Asserts spin doubling on a magnetic run and single blocks on the controls."""
+    """spin doubling on a magnetic run, single blocks on the controls"""
     Require_The_Pool()
     for name in ("CHGCAR", "ELFCAR", "LOCPOT"):
         assert len(Read_Field_File(ARSENIC_DEFECT / name).blocks) == 2
@@ -149,7 +149,7 @@ def Test_The_Spin_Block_Law_Holds() -> None:
 
 @pytest.mark.pool
 def Test_The_Magnetization_Calibration_Replicates() -> None:
-    """Asserts the magnetization block integrates to the recorded two-magneton moment."""
+    """the magnetization block integrates to the recorded two-magneton moment"""
     Require_The_Pool()
     field = Read_Field_File(MAGNESIUM_DEFECT / "CHGCAR")
     moment = float(np.mean(field.blocks[1]))
@@ -160,7 +160,7 @@ def Test_The_Magnetization_Calibration_Replicates() -> None:
 
 @pytest.mark.pool
 def Test_The_Superposed_Atomic_Density_Floor_Replicates() -> None:
-    """Asserts the recorded atomic-superposition error levels on the arsenic run."""
+    """the recorded atomic-superposition error levels, on the arsenic run"""
     Require_The_Pool()
     charge = Read_Field_File(ARSENIC_DEFECT / "CHGCAR").blocks[0]
     superposed = Read_Field_File(ARSENIC_DEFECT / "AECCAR1").blocks[0]
@@ -171,7 +171,7 @@ def Test_The_Superposed_Atomic_Density_Floor_Replicates() -> None:
 
 @pytest.mark.pool
 def Test_Eigenvalue_Headers_Match_The_Recorded_Run() -> None:
-    """Asserts the arsenic run's eigenvalue header against the census row."""
+    """the arsenic run's eigenvalue header against its census row"""
     Require_The_Pool()
     eigenvalues = Read_Eigenvalues(ARSENIC_DEFECT / "EIGENVAL")
     assert eigenvalues.electron_count == 257.0

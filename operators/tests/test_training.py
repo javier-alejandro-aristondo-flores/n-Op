@@ -1,4 +1,4 @@
-"""Checks the trainer against closed forms and threads the whole stack on live pairs."""
+"""the trainer against closed forms, and the whole stack threaded on live pairs"""
 
 from pathlib import Path
 from typing import Any
@@ -24,7 +24,7 @@ ENGINE_CASES = [
 
 
 def Regression_Loss(lifted: dict[str, Any], batch: Any) -> Any:
-    """Mean squared error of a two-feature linear model against the batch's last column."""
+    """mean squared error of a two-feature linear model against the batch's last column"""
     predictions = batch[:, :2] @ lifted["coefficients"] + lifted["offset"]
     residuals = predictions - batch[:, 2]
     return (residuals * residuals).mean()
@@ -32,7 +32,7 @@ def Regression_Loss(lifted: dict[str, Any], batch: Any) -> Any:
 
 @pytest.mark.parametrize("engine", ENGINE_CASES)
 def Test_Training_Recovers_Linear_Regression(engine: Engine, tmp_path: Path) -> None:
-    """Asserts the loop reaches the closed-form regression and stores its artifacts."""
+    """the loop reaches the closed-form regression, and stores its artifacts"""
     generator = np.random.default_rng(9)
     features = generator.random((40, 2))
     targets = features @ np.asarray([2.0, -1.0]) + 0.5
@@ -57,7 +57,7 @@ def Test_Training_Recovers_Linear_Regression(engine: Engine, tmp_path: Path) -> 
 
 @pytest.mark.pool
 def Test_The_Thread_Reproduces_The_Affine_Floor() -> None:
-    """Trains the two-parameter affine map on live pairs and matches the closed form."""
+    """the two-parameter affine map, trained on live pairs, against the closed form"""
     if not POOL_ROOT.exists():
         pytest.fail("the corpus at /Pool/VASP_DATA is not mounted on this machine")
     sampled_rows: list[Any] = []
@@ -93,7 +93,7 @@ def Test_The_Thread_Reproduces_The_Affine_Floor() -> None:
 
 @pytest.mark.pool
 def Test_The_Paired_Loader_Assembles_Channels_Across_The_Half_Grid() -> None:
-    """Asserts the loader builds spin-doubled inputs and half-grid localization targets."""
+    """spin-doubled inputs, and half-grid localization targets"""
     if not POOL_ROOT.exists():
         pytest.fail("the corpus at /Pool/VASP_DATA is not mounted on this machine")
     card = Card_Named("charge_to_localization")

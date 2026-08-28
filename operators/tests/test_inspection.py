@@ -1,4 +1,4 @@
-"""Checks the inspection catalog, the summary tables, the renderers, and the rendering seam."""
+"""the inspection catalog, the summary tables, the renderers and the rendering seam"""
 
 import ast
 from pathlib import Path
@@ -26,7 +26,7 @@ RENDERING_SEAM = PACKAGE_ROOT / "inspection" / "plots.py"
 
 
 def Test_The_Rendering_Seam_Holds() -> None:
-    """Asserts the plotting library is imported by the one rendering module alone."""
+    """the plotting library is imported by the one rendering module alone"""
     for source_path in PACKAGE_ROOT.rglob("*.py"):
         if source_path == RENDERING_SEAM or ".pytest_cache" in source_path.parts:
             continue
@@ -43,7 +43,7 @@ def Test_The_Rendering_Seam_Holds() -> None:
 
 
 def Test_The_Renderers_Write_Images(tmp_path: Path) -> None:
-    """Draws a synthetic field and a synthetic curve and checks the files exist."""
+    """a synthetic field and a synthetic curve reach files"""
     generator = np.random.default_rng(2)
     field = generator.random((12, 12, 12))
     slices_path = Render_Field_Slices(field, tmp_path / "slices.png", "synthetic")
@@ -61,7 +61,7 @@ def Test_The_Renderers_Write_Images(tmp_path: Path) -> None:
 
 
 def Test_Fold_Balance_Reads_The_Committed_Artifact() -> None:
-    """Asserts the fold table covers every stratum with balanced folds."""
+    """the fold table covers every stratum, with balanced folds"""
     rows = Fold_Balance()
     assert len(rows) >= 5
     for row in rows:
@@ -73,7 +73,7 @@ def Test_Fold_Balance_Reads_The_Committed_Artifact() -> None:
 
 @pytest.mark.pool
 def Test_The_Catalog_Browses_The_Store() -> None:
-    """Asserts campaigns, runs, descriptions, and field loading against the live store."""
+    """campaigns, runs, descriptions and field loading against the live store"""
     if not POOL_ROOT.exists():
         pytest.fail("the corpus at /Pool/VASP_DATA is not mounted on this machine")
     campaigns = List_Campaigns()
@@ -93,7 +93,7 @@ def Test_The_Catalog_Browses_The_Store() -> None:
 
 @pytest.mark.pool
 def Test_The_Summary_Tables_Match_The_Records() -> None:
-    """Asserts the orbit and exclusion tables reproduce the measured counts."""
+    """the orbit and exclusion tables reproduce the measured counts"""
     if not POOL_ROOT.exists():
         pytest.fail("the corpus at /Pool/VASP_DATA is not mounted on this machine")
     orbit_rows = Orbit_Summary()

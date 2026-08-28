@@ -1,4 +1,4 @@
-"""Checks the substrate facets: engine conformance, the optimizer, transforms, and the torch seam."""
+"""the substrate facets, engine conformance and the optimizer and transforms and the seam"""
 
 from pathlib import Path
 from typing import Any
@@ -33,13 +33,13 @@ ENGINE_CASES = [
 
 
 def Quadratic_Loss(lifted: dict[str, Any]) -> Any:
-    """A two-parameter quadratic with its minimum at three and negative one."""
+    """a two-parameter quadratic with its minimum at three and minus one"""
     return ((lifted["scale"] - 3.0) ** 2).sum() + ((lifted["offset"] + 1.0) ** 2).sum()
 
 
 @pytest.mark.parametrize("engine", ENGINE_CASES)
 def Test_Engine_Gradients_Match_The_Analytic_Quadratic(engine: Engine) -> None:
-    """Asserts each engine differentiates the quadratic exactly."""
+    """each engine differentiates the quadratic exactly"""
     parameters = ParameterSet(values={"scale": np.asarray([1.0]), "offset": np.asarray([2.0])})
     gradients = engine.Gradients(parameters, Quadratic_Loss)
     assert abs(float(gradients["scale"][0]) - 2.0 * (1.0 - 3.0)) < 1e-4
@@ -49,7 +49,7 @@ def Test_Engine_Gradients_Match_The_Analytic_Quadratic(engine: Engine) -> None:
 
 @pytest.mark.parametrize("engine", ENGINE_CASES)
 def Test_Adam_Descends_The_Quadratic(engine: Engine) -> None:
-    """Asserts the in-house optimizer reaches the quadratic's minimum on each engine."""
+    """the in-house optimizer reaches the minimum on each engine"""
     parameters = ParameterSet(values={"scale": np.asarray([0.0]), "offset": np.asarray([0.0])})
     state = Fresh_Adam_State(parameters)
     for _ in range(400):
@@ -60,14 +60,14 @@ def Test_Adam_Descends_The_Quadratic(engine: Engine) -> None:
 
 
 def Test_The_Nonlinearities_Have_Their_Known_Values() -> None:
-    """Asserts the softplus and the smooth unit at anchor points."""
+    """the softplus and the smooth unit at anchor points"""
     assert abs(float(Softplus(np.asarray(0.0))) - np.log(2.0)) < 1e-12
     assert float(Gaussian_Error_Linear_Unit(np.asarray(0.0))) == 0.0
     assert abs(float(Gaussian_Error_Linear_Unit(np.asarray(3.0))) - 3.0) < 2e-2
 
 
 def Test_The_Transform_Round_Trips() -> None:
-    """Asserts the three-dimensional transform inverts on the reference arrays."""
+    """the three-dimensional transform inverts on the reference arrays"""
     generator = np.random.default_rng(4)
     field = generator.random((2, 6, 6, 6))
     spectrum = Fourier_Transform_3d(field)
@@ -76,7 +76,7 @@ def Test_The_Transform_Round_Trips() -> None:
 
 
 def Test_The_Torch_Seam_Holds() -> None:
-    """Asserts no module outside the substrate mentions the foreign engine at all."""
+    """no module outside the substrate mentions the foreign engine at all"""
     for source_path in PACKAGE_ROOT.rglob("*.py"):
         parts = source_path.parts
         if ".pytest_cache" in parts or "substrate" in parts or "tests" in parts:

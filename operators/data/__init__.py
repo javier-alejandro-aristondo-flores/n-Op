@@ -1,4 +1,4 @@
-"""Corpus parsers, the derived tensor store, the split engine, and the floors."""
+"""corpus parsers, the derived tensor store, the split engine and the floors"""
 
 from operators.data.exclusions import EXCLUSIONS, Excluded_Paths_For_Scope, Exclusion, Read_Byte_Alias_Groups, Resolve_Exclusion
 from operators.data.floors import (

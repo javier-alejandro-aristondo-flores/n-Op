@@ -1,4 +1,4 @@
-"""Checks the orbit map's symmetry algebra and its recorded collapses on the live census."""
+"""the orbit map's symmetry algebra, and its recorded collapses on the live census"""
 
 import pytest
 
@@ -7,18 +7,18 @@ from operators.data.store import POOL_ROOT, Read_Census
 
 
 def Require_The_Pool() -> None:
-    """Fails the calling test when the corpus partition is not mounted."""
+    """fails the calling test when the corpus partition is not mounted"""
     if not POOL_ROOT.exists():
         pytest.fail("the corpus at /Pool/VASP_DATA is not mounted on this machine")
 
 
 def Atlas() -> tuple[StrainAssignment, ...]:
-    """Builds the orbit map from the live census."""
+    """the orbit map, built from the live census"""
     return Orbit_Map(Read_Census(POOL_ROOT))
 
 
 def Test_Signed_Permutations_Collapse_Known_Equalities() -> None:
-    """Asserts the byte-verified duplicate triple and textbook symmetries share orbits."""
+    """the byte-verified duplicate triple and the textbook symmetries share orbits"""
     one_angle = Canonical_Orbit(Strain_Tensor_Of("shear_xz_g-0.100", None))
     assert one_angle == Canonical_Orbit(Strain_Tensor_Of("shear_xy_xz_g1_0.000_g2_-0.1", None))
     assert one_angle == Canonical_Orbit(Strain_Tensor_Of("shear_xz_yz_g1_-0.1_g2_0.000", None))
@@ -36,7 +36,7 @@ def Test_Signed_Permutations_Collapse_Known_Equalities() -> None:
 
 @pytest.mark.pool
 def Test_The_Atlas_Has_The_Recorded_Point_And_Pair_Structure() -> None:
-    """Asserts 2,680 runs form 1,340 points, each with one cheap and one accurate run."""
+    """2,680 runs as 1,340 points, each with one cheap and one accurate run"""
     Require_The_Pool()
     atlas = Atlas()
     assert len(atlas) == 2680
@@ -49,12 +49,12 @@ def Test_The_Atlas_Has_The_Recorded_Point_And_Pair_Structure() -> None:
 
 @pytest.mark.pool
 def Test_The_Recorded_Orbit_Collapses_Replicate() -> None:
-    """Asserts the measured family collapses: 512 to 120, 120 to 20, and 40 apiece."""
+    """the measured family collapses, 512 to 120, 120 to 20, and 40 apiece"""
     Require_The_Pool()
     atlas = Atlas()
 
     def Family_Counts(family: str) -> tuple[int, int]:
-        """Returns distinct points and distinct orbits in one family."""
+        """distinct points and distinct orbits in one family"""
         members = [assignment for assignment in atlas if assignment.family == family]
         return len({assignment.point for assignment in members}), len({assignment.orbit for assignment in members})
 
@@ -67,7 +67,7 @@ def Test_The_Recorded_Orbit_Collapses_Replicate() -> None:
 
 @pytest.mark.pool
 def Test_The_Auxiliary_Sweep_Adds_No_Orbits() -> None:
-    """Asserts the 160-point auxiliary sweep contributes zero new orbit units."""
+    """the 160-point later sweep contributes no new orbit unit"""
     Require_The_Pool()
     atlas = Atlas()
     with_auxiliary = {assignment.orbit for assignment in atlas}
@@ -78,7 +78,7 @@ def Test_The_Auxiliary_Sweep_Adds_No_Orbits() -> None:
 
 @pytest.mark.pool
 def Test_The_Label_Unit_Count_Is_Near_The_Recorded_Number() -> None:
-    """Asserts the exact-symmetry label units land near the recorded two hundred ninety-nine."""
+    """the exact-symmetry label units land near the recorded two hundred ninety-nine"""
     Require_The_Pool()
     orbit_count = len({assignment.orbit for assignment in Atlas()})
     print(f"exact orbit unit count: {orbit_count}")

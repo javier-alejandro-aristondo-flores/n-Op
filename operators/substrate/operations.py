@@ -1,4 +1,4 @@
-"""Array mathematics that differs between engines, dispatched on the array's kind."""
+"""array mathematics that differs between engines, dispatched on the array's kind"""
 
 from typing import Any
 
@@ -8,7 +8,7 @@ from operators.substrate.torch_engine import Torch_Module
 
 
 def Is_Engine_Native(value: Any) -> bool:
-    """Returns whether the value belongs to the foreign engine rather than numpy."""
+    """whether the value belongs to the foreign engine rather than numpy"""
     return not isinstance(value, (np.ndarray, np.generic, float, int))
 
 
@@ -23,11 +23,14 @@ def Hyperbolic_Tangent(value: Any) -> Any:
 def Softplus(value: Any) -> Any:
     if Is_Engine_Native(value):
         return Torch_Module().nn.functional.softplus(value)
+    # log of one plus the exponential, computed without overflowing
     return np.logaddexp(0.0, value)
 
 
 def Gaussian_Error_Linear_Unit(value: Any) -> Any:
+    # the tanh form, so every engine returns the same numbers
     shaping = value + 0.044715 * value * value * value
+    # 0.79788... is the square root of two over pi
     return 0.5 * value * (1.0 + Hyperbolic_Tangent(0.7978845608028654 * shaping))
 
 

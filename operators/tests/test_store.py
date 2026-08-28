@@ -1,4 +1,4 @@
-"""Checks the store builder on a synthetic corpus and on one live run, without writing to /Pool."""
+"""the store builder on a synthetic corpus and one live run, writing nothing to the corpus"""
 
 import json
 from pathlib import Path
@@ -62,12 +62,12 @@ Direct
 
 
 def As_Float_Array(value: StoreArray) -> NDArray[np.float64]:
-    """Coerces a stored array to float64 for assertions."""
+    """a stored array in double precision, for assertions"""
     return np.asarray(value, dtype=np.float64)
 
 
 def Fake_Pool(tmp_path: Path) -> Path:
-    """Builds a two-run synthetic corpus with a census under a temporary root."""
+    """a two-run synthetic corpus with a census, under a temporary root"""
     pool = tmp_path / "pool"
     field_run = pool / "diamond/single_defect/fake/run"
     field_run.mkdir(parents=True)
@@ -92,7 +92,7 @@ def Fake_Pool(tmp_path: Path) -> Path:
 
 
 def Test_Campaign_Names_Map_From_Paths() -> None:
-    """Checks the path-prefix campaign mapping including the new-only defect trees."""
+    """the path-prefix campaign mapping, new-only defect trees included"""
     assert Campaign_Of("alloy/1-Alloy/x") == "alloy_ensemble"
     assert Campaign_Of("diamond/2_atoms_4-10-2026/x") == "strain_atlas"
     assert Campaign_Of("diamond/Pure/x") == "supercell_strains"
@@ -103,7 +103,7 @@ def Test_Campaign_Names_Map_From_Paths() -> None:
 
 
 def Test_The_Egress_Guard_Refuses_Foreign_Destinations(tmp_path: Path) -> None:
-    """Asserts volumetric writes outside the corpus partition are refused."""
+    """volumetric writes outside the corpus partition are refused"""
     pool = tmp_path / "pool"
     pool.mkdir()
     Guard_Volumetric_Destination(pool / "_derived" / "x", pool)
@@ -112,7 +112,7 @@ def Test_The_Egress_Guard_Refuses_Foreign_Destinations(tmp_path: Path) -> None:
 
 
 def Test_A_Synthetic_Run_Extracts_Writes_And_Freshens(tmp_path: Path) -> None:
-    """Runs extract, write, reload, and staleness on the synthetic corpus."""
+    """extract, write, reload and staleness on the synthetic corpus"""
     pool = Fake_Pool(tmp_path)
     census_rows = Read_Census(pool)
     arrays, sidecar = Extract_Run(census_rows[0], pool)
@@ -144,7 +144,7 @@ def Test_A_Synthetic_Run_Extracts_Writes_And_Freshens(tmp_path: Path) -> None:
 
 @pytest.mark.pool
 def Test_The_Arsenic_Run_Extracts_Faithfully() -> None:
-    """Extracts the recorded arsenic defect run in memory and checks its channels."""
+    """the recorded arsenic defect run extracted in memory, channel by channel"""
     if not POOL_ROOT.exists():
         pytest.fail("the corpus at /Pool/VASP_DATA is not mounted on this machine")
     census_rows = [census_row for census_row in Read_Census(POOL_ROOT) if census_row.path.endswith("VA-element-single-impurity/As/GGA-PBE")]

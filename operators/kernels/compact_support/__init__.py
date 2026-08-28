@@ -1,1 +1,1 @@
-"""Small-support kernels applied as grid convolution or as message passing over points."""
+"""small-support kernels as grid convolution or message passing"""

@@ -1,4 +1,4 @@
-"""The split engine: co-split units, deterministic fold maps, and their committed artifacts."""
+"""the split engine, co-split units and deterministic fold maps with their artifacts"""
 
 import hashlib
 import json
@@ -23,7 +23,7 @@ FIELD_FILE_NAMES = ("CHGCAR", "ELFCAR", "LOCPOT")
 
 @dataclass(frozen=True, slots=True)
 class SplitUnit:
-    """One co-split unit: runs that must always land in the same fold."""
+    """runs that must always land in the same fold"""
 
     key: str
     campaign: str
@@ -32,13 +32,14 @@ class SplitUnit:
 
 
 def Stable_Fraction(split_key: str) -> float:
-    """Maps a key to a deterministic fraction of one via a seeded hash."""
+    """a key to a fraction of one, through a seeded hash"""
+    # the seed is fixed, so a key lands in the same place on every machine and every rerun
     digest = hashlib.sha256(f"{SPLIT_SEED}:{split_key}".encode()).digest()
     return int.from_bytes(digest[:8]) / 2.0**64
 
 
 def Hard_Excluded_Paths(census_rows: Sequence[CensusRow], pool_root: Path) -> frozenset[str]:
-    """Returns the runs excluded from every task before any unit is built."""
+    """the runs excluded from every task, before any unit is built"""
     excluded: set[str] = set()
     for identifier in ("E1", "E2", "E3", "E10"):
         excluded.update(Resolve_Exclusion(identifier, census_rows, pool_root))
@@ -46,12 +47,13 @@ def Hard_Excluded_Paths(census_rows: Sequence[CensusRow], pool_root: Path) -> fr
 
 
 def Has_Full_Fields(census_row: CensusRow) -> bool:
-    """Returns whether the run carries charge, localization, and potential files."""
+    """whether the run carries charge, localization and potential files"""
     return all(census_row.file_sizes.get(name, 0) > 0 for name in FIELD_FILE_NAMES)
 
 
 def Alloy_Composition_Of(census_row: CensusRow) -> str:
-    """Reads the composition fraction from the POSCAR title, never the directory name."""
+    """the composition fraction, read off the structure title"""
+    # the directory names disagree with the titles, and the title is what the run computed
     matched = re.search(r"x=([0-9.]+)", str(census_row.record.get("p_title", "")))
     if matched is None:
         raise ValueError(f"no composition in the title of {census_row.path}")
@@ -59,7 +61,7 @@ def Alloy_Composition_Of(census_row: CensusRow) -> str:
 
 
 def Alloy_Units(census_rows: Sequence[CensusRow], excluded: frozenset[str]) -> list[SplitUnit]:
-    """Groups alloy runs by configuration, with satellites joining their seed config."""
+    """alloy runs grouped by configuration, satellites joining their seed"""
     alloy_rows = [census_row for census_row in census_rows if Campaign_Of(census_row.path) == "alloy_ensemble" and census_row.path not in excluded]
     seed_configuration: dict[str, str] = {}
     for census_row in alloy_rows:
@@ -83,7 +85,7 @@ def Alloy_Units(census_rows: Sequence[CensusRow], excluded: frozenset[str]) -> l
 
 
 def Supercell_Point_Key(path: str) -> tuple[str, str]:
-    """Returns a supercell run's co-split key and its deformation-family stratum."""
+    """a supercell run's co-split key and its deformation-family stratum"""
     segments = path.split("/")
     if "New_files" not in segments:
         return "supercell_pristine_reference", "pristine_reference"
@@ -97,7 +99,7 @@ def Supercell_Point_Key(path: str) -> tuple[str, str]:
 
 
 def Supercell_Units(census_rows: Sequence[CensusRow], excluded: frozenset[str]) -> list[SplitUnit]:
-    """Groups full-field supercell runs by exact shear orbit or by point."""
+    """full-field supercell runs grouped by exact shear orbit, or by point"""
     members: dict[str, tuple[str, list[str]]] = {}
     for census_row in census_rows:
         if Campaign_Of(census_row.path) != "supercell_strains" or census_row.path in excluded or not Has_Full_Fields(census_row):
@@ -111,7 +113,7 @@ def Supercell_Units(census_rows: Sequence[CensusRow], excluded: frozenset[str]) 
 
 
 def Non_Geometry_Segment(segment: str) -> bool:
-    """Returns whether a segment names a functional or smearing variant, not a geometry."""
+    """whether a segment names a functional or smearing variant, not a geometry"""
     lowered = segment.lower()
     return (
         re.fullmatch(r"(\d+-)?(gga-pbe|hse06)", lowered) is not None
@@ -120,8 +122,9 @@ def Non_Geometry_Segment(segment: str) -> bool:
 
 
 def Defect_Unit_Key(path: str) -> tuple[str, str]:
-    """Returns a defect run's same-geometry key and its tree stratum."""
+    """a defect run's same-geometry key and its tree stratum"""
     segments = path.split("/")
+    # dropping the functional and smearing segments brings both functionals into one unit
     geometry = "_".join(segment for segment in segments[2:] if not Non_Geometry_Segment(segment))
     if "new-only" in segments[1]:
         return f"defect_new_only_{geometry}", "new_only"
@@ -130,7 +133,7 @@ def Defect_Unit_Key(path: str) -> tuple[str, str]:
 
 
 def Defect_Units(census_rows: Sequence[CensusRow], excluded: frozenset[str]) -> list[SplitUnit]:
-    """Groups defect runs into same-geometry functional pairs."""
+    """defect runs grouped into same-geometry functional pairs"""
     members: dict[str, tuple[str, list[str]]] = {}
     for census_row in census_rows:
         if Campaign_Of(census_row.path) != "defect_set" or census_row.path in excluded:
@@ -144,19 +147,20 @@ def Defect_Units(census_rows: Sequence[CensusRow], excluded: frozenset[str]) -> 
 
 
 def Paired_Fields_Units(census_rows: Sequence[CensusRow], pool_root: Path) -> list[SplitUnit]:
-    """Assembles the co-split units of the three full-field campaigns."""
+    """the co-split units of the three full-field campaigns"""
     excluded = Hard_Excluded_Paths(census_rows, pool_root)
     units = Alloy_Units(census_rows, excluded) + Supercell_Units(census_rows, excluded) + Defect_Units(census_rows, excluded)
     return sorted(units, key=lambda unit: unit.key)
 
 
 def Fold_Assignment(units: Sequence[SplitUnit], fold_count: int = FOLD_COUNT) -> dict[str, int]:
-    """Assigns folds round-robin in seeded-hash order within each stratum."""
+    """folds handed out round-robin, in seeded-hash order within each stratum"""
     assignment: dict[str, int] = {}
     by_stratum: dict[str, list[SplitUnit]] = {}
     for unit in units:
         by_stratum.setdefault(f"{unit.campaign}:{unit.stratum}", []).append(unit)
     for stratum_units in by_stratum.values():
+        # hash order rather than path order, so corpus neighbors do not share a fold
         ordered = sorted(stratum_units, key=lambda unit: (Stable_Fraction(unit.key), unit.key))
         for position_in_order, unit in enumerate(ordered):
             assignment[unit.key] = position_in_order % fold_count
@@ -165,7 +169,7 @@ def Fold_Assignment(units: Sequence[SplitUnit], fold_count: int = FOLD_COUNT) ->
 
 @dataclass(slots=True)
 class OrbitHoldout:
-    """One orbit's holdout assignment with its runs."""
+    """one orbit's holdout assignment with its runs"""
 
     family: str
     assignment: str
@@ -175,7 +179,7 @@ class OrbitHoldout:
 
 
 def Strain_Holdout_Assignment(census_rows: Sequence[CensusRow]) -> dict[str, OrbitHoldout]:
-    """Assigns strain orbits to train, validation, test, or the reserved probe."""
+    """strain orbits assigned to train, validation, test or the reserved probe"""
     atlas = Orbit_Map(census_rows)
     by_orbit: dict[str, OrbitHoldout] = {}
     for entry in atlas:
@@ -201,6 +205,7 @@ def Strain_Holdout_Assignment(census_rows: Sequence[CensusRow]) -> dict[str, Orb
                 by_orbit[orbit].assignment = "test"
             else:
                 by_orbit[orbit].assignment = "train"
+        # an orbit the later sweep alone visited is held back as the equivariance probe
         for orbit in orbits:
             if by_orbit[orbit].auxiliary_only:
                 by_orbit[orbit].assignment = "reserved_probe"
@@ -211,7 +216,7 @@ def Strain_Holdout_Assignment(census_rows: Sequence[CensusRow]) -> dict[str, Orb
 
 
 def Perovskite_Units(census_rows: Sequence[CensusRow], pool_root: Path) -> list[SplitUnit]:
-    """Returns one unit per perovskite run, with the duplicated center removed."""
+    """one unit per perovskite run, with the duplicated center removed"""
     excluded = Hard_Excluded_Paths(census_rows, pool_root)
     units: list[SplitUnit] = []
     for census_row in census_rows:
@@ -223,7 +228,7 @@ def Perovskite_Units(census_rows: Sequence[CensusRow], pool_root: Path) -> list[
 
 
 def Perovskite_Extrapolation_Tags(unit: SplitUnit) -> tuple[str, ...]:
-    """Tags a perovskite unit with the factor holdouts it belongs to."""
+    """the factor holdouts a perovskite unit belongs to"""
     name = unit.run_paths[0].rsplit("/", 1)[-1]
     tags: list[str] = []
     if "0p8" in name:
@@ -234,7 +239,7 @@ def Perovskite_Extrapolation_Tags(unit: SplitUnit) -> tuple[str, ...]:
 
 
 def Twin_Shear_Map(census_rows: Sequence[CensusRow], pool_root: Path) -> dict[str, dict[str, list[str]]]:
-    """Maps each shear orbit to its strain-atlas and supercell runs."""
+    """each shear orbit with its strain-atlas and supercell runs"""
     atlas = Orbit_Map(census_rows)
     twins: dict[str, dict[str, list[str]]] = {}
     for entry in atlas:
@@ -251,7 +256,7 @@ def Twin_Shear_Map(census_rows: Sequence[CensusRow], pool_root: Path) -> dict[st
 
 
 def Write_Split_Artifacts(census_rows: Sequence[CensusRow], pool_root: Path, out_directory: Path = ARTIFACT_DIRECTORY) -> None:
-    """Writes the committed fold maps and twin map as deterministic identifier lists."""
+    """the committed fold maps and twin map, as deterministic identifier lists"""
     out_directory.mkdir(parents=True, exist_ok=True)
     paired_units = Paired_Fields_Units(census_rows, pool_root)
     paired_folds = Fold_Assignment(paired_units)
@@ -294,11 +299,12 @@ def Write_Split_Artifacts(census_rows: Sequence[CensusRow], pool_root: Path, out
         ("strain_atlas_holdout.json", strain_payload),
         ("twin_shear_map.json", twin_payload),
     ):
+        # sorted keys and a closing newline, so a regenerated file matches byte for byte
         (out_directory / name).write_text(json.dumps(payload, indent=1, sort_keys=True) + "\n")
 
 
 def Unit_Report(census_rows: Sequence[CensusRow], pool_root: Path) -> dict[str, object]:
-    """Summarizes unit counts and size patterns for verification."""
+    """unit counts and size patterns, for verification"""
     paired = Paired_Fields_Units(census_rows, pool_root)
     sizes: dict[str, dict[int, int]] = {}
     for unit in paired:
@@ -312,7 +318,7 @@ def Unit_Report(census_rows: Sequence[CensusRow], pool_root: Path) -> dict[str, 
 
 
 def Regenerated_Artifacts_Match(census_rows: Sequence[CensusRow], pool_root: Path, artifact_directory: Path = ARTIFACT_DIRECTORY) -> bool:
-    """Returns whether regenerating the artifacts reproduces the committed files."""
+    """whether regenerating the artifacts reproduces the committed files"""
     with tempfile.TemporaryDirectory() as scratch:
         scratch_directory = Path(scratch)
         Write_Split_Artifacts(census_rows, pool_root, scratch_directory)

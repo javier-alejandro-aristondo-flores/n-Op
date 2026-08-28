@@ -1,4 +1,4 @@
-"""Checks the floor machinery against closed forms."""
+"""the floor machinery against closed forms"""
 
 import numpy as np
 
@@ -17,14 +17,14 @@ from operators.data.pod import Basis_Decay_Gate, Gram_Pod, Project, Reconstruct,
 
 
 def Test_Reciprocal_Rows_Are_Dual_To_The_Lattice() -> None:
-    """Asserts lattice rows and reciprocal rows satisfy the two-pi duality on a skewed cell."""
+    """lattice rows against reciprocal rows, on a skewed cell"""
     lattice = np.asarray([[3.0, 0.0, 0.0], [0.4, 2.5, 0.0], [0.1, 0.3, 4.0]])
     duality = lattice @ Reciprocal_Rows(lattice).T
     assert np.allclose(duality, 2.0 * np.pi * np.eye(3))
 
 
 def Test_The_Hartree_Potential_Solves_A_Single_Mode() -> None:
-    """Asserts the spectral Poisson solution matches the closed form for one cosine."""
+    """the spectral Poisson solution against the closed form for one cosine"""
     extent = 16
     length = 5.0
     lattice = np.eye(3) * length
@@ -37,7 +37,7 @@ def Test_The_Hartree_Potential_Solves_A_Single_Mode() -> None:
 
 
 def Test_Spectral_Derivatives_Match_Closed_Forms() -> None:
-    """Asserts the gradient magnitude and Laplacian of one sine mode."""
+    """the gradient magnitude and Laplacian of one sine mode"""
     extent = 16
     length = 2.0
     lattice = np.eye(3) * length
@@ -51,7 +51,7 @@ def Test_Spectral_Derivatives_Match_Closed_Forms() -> None:
 
 
 def Test_The_Shell_Filter_Recovers_A_Diagonal_Map() -> None:
-    """Asserts fitting on one filtered pair recovers the applied gains exactly."""
+    """fitting on one filtered pair recovers the applied gains exactly"""
     generator = np.random.default_rng(11)
     field = generator.random((8, 8, 8))
     shells = Shell_Index_Grid(field.shape)
@@ -62,7 +62,7 @@ def Test_The_Shell_Filter_Recovers_A_Diagonal_Map() -> None:
 
 
 def Test_Gram_Pod_Reconstructs_A_Low_Rank_Block() -> None:
-    """Asserts a rank-three block reconstructs exactly and passes the gate."""
+    """a rank-three block reconstructs exactly, and passes the gate"""
     generator = np.random.default_rng(5)
     modes = generator.standard_normal((3, 200))
     coefficients = generator.standard_normal((24, 3))
@@ -78,7 +78,7 @@ def Test_Gram_Pod_Reconstructs_A_Low_Rank_Block() -> None:
 
 
 def Test_Ridge_Fits_A_Linear_Law() -> None:
-    """Asserts the ridge recovers a noiseless linear relation with intercept."""
+    """the ridge recovers a noiseless linear relation with intercept"""
     generator = np.random.default_rng(3)
     features = generator.standard_normal((500, 2))
     targets = 2.0 * features[:, 0] - 3.0 * features[:, 1] + 1.0
@@ -88,7 +88,7 @@ def Test_Ridge_Fits_A_Linear_Law() -> None:
 
 
 def Test_Wavevectors_Have_The_Nyquist_Symmetry() -> None:
-    """Asserts centered modes give equal and opposite wavevectors off the axis ends."""
+    """centered modes give equal and opposite wavevectors off the axis ends"""
     lattice = np.eye(3) * 4.0
     wavevectors = Cartesian_Wavevectors(lattice, (8, 8, 8))
     assert np.allclose(wavevectors[1, 0, 0], -wavevectors[7, 0, 0])

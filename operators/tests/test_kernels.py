@@ -1,4 +1,4 @@
-"""Checks every shared kernel against the dense reference integral."""
+"""every shared kernel against the dense reference integral"""
 
 import numpy as np
 from numpy.typing import NDArray
@@ -21,7 +21,7 @@ CUBE = Domain(lattice=np.eye(3) * 2.0)
 
 
 def Test_The_Dense_Kernel_Matches_The_Oracle() -> None:
-    """Asserts the dense index kernel equals the reference summation."""
+    """the dense index kernel equals the reference summation"""
     kernel = DenseKernel(output_count=3, input_count=4, seed=1)
     weights = kernel.parameter_values["weights"]
     coefficients = Coefficients(vector=np.asarray([0.5, -1.0, 2.0, 0.25]), domain=CUBE)
@@ -38,13 +38,13 @@ def Test_The_Dense_Kernel_Matches_The_Oracle() -> None:
 
 
 def Fourier_Feature_Map(points: NDArray[np.float64]) -> NDArray[np.float64]:
-    """A fixed feature map: a constant plus one wave per axis."""
+    """a constant plus one wave per axis"""
     waves = np.cos(2.0 * np.pi * points)
     return np.concatenate([np.ones((points.shape[0], 1)), waves], axis=1)
 
 
 def Test_The_Low_Rank_Kernel_Matches_The_Oracle_On_Points_And_Grids() -> None:
-    """Asserts the feature-product kernel equals the reference on both source kinds."""
+    """the feature-product kernel equals the reference, on grids and on points"""
     kernel = LowRankKernel(Fourier_Feature_Map, feature_count=4, seed=2)
     core = kernel.parameter_values["core"]
 
@@ -75,7 +75,7 @@ def Test_The_Low_Rank_Kernel_Matches_The_Oracle_On_Points_And_Grids() -> None:
 
 
 def Test_The_Spectral_Kernel_Matches_The_Dense_Oracle() -> None:
-    """Asserts the fused spectral path equals the closed-form pair kernel summation."""
+    """the fused spectral path equals the closed-form pair kernel summation"""
     kernel = SpectralKernel(kept_modes=(1, 1, 1), output_channels=2, input_channels=2, seed=4)
     kernel.Hermitian_Symmetrize()
     generator = np.random.default_rng(5)
@@ -92,7 +92,7 @@ def Test_The_Spectral_Kernel_Matches_The_Dense_Oracle() -> None:
 
 
 def Test_The_Spectral_Kernel_Transfers_Discretization() -> None:
-    """Asserts the same weights evaluate exactly on a finer output grid."""
+    """the same weights evaluate exactly on a finer output grid"""
     kernel = SpectralKernel(kept_modes=(1, 1, 1), output_channels=1, input_channels=1, seed=6)
     kernel.Hermitian_Symmetrize()
     generator = np.random.default_rng(7)

@@ -1,4 +1,4 @@
-"""Split-aware loading from the derived store into framework representations."""
+"""split-aware loading from the derived store into framework representations"""
 
 import json
 from collections.abc import Iterator
@@ -16,7 +16,7 @@ from operators.tasks import TaskCard
 
 @dataclass(frozen=True, slots=True)
 class TrainingExample:
-    """One run's input and target fields with its store identifier."""
+    """one run's input and target fields, with its store identifier"""
 
     identifier: str
     input_function: GridFunction
@@ -27,11 +27,12 @@ def Field_From_Archive(
     archive: "np.lib.npyio.NpzFile",
     channel_names: tuple[str, ...],
 ) -> GridFunction | None:
-    """Builds one field from named channels, injecting zeros for an absent magnetization."""
+    """one field from named channels, zeros standing in for an absent magnetization"""
     channels: list[NDArray[np.float64]] = []
     for name in channel_names:
         if name in archive:
             channels.append(np.asarray(archive[name], dtype=np.float64))
+        # an unpolarized run wrote no magnetization because it is zero everywhere
         elif name == "magnetization_density" and "charge_density" in archive:
             channels.append(np.zeros_like(np.asarray(archive["charge_density"], dtype=np.float64)))
         else:
@@ -53,7 +54,7 @@ def Strain_Charge_Pairs(
     pool_root: Path = POOL_ROOT,
     limit: int | None = None,
 ) -> Iterator[tuple[str, GridFunction, GridFunction]]:
-    """Yields same-grid cheap and accurate charge fields for one holdout assignment."""
+    """same-grid cheap and accurate charge fields, for one holdout assignment"""
     holdout = json.loads((ARTIFACT_DIRECTORY / "strain_atlas_holdout.json").read_text())
     from operators.data.store import Run_Identifier
 
@@ -61,6 +62,7 @@ def Strain_Charge_Pairs(
     for orbit_record in holdout.values():
         if orbit_record["assignment"] != assignment:
             continue
+        # the later sweep is reserved for the equivariance probe and never trains
         auxiliary = set(orbit_record["auxiliary_run_paths"])
         by_point: dict[str, dict[str, str]] = {}
         for run_path in orbit_record["run_paths"]:
@@ -82,6 +84,7 @@ def Strain_Charge_Pairs(
                 fields[side] = field
             if len(fields) != 2:
                 continue
+            # a pair on two different grids has no pointwise comparison to make
             if np.asarray(fields["cheap"].values).shape != np.asarray(fields["accurate"].values).shape:
                 continue
             yield point, fields["cheap"], fields["accurate"]
@@ -97,7 +100,7 @@ def Paired_Field_Examples(
     pool_root: Path = POOL_ROOT,
     limit: int | None = None,
 ) -> Iterator[TrainingExample]:
-    """Yields input and target fields for one task card under the committed fold map."""
+    """input and target fields for one task card, under the committed fold map"""
     folds = json.loads((ARTIFACT_DIRECTORY / "paired_fields_fivefold.json").read_text())
     produced = 0
     for unit in folds.values():
@@ -111,6 +114,7 @@ def Paired_Field_Examples(
             with np.load(archive_path) as archive:
                 input_function = Field_From_Archive(archive, card.inputs)
                 target_function = Field_From_Archive(archive, card.targets)
+            # a run missing a channel the card asks for is simply not an example
             if input_function is None or target_function is None:
                 continue
             yield TrainingExample(identifier, input_function, target_function)
@@ -120,7 +124,7 @@ def Paired_Field_Examples(
 
 
 def Per_Channel_Statistics(fields: list[GridFunction]) -> tuple[NDArray[np.float64], NDArray[np.float64]]:
-    """Returns per-channel means and deviations over a list of same-channel fields."""
+    """per-channel means and deviations over a list of same-channel fields"""
     stacked = np.stack([np.asarray(field.values, dtype=np.float64).reshape(len(field.channel_labels), -1) for field in fields])
     means = stacked.mean(axis=(0, 2))
     deviations = stacked.std(axis=(0, 2))

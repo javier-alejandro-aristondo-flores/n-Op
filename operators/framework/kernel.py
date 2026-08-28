@@ -1,4 +1,4 @@
-"""The kernel of the integral transform, fused with its own integration."""
+"""the kernel of the integral transform, fused with its own integration"""
 
 from abc import abstractmethod
 from typing import ClassVar, Protocol
@@ -9,7 +9,7 @@ from operators.framework.representation import Coefficients, Representation
 
 
 class Kernel[In: Representation, Out: Representation](Inspectable, Protocol):
-    """Integrates a learned kernel against the quadrature of a representation."""
+    """a learned kernel integrated against a representation's quadrature"""
 
     supported_representations: ClassVar[tuple[type[Representation], ...]]
 

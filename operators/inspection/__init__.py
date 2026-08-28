@@ -1,4 +1,4 @@
-"""Browsing and rendering everything the project computes, as named plain-word arrays."""
+"""browsing and rendering everything the project computes, as named plain-word arrays"""
 
 from operators.inspection.catalog import (
     Describe_Run,

@@ -1,11 +1,11 @@
-"""Task cards naming the inputs, targets, loss, metrics, and split of one suite task."""
+"""task cards naming the inputs, targets, loss, metrics and split of one suite task"""
 
 from dataclasses import dataclass
 
 
 @dataclass(frozen=True, slots=True)
 class TaskCard:
-    """One suite task stated as data."""
+    """one suite task stated as data"""
 
     name: str
     suite_card: str
@@ -144,7 +144,7 @@ CARDS: tuple[TaskCard, ...] = (
 
 
 def Card_Named(name: str) -> TaskCard:
-    """Returns the one card with the given name."""
+    """the one card with the given name"""
     for card in CARDS:
         if card.name == name:
             return card

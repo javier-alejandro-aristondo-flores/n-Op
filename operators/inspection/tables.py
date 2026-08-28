@@ -1,4 +1,4 @@
-"""Summaries of the orbit map, fold balance, and exclusions as plain tables."""
+"""the orbit map, fold balance and exclusions summarized as plain tables"""
 
 import json
 from collections import Counter
@@ -13,7 +13,7 @@ type Table = tuple[dict[str, object], ...]
 
 
 def Orbit_Summary(pool_root: Path = POOL_ROOT) -> Table:
-    """Tabulates points, orbits, and runs per strain sweep family."""
+    """points, orbits and runs per strain sweep family"""
     atlas = Orbit_Map(Read_Census(pool_root))
     rows: list[dict[str, object]] = []
     for family in sorted({entry.family for entry in atlas}):
@@ -38,7 +38,7 @@ def Orbit_Summary(pool_root: Path = POOL_ROOT) -> Table:
 
 
 def Fold_Balance(artifact_directory: Path = ARTIFACT_DIRECTORY) -> Table:
-    """Tabulates unit counts per fold for every campaign and stratum."""
+    """unit counts per fold, for every campaign and stratum"""
     payload = json.loads((artifact_directory / "paired_fields_fivefold.json").read_text())
     counts: dict[str, Counter[int]] = {}
     for unit in payload.values():
@@ -57,7 +57,7 @@ def Fold_Balance(artifact_directory: Path = ARTIFACT_DIRECTORY) -> Table:
 
 
 def Exclusion_Summary(pool_root: Path = POOL_ROOT) -> Table:
-    """Tabulates every exclusion with its resolved run count."""
+    """every exclusion with its resolved run count"""
     census_rows = Read_Census(pool_root)
     rows: list[dict[str, object]] = []
     for exclusion in EXCLUSIONS:
@@ -74,9 +74,10 @@ def Exclusion_Summary(pool_root: Path = POOL_ROOT) -> Table:
 
 
 def Render_Table(rows: Table) -> str:
-    """Formats table rows as aligned plain text."""
+    """table rows as aligned plain text"""
     if not rows:
         return ""
+    # the first row's keys are the columns, in the order it names them
     names = list(rows[0])
     cells = [[str(row[name]) for name in names] for row in rows]
     widths = [max(len(name), *(len(line[column]) for line in cells)) for column, name in enumerate(names)]

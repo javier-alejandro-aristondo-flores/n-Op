@@ -1,4 +1,4 @@
-"""Readers for the corpus's VASP text files, returning typed NumPy records."""
+"""readers for the corpus's VASP text files, returning typed arrays"""
 
 from collections.abc import Sequence
 from dataclasses import dataclass
@@ -9,12 +9,12 @@ from numpy.typing import NDArray
 
 
 class ParseError(Exception):
-    """Raised when a corpus file deviates from the format the reader expects."""
+    """raised when a corpus file deviates from the format the reader expects"""
 
 
 @dataclass(frozen=True, slots=True)
 class Geometry:
-    """A periodic cell with its species, per-species counts, and fractional positions."""
+    """a periodic cell with its species, per-species counts and fractional positions"""
 
     comment: str
     lattice: NDArray[np.float64]
@@ -25,7 +25,7 @@ class Geometry:
 
 @dataclass(frozen=True, slots=True)
 class FieldFile:
-    """The grid blocks of one volumetric file, raw values in file units."""
+    """the grid blocks of one volumetric file, raw values in file units"""
 
     geometry: Geometry
     dimensions: tuple[int, int, int]
@@ -34,7 +34,7 @@ class FieldFile:
 
 @dataclass(frozen=True, slots=True)
 class EigenvalueSet:
-    """Eigenvalues and occupancies indexed by spin, k-point, and band."""
+    """eigenvalues and occupancies indexed by spin, k-point and band"""
 
     electron_count: float
     kpoints: NDArray[np.float64]
@@ -45,29 +45,31 @@ class EigenvalueSet:
 
 @dataclass(frozen=True, slots=True)
 class OutcarEchoes:
-    """Scalars echoed by OUTCAR: electron count and pseudopotential titles."""
+    """the scalars OUTCAR echoes, electron count and pseudopotential titles"""
 
     electron_count: float
     pseudopotential_titles: tuple[str, ...]
 
 
 def Cell_Volume(lattice: NDArray[np.float64]) -> float:
-    """Returns the absolute determinant of the lattice rows in cubic angstrom."""
+    """absolute determinant of the lattice rows, in cubic angstrom"""
     return float(abs(np.linalg.det(lattice)))
 
 
 def Read_Geometry(lines: Sequence[str], start: int = 0) -> tuple[Geometry, int]:
-    """Reads one POSCAR-style header and returns it with the index of the next line."""
+    """one POSCAR-style header, with the index of the line after it"""
     comment = lines[start].strip()
     scale = float(lines[start + 1].split()[0])
     lattice_rows = [[float(token) for token in line.split()[:3]] for line in lines[start + 2 : start + 5]]
     lattice = np.asarray(lattice_rows, dtype=np.float64)
+    # a negative scale is a target cell volume, not a factor
     if scale < 0.0:
         scale = (-scale / float(abs(np.linalg.det(lattice)))) ** (1.0 / 3.0)
     lattice = lattice * scale
     species = tuple(lines[start + 5].split())
     species_counts = tuple(int(token) for token in lines[start + 6].split())
     cursor = start + 7
+    # an optional selective-dynamics line sits between the counts and the coordinate mode
     if lines[cursor].strip().lower().startswith("s"):
         cursor += 1
     mode = lines[cursor].strip().lower()
@@ -75,13 +77,14 @@ def Read_Geometry(lines: Sequence[str], start: int = 0) -> tuple[Geometry, int]:
     total = sum(species_counts)
     coordinate_rows = [[float(token) for token in line.split()[:3]] for line in lines[cursor : cursor + total]]
     positions = np.asarray(coordinate_rows, dtype=np.float64)
+    # cartesian and direct both come home as fractions
     if mode.startswith(("c", "k")):
         positions = positions @ np.linalg.inv(lattice)
     return Geometry(comment, lattice, species, species_counts, positions), cursor + total
 
 
 def Grid_Dimensions_On_Line(line: str) -> tuple[int, int, int] | None:
-    """Returns the line's three integer grid dimensions, or None for any other line."""
+    """the line's three integer grid dimensions, or nothing for any other line"""
     tokens = line.split()
     if len(tokens) != 3 or not all(token.isdigit() for token in tokens):
         return None
@@ -89,10 +92,11 @@ def Grid_Dimensions_On_Line(line: str) -> tuple[int, int, int] | None:
 
 
 def Read_Grid_Block(lines: Sequence[str], start: int, value_count: int) -> tuple[NDArray[np.float64], int]:
-    """Reads value_count whitespace-separated floats beginning at the start line."""
+    """the requested count of whitespace-separated floats, from the start line on"""
     first_width = len(lines[start].split())
     if first_width == 0:
         raise ParseError(f"empty line where grid data was expected at line {start + 1}")
+    # the first line's width sets the block's, so the line count divides and rounds up
     line_count = -(-value_count // first_width)
     tokens = " ".join(lines[start : start + line_count]).split()
     if len(tokens) < value_count:
@@ -102,11 +106,12 @@ def Read_Grid_Block(lines: Sequence[str], start: int, value_count: int) -> tuple
 
 
 def Read_Field_File(path: Path) -> FieldFile:
-    """Reads a CHGCAR-family volumetric file into its geometry and grid blocks."""
+    """a CHGCAR-family volumetric file as its geometry and grid blocks"""
     lines = path.read_text().splitlines()
     geometry, cursor = Read_Geometry(lines)
     dimensions: tuple[int, int, int] | None = None
     blocks: list[NDArray[np.float64]] = []
+    # scanning for dimension lines walks past the augmentation and legacy ion blocks
     while cursor < len(lines):
         found = Grid_Dimensions_On_Line(lines[cursor])
         if found is None or (dimensions is not None and found != dimensions):
@@ -115,6 +120,7 @@ def Read_Field_File(path: Path) -> FieldFile:
         dimensions = found
         count = dimensions[0] * dimensions[1] * dimensions[2]
         flat, cursor = Read_Grid_Block(lines, cursor + 1, count)
+        # the file runs x fastest, so it is read reversed and put back axis by axis
         blocks.append(flat.reshape((dimensions[2], dimensions[1], dimensions[0])).transpose(2, 1, 0))
     if dimensions is None or not blocks:
         raise ParseError(f"no grid block found in {path}")
@@ -122,7 +128,7 @@ def Read_Field_File(path: Path) -> FieldFile:
 
 
 def Read_Eigenvalues(path: Path) -> EigenvalueSet:
-    """Reads EIGENVAL into per-spin, per-k-point, per-band energies and occupancies."""
+    """the eigenvalue file as per-spin, per-k-point, per-band energies and occupancies"""
     lines = path.read_text().splitlines()
     spin_count = int(lines[0].split()[3])
     header = lines[5].split()
@@ -135,6 +141,7 @@ def Read_Eigenvalues(path: Path) -> EigenvalueSet:
     occupancies = np.zeros((spin_count, kpoint_count, band_count), dtype=np.float64)
     cursor = 6
     for kpoint_index in range(kpoint_count):
+        # a blank line separates one k-point's block from the next
         while lines[cursor].strip() == "":
             cursor += 1
         kpoint_tokens = lines[cursor].split()
@@ -142,6 +149,7 @@ def Read_Eigenvalues(path: Path) -> EigenvalueSet:
         kpoint_weights[kpoint_index] = float(kpoint_tokens[3])
         cursor += 1
         for band_index in range(band_count):
+            # a band row is its number, then every spin's energy, then every spin's occupancy
             row = lines[cursor].split()
             for spin_index in range(spin_count):
                 energies[spin_index, kpoint_index, band_index] = float(row[1 + spin_index])
@@ -151,25 +159,28 @@ def Read_Eigenvalues(path: Path) -> EigenvalueSet:
 
 
 def Read_Outcar_Echoes(path: Path) -> OutcarEchoes:
-    """Reads the NELECT echo and the pseudopotential titles from OUTCAR."""
+    """the electron-count echo and the pseudopotential titles from OUTCAR"""
     electron_count: float | None = None
     titles: list[str] = []
     with path.open() as stream:
         for line in stream:
             if "TITEL" in line:
                 titles.append(line.split("=", 1)[1].strip())
+            # the first echo is the run's own, later ones restate it
             elif "NELECT" in line and electron_count is None:
                 electron_count = float(line.split()[2])
     if electron_count is None:
         raise ParseError(f"no NELECT echo in {path}")
+    # the file repeats each title once per ion, and the order matters
     return OutcarEchoes(electron_count, tuple(dict.fromkeys(titles)))
 
 
 def Read_Final_Magnetization(path: Path) -> float | None:
-    """Reads the last per-step magnetization from OSZICAR, or None when absent."""
+    """the last per-step magnetization in OSZICAR, or nothing when absent"""
     magnetization: float | None = None
     with path.open() as stream:
         for line in stream:
+            # every step prints one, the last is the converged value
             if "mag=" in line:
                 magnetization = float(line.rsplit("mag=", 1)[1].split()[0])
     return magnetization

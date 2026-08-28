@@ -1,4 +1,4 @@
-"""Checks every exclusion resolves to its recorded count on the live census."""
+"""every exclusion resolves to its recorded count on the live census"""
 
 import pytest
 
@@ -7,14 +7,14 @@ from operators.data.store import POOL_ROOT, Campaign_Of, Read_Census
 
 
 def Require_The_Pool() -> None:
-    """Fails the calling test when the corpus partition is not mounted."""
+    """fails the calling test when the corpus partition is not mounted"""
     if not POOL_ROOT.exists():
         pytest.fail("the corpus at /Pool/VASP_DATA is not mounted on this machine")
 
 
 @pytest.mark.pool
 def Test_The_Exclusion_Counts_Match_The_Registry() -> None:
-    """Asserts each cheap-to-resolve exclusion names exactly its recorded runs."""
+    """each cheap-to-resolve exclusion names exactly its recorded runs"""
     Require_The_Pool()
     census_rows = Read_Census(POOL_ROOT)
     expected = {"E1": 6, "E2": 1, "E3": 1, "E4": 1, "E5": 1, "E6": 73, "E7": 4, "E9": 12, "E10": 1}
@@ -25,7 +25,7 @@ def Test_The_Exclusion_Counts_Match_The_Registry() -> None:
 
 @pytest.mark.pool
 def Test_The_Fractional_Occupancy_Counts_Match() -> None:
-    """Asserts the perovskite fractional-occupancy flags split 106 angle and 22 length."""
+    """the perovskite fractional-occupancy flags split 106 angle and 22 length"""
     Require_The_Pool()
     census_rows = Read_Census(POOL_ROOT)
     flagged = Resolve_Exclusion("E8", census_rows, POOL_ROOT)
@@ -36,7 +36,7 @@ def Test_The_Fractional_Occupancy_Counts_Match() -> None:
 
 @pytest.mark.pool
 def Test_The_Byte_Alias_Triples_Count_Twenty_Four() -> None:
-    """Asserts the strain atlas holds exactly twenty-four byte-alias triples."""
+    """the strain atlas holds exactly twenty-four byte-alias triples"""
     Require_The_Pool()
     groups = Read_Byte_Alias_Groups(POOL_ROOT)
     strain_triples = [

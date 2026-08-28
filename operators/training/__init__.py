@@ -1,4 +1,4 @@
-"""Split-aware loading and the engine-facet training loop."""
+"""split-aware loading and the engine-facet training loop"""
 
 from operators.training.loader import (
     Field_From_Archive,

@@ -1,4 +1,4 @@
-"""Checks the metrics on analytic cases and the gap walk against the census labels."""
+"""the metrics on analytic cases, and the gap walk against the census labels"""
 
 from typing import cast
 
@@ -22,7 +22,7 @@ from operators.metrics import (
 
 
 def Test_Field_Errors_Have_Their_Analytic_Values() -> None:
-    """Asserts the relative and mean-removed errors on closed-form cases."""
+    """the relative and mean-removed errors on closed-form cases"""
     truth = np.asarray([3.0, 4.0])
     assert Relative_L2(truth, truth) == 0.0
     assert abs(Relative_L2(2.0 * truth, truth) - 1.0) < 1e-12
@@ -30,7 +30,7 @@ def Test_Field_Errors_Have_Their_Analytic_Values() -> None:
 
 
 def Test_The_Frequency_Split_Separates_Bands() -> None:
-    """Asserts low-mode agreement survives high-mode contamination."""
+    """low-mode agreement survives high-mode contamination"""
     coordinates = np.arange(8) / 8.0
     x_coordinate, y_coordinate, _ = np.meshgrid(coordinates, coordinates, coordinates, indexing="ij")
     truth = np.cos(2.0 * np.pi * x_coordinate)
@@ -41,7 +41,7 @@ def Test_The_Frequency_Split_Separates_Bands() -> None:
 
 
 def Test_Structural_Similarity_Ranks_Agreement() -> None:
-    """Asserts identical fields score one and unrelated noise scores much lower."""
+    """identical fields score one, unrelated noise scores far lower"""
     generator = np.random.default_rng(7)
     field = generator.random((12, 12, 12))
     assert abs(Structural_Similarity_3d(field, field) - 1.0) < 1e-9
@@ -50,7 +50,7 @@ def Test_Structural_Similarity_Ranks_Agreement() -> None:
 
 
 def Test_Curve_Distances_Have_Their_Analytic_Values() -> None:
-    """Asserts the curve error and transport distance on shifted point masses."""
+    """the curve error and the transport distance on shifted point masses"""
     first = np.zeros(64)
     second = np.zeros(64)
     first[10] = 1.0
@@ -61,7 +61,7 @@ def Test_Curve_Distances_Have_Their_Analytic_Values() -> None:
 
 
 def Test_Aggregates_Behave() -> None:
-    """Asserts the fraction, quartile, and bootstrap aggregates on tiny cases."""
+    """the fraction, quartile and bootstrap aggregates on tiny cases"""
     errors = np.asarray([0.05, 0.2, -0.08])
     assert abs(Fraction_Within(errors, 0.1) - 2.0 / 3.0) < 1e-12
     median, interquartile = Median_And_Interquartile(np.asarray([1.0, 2.0, 3.0, 4.0]))
@@ -71,7 +71,7 @@ def Test_Aggregates_Behave() -> None:
 
 
 def Test_The_Occupancy_Walk_And_Rebuild_Are_Consistent() -> None:
-    """Asserts the synthetic gap and the state-count normalization of the rebuild."""
+    """the synthetic gap, and the state count the rebuild normalizes to"""
     energies = np.asarray([[[-1.0, 2.0]]])
     occupancies = np.asarray([[[1.0, 0.0]]])
     assert Occupancy_Walk_Gap(energies, occupancies) == 3.0
@@ -83,7 +83,7 @@ def Test_The_Occupancy_Walk_And_Rebuild_Are_Consistent() -> None:
 
 @pytest.mark.pool
 def Test_The_Gap_Walk_Matches_The_Census_Labels() -> None:
-    """Asserts the occupancy walk reproduces the census gap on sampled live runs."""
+    """the occupancy walk reproduces the census gap on sampled live runs"""
     if not POOL_ROOT.exists():
         pytest.fail("the corpus at /Pool/VASP_DATA is not mounted on this machine")
     census_rows = [

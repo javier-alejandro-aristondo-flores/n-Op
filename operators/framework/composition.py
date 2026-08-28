@@ -1,4 +1,4 @@
-"""Schemes for chaining layers, each owning its topology and its backward pass."""
+"""schemes for chaining layers, each owning its topology and backward pass"""
 
 from abc import abstractmethod
 from typing import Protocol
@@ -8,7 +8,7 @@ from operators.framework.representation import Coefficients, Representation
 
 
 class Composition[State: Representation](Inspectable, Protocol):
-    """Applies a scheme's layers to a representation in channel space."""
+    """a scheme's layers applied to a representation in channel space"""
 
 
     @abstractmethod

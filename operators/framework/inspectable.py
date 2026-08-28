@@ -1,4 +1,4 @@
-"""The inspection contract: every part exposes its state as named plain-word arrays."""
+"""the inspection contract, one dictionary of named arrays per part"""
 
 from abc import abstractmethod
 from typing import Protocol
@@ -7,7 +7,7 @@ from operators.framework.domain import Array
 
 
 class Inspectable(Protocol):
-    """Exposes learned arrays and last-forward intermediates under plain-word names."""
+    """learned arrays and last-forward intermediates under plain-word names"""
 
 
     @abstractmethod

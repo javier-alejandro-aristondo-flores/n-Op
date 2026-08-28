@@ -1,4 +1,4 @@
-"""The root interface, and the template chaining encoder, composition, and readout."""
+"""the root interface, and the template chaining encoder, composition and readout"""
 
 from abc import abstractmethod
 from typing import Protocol
@@ -10,7 +10,7 @@ from operators.framework.representation import Coefficients, Representation
 
 
 class Operator[In: Representation, Out: Representation](Inspectable, Protocol):
-    """Maps one representation to another, evaluated on a requested discretization."""
+    """one representation to another, evaluated on a requested discretization"""
 
 
     @abstractmethod
@@ -23,7 +23,7 @@ class Operator[In: Representation, Out: Representation](Inspectable, Protocol):
 
 
 class NeuralOperator[In: Representation, Hidden: Representation, Out: Representation](Operator[In, Out]):
-    """An operator assembled from an encoder, a composition of layers, and a readout."""
+    """an encoder, a composition of layers and a readout, held together"""
 
 
     def __init__(
@@ -48,6 +48,7 @@ class NeuralOperator[In: Representation, Hidden: Representation, Out: Representa
 
     def Inspect(self) -> dict[str, Array]:
         state: dict[str, Array] = {}
+        # each part's own names survive under a prefix naming the part
         for prefix, inspected in (
             ("encoder", self.encoder.Inspect()),
             ("composition", self.composition.Inspect()),

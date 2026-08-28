@@ -1,4 +1,4 @@
-"""Checks the shared encoders, readouts, compositions, and wrappers."""
+"""the shared encoders, readouts, compositions and wrappers"""
 
 import numpy as np
 
@@ -26,14 +26,14 @@ GRID_QUADRATURE = UniformGridQuadrature(cell_volume=8.0, point_count=64)
 
 
 def Small_Field(channels: int, seed: int) -> GridFunction:
-    """Builds a random four-cubed field with the cube quadrature."""
+    """a random four-cubed field with the cube quadrature"""
     generator = np.random.default_rng(seed)
     labels = tuple(f"channel_{channel}" for channel in range(channels))
     return GridFunction(generator.random((channels, 4, 4, 4)), labels, CUBE, GRID_QUADRATURE)
 
 
 def Test_The_Lift_And_Projection_Mix_Channels() -> None:
-    """Asserts channel counts change while grids stay, and the bounded head stays in range."""
+    """channel counts change while the grid stays, and the bounded head stays in range"""
     field = Small_Field(2, seed=1)
     lift = PointwiseLift(hidden_channels=5, input_channels=2)
     lifted_field = lift(field, GridSpec((4, 4, 4)))
@@ -47,7 +47,7 @@ def Test_The_Lift_And_Projection_Mix_Channels() -> None:
 
 
 def Test_The_Sensor_Encoder_Reads_Parameters() -> None:
-    """Asserts the perceptron encoder maps a parameter vector to the latent width."""
+    """a parameter vector reaches the latent width"""
     encoder = SensorEncoder(layer_widths=(3, 16, 8), seed=2)
     parameters = Coefficients(vector=np.asarray([0.1, -0.2, 0.3]), domain=CUBE)
     latent = encoder(parameters, PointSpec(np.zeros((1, 1))))
@@ -55,7 +55,7 @@ def Test_The_Sensor_Encoder_Reads_Parameters() -> None:
 
 
 def Test_The_Basis_Projection_Recovers_Exact_Coefficients() -> None:
-    """Asserts projecting a field built from the basis returns its true coefficients."""
+    """a field built from the basis projects back to its own coefficients"""
     generator = np.random.default_rng(3)
     raw = generator.random((2, 64))
     orthonormal, _ = np.linalg.qr(raw.T)
@@ -70,7 +70,7 @@ def Test_The_Basis_Projection_Recovers_Exact_Coefficients() -> None:
 
 
 def Test_The_Basis_Expansion_Queries_Anywhere() -> None:
-    """Asserts the trunk answers identically on a grid and on the same explicit points."""
+    """the trunk answers identically on a grid and on the same explicit points"""
     readout = BasisExpansion(latent_width=6, trunk_widths=(16,), fourier_orders=2, seed=4)
     branch = Coefficients(vector=np.arange(6.0) / 6.0, domain=CUBE)
     on_grid = readout(branch, GridSpec((4, 4, 4)))
@@ -84,7 +84,7 @@ def Test_The_Basis_Expansion_Queries_Anywhere() -> None:
 
 
 def Test_The_Explicit_Stack_Chains_And_Inspects() -> None:
-    """Asserts the stack applies its layers and exposes prefixed kernel state."""
+    """the stack applies its layers, and exposes prefixed kernel state"""
     kernel = SpectralKernel(kept_modes=(1, 1, 1), output_channels=2, input_channels=2, seed=5)
     kernel.Hermitian_Symmetrize()
 
@@ -101,7 +101,7 @@ def Test_The_Explicit_Stack_Chains_And_Inspects() -> None:
 
 
 class FieldIdentity:
-    """A trivial inner operator returning its input unchanged."""
+    """an inner operator returning its input unchanged"""
 
 
     def __call__(
@@ -118,7 +118,7 @@ class FieldIdentity:
 
 
 def Test_The_Wrappers_Enforce_Their_Laws() -> None:
-    """Asserts zero-mean projection, electron-count renormalization, and the residual start."""
+    """zero mean, electron-count renormalization, and the residual start"""
     field = Small_Field(1, seed=7)
     zero_mean = Conserving(FieldIdentity(), law="zero_mean")
     balanced = zero_mean(field, GridSpec((4, 4, 4)))
@@ -131,7 +131,7 @@ def Test_The_Wrappers_Enforce_Their_Laws() -> None:
     assert abs(integral - 8.0) < 1e-9
 
     class ZeroInner(FieldIdentity):
-        """An inner operator returning all zeros."""
+        """an inner operator returning all zeros"""
 
 
         def __call__(

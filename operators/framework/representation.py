@@ -1,4 +1,4 @@
-"""Typed function objects, each carrying the quadrature it is integrated against."""
+"""typed function objects, each carrying the quadrature it is integrated against"""
 
 from dataclasses import dataclass, field
 
@@ -7,7 +7,7 @@ from operators.framework.domain import Array, Domain
 
 @dataclass(frozen=True, slots=True)
 class UniformGridQuadrature:
-    """Weights every grid point by the cell volume divided by the point count."""
+    """the cell volume split evenly over the grid points"""
 
     cell_volume: float
     point_count: int
@@ -15,23 +15,24 @@ class UniformGridQuadrature:
 
 @dataclass(frozen=True, slots=True)
 class CountingQuadrature:
-    """Weights every point by one."""
+    """unit weight on every point"""
 
 
 type Quadrature = UniformGridQuadrature | CountingQuadrature
 
 
 class Representation:
-    """Base of the typed function objects; every form carries a domain and a quadrature."""
+    """base of the typed function objects"""
 
     __slots__ = ()
 
+    # only the domain is declared here, each form narrows its own quadrature
     domain: Domain
 
 
 @dataclass(frozen=True, slots=True)
 class GridFunction(Representation):
-    """Field values on a uniform grid, one named channel per physical quantity."""
+    """field values on a uniform grid, one named channel per quantity"""
 
     values: Array
     channel_labels: tuple[str, ...]
@@ -41,7 +42,7 @@ class GridFunction(Representation):
 
 @dataclass(frozen=True, slots=True)
 class PointSet(Representation):
-    """Points in the cell with optional values, species, and message-passing roles."""
+    """points in the cell with optional values, species and message-passing roles"""
 
     positions: Array
     domain: Domain
@@ -53,7 +54,7 @@ class PointSet(Representation):
 
 @dataclass(frozen=True, slots=True)
 class Coefficients(Representation):
-    """A finite vector over an index set."""
+    """a finite vector over an index set"""
 
     vector: Array
     domain: Domain

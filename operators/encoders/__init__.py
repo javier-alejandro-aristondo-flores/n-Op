@@ -1,4 +1,4 @@
-"""Encoders: maps from corpus representations into the channel space layers work in."""
+"""maps from corpus representations into the channel space layers work in"""
 
 from typing import Any
 
@@ -11,7 +11,7 @@ from operators.substrate.network import MultilayerPerceptron
 
 
 class PointwiseLift(Operator[GridFunction, GridFunction]):
-    """Mixes input channels into a wider channel space at every grid point alike."""
+    """input channels mixed into a wider channel space, alike at every grid point"""
 
 
     def __init__(self, hidden_channels: int, input_channels: int, seed: int = 0) -> None:
@@ -24,6 +24,7 @@ class PointwiseLift(Operator[GridFunction, GridFunction]):
 
 
     def Forward(self, lifted: dict[str, Any], input_values: Any) -> Any:
+        # flattening the grid lets one matrix multiply cover every point
         flattened = input_values.reshape(input_values.shape[0], -1)
         mixed = lifted["lift_weights"] @ flattened + lifted["lift_biases"][:, None]
         return mixed.reshape(lifted["lift_weights"].shape[0], *input_values.shape[1:])
@@ -45,7 +46,7 @@ class PointwiseLift(Operator[GridFunction, GridFunction]):
 
 
 class SensorEncoder(Operator[Coefficients, Coefficients]):
-    """Reads a parameter vector through a perceptron into a latent vector."""
+    """a parameter vector read through a perceptron into a latent vector"""
 
 
     def __init__(self, layer_widths: tuple[int, ...], seed: int = 0) -> None:
@@ -72,7 +73,7 @@ class SensorEncoder(Operator[Coefficients, Coefficients]):
 
 
 class BasisProjectionEncoder(Operator[GridFunction, Coefficients]):
-    """Projects a field onto a fixed orthonormal basis by quadrature-weighted inner products."""
+    """a field projected onto a fixed orthonormal basis"""
 
 
     def __init__(self, basis_modes: NDArray[np.float64], basis_mean: NDArray[np.float64]) -> None:
@@ -88,6 +89,7 @@ class BasisProjectionEncoder(Operator[GridFunction, Coefficients]):
         condition: Coefficients | None = None,
     ) -> Coefficients:
         flattened = np.asarray(input_function.values, dtype=np.float64).reshape(-1)
+        # the basis was built on mean-removed fields, so the mean comes off here too
         coefficients = self.basis_modes @ (flattened - self.basis_mean)
         self.last_coefficients = coefficients
         return Coefficients(vector=coefficients, domain=input_function.domain)

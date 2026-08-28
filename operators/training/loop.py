@@ -1,4 +1,4 @@
-"""The training loop on the engine facet, emitting inspectable curve artifacts."""
+"""the training loop on the engine facet, emitting inspectable curve artifacts"""
 
 import json
 from collections.abc import Callable, Sequence
@@ -16,7 +16,7 @@ from operators.substrate.optimize import Adam_Step, Fresh_Adam_State
 
 @dataclass(frozen=True, slots=True)
 class TrainingResult:
-    """The trained parameters, the loss curve, and the run manifest."""
+    """the trained parameters, the loss curve and the run manifest"""
 
     parameters: ParameterSet
     loss_curve: NDArray[np.float64]
@@ -34,11 +34,13 @@ def Train(
     artifact_directory: Path | None = None,
     run_name: str = "training_run",
 ) -> TrainingResult:
-    """Runs Adam over the batches and stores the loss curve as inspectable artifacts."""
+    """the Adam loop over the batches, its loss curve stored as inspectable artifacts"""
     state = Fresh_Adam_State(parameters)
     losses: list[float] = []
     for training_step in range(step_count):
+        # the batches cycle, so a step count past their number is another pass over them
         batch = batches[training_step % len(batches)]
+        # a plain array is lifted onto the engine, anything already lifted is left alone
         if isinstance(batch, np.ndarray):
             lifted_batch = engine.Lift_Constant(cast(NDArray[np.float64], batch))
         else:
@@ -49,6 +51,7 @@ def Train(
 
         gradients = engine.Gradients(parameters, Loss_Of)
         parameters = Adam_Step(parameters, gradients, state, learning_rate=learning_rate)
+        # the recorded loss is the one after the step, so the curve shows what was gained
         losses.append(engine.Evaluate(parameters, Loss_Of))
     loss_curve = np.asarray(losses, dtype=np.float64)
     manifest: dict[str, object] = {

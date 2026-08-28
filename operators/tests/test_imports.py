@@ -1,10 +1,12 @@
-"""Checks that every package imports and that the framework's contracts hold their shape."""
+"""every package imports, and the framework's contracts hold their shape"""
 
 import ast
 import importlib
 import inspect
+import io
 import shutil
 import subprocess
+import tokenize
 from pathlib import Path
 from typing import Any, cast, is_protocol
 
@@ -51,13 +53,13 @@ ASSEMBLIES = {
 
 
 def Test_Every_Package_Imports() -> None:
-    """Imports every package listed in PACKAGES."""
+    """every package in the list, imported"""
     for package_name in PACKAGES:
         importlib.import_module(package_name)
 
 
 def Test_The_Behavioral_Classes_Are_Protocols() -> None:
-    """Asserts that the behavioral contracts are abstract protocols."""
+    """the behavioral contracts are abstract protocols"""
     from operators.framework import Composition, Inspectable, Kernel, Operator
 
     contracts: tuple[type[Any], ...] = (Operator, Kernel, Composition, Inspectable)
@@ -69,7 +71,7 @@ def Test_The_Behavioral_Classes_Are_Protocols() -> None:
 
 
 def Test_Representation_Has_Exactly_Three_Forms() -> None:
-    """Asserts that the three function objects derive from Representation."""
+    """the three function objects derive from Representation"""
     from operators.framework import Coefficients, GridFunction, PointSet, Representation
 
     for concrete_form in (GridFunction, PointSet, Coefficients):
@@ -77,7 +79,7 @@ def Test_Representation_Has_Exactly_Three_Forms() -> None:
 
 
 def Test_Each_Operator_Package_Exposes_One_Assembly() -> None:
-    """Asserts that every operator package exports its assembly implementing Operator."""
+    """every operator package exports one assembly, implementing Operator"""
     from operators.framework import Operator
 
     for package_name, class_name in ASSEMBLIES.items():
@@ -87,7 +89,7 @@ def Test_Each_Operator_Package_Exposes_One_Assembly() -> None:
 
 
 def Test_Every_Assembly_Carries_The_Inspection_Contract() -> None:
-    """Asserts every assembly inherits Inspectable and answers Inspect."""
+    """every assembly inherits Inspectable and answers Inspect"""
     from operators.framework import Inspectable
 
     for package_name, class_name in ASSEMBLIES.items():
@@ -98,7 +100,7 @@ def Test_Every_Assembly_Carries_The_Inspection_Contract() -> None:
 
 
 def Test_The_Names_Are_Prosaic() -> None:
-    """Asserts no cryptic identifiers and no placeholder counters anywhere in the package."""
+    """no cryptic identifiers and no placeholder counters, package-wide"""
     allowed_short_names = {"_", "In"}
     placeholder_names = {
         "index",
@@ -140,8 +142,44 @@ def Test_The_Names_Are_Prosaic() -> None:
     assert offenses == [], offenses
 
 
+def Test_The_Comments_Describe_The_Code() -> None:
+    """every docstring and comment is one lowercase line, with no closing period"""
+    pragma_prefixes = ("#!", "# type:", "# pyright:", "# noqa")
+    package_root = Path(__file__).resolve().parent.parent
+    offenses: list[str] = []
+    for source_path in sorted(package_root.rglob("*.py")):
+        if ".pytest_cache" in source_path.parts:
+            continue
+        source = source_path.read_text()
+        tree = ast.parse(source)
+        for node in ast.walk(tree):
+            if not isinstance(node, (ast.Module, ast.FunctionDef, ast.AsyncFunctionDef, ast.ClassDef)):
+                continue
+            written = ast.get_docstring(node, clean=False)
+            if written is None:
+                continue
+            line = getattr(node, "lineno", 0)
+            if "\n" in written:
+                offenses.append(f"{source_path.name}:{line} docstring runs past one line")
+            if written[:1].isupper():
+                offenses.append(f"{source_path.name}:{line} docstring starts capitalized")
+            if written.rstrip().endswith("."):
+                offenses.append(f"{source_path.name}:{line} docstring ends in a period")
+        for token in tokenize.generate_tokens(io.StringIO(source).readline):
+            if token.type != tokenize.COMMENT or token.string.startswith(pragma_prefixes):
+                continue
+            written = token.string.lstrip("#").strip()
+            if token.line[: token.start[1]].strip():
+                offenses.append(f"{source_path.name}:{token.start[0]} comment sits beside code")
+            if written[:1].isupper():
+                offenses.append(f"{source_path.name}:{token.start[0]} comment starts capitalized")
+            if written.endswith("."):
+                offenses.append(f"{source_path.name}:{token.start[0]} comment ends in a period")
+    assert offenses == [], offenses
+
+
 def Test_The_Package_Type_Checks_Strictly() -> None:
-    """Runs pyright strict over the package and fails on any error or a missing binary."""
+    """pyright strict over the package, failing on any error or a missing binary"""
     pyright_binary = shutil.which("pyright")
     assert pyright_binary is not None
     package_root = Path(__file__).resolve().parent.parent

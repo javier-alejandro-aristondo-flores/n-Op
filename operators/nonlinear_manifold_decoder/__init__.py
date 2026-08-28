@@ -1,10 +1,10 @@
-"""Strain or lattice parameters to charge density field, decoded point by point."""
+"""strain or lattice parameters to charge density, decoded point by point"""
 
 from operators.framework import Coefficients, GridFunction, NeuralOperator, PointSet
 
 
 class NonlinearManifoldDecoder(NeuralOperator[Coefficients, Coefficients, GridFunction | PointSet]):
-    """Assembles a sensor encoder, dense layers, and a nonlinear decoder."""
+    """sensor encoder, dense layers, nonlinear decoder"""
 
 
     def __init__(self) -> None:

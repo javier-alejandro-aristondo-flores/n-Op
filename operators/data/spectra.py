@@ -3,6 +3,14 @@
 import numpy
 from numpy.typing import NDArray
 
+SMEARING_WIDTH_BY_CAMPAIGN: dict[str, float] = {
+    "strain_atlas": 0.175,
+    "perovskite_grid": 0.125,
+    "supercell_strains": 0.2,
+    "defect_set": 0.2,
+    "relaxation_pool": 0.2,
+}
+
 
 def Occupancy_Walk_Gap(
     energies: NDArray[numpy.float64],

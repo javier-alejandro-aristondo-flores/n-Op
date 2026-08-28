@@ -171,6 +171,7 @@ rather than inventing a fake integral to satisfy the template.
 | `wrappers/` | residual · conditioned · conserving · the conformal calibrator |
 | `data/` | corpus parsers, the derived tensor store, the split engine, the exclusion registry, the orbit map, spectral derivations, the floors, and the Stage-0 report generator |
 | `metrics/` | comparison metrics — field errors, curve distances, and unit-level aggregates |
+| `inspection/` | the catalog over the store, the summary tables, and `plots.py` behind the rendering seam |
 | `tasks/` | task cards — inputs, targets, loss, metrics, conservation law, covariates, split |
 
 ### Notes that the code deliberately does not carry

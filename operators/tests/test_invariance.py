@@ -2,7 +2,7 @@
 
 import numpy
 
-from operators.framework.domain import Array
+from numpy.typing import NDArray
 from operators.framework.invariance import (
     Apply_Grid_Operation,
     Block_Gap_Null,
@@ -21,7 +21,7 @@ KNOWN_SPLITS = {
 }
 
 
-def Band_Limited_Field(extent: int) -> Array:
+def Band_Limited_Field(extent: int) -> NDArray[numpy.float64]:
     """Returns a two-channel field holding only modes below any test Nyquist."""
     coordinates = numpy.arange(extent) / extent
     x_coordinate, y_coordinate, z_coordinate = numpy.meshgrid(coordinates, coordinates, coordinates, indexing="ij")

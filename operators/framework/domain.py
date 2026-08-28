@@ -1,9 +1,10 @@
 """The periodic cell, and the two ways of naming where an operator evaluates."""
 
 from dataclasses import dataclass
-from typing import Any
 
-type Array = Any
+from operators.substrate.arrays import ArrayLike
+
+type Array = ArrayLike
 
 
 @dataclass(frozen=True, slots=True)

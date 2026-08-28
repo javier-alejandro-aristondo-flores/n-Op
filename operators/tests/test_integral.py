@@ -12,13 +12,13 @@ from operators.framework import (
     PointSpec,
     UniformGridQuadrature,
 )
-from operators.framework.domain import Array
+from numpy.typing import NDArray
 from operators.framework.integral import Dense_Reference_Integral, Quadrature_Weights
 
 CUBE = Domain(lattice=numpy.eye(3) * 2.0)
 
 
-def Constant_Kernel(targets: Array, sources: Array) -> Array:
+def Constant_Kernel(targets: NDArray[numpy.float64], sources: NDArray[numpy.float64]) -> NDArray[numpy.float64]:
     """Returns one for every target and source pair."""
     return numpy.ones((numpy.asarray(targets).shape[0], numpy.asarray(sources).shape[0]))
 
@@ -44,7 +44,7 @@ def Test_A_Dot_Kernel_Sums_Points_Analytically() -> None:
     point_values = numpy.asarray([[3.0], [5.0]])
     cloud = PointSet(positions=positions, domain=CUBE, values=point_values, quadrature=CountingQuadrature())
 
-    def Dot_Kernel(targets: Array, sources: Array) -> Array:
+    def Dot_Kernel(targets: NDArray[numpy.float64], sources: NDArray[numpy.float64]) -> NDArray[numpy.float64]:
         """Returns the coordinate dot product of every pair."""
         return numpy.asarray(targets) @ numpy.asarray(sources).T
 
@@ -57,7 +57,7 @@ def Test_A_Channel_Mixing_Kernel_Uses_The_Four_Axis_Path() -> None:
     positions = numpy.asarray([[0.0, 0.0, 0.0]])
     cloud = PointSet(positions=positions, domain=CUBE, values=numpy.asarray([[2.0, 7.0]]))
 
-    def Swap_Kernel(targets: Array, sources: Array) -> Array:
+    def Swap_Kernel(targets: NDArray[numpy.float64], sources: NDArray[numpy.float64]) -> NDArray[numpy.float64]:
         """Returns the channel-swap matrix for every pair."""
         pairs = (numpy.asarray(targets).shape[0], numpy.asarray(sources).shape[0])
         return numpy.broadcast_to(numpy.asarray([[0.0, 1.0], [1.0, 0.0]]), (*pairs, 2, 2))
@@ -70,7 +70,7 @@ def Test_Coefficients_Integrate_As_A_Weighted_Sum() -> None:
     """Asserts an index-selecting kernel reads coefficients like a matrix product."""
     coefficients = Coefficients(vector=numpy.asarray([2.0, 4.0, 8.0]), domain=CUBE)
 
-    def Selector_Kernel(targets: Array, sources: Array) -> Array:
+    def Selector_Kernel(targets: NDArray[numpy.float64], sources: NDArray[numpy.float64]) -> NDArray[numpy.float64]:
         """Returns one only where the source index matches the target row."""
         return (numpy.asarray(targets) == numpy.asarray(sources).T).astype(numpy.float64)
 

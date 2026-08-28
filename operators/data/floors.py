@@ -8,6 +8,7 @@ import numpy
 from numpy.typing import NDArray
 
 from operators.data.orbits import Orbit_Map
+from operators.substrate.fourier import Cartesian_Wavevectors
 from operators.data.spectra import Occupancy_Walk_Gap
 from operators.data.store import POOL_ROOT, CensusRow, Run_Identifier
 
@@ -160,25 +161,6 @@ def Scissor_Floor(
         "linear_residual_deviation": float(residual.std()),
         "r_squared": float(1.0 - residual.var() / accurate.var()),
     }
-
-
-def Reciprocal_Rows(lattice: Field) -> Field:
-    """Returns the reciprocal lattice vectors as rows, in inverse angstrom times two pi."""
-    return numpy.asarray(2.0 * numpy.pi * numpy.linalg.inv(lattice).T, dtype=numpy.float64)
-
-
-def Centered_Modes(extent: int) -> NDArray[numpy.int64]:
-    """Returns each spectral index as its signed centered mode number."""
-    indices = numpy.arange(extent, dtype=numpy.int64)
-    return numpy.where(indices <= extent // 2, indices, indices - extent)
-
-
-def Cartesian_Wavevectors(lattice: Field, shape: tuple[int, ...]) -> Field:
-    """Returns the Cartesian wavevector at every full-spectrum entry."""
-    reciprocal = Reciprocal_Rows(lattice)
-    modes = numpy.meshgrid(*[Centered_Modes(extent) for extent in shape], indexing="ij")
-    stacked = numpy.stack([numpy.asarray(grid, dtype=numpy.float64) for grid in modes], axis=-1)
-    return stacked @ reciprocal
 
 
 def Hartree_Potential(charge_density: Field, lattice: Field) -> Field:

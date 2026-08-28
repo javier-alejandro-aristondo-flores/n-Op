@@ -4,16 +4,15 @@ import numpy
 
 from operators.data.floors import (
     Apply_Per_Shell_Filter,
-    Cartesian_Wavevectors,
     Fit_Per_Shell_Filter,
     Hartree_Potential,
-    Reciprocal_Rows,
     Ridge_Apply,
     Ridge_Fit,
     Shell_Index_Grid,
     Spectral_Gradient_Magnitude_And_Laplacian,
     COULOMB_CONSTANT,
 )
+from operators.substrate.fourier import Cartesian_Wavevectors, Reciprocal_Rows
 from operators.data.pod import Basis_Decay_Gate, Gram_Pod, Project, Reconstruct, Reconstruction_Error_Curve
 
 

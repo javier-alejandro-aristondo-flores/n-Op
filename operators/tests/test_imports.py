@@ -25,6 +25,7 @@ PACKAGES = [
     "operators.data",
     "operators.inspection",
     "operators.metrics",
+    "operators.substrate",
     "operators.tasks",
     "operators.factorized_fourier",
     "operators.alias_free_convolutional",

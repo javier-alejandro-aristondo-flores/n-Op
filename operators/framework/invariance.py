@@ -5,19 +5,20 @@ from itertools import permutations, product
 
 import numpy
 
-from operators.framework.domain import Array
+from numpy.typing import NDArray
+
 from operators.framework.operator import Operator
 from operators.framework.representation import Representation
 from operators.tasks import TaskCard
 
 
-def Spectral_Truncation_Resample(values: Array, target_shape: tuple[int, int, int]) -> Array:
+def Spectral_Truncation_Resample(values: NDArray[numpy.float64], target_shape: tuple[int, int, int]) -> NDArray[numpy.float64]:
     """Resamples channel fields between grids by exact Fourier truncation or zero-padding."""
     stacked = numpy.asarray(values, dtype=numpy.float64)
     spectrum = numpy.fft.fftn(stacked, axes=(1, 2, 3))
     result = numpy.zeros((stacked.shape[0], *target_shape), dtype=numpy.complex128)
-    source_index: list[Array] = []
-    target_index: list[Array] = []
+    source_index: list[NDArray[numpy.int64]] = []
+    target_index: list[NDArray[numpy.int64]] = []
     for source_extent, target_extent in zip(stacked.shape[1:], target_shape):
         largest_kept_mode = (min(source_extent, target_extent) - 1) // 2
         modes = numpy.arange(-largest_kept_mode, largest_kept_mode + 1, dtype=numpy.int64)
@@ -40,11 +41,11 @@ def Diamond_Conventional_Motif() -> tuple[tuple[float, float, float], ...]:
     return tuple(positions)
 
 
-def Diamond_Grid_Operations() -> tuple[tuple[Array, Array], ...]:
+def Diamond_Grid_Operations() -> tuple[tuple[NDArray[numpy.int64], NDArray[numpy.float64]], ...]:
     """Returns the 48 signed permutations with the fractional translation each needs."""
     motif = {tuple(numpy.round(position, 6)) for position in Diamond_Conventional_Motif()}
     candidate_translations = [numpy.asarray(position, dtype=numpy.float64) for position in Diamond_Conventional_Motif()]
-    operations: list[tuple[Array, Array]] = []
+    operations: list[tuple[NDArray[numpy.int64], NDArray[numpy.float64]]] = []
     for permutation in permutations((0, 1, 2)):
         for signs in product((1, -1), repeat=3):
             matrix = numpy.zeros((3, 3), dtype=numpy.int64)
@@ -60,7 +61,7 @@ def Diamond_Grid_Operations() -> tuple[tuple[Array, Array], ...]:
     return tuple(operations)
 
 
-def Apply_Grid_Operation(values: Array, matrix: Array, translation: Array) -> Array:
+def Apply_Grid_Operation(values: NDArray[numpy.float64], matrix: NDArray[numpy.int64], translation: NDArray[numpy.float64]) -> NDArray[numpy.float64]:
     """Applies one exact symmetry operation to channel fields on a compatible cubic grid."""
     stacked = numpy.asarray(values)
     extent = stacked.shape[1]
@@ -73,10 +74,10 @@ def Apply_Grid_Operation(values: Array, matrix: Array, translation: Array) -> Ar
 
 
 def Equivariance_Errors(
-    apply_model: Callable[[Array], Array],
-    values: Array,
-    operations: tuple[tuple[Array, Array], ...],
-) -> Array:
+    apply_model: Callable[[NDArray[numpy.float64]], NDArray[numpy.float64]],
+    values: NDArray[numpy.float64],
+    operations: tuple[tuple[NDArray[numpy.int64], NDArray[numpy.float64]], ...],
+) -> NDArray[numpy.float64]:
     """Returns the relative equivariance error of a model under each operation."""
     base_output = numpy.asarray(apply_model(values), dtype=numpy.float64)
     scale = numpy.linalg.norm(base_output.ravel())
@@ -89,7 +90,7 @@ def Equivariance_Errors(
     return numpy.asarray(errors, dtype=numpy.float64)
 
 
-def Block_Gap_Null(primitive_values: Array, supercell_values: Array, tiles: tuple[int, int, int]) -> float:
+def Block_Gap_Null(primitive_values: NDArray[numpy.float64], supercell_values: NDArray[numpy.float64], tiles: tuple[int, int, int]) -> float:
     """Returns the relative distance between the tiled primitive truth and the supercell truth."""
     primitive = numpy.asarray(primitive_values, dtype=numpy.float64)
     supercell = numpy.asarray(supercell_values, dtype=numpy.float64)

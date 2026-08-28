@@ -1,0 +1,3181 @@
+{
+ "perovskite_a_0p8_b_0p8_c_0p8_alpha_1_beta_1_gamma_1_length": {
+  "extrapolation_tags": [
+   "holdout_factor_0p8"
+  ],
+  "fold": 4,
+  "run_identifiers": [
+   "6fe0ec45710a1736"
+  ],
+  "run_paths": [
+   "ggapbe/length_distortions/a_0p8_b_0p8_c_0p8_alpha_1_beta_1_gamma_1"
+  ],
+  "stratum": "length"
+ },
+ "perovskite_a_0p8_b_0p8_c_0p9_alpha_1_beta_1_gamma_1_length": {
+  "extrapolation_tags": [
+   "holdout_factor_0p8"
+  ],
+  "fold": 4,
+  "run_identifiers": [
+   "3f40b2dcdabb7308"
+  ],
+  "run_paths": [
+   "ggapbe/length_distortions/a_0p8_b_0p8_c_0p9_alpha_1_beta_1_gamma_1"
+  ],
+  "stratum": "length"
+ },
+ "perovskite_a_0p8_b_0p8_c_1_alpha_1_beta_1_gamma_1_length": {
+  "extrapolation_tags": [
+   "holdout_factor_0p8"
+  ],
+  "fold": 1,
+  "run_identifiers": [
+   "1942cb3ec8dc07cf"
+  ],
+  "run_paths": [
+   "ggapbe/length_distortions/a_0p8_b_0p8_c_1_alpha_1_beta_1_gamma_1"
+  ],
+  "stratum": "length"
+ },
+ "perovskite_a_0p8_b_0p8_c_1p1_alpha_1_beta_1_gamma_1_length": {
+  "extrapolation_tags": [
+   "holdout_factor_0p8"
+  ],
+  "fold": 2,
+  "run_identifiers": [
+   "de1029a9c8f0fee7"
+  ],
+  "run_paths": [
+   "ggapbe/length_distortions/a_0p8_b_0p8_c_1p1_alpha_1_beta_1_gamma_1"
+  ],
+  "stratum": "length"
+ },
+ "perovskite_a_0p8_b_0p8_c_1p2_alpha_1_beta_1_gamma_1_length": {
+  "extrapolation_tags": [
+   "holdout_factor_0p8",
+   "holdout_factor_1p2"
+  ],
+  "fold": 3,
+  "run_identifiers": [
+   "8206dcdb49be1dd0"
+  ],
+  "run_paths": [
+   "ggapbe/length_distortions/a_0p8_b_0p8_c_1p2_alpha_1_beta_1_gamma_1"
+  ],
+  "stratum": "length"
+ },
+ "perovskite_a_0p8_b_0p9_c_0p8_alpha_1_beta_1_gamma_1_length": {
+  "extrapolation_tags": [
+   "holdout_factor_0p8"
+  ],
+  "fold": 0,
+  "run_identifiers": [
+   "50711dee0e22a1b6"
+  ],
+  "run_paths": [
+   "ggapbe/length_distortions/a_0p8_b_0p9_c_0p8_alpha_1_beta_1_gamma_1"
+  ],
+  "stratum": "length"
+ },
+ "perovskite_a_0p8_b_0p9_c_0p9_alpha_1_beta_1_gamma_1_length": {
+  "extrapolation_tags": [
+   "holdout_factor_0p8"
+  ],
+  "fold": 2,
+  "run_identifiers": [
+   "3121bcc05dbb8e18"
+  ],
+  "run_paths": [
+   "ggapbe/length_distortions/a_0p8_b_0p9_c_0p9_alpha_1_beta_1_gamma_1"
+  ],
+  "stratum": "length"
+ },
+ "perovskite_a_0p8_b_0p9_c_1_alpha_1_beta_1_gamma_1_length": {
+  "extrapolation_tags": [
+   "holdout_factor_0p8"
+  ],
+  "fold": 2,
+  "run_identifiers": [
+   "d09d5e2a379d2b98"
+  ],
+  "run_paths": [
+   "ggapbe/length_distortions/a_0p8_b_0p9_c_1_alpha_1_beta_1_gamma_1"
+  ],
+  "stratum": "length"
+ },
+ "perovskite_a_0p8_b_0p9_c_1p1_alpha_1_beta_1_gamma_1_length": {
+  "extrapolation_tags": [
+   "holdout_factor_0p8"
+  ],
+  "fold": 2,
+  "run_identifiers": [
+   "42f86a16ff614440"
+  ],
+  "run_paths": [
+   "ggapbe/length_distortions/a_0p8_b_0p9_c_1p1_alpha_1_beta_1_gamma_1"
+  ],
+  "stratum": "length"
+ },
+ "perovskite_a_0p8_b_0p9_c_1p2_alpha_1_beta_1_gamma_1_length": {
+  "extrapolation_tags": [
+   "holdout_factor_0p8",
+   "holdout_factor_1p2"
+  ],
+  "fold": 3,
+  "run_identifiers": [
+   "c441225b9604dae7"
+  ],
+  "run_paths": [
+   "ggapbe/length_distortions/a_0p8_b_0p9_c_1p2_alpha_1_beta_1_gamma_1"
+  ],
+  "stratum": "length"
+ },
+ "perovskite_a_0p8_b_1_c_0p8_alpha_1_beta_1_gamma_1_length": {
+  "extrapolation_tags": [
+   "holdout_factor_0p8"
+  ],
+  "fold": 2,
+  "run_identifiers": [
+   "19782446ecf0d5e0"
+  ],
+  "run_paths": [
+   "ggapbe/length_distortions/a_0p8_b_1_c_0p8_alpha_1_beta_1_gamma_1"
+  ],
+  "stratum": "length"
+ },
+ "perovskite_a_0p8_b_1_c_0p9_alpha_1_beta_1_gamma_1_length": {
+  "extrapolation_tags": [
+   "holdout_factor_0p8"
+  ],
+  "fold": 0,
+  "run_identifiers": [
+   "d3578e5119d66776"
+  ],
+  "run_paths": [
+   "ggapbe/length_distortions/a_0p8_b_1_c_0p9_alpha_1_beta_1_gamma_1"
+  ],
+  "stratum": "length"
+ },
+ "perovskite_a_0p8_b_1_c_1_alpha_1_beta_1_gamma_1_length": {
+  "extrapolation_tags": [
+   "holdout_factor_0p8"
+  ],
+  "fold": 4,
+  "run_identifiers": [
+   "ca8533c3b07d62ea"
+  ],
+  "run_paths": [
+   "ggapbe/length_distortions/a_0p8_b_1_c_1_alpha_1_beta_1_gamma_1"
+  ],
+  "stratum": "length"
+ },
+ "perovskite_a_0p8_b_1_c_1p1_alpha_1_beta_1_gamma_1_length": {
+  "extrapolation_tags": [
+   "holdout_factor_0p8"
+  ],
+  "fold": 3,
+  "run_identifiers": [
+   "7cb3c76d931da0f5"
+  ],
+  "run_paths": [
+   "ggapbe/length_distortions/a_0p8_b_1_c_1p1_alpha_1_beta_1_gamma_1"
+  ],
+  "stratum": "length"
+ },
+ "perovskite_a_0p8_b_1_c_1p2_alpha_1_beta_1_gamma_1_length": {
+  "extrapolation_tags": [
+   "holdout_factor_0p8",
+   "holdout_factor_1p2"
+  ],
+  "fold": 1,
+  "run_identifiers": [
+   "4c269e8b489e4864"
+  ],
+  "run_paths": [
+   "ggapbe/length_distortions/a_0p8_b_1_c_1p2_alpha_1_beta_1_gamma_1"
+  ],
+  "stratum": "length"
+ },
+ "perovskite_a_0p8_b_1p1_c_0p8_alpha_1_beta_1_gamma_1_length": {
+  "extrapolation_tags": [
+   "holdout_factor_0p8"
+  ],
+  "fold": 1,
+  "run_identifiers": [
+   "23cb9ba00db9a40a"
+  ],
+  "run_paths": [
+   "ggapbe/length_distortions/a_0p8_b_1p1_c_0p8_alpha_1_beta_1_gamma_1"
+  ],
+  "stratum": "length"
+ },
+ "perovskite_a_0p8_b_1p1_c_0p9_alpha_1_beta_1_gamma_1_length": {
+  "extrapolation_tags": [
+   "holdout_factor_0p8"
+  ],
+  "fold": 3,
+  "run_identifiers": [
+   "dd57fabd4a93653d"
+  ],
+  "run_paths": [
+   "ggapbe/length_distortions/a_0p8_b_1p1_c_0p9_alpha_1_beta_1_gamma_1"
+  ],
+  "stratum": "length"
+ },
+ "perovskite_a_0p8_b_1p1_c_1_alpha_1_beta_1_gamma_1_length": {
+  "extrapolation_tags": [
+   "holdout_factor_0p8"
+  ],
+  "fold": 1,
+  "run_identifiers": [
+   "95f1d4c2a7ac1973"
+  ],
+  "run_paths": [
+   "ggapbe/length_distortions/a_0p8_b_1p1_c_1_alpha_1_beta_1_gamma_1"
+  ],
+  "stratum": "length"
+ },
+ "perovskite_a_0p8_b_1p1_c_1p1_alpha_1_beta_1_gamma_1_length": {
+  "extrapolation_tags": [
+   "holdout_factor_0p8"
+  ],
+  "fold": 2,
+  "run_identifiers": [
+   "a059948eb6a07ed6"
+  ],
+  "run_paths": [
+   "ggapbe/length_distortions/a_0p8_b_1p1_c_1p1_alpha_1_beta_1_gamma_1"
+  ],
+  "stratum": "length"
+ },
+ "perovskite_a_0p8_b_1p1_c_1p2_alpha_1_beta_1_gamma_1_length": {
+  "extrapolation_tags": [
+   "holdout_factor_0p8",
+   "holdout_factor_1p2"
+  ],
+  "fold": 4,
+  "run_identifiers": [
+   "15aaa4764aedffa7"
+  ],
+  "run_paths": [
+   "ggapbe/length_distortions/a_0p8_b_1p1_c_1p2_alpha_1_beta_1_gamma_1"
+  ],
+  "stratum": "length"
+ },
+ "perovskite_a_0p8_b_1p2_c_0p8_alpha_1_beta_1_gamma_1_length": {
+  "extrapolation_tags": [
+   "holdout_factor_0p8",
+   "holdout_factor_1p2"
+  ],
+  "fold": 3,
+  "run_identifiers": [
+   "f9f738db9ed2ba90"
+  ],
+  "run_paths": [
+   "ggapbe/length_distortions/a_0p8_b_1p2_c_0p8_alpha_1_beta_1_gamma_1"
+  ],
+  "stratum": "length"
+ },
+ "perovskite_a_0p8_b_1p2_c_0p9_alpha_1_beta_1_gamma_1_length": {
+  "extrapolation_tags": [
+   "holdout_factor_0p8",
+   "holdout_factor_1p2"
+  ],
+  "fold": 2,
+  "run_identifiers": [
+   "8202b1554c91063d"
+  ],
+  "run_paths": [
+   "ggapbe/length_distortions/a_0p8_b_1p2_c_0p9_alpha_1_beta_1_gamma_1"
+  ],
+  "stratum": "length"
+ },
+ "perovskite_a_0p8_b_1p2_c_1_alpha_1_beta_1_gamma_1_length": {
+  "extrapolation_tags": [
+   "holdout_factor_0p8",
+   "holdout_factor_1p2"
+  ],
+  "fold": 2,
+  "run_identifiers": [
+   "61ca03aee4dc643a"
+  ],
+  "run_paths": [
+   "ggapbe/length_distortions/a_0p8_b_1p2_c_1_alpha_1_beta_1_gamma_1"
+  ],
+  "stratum": "length"
+ },
+ "perovskite_a_0p8_b_1p2_c_1p1_alpha_1_beta_1_gamma_1_length": {
+  "extrapolation_tags": [
+   "holdout_factor_0p8",
+   "holdout_factor_1p2"
+  ],
+  "fold": 3,
+  "run_identifiers": [
+   "e1f8d78ab1a1087b"
+  ],
+  "run_paths": [
+   "ggapbe/length_distortions/a_0p8_b_1p2_c_1p1_alpha_1_beta_1_gamma_1"
+  ],
+  "stratum": "length"
+ },
+ "perovskite_a_0p8_b_1p2_c_1p2_alpha_1_beta_1_gamma_1_length": {
+  "extrapolation_tags": [
+   "holdout_factor_0p8",
+   "holdout_factor_1p2"
+  ],
+  "fold": 1,
+  "run_identifiers": [
+   "933f778e895e4598"
+  ],
+  "run_paths": [
+   "ggapbe/length_distortions/a_0p8_b_1p2_c_1p2_alpha_1_beta_1_gamma_1"
+  ],
+  "stratum": "length"
+ },
+ "perovskite_a_0p9_b_0p8_c_0p8_alpha_1_beta_1_gamma_1_length": {
+  "extrapolation_tags": [
+   "holdout_factor_0p8"
+  ],
+  "fold": 3,
+  "run_identifiers": [
+   "d858b7a768bfb957"
+  ],
+  "run_paths": [
+   "ggapbe/length_distortions/a_0p9_b_0p8_c_0p8_alpha_1_beta_1_gamma_1"
+  ],
+  "stratum": "length"
+ },
+ "perovskite_a_0p9_b_0p8_c_0p9_alpha_1_beta_1_gamma_1_length": {
+  "extrapolation_tags": [
+   "holdout_factor_0p8"
+  ],
+  "fold": 1,
+  "run_identifiers": [
+   "ef319aa95c4d3302"
+  ],
+  "run_paths": [
+   "ggapbe/length_distortions/a_0p9_b_0p8_c_0p9_alpha_1_beta_1_gamma_1"
+  ],
+  "stratum": "length"
+ },
+ "perovskite_a_0p9_b_0p8_c_1_alpha_1_beta_1_gamma_1_length": {
+  "extrapolation_tags": [
+   "holdout_factor_0p8"
+  ],
+  "fold": 1,
+  "run_identifiers": [
+   "1afa02b86bf9daa8"
+  ],
+  "run_paths": [
+   "ggapbe/length_distortions/a_0p9_b_0p8_c_1_alpha_1_beta_1_gamma_1"
+  ],
+  "stratum": "length"
+ },
+ "perovskite_a_0p9_b_0p8_c_1p1_alpha_1_beta_1_gamma_1_length": {
+  "extrapolation_tags": [
+   "holdout_factor_0p8"
+  ],
+  "fold": 4,
+  "run_identifiers": [
+   "e394027bc058a043"
+  ],
+  "run_paths": [
+   "ggapbe/length_distortions/a_0p9_b_0p8_c_1p1_alpha_1_beta_1_gamma_1"
+  ],
+  "stratum": "length"
+ },
+ "perovskite_a_0p9_b_0p8_c_1p2_alpha_1_beta_1_gamma_1_length": {
+  "extrapolation_tags": [
+   "holdout_factor_0p8",
+   "holdout_factor_1p2"
+  ],
+  "fold": 3,
+  "run_identifiers": [
+   "71ed2ff249c6ac2f"
+  ],
+  "run_paths": [
+   "ggapbe/length_distortions/a_0p9_b_0p8_c_1p2_alpha_1_beta_1_gamma_1"
+  ],
+  "stratum": "length"
+ },
+ "perovskite_a_0p9_b_0p9_c_0p8_alpha_1_beta_1_gamma_1_length": {
+  "extrapolation_tags": [
+   "holdout_factor_0p8"
+  ],
+  "fold": 4,
+  "run_identifiers": [
+   "a798b96c6c44d38b"
+  ],
+  "run_paths": [
+   "ggapbe/length_distortions/a_0p9_b_0p9_c_0p8_alpha_1_beta_1_gamma_1"
+  ],
+  "stratum": "length"
+ },
+ "perovskite_a_0p9_b_0p9_c_0p9_alpha_1_beta_1_gamma_1_length": {
+  "extrapolation_tags": [],
+  "fold": 3,
+  "run_identifiers": [
+   "93cb5711d63dc4d2"
+  ],
+  "run_paths": [
+   "ggapbe/length_distortions/a_0p9_b_0p9_c_0p9_alpha_1_beta_1_gamma_1"
+  ],
+  "stratum": "length"
+ },
+ "perovskite_a_0p9_b_0p9_c_1_alpha_1_beta_1_gamma_1_length": {
+  "extrapolation_tags": [],
+  "fold": 1,
+  "run_identifiers": [
+   "d76624b4af887034"
+  ],
+  "run_paths": [
+   "ggapbe/length_distortions/a_0p9_b_0p9_c_1_alpha_1_beta_1_gamma_1"
+  ],
+  "stratum": "length"
+ },
+ "perovskite_a_0p9_b_0p9_c_1p1_alpha_1_beta_1_gamma_1_length": {
+  "extrapolation_tags": [],
+  "fold": 3,
+  "run_identifiers": [
+   "d10a2e5bd80d89cf"
+  ],
+  "run_paths": [
+   "ggapbe/length_distortions/a_0p9_b_0p9_c_1p1_alpha_1_beta_1_gamma_1"
+  ],
+  "stratum": "length"
+ },
+ "perovskite_a_0p9_b_0p9_c_1p2_alpha_1_beta_1_gamma_1_length": {
+  "extrapolation_tags": [
+   "holdout_factor_1p2"
+  ],
+  "fold": 2,
+  "run_identifiers": [
+   "35e6d56a552585aa"
+  ],
+  "run_paths": [
+   "ggapbe/length_distortions/a_0p9_b_0p9_c_1p2_alpha_1_beta_1_gamma_1"
+  ],
+  "stratum": "length"
+ },
+ "perovskite_a_0p9_b_1_c_0p8_alpha_1_beta_1_gamma_1_length": {
+  "extrapolation_tags": [
+   "holdout_factor_0p8"
+  ],
+  "fold": 4,
+  "run_identifiers": [
+   "dd421b55bb7f36fb"
+  ],
+  "run_paths": [
+   "ggapbe/length_distortions/a_0p9_b_1_c_0p8_alpha_1_beta_1_gamma_1"
+  ],
+  "stratum": "length"
+ },
+ "perovskite_a_0p9_b_1_c_0p9_alpha_1_beta_1_gamma_1_length": {
+  "extrapolation_tags": [],
+  "fold": 3,
+  "run_identifiers": [
+   "8a0db831a4fc1b41"
+  ],
+  "run_paths": [
+   "ggapbe/length_distortions/a_0p9_b_1_c_0p9_alpha_1_beta_1_gamma_1"
+  ],
+  "stratum": "length"
+ },
+ "perovskite_a_0p9_b_1_c_1_alpha_1_beta_1_gamma_1_length": {
+  "extrapolation_tags": [],
+  "fold": 1,
+  "run_identifiers": [
+   "85b8a7eb9a23df12"
+  ],
+  "run_paths": [
+   "ggapbe/length_distortions/a_0p9_b_1_c_1_alpha_1_beta_1_gamma_1"
+  ],
+  "stratum": "length"
+ },
+ "perovskite_a_0p9_b_1_c_1p1_alpha_1_beta_1_gamma_1_length": {
+  "extrapolation_tags": [],
+  "fold": 4,
+  "run_identifiers": [
+   "5157587c8145687f"
+  ],
+  "run_paths": [
+   "ggapbe/length_distortions/a_0p9_b_1_c_1p1_alpha_1_beta_1_gamma_1"
+  ],
+  "stratum": "length"
+ },
+ "perovskite_a_0p9_b_1_c_1p2_alpha_1_beta_1_gamma_1_length": {
+  "extrapolation_tags": [
+   "holdout_factor_1p2"
+  ],
+  "fold": 0,
+  "run_identifiers": [
+   "36272a6d8b37ca6a"
+  ],
+  "run_paths": [
+   "ggapbe/length_distortions/a_0p9_b_1_c_1p2_alpha_1_beta_1_gamma_1"
+  ],
+  "stratum": "length"
+ },
+ "perovskite_a_0p9_b_1p1_c_0p8_alpha_1_beta_1_gamma_1_length": {
+  "extrapolation_tags": [
+   "holdout_factor_0p8"
+  ],
+  "fold": 2,
+  "run_identifiers": [
+   "a9f53f304b34a19c"
+  ],
+  "run_paths": [
+   "ggapbe/length_distortions/a_0p9_b_1p1_c_0p8_alpha_1_beta_1_gamma_1"
+  ],
+  "stratum": "length"
+ },
+ "perovskite_a_0p9_b_1p1_c_0p9_alpha_1_beta_1_gamma_1_length": {
+  "extrapolation_tags": [],
+  "fold": 0,
+  "run_identifiers": [
+   "60e6fd5bca7b73b6"
+  ],
+  "run_paths": [
+   "ggapbe/length_distortions/a_0p9_b_1p1_c_0p9_alpha_1_beta_1_gamma_1"
+  ],
+  "stratum": "length"
+ },
+ "perovskite_a_0p9_b_1p1_c_1_alpha_1_beta_1_gamma_1_length": {
+  "extrapolation_tags": [],
+  "fold": 0,
+  "run_identifiers": [
+   "664032c01db4c14d"
+  ],
+  "run_paths": [
+   "ggapbe/length_distortions/a_0p9_b_1p1_c_1_alpha_1_beta_1_gamma_1"
+  ],
+  "stratum": "length"
+ },
+ "perovskite_a_0p9_b_1p1_c_1p1_alpha_1_beta_1_gamma_1_length": {
+  "extrapolation_tags": [],
+  "fold": 1,
+  "run_identifiers": [
+   "510785512d61e784"
+  ],
+  "run_paths": [
+   "ggapbe/length_distortions/a_0p9_b_1p1_c_1p1_alpha_1_beta_1_gamma_1"
+  ],
+  "stratum": "length"
+ },
+ "perovskite_a_0p9_b_1p1_c_1p2_alpha_1_beta_1_gamma_1_length": {
+  "extrapolation_tags": [
+   "holdout_factor_1p2"
+  ],
+  "fold": 3,
+  "run_identifiers": [
+   "3266d36c88a50df7"
+  ],
+  "run_paths": [
+   "ggapbe/length_distortions/a_0p9_b_1p1_c_1p2_alpha_1_beta_1_gamma_1"
+  ],
+  "stratum": "length"
+ },
+ "perovskite_a_0p9_b_1p2_c_0p8_alpha_1_beta_1_gamma_1_length": {
+  "extrapolation_tags": [
+   "holdout_factor_0p8",
+   "holdout_factor_1p2"
+  ],
+  "fold": 1,
+  "run_identifiers": [
+   "4d084a0c26009c5c"
+  ],
+  "run_paths": [
+   "ggapbe/length_distortions/a_0p9_b_1p2_c_0p8_alpha_1_beta_1_gamma_1"
+  ],
+  "stratum": "length"
+ },
+ "perovskite_a_0p9_b_1p2_c_0p9_alpha_1_beta_1_gamma_1_length": {
+  "extrapolation_tags": [
+   "holdout_factor_1p2"
+  ],
+  "fold": 0,
+  "run_identifiers": [
+   "1cee9b763cbf9216"
+  ],
+  "run_paths": [
+   "ggapbe/length_distortions/a_0p9_b_1p2_c_0p9_alpha_1_beta_1_gamma_1"
+  ],
+  "stratum": "length"
+ },
+ "perovskite_a_0p9_b_1p2_c_1_alpha_1_beta_1_gamma_1_length": {
+  "extrapolation_tags": [
+   "holdout_factor_1p2"
+  ],
+  "fold": 3,
+  "run_identifiers": [
+   "77ba8fc70ae5b74d"
+  ],
+  "run_paths": [
+   "ggapbe/length_distortions/a_0p9_b_1p2_c_1_alpha_1_beta_1_gamma_1"
+  ],
+  "stratum": "length"
+ },
+ "perovskite_a_0p9_b_1p2_c_1p1_alpha_1_beta_1_gamma_1_length": {
+  "extrapolation_tags": [
+   "holdout_factor_1p2"
+  ],
+  "fold": 0,
+  "run_identifiers": [
+   "5a16186a7ec21ea2"
+  ],
+  "run_paths": [
+   "ggapbe/length_distortions/a_0p9_b_1p2_c_1p1_alpha_1_beta_1_gamma_1"
+  ],
+  "stratum": "length"
+ },
+ "perovskite_a_0p9_b_1p2_c_1p2_alpha_1_beta_1_gamma_1_length": {
+  "extrapolation_tags": [
+   "holdout_factor_1p2"
+  ],
+  "fold": 0,
+  "run_identifiers": [
+   "44a93602eea4f874"
+  ],
+  "run_paths": [
+   "ggapbe/length_distortions/a_0p9_b_1p2_c_1p2_alpha_1_beta_1_gamma_1"
+  ],
+  "stratum": "length"
+ },
+ "perovskite_a_1_b_0p8_c_0p8_alpha_1_beta_1_gamma_1_length": {
+  "extrapolation_tags": [
+   "holdout_factor_0p8"
+  ],
+  "fold": 4,
+  "run_identifiers": [
+   "0f3e2b39640e3a73"
+  ],
+  "run_paths": [
+   "ggapbe/length_distortions/a_1_b_0p8_c_0p8_alpha_1_beta_1_gamma_1"
+  ],
+  "stratum": "length"
+ },
+ "perovskite_a_1_b_0p8_c_0p9_alpha_1_beta_1_gamma_1_length": {
+  "extrapolation_tags": [
+   "holdout_factor_0p8"
+  ],
+  "fold": 3,
+  "run_identifiers": [
+   "83eaaab2742e49eb"
+  ],
+  "run_paths": [
+   "ggapbe/length_distortions/a_1_b_0p8_c_0p9_alpha_1_beta_1_gamma_1"
+  ],
+  "stratum": "length"
+ },
+ "perovskite_a_1_b_0p8_c_1_alpha_1_beta_1_gamma_1_length": {
+  "extrapolation_tags": [
+   "holdout_factor_0p8"
+  ],
+  "fold": 2,
+  "run_identifiers": [
+   "b99511222e76cbed"
+  ],
+  "run_paths": [
+   "ggapbe/length_distortions/a_1_b_0p8_c_1_alpha_1_beta_1_gamma_1"
+  ],
+  "stratum": "length"
+ },
+ "perovskite_a_1_b_0p8_c_1p1_alpha_1_beta_1_gamma_1_length": {
+  "extrapolation_tags": [
+   "holdout_factor_0p8"
+  ],
+  "fold": 3,
+  "run_identifiers": [
+   "e845d3e771386a05"
+  ],
+  "run_paths": [
+   "ggapbe/length_distortions/a_1_b_0p8_c_1p1_alpha_1_beta_1_gamma_1"
+  ],
+  "stratum": "length"
+ },
+ "perovskite_a_1_b_0p8_c_1p2_alpha_1_beta_1_gamma_1_length": {
+  "extrapolation_tags": [
+   "holdout_factor_0p8",
+   "holdout_factor_1p2"
+  ],
+  "fold": 1,
+  "run_identifiers": [
+   "cf8d8cdf8e76615e"
+  ],
+  "run_paths": [
+   "ggapbe/length_distortions/a_1_b_0p8_c_1p2_alpha_1_beta_1_gamma_1"
+  ],
+  "stratum": "length"
+ },
+ "perovskite_a_1_b_0p9_c_0p8_alpha_1_beta_1_gamma_1_length": {
+  "extrapolation_tags": [
+   "holdout_factor_0p8"
+  ],
+  "fold": 3,
+  "run_identifiers": [
+   "eb5501fb4498dd56"
+  ],
+  "run_paths": [
+   "ggapbe/length_distortions/a_1_b_0p9_c_0p8_alpha_1_beta_1_gamma_1"
+  ],
+  "stratum": "length"
+ },
+ "perovskite_a_1_b_0p9_c_0p9_alpha_1_beta_1_gamma_1_length": {
+  "extrapolation_tags": [],
+  "fold": 4,
+  "run_identifiers": [
+   "d814b9bda4d59a0d"
+  ],
+  "run_paths": [
+   "ggapbe/length_distortions/a_1_b_0p9_c_0p9_alpha_1_beta_1_gamma_1"
+  ],
+  "stratum": "length"
+ },
+ "perovskite_a_1_b_0p9_c_1_alpha_1_beta_1_gamma_1_length": {
+  "extrapolation_tags": [],
+  "fold": 2,
+  "run_identifiers": [
+   "1bffbd9cc4d46e76"
+  ],
+  "run_paths": [
+   "ggapbe/length_distortions/a_1_b_0p9_c_1_alpha_1_beta_1_gamma_1"
+  ],
+  "stratum": "length"
+ },
+ "perovskite_a_1_b_0p9_c_1p1_alpha_1_beta_1_gamma_1_length": {
+  "extrapolation_tags": [],
+  "fold": 1,
+  "run_identifiers": [
+   "0c6cb154d1280908"
+  ],
+  "run_paths": [
+   "ggapbe/length_distortions/a_1_b_0p9_c_1p1_alpha_1_beta_1_gamma_1"
+  ],
+  "stratum": "length"
+ },
+ "perovskite_a_1_b_0p9_c_1p2_alpha_1_beta_1_gamma_1_length": {
+  "extrapolation_tags": [
+   "holdout_factor_1p2"
+  ],
+  "fold": 0,
+  "run_identifiers": [
+   "0296dd72d8707944"
+  ],
+  "run_paths": [
+   "ggapbe/length_distortions/a_1_b_0p9_c_1p2_alpha_1_beta_1_gamma_1"
+  ],
+  "stratum": "length"
+ },
+ "perovskite_a_1_b_1_c_0p8_alpha_1_beta_1_gamma_1_length": {
+  "extrapolation_tags": [
+   "holdout_factor_0p8"
+  ],
+  "fold": 2,
+  "run_identifiers": [
+   "16b5481989e5a64f"
+  ],
+  "run_paths": [
+   "ggapbe/length_distortions/a_1_b_1_c_0p8_alpha_1_beta_1_gamma_1"
+  ],
+  "stratum": "length"
+ },
+ "perovskite_a_1_b_1_c_0p9_alpha_1_beta_1_gamma_1_length": {
+  "extrapolation_tags": [],
+  "fold": 4,
+  "run_identifiers": [
+   "5ed7478cf38df40b"
+  ],
+  "run_paths": [
+   "ggapbe/length_distortions/a_1_b_1_c_0p9_alpha_1_beta_1_gamma_1"
+  ],
+  "stratum": "length"
+ },
+ "perovskite_a_1_b_1_c_1_alpha_0p8_beta_0p8_gamma_0p8_angle": {
+  "extrapolation_tags": [
+   "holdout_factor_0p8"
+  ],
+  "fold": 1,
+  "run_identifiers": [
+   "6060eb2137f6d24d"
+  ],
+  "run_paths": [
+   "ggapbe/angle_distortions/a_1_b_1_c_1_alpha_0p8_beta_0p8_gamma_0p8"
+  ],
+  "stratum": "angle"
+ },
+ "perovskite_a_1_b_1_c_1_alpha_0p8_beta_0p8_gamma_0p9_angle": {
+  "extrapolation_tags": [
+   "holdout_factor_0p8"
+  ],
+  "fold": 0,
+  "run_identifiers": [
+   "af43914b825c249b"
+  ],
+  "run_paths": [
+   "ggapbe/angle_distortions/a_1_b_1_c_1_alpha_0p8_beta_0p8_gamma_0p9"
+  ],
+  "stratum": "angle"
+ },
+ "perovskite_a_1_b_1_c_1_alpha_0p8_beta_0p8_gamma_1_angle": {
+  "extrapolation_tags": [
+   "holdout_factor_0p8"
+  ],
+  "fold": 3,
+  "run_identifiers": [
+   "66c201f2e6fecd7b"
+  ],
+  "run_paths": [
+   "ggapbe/angle_distortions/a_1_b_1_c_1_alpha_0p8_beta_0p8_gamma_1"
+  ],
+  "stratum": "angle"
+ },
+ "perovskite_a_1_b_1_c_1_alpha_0p8_beta_0p8_gamma_1p1_angle": {
+  "extrapolation_tags": [
+   "holdout_factor_0p8"
+  ],
+  "fold": 4,
+  "run_identifiers": [
+   "3cfb4f189d8c4ff6"
+  ],
+  "run_paths": [
+   "ggapbe/angle_distortions/a_1_b_1_c_1_alpha_0p8_beta_0p8_gamma_1p1"
+  ],
+  "stratum": "angle"
+ },
+ "perovskite_a_1_b_1_c_1_alpha_0p8_beta_0p8_gamma_1p2_angle": {
+  "extrapolation_tags": [
+   "holdout_factor_0p8",
+   "holdout_factor_1p2"
+  ],
+  "fold": 2,
+  "run_identifiers": [
+   "a42328eff7c6752d"
+  ],
+  "run_paths": [
+   "ggapbe/angle_distortions/a_1_b_1_c_1_alpha_0p8_beta_0p8_gamma_1p2"
+  ],
+  "stratum": "angle"
+ },
+ "perovskite_a_1_b_1_c_1_alpha_0p8_beta_0p9_gamma_0p8_angle": {
+  "extrapolation_tags": [
+   "holdout_factor_0p8"
+  ],
+  "fold": 1,
+  "run_identifiers": [
+   "66d24a076af0f951"
+  ],
+  "run_paths": [
+   "ggapbe/angle_distortions/a_1_b_1_c_1_alpha_0p8_beta_0p9_gamma_0p8"
+  ],
+  "stratum": "angle"
+ },
+ "perovskite_a_1_b_1_c_1_alpha_0p8_beta_0p9_gamma_0p9_angle": {
+  "extrapolation_tags": [
+   "holdout_factor_0p8"
+  ],
+  "fold": 2,
+  "run_identifiers": [
+   "a5d51eafa0e5cc5c"
+  ],
+  "run_paths": [
+   "ggapbe/angle_distortions/a_1_b_1_c_1_alpha_0p8_beta_0p9_gamma_0p9"
+  ],
+  "stratum": "angle"
+ },
+ "perovskite_a_1_b_1_c_1_alpha_0p8_beta_0p9_gamma_1_angle": {
+  "extrapolation_tags": [
+   "holdout_factor_0p8"
+  ],
+  "fold": 4,
+  "run_identifiers": [
+   "fdf097dd6d4a1064"
+  ],
+  "run_paths": [
+   "ggapbe/angle_distortions/a_1_b_1_c_1_alpha_0p8_beta_0p9_gamma_1"
+  ],
+  "stratum": "angle"
+ },
+ "perovskite_a_1_b_1_c_1_alpha_0p8_beta_0p9_gamma_1p1_angle": {
+  "extrapolation_tags": [
+   "holdout_factor_0p8"
+  ],
+  "fold": 0,
+  "run_identifiers": [
+   "67036ea187c14cf0"
+  ],
+  "run_paths": [
+   "ggapbe/angle_distortions/a_1_b_1_c_1_alpha_0p8_beta_0p9_gamma_1p1"
+  ],
+  "stratum": "angle"
+ },
+ "perovskite_a_1_b_1_c_1_alpha_0p8_beta_0p9_gamma_1p2_angle": {
+  "extrapolation_tags": [
+   "holdout_factor_0p8",
+   "holdout_factor_1p2"
+  ],
+  "fold": 4,
+  "run_identifiers": [
+   "b49a386654d5a942"
+  ],
+  "run_paths": [
+   "ggapbe/angle_distortions/a_1_b_1_c_1_alpha_0p8_beta_0p9_gamma_1p2"
+  ],
+  "stratum": "angle"
+ },
+ "perovskite_a_1_b_1_c_1_alpha_0p8_beta_1_gamma_0p8_angle": {
+  "extrapolation_tags": [
+   "holdout_factor_0p8"
+  ],
+  "fold": 3,
+  "run_identifiers": [
+   "9c543455cd796068"
+  ],
+  "run_paths": [
+   "ggapbe/angle_distortions/a_1_b_1_c_1_alpha_0p8_beta_1_gamma_0p8"
+  ],
+  "stratum": "angle"
+ },
+ "perovskite_a_1_b_1_c_1_alpha_0p8_beta_1_gamma_0p9_angle": {
+  "extrapolation_tags": [
+   "holdout_factor_0p8"
+  ],
+  "fold": 4,
+  "run_identifiers": [
+   "59583e732bcb6e57"
+  ],
+  "run_paths": [
+   "ggapbe/angle_distortions/a_1_b_1_c_1_alpha_0p8_beta_1_gamma_0p9"
+  ],
+  "stratum": "angle"
+ },
+ "perovskite_a_1_b_1_c_1_alpha_0p8_beta_1_gamma_1_angle": {
+  "extrapolation_tags": [
+   "holdout_factor_0p8"
+  ],
+  "fold": 0,
+  "run_identifiers": [
+   "bb37c2fb43746873"
+  ],
+  "run_paths": [
+   "ggapbe/angle_distortions/a_1_b_1_c_1_alpha_0p8_beta_1_gamma_1"
+  ],
+  "stratum": "angle"
+ },
+ "perovskite_a_1_b_1_c_1_alpha_0p8_beta_1_gamma_1p1_angle": {
+  "extrapolation_tags": [
+   "holdout_factor_0p8"
+  ],
+  "fold": 0,
+  "run_identifiers": [
+   "e700066057e968bb"
+  ],
+  "run_paths": [
+   "ggapbe/angle_distortions/a_1_b_1_c_1_alpha_0p8_beta_1_gamma_1p1"
+  ],
+  "stratum": "angle"
+ },
+ "perovskite_a_1_b_1_c_1_alpha_0p8_beta_1_gamma_1p2_angle": {
+  "extrapolation_tags": [
+   "holdout_factor_0p8",
+   "holdout_factor_1p2"
+  ],
+  "fold": 0,
+  "run_identifiers": [
+   "0fedc2896b3c4cc9"
+  ],
+  "run_paths": [
+   "ggapbe/angle_distortions/a_1_b_1_c_1_alpha_0p8_beta_1_gamma_1p2"
+  ],
+  "stratum": "angle"
+ },
+ "perovskite_a_1_b_1_c_1_alpha_0p8_beta_1p1_gamma_0p8_angle": {
+  "extrapolation_tags": [
+   "holdout_factor_0p8"
+  ],
+  "fold": 4,
+  "run_identifiers": [
+   "f7b429835d21e054"
+  ],
+  "run_paths": [
+   "ggapbe/angle_distortions/a_1_b_1_c_1_alpha_0p8_beta_1p1_gamma_0p8"
+  ],
+  "stratum": "angle"
+ },
+ "perovskite_a_1_b_1_c_1_alpha_0p8_beta_1p1_gamma_0p9_angle": {
+  "extrapolation_tags": [
+   "holdout_factor_0p8"
+  ],
+  "fold": 2,
+  "run_identifiers": [
+   "3813f6fbcd1e8e08"
+  ],
+  "run_paths": [
+   "ggapbe/angle_distortions/a_1_b_1_c_1_alpha_0p8_beta_1p1_gamma_0p9"
+  ],
+  "stratum": "angle"
+ },
+ "perovskite_a_1_b_1_c_1_alpha_0p8_beta_1p1_gamma_1_angle": {
+  "extrapolation_tags": [
+   "holdout_factor_0p8"
+  ],
+  "fold": 2,
+  "run_identifiers": [
+   "5955f8d69f870804"
+  ],
+  "run_paths": [
+   "ggapbe/angle_distortions/a_1_b_1_c_1_alpha_0p8_beta_1p1_gamma_1"
+  ],
+  "stratum": "angle"
+ },
+ "perovskite_a_1_b_1_c_1_alpha_0p8_beta_1p1_gamma_1p1_angle": {
+  "extrapolation_tags": [
+   "holdout_factor_0p8"
+  ],
+  "fold": 1,
+  "run_identifiers": [
+   "9b822634872317aa"
+  ],
+  "run_paths": [
+   "ggapbe/angle_distortions/a_1_b_1_c_1_alpha_0p8_beta_1p1_gamma_1p1"
+  ],
+  "stratum": "angle"
+ },
+ "perovskite_a_1_b_1_c_1_alpha_0p8_beta_1p1_gamma_1p2_angle": {
+  "extrapolation_tags": [
+   "holdout_factor_0p8",
+   "holdout_factor_1p2"
+  ],
+  "fold": 4,
+  "run_identifiers": [
+   "038882bc661aa53b"
+  ],
+  "run_paths": [
+   "ggapbe/angle_distortions/a_1_b_1_c_1_alpha_0p8_beta_1p1_gamma_1p2"
+  ],
+  "stratum": "angle"
+ },
+ "perovskite_a_1_b_1_c_1_alpha_0p8_beta_1p2_gamma_0p8_angle": {
+  "extrapolation_tags": [
+   "holdout_factor_0p8",
+   "holdout_factor_1p2"
+  ],
+  "fold": 0,
+  "run_identifiers": [
+   "b70bd905e2ce7e16"
+  ],
+  "run_paths": [
+   "ggapbe/angle_distortions/a_1_b_1_c_1_alpha_0p8_beta_1p2_gamma_0p8"
+  ],
+  "stratum": "angle"
+ },
+ "perovskite_a_1_b_1_c_1_alpha_0p8_beta_1p2_gamma_0p9_angle": {
+  "extrapolation_tags": [
+   "holdout_factor_0p8",
+   "holdout_factor_1p2"
+  ],
+  "fold": 0,
+  "run_identifiers": [
+   "e0e87c5cce54f43d"
+  ],
+  "run_paths": [
+   "ggapbe/angle_distortions/a_1_b_1_c_1_alpha_0p8_beta_1p2_gamma_0p9"
+  ],
+  "stratum": "angle"
+ },
+ "perovskite_a_1_b_1_c_1_alpha_0p8_beta_1p2_gamma_1_angle": {
+  "extrapolation_tags": [
+   "holdout_factor_0p8",
+   "holdout_factor_1p2"
+  ],
+  "fold": 3,
+  "run_identifiers": [
+   "ca0c41a4c9300fc3"
+  ],
+  "run_paths": [
+   "ggapbe/angle_distortions/a_1_b_1_c_1_alpha_0p8_beta_1p2_gamma_1"
+  ],
+  "stratum": "angle"
+ },
+ "perovskite_a_1_b_1_c_1_alpha_0p8_beta_1p2_gamma_1p1_angle": {
+  "extrapolation_tags": [
+   "holdout_factor_0p8",
+   "holdout_factor_1p2"
+  ],
+  "fold": 4,
+  "run_identifiers": [
+   "379af7e67c60fd16"
+  ],
+  "run_paths": [
+   "ggapbe/angle_distortions/a_1_b_1_c_1_alpha_0p8_beta_1p2_gamma_1p1"
+  ],
+  "stratum": "angle"
+ },
+ "perovskite_a_1_b_1_c_1_alpha_0p8_beta_1p2_gamma_1p2_angle": {
+  "extrapolation_tags": [
+   "holdout_factor_0p8",
+   "holdout_factor_1p2"
+  ],
+  "fold": 3,
+  "run_identifiers": [
+   "9b0b62ff66a7ed69"
+  ],
+  "run_paths": [
+   "ggapbe/angle_distortions/a_1_b_1_c_1_alpha_0p8_beta_1p2_gamma_1p2"
+  ],
+  "stratum": "angle"
+ },
+ "perovskite_a_1_b_1_c_1_alpha_0p9_beta_0p8_gamma_0p8_angle": {
+  "extrapolation_tags": [
+   "holdout_factor_0p8"
+  ],
+  "fold": 3,
+  "run_identifiers": [
+   "abdf4debc474f828"
+  ],
+  "run_paths": [
+   "ggapbe/angle_distortions/a_1_b_1_c_1_alpha_0p9_beta_0p8_gamma_0p8"
+  ],
+  "stratum": "angle"
+ },
+ "perovskite_a_1_b_1_c_1_alpha_0p9_beta_0p8_gamma_0p9_angle": {
+  "extrapolation_tags": [
+   "holdout_factor_0p8"
+  ],
+  "fold": 0,
+  "run_identifiers": [
+   "ecb46a6c83132b7a"
+  ],
+  "run_paths": [
+   "ggapbe/angle_distortions/a_1_b_1_c_1_alpha_0p9_beta_0p8_gamma_0p9"
+  ],
+  "stratum": "angle"
+ },
+ "perovskite_a_1_b_1_c_1_alpha_0p9_beta_0p8_gamma_1_angle": {
+  "extrapolation_tags": [
+   "holdout_factor_0p8"
+  ],
+  "fold": 3,
+  "run_identifiers": [
+   "d931a4b56ce37689"
+  ],
+  "run_paths": [
+   "ggapbe/angle_distortions/a_1_b_1_c_1_alpha_0p9_beta_0p8_gamma_1"
+  ],
+  "stratum": "angle"
+ },
+ "perovskite_a_1_b_1_c_1_alpha_0p9_beta_0p8_gamma_1p1_angle": {
+  "extrapolation_tags": [
+   "holdout_factor_0p8"
+  ],
+  "fold": 1,
+  "run_identifiers": [
+   "1c15b82d996ea5db"
+  ],
+  "run_paths": [
+   "ggapbe/angle_distortions/a_1_b_1_c_1_alpha_0p9_beta_0p8_gamma_1p1"
+  ],
+  "stratum": "angle"
+ },
+ "perovskite_a_1_b_1_c_1_alpha_0p9_beta_0p8_gamma_1p2_angle": {
+  "extrapolation_tags": [
+   "holdout_factor_0p8",
+   "holdout_factor_1p2"
+  ],
+  "fold": 2,
+  "run_identifiers": [
+   "fff0f1e36297c8ee"
+  ],
+  "run_paths": [
+   "ggapbe/angle_distortions/a_1_b_1_c_1_alpha_0p9_beta_0p8_gamma_1p2"
+  ],
+  "stratum": "angle"
+ },
+ "perovskite_a_1_b_1_c_1_alpha_0p9_beta_0p9_gamma_0p8_angle": {
+  "extrapolation_tags": [
+   "holdout_factor_0p8"
+  ],
+  "fold": 4,
+  "run_identifiers": [
+   "488c96d99a6a539d"
+  ],
+  "run_paths": [
+   "ggapbe/angle_distortions/a_1_b_1_c_1_alpha_0p9_beta_0p9_gamma_0p8"
+  ],
+  "stratum": "angle"
+ },
+ "perovskite_a_1_b_1_c_1_alpha_0p9_beta_0p9_gamma_0p9_angle": {
+  "extrapolation_tags": [],
+  "fold": 3,
+  "run_identifiers": [
+   "821b9fe6112e00ca"
+  ],
+  "run_paths": [
+   "ggapbe/angle_distortions/a_1_b_1_c_1_alpha_0p9_beta_0p9_gamma_0p9"
+  ],
+  "stratum": "angle"
+ },
+ "perovskite_a_1_b_1_c_1_alpha_0p9_beta_0p9_gamma_1_angle": {
+  "extrapolation_tags": [],
+  "fold": 4,
+  "run_identifiers": [
+   "3ac15d3ced68bc14"
+  ],
+  "run_paths": [
+   "ggapbe/angle_distortions/a_1_b_1_c_1_alpha_0p9_beta_0p9_gamma_1"
+  ],
+  "stratum": "angle"
+ },
+ "perovskite_a_1_b_1_c_1_alpha_0p9_beta_0p9_gamma_1p1_angle": {
+  "extrapolation_tags": [],
+  "fold": 1,
+  "run_identifiers": [
+   "3220e0fc624d3ef4"
+  ],
+  "run_paths": [
+   "ggapbe/angle_distortions/a_1_b_1_c_1_alpha_0p9_beta_0p9_gamma_1p1"
+  ],
+  "stratum": "angle"
+ },
+ "perovskite_a_1_b_1_c_1_alpha_0p9_beta_0p9_gamma_1p2_angle": {
+  "extrapolation_tags": [
+   "holdout_factor_1p2"
+  ],
+  "fold": 2,
+  "run_identifiers": [
+   "dcb5e7680e9b92cc"
+  ],
+  "run_paths": [
+   "ggapbe/angle_distortions/a_1_b_1_c_1_alpha_0p9_beta_0p9_gamma_1p2"
+  ],
+  "stratum": "angle"
+ },
+ "perovskite_a_1_b_1_c_1_alpha_0p9_beta_1_gamma_0p8_angle": {
+  "extrapolation_tags": [
+   "holdout_factor_0p8"
+  ],
+  "fold": 1,
+  "run_identifiers": [
+   "d449dcfe249aec0d"
+  ],
+  "run_paths": [
+   "ggapbe/angle_distortions/a_1_b_1_c_1_alpha_0p9_beta_1_gamma_0p8"
+  ],
+  "stratum": "angle"
+ },
+ "perovskite_a_1_b_1_c_1_alpha_0p9_beta_1_gamma_0p9_angle": {
+  "extrapolation_tags": [],
+  "fold": 3,
+  "run_identifiers": [
+   "9d01a0ac22d3b6b1"
+  ],
+  "run_paths": [
+   "ggapbe/angle_distortions/a_1_b_1_c_1_alpha_0p9_beta_1_gamma_0p9"
+  ],
+  "stratum": "angle"
+ },
+ "perovskite_a_1_b_1_c_1_alpha_0p9_beta_1_gamma_1_angle": {
+  "extrapolation_tags": [],
+  "fold": 3,
+  "run_identifiers": [
+   "bab57c8f3b5be834"
+  ],
+  "run_paths": [
+   "ggapbe/angle_distortions/a_1_b_1_c_1_alpha_0p9_beta_1_gamma_1"
+  ],
+  "stratum": "angle"
+ },
+ "perovskite_a_1_b_1_c_1_alpha_0p9_beta_1_gamma_1p1_angle": {
+  "extrapolation_tags": [],
+  "fold": 4,
+  "run_identifiers": [
+   "f8869e9d0c303b59"
+  ],
+  "run_paths": [
+   "ggapbe/angle_distortions/a_1_b_1_c_1_alpha_0p9_beta_1_gamma_1p1"
+  ],
+  "stratum": "angle"
+ },
+ "perovskite_a_1_b_1_c_1_alpha_0p9_beta_1_gamma_1p2_angle": {
+  "extrapolation_tags": [
+   "holdout_factor_1p2"
+  ],
+  "fold": 4,
+  "run_identifiers": [
+   "d46ae1eaff822a0f"
+  ],
+  "run_paths": [
+   "ggapbe/angle_distortions/a_1_b_1_c_1_alpha_0p9_beta_1_gamma_1p2"
+  ],
+  "stratum": "angle"
+ },
+ "perovskite_a_1_b_1_c_1_alpha_0p9_beta_1p1_gamma_0p8_angle": {
+  "extrapolation_tags": [
+   "holdout_factor_0p8"
+  ],
+  "fold": 1,
+  "run_identifiers": [
+   "ba293321f7fa9c30"
+  ],
+  "run_paths": [
+   "ggapbe/angle_distortions/a_1_b_1_c_1_alpha_0p9_beta_1p1_gamma_0p8"
+  ],
+  "stratum": "angle"
+ },
+ "perovskite_a_1_b_1_c_1_alpha_0p9_beta_1p1_gamma_0p9_angle": {
+  "extrapolation_tags": [],
+  "fold": 3,
+  "run_identifiers": [
+   "5ba0123a4d706cd6"
+  ],
+  "run_paths": [
+   "ggapbe/angle_distortions/a_1_b_1_c_1_alpha_0p9_beta_1p1_gamma_0p9"
+  ],
+  "stratum": "angle"
+ },
+ "perovskite_a_1_b_1_c_1_alpha_0p9_beta_1p1_gamma_1_angle": {
+  "extrapolation_tags": [],
+  "fold": 3,
+  "run_identifiers": [
+   "3e0021996b563c1c"
+  ],
+  "run_paths": [
+   "ggapbe/angle_distortions/a_1_b_1_c_1_alpha_0p9_beta_1p1_gamma_1"
+  ],
+  "stratum": "angle"
+ },
+ "perovskite_a_1_b_1_c_1_alpha_0p9_beta_1p1_gamma_1p1_angle": {
+  "extrapolation_tags": [],
+  "fold": 2,
+  "run_identifiers": [
+   "15588b85ed92992a"
+  ],
+  "run_paths": [
+   "ggapbe/angle_distortions/a_1_b_1_c_1_alpha_0p9_beta_1p1_gamma_1p1"
+  ],
+  "stratum": "angle"
+ },
+ "perovskite_a_1_b_1_c_1_alpha_0p9_beta_1p1_gamma_1p2_angle": {
+  "extrapolation_tags": [
+   "holdout_factor_1p2"
+  ],
+  "fold": 0,
+  "run_identifiers": [
+   "9c0f522df9128c55"
+  ],
+  "run_paths": [
+   "ggapbe/angle_distortions/a_1_b_1_c_1_alpha_0p9_beta_1p1_gamma_1p2"
+  ],
+  "stratum": "angle"
+ },
+ "perovskite_a_1_b_1_c_1_alpha_0p9_beta_1p2_gamma_0p8_angle": {
+  "extrapolation_tags": [
+   "holdout_factor_0p8",
+   "holdout_factor_1p2"
+  ],
+  "fold": 0,
+  "run_identifiers": [
+   "16051cb7d1cf0d9e"
+  ],
+  "run_paths": [
+   "ggapbe/angle_distortions/a_1_b_1_c_1_alpha_0p9_beta_1p2_gamma_0p8"
+  ],
+  "stratum": "angle"
+ },
+ "perovskite_a_1_b_1_c_1_alpha_0p9_beta_1p2_gamma_0p9_angle": {
+  "extrapolation_tags": [
+   "holdout_factor_1p2"
+  ],
+  "fold": 2,
+  "run_identifiers": [
+   "cb8ca85a3829b758"
+  ],
+  "run_paths": [
+   "ggapbe/angle_distortions/a_1_b_1_c_1_alpha_0p9_beta_1p2_gamma_0p9"
+  ],
+  "stratum": "angle"
+ },
+ "perovskite_a_1_b_1_c_1_alpha_0p9_beta_1p2_gamma_1_angle": {
+  "extrapolation_tags": [
+   "holdout_factor_1p2"
+  ],
+  "fold": 2,
+  "run_identifiers": [
+   "ba828248fa56428c"
+  ],
+  "run_paths": [
+   "ggapbe/angle_distortions/a_1_b_1_c_1_alpha_0p9_beta_1p2_gamma_1"
+  ],
+  "stratum": "angle"
+ },
+ "perovskite_a_1_b_1_c_1_alpha_0p9_beta_1p2_gamma_1p1_angle": {
+  "extrapolation_tags": [
+   "holdout_factor_1p2"
+  ],
+  "fold": 1,
+  "run_identifiers": [
+   "79c656ef38792de3"
+  ],
+  "run_paths": [
+   "ggapbe/angle_distortions/a_1_b_1_c_1_alpha_0p9_beta_1p2_gamma_1p1"
+  ],
+  "stratum": "angle"
+ },
+ "perovskite_a_1_b_1_c_1_alpha_0p9_beta_1p2_gamma_1p2_angle": {
+  "extrapolation_tags": [
+   "holdout_factor_1p2"
+  ],
+  "fold": 4,
+  "run_identifiers": [
+   "9dd945a9c6ec7954"
+  ],
+  "run_paths": [
+   "ggapbe/angle_distortions/a_1_b_1_c_1_alpha_0p9_beta_1p2_gamma_1p2"
+  ],
+  "stratum": "angle"
+ },
+ "perovskite_a_1_b_1_c_1_alpha_1_beta_0p8_gamma_0p8_angle": {
+  "extrapolation_tags": [
+   "holdout_factor_0p8"
+  ],
+  "fold": 0,
+  "run_identifiers": [
+   "a03dc55382aeaf67"
+  ],
+  "run_paths": [
+   "ggapbe/angle_distortions/a_1_b_1_c_1_alpha_1_beta_0p8_gamma_0p8"
+  ],
+  "stratum": "angle"
+ },
+ "perovskite_a_1_b_1_c_1_alpha_1_beta_0p8_gamma_0p9_angle": {
+  "extrapolation_tags": [
+   "holdout_factor_0p8"
+  ],
+  "fold": 2,
+  "run_identifiers": [
+   "5bb2678a9d27c341"
+  ],
+  "run_paths": [
+   "ggapbe/angle_distortions/a_1_b_1_c_1_alpha_1_beta_0p8_gamma_0p9"
+  ],
+  "stratum": "angle"
+ },
+ "perovskite_a_1_b_1_c_1_alpha_1_beta_0p8_gamma_1_angle": {
+  "extrapolation_tags": [
+   "holdout_factor_0p8"
+  ],
+  "fold": 3,
+  "run_identifiers": [
+   "26bd0ac2915263c0"
+  ],
+  "run_paths": [
+   "ggapbe/angle_distortions/a_1_b_1_c_1_alpha_1_beta_0p8_gamma_1"
+  ],
+  "stratum": "angle"
+ },
+ "perovskite_a_1_b_1_c_1_alpha_1_beta_0p8_gamma_1p1_angle": {
+  "extrapolation_tags": [
+   "holdout_factor_0p8"
+  ],
+  "fold": 2,
+  "run_identifiers": [
+   "970f45b9bec7e237"
+  ],
+  "run_paths": [
+   "ggapbe/angle_distortions/a_1_b_1_c_1_alpha_1_beta_0p8_gamma_1p1"
+  ],
+  "stratum": "angle"
+ },
+ "perovskite_a_1_b_1_c_1_alpha_1_beta_0p8_gamma_1p2_angle": {
+  "extrapolation_tags": [
+   "holdout_factor_0p8",
+   "holdout_factor_1p2"
+  ],
+  "fold": 1,
+  "run_identifiers": [
+   "9eb2b74c0b97ebfe"
+  ],
+  "run_paths": [
+   "ggapbe/angle_distortions/a_1_b_1_c_1_alpha_1_beta_0p8_gamma_1p2"
+  ],
+  "stratum": "angle"
+ },
+ "perovskite_a_1_b_1_c_1_alpha_1_beta_0p9_gamma_0p8_angle": {
+  "extrapolation_tags": [
+   "holdout_factor_0p8"
+  ],
+  "fold": 0,
+  "run_identifiers": [
+   "86b6b59f96434109"
+  ],
+  "run_paths": [
+   "ggapbe/angle_distortions/a_1_b_1_c_1_alpha_1_beta_0p9_gamma_0p8"
+  ],
+  "stratum": "angle"
+ },
+ "perovskite_a_1_b_1_c_1_alpha_1_beta_0p9_gamma_0p9_angle": {
+  "extrapolation_tags": [],
+  "fold": 0,
+  "run_identifiers": [
+   "5cb0fe5abbbad4dd"
+  ],
+  "run_paths": [
+   "ggapbe/angle_distortions/a_1_b_1_c_1_alpha_1_beta_0p9_gamma_0p9"
+  ],
+  "stratum": "angle"
+ },
+ "perovskite_a_1_b_1_c_1_alpha_1_beta_0p9_gamma_1_angle": {
+  "extrapolation_tags": [],
+  "fold": 0,
+  "run_identifiers": [
+   "003163eb16aaa97f"
+  ],
+  "run_paths": [
+   "ggapbe/angle_distortions/a_1_b_1_c_1_alpha_1_beta_0p9_gamma_1"
+  ],
+  "stratum": "angle"
+ },
+ "perovskite_a_1_b_1_c_1_alpha_1_beta_0p9_gamma_1p1_angle": {
+  "extrapolation_tags": [],
+  "fold": 1,
+  "run_identifiers": [
+   "e0ef454b02761e20"
+  ],
+  "run_paths": [
+   "ggapbe/angle_distortions/a_1_b_1_c_1_alpha_1_beta_0p9_gamma_1p1"
+  ],
+  "stratum": "angle"
+ },
+ "perovskite_a_1_b_1_c_1_alpha_1_beta_0p9_gamma_1p2_angle": {
+  "extrapolation_tags": [
+   "holdout_factor_1p2"
+  ],
+  "fold": 4,
+  "run_identifiers": [
+   "7eec6da8d3dffcde"
+  ],
+  "run_paths": [
+   "ggapbe/angle_distortions/a_1_b_1_c_1_alpha_1_beta_0p9_gamma_1p2"
+  ],
+  "stratum": "angle"
+ },
+ "perovskite_a_1_b_1_c_1_alpha_1_beta_1_gamma_0p8_angle": {
+  "extrapolation_tags": [
+   "holdout_factor_0p8"
+  ],
+  "fold": 2,
+  "run_identifiers": [
+   "467c15cb9d9945e0"
+  ],
+  "run_paths": [
+   "ggapbe/angle_distortions/a_1_b_1_c_1_alpha_1_beta_1_gamma_0p8"
+  ],
+  "stratum": "angle"
+ },
+ "perovskite_a_1_b_1_c_1_alpha_1_beta_1_gamma_0p9_angle": {
+  "extrapolation_tags": [],
+  "fold": 1,
+  "run_identifiers": [
+   "99f576237952ffdc"
+  ],
+  "run_paths": [
+   "ggapbe/angle_distortions/a_1_b_1_c_1_alpha_1_beta_1_gamma_0p9"
+  ],
+  "stratum": "angle"
+ },
+ "perovskite_a_1_b_1_c_1_alpha_1_beta_1_gamma_1_angle": {
+  "extrapolation_tags": [],
+  "fold": 4,
+  "run_identifiers": [
+   "8085e1f06e7eae2e"
+  ],
+  "run_paths": [
+   "ggapbe/angle_distortions/a_1_b_1_c_1_alpha_1_beta_1_gamma_1"
+  ],
+  "stratum": "angle"
+ },
+ "perovskite_a_1_b_1_c_1_alpha_1_beta_1_gamma_1p1_angle": {
+  "extrapolation_tags": [],
+  "fold": 3,
+  "run_identifiers": [
+   "e6530a3f865cf5d5"
+  ],
+  "run_paths": [
+   "ggapbe/angle_distortions/a_1_b_1_c_1_alpha_1_beta_1_gamma_1p1"
+  ],
+  "stratum": "angle"
+ },
+ "perovskite_a_1_b_1_c_1_alpha_1_beta_1_gamma_1p2_angle": {
+  "extrapolation_tags": [
+   "holdout_factor_1p2"
+  ],
+  "fold": 2,
+  "run_identifiers": [
+   "fa2228deee4dfe08"
+  ],
+  "run_paths": [
+   "ggapbe/angle_distortions/a_1_b_1_c_1_alpha_1_beta_1_gamma_1p2"
+  ],
+  "stratum": "angle"
+ },
+ "perovskite_a_1_b_1_c_1_alpha_1_beta_1p1_gamma_0p8_angle": {
+  "extrapolation_tags": [
+   "holdout_factor_0p8"
+  ],
+  "fold": 2,
+  "run_identifiers": [
+   "6f1688427c4f4cf6"
+  ],
+  "run_paths": [
+   "ggapbe/angle_distortions/a_1_b_1_c_1_alpha_1_beta_1p1_gamma_0p8"
+  ],
+  "stratum": "angle"
+ },
+ "perovskite_a_1_b_1_c_1_alpha_1_beta_1p1_gamma_0p9_angle": {
+  "extrapolation_tags": [],
+  "fold": 3,
+  "run_identifiers": [
+   "b50e1e4456edc559"
+  ],
+  "run_paths": [
+   "ggapbe/angle_distortions/a_1_b_1_c_1_alpha_1_beta_1p1_gamma_0p9"
+  ],
+  "stratum": "angle"
+ },
+ "perovskite_a_1_b_1_c_1_alpha_1_beta_1p1_gamma_1_angle": {
+  "extrapolation_tags": [],
+  "fold": 3,
+  "run_identifiers": [
+   "507b6c70cfe54ea1"
+  ],
+  "run_paths": [
+   "ggapbe/angle_distortions/a_1_b_1_c_1_alpha_1_beta_1p1_gamma_1"
+  ],
+  "stratum": "angle"
+ },
+ "perovskite_a_1_b_1_c_1_alpha_1_beta_1p1_gamma_1p1_angle": {
+  "extrapolation_tags": [],
+  "fold": 3,
+  "run_identifiers": [
+   "cb78822c32d0109a"
+  ],
+  "run_paths": [
+   "ggapbe/angle_distortions/a_1_b_1_c_1_alpha_1_beta_1p1_gamma_1p1"
+  ],
+  "stratum": "angle"
+ },
+ "perovskite_a_1_b_1_c_1_alpha_1_beta_1p1_gamma_1p2_angle": {
+  "extrapolation_tags": [
+   "holdout_factor_1p2"
+  ],
+  "fold": 0,
+  "run_identifiers": [
+   "4d74407c33da4d0f"
+  ],
+  "run_paths": [
+   "ggapbe/angle_distortions/a_1_b_1_c_1_alpha_1_beta_1p1_gamma_1p2"
+  ],
+  "stratum": "angle"
+ },
+ "perovskite_a_1_b_1_c_1_alpha_1_beta_1p2_gamma_0p8_angle": {
+  "extrapolation_tags": [
+   "holdout_factor_0p8",
+   "holdout_factor_1p2"
+  ],
+  "fold": 1,
+  "run_identifiers": [
+   "5ed7a121870f8cb3"
+  ],
+  "run_paths": [
+   "ggapbe/angle_distortions/a_1_b_1_c_1_alpha_1_beta_1p2_gamma_0p8"
+  ],
+  "stratum": "angle"
+ },
+ "perovskite_a_1_b_1_c_1_alpha_1_beta_1p2_gamma_0p9_angle": {
+  "extrapolation_tags": [
+   "holdout_factor_1p2"
+  ],
+  "fold": 3,
+  "run_identifiers": [
+   "17cf677bfba52b5b"
+  ],
+  "run_paths": [
+   "ggapbe/angle_distortions/a_1_b_1_c_1_alpha_1_beta_1p2_gamma_0p9"
+  ],
+  "stratum": "angle"
+ },
+ "perovskite_a_1_b_1_c_1_alpha_1_beta_1p2_gamma_1_angle": {
+  "extrapolation_tags": [
+   "holdout_factor_1p2"
+  ],
+  "fold": 0,
+  "run_identifiers": [
+   "a64c666f6e5f86bc"
+  ],
+  "run_paths": [
+   "ggapbe/angle_distortions/a_1_b_1_c_1_alpha_1_beta_1p2_gamma_1"
+  ],
+  "stratum": "angle"
+ },
+ "perovskite_a_1_b_1_c_1_alpha_1_beta_1p2_gamma_1p1_angle": {
+  "extrapolation_tags": [
+   "holdout_factor_1p2"
+  ],
+  "fold": 1,
+  "run_identifiers": [
+   "c7ebb467b0a7b82c"
+  ],
+  "run_paths": [
+   "ggapbe/angle_distortions/a_1_b_1_c_1_alpha_1_beta_1p2_gamma_1p1"
+  ],
+  "stratum": "angle"
+ },
+ "perovskite_a_1_b_1_c_1_alpha_1_beta_1p2_gamma_1p2_angle": {
+  "extrapolation_tags": [
+   "holdout_factor_1p2"
+  ],
+  "fold": 0,
+  "run_identifiers": [
+   "dfd4d07f025676ae"
+  ],
+  "run_paths": [
+   "ggapbe/angle_distortions/a_1_b_1_c_1_alpha_1_beta_1p2_gamma_1p2"
+  ],
+  "stratum": "angle"
+ },
+ "perovskite_a_1_b_1_c_1_alpha_1p1_beta_0p8_gamma_0p8_angle": {
+  "extrapolation_tags": [
+   "holdout_factor_0p8"
+  ],
+  "fold": 3,
+  "run_identifiers": [
+   "6db203f971da48e7"
+  ],
+  "run_paths": [
+   "ggapbe/angle_distortions/a_1_b_1_c_1_alpha_1p1_beta_0p8_gamma_0p8"
+  ],
+  "stratum": "angle"
+ },
+ "perovskite_a_1_b_1_c_1_alpha_1p1_beta_0p8_gamma_0p9_angle": {
+  "extrapolation_tags": [
+   "holdout_factor_0p8"
+  ],
+  "fold": 0,
+  "run_identifiers": [
+   "d7abee8cace427ff"
+  ],
+  "run_paths": [
+   "ggapbe/angle_distortions/a_1_b_1_c_1_alpha_1p1_beta_0p8_gamma_0p9"
+  ],
+  "stratum": "angle"
+ },
+ "perovskite_a_1_b_1_c_1_alpha_1p1_beta_0p8_gamma_1_angle": {
+  "extrapolation_tags": [
+   "holdout_factor_0p8"
+  ],
+  "fold": 0,
+  "run_identifiers": [
+   "87f19a9f40295ec8"
+  ],
+  "run_paths": [
+   "ggapbe/angle_distortions/a_1_b_1_c_1_alpha_1p1_beta_0p8_gamma_1"
+  ],
+  "stratum": "angle"
+ },
+ "perovskite_a_1_b_1_c_1_alpha_1p1_beta_0p8_gamma_1p1_angle": {
+  "extrapolation_tags": [
+   "holdout_factor_0p8"
+  ],
+  "fold": 0,
+  "run_identifiers": [
+   "b40937e0c682022a"
+  ],
+  "run_paths": [
+   "ggapbe/angle_distortions/a_1_b_1_c_1_alpha_1p1_beta_0p8_gamma_1p1"
+  ],
+  "stratum": "angle"
+ },
+ "perovskite_a_1_b_1_c_1_alpha_1p1_beta_0p8_gamma_1p2_angle": {
+  "extrapolation_tags": [
+   "holdout_factor_0p8",
+   "holdout_factor_1p2"
+  ],
+  "fold": 4,
+  "run_identifiers": [
+   "bcb51a61ef29297a"
+  ],
+  "run_paths": [
+   "ggapbe/angle_distortions/a_1_b_1_c_1_alpha_1p1_beta_0p8_gamma_1p2"
+  ],
+  "stratum": "angle"
+ },
+ "perovskite_a_1_b_1_c_1_alpha_1p1_beta_0p9_gamma_0p8_angle": {
+  "extrapolation_tags": [
+   "holdout_factor_0p8"
+  ],
+  "fold": 2,
+  "run_identifiers": [
+   "3f952f4490c9d788"
+  ],
+  "run_paths": [
+   "ggapbe/angle_distortions/a_1_b_1_c_1_alpha_1p1_beta_0p9_gamma_0p8"
+  ],
+  "stratum": "angle"
+ },
+ "perovskite_a_1_b_1_c_1_alpha_1p1_beta_0p9_gamma_0p9_angle": {
+  "extrapolation_tags": [],
+  "fold": 3,
+  "run_identifiers": [
+   "63d46411565a761d"
+  ],
+  "run_paths": [
+   "ggapbe/angle_distortions/a_1_b_1_c_1_alpha_1p1_beta_0p9_gamma_0p9"
+  ],
+  "stratum": "angle"
+ },
+ "perovskite_a_1_b_1_c_1_alpha_1p1_beta_0p9_gamma_1_angle": {
+  "extrapolation_tags": [],
+  "fold": 4,
+  "run_identifiers": [
+   "eb9c487177ae968f"
+  ],
+  "run_paths": [
+   "ggapbe/angle_distortions/a_1_b_1_c_1_alpha_1p1_beta_0p9_gamma_1"
+  ],
+  "stratum": "angle"
+ },
+ "perovskite_a_1_b_1_c_1_alpha_1p1_beta_0p9_gamma_1p1_angle": {
+  "extrapolation_tags": [],
+  "fold": 1,
+  "run_identifiers": [
+   "1c9a250ff3205ce1"
+  ],
+  "run_paths": [
+   "ggapbe/angle_distortions/a_1_b_1_c_1_alpha_1p1_beta_0p9_gamma_1p1"
+  ],
+  "stratum": "angle"
+ },
+ "perovskite_a_1_b_1_c_1_alpha_1p1_beta_0p9_gamma_1p2_angle": {
+  "extrapolation_tags": [
+   "holdout_factor_1p2"
+  ],
+  "fold": 2,
+  "run_identifiers": [
+   "0af1b16575fa7104"
+  ],
+  "run_paths": [
+   "ggapbe/angle_distortions/a_1_b_1_c_1_alpha_1p1_beta_0p9_gamma_1p2"
+  ],
+  "stratum": "angle"
+ },
+ "perovskite_a_1_b_1_c_1_alpha_1p1_beta_1_gamma_0p8_angle": {
+  "extrapolation_tags": [
+   "holdout_factor_0p8"
+  ],
+  "fold": 0,
+  "run_identifiers": [
+   "79e0379fe6d4b26e"
+  ],
+  "run_paths": [
+   "ggapbe/angle_distortions/a_1_b_1_c_1_alpha_1p1_beta_1_gamma_0p8"
+  ],
+  "stratum": "angle"
+ },
+ "perovskite_a_1_b_1_c_1_alpha_1p1_beta_1_gamma_0p9_angle": {
+  "extrapolation_tags": [],
+  "fold": 0,
+  "run_identifiers": [
+   "1cb9bd3ab39f8f15"
+  ],
+  "run_paths": [
+   "ggapbe/angle_distortions/a_1_b_1_c_1_alpha_1p1_beta_1_gamma_0p9"
+  ],
+  "stratum": "angle"
+ },
+ "perovskite_a_1_b_1_c_1_alpha_1p1_beta_1_gamma_1_angle": {
+  "extrapolation_tags": [],
+  "fold": 1,
+  "run_identifiers": [
+   "bc4f2714c44ab532"
+  ],
+  "run_paths": [
+   "ggapbe/angle_distortions/a_1_b_1_c_1_alpha_1p1_beta_1_gamma_1"
+  ],
+  "stratum": "angle"
+ },
+ "perovskite_a_1_b_1_c_1_alpha_1p1_beta_1_gamma_1p1_angle": {
+  "extrapolation_tags": [],
+  "fold": 2,
+  "run_identifiers": [
+   "abe7b69522d87705"
+  ],
+  "run_paths": [
+   "ggapbe/angle_distortions/a_1_b_1_c_1_alpha_1p1_beta_1_gamma_1p1"
+  ],
+  "stratum": "angle"
+ },
+ "perovskite_a_1_b_1_c_1_alpha_1p1_beta_1_gamma_1p2_angle": {
+  "extrapolation_tags": [
+   "holdout_factor_1p2"
+  ],
+  "fold": 4,
+  "run_identifiers": [
+   "2c6566c49406ae8c"
+  ],
+  "run_paths": [
+   "ggapbe/angle_distortions/a_1_b_1_c_1_alpha_1p1_beta_1_gamma_1p2"
+  ],
+  "stratum": "angle"
+ },
+ "perovskite_a_1_b_1_c_1_alpha_1p1_beta_1p1_gamma_0p8_angle": {
+  "extrapolation_tags": [
+   "holdout_factor_0p8"
+  ],
+  "fold": 1,
+  "run_identifiers": [
+   "8014d841a2b2b026"
+  ],
+  "run_paths": [
+   "ggapbe/angle_distortions/a_1_b_1_c_1_alpha_1p1_beta_1p1_gamma_0p8"
+  ],
+  "stratum": "angle"
+ },
+ "perovskite_a_1_b_1_c_1_alpha_1p1_beta_1p1_gamma_0p9_angle": {
+  "extrapolation_tags": [],
+  "fold": 1,
+  "run_identifiers": [
+   "3e66a4d0e8ee72ef"
+  ],
+  "run_paths": [
+   "ggapbe/angle_distortions/a_1_b_1_c_1_alpha_1p1_beta_1p1_gamma_0p9"
+  ],
+  "stratum": "angle"
+ },
+ "perovskite_a_1_b_1_c_1_alpha_1p1_beta_1p1_gamma_1_angle": {
+  "extrapolation_tags": [],
+  "fold": 3,
+  "run_identifiers": [
+   "c3aa723838858df5"
+  ],
+  "run_paths": [
+   "ggapbe/angle_distortions/a_1_b_1_c_1_alpha_1p1_beta_1p1_gamma_1"
+  ],
+  "stratum": "angle"
+ },
+ "perovskite_a_1_b_1_c_1_alpha_1p1_beta_1p1_gamma_1p1_angle": {
+  "extrapolation_tags": [],
+  "fold": 4,
+  "run_identifiers": [
+   "baae3b11cd8634b8"
+  ],
+  "run_paths": [
+   "ggapbe/angle_distortions/a_1_b_1_c_1_alpha_1p1_beta_1p1_gamma_1p1"
+  ],
+  "stratum": "angle"
+ },
+ "perovskite_a_1_b_1_c_1_alpha_1p1_beta_1p1_gamma_1p2_angle": {
+  "extrapolation_tags": [
+   "holdout_factor_1p2"
+  ],
+  "fold": 2,
+  "run_identifiers": [
+   "21ed903f071abcdf"
+  ],
+  "run_paths": [
+   "ggapbe/angle_distortions/a_1_b_1_c_1_alpha_1p1_beta_1p1_gamma_1p2"
+  ],
+  "stratum": "angle"
+ },
+ "perovskite_a_1_b_1_c_1_alpha_1p1_beta_1p2_gamma_0p8_angle": {
+  "extrapolation_tags": [
+   "holdout_factor_0p8",
+   "holdout_factor_1p2"
+  ],
+  "fold": 4,
+  "run_identifiers": [
+   "181909aee2d64491"
+  ],
+  "run_paths": [
+   "ggapbe/angle_distortions/a_1_b_1_c_1_alpha_1p1_beta_1p2_gamma_0p8"
+  ],
+  "stratum": "angle"
+ },
+ "perovskite_a_1_b_1_c_1_alpha_1p1_beta_1p2_gamma_0p9_angle": {
+  "extrapolation_tags": [
+   "holdout_factor_1p2"
+  ],
+  "fold": 0,
+  "run_identifiers": [
+   "9c81ce29599cf073"
+  ],
+  "run_paths": [
+   "ggapbe/angle_distortions/a_1_b_1_c_1_alpha_1p1_beta_1p2_gamma_0p9"
+  ],
+  "stratum": "angle"
+ },
+ "perovskite_a_1_b_1_c_1_alpha_1p1_beta_1p2_gamma_1_angle": {
+  "extrapolation_tags": [
+   "holdout_factor_1p2"
+  ],
+  "fold": 1,
+  "run_identifiers": [
+   "c926f947b974ffbb"
+  ],
+  "run_paths": [
+   "ggapbe/angle_distortions/a_1_b_1_c_1_alpha_1p1_beta_1p2_gamma_1"
+  ],
+  "stratum": "angle"
+ },
+ "perovskite_a_1_b_1_c_1_alpha_1p1_beta_1p2_gamma_1p1_angle": {
+  "extrapolation_tags": [
+   "holdout_factor_1p2"
+  ],
+  "fold": 2,
+  "run_identifiers": [
+   "f7b6a0fef85a15a0"
+  ],
+  "run_paths": [
+   "ggapbe/angle_distortions/a_1_b_1_c_1_alpha_1p1_beta_1p2_gamma_1p1"
+  ],
+  "stratum": "angle"
+ },
+ "perovskite_a_1_b_1_c_1_alpha_1p1_beta_1p2_gamma_1p2_angle": {
+  "extrapolation_tags": [
+   "holdout_factor_1p2"
+  ],
+  "fold": 2,
+  "run_identifiers": [
+   "af6c7b9f35d70952"
+  ],
+  "run_paths": [
+   "ggapbe/angle_distortions/a_1_b_1_c_1_alpha_1p1_beta_1p2_gamma_1p2"
+  ],
+  "stratum": "angle"
+ },
+ "perovskite_a_1_b_1_c_1_alpha_1p2_beta_0p8_gamma_0p8_angle": {
+  "extrapolation_tags": [
+   "holdout_factor_0p8",
+   "holdout_factor_1p2"
+  ],
+  "fold": 2,
+  "run_identifiers": [
+   "0cb73920673c9e87"
+  ],
+  "run_paths": [
+   "ggapbe/angle_distortions/a_1_b_1_c_1_alpha_1p2_beta_0p8_gamma_0p8"
+  ],
+  "stratum": "angle"
+ },
+ "perovskite_a_1_b_1_c_1_alpha_1p2_beta_0p8_gamma_0p9_angle": {
+  "extrapolation_tags": [
+   "holdout_factor_0p8",
+   "holdout_factor_1p2"
+  ],
+  "fold": 1,
+  "run_identifiers": [
+   "fccbf85d6f313642"
+  ],
+  "run_paths": [
+   "ggapbe/angle_distortions/a_1_b_1_c_1_alpha_1p2_beta_0p8_gamma_0p9"
+  ],
+  "stratum": "angle"
+ },
+ "perovskite_a_1_b_1_c_1_alpha_1p2_beta_0p8_gamma_1_angle": {
+  "extrapolation_tags": [
+   "holdout_factor_0p8",
+   "holdout_factor_1p2"
+  ],
+  "fold": 4,
+  "run_identifiers": [
+   "f842a7963747b3b2"
+  ],
+  "run_paths": [
+   "ggapbe/angle_distortions/a_1_b_1_c_1_alpha_1p2_beta_0p8_gamma_1"
+  ],
+  "stratum": "angle"
+ },
+ "perovskite_a_1_b_1_c_1_alpha_1p2_beta_0p8_gamma_1p1_angle": {
+  "extrapolation_tags": [
+   "holdout_factor_0p8",
+   "holdout_factor_1p2"
+  ],
+  "fold": 1,
+  "run_identifiers": [
+   "4088cb7612c18f42"
+  ],
+  "run_paths": [
+   "ggapbe/angle_distortions/a_1_b_1_c_1_alpha_1p2_beta_0p8_gamma_1p1"
+  ],
+  "stratum": "angle"
+ },
+ "perovskite_a_1_b_1_c_1_alpha_1p2_beta_0p8_gamma_1p2_angle": {
+  "extrapolation_tags": [
+   "holdout_factor_0p8",
+   "holdout_factor_1p2"
+  ],
+  "fold": 3,
+  "run_identifiers": [
+   "377026d398e9773c"
+  ],
+  "run_paths": [
+   "ggapbe/angle_distortions/a_1_b_1_c_1_alpha_1p2_beta_0p8_gamma_1p2"
+  ],
+  "stratum": "angle"
+ },
+ "perovskite_a_1_b_1_c_1_alpha_1p2_beta_0p9_gamma_0p8_angle": {
+  "extrapolation_tags": [
+   "holdout_factor_0p8",
+   "holdout_factor_1p2"
+  ],
+  "fold": 1,
+  "run_identifiers": [
+   "0b6c0e45e931782c"
+  ],
+  "run_paths": [
+   "ggapbe/angle_distortions/a_1_b_1_c_1_alpha_1p2_beta_0p9_gamma_0p8"
+  ],
+  "stratum": "angle"
+ },
+ "perovskite_a_1_b_1_c_1_alpha_1p2_beta_0p9_gamma_0p9_angle": {
+  "extrapolation_tags": [
+   "holdout_factor_1p2"
+  ],
+  "fold": 4,
+  "run_identifiers": [
+   "5170ac380474cca2"
+  ],
+  "run_paths": [
+   "ggapbe/angle_distortions/a_1_b_1_c_1_alpha_1p2_beta_0p9_gamma_0p9"
+  ],
+  "stratum": "angle"
+ },
+ "perovskite_a_1_b_1_c_1_alpha_1p2_beta_0p9_gamma_1_angle": {
+  "extrapolation_tags": [
+   "holdout_factor_1p2"
+  ],
+  "fold": 0,
+  "run_identifiers": [
+   "652b1731b104b635"
+  ],
+  "run_paths": [
+   "ggapbe/angle_distortions/a_1_b_1_c_1_alpha_1p2_beta_0p9_gamma_1"
+  ],
+  "stratum": "angle"
+ },
+ "perovskite_a_1_b_1_c_1_alpha_1p2_beta_0p9_gamma_1p1_angle": {
+  "extrapolation_tags": [
+   "holdout_factor_1p2"
+  ],
+  "fold": 3,
+  "run_identifiers": [
+   "f4f594f6d8f8b6dc"
+  ],
+  "run_paths": [
+   "ggapbe/angle_distortions/a_1_b_1_c_1_alpha_1p2_beta_0p9_gamma_1p1"
+  ],
+  "stratum": "angle"
+ },
+ "perovskite_a_1_b_1_c_1_alpha_1p2_beta_0p9_gamma_1p2_angle": {
+  "extrapolation_tags": [
+   "holdout_factor_1p2"
+  ],
+  "fold": 1,
+  "run_identifiers": [
+   "233232f5325c3d23"
+  ],
+  "run_paths": [
+   "ggapbe/angle_distortions/a_1_b_1_c_1_alpha_1p2_beta_0p9_gamma_1p2"
+  ],
+  "stratum": "angle"
+ },
+ "perovskite_a_1_b_1_c_1_alpha_1p2_beta_1_gamma_0p8_angle": {
+  "extrapolation_tags": [
+   "holdout_factor_0p8",
+   "holdout_factor_1p2"
+  ],
+  "fold": 1,
+  "run_identifiers": [
+   "355f9dafda0421e4"
+  ],
+  "run_paths": [
+   "ggapbe/angle_distortions/a_1_b_1_c_1_alpha_1p2_beta_1_gamma_0p8"
+  ],
+  "stratum": "angle"
+ },
+ "perovskite_a_1_b_1_c_1_alpha_1p2_beta_1_gamma_0p9_angle": {
+  "extrapolation_tags": [
+   "holdout_factor_1p2"
+  ],
+  "fold": 0,
+  "run_identifiers": [
+   "5a5caceeabab4a66"
+  ],
+  "run_paths": [
+   "ggapbe/angle_distortions/a_1_b_1_c_1_alpha_1p2_beta_1_gamma_0p9"
+  ],
+  "stratum": "angle"
+ },
+ "perovskite_a_1_b_1_c_1_alpha_1p2_beta_1_gamma_1_angle": {
+  "extrapolation_tags": [
+   "holdout_factor_1p2"
+  ],
+  "fold": 4,
+  "run_identifiers": [
+   "1c92ed938d71311a"
+  ],
+  "run_paths": [
+   "ggapbe/angle_distortions/a_1_b_1_c_1_alpha_1p2_beta_1_gamma_1"
+  ],
+  "stratum": "angle"
+ },
+ "perovskite_a_1_b_1_c_1_alpha_1p2_beta_1_gamma_1p1_angle": {
+  "extrapolation_tags": [
+   "holdout_factor_1p2"
+  ],
+  "fold": 4,
+  "run_identifiers": [
+   "dd9dc0d2faa219d7"
+  ],
+  "run_paths": [
+   "ggapbe/angle_distortions/a_1_b_1_c_1_alpha_1p2_beta_1_gamma_1p1"
+  ],
+  "stratum": "angle"
+ },
+ "perovskite_a_1_b_1_c_1_alpha_1p2_beta_1_gamma_1p2_angle": {
+  "extrapolation_tags": [
+   "holdout_factor_1p2"
+  ],
+  "fold": 2,
+  "run_identifiers": [
+   "db8d94568b39aafd"
+  ],
+  "run_paths": [
+   "ggapbe/angle_distortions/a_1_b_1_c_1_alpha_1p2_beta_1_gamma_1p2"
+  ],
+  "stratum": "angle"
+ },
+ "perovskite_a_1_b_1_c_1_alpha_1p2_beta_1p1_gamma_0p8_angle": {
+  "extrapolation_tags": [
+   "holdout_factor_0p8",
+   "holdout_factor_1p2"
+  ],
+  "fold": 3,
+  "run_identifiers": [
+   "ec81994c3f7fe958"
+  ],
+  "run_paths": [
+   "ggapbe/angle_distortions/a_1_b_1_c_1_alpha_1p2_beta_1p1_gamma_0p8"
+  ],
+  "stratum": "angle"
+ },
+ "perovskite_a_1_b_1_c_1_alpha_1p2_beta_1p1_gamma_0p9_angle": {
+  "extrapolation_tags": [
+   "holdout_factor_1p2"
+  ],
+  "fold": 1,
+  "run_identifiers": [
+   "c9deab2cfe61877b"
+  ],
+  "run_paths": [
+   "ggapbe/angle_distortions/a_1_b_1_c_1_alpha_1p2_beta_1p1_gamma_0p9"
+  ],
+  "stratum": "angle"
+ },
+ "perovskite_a_1_b_1_c_1_alpha_1p2_beta_1p1_gamma_1_angle": {
+  "extrapolation_tags": [
+   "holdout_factor_1p2"
+  ],
+  "fold": 2,
+  "run_identifiers": [
+   "6ace4b7007558f47"
+  ],
+  "run_paths": [
+   "ggapbe/angle_distortions/a_1_b_1_c_1_alpha_1p2_beta_1p1_gamma_1"
+  ],
+  "stratum": "angle"
+ },
+ "perovskite_a_1_b_1_c_1_alpha_1p2_beta_1p1_gamma_1p1_angle": {
+  "extrapolation_tags": [
+   "holdout_factor_1p2"
+  ],
+  "fold": 4,
+  "run_identifiers": [
+   "bd8aae5f63be9822"
+  ],
+  "run_paths": [
+   "ggapbe/angle_distortions/a_1_b_1_c_1_alpha_1p2_beta_1p1_gamma_1p1"
+  ],
+  "stratum": "angle"
+ },
+ "perovskite_a_1_b_1_c_1_alpha_1p2_beta_1p1_gamma_1p2_angle": {
+  "extrapolation_tags": [
+   "holdout_factor_1p2"
+  ],
+  "fold": 2,
+  "run_identifiers": [
+   "0dd395813ccb399c"
+  ],
+  "run_paths": [
+   "ggapbe/angle_distortions/a_1_b_1_c_1_alpha_1p2_beta_1p1_gamma_1p2"
+  ],
+  "stratum": "angle"
+ },
+ "perovskite_a_1_b_1_c_1_alpha_1p2_beta_1p2_gamma_0p8_angle": {
+  "extrapolation_tags": [
+   "holdout_factor_0p8",
+   "holdout_factor_1p2"
+  ],
+  "fold": 3,
+  "run_identifiers": [
+   "5e9040be5c11ee16"
+  ],
+  "run_paths": [
+   "ggapbe/angle_distortions/a_1_b_1_c_1_alpha_1p2_beta_1p2_gamma_0p8"
+  ],
+  "stratum": "angle"
+ },
+ "perovskite_a_1_b_1_c_1_alpha_1p2_beta_1p2_gamma_0p9_angle": {
+  "extrapolation_tags": [
+   "holdout_factor_1p2"
+  ],
+  "fold": 3,
+  "run_identifiers": [
+   "52c77d5dcd20bf6a"
+  ],
+  "run_paths": [
+   "ggapbe/angle_distortions/a_1_b_1_c_1_alpha_1p2_beta_1p2_gamma_0p9"
+  ],
+  "stratum": "angle"
+ },
+ "perovskite_a_1_b_1_c_1_alpha_1p2_beta_1p2_gamma_1_angle": {
+  "extrapolation_tags": [
+   "holdout_factor_1p2"
+  ],
+  "fold": 4,
+  "run_identifiers": [
+   "05a2ad8a179ca484"
+  ],
+  "run_paths": [
+   "ggapbe/angle_distortions/a_1_b_1_c_1_alpha_1p2_beta_1p2_gamma_1"
+  ],
+  "stratum": "angle"
+ },
+ "perovskite_a_1_b_1_c_1_alpha_1p2_beta_1p2_gamma_1p1_angle": {
+  "extrapolation_tags": [
+   "holdout_factor_1p2"
+  ],
+  "fold": 1,
+  "run_identifiers": [
+   "750afe7bc7d21a11"
+  ],
+  "run_paths": [
+   "ggapbe/angle_distortions/a_1_b_1_c_1_alpha_1p2_beta_1p2_gamma_1p1"
+  ],
+  "stratum": "angle"
+ },
+ "perovskite_a_1_b_1_c_1_alpha_1p2_beta_1p2_gamma_1p2_angle": {
+  "extrapolation_tags": [
+   "holdout_factor_1p2"
+  ],
+  "fold": 2,
+  "run_identifiers": [
+   "35565abe7a9d5fb3"
+  ],
+  "run_paths": [
+   "ggapbe/angle_distortions/a_1_b_1_c_1_alpha_1p2_beta_1p2_gamma_1p2"
+  ],
+  "stratum": "angle"
+ },
+ "perovskite_a_1_b_1_c_1p1_alpha_1_beta_1_gamma_1_length": {
+  "extrapolation_tags": [],
+  "fold": 3,
+  "run_identifiers": [
+   "3c818636e788f03d"
+  ],
+  "run_paths": [
+   "ggapbe/length_distortions/a_1_b_1_c_1p1_alpha_1_beta_1_gamma_1"
+  ],
+  "stratum": "length"
+ },
+ "perovskite_a_1_b_1_c_1p2_alpha_1_beta_1_gamma_1_length": {
+  "extrapolation_tags": [
+   "holdout_factor_1p2"
+  ],
+  "fold": 1,
+  "run_identifiers": [
+   "831efd19e353459f"
+  ],
+  "run_paths": [
+   "ggapbe/length_distortions/a_1_b_1_c_1p2_alpha_1_beta_1_gamma_1"
+  ],
+  "stratum": "length"
+ },
+ "perovskite_a_1_b_1p1_c_0p8_alpha_1_beta_1_gamma_1_length": {
+  "extrapolation_tags": [
+   "holdout_factor_0p8"
+  ],
+  "fold": 0,
+  "run_identifiers": [
+   "bb767e3f319a7a69"
+  ],
+  "run_paths": [
+   "ggapbe/length_distortions/a_1_b_1p1_c_0p8_alpha_1_beta_1_gamma_1"
+  ],
+  "stratum": "length"
+ },
+ "perovskite_a_1_b_1p1_c_0p9_alpha_1_beta_1_gamma_1_length": {
+  "extrapolation_tags": [],
+  "fold": 2,
+  "run_identifiers": [
+   "6d5b27e4f8e1c0cf"
+  ],
+  "run_paths": [
+   "ggapbe/length_distortions/a_1_b_1p1_c_0p9_alpha_1_beta_1_gamma_1"
+  ],
+  "stratum": "length"
+ },
+ "perovskite_a_1_b_1p1_c_1_alpha_1_beta_1_gamma_1_length": {
+  "extrapolation_tags": [],
+  "fold": 1,
+  "run_identifiers": [
+   "716168f41605e640"
+  ],
+  "run_paths": [
+   "ggapbe/length_distortions/a_1_b_1p1_c_1_alpha_1_beta_1_gamma_1"
+  ],
+  "stratum": "length"
+ },
+ "perovskite_a_1_b_1p1_c_1p1_alpha_1_beta_1_gamma_1_length": {
+  "extrapolation_tags": [],
+  "fold": 0,
+  "run_identifiers": [
+   "d2232e6aa8b97d41"
+  ],
+  "run_paths": [
+   "ggapbe/length_distortions/a_1_b_1p1_c_1p1_alpha_1_beta_1_gamma_1"
+  ],
+  "stratum": "length"
+ },
+ "perovskite_a_1_b_1p1_c_1p2_alpha_1_beta_1_gamma_1_length": {
+  "extrapolation_tags": [
+   "holdout_factor_1p2"
+  ],
+  "fold": 2,
+  "run_identifiers": [
+   "a413182d11b3d35b"
+  ],
+  "run_paths": [
+   "ggapbe/length_distortions/a_1_b_1p1_c_1p2_alpha_1_beta_1_gamma_1"
+  ],
+  "stratum": "length"
+ },
+ "perovskite_a_1_b_1p2_c_0p8_alpha_1_beta_1_gamma_1_length": {
+  "extrapolation_tags": [
+   "holdout_factor_0p8",
+   "holdout_factor_1p2"
+  ],
+  "fold": 1,
+  "run_identifiers": [
+   "1ef91ae01ba7b405"
+  ],
+  "run_paths": [
+   "ggapbe/length_distortions/a_1_b_1p2_c_0p8_alpha_1_beta_1_gamma_1"
+  ],
+  "stratum": "length"
+ },
+ "perovskite_a_1_b_1p2_c_0p9_alpha_1_beta_1_gamma_1_length": {
+  "extrapolation_tags": [
+   "holdout_factor_1p2"
+  ],
+  "fold": 1,
+  "run_identifiers": [
+   "623d1591649c2de9"
+  ],
+  "run_paths": [
+   "ggapbe/length_distortions/a_1_b_1p2_c_0p9_alpha_1_beta_1_gamma_1"
+  ],
+  "stratum": "length"
+ },
+ "perovskite_a_1_b_1p2_c_1_alpha_1_beta_1_gamma_1_length": {
+  "extrapolation_tags": [
+   "holdout_factor_1p2"
+  ],
+  "fold": 0,
+  "run_identifiers": [
+   "3efa7eaebeff2654"
+  ],
+  "run_paths": [
+   "ggapbe/length_distortions/a_1_b_1p2_c_1_alpha_1_beta_1_gamma_1"
+  ],
+  "stratum": "length"
+ },
+ "perovskite_a_1_b_1p2_c_1p1_alpha_1_beta_1_gamma_1_length": {
+  "extrapolation_tags": [
+   "holdout_factor_1p2"
+  ],
+  "fold": 4,
+  "run_identifiers": [
+   "9ea12cdf4c0ff0e6"
+  ],
+  "run_paths": [
+   "ggapbe/length_distortions/a_1_b_1p2_c_1p1_alpha_1_beta_1_gamma_1"
+  ],
+  "stratum": "length"
+ },
+ "perovskite_a_1_b_1p2_c_1p2_alpha_1_beta_1_gamma_1_length": {
+  "extrapolation_tags": [
+   "holdout_factor_1p2"
+  ],
+  "fold": 1,
+  "run_identifiers": [
+   "8a0f9a85135c09b7"
+  ],
+  "run_paths": [
+   "ggapbe/length_distortions/a_1_b_1p2_c_1p2_alpha_1_beta_1_gamma_1"
+  ],
+  "stratum": "length"
+ },
+ "perovskite_a_1p1_b_0p8_c_0p8_alpha_1_beta_1_gamma_1_length": {
+  "extrapolation_tags": [
+   "holdout_factor_0p8"
+  ],
+  "fold": 4,
+  "run_identifiers": [
+   "281dae52b1f9d061"
+  ],
+  "run_paths": [
+   "ggapbe/length_distortions/a_1p1_b_0p8_c_0p8_alpha_1_beta_1_gamma_1"
+  ],
+  "stratum": "length"
+ },
+ "perovskite_a_1p1_b_0p8_c_0p9_alpha_1_beta_1_gamma_1_length": {
+  "extrapolation_tags": [
+   "holdout_factor_0p8"
+  ],
+  "fold": 1,
+  "run_identifiers": [
+   "3fb7c584cc40d478"
+  ],
+  "run_paths": [
+   "ggapbe/length_distortions/a_1p1_b_0p8_c_0p9_alpha_1_beta_1_gamma_1"
+  ],
+  "stratum": "length"
+ },
+ "perovskite_a_1p1_b_0p8_c_1_alpha_1_beta_1_gamma_1_length": {
+  "extrapolation_tags": [
+   "holdout_factor_0p8"
+  ],
+  "fold": 4,
+  "run_identifiers": [
+   "e313eb9a08d1f917"
+  ],
+  "run_paths": [
+   "ggapbe/length_distortions/a_1p1_b_0p8_c_1_alpha_1_beta_1_gamma_1"
+  ],
+  "stratum": "length"
+ },
+ "perovskite_a_1p1_b_0p8_c_1p1_alpha_1_beta_1_gamma_1_length": {
+  "extrapolation_tags": [
+   "holdout_factor_0p8"
+  ],
+  "fold": 0,
+  "run_identifiers": [
+   "2c77e65db1ff8590"
+  ],
+  "run_paths": [
+   "ggapbe/length_distortions/a_1p1_b_0p8_c_1p1_alpha_1_beta_1_gamma_1"
+  ],
+  "stratum": "length"
+ },
+ "perovskite_a_1p1_b_0p8_c_1p2_alpha_1_beta_1_gamma_1_length": {
+  "extrapolation_tags": [
+   "holdout_factor_0p8",
+   "holdout_factor_1p2"
+  ],
+  "fold": 1,
+  "run_identifiers": [
+   "144e5f14ac6f49c4"
+  ],
+  "run_paths": [
+   "ggapbe/length_distortions/a_1p1_b_0p8_c_1p2_alpha_1_beta_1_gamma_1"
+  ],
+  "stratum": "length"
+ },
+ "perovskite_a_1p1_b_0p9_c_0p8_alpha_1_beta_1_gamma_1_length": {
+  "extrapolation_tags": [
+   "holdout_factor_0p8"
+  ],
+  "fold": 2,
+  "run_identifiers": [
+   "6a2a2fe613393cd0"
+  ],
+  "run_paths": [
+   "ggapbe/length_distortions/a_1p1_b_0p9_c_0p8_alpha_1_beta_1_gamma_1"
+  ],
+  "stratum": "length"
+ },
+ "perovskite_a_1p1_b_0p9_c_0p9_alpha_1_beta_1_gamma_1_length": {
+  "extrapolation_tags": [],
+  "fold": 3,
+  "run_identifiers": [
+   "33c7e27ba17848a4"
+  ],
+  "run_paths": [
+   "ggapbe/length_distortions/a_1p1_b_0p9_c_0p9_alpha_1_beta_1_gamma_1"
+  ],
+  "stratum": "length"
+ },
+ "perovskite_a_1p1_b_0p9_c_1_alpha_1_beta_1_gamma_1_length": {
+  "extrapolation_tags": [],
+  "fold": 1,
+  "run_identifiers": [
+   "e305aa2dd62584a7"
+  ],
+  "run_paths": [
+   "ggapbe/length_distortions/a_1p1_b_0p9_c_1_alpha_1_beta_1_gamma_1"
+  ],
+  "stratum": "length"
+ },
+ "perovskite_a_1p1_b_0p9_c_1p1_alpha_1_beta_1_gamma_1_length": {
+  "extrapolation_tags": [],
+  "fold": 2,
+  "run_identifiers": [
+   "2c2db2de8f16e2b7"
+  ],
+  "run_paths": [
+   "ggapbe/length_distortions/a_1p1_b_0p9_c_1p1_alpha_1_beta_1_gamma_1"
+  ],
+  "stratum": "length"
+ },
+ "perovskite_a_1p1_b_0p9_c_1p2_alpha_1_beta_1_gamma_1_length": {
+  "extrapolation_tags": [
+   "holdout_factor_1p2"
+  ],
+  "fold": 4,
+  "run_identifiers": [
+   "ca06188ef767e2fc"
+  ],
+  "run_paths": [
+   "ggapbe/length_distortions/a_1p1_b_0p9_c_1p2_alpha_1_beta_1_gamma_1"
+  ],
+  "stratum": "length"
+ },
+ "perovskite_a_1p1_b_1_c_0p8_alpha_1_beta_1_gamma_1_length": {
+  "extrapolation_tags": [
+   "holdout_factor_0p8"
+  ],
+  "fold": 4,
+  "run_identifiers": [
+   "85bd7a639c6f13d1"
+  ],
+  "run_paths": [
+   "ggapbe/length_distortions/a_1p1_b_1_c_0p8_alpha_1_beta_1_gamma_1"
+  ],
+  "stratum": "length"
+ },
+ "perovskite_a_1p1_b_1_c_0p9_alpha_1_beta_1_gamma_1_length": {
+  "extrapolation_tags": [],
+  "fold": 0,
+  "run_identifiers": [
+   "3492f7ec0b5c95fa"
+  ],
+  "run_paths": [
+   "ggapbe/length_distortions/a_1p1_b_1_c_0p9_alpha_1_beta_1_gamma_1"
+  ],
+  "stratum": "length"
+ },
+ "perovskite_a_1p1_b_1_c_1_alpha_1_beta_1_gamma_1_length": {
+  "extrapolation_tags": [],
+  "fold": 3,
+  "run_identifiers": [
+   "17796690cf49a089"
+  ],
+  "run_paths": [
+   "ggapbe/length_distortions/a_1p1_b_1_c_1_alpha_1_beta_1_gamma_1"
+  ],
+  "stratum": "length"
+ },
+ "perovskite_a_1p1_b_1_c_1p1_alpha_1_beta_1_gamma_1_length": {
+  "extrapolation_tags": [],
+  "fold": 2,
+  "run_identifiers": [
+   "b0baf93e94f24e48"
+  ],
+  "run_paths": [
+   "ggapbe/length_distortions/a_1p1_b_1_c_1p1_alpha_1_beta_1_gamma_1"
+  ],
+  "stratum": "length"
+ },
+ "perovskite_a_1p1_b_1_c_1p2_alpha_1_beta_1_gamma_1_length": {
+  "extrapolation_tags": [
+   "holdout_factor_1p2"
+  ],
+  "fold": 3,
+  "run_identifiers": [
+   "d29f654d4877d9b4"
+  ],
+  "run_paths": [
+   "ggapbe/length_distortions/a_1p1_b_1_c_1p2_alpha_1_beta_1_gamma_1"
+  ],
+  "stratum": "length"
+ },
+ "perovskite_a_1p1_b_1p1_c_0p8_alpha_1_beta_1_gamma_1_length": {
+  "extrapolation_tags": [
+   "holdout_factor_0p8"
+  ],
+  "fold": 0,
+  "run_identifiers": [
+   "b4539296418ca8d0"
+  ],
+  "run_paths": [
+   "ggapbe/length_distortions/a_1p1_b_1p1_c_0p8_alpha_1_beta_1_gamma_1"
+  ],
+  "stratum": "length"
+ },
+ "perovskite_a_1p1_b_1p1_c_0p9_alpha_1_beta_1_gamma_1_length": {
+  "extrapolation_tags": [],
+  "fold": 2,
+  "run_identifiers": [
+   "17cbee4999a3f7bc"
+  ],
+  "run_paths": [
+   "ggapbe/length_distortions/a_1p1_b_1p1_c_0p9_alpha_1_beta_1_gamma_1"
+  ],
+  "stratum": "length"
+ },
+ "perovskite_a_1p1_b_1p1_c_1_alpha_1_beta_1_gamma_1_length": {
+  "extrapolation_tags": [],
+  "fold": 0,
+  "run_identifiers": [
+   "6073ff3b30267799"
+  ],
+  "run_paths": [
+   "ggapbe/length_distortions/a_1p1_b_1p1_c_1_alpha_1_beta_1_gamma_1"
+  ],
+  "stratum": "length"
+ },
+ "perovskite_a_1p1_b_1p1_c_1p1_alpha_1_beta_1_gamma_1_length": {
+  "extrapolation_tags": [],
+  "fold": 1,
+  "run_identifiers": [
+   "0091b8d34d5f7d2d"
+  ],
+  "run_paths": [
+   "ggapbe/length_distortions/a_1p1_b_1p1_c_1p1_alpha_1_beta_1_gamma_1"
+  ],
+  "stratum": "length"
+ },
+ "perovskite_a_1p1_b_1p1_c_1p2_alpha_1_beta_1_gamma_1_length": {
+  "extrapolation_tags": [
+   "holdout_factor_1p2"
+  ],
+  "fold": 4,
+  "run_identifiers": [
+   "56d9ec150d93544c"
+  ],
+  "run_paths": [
+   "ggapbe/length_distortions/a_1p1_b_1p1_c_1p2_alpha_1_beta_1_gamma_1"
+  ],
+  "stratum": "length"
+ },
+ "perovskite_a_1p1_b_1p2_c_0p8_alpha_1_beta_1_gamma_1_length": {
+  "extrapolation_tags": [
+   "holdout_factor_0p8",
+   "holdout_factor_1p2"
+  ],
+  "fold": 2,
+  "run_identifiers": [
+   "e7f9f2a70d6fc6a1"
+  ],
+  "run_paths": [
+   "ggapbe/length_distortions/a_1p1_b_1p2_c_0p8_alpha_1_beta_1_gamma_1"
+  ],
+  "stratum": "length"
+ },
+ "perovskite_a_1p1_b_1p2_c_0p9_alpha_1_beta_1_gamma_1_length": {
+  "extrapolation_tags": [
+   "holdout_factor_1p2"
+  ],
+  "fold": 0,
+  "run_identifiers": [
+   "330e1d8c2278ea1c"
+  ],
+  "run_paths": [
+   "ggapbe/length_distortions/a_1p1_b_1p2_c_0p9_alpha_1_beta_1_gamma_1"
+  ],
+  "stratum": "length"
+ },
+ "perovskite_a_1p1_b_1p2_c_1_alpha_1_beta_1_gamma_1_length": {
+  "extrapolation_tags": [
+   "holdout_factor_1p2"
+  ],
+  "fold": 0,
+  "run_identifiers": [
+   "6b30687faa668a80"
+  ],
+  "run_paths": [
+   "ggapbe/length_distortions/a_1p1_b_1p2_c_1_alpha_1_beta_1_gamma_1"
+  ],
+  "stratum": "length"
+ },
+ "perovskite_a_1p1_b_1p2_c_1p1_alpha_1_beta_1_gamma_1_length": {
+  "extrapolation_tags": [
+   "holdout_factor_1p2"
+  ],
+  "fold": 1,
+  "run_identifiers": [
+   "f335560011821285"
+  ],
+  "run_paths": [
+   "ggapbe/length_distortions/a_1p1_b_1p2_c_1p1_alpha_1_beta_1_gamma_1"
+  ],
+  "stratum": "length"
+ },
+ "perovskite_a_1p1_b_1p2_c_1p2_alpha_1_beta_1_gamma_1_length": {
+  "extrapolation_tags": [
+   "holdout_factor_1p2"
+  ],
+  "fold": 0,
+  "run_identifiers": [
+   "fe3139d0973ab6fb"
+  ],
+  "run_paths": [
+   "ggapbe/length_distortions/a_1p1_b_1p2_c_1p2_alpha_1_beta_1_gamma_1"
+  ],
+  "stratum": "length"
+ },
+ "perovskite_a_1p2_b_0p8_c_0p8_alpha_1_beta_1_gamma_1_length": {
+  "extrapolation_tags": [
+   "holdout_factor_0p8",
+   "holdout_factor_1p2"
+  ],
+  "fold": 1,
+  "run_identifiers": [
+   "3de89546493654d8"
+  ],
+  "run_paths": [
+   "ggapbe/length_distortions/a_1p2_b_0p8_c_0p8_alpha_1_beta_1_gamma_1"
+  ],
+  "stratum": "length"
+ },
+ "perovskite_a_1p2_b_0p8_c_0p9_alpha_1_beta_1_gamma_1_length": {
+  "extrapolation_tags": [
+   "holdout_factor_0p8",
+   "holdout_factor_1p2"
+  ],
+  "fold": 4,
+  "run_identifiers": [
+   "68b79d3822a98b75"
+  ],
+  "run_paths": [
+   "ggapbe/length_distortions/a_1p2_b_0p8_c_0p9_alpha_1_beta_1_gamma_1"
+  ],
+  "stratum": "length"
+ },
+ "perovskite_a_1p2_b_0p8_c_1_alpha_1_beta_1_gamma_1_length": {
+  "extrapolation_tags": [
+   "holdout_factor_0p8",
+   "holdout_factor_1p2"
+  ],
+  "fold": 4,
+  "run_identifiers": [
+   "77727f8a2a1b421e"
+  ],
+  "run_paths": [
+   "ggapbe/length_distortions/a_1p2_b_0p8_c_1_alpha_1_beta_1_gamma_1"
+  ],
+  "stratum": "length"
+ },
+ "perovskite_a_1p2_b_0p8_c_1p1_alpha_1_beta_1_gamma_1_length": {
+  "extrapolation_tags": [
+   "holdout_factor_0p8",
+   "holdout_factor_1p2"
+  ],
+  "fold": 3,
+  "run_identifiers": [
+   "e91d4b749c8205b2"
+  ],
+  "run_paths": [
+   "ggapbe/length_distortions/a_1p2_b_0p8_c_1p1_alpha_1_beta_1_gamma_1"
+  ],
+  "stratum": "length"
+ },
+ "perovskite_a_1p2_b_0p8_c_1p2_alpha_1_beta_1_gamma_1_length": {
+  "extrapolation_tags": [
+   "holdout_factor_0p8",
+   "holdout_factor_1p2"
+  ],
+  "fold": 4,
+  "run_identifiers": [
+   "6f60c747b6aa047f"
+  ],
+  "run_paths": [
+   "ggapbe/length_distortions/a_1p2_b_0p8_c_1p2_alpha_1_beta_1_gamma_1"
+  ],
+  "stratum": "length"
+ },
+ "perovskite_a_1p2_b_0p9_c_0p8_alpha_1_beta_1_gamma_1_length": {
+  "extrapolation_tags": [
+   "holdout_factor_0p8",
+   "holdout_factor_1p2"
+  ],
+  "fold": 2,
+  "run_identifiers": [
+   "5caecfe28776121d"
+  ],
+  "run_paths": [
+   "ggapbe/length_distortions/a_1p2_b_0p9_c_0p8_alpha_1_beta_1_gamma_1"
+  ],
+  "stratum": "length"
+ },
+ "perovskite_a_1p2_b_0p9_c_0p9_alpha_1_beta_1_gamma_1_length": {
+  "extrapolation_tags": [
+   "holdout_factor_1p2"
+  ],
+  "fold": 3,
+  "run_identifiers": [
+   "cc02eb00c3c38316"
+  ],
+  "run_paths": [
+   "ggapbe/length_distortions/a_1p2_b_0p9_c_0p9_alpha_1_beta_1_gamma_1"
+  ],
+  "stratum": "length"
+ },
+ "perovskite_a_1p2_b_0p9_c_1_alpha_1_beta_1_gamma_1_length": {
+  "extrapolation_tags": [
+   "holdout_factor_1p2"
+  ],
+  "fold": 1,
+  "run_identifiers": [
+   "c223ef7f174edd41"
+  ],
+  "run_paths": [
+   "ggapbe/length_distortions/a_1p2_b_0p9_c_1_alpha_1_beta_1_gamma_1"
+  ],
+  "stratum": "length"
+ },
+ "perovskite_a_1p2_b_0p9_c_1p1_alpha_1_beta_1_gamma_1_length": {
+  "extrapolation_tags": [
+   "holdout_factor_1p2"
+  ],
+  "fold": 2,
+  "run_identifiers": [
+   "27f0937b7eb36605"
+  ],
+  "run_paths": [
+   "ggapbe/length_distortions/a_1p2_b_0p9_c_1p1_alpha_1_beta_1_gamma_1"
+  ],
+  "stratum": "length"
+ },
+ "perovskite_a_1p2_b_0p9_c_1p2_alpha_1_beta_1_gamma_1_length": {
+  "extrapolation_tags": [
+   "holdout_factor_1p2"
+  ],
+  "fold": 0,
+  "run_identifiers": [
+   "05e87ed31677a724"
+  ],
+  "run_paths": [
+   "ggapbe/length_distortions/a_1p2_b_0p9_c_1p2_alpha_1_beta_1_gamma_1"
+  ],
+  "stratum": "length"
+ },
+ "perovskite_a_1p2_b_1_c_0p8_alpha_1_beta_1_gamma_1_length": {
+  "extrapolation_tags": [
+   "holdout_factor_0p8",
+   "holdout_factor_1p2"
+  ],
+  "fold": 2,
+  "run_identifiers": [
+   "07b0a07ce4af8b48"
+  ],
+  "run_paths": [
+   "ggapbe/length_distortions/a_1p2_b_1_c_0p8_alpha_1_beta_1_gamma_1"
+  ],
+  "stratum": "length"
+ },
+ "perovskite_a_1p2_b_1_c_0p9_alpha_1_beta_1_gamma_1_length": {
+  "extrapolation_tags": [
+   "holdout_factor_1p2"
+  ],
+  "fold": 4,
+  "run_identifiers": [
+   "ef2a636d5f85b8aa"
+  ],
+  "run_paths": [
+   "ggapbe/length_distortions/a_1p2_b_1_c_0p9_alpha_1_beta_1_gamma_1"
+  ],
+  "stratum": "length"
+ },
+ "perovskite_a_1p2_b_1_c_1_alpha_1_beta_1_gamma_1_length": {
+  "extrapolation_tags": [
+   "holdout_factor_1p2"
+  ],
+  "fold": 0,
+  "run_identifiers": [
+   "14f0b776a931af40"
+  ],
+  "run_paths": [
+   "ggapbe/length_distortions/a_1p2_b_1_c_1_alpha_1_beta_1_gamma_1"
+  ],
+  "stratum": "length"
+ },
+ "perovskite_a_1p2_b_1_c_1p1_alpha_1_beta_1_gamma_1_length": {
+  "extrapolation_tags": [
+   "holdout_factor_1p2"
+  ],
+  "fold": 4,
+  "run_identifiers": [
+   "2ddc9ee5c2da8614"
+  ],
+  "run_paths": [
+   "ggapbe/length_distortions/a_1p2_b_1_c_1p1_alpha_1_beta_1_gamma_1"
+  ],
+  "stratum": "length"
+ },
+ "perovskite_a_1p2_b_1_c_1p2_alpha_1_beta_1_gamma_1_length": {
+  "extrapolation_tags": [
+   "holdout_factor_1p2"
+  ],
+  "fold": 0,
+  "run_identifiers": [
+   "17edd8a3e87bfeab"
+  ],
+  "run_paths": [
+   "ggapbe/length_distortions/a_1p2_b_1_c_1p2_alpha_1_beta_1_gamma_1"
+  ],
+  "stratum": "length"
+ },
+ "perovskite_a_1p2_b_1p1_c_0p8_alpha_1_beta_1_gamma_1_length": {
+  "extrapolation_tags": [
+   "holdout_factor_0p8",
+   "holdout_factor_1p2"
+  ],
+  "fold": 2,
+  "run_identifiers": [
+   "32ff89bf624c1f3d"
+  ],
+  "run_paths": [
+   "ggapbe/length_distortions/a_1p2_b_1p1_c_0p8_alpha_1_beta_1_gamma_1"
+  ],
+  "stratum": "length"
+ },
+ "perovskite_a_1p2_b_1p1_c_0p9_alpha_1_beta_1_gamma_1_length": {
+  "extrapolation_tags": [
+   "holdout_factor_1p2"
+  ],
+  "fold": 4,
+  "run_identifiers": [
+   "49bd700fcfbff643"
+  ],
+  "run_paths": [
+   "ggapbe/length_distortions/a_1p2_b_1p1_c_0p9_alpha_1_beta_1_gamma_1"
+  ],
+  "stratum": "length"
+ },
+ "perovskite_a_1p2_b_1p1_c_1_alpha_1_beta_1_gamma_1_length": {
+  "extrapolation_tags": [
+   "holdout_factor_1p2"
+  ],
+  "fold": 2,
+  "run_identifiers": [
+   "bae990fc17cf1a7f"
+  ],
+  "run_paths": [
+   "ggapbe/length_distortions/a_1p2_b_1p1_c_1_alpha_1_beta_1_gamma_1"
+  ],
+  "stratum": "length"
+ },
+ "perovskite_a_1p2_b_1p1_c_1p1_alpha_1_beta_1_gamma_1_length": {
+  "extrapolation_tags": [
+   "holdout_factor_1p2"
+  ],
+  "fold": 3,
+  "run_identifiers": [
+   "ee330a37e239e35e"
+  ],
+  "run_paths": [
+   "ggapbe/length_distortions/a_1p2_b_1p1_c_1p1_alpha_1_beta_1_gamma_1"
+  ],
+  "stratum": "length"
+ },
+ "perovskite_a_1p2_b_1p1_c_1p2_alpha_1_beta_1_gamma_1_length": {
+  "extrapolation_tags": [
+   "holdout_factor_1p2"
+  ],
+  "fold": 4,
+  "run_identifiers": [
+   "43bf1a93ecb4b260"
+  ],
+  "run_paths": [
+   "ggapbe/length_distortions/a_1p2_b_1p1_c_1p2_alpha_1_beta_1_gamma_1"
+  ],
+  "stratum": "length"
+ },
+ "perovskite_a_1p2_b_1p2_c_0p8_alpha_1_beta_1_gamma_1_length": {
+  "extrapolation_tags": [
+   "holdout_factor_0p8",
+   "holdout_factor_1p2"
+  ],
+  "fold": 0,
+  "run_identifiers": [
+   "29d18c7c59f0e4dd"
+  ],
+  "run_paths": [
+   "ggapbe/length_distortions/a_1p2_b_1p2_c_0p8_alpha_1_beta_1_gamma_1"
+  ],
+  "stratum": "length"
+ },
+ "perovskite_a_1p2_b_1p2_c_0p9_alpha_1_beta_1_gamma_1_length": {
+  "extrapolation_tags": [
+   "holdout_factor_1p2"
+  ],
+  "fold": 3,
+  "run_identifiers": [
+   "dece3ae42a0be15f"
+  ],
+  "run_paths": [
+   "ggapbe/length_distortions/a_1p2_b_1p2_c_0p9_alpha_1_beta_1_gamma_1"
+  ],
+  "stratum": "length"
+ },
+ "perovskite_a_1p2_b_1p2_c_1_alpha_1_beta_1_gamma_1_length": {
+  "extrapolation_tags": [
+   "holdout_factor_1p2"
+  ],
+  "fold": 0,
+  "run_identifiers": [
+   "c34dd32a6476a092"
+  ],
+  "run_paths": [
+   "ggapbe/length_distortions/a_1p2_b_1p2_c_1_alpha_1_beta_1_gamma_1"
+  ],
+  "stratum": "length"
+ },
+ "perovskite_a_1p2_b_1p2_c_1p1_alpha_1_beta_1_gamma_1_length": {
+  "extrapolation_tags": [
+   "holdout_factor_1p2"
+  ],
+  "fold": 0,
+  "run_identifiers": [
+   "2f648fb26db28241"
+  ],
+  "run_paths": [
+   "ggapbe/length_distortions/a_1p2_b_1p2_c_1p1_alpha_1_beta_1_gamma_1"
+  ],
+  "stratum": "length"
+ },
+ "perovskite_a_1p2_b_1p2_c_1p2_alpha_1_beta_1_gamma_1_length": {
+  "extrapolation_tags": [
+   "holdout_factor_1p2"
+  ],
+  "fold": 3,
+  "run_identifiers": [
+   "887545182b46bd8a"
+  ],
+  "run_paths": [
+   "ggapbe/length_distortions/a_1p2_b_1p2_c_1p2_alpha_1_beta_1_gamma_1"
+  ],
+  "stratum": "length"
+ }
+}

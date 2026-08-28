@@ -1,0 +1,481 @@
+{
+ "+0.0000_+0.0000_+0.0000_+0.0050_+0.0000_+0.0000": {
+  "strain_atlas": [
+   "diamond/2_atoms_4-10-2026/new-data/3_angular-distortion-1angle-HSE06/shear_xy_g-0.005/1-GGA-PBE",
+   "diamond/2_atoms_4-10-2026/new-data/3_angular-distortion-1angle-HSE06/shear_xy_g-0.005/2-HSE06",
+   "diamond/2_atoms_4-10-2026/new-data/3_angular-distortion-1angle-HSE06/shear_xy_g0.005/1-GGA-PBE",
+   "diamond/2_atoms_4-10-2026/new-data/3_angular-distortion-1angle-HSE06/shear_xy_g0.005/2-HSE06",
+   "diamond/2_atoms_4-10-2026/new-data/3_angular-distortion-1angle-HSE06/shear_xz_g-0.005/1-GGA-PBE",
+   "diamond/2_atoms_4-10-2026/new-data/3_angular-distortion-1angle-HSE06/shear_xz_g-0.005/2-HSE06",
+   "diamond/2_atoms_4-10-2026/new-data/3_angular-distortion-1angle-HSE06/shear_xz_g0.005/1-GGA-PBE",
+   "diamond/2_atoms_4-10-2026/new-data/3_angular-distortion-1angle-HSE06/shear_xz_g0.005/2-HSE06",
+   "diamond/2_atoms_4-10-2026/new-data/3_angular-distortion-1angle-HSE06/shear_yz_g-0.005/1-GGA-PBE",
+   "diamond/2_atoms_4-10-2026/new-data/3_angular-distortion-1angle-HSE06/shear_yz_g-0.005/2-HSE06",
+   "diamond/2_atoms_4-10-2026/new-data/3_angular-distortion-1angle-HSE06/shear_yz_g0.005/1-GGA-PBE",
+   "diamond/2_atoms_4-10-2026/new-data/3_angular-distortion-1angle-HSE06/shear_yz_g0.005/2-HSE06"
+  ],
+  "supercell_strains": [
+   "diamond/Pure/New_files/angular-distortion/shear_xy_g-0.005",
+   "diamond/Pure/New_files/angular-distortion/shear_xy_g0.005",
+   "diamond/Pure/New_files/angular-distortion/shear_xz_g-0.005",
+   "diamond/Pure/New_files/angular-distortion/shear_xz_g0.005",
+   "diamond/Pure/New_files/angular-distortion/shear_yz_g-0.005",
+   "diamond/Pure/New_files/angular-distortion/shear_yz_g0.005"
+  ]
+ },
+ "+0.0000_+0.0000_+0.0000_+0.0100_+0.0000_+0.0000": {
+  "strain_atlas": [
+   "diamond/2_atoms_4-10-2026/new-data/3_angular-distortion-1angle-HSE06/shear_xy_g-0.010/1-GGA-PBE",
+   "diamond/2_atoms_4-10-2026/new-data/3_angular-distortion-1angle-HSE06/shear_xy_g-0.010/2-HSE06",
+   "diamond/2_atoms_4-10-2026/new-data/3_angular-distortion-1angle-HSE06/shear_xy_g0.010/1-GGA-PBE",
+   "diamond/2_atoms_4-10-2026/new-data/3_angular-distortion-1angle-HSE06/shear_xy_g0.010/2-HSE06",
+   "diamond/2_atoms_4-10-2026/new-data/3_angular-distortion-1angle-HSE06/shear_xz_g-0.010/1-GGA-PBE",
+   "diamond/2_atoms_4-10-2026/new-data/3_angular-distortion-1angle-HSE06/shear_xz_g-0.010/2-HSE06",
+   "diamond/2_atoms_4-10-2026/new-data/3_angular-distortion-1angle-HSE06/shear_xz_g0.010/1-GGA-PBE",
+   "diamond/2_atoms_4-10-2026/new-data/3_angular-distortion-1angle-HSE06/shear_xz_g0.010/2-HSE06",
+   "diamond/2_atoms_4-10-2026/new-data/3_angular-distortion-1angle-HSE06/shear_yz_g-0.010/1-GGA-PBE",
+   "diamond/2_atoms_4-10-2026/new-data/3_angular-distortion-1angle-HSE06/shear_yz_g-0.010/2-HSE06",
+   "diamond/2_atoms_4-10-2026/new-data/3_angular-distortion-1angle-HSE06/shear_yz_g0.010/1-GGA-PBE",
+   "diamond/2_atoms_4-10-2026/new-data/3_angular-distortion-1angle-HSE06/shear_yz_g0.010/2-HSE06"
+  ],
+  "supercell_strains": [
+   "diamond/Pure/New_files/angular-distortion/shear_xy_g-0.010",
+   "diamond/Pure/New_files/angular-distortion/shear_xz_g-0.010",
+   "diamond/Pure/New_files/angular-distortion/shear_xz_g0.010",
+   "diamond/Pure/New_files/angular-distortion/shear_yz_g-0.010",
+   "diamond/Pure/New_files/angular-distortion/shear_yz_g0.010"
+  ]
+ },
+ "+0.0000_+0.0000_+0.0000_+0.0150_+0.0000_+0.0000": {
+  "strain_atlas": [
+   "diamond/2_atoms_4-10-2026/new-data/3_angular-distortion-1angle-HSE06/shear_xy_g-0.015/1-GGA-PBE",
+   "diamond/2_atoms_4-10-2026/new-data/3_angular-distortion-1angle-HSE06/shear_xy_g-0.015/2-HSE06",
+   "diamond/2_atoms_4-10-2026/new-data/3_angular-distortion-1angle-HSE06/shear_xy_g0.015/1-GGA-PBE",
+   "diamond/2_atoms_4-10-2026/new-data/3_angular-distortion-1angle-HSE06/shear_xy_g0.015/2-HSE06",
+   "diamond/2_atoms_4-10-2026/new-data/3_angular-distortion-1angle-HSE06/shear_xz_g-0.015/1-GGA-PBE",
+   "diamond/2_atoms_4-10-2026/new-data/3_angular-distortion-1angle-HSE06/shear_xz_g-0.015/2-HSE06",
+   "diamond/2_atoms_4-10-2026/new-data/3_angular-distortion-1angle-HSE06/shear_xz_g0.015/1-GGA-PBE",
+   "diamond/2_atoms_4-10-2026/new-data/3_angular-distortion-1angle-HSE06/shear_xz_g0.015/2-HSE06",
+   "diamond/2_atoms_4-10-2026/new-data/3_angular-distortion-1angle-HSE06/shear_yz_g-0.015/1-GGA-PBE",
+   "diamond/2_atoms_4-10-2026/new-data/3_angular-distortion-1angle-HSE06/shear_yz_g-0.015/2-HSE06",
+   "diamond/2_atoms_4-10-2026/new-data/3_angular-distortion-1angle-HSE06/shear_yz_g0.015/1-GGA-PBE",
+   "diamond/2_atoms_4-10-2026/new-data/3_angular-distortion-1angle-HSE06/shear_yz_g0.015/2-HSE06"
+  ],
+  "supercell_strains": [
+   "diamond/Pure/New_files/angular-distortion/shear_xy_g-0.015",
+   "diamond/Pure/New_files/angular-distortion/shear_xy_g0.015",
+   "diamond/Pure/New_files/angular-distortion/shear_xz_g-0.015",
+   "diamond/Pure/New_files/angular-distortion/shear_xz_g0.015",
+   "diamond/Pure/New_files/angular-distortion/shear_yz_g-0.015",
+   "diamond/Pure/New_files/angular-distortion/shear_yz_g0.015"
+  ]
+ },
+ "+0.0000_+0.0000_+0.0000_+0.0200_+0.0000_+0.0000": {
+  "strain_atlas": [
+   "diamond/2_atoms_4-10-2026/new-data/3_angular-distortion-1angle-HSE06/shear_xy_g-0.020/1-GGA-PBE",
+   "diamond/2_atoms_4-10-2026/new-data/3_angular-distortion-1angle-HSE06/shear_xy_g-0.020/2-HSE06",
+   "diamond/2_atoms_4-10-2026/new-data/3_angular-distortion-1angle-HSE06/shear_xy_g0.020/1-GGA-PBE",
+   "diamond/2_atoms_4-10-2026/new-data/3_angular-distortion-1angle-HSE06/shear_xy_g0.020/2-HSE06",
+   "diamond/2_atoms_4-10-2026/new-data/3_angular-distortion-1angle-HSE06/shear_xz_g-0.020/1-GGA-PBE",
+   "diamond/2_atoms_4-10-2026/new-data/3_angular-distortion-1angle-HSE06/shear_xz_g-0.020/2-HSE06",
+   "diamond/2_atoms_4-10-2026/new-data/3_angular-distortion-1angle-HSE06/shear_xz_g0.020/1-GGA-PBE",
+   "diamond/2_atoms_4-10-2026/new-data/3_angular-distortion-1angle-HSE06/shear_xz_g0.020/2-HSE06",
+   "diamond/2_atoms_4-10-2026/new-data/3_angular-distortion-1angle-HSE06/shear_yz_g-0.020/1-GGA-PBE",
+   "diamond/2_atoms_4-10-2026/new-data/3_angular-distortion-1angle-HSE06/shear_yz_g-0.020/2-HSE06",
+   "diamond/2_atoms_4-10-2026/new-data/3_angular-distortion-1angle-HSE06/shear_yz_g0.020/1-GGA-PBE",
+   "diamond/2_atoms_4-10-2026/new-data/3_angular-distortion-1angle-HSE06/shear_yz_g0.020/2-HSE06"
+  ],
+  "supercell_strains": [
+   "diamond/Pure/New_files/angular-distortion/shear_xy_g-0.020",
+   "diamond/Pure/New_files/angular-distortion/shear_xy_g0.020",
+   "diamond/Pure/New_files/angular-distortion/shear_xz_g-0.020",
+   "diamond/Pure/New_files/angular-distortion/shear_xz_g0.020",
+   "diamond/Pure/New_files/angular-distortion/shear_yz_g-0.020",
+   "diamond/Pure/New_files/angular-distortion/shear_yz_g0.020"
+  ]
+ },
+ "+0.0000_+0.0000_+0.0000_+0.0250_+0.0000_+0.0000": {
+  "strain_atlas": [
+   "diamond/2_atoms_4-10-2026/new-data/3_angular-distortion-1angle-HSE06/shear_xy_g-0.025/1-GGA-PBE",
+   "diamond/2_atoms_4-10-2026/new-data/3_angular-distortion-1angle-HSE06/shear_xy_g-0.025/2-HSE06",
+   "diamond/2_atoms_4-10-2026/new-data/3_angular-distortion-1angle-HSE06/shear_xy_g0.025/1-GGA-PBE",
+   "diamond/2_atoms_4-10-2026/new-data/3_angular-distortion-1angle-HSE06/shear_xy_g0.025/2-HSE06",
+   "diamond/2_atoms_4-10-2026/new-data/3_angular-distortion-1angle-HSE06/shear_xz_g-0.025/1-GGA-PBE",
+   "diamond/2_atoms_4-10-2026/new-data/3_angular-distortion-1angle-HSE06/shear_xz_g-0.025/2-HSE06",
+   "diamond/2_atoms_4-10-2026/new-data/3_angular-distortion-1angle-HSE06/shear_xz_g0.025/1-GGA-PBE",
+   "diamond/2_atoms_4-10-2026/new-data/3_angular-distortion-1angle-HSE06/shear_xz_g0.025/2-HSE06",
+   "diamond/2_atoms_4-10-2026/new-data/3_angular-distortion-1angle-HSE06/shear_yz_g-0.025/1-GGA-PBE",
+   "diamond/2_atoms_4-10-2026/new-data/3_angular-distortion-1angle-HSE06/shear_yz_g-0.025/2-HSE06",
+   "diamond/2_atoms_4-10-2026/new-data/3_angular-distortion-1angle-HSE06/shear_yz_g0.025/1-GGA-PBE",
+   "diamond/2_atoms_4-10-2026/new-data/3_angular-distortion-1angle-HSE06/shear_yz_g0.025/2-HSE06"
+  ],
+  "supercell_strains": [
+   "diamond/Pure/New_files/angular-distortion/shear_xy_g-0.025",
+   "diamond/Pure/New_files/angular-distortion/shear_xy_g0.025",
+   "diamond/Pure/New_files/angular-distortion/shear_xz_g-0.025",
+   "diamond/Pure/New_files/angular-distortion/shear_xz_g0.025",
+   "diamond/Pure/New_files/angular-distortion/shear_yz_g-0.025",
+   "diamond/Pure/New_files/angular-distortion/shear_yz_g0.025"
+  ]
+ },
+ "+0.0000_+0.0000_+0.0000_+0.0300_+0.0000_+0.0000": {
+  "strain_atlas": [
+   "diamond/2_atoms_4-10-2026/new-data/3_angular-distortion-1angle-HSE06/shear_xy_g-0.030/1-GGA-PBE",
+   "diamond/2_atoms_4-10-2026/new-data/3_angular-distortion-1angle-HSE06/shear_xy_g-0.030/2-HSE06",
+   "diamond/2_atoms_4-10-2026/new-data/3_angular-distortion-1angle-HSE06/shear_xy_g0.030/1-GGA-PBE",
+   "diamond/2_atoms_4-10-2026/new-data/3_angular-distortion-1angle-HSE06/shear_xy_g0.030/2-HSE06",
+   "diamond/2_atoms_4-10-2026/new-data/3_angular-distortion-1angle-HSE06/shear_xz_g-0.030/1-GGA-PBE",
+   "diamond/2_atoms_4-10-2026/new-data/3_angular-distortion-1angle-HSE06/shear_xz_g-0.030/2-HSE06",
+   "diamond/2_atoms_4-10-2026/new-data/3_angular-distortion-1angle-HSE06/shear_xz_g0.030/1-GGA-PBE",
+   "diamond/2_atoms_4-10-2026/new-data/3_angular-distortion-1angle-HSE06/shear_xz_g0.030/2-HSE06",
+   "diamond/2_atoms_4-10-2026/new-data/3_angular-distortion-1angle-HSE06/shear_yz_g-0.030/1-GGA-PBE",
+   "diamond/2_atoms_4-10-2026/new-data/3_angular-distortion-1angle-HSE06/shear_yz_g-0.030/2-HSE06",
+   "diamond/2_atoms_4-10-2026/new-data/3_angular-distortion-1angle-HSE06/shear_yz_g0.030/1-GGA-PBE",
+   "diamond/2_atoms_4-10-2026/new-data/3_angular-distortion-1angle-HSE06/shear_yz_g0.030/2-HSE06"
+  ],
+  "supercell_strains": [
+   "diamond/Pure/New_files/angular-distortion/shear_xy_g-0.030",
+   "diamond/Pure/New_files/angular-distortion/shear_xy_g0.030",
+   "diamond/Pure/New_files/angular-distortion/shear_xz_g-0.030",
+   "diamond/Pure/New_files/angular-distortion/shear_xz_g0.030",
+   "diamond/Pure/New_files/angular-distortion/shear_yz_g-0.030",
+   "diamond/Pure/New_files/angular-distortion/shear_yz_g0.030"
+  ]
+ },
+ "+0.0000_+0.0000_+0.0000_+0.0350_+0.0000_+0.0000": {
+  "strain_atlas": [
+   "diamond/2_atoms_4-10-2026/new-data/3_angular-distortion-1angle-HSE06/shear_xy_g-0.035/1-GGA-PBE",
+   "diamond/2_atoms_4-10-2026/new-data/3_angular-distortion-1angle-HSE06/shear_xy_g-0.035/2-HSE06",
+   "diamond/2_atoms_4-10-2026/new-data/3_angular-distortion-1angle-HSE06/shear_xy_g0.035/1-GGA-PBE",
+   "diamond/2_atoms_4-10-2026/new-data/3_angular-distortion-1angle-HSE06/shear_xy_g0.035/2-HSE06",
+   "diamond/2_atoms_4-10-2026/new-data/3_angular-distortion-1angle-HSE06/shear_xz_g-0.035/1-GGA-PBE",
+   "diamond/2_atoms_4-10-2026/new-data/3_angular-distortion-1angle-HSE06/shear_xz_g-0.035/2-HSE06",
+   "diamond/2_atoms_4-10-2026/new-data/3_angular-distortion-1angle-HSE06/shear_xz_g0.035/1-GGA-PBE",
+   "diamond/2_atoms_4-10-2026/new-data/3_angular-distortion-1angle-HSE06/shear_xz_g0.035/2-HSE06",
+   "diamond/2_atoms_4-10-2026/new-data/3_angular-distortion-1angle-HSE06/shear_yz_g-0.035/1-GGA-PBE",
+   "diamond/2_atoms_4-10-2026/new-data/3_angular-distortion-1angle-HSE06/shear_yz_g-0.035/2-HSE06",
+   "diamond/2_atoms_4-10-2026/new-data/3_angular-distortion-1angle-HSE06/shear_yz_g0.035/1-GGA-PBE",
+   "diamond/2_atoms_4-10-2026/new-data/3_angular-distortion-1angle-HSE06/shear_yz_g0.035/2-HSE06"
+  ],
+  "supercell_strains": [
+   "diamond/Pure/New_files/angular-distortion/shear_xy_g-0.035",
+   "diamond/Pure/New_files/angular-distortion/shear_xy_g0.035",
+   "diamond/Pure/New_files/angular-distortion/shear_xz_g-0.035",
+   "diamond/Pure/New_files/angular-distortion/shear_xz_g0.035",
+   "diamond/Pure/New_files/angular-distortion/shear_yz_g-0.035",
+   "diamond/Pure/New_files/angular-distortion/shear_yz_g0.035"
+  ]
+ },
+ "+0.0000_+0.0000_+0.0000_+0.0400_+0.0000_+0.0000": {
+  "strain_atlas": [
+   "diamond/2_atoms_4-10-2026/new-data/3_angular-distortion-1angle-HSE06/shear_xy_g-0.040/1-GGA-PBE",
+   "diamond/2_atoms_4-10-2026/new-data/3_angular-distortion-1angle-HSE06/shear_xy_g-0.040/2-HSE06",
+   "diamond/2_atoms_4-10-2026/new-data/3_angular-distortion-1angle-HSE06/shear_xy_g0.040/1-GGA-PBE",
+   "diamond/2_atoms_4-10-2026/new-data/3_angular-distortion-1angle-HSE06/shear_xy_g0.040/2-HSE06",
+   "diamond/2_atoms_4-10-2026/new-data/3_angular-distortion-1angle-HSE06/shear_xz_g-0.040/1-GGA-PBE",
+   "diamond/2_atoms_4-10-2026/new-data/3_angular-distortion-1angle-HSE06/shear_xz_g-0.040/2-HSE06",
+   "diamond/2_atoms_4-10-2026/new-data/3_angular-distortion-1angle-HSE06/shear_xz_g0.040/1-GGA-PBE",
+   "diamond/2_atoms_4-10-2026/new-data/3_angular-distortion-1angle-HSE06/shear_xz_g0.040/2-HSE06",
+   "diamond/2_atoms_4-10-2026/new-data/3_angular-distortion-1angle-HSE06/shear_yz_g-0.040/1-GGA-PBE",
+   "diamond/2_atoms_4-10-2026/new-data/3_angular-distortion-1angle-HSE06/shear_yz_g-0.040/2-HSE06",
+   "diamond/2_atoms_4-10-2026/new-data/3_angular-distortion-1angle-HSE06/shear_yz_g0.040/1-GGA-PBE",
+   "diamond/2_atoms_4-10-2026/new-data/3_angular-distortion-1angle-HSE06/shear_yz_g0.040/2-HSE06"
+  ],
+  "supercell_strains": [
+   "diamond/Pure/New_files/angular-distortion/shear_xy_g-0.040",
+   "diamond/Pure/New_files/angular-distortion/shear_xy_g0.040",
+   "diamond/Pure/New_files/angular-distortion/shear_xz_g-0.040",
+   "diamond/Pure/New_files/angular-distortion/shear_xz_g0.040",
+   "diamond/Pure/New_files/angular-distortion/shear_yz_g-0.040",
+   "diamond/Pure/New_files/angular-distortion/shear_yz_g0.040"
+  ]
+ },
+ "+0.0000_+0.0000_+0.0000_+0.0450_+0.0000_+0.0000": {
+  "strain_atlas": [
+   "diamond/2_atoms_4-10-2026/new-data/3_angular-distortion-1angle-HSE06/shear_xy_g-0.045/1-GGA-PBE",
+   "diamond/2_atoms_4-10-2026/new-data/3_angular-distortion-1angle-HSE06/shear_xy_g-0.045/2-HSE06",
+   "diamond/2_atoms_4-10-2026/new-data/3_angular-distortion-1angle-HSE06/shear_xy_g0.045/1-GGA-PBE",
+   "diamond/2_atoms_4-10-2026/new-data/3_angular-distortion-1angle-HSE06/shear_xy_g0.045/2-HSE06",
+   "diamond/2_atoms_4-10-2026/new-data/3_angular-distortion-1angle-HSE06/shear_xz_g-0.045/1-GGA-PBE",
+   "diamond/2_atoms_4-10-2026/new-data/3_angular-distortion-1angle-HSE06/shear_xz_g-0.045/2-HSE06",
+   "diamond/2_atoms_4-10-2026/new-data/3_angular-distortion-1angle-HSE06/shear_xz_g0.045/1-GGA-PBE",
+   "diamond/2_atoms_4-10-2026/new-data/3_angular-distortion-1angle-HSE06/shear_xz_g0.045/2-HSE06",
+   "diamond/2_atoms_4-10-2026/new-data/3_angular-distortion-1angle-HSE06/shear_yz_g-0.045/1-GGA-PBE",
+   "diamond/2_atoms_4-10-2026/new-data/3_angular-distortion-1angle-HSE06/shear_yz_g-0.045/2-HSE06",
+   "diamond/2_atoms_4-10-2026/new-data/3_angular-distortion-1angle-HSE06/shear_yz_g0.045/1-GGA-PBE",
+   "diamond/2_atoms_4-10-2026/new-data/3_angular-distortion-1angle-HSE06/shear_yz_g0.045/2-HSE06"
+  ],
+  "supercell_strains": [
+   "diamond/Pure/New_files/angular-distortion/shear_xy_g-0.045",
+   "diamond/Pure/New_files/angular-distortion/shear_xy_g0.045",
+   "diamond/Pure/New_files/angular-distortion/shear_xz_g-0.045",
+   "diamond/Pure/New_files/angular-distortion/shear_xz_g0.045",
+   "diamond/Pure/New_files/angular-distortion/shear_yz_g-0.045",
+   "diamond/Pure/New_files/angular-distortion/shear_yz_g0.045"
+  ]
+ },
+ "+0.0000_+0.0000_+0.0000_+0.0500_+0.0000_+0.0000": {
+  "strain_atlas": [
+   "diamond/2_atoms_4-10-2026/new-data/3_angular-distortion-1angle-HSE06/shear_xy_g-0.050/1-GGA-PBE",
+   "diamond/2_atoms_4-10-2026/new-data/3_angular-distortion-1angle-HSE06/shear_xy_g-0.050/2-HSE06",
+   "diamond/2_atoms_4-10-2026/new-data/3_angular-distortion-1angle-HSE06/shear_xy_g0.050/1-GGA-PBE",
+   "diamond/2_atoms_4-10-2026/new-data/3_angular-distortion-1angle-HSE06/shear_xy_g0.050/2-HSE06",
+   "diamond/2_atoms_4-10-2026/new-data/3_angular-distortion-1angle-HSE06/shear_xz_g-0.050/1-GGA-PBE",
+   "diamond/2_atoms_4-10-2026/new-data/3_angular-distortion-1angle-HSE06/shear_xz_g-0.050/2-HSE06",
+   "diamond/2_atoms_4-10-2026/new-data/3_angular-distortion-1angle-HSE06/shear_xz_g0.050/1-GGA-PBE",
+   "diamond/2_atoms_4-10-2026/new-data/3_angular-distortion-1angle-HSE06/shear_xz_g0.050/2-HSE06",
+   "diamond/2_atoms_4-10-2026/new-data/3_angular-distortion-1angle-HSE06/shear_yz_g-0.050/1-GGA-PBE",
+   "diamond/2_atoms_4-10-2026/new-data/3_angular-distortion-1angle-HSE06/shear_yz_g-0.050/2-HSE06",
+   "diamond/2_atoms_4-10-2026/new-data/3_angular-distortion-1angle-HSE06/shear_yz_g0.050/1-GGA-PBE",
+   "diamond/2_atoms_4-10-2026/new-data/3_angular-distortion-1angle-HSE06/shear_yz_g0.050/2-HSE06"
+  ],
+  "supercell_strains": [
+   "diamond/Pure/New_files/angular-distortion/shear_xy_g-0.050",
+   "diamond/Pure/New_files/angular-distortion/shear_xy_g0.050",
+   "diamond/Pure/New_files/angular-distortion/shear_xz_g-0.050",
+   "diamond/Pure/New_files/angular-distortion/shear_xz_g0.050",
+   "diamond/Pure/New_files/angular-distortion/shear_yz_g-0.050",
+   "diamond/Pure/New_files/angular-distortion/shear_yz_g0.050"
+  ]
+ },
+ "+0.0000_+0.0000_+0.0000_+0.0550_+0.0000_+0.0000": {
+  "strain_atlas": [
+   "diamond/2_atoms_4-10-2026/new-data/3_angular-distortion-1angle-HSE06/shear_xy_g-0.055/1-GGA-PBE",
+   "diamond/2_atoms_4-10-2026/new-data/3_angular-distortion-1angle-HSE06/shear_xy_g-0.055/2-HSE06",
+   "diamond/2_atoms_4-10-2026/new-data/3_angular-distortion-1angle-HSE06/shear_xy_g0.055/1-GGA-PBE",
+   "diamond/2_atoms_4-10-2026/new-data/3_angular-distortion-1angle-HSE06/shear_xy_g0.055/2-HSE06",
+   "diamond/2_atoms_4-10-2026/new-data/3_angular-distortion-1angle-HSE06/shear_xz_g-0.055/1-GGA-PBE",
+   "diamond/2_atoms_4-10-2026/new-data/3_angular-distortion-1angle-HSE06/shear_xz_g-0.055/2-HSE06",
+   "diamond/2_atoms_4-10-2026/new-data/3_angular-distortion-1angle-HSE06/shear_xz_g0.055/1-GGA-PBE",
+   "diamond/2_atoms_4-10-2026/new-data/3_angular-distortion-1angle-HSE06/shear_xz_g0.055/2-HSE06",
+   "diamond/2_atoms_4-10-2026/new-data/3_angular-distortion-1angle-HSE06/shear_yz_g-0.055/1-GGA-PBE",
+   "diamond/2_atoms_4-10-2026/new-data/3_angular-distortion-1angle-HSE06/shear_yz_g-0.055/2-HSE06",
+   "diamond/2_atoms_4-10-2026/new-data/3_angular-distortion-1angle-HSE06/shear_yz_g0.055/1-GGA-PBE",
+   "diamond/2_atoms_4-10-2026/new-data/3_angular-distortion-1angle-HSE06/shear_yz_g0.055/2-HSE06"
+  ],
+  "supercell_strains": [
+   "diamond/Pure/New_files/angular-distortion-new/shear_xy_g-0.055",
+   "diamond/Pure/New_files/angular-distortion-new/shear_xy_g0.055",
+   "diamond/Pure/New_files/angular-distortion-new/shear_xz_g-0.055",
+   "diamond/Pure/New_files/angular-distortion-new/shear_xz_g0.055",
+   "diamond/Pure/New_files/angular-distortion-new/shear_yz_g-0.055",
+   "diamond/Pure/New_files/angular-distortion-new/shear_yz_g0.055"
+  ]
+ },
+ "+0.0000_+0.0000_+0.0000_+0.0600_+0.0000_+0.0000": {
+  "strain_atlas": [
+   "diamond/2_atoms_4-10-2026/new-data/3_angular-distortion-1angle-HSE06/shear_xy_g-0.060/1-GGA-PBE",
+   "diamond/2_atoms_4-10-2026/new-data/3_angular-distortion-1angle-HSE06/shear_xy_g-0.060/2-HSE06",
+   "diamond/2_atoms_4-10-2026/new-data/3_angular-distortion-1angle-HSE06/shear_xy_g0.060/1-GGA-PBE",
+   "diamond/2_atoms_4-10-2026/new-data/3_angular-distortion-1angle-HSE06/shear_xy_g0.060/2-HSE06",
+   "diamond/2_atoms_4-10-2026/new-data/3_angular-distortion-1angle-HSE06/shear_xz_g-0.060/1-GGA-PBE",
+   "diamond/2_atoms_4-10-2026/new-data/3_angular-distortion-1angle-HSE06/shear_xz_g-0.060/2-HSE06",
+   "diamond/2_atoms_4-10-2026/new-data/3_angular-distortion-1angle-HSE06/shear_xz_g0.060/1-GGA-PBE",
+   "diamond/2_atoms_4-10-2026/new-data/3_angular-distortion-1angle-HSE06/shear_xz_g0.060/2-HSE06",
+   "diamond/2_atoms_4-10-2026/new-data/3_angular-distortion-1angle-HSE06/shear_yz_g-0.060/1-GGA-PBE",
+   "diamond/2_atoms_4-10-2026/new-data/3_angular-distortion-1angle-HSE06/shear_yz_g-0.060/2-HSE06",
+   "diamond/2_atoms_4-10-2026/new-data/3_angular-distortion-1angle-HSE06/shear_yz_g0.060/1-GGA-PBE",
+   "diamond/2_atoms_4-10-2026/new-data/3_angular-distortion-1angle-HSE06/shear_yz_g0.060/2-HSE06"
+  ],
+  "supercell_strains": [
+   "diamond/Pure/New_files/angular-distortion-new/shear_xy_g-0.060",
+   "diamond/Pure/New_files/angular-distortion-new/shear_xy_g0.060",
+   "diamond/Pure/New_files/angular-distortion-new/shear_xz_g-0.060",
+   "diamond/Pure/New_files/angular-distortion-new/shear_xz_g0.060",
+   "diamond/Pure/New_files/angular-distortion-new/shear_yz_g-0.060",
+   "diamond/Pure/New_files/angular-distortion-new/shear_yz_g0.060"
+  ]
+ },
+ "+0.0000_+0.0000_+0.0000_+0.0650_+0.0000_+0.0000": {
+  "strain_atlas": [
+   "diamond/2_atoms_4-10-2026/new-data/3_angular-distortion-1angle-HSE06/shear_xy_g-0.065/1-GGA-PBE",
+   "diamond/2_atoms_4-10-2026/new-data/3_angular-distortion-1angle-HSE06/shear_xy_g-0.065/2-HSE06",
+   "diamond/2_atoms_4-10-2026/new-data/3_angular-distortion-1angle-HSE06/shear_xy_g0.065/1-GGA-PBE",
+   "diamond/2_atoms_4-10-2026/new-data/3_angular-distortion-1angle-HSE06/shear_xy_g0.065/2-HSE06",
+   "diamond/2_atoms_4-10-2026/new-data/3_angular-distortion-1angle-HSE06/shear_xz_g-0.065/1-GGA-PBE",
+   "diamond/2_atoms_4-10-2026/new-data/3_angular-distortion-1angle-HSE06/shear_xz_g-0.065/2-HSE06",
+   "diamond/2_atoms_4-10-2026/new-data/3_angular-distortion-1angle-HSE06/shear_xz_g0.065/1-GGA-PBE",
+   "diamond/2_atoms_4-10-2026/new-data/3_angular-distortion-1angle-HSE06/shear_xz_g0.065/2-HSE06",
+   "diamond/2_atoms_4-10-2026/new-data/3_angular-distortion-1angle-HSE06/shear_yz_g-0.065/1-GGA-PBE",
+   "diamond/2_atoms_4-10-2026/new-data/3_angular-distortion-1angle-HSE06/shear_yz_g-0.065/2-HSE06",
+   "diamond/2_atoms_4-10-2026/new-data/3_angular-distortion-1angle-HSE06/shear_yz_g0.065/1-GGA-PBE",
+   "diamond/2_atoms_4-10-2026/new-data/3_angular-distortion-1angle-HSE06/shear_yz_g0.065/2-HSE06"
+  ],
+  "supercell_strains": [
+   "diamond/Pure/New_files/angular-distortion-new/shear_xy_g-0.065",
+   "diamond/Pure/New_files/angular-distortion-new/shear_xy_g0.065",
+   "diamond/Pure/New_files/angular-distortion-new/shear_xz_g-0.065",
+   "diamond/Pure/New_files/angular-distortion-new/shear_xz_g0.065",
+   "diamond/Pure/New_files/angular-distortion-new/shear_yz_g-0.065",
+   "diamond/Pure/New_files/angular-distortion-new/shear_yz_g0.065"
+  ]
+ },
+ "+0.0000_+0.0000_+0.0000_+0.0700_+0.0000_+0.0000": {
+  "strain_atlas": [
+   "diamond/2_atoms_4-10-2026/new-data/3_angular-distortion-1angle-HSE06/shear_xy_g-0.070/1-GGA-PBE",
+   "diamond/2_atoms_4-10-2026/new-data/3_angular-distortion-1angle-HSE06/shear_xy_g-0.070/2-HSE06",
+   "diamond/2_atoms_4-10-2026/new-data/3_angular-distortion-1angle-HSE06/shear_xy_g0.070/1-GGA-PBE",
+   "diamond/2_atoms_4-10-2026/new-data/3_angular-distortion-1angle-HSE06/shear_xy_g0.070/2-HSE06",
+   "diamond/2_atoms_4-10-2026/new-data/3_angular-distortion-1angle-HSE06/shear_xz_g-0.070/1-GGA-PBE",
+   "diamond/2_atoms_4-10-2026/new-data/3_angular-distortion-1angle-HSE06/shear_xz_g-0.070/2-HSE06",
+   "diamond/2_atoms_4-10-2026/new-data/3_angular-distortion-1angle-HSE06/shear_xz_g0.070/1-GGA-PBE",
+   "diamond/2_atoms_4-10-2026/new-data/3_angular-distortion-1angle-HSE06/shear_xz_g0.070/2-HSE06",
+   "diamond/2_atoms_4-10-2026/new-data/3_angular-distortion-1angle-HSE06/shear_yz_g-0.070/1-GGA-PBE",
+   "diamond/2_atoms_4-10-2026/new-data/3_angular-distortion-1angle-HSE06/shear_yz_g-0.070/2-HSE06",
+   "diamond/2_atoms_4-10-2026/new-data/3_angular-distortion-1angle-HSE06/shear_yz_g0.070/1-GGA-PBE",
+   "diamond/2_atoms_4-10-2026/new-data/3_angular-distortion-1angle-HSE06/shear_yz_g0.070/2-HSE06"
+  ],
+  "supercell_strains": [
+   "diamond/Pure/New_files/angular-distortion-new/shear_xy_g-0.070",
+   "diamond/Pure/New_files/angular-distortion-new/shear_xy_g0.070",
+   "diamond/Pure/New_files/angular-distortion-new/shear_xz_g-0.070",
+   "diamond/Pure/New_files/angular-distortion-new/shear_xz_g0.070",
+   "diamond/Pure/New_files/angular-distortion-new/shear_yz_g-0.070",
+   "diamond/Pure/New_files/angular-distortion-new/shear_yz_g0.070"
+  ]
+ },
+ "+0.0000_+0.0000_+0.0000_+0.0750_+0.0000_+0.0000": {
+  "strain_atlas": [
+   "diamond/2_atoms_4-10-2026/new-data/3_angular-distortion-1angle-HSE06/shear_xy_g-0.075/1-GGA-PBE",
+   "diamond/2_atoms_4-10-2026/new-data/3_angular-distortion-1angle-HSE06/shear_xy_g-0.075/2-HSE06",
+   "diamond/2_atoms_4-10-2026/new-data/3_angular-distortion-1angle-HSE06/shear_xy_g0.075/1-GGA-PBE",
+   "diamond/2_atoms_4-10-2026/new-data/3_angular-distortion-1angle-HSE06/shear_xy_g0.075/2-HSE06",
+   "diamond/2_atoms_4-10-2026/new-data/3_angular-distortion-1angle-HSE06/shear_xz_g-0.075/1-GGA-PBE",
+   "diamond/2_atoms_4-10-2026/new-data/3_angular-distortion-1angle-HSE06/shear_xz_g-0.075/2-HSE06",
+   "diamond/2_atoms_4-10-2026/new-data/3_angular-distortion-1angle-HSE06/shear_xz_g0.075/1-GGA-PBE",
+   "diamond/2_atoms_4-10-2026/new-data/3_angular-distortion-1angle-HSE06/shear_xz_g0.075/2-HSE06",
+   "diamond/2_atoms_4-10-2026/new-data/3_angular-distortion-1angle-HSE06/shear_yz_g-0.075/1-GGA-PBE",
+   "diamond/2_atoms_4-10-2026/new-data/3_angular-distortion-1angle-HSE06/shear_yz_g-0.075/2-HSE06",
+   "diamond/2_atoms_4-10-2026/new-data/3_angular-distortion-1angle-HSE06/shear_yz_g0.075/1-GGA-PBE",
+   "diamond/2_atoms_4-10-2026/new-data/3_angular-distortion-1angle-HSE06/shear_yz_g0.075/2-HSE06"
+  ],
+  "supercell_strains": [
+   "diamond/Pure/New_files/angular-distortion-new/shear_xy_g-0.075",
+   "diamond/Pure/New_files/angular-distortion-new/shear_xy_g0.075",
+   "diamond/Pure/New_files/angular-distortion-new/shear_xz_g-0.075",
+   "diamond/Pure/New_files/angular-distortion-new/shear_xz_g0.075",
+   "diamond/Pure/New_files/angular-distortion-new/shear_yz_g-0.075",
+   "diamond/Pure/New_files/angular-distortion-new/shear_yz_g0.075"
+  ]
+ },
+ "+0.0000_+0.0000_+0.0000_+0.0800_+0.0000_+0.0000": {
+  "strain_atlas": [
+   "diamond/2_atoms_4-10-2026/new-data/3_angular-distortion-1angle-HSE06/shear_xy_g-0.080/1-GGA-PBE",
+   "diamond/2_atoms_4-10-2026/new-data/3_angular-distortion-1angle-HSE06/shear_xy_g-0.080/2-HSE06",
+   "diamond/2_atoms_4-10-2026/new-data/3_angular-distortion-1angle-HSE06/shear_xy_g0.080/1-GGA-PBE",
+   "diamond/2_atoms_4-10-2026/new-data/3_angular-distortion-1angle-HSE06/shear_xy_g0.080/2-HSE06",
+   "diamond/2_atoms_4-10-2026/new-data/3_angular-distortion-1angle-HSE06/shear_xz_g-0.080/1-GGA-PBE",
+   "diamond/2_atoms_4-10-2026/new-data/3_angular-distortion-1angle-HSE06/shear_xz_g-0.080/2-HSE06",
+   "diamond/2_atoms_4-10-2026/new-data/3_angular-distortion-1angle-HSE06/shear_xz_g0.080/1-GGA-PBE",
+   "diamond/2_atoms_4-10-2026/new-data/3_angular-distortion-1angle-HSE06/shear_xz_g0.080/2-HSE06",
+   "diamond/2_atoms_4-10-2026/new-data/3_angular-distortion-1angle-HSE06/shear_yz_g-0.080/1-GGA-PBE",
+   "diamond/2_atoms_4-10-2026/new-data/3_angular-distortion-1angle-HSE06/shear_yz_g-0.080/2-HSE06",
+   "diamond/2_atoms_4-10-2026/new-data/3_angular-distortion-1angle-HSE06/shear_yz_g0.080/1-GGA-PBE",
+   "diamond/2_atoms_4-10-2026/new-data/3_angular-distortion-1angle-HSE06/shear_yz_g0.080/2-HSE06"
+  ],
+  "supercell_strains": [
+   "diamond/Pure/New_files/angular-distortion-new/shear_xy_g-0.080",
+   "diamond/Pure/New_files/angular-distortion-new/shear_xy_g0.080",
+   "diamond/Pure/New_files/angular-distortion-new/shear_xz_g-0.080",
+   "diamond/Pure/New_files/angular-distortion-new/shear_xz_g0.080",
+   "diamond/Pure/New_files/angular-distortion-new/shear_yz_g-0.080",
+   "diamond/Pure/New_files/angular-distortion-new/shear_yz_g0.080"
+  ]
+ },
+ "+0.0000_+0.0000_+0.0000_+0.0850_+0.0000_+0.0000": {
+  "strain_atlas": [
+   "diamond/2_atoms_4-10-2026/new-data/3_angular-distortion-1angle-HSE06/shear_xy_g-0.085/1-GGA-PBE",
+   "diamond/2_atoms_4-10-2026/new-data/3_angular-distortion-1angle-HSE06/shear_xy_g-0.085/2-HSE06",
+   "diamond/2_atoms_4-10-2026/new-data/3_angular-distortion-1angle-HSE06/shear_xy_g0.085/1-GGA-PBE",
+   "diamond/2_atoms_4-10-2026/new-data/3_angular-distortion-1angle-HSE06/shear_xy_g0.085/2-HSE06",
+   "diamond/2_atoms_4-10-2026/new-data/3_angular-distortion-1angle-HSE06/shear_xz_g-0.085/1-GGA-PBE",
+   "diamond/2_atoms_4-10-2026/new-data/3_angular-distortion-1angle-HSE06/shear_xz_g-0.085/2-HSE06",
+   "diamond/2_atoms_4-10-2026/new-data/3_angular-distortion-1angle-HSE06/shear_xz_g0.085/1-GGA-PBE",
+   "diamond/2_atoms_4-10-2026/new-data/3_angular-distortion-1angle-HSE06/shear_xz_g0.085/2-HSE06",
+   "diamond/2_atoms_4-10-2026/new-data/3_angular-distortion-1angle-HSE06/shear_yz_g-0.085/1-GGA-PBE",
+   "diamond/2_atoms_4-10-2026/new-data/3_angular-distortion-1angle-HSE06/shear_yz_g-0.085/2-HSE06",
+   "diamond/2_atoms_4-10-2026/new-data/3_angular-distortion-1angle-HSE06/shear_yz_g0.085/1-GGA-PBE",
+   "diamond/2_atoms_4-10-2026/new-data/3_angular-distortion-1angle-HSE06/shear_yz_g0.085/2-HSE06"
+  ],
+  "supercell_strains": [
+   "diamond/Pure/New_files/angular-distortion-new/shear_xy_g-0.085",
+   "diamond/Pure/New_files/angular-distortion-new/shear_xy_g0.085",
+   "diamond/Pure/New_files/angular-distortion-new/shear_xz_g-0.085",
+   "diamond/Pure/New_files/angular-distortion-new/shear_xz_g0.085",
+   "diamond/Pure/New_files/angular-distortion-new/shear_yz_g-0.085",
+   "diamond/Pure/New_files/angular-distortion-new/shear_yz_g0.085"
+  ]
+ },
+ "+0.0000_+0.0000_+0.0000_+0.0900_+0.0000_+0.0000": {
+  "strain_atlas": [
+   "diamond/2_atoms_4-10-2026/new-data/3_angular-distortion-1angle-HSE06/shear_xy_g-0.090/1-GGA-PBE",
+   "diamond/2_atoms_4-10-2026/new-data/3_angular-distortion-1angle-HSE06/shear_xy_g-0.090/2-HSE06",
+   "diamond/2_atoms_4-10-2026/new-data/3_angular-distortion-1angle-HSE06/shear_xy_g0.090/1-GGA-PBE",
+   "diamond/2_atoms_4-10-2026/new-data/3_angular-distortion-1angle-HSE06/shear_xy_g0.090/2-HSE06",
+   "diamond/2_atoms_4-10-2026/new-data/3_angular-distortion-1angle-HSE06/shear_xz_g-0.090/1-GGA-PBE",
+   "diamond/2_atoms_4-10-2026/new-data/3_angular-distortion-1angle-HSE06/shear_xz_g-0.090/2-HSE06",
+   "diamond/2_atoms_4-10-2026/new-data/3_angular-distortion-1angle-HSE06/shear_xz_g0.090/1-GGA-PBE",
+   "diamond/2_atoms_4-10-2026/new-data/3_angular-distortion-1angle-HSE06/shear_xz_g0.090/2-HSE06",
+   "diamond/2_atoms_4-10-2026/new-data/3_angular-distortion-1angle-HSE06/shear_yz_g-0.090/1-GGA-PBE",
+   "diamond/2_atoms_4-10-2026/new-data/3_angular-distortion-1angle-HSE06/shear_yz_g-0.090/2-HSE06",
+   "diamond/2_atoms_4-10-2026/new-data/3_angular-distortion-1angle-HSE06/shear_yz_g0.090/1-GGA-PBE",
+   "diamond/2_atoms_4-10-2026/new-data/3_angular-distortion-1angle-HSE06/shear_yz_g0.090/2-HSE06"
+  ],
+  "supercell_strains": [
+   "diamond/Pure/New_files/angular-distortion-new/shear_xy_g-0.090",
+   "diamond/Pure/New_files/angular-distortion-new/shear_xy_g0.090",
+   "diamond/Pure/New_files/angular-distortion-new/shear_xz_g-0.090",
+   "diamond/Pure/New_files/angular-distortion-new/shear_xz_g0.090",
+   "diamond/Pure/New_files/angular-distortion-new/shear_yz_g-0.090",
+   "diamond/Pure/New_files/angular-distortion-new/shear_yz_g0.090"
+  ]
+ },
+ "+0.0000_+0.0000_+0.0000_+0.0950_+0.0000_+0.0000": {
+  "strain_atlas": [
+   "diamond/2_atoms_4-10-2026/new-data/3_angular-distortion-1angle-HSE06/shear_xy_g-0.095/1-GGA-PBE",
+   "diamond/2_atoms_4-10-2026/new-data/3_angular-distortion-1angle-HSE06/shear_xy_g-0.095/2-HSE06",
+   "diamond/2_atoms_4-10-2026/new-data/3_angular-distortion-1angle-HSE06/shear_xy_g0.095/1-GGA-PBE",
+   "diamond/2_atoms_4-10-2026/new-data/3_angular-distortion-1angle-HSE06/shear_xy_g0.095/2-HSE06",
+   "diamond/2_atoms_4-10-2026/new-data/3_angular-distortion-1angle-HSE06/shear_xz_g-0.095/1-GGA-PBE",
+   "diamond/2_atoms_4-10-2026/new-data/3_angular-distortion-1angle-HSE06/shear_xz_g-0.095/2-HSE06",
+   "diamond/2_atoms_4-10-2026/new-data/3_angular-distortion-1angle-HSE06/shear_xz_g0.095/1-GGA-PBE",
+   "diamond/2_atoms_4-10-2026/new-data/3_angular-distortion-1angle-HSE06/shear_xz_g0.095/2-HSE06",
+   "diamond/2_atoms_4-10-2026/new-data/3_angular-distortion-1angle-HSE06/shear_yz_g-0.095/1-GGA-PBE",
+   "diamond/2_atoms_4-10-2026/new-data/3_angular-distortion-1angle-HSE06/shear_yz_g-0.095/2-HSE06",
+   "diamond/2_atoms_4-10-2026/new-data/3_angular-distortion-1angle-HSE06/shear_yz_g0.095/1-GGA-PBE",
+   "diamond/2_atoms_4-10-2026/new-data/3_angular-distortion-1angle-HSE06/shear_yz_g0.095/2-HSE06"
+  ],
+  "supercell_strains": [
+   "diamond/Pure/New_files/angular-distortion-new/shear_xy_g-0.095",
+   "diamond/Pure/New_files/angular-distortion-new/shear_xy_g0.095",
+   "diamond/Pure/New_files/angular-distortion-new/shear_xz_g-0.095",
+   "diamond/Pure/New_files/angular-distortion-new/shear_xz_g0.095",
+   "diamond/Pure/New_files/angular-distortion-new/shear_yz_g-0.095",
+   "diamond/Pure/New_files/angular-distortion-new/shear_yz_g0.095"
+  ]
+ },
+ "+0.0000_+0.0000_+0.0000_+0.1000_+0.0000_+0.0000": {
+  "strain_atlas": [
+   "diamond/2_atoms_4-10-2026/new-data/3_angular-distortion-1angle-HSE06/shear_xy_g-0.100/1-GGA-PBE",
+   "diamond/2_atoms_4-10-2026/new-data/3_angular-distortion-1angle-HSE06/shear_xy_g-0.100/2-HSE06",
+   "diamond/2_atoms_4-10-2026/new-data/3_angular-distortion-1angle-HSE06/shear_xy_g0.100/1-GGA-PBE",
+   "diamond/2_atoms_4-10-2026/new-data/3_angular-distortion-1angle-HSE06/shear_xy_g0.100/2-HSE06",
+   "diamond/2_atoms_4-10-2026/new-data/3_angular-distortion-1angle-HSE06/shear_xz_g-0.100/1-GGA-PBE",
+   "diamond/2_atoms_4-10-2026/new-data/3_angular-distortion-1angle-HSE06/shear_xz_g-0.100/2-HSE06",
+   "diamond/2_atoms_4-10-2026/new-data/3_angular-distortion-1angle-HSE06/shear_xz_g0.100/1-GGA-PBE",
+   "diamond/2_atoms_4-10-2026/new-data/3_angular-distortion-1angle-HSE06/shear_xz_g0.100/2-HSE06",
+   "diamond/2_atoms_4-10-2026/new-data/3_angular-distortion-1angle-HSE06/shear_yz_g-0.100/1-GGA-PBE",
+   "diamond/2_atoms_4-10-2026/new-data/3_angular-distortion-1angle-HSE06/shear_yz_g-0.100/2-HSE06",
+   "diamond/2_atoms_4-10-2026/new-data/3_angular-distortion-1angle-HSE06/shear_yz_g0.100/1-GGA-PBE",
+   "diamond/2_atoms_4-10-2026/new-data/3_angular-distortion-1angle-HSE06/shear_yz_g0.100/2-HSE06"
+  ],
+  "supercell_strains": [
+   "diamond/Pure/New_files/angular-distortion-new/shear_xy_g-0.100",
+   "diamond/Pure/New_files/angular-distortion-new/shear_xy_g0.100",
+   "diamond/Pure/New_files/angular-distortion-new/shear_xz_g-0.100",
+   "diamond/Pure/New_files/angular-distortion-new/shear_xz_g0.100",
+   "diamond/Pure/New_files/angular-distortion-new/shear_yz_g-0.100",
+   "diamond/Pure/New_files/angular-distortion-new/shear_yz_g0.100"
+  ]
+ }
+}

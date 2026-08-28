@@ -1,0 +1,2945 @@
+{
+ "alloy_x0.00000_cfg001": {
+  "campaign": "alloy_ensemble",
+  "fold": 0,
+  "run_identifiers": [
+   "a131d3e699a3d9f9",
+   "f7ce20e70556ce17",
+   "42fc07424d1dc1a5",
+   "45bb1feac1f180a4",
+   "7ff03cd0ce23c124",
+   "1058b7180ed551d2",
+   "2efff6575f625244",
+   "3d0e931ad9ae0f87",
+   "a80fcb994a6d4a2b",
+   "6c6d3b4c611cf7b5",
+   "e123986634a2658d"
+  ],
+  "run_paths": [
+   "alloy/0-Alumium-position-teste/0-Alumium-position-teste/x_000.0_Al_Al0Ga8O12_POSCAR_x000.0_cfg001_AlSites_none",
+   "alloy/1-Alloy/1-Alloy/1-Volume-relaxation/1-x-0/volume_series/scale_0.95",
+   "alloy/1-Alloy/1-Alloy/1-Volume-relaxation/1-x-0/volume_series/scale_0.96",
+   "alloy/1-Alloy/1-Alloy/1-Volume-relaxation/1-x-0/volume_series/scale_0.970",
+   "alloy/1-Alloy/1-Alloy/1-Volume-relaxation/1-x-0/volume_series/scale_0.990",
+   "alloy/1-Alloy/1-Alloy/1-Volume-relaxation/1-x-0/volume_series/scale_1.010",
+   "alloy/1-Alloy/1-Alloy/1-Volume-relaxation/1-x-0/volume_series/scale_1.020",
+   "alloy/1-Alloy/1-Alloy/1-Volume-relaxation/1-x-0/volume_series/scale_1.030",
+   "alloy/1-Alloy/1-Alloy/1-Volume-relaxation/1-x-0/volume_series/scale_1.04",
+   "alloy/1-Alloy/1-Alloy/2-GGA-PBE-relaxation/1-x-0",
+   "alloy/1-Alloy/1-Alloy/3-HSE06/1-x-0"
+  ],
+  "stratum": "x0.00000"
+ },
+ "alloy_x0.12500_cfg001": {
+  "campaign": "alloy_ensemble",
+  "fold": 0,
+  "run_identifiers": [
+   "d915a00e4c9c8568",
+   "933b204af2fd21c1",
+   "a0a76f6ba186fbbe",
+   "4c049878efcbfd8e",
+   "91b6ab5ef03664d4",
+   "4aa32dfa61f61b2f",
+   "5350b3b836f01dab",
+   "8e4c0efc6eae5273",
+   "facc371aec244b9b",
+   "e127de7f3a97629b",
+   "b7f070abd031fa5d",
+   "5931aa50ef6f1832",
+   "d1e946bfd8c3a5b9",
+   "a6e5a4e6474b6181",
+   "ec7a7149c04f946f",
+   "73b041c4ff2ca1c2",
+   "96acce479dc7ac69",
+   "a486c7f40fac4ad8",
+   "061e2d8297537f16"
+  ],
+  "run_paths": [
+   "alloy/0-Alumium-position-teste/0-Alumium-position-teste/x_012.5_Al_Al1Ga7O12_POSCAR_x012.5_cfg001_AlSites_1",
+   "alloy/1-Alloy/1-Alloy/1-Volume-relaxation/2-x-12.5/volume_series/scale_0.900",
+   "alloy/1-Alloy/1-Alloy/1-Volume-relaxation/2-x-12.5/volume_series/scale_0.910",
+   "alloy/1-Alloy/1-Alloy/1-Volume-relaxation/2-x-12.5/volume_series/scale_0.920",
+   "alloy/1-Alloy/1-Alloy/1-Volume-relaxation/2-x-12.5/volume_series/scale_0.93",
+   "alloy/1-Alloy/1-Alloy/1-Volume-relaxation/2-x-12.5/volume_series/scale_0.94",
+   "alloy/1-Alloy/1-Alloy/1-Volume-relaxation/2-x-12.5/volume_series/scale_0.95",
+   "alloy/1-Alloy/1-Alloy/1-Volume-relaxation/2-x-12.5/volume_series/scale_0.96",
+   "alloy/1-Alloy/1-Alloy/1-Volume-relaxation/2-x-12.5/volume_series/scale_0.970",
+   "alloy/1-Alloy/1-Alloy/1-Volume-relaxation/2-x-12.5/volume_series/scale_0.980",
+   "alloy/1-Alloy/1-Alloy/1-Volume-relaxation/2-x-12.5/volume_series/scale_0.990",
+   "alloy/1-Alloy/1-Alloy/1-Volume-relaxation/2-x-12.5/volume_series/scale_1.000",
+   "alloy/1-Alloy/1-Alloy/1-Volume-relaxation/2-x-12.5/volume_series/scale_1.010",
+   "alloy/1-Alloy/1-Alloy/1-Volume-relaxation/2-x-12.5/volume_series/scale_1.020",
+   "alloy/1-Alloy/1-Alloy/1-Volume-relaxation/2-x-12.5/volume_series/scale_1.030",
+   "alloy/1-Alloy/1-Alloy/1-Volume-relaxation/2-x-12.5/volume_series/scale_1.04",
+   "alloy/1-Alloy/1-Alloy/1-Volume-relaxation/2-x-12.5/volume_series/scale_1.05",
+   "alloy/1-Alloy/1-Alloy/2-GGA-PBE-relaxation/2-x-12.5",
+   "alloy/1-Alloy/1-Alloy/3-HSE06/2-x-12.5"
+  ],
+  "stratum": "x0.12500"
+ },
+ "alloy_x0.12500_cfg002": {
+  "campaign": "alloy_ensemble",
+  "fold": 1,
+  "run_identifiers": [
+   "785f397d770878ac"
+  ],
+  "run_paths": [
+   "alloy/0-Alumium-position-teste/0-Alumium-position-teste/x_012.5_Al_Al1Ga7O12_POSCAR_x012.5_cfg002_AlSites_3"
+  ],
+  "stratum": "x0.12500"
+ },
+ "alloy_x0.25000_cfg001": {
+  "campaign": "alloy_ensemble",
+  "fold": 3,
+  "run_identifiers": [
+   "e0b576d066c14c94",
+   "169e55ec75df32e5",
+   "0a67d4a5ef89555e",
+   "1084b7c9c56d6b84",
+   "7ce0d105a6379dfd",
+   "8433879fcf320612",
+   "18c2d9c29fd27e4d",
+   "fc5c5d69b859dfab",
+   "35b7983e7425b679",
+   "eccf951c0a408521",
+   "4ae6321121ec285d",
+   "ae857ef9a19d7c4b",
+   "6500b39edfeb7413",
+   "991606b403326c12",
+   "e2ea76cd02ad805d",
+   "b9eba5bd56edbce6",
+   "ad2f38884172d877",
+   "687e9b0ceebbaf10",
+   "eca175576606b828"
+  ],
+  "run_paths": [
+   "alloy/0-Alumium-position-teste/0-Alumium-position-teste/x_025.0_Al_Al2Ga6O12_POSCAR_x025.0_cfg001_AlSites_1-2",
+   "alloy/1-Alloy/1-Alloy/1-Volume-relaxation/3-x-25/volume_series/scale_0.900",
+   "alloy/1-Alloy/1-Alloy/1-Volume-relaxation/3-x-25/volume_series/scale_0.910",
+   "alloy/1-Alloy/1-Alloy/1-Volume-relaxation/3-x-25/volume_series/scale_0.920",
+   "alloy/1-Alloy/1-Alloy/1-Volume-relaxation/3-x-25/volume_series/scale_0.93",
+   "alloy/1-Alloy/1-Alloy/1-Volume-relaxation/3-x-25/volume_series/scale_0.94",
+   "alloy/1-Alloy/1-Alloy/1-Volume-relaxation/3-x-25/volume_series/scale_0.95",
+   "alloy/1-Alloy/1-Alloy/1-Volume-relaxation/3-x-25/volume_series/scale_0.96",
+   "alloy/1-Alloy/1-Alloy/1-Volume-relaxation/3-x-25/volume_series/scale_0.970",
+   "alloy/1-Alloy/1-Alloy/1-Volume-relaxation/3-x-25/volume_series/scale_0.980",
+   "alloy/1-Alloy/1-Alloy/1-Volume-relaxation/3-x-25/volume_series/scale_0.990",
+   "alloy/1-Alloy/1-Alloy/1-Volume-relaxation/3-x-25/volume_series/scale_1.000",
+   "alloy/1-Alloy/1-Alloy/1-Volume-relaxation/3-x-25/volume_series/scale_1.010",
+   "alloy/1-Alloy/1-Alloy/1-Volume-relaxation/3-x-25/volume_series/scale_1.020",
+   "alloy/1-Alloy/1-Alloy/1-Volume-relaxation/3-x-25/volume_series/scale_1.030",
+   "alloy/1-Alloy/1-Alloy/1-Volume-relaxation/3-x-25/volume_series/scale_1.04",
+   "alloy/1-Alloy/1-Alloy/1-Volume-relaxation/3-x-25/volume_series/scale_1.05",
+   "alloy/1-Alloy/1-Alloy/2-GGA-PBE-relaxation/3-x-25",
+   "alloy/1-Alloy/1-Alloy/3-HSE06/3-x-25"
+  ],
+  "stratum": "x0.25000"
+ },
+ "alloy_x0.25000_cfg002": {
+  "campaign": "alloy_ensemble",
+  "fold": 0,
+  "run_identifiers": [
+   "66d82c1d4fd8405d"
+  ],
+  "run_paths": [
+   "alloy/0-Alumium-position-teste/0-Alumium-position-teste/x_025.0_Al_Al2Ga6O12_POSCAR_x025.0_cfg002_AlSites_1-3"
+  ],
+  "stratum": "x0.25000"
+ },
+ "alloy_x0.25000_cfg003": {
+  "campaign": "alloy_ensemble",
+  "fold": 4,
+  "run_identifiers": [
+   "3cb02a826322ea28"
+  ],
+  "run_paths": [
+   "alloy/0-Alumium-position-teste/0-Alumium-position-teste/x_025.0_Al_Al2Ga6O12_POSCAR_x025.0_cfg003_AlSites_1-4"
+  ],
+  "stratum": "x0.25000"
+ },
+ "alloy_x0.25000_cfg004": {
+  "campaign": "alloy_ensemble",
+  "fold": 3,
+  "run_identifiers": [
+   "c0c3508fd004fe11"
+  ],
+  "run_paths": [
+   "alloy/0-Alumium-position-teste/0-Alumium-position-teste/x_025.0_Al_Al2Ga6O12_POSCAR_x025.0_cfg004_AlSites_1-5"
+  ],
+  "stratum": "x0.25000"
+ },
+ "alloy_x0.25000_cfg005": {
+  "campaign": "alloy_ensemble",
+  "fold": 4,
+  "run_identifiers": [
+   "b7e8ef3feb8b4982"
+  ],
+  "run_paths": [
+   "alloy/0-Alumium-position-teste/0-Alumium-position-teste/x_025.0_Al_Al2Ga6O12_POSCAR_x025.0_cfg005_AlSites_1-6"
+  ],
+  "stratum": "x0.25000"
+ },
+ "alloy_x0.25000_cfg006": {
+  "campaign": "alloy_ensemble",
+  "fold": 2,
+  "run_identifiers": [
+   "3f254da9e5069df9"
+  ],
+  "run_paths": [
+   "alloy/0-Alumium-position-teste/0-Alumium-position-teste/x_025.0_Al_Al2Ga6O12_POSCAR_x025.0_cfg006_AlSites_1-7"
+  ],
+  "stratum": "x0.25000"
+ },
+ "alloy_x0.25000_cfg007": {
+  "campaign": "alloy_ensemble",
+  "fold": 1,
+  "run_identifiers": [
+   "d8148c44336e0343"
+  ],
+  "run_paths": [
+   "alloy/0-Alumium-position-teste/0-Alumium-position-teste/x_025.0_Al_Al2Ga6O12_POSCAR_x025.0_cfg007_AlSites_1-8"
+  ],
+  "stratum": "x0.25000"
+ },
+ "alloy_x0.25000_cfg008": {
+  "campaign": "alloy_ensemble",
+  "fold": 1,
+  "run_identifiers": [
+   "7b114ef66e9b75e8"
+  ],
+  "run_paths": [
+   "alloy/0-Alumium-position-teste/0-Alumium-position-teste/x_025.0_Al_Al2Ga6O12_POSCAR_x025.0_cfg008_AlSites_3-4"
+  ],
+  "stratum": "x0.25000"
+ },
+ "alloy_x0.25000_cfg009": {
+  "campaign": "alloy_ensemble",
+  "fold": 2,
+  "run_identifiers": [
+   "d71a6f8a0787052e"
+  ],
+  "run_paths": [
+   "alloy/0-Alumium-position-teste/0-Alumium-position-teste/x_025.0_Al_Al2Ga6O12_POSCAR_x025.0_cfg009_AlSites_3-7"
+  ],
+  "stratum": "x0.25000"
+ },
+ "alloy_x0.25000_cfg010": {
+  "campaign": "alloy_ensemble",
+  "fold": 0,
+  "run_identifiers": [
+   "fd84ccab739d1c54"
+  ],
+  "run_paths": [
+   "alloy/0-Alumium-position-teste/0-Alumium-position-teste/x_025.0_Al_Al2Ga6O12_POSCAR_x025.0_cfg010_AlSites_3-8"
+  ],
+  "stratum": "x0.25000"
+ },
+ "alloy_x0.37500_cfg001": {
+  "campaign": "alloy_ensemble",
+  "fold": 0,
+  "run_identifiers": [
+   "00b6e128f8870b53"
+  ],
+  "run_paths": [
+   "alloy/0-Alumium-position-teste/0-Alumium-position-teste/x_037.5_Al_Al3Ga5O12_POSCAR_x037.5_cfg001_AlSites_1-2-3"
+  ],
+  "stratum": "x0.37500"
+ },
+ "alloy_x0.37500_cfg002": {
+  "campaign": "alloy_ensemble",
+  "fold": 1,
+  "run_identifiers": [
+   "73885e0997bf03fd",
+   "f0494f64877aa00f",
+   "e07ebd9a6564cc4b"
+  ],
+  "run_paths": [
+   "alloy/0-Alumium-position-teste/0-Alumium-position-teste/x_037.5_Al_Al3Ga5O12_POSCAR_x037.5_cfg002_AlSites_1-2-5",
+   "alloy/1-Alloy/1-Alloy/2-GGA-PBE-relaxation/4-x-32.5",
+   "alloy/1-Alloy/1-Alloy/3-HSE06/4-x-32.5"
+  ],
+  "stratum": "x0.37500"
+ },
+ "alloy_x0.37500_cfg003": {
+  "campaign": "alloy_ensemble",
+  "fold": 1,
+  "run_identifiers": [
+   "d5ae6737b5c222ce"
+  ],
+  "run_paths": [
+   "alloy/0-Alumium-position-teste/0-Alumium-position-teste/x_037.5_Al_Al3Ga5O12_POSCAR_x037.5_cfg003_AlSites_1-2-7"
+  ],
+  "stratum": "x0.37500"
+ },
+ "alloy_x0.37500_cfg004": {
+  "campaign": "alloy_ensemble",
+  "fold": 4,
+  "run_identifiers": [
+   "a0ea7baeb83aa1af"
+  ],
+  "run_paths": [
+   "alloy/0-Alumium-position-teste/0-Alumium-position-teste/x_037.5_Al_Al3Ga5O12_POSCAR_x037.5_cfg004_AlSites_1-3-4"
+  ],
+  "stratum": "x0.37500"
+ },
+ "alloy_x0.37500_cfg005": {
+  "campaign": "alloy_ensemble",
+  "fold": 0,
+  "run_identifiers": [
+   "277d4946105fa261"
+  ],
+  "run_paths": [
+   "alloy/0-Alumium-position-teste/0-Alumium-position-teste/x_037.5_Al_Al3Ga5O12_POSCAR_x037.5_cfg005_AlSites_1-3-5"
+  ],
+  "stratum": "x0.37500"
+ },
+ "alloy_x0.37500_cfg006": {
+  "campaign": "alloy_ensemble",
+  "fold": 2,
+  "run_identifiers": [
+   "4a6ed6c86bd7e2b3"
+  ],
+  "run_paths": [
+   "alloy/0-Alumium-position-teste/0-Alumium-position-teste/x_037.5_Al_Al3Ga5O12_POSCAR_x037.5_cfg006_AlSites_1-3-6"
+  ],
+  "stratum": "x0.37500"
+ },
+ "alloy_x0.37500_cfg007": {
+  "campaign": "alloy_ensemble",
+  "fold": 1,
+  "run_identifiers": [
+   "2df04f74435f01f9"
+  ],
+  "run_paths": [
+   "alloy/0-Alumium-position-teste/0-Alumium-position-teste/x_037.5_Al_Al3Ga5O12_POSCAR_x037.5_cfg007_AlSites_1-3-7"
+  ],
+  "stratum": "x0.37500"
+ },
+ "alloy_x0.37500_cfg008": {
+  "campaign": "alloy_ensemble",
+  "fold": 3,
+  "run_identifiers": [
+   "ee4629e1d23063a4"
+  ],
+  "run_paths": [
+   "alloy/0-Alumium-position-teste/0-Alumium-position-teste/x_037.5_Al_Al3Ga5O12_POSCAR_x037.5_cfg008_AlSites_1-3-8"
+  ],
+  "stratum": "x0.37500"
+ },
+ "alloy_x0.37500_cfg009": {
+  "campaign": "alloy_ensemble",
+  "fold": 3,
+  "run_identifiers": [
+   "4dd9416a666f8584"
+  ],
+  "run_paths": [
+   "alloy/0-Alumium-position-teste/0-Alumium-position-teste/x_037.5_Al_Al3Ga5O12_POSCAR_x037.5_cfg009_AlSites_1-4-5"
+  ],
+  "stratum": "x0.37500"
+ },
+ "alloy_x0.37500_cfg010": {
+  "campaign": "alloy_ensemble",
+  "fold": 0,
+  "run_identifiers": [
+   "ad5c7821bcb4546b"
+  ],
+  "run_paths": [
+   "alloy/0-Alumium-position-teste/0-Alumium-position-teste/x_037.5_Al_Al3Ga5O12_POSCAR_x037.5_cfg010_AlSites_1-4-6"
+  ],
+  "stratum": "x0.37500"
+ },
+ "alloy_x0.37500_cfg011": {
+  "campaign": "alloy_ensemble",
+  "fold": 2,
+  "run_identifiers": [
+   "75dffb5429950d6d"
+  ],
+  "run_paths": [
+   "alloy/0-Alumium-position-teste/0-Alumium-position-teste/x_037.5_Al_Al3Ga5O12_POSCAR_x037.5_cfg011_AlSites_1-4-7"
+  ],
+  "stratum": "x0.37500"
+ },
+ "alloy_x0.37500_cfg012": {
+  "campaign": "alloy_ensemble",
+  "fold": 3,
+  "run_identifiers": [
+   "6042319d44862cf7"
+  ],
+  "run_paths": [
+   "alloy/0-Alumium-position-teste/0-Alumium-position-teste/x_037.5_Al_Al3Ga5O12_POSCAR_x037.5_cfg012_AlSites_1-4-8"
+  ],
+  "stratum": "x0.37500"
+ },
+ "alloy_x0.37500_cfg013": {
+  "campaign": "alloy_ensemble",
+  "fold": 2,
+  "run_identifiers": [
+   "3aa6fe36078d50e6"
+  ],
+  "run_paths": [
+   "alloy/0-Alumium-position-teste/0-Alumium-position-teste/x_037.5_Al_Al3Ga5O12_POSCAR_x037.5_cfg013_AlSites_1-7-8"
+  ],
+  "stratum": "x0.37500"
+ },
+ "alloy_x0.37500_cfg014": {
+  "campaign": "alloy_ensemble",
+  "fold": 4,
+  "run_identifiers": [
+   "bcef00a07e33ed2c"
+  ],
+  "run_paths": [
+   "alloy/0-Alumium-position-teste/0-Alumium-position-teste/x_037.5_Al_Al3Ga5O12_POSCAR_x037.5_cfg014_AlSites_3-4-7"
+  ],
+  "stratum": "x0.37500"
+ },
+ "alloy_x0.50000_cfg001": {
+  "campaign": "alloy_ensemble",
+  "fold": 0,
+  "run_identifiers": [
+   "cef8cb1e5d06cef4"
+  ],
+  "run_paths": [
+   "alloy/0-Alumium-position-teste/0-Alumium-position-teste/x_050.0_Al_Al4Ga4O12_POSCAR_x050.0_cfg001_AlSites_1-2-3-4"
+  ],
+  "stratum": "x0.50000"
+ },
+ "alloy_x0.50000_cfg002": {
+  "campaign": "alloy_ensemble",
+  "fold": 2,
+  "run_identifiers": [
+   "05b66c3881058e32"
+  ],
+  "run_paths": [
+   "alloy/0-Alumium-position-teste/0-Alumium-position-teste/x_050.0_Al_Al4Ga4O12_POSCAR_x050.0_cfg002_AlSites_1-2-3-5"
+  ],
+  "stratum": "x0.50000"
+ },
+ "alloy_x0.50000_cfg003": {
+  "campaign": "alloy_ensemble",
+  "fold": 0,
+  "run_identifiers": [
+   "30d1725eae9dee66"
+  ],
+  "run_paths": [
+   "alloy/0-Alumium-position-teste/0-Alumium-position-teste/x_050.0_Al_Al4Ga4O12_POSCAR_x050.0_cfg003_AlSites_1-2-3-6"
+  ],
+  "stratum": "x0.50000"
+ },
+ "alloy_x0.50000_cfg004": {
+  "campaign": "alloy_ensemble",
+  "fold": 4,
+  "run_identifiers": [
+   "05d143be8e1f01ae"
+  ],
+  "run_paths": [
+   "alloy/0-Alumium-position-teste/0-Alumium-position-teste/x_050.0_Al_Al4Ga4O12_POSCAR_x050.0_cfg004_AlSites_1-2-3-7"
+  ],
+  "stratum": "x0.50000"
+ },
+ "alloy_x0.50000_cfg005": {
+  "campaign": "alloy_ensemble",
+  "fold": 1,
+  "run_identifiers": [
+   "bf3682ee76760004"
+  ],
+  "run_paths": [
+   "alloy/0-Alumium-position-teste/0-Alumium-position-teste/x_050.0_Al_Al4Ga4O12_POSCAR_x050.0_cfg005_AlSites_1-2-3-8"
+  ],
+  "stratum": "x0.50000"
+ },
+ "alloy_x0.50000_cfg006": {
+  "campaign": "alloy_ensemble",
+  "fold": 4,
+  "run_identifiers": [
+   "10a9ae399dff1369",
+   "bbdde94d9b54b7d0",
+   "7a614c590f5662a8"
+  ],
+  "run_paths": [
+   "alloy/0-Alumium-position-teste/0-Alumium-position-teste/x_050.0_Al_Al4Ga4O12_POSCAR_x050.0_cfg006_AlSites_1-2-5-6",
+   "alloy/1-Alloy/1-Alloy/2-GGA-PBE-relaxation/5-x-50",
+   "alloy/1-Alloy/1-Alloy/3-HSE06/5-x-50"
+  ],
+  "stratum": "x0.50000"
+ },
+ "alloy_x0.50000_cfg007": {
+  "campaign": "alloy_ensemble",
+  "fold": 0,
+  "run_identifiers": [
+   "ae6af29fd3d61709"
+  ],
+  "run_paths": [
+   "alloy/0-Alumium-position-teste/0-Alumium-position-teste/x_050.0_Al_Al4Ga4O12_POSCAR_x050.0_cfg007_AlSites_1-2-5-7"
+  ],
+  "stratum": "x0.50000"
+ },
+ "alloy_x0.50000_cfg008": {
+  "campaign": "alloy_ensemble",
+  "fold": 1,
+  "run_identifiers": [
+   "07b21e2f6b94569f"
+  ],
+  "run_paths": [
+   "alloy/0-Alumium-position-teste/0-Alumium-position-teste/x_050.0_Al_Al4Ga4O12_POSCAR_x050.0_cfg008_AlSites_1-2-5-8"
+  ],
+  "stratum": "x0.50000"
+ },
+ "alloy_x0.50000_cfg009": {
+  "campaign": "alloy_ensemble",
+  "fold": 0,
+  "run_identifiers": [
+   "2c97d7b5a30ba6a1"
+  ],
+  "run_paths": [
+   "alloy/0-Alumium-position-teste/0-Alumium-position-teste/x_050.0_Al_Al4Ga4O12_POSCAR_x050.0_cfg009_AlSites_1-2-7-8"
+  ],
+  "stratum": "x0.50000"
+ },
+ "alloy_x0.50000_cfg010": {
+  "campaign": "alloy_ensemble",
+  "fold": 3,
+  "run_identifiers": [
+   "527dc320aed03758"
+  ],
+  "run_paths": [
+   "alloy/0-Alumium-position-teste/0-Alumium-position-teste/x_050.0_Al_Al4Ga4O12_POSCAR_x050.0_cfg010_AlSites_1-3-4-5"
+  ],
+  "stratum": "x0.50000"
+ },
+ "alloy_x0.50000_cfg011": {
+  "campaign": "alloy_ensemble",
+  "fold": 3,
+  "run_identifiers": [
+   "ae48fcae07382fef"
+  ],
+  "run_paths": [
+   "alloy/0-Alumium-position-teste/0-Alumium-position-teste/x_050.0_Al_Al4Ga4O12_POSCAR_x050.0_cfg011_AlSites_1-3-4-6"
+  ],
+  "stratum": "x0.50000"
+ },
+ "alloy_x0.50000_cfg012": {
+  "campaign": "alloy_ensemble",
+  "fold": 0,
+  "run_identifiers": [
+   "14ab80e9221fc0bc"
+  ],
+  "run_paths": [
+   "alloy/0-Alumium-position-teste/0-Alumium-position-teste/x_050.0_Al_Al4Ga4O12_POSCAR_x050.0_cfg012_AlSites_1-3-4-7"
+  ],
+  "stratum": "x0.50000"
+ },
+ "alloy_x0.50000_cfg013": {
+  "campaign": "alloy_ensemble",
+  "fold": 1,
+  "run_identifiers": [
+   "79dfe30d8190e0f8"
+  ],
+  "run_paths": [
+   "alloy/0-Alumium-position-teste/0-Alumium-position-teste/x_050.0_Al_Al4Ga4O12_POSCAR_x050.0_cfg013_AlSites_1-3-4-8"
+  ],
+  "stratum": "x0.50000"
+ },
+ "alloy_x0.50000_cfg014": {
+  "campaign": "alloy_ensemble",
+  "fold": 4,
+  "run_identifiers": [
+   "addd97e99b0271b2"
+  ],
+  "run_paths": [
+   "alloy/0-Alumium-position-teste/0-Alumium-position-teste/x_050.0_Al_Al4Ga4O12_POSCAR_x050.0_cfg014_AlSites_1-3-5-7"
+  ],
+  "stratum": "x0.50000"
+ },
+ "alloy_x0.50000_cfg015": {
+  "campaign": "alloy_ensemble",
+  "fold": 2,
+  "run_identifiers": [
+   "49f0fce0f0ad47cf"
+  ],
+  "run_paths": [
+   "alloy/0-Alumium-position-teste/0-Alumium-position-teste/x_050.0_Al_Al4Ga4O12_POSCAR_x050.0_cfg015_AlSites_1-3-5-8"
+  ],
+  "stratum": "x0.50000"
+ },
+ "alloy_x0.50000_cfg016": {
+  "campaign": "alloy_ensemble",
+  "fold": 2,
+  "run_identifiers": [
+   "491deee335ce533a"
+  ],
+  "run_paths": [
+   "alloy/0-Alumium-position-teste/0-Alumium-position-teste/x_050.0_Al_Al4Ga4O12_POSCAR_x050.0_cfg016_AlSites_1-3-6-7"
+  ],
+  "stratum": "x0.50000"
+ },
+ "alloy_x0.50000_cfg017": {
+  "campaign": "alloy_ensemble",
+  "fold": 1,
+  "run_identifiers": [
+   "fc0219ca4ef97f9d"
+  ],
+  "run_paths": [
+   "alloy/0-Alumium-position-teste/0-Alumium-position-teste/x_050.0_Al_Al4Ga4O12_POSCAR_x050.0_cfg017_AlSites_1-3-6-8"
+  ],
+  "stratum": "x0.50000"
+ },
+ "alloy_x0.50000_cfg018": {
+  "campaign": "alloy_ensemble",
+  "fold": 4,
+  "run_identifiers": [
+   "8c5ea2170c5fc532"
+  ],
+  "run_paths": [
+   "alloy/0-Alumium-position-teste/0-Alumium-position-teste/x_050.0_Al_Al4Ga4O12_POSCAR_x050.0_cfg018_AlSites_1-3-7-8"
+  ],
+  "stratum": "x0.50000"
+ },
+ "alloy_x0.50000_cfg019": {
+  "campaign": "alloy_ensemble",
+  "fold": 3,
+  "run_identifiers": [
+   "2ba44072a0db45ff"
+  ],
+  "run_paths": [
+   "alloy/0-Alumium-position-teste/0-Alumium-position-teste/x_050.0_Al_Al4Ga4O12_POSCAR_x050.0_cfg019_AlSites_1-4-5-8"
+  ],
+  "stratum": "x0.50000"
+ },
+ "alloy_x0.50000_cfg020": {
+  "campaign": "alloy_ensemble",
+  "fold": 1,
+  "run_identifiers": [
+   "34ae8fe2adbbb49d"
+  ],
+  "run_paths": [
+   "alloy/0-Alumium-position-teste/0-Alumium-position-teste/x_050.0_Al_Al4Ga4O12_POSCAR_x050.0_cfg020_AlSites_1-4-6-7"
+  ],
+  "stratum": "x0.50000"
+ },
+ "alloy_x0.50000_cfg021": {
+  "campaign": "alloy_ensemble",
+  "fold": 2,
+  "run_identifiers": [
+   "d3ce9d8ec1539e35"
+  ],
+  "run_paths": [
+   "alloy/0-Alumium-position-teste/0-Alumium-position-teste/x_050.0_Al_Al4Ga4O12_POSCAR_x050.0_cfg021_AlSites_1-4-7-8"
+  ],
+  "stratum": "x0.50000"
+ },
+ "alloy_x0.50000_cfg022": {
+  "campaign": "alloy_ensemble",
+  "fold": 3,
+  "run_identifiers": [
+   "e3a8da2dc35df034"
+  ],
+  "run_paths": [
+   "alloy/0-Alumium-position-teste/0-Alumium-position-teste/x_050.0_Al_Al4Ga4O12_POSCAR_x050.0_cfg022_AlSites_3-4-7-8"
+  ],
+  "stratum": "x0.50000"
+ },
+ "alloy_x0.62500_cfg001": {
+  "campaign": "alloy_ensemble",
+  "fold": 2,
+  "run_identifiers": [
+   "fe133bd322d3ea6f"
+  ],
+  "run_paths": [
+   "alloy/0-Alumium-position-teste/0-Alumium-position-teste/x_062.5_Al_Al5Ga3O12_POSCAR_x062.5_cfg001_AlSites_1-2-3-4-5"
+  ],
+  "stratum": "x0.62500"
+ },
+ "alloy_x0.62500_cfg002": {
+  "campaign": "alloy_ensemble",
+  "fold": 1,
+  "run_identifiers": [
+   "756efa2877806fec"
+  ],
+  "run_paths": [
+   "alloy/0-Alumium-position-teste/0-Alumium-position-teste/x_062.5_Al_Al5Ga3O12_POSCAR_x062.5_cfg002_AlSites_1-2-3-4-7"
+  ],
+  "stratum": "x0.62500"
+ },
+ "alloy_x0.62500_cfg003": {
+  "campaign": "alloy_ensemble",
+  "fold": 1,
+  "run_identifiers": [
+   "ab1d44854fce9802",
+   "b89f70b2f5d42769",
+   "c6761ecf1e6d439f",
+   "2c6e8d7f6b9f636b",
+   "6c605273286a75da",
+   "e951c5ac22b7c5e1",
+   "20cd7c8a70a0f666",
+   "1a1c4071d62774c0",
+   "b8f11084389af0b2",
+   "d673603e6d9264f9",
+   "3240b5da1567300d",
+   "8219821b19e0dec4",
+   "7f5e9a748a8a8746",
+   "9127239815e52fe0",
+   "9dea5a12227129e6",
+   "1d621a19d70483ef",
+   "d6e7eefc7903f30a",
+   "4a7342fb8adbb782",
+   "0491766ba4a25822"
+  ],
+  "run_paths": [
+   "alloy/0-Alumium-position-teste/0-Alumium-position-teste/x_062.5_Al_Al5Ga3O12_POSCAR_x062.5_cfg003_AlSites_1-2-3-5-6",
+   "alloy/1-Alloy/1-Alloy/1-Volume-relaxation/6-x-62.5/volume_series/scale_0.900",
+   "alloy/1-Alloy/1-Alloy/1-Volume-relaxation/6-x-62.5/volume_series/scale_0.910",
+   "alloy/1-Alloy/1-Alloy/1-Volume-relaxation/6-x-62.5/volume_series/scale_0.920",
+   "alloy/1-Alloy/1-Alloy/1-Volume-relaxation/6-x-62.5/volume_series/scale_0.93",
+   "alloy/1-Alloy/1-Alloy/1-Volume-relaxation/6-x-62.5/volume_series/scale_0.94",
+   "alloy/1-Alloy/1-Alloy/1-Volume-relaxation/6-x-62.5/volume_series/scale_0.95",
+   "alloy/1-Alloy/1-Alloy/1-Volume-relaxation/6-x-62.5/volume_series/scale_0.96",
+   "alloy/1-Alloy/1-Alloy/1-Volume-relaxation/6-x-62.5/volume_series/scale_0.970",
+   "alloy/1-Alloy/1-Alloy/1-Volume-relaxation/6-x-62.5/volume_series/scale_0.980",
+   "alloy/1-Alloy/1-Alloy/1-Volume-relaxation/6-x-62.5/volume_series/scale_0.990",
+   "alloy/1-Alloy/1-Alloy/1-Volume-relaxation/6-x-62.5/volume_series/scale_1.000",
+   "alloy/1-Alloy/1-Alloy/1-Volume-relaxation/6-x-62.5/volume_series/scale_1.010",
+   "alloy/1-Alloy/1-Alloy/1-Volume-relaxation/6-x-62.5/volume_series/scale_1.020",
+   "alloy/1-Alloy/1-Alloy/1-Volume-relaxation/6-x-62.5/volume_series/scale_1.030",
+   "alloy/1-Alloy/1-Alloy/1-Volume-relaxation/6-x-62.5/volume_series/scale_1.04",
+   "alloy/1-Alloy/1-Alloy/1-Volume-relaxation/6-x-62.5/volume_series/scale_1.05",
+   "alloy/1-Alloy/1-Alloy/2-GGA-PBE-relaxation/6-x-62.5",
+   "alloy/1-Alloy/1-Alloy/3-HSE06/6-x-62.5"
+  ],
+  "stratum": "x0.62500"
+ },
+ "alloy_x0.62500_cfg004": {
+  "campaign": "alloy_ensemble",
+  "fold": 4,
+  "run_identifiers": [
+   "8839b82c64b67c80"
+  ],
+  "run_paths": [
+   "alloy/0-Alumium-position-teste/0-Alumium-position-teste/x_062.5_Al_Al5Ga3O12_POSCAR_x062.5_cfg004_AlSites_1-2-3-5-7"
+  ],
+  "stratum": "x0.62500"
+ },
+ "alloy_x0.62500_cfg005": {
+  "campaign": "alloy_ensemble",
+  "fold": 2,
+  "run_identifiers": [
+   "c51cd5169db33b6c"
+  ],
+  "run_paths": [
+   "alloy/0-Alumium-position-teste/0-Alumium-position-teste/x_062.5_Al_Al5Ga3O12_POSCAR_x062.5_cfg005_AlSites_1-2-3-5-8"
+  ],
+  "stratum": "x0.62500"
+ },
+ "alloy_x0.62500_cfg006": {
+  "campaign": "alloy_ensemble",
+  "fold": 2,
+  "run_identifiers": [
+   "7e405582043f69d1"
+  ],
+  "run_paths": [
+   "alloy/0-Alumium-position-teste/0-Alumium-position-teste/x_062.5_Al_Al5Ga3O12_POSCAR_x062.5_cfg006_AlSites_1-2-3-6-7"
+  ],
+  "stratum": "x0.62500"
+ },
+ "alloy_x0.62500_cfg007": {
+  "campaign": "alloy_ensemble",
+  "fold": 1,
+  "run_identifiers": [
+   "7ad623b83c9e1541"
+  ],
+  "run_paths": [
+   "alloy/0-Alumium-position-teste/0-Alumium-position-teste/x_062.5_Al_Al5Ga3O12_POSCAR_x062.5_cfg007_AlSites_1-2-3-6-8"
+  ],
+  "stratum": "x0.62500"
+ },
+ "alloy_x0.62500_cfg008": {
+  "campaign": "alloy_ensemble",
+  "fold": 0,
+  "run_identifiers": [
+   "347fdb0bf18cee47"
+  ],
+  "run_paths": [
+   "alloy/0-Alumium-position-teste/0-Alumium-position-teste/x_062.5_Al_Al5Ga3O12_POSCAR_x062.5_cfg008_AlSites_1-2-3-7-8"
+  ],
+  "stratum": "x0.62500"
+ },
+ "alloy_x0.62500_cfg009": {
+  "campaign": "alloy_ensemble",
+  "fold": 0,
+  "run_identifiers": [
+   "c6001f87d8e017ae"
+  ],
+  "run_paths": [
+   "alloy/0-Alumium-position-teste/0-Alumium-position-teste/x_062.5_Al_Al5Ga3O12_POSCAR_x062.5_cfg009_AlSites_1-2-5-7-8"
+  ],
+  "stratum": "x0.62500"
+ },
+ "alloy_x0.62500_cfg010": {
+  "campaign": "alloy_ensemble",
+  "fold": 3,
+  "run_identifiers": [
+   "b78d60376234b7d1"
+  ],
+  "run_paths": [
+   "alloy/0-Alumium-position-teste/0-Alumium-position-teste/x_062.5_Al_Al5Ga3O12_POSCAR_x062.5_cfg010_AlSites_1-3-4-5-7"
+  ],
+  "stratum": "x0.62500"
+ },
+ "alloy_x0.62500_cfg011": {
+  "campaign": "alloy_ensemble",
+  "fold": 0,
+  "run_identifiers": [
+   "dcbabb2cc1b212a8"
+  ],
+  "run_paths": [
+   "alloy/0-Alumium-position-teste/0-Alumium-position-teste/x_062.5_Al_Al5Ga3O12_POSCAR_x062.5_cfg011_AlSites_1-3-4-5-8"
+  ],
+  "stratum": "x0.62500"
+ },
+ "alloy_x0.62500_cfg012": {
+  "campaign": "alloy_ensemble",
+  "fold": 3,
+  "run_identifiers": [
+   "678c4a689992027c"
+  ],
+  "run_paths": [
+   "alloy/0-Alumium-position-teste/0-Alumium-position-teste/x_062.5_Al_Al5Ga3O12_POSCAR_x062.5_cfg012_AlSites_1-3-4-6-7"
+  ],
+  "stratum": "x0.62500"
+ },
+ "alloy_x0.62500_cfg013": {
+  "campaign": "alloy_ensemble",
+  "fold": 4,
+  "run_identifiers": [
+   "2d83c90636ccaa6c"
+  ],
+  "run_paths": [
+   "alloy/0-Alumium-position-teste/0-Alumium-position-teste/x_062.5_Al_Al5Ga3O12_POSCAR_x062.5_cfg013_AlSites_1-3-4-6-8"
+  ],
+  "stratum": "x0.62500"
+ },
+ "alloy_x0.62500_cfg014": {
+  "campaign": "alloy_ensemble",
+  "fold": 3,
+  "run_identifiers": [
+   "b2b54c23a47b93dd"
+  ],
+  "run_paths": [
+   "alloy/0-Alumium-position-teste/0-Alumium-position-teste/x_062.5_Al_Al5Ga3O12_POSCAR_x062.5_cfg014_AlSites_1-3-4-7-8"
+  ],
+  "stratum": "x0.62500"
+ },
+ "alloy_x0.75000_cfg001": {
+  "campaign": "alloy_ensemble",
+  "fold": 2,
+  "run_identifiers": [
+   "7df4a945759a370d"
+  ],
+  "run_paths": [
+   "alloy/0-Alumium-position-teste/0-Alumium-position-teste/x_075.0_Al_Al6Ga2O12_POSCAR_x075.0_cfg001_AlSites_1-2-3-4-5-6"
+  ],
+  "stratum": "x0.75000"
+ },
+ "alloy_x0.75000_cfg002": {
+  "campaign": "alloy_ensemble",
+  "fold": 0,
+  "run_identifiers": [
+   "87e3870f68f74dbd"
+  ],
+  "run_paths": [
+   "alloy/0-Alumium-position-teste/0-Alumium-position-teste/x_075.0_Al_Al6Ga2O12_POSCAR_x075.0_cfg002_AlSites_1-2-3-4-5-7"
+  ],
+  "stratum": "x0.75000"
+ },
+ "alloy_x0.75000_cfg003": {
+  "campaign": "alloy_ensemble",
+  "fold": 4,
+  "run_identifiers": [
+   "5af47572a089e02c"
+  ],
+  "run_paths": [
+   "alloy/0-Alumium-position-teste/0-Alumium-position-teste/x_075.0_Al_Al6Ga2O12_POSCAR_x075.0_cfg003_AlSites_1-2-3-4-5-8"
+  ],
+  "stratum": "x0.75000"
+ },
+ "alloy_x0.75000_cfg004": {
+  "campaign": "alloy_ensemble",
+  "fold": 3,
+  "run_identifiers": [
+   "5999d295691c7ae7"
+  ],
+  "run_paths": [
+   "alloy/0-Alumium-position-teste/0-Alumium-position-teste/x_075.0_Al_Al6Ga2O12_POSCAR_x075.0_cfg004_AlSites_1-2-3-4-7-8"
+  ],
+  "stratum": "x0.75000"
+ },
+ "alloy_x0.75000_cfg005": {
+  "campaign": "alloy_ensemble",
+  "fold": 3,
+  "run_identifiers": [
+   "f237f58f12cec319"
+  ],
+  "run_paths": [
+   "alloy/0-Alumium-position-teste/0-Alumium-position-teste/x_075.0_Al_Al6Ga2O12_POSCAR_x075.0_cfg005_AlSites_1-2-3-5-6-7"
+  ],
+  "stratum": "x0.75000"
+ },
+ "alloy_x0.75000_cfg006": {
+  "campaign": "alloy_ensemble",
+  "fold": 0,
+  "run_identifiers": [
+   "fd2c2ece06a5786c",
+   "5d1e7e8b0447fa13",
+   "6e9bbb927c46fcbe"
+  ],
+  "run_paths": [
+   "alloy/0-Alumium-position-teste/0-Alumium-position-teste/x_075.0_Al_Al6Ga2O12_POSCAR_x075.0_cfg006_AlSites_1-2-3-5-6-8",
+   "alloy/1-Alloy/1-Alloy/2-GGA-PBE-relaxation/7-x-75",
+   "alloy/1-Alloy/1-Alloy/3-HSE06/7-x-75"
+  ],
+  "stratum": "x0.75000"
+ },
+ "alloy_x0.75000_cfg007": {
+  "campaign": "alloy_ensemble",
+  "fold": 1,
+  "run_identifiers": [
+   "5fe369627556d981"
+  ],
+  "run_paths": [
+   "alloy/0-Alumium-position-teste/0-Alumium-position-teste/x_075.0_Al_Al6Ga2O12_POSCAR_x075.0_cfg007_AlSites_1-2-3-5-7-8"
+  ],
+  "stratum": "x0.75000"
+ },
+ "alloy_x0.75000_cfg008": {
+  "campaign": "alloy_ensemble",
+  "fold": 4,
+  "run_identifiers": [
+   "7b75523aec7d5463"
+  ],
+  "run_paths": [
+   "alloy/0-Alumium-position-teste/0-Alumium-position-teste/x_075.0_Al_Al6Ga2O12_POSCAR_x075.0_cfg008_AlSites_1-2-3-6-7-8"
+  ],
+  "stratum": "x0.75000"
+ },
+ "alloy_x0.75000_cfg009": {
+  "campaign": "alloy_ensemble",
+  "fold": 2,
+  "run_identifiers": [
+   "26c9eefd6e563feb"
+  ],
+  "run_paths": [
+   "alloy/0-Alumium-position-teste/0-Alumium-position-teste/x_075.0_Al_Al6Ga2O12_POSCAR_x075.0_cfg009_AlSites_1-3-4-5-7-8"
+  ],
+  "stratum": "x0.75000"
+ },
+ "alloy_x0.75000_cfg010": {
+  "campaign": "alloy_ensemble",
+  "fold": 1,
+  "run_identifiers": [
+   "95f4e4fc1a8fddc8"
+  ],
+  "run_paths": [
+   "alloy/0-Alumium-position-teste/0-Alumium-position-teste/x_075.0_Al_Al6Ga2O12_POSCAR_x075.0_cfg010_AlSites_1-3-4-6-7-8"
+  ],
+  "stratum": "x0.75000"
+ },
+ "alloy_x0.87500_cfg001": {
+  "campaign": "alloy_ensemble",
+  "fold": 1,
+  "run_identifiers": [
+   "2da86ccb9327a75d",
+   "903f2209bab1fa17",
+   "898cb187d5362757",
+   "4f2d49e029dc30ac",
+   "f61ead0d1ab75484",
+   "ce8c4cc32c0ceb8b",
+   "e5ed2868a1c2bf49",
+   "3c67f77cec5cdaf5",
+   "fbe60ea806d5812c",
+   "9bb8fb8c0a875151",
+   "4dbe7441e5192020",
+   "0ca58295da67377f",
+   "f915b1d8105f0ce6",
+   "8972883476070cee",
+   "25389f470e941ca0",
+   "d6cfa741700c1cb0",
+   "2e1f8e643d8e71f5",
+   "62d4deaf1a883d6f",
+   "8969f1d0fb9894d9"
+  ],
+  "run_paths": [
+   "alloy/0-Alumium-position-teste/0-Alumium-position-teste/x_087.5_Al_Al7Ga1O12_POSCAR_x087.5_cfg001_AlSites_1-2-3-4-5-6-7",
+   "alloy/1-Alloy/1-Alloy/1-Volume-relaxation/8-x-87.5/volume_series/scale_0.900",
+   "alloy/1-Alloy/1-Alloy/1-Volume-relaxation/8-x-87.5/volume_series/scale_0.910",
+   "alloy/1-Alloy/1-Alloy/1-Volume-relaxation/8-x-87.5/volume_series/scale_0.920",
+   "alloy/1-Alloy/1-Alloy/1-Volume-relaxation/8-x-87.5/volume_series/scale_0.93",
+   "alloy/1-Alloy/1-Alloy/1-Volume-relaxation/8-x-87.5/volume_series/scale_0.94",
+   "alloy/1-Alloy/1-Alloy/1-Volume-relaxation/8-x-87.5/volume_series/scale_0.95",
+   "alloy/1-Alloy/1-Alloy/1-Volume-relaxation/8-x-87.5/volume_series/scale_0.96",
+   "alloy/1-Alloy/1-Alloy/1-Volume-relaxation/8-x-87.5/volume_series/scale_0.970",
+   "alloy/1-Alloy/1-Alloy/1-Volume-relaxation/8-x-87.5/volume_series/scale_0.980",
+   "alloy/1-Alloy/1-Alloy/1-Volume-relaxation/8-x-87.5/volume_series/scale_0.990",
+   "alloy/1-Alloy/1-Alloy/1-Volume-relaxation/8-x-87.5/volume_series/scale_1.000",
+   "alloy/1-Alloy/1-Alloy/1-Volume-relaxation/8-x-87.5/volume_series/scale_1.010",
+   "alloy/1-Alloy/1-Alloy/1-Volume-relaxation/8-x-87.5/volume_series/scale_1.020",
+   "alloy/1-Alloy/1-Alloy/1-Volume-relaxation/8-x-87.5/volume_series/scale_1.030",
+   "alloy/1-Alloy/1-Alloy/1-Volume-relaxation/8-x-87.5/volume_series/scale_1.04",
+   "alloy/1-Alloy/1-Alloy/1-Volume-relaxation/8-x-87.5/volume_series/scale_1.05",
+   "alloy/1-Alloy/1-Alloy/2-GGA-PBE-relaxation/8-x-82.5",
+   "alloy/1-Alloy/1-Alloy/3-HSE06/8-x-82.5"
+  ],
+  "stratum": "x0.87500"
+ },
+ "alloy_x0.87500_cfg002": {
+  "campaign": "alloy_ensemble",
+  "fold": 0,
+  "run_identifiers": [
+   "ac21c153b0a2259a"
+  ],
+  "run_paths": [
+   "alloy/0-Alumium-position-teste/0-Alumium-position-teste/x_087.5_Al_Al7Ga1O12_POSCAR_x087.5_cfg002_AlSites_1-2-3-4-5-7-8"
+  ],
+  "stratum": "x0.87500"
+ },
+ "alloy_x1.00000_cfg001": {
+  "campaign": "alloy_ensemble",
+  "fold": 0,
+  "run_identifiers": [
+   "367f3d3f882a8df7",
+   "04bd7234b450a46f",
+   "cb45682a115e1b1d",
+   "d8ace32ae51e716c",
+   "cb07b80cc9671ae8",
+   "9ccccdaf8f6509ee",
+   "7f002f135a6edac4",
+   "31e6a7fbd6761a13",
+   "cbbbf0cc736c5149",
+   "d7a2ca724175661b",
+   "86ddcf594f3b5a66",
+   "abff921df8721973",
+   "54222121471002cb",
+   "074873f225858142",
+   "15ec9b6066ef8993",
+   "16a2b9f3fb686406",
+   "9b84e5518c18e611",
+   "cf8c0c0ee1fce5f3",
+   "153c178270ea954a"
+  ],
+  "run_paths": [
+   "alloy/0-Alumium-position-teste/0-Alumium-position-teste/x_100.0_Al_Al8Ga0O12_POSCAR_x100.0_cfg001_AlSites_1-2-3-4-5-6-7-8",
+   "alloy/1-Alloy/1-Alloy/1-Volume-relaxation/9-x-100/volume_series/scale_0.900",
+   "alloy/1-Alloy/1-Alloy/1-Volume-relaxation/9-x-100/volume_series/scale_0.910",
+   "alloy/1-Alloy/1-Alloy/1-Volume-relaxation/9-x-100/volume_series/scale_0.920",
+   "alloy/1-Alloy/1-Alloy/1-Volume-relaxation/9-x-100/volume_series/scale_0.93",
+   "alloy/1-Alloy/1-Alloy/1-Volume-relaxation/9-x-100/volume_series/scale_0.94",
+   "alloy/1-Alloy/1-Alloy/1-Volume-relaxation/9-x-100/volume_series/scale_0.95",
+   "alloy/1-Alloy/1-Alloy/1-Volume-relaxation/9-x-100/volume_series/scale_0.96",
+   "alloy/1-Alloy/1-Alloy/1-Volume-relaxation/9-x-100/volume_series/scale_0.970",
+   "alloy/1-Alloy/1-Alloy/1-Volume-relaxation/9-x-100/volume_series/scale_0.980",
+   "alloy/1-Alloy/1-Alloy/1-Volume-relaxation/9-x-100/volume_series/scale_0.990",
+   "alloy/1-Alloy/1-Alloy/1-Volume-relaxation/9-x-100/volume_series/scale_1.000",
+   "alloy/1-Alloy/1-Alloy/1-Volume-relaxation/9-x-100/volume_series/scale_1.010",
+   "alloy/1-Alloy/1-Alloy/1-Volume-relaxation/9-x-100/volume_series/scale_1.020",
+   "alloy/1-Alloy/1-Alloy/1-Volume-relaxation/9-x-100/volume_series/scale_1.030",
+   "alloy/1-Alloy/1-Alloy/1-Volume-relaxation/9-x-100/volume_series/scale_1.04",
+   "alloy/1-Alloy/1-Alloy/1-Volume-relaxation/9-x-100/volume_series/scale_1.05",
+   "alloy/1-Alloy/1-Alloy/2-GGA-PBE-relaxation/9-x-100",
+   "alloy/1-Alloy/1-Alloy/3-HSE06/9-x-100"
+  ],
+  "stratum": "x1.00000"
+ },
+ "defect_new_only_IA-impurity_Cs": {
+  "campaign": "defect_set",
+  "fold": 1,
+  "run_identifiers": [
+   "a241daf388f71072",
+   "358a6cf09f1e2983"
+  ],
+  "run_paths": [
+   "diamond/single_defects_new-only-GGA-PBE/IA-impurity/Cs/GGA-PBE",
+   "diamond/single_defects_new-only-HSE06/IA-impurity/Cs/hse06"
+  ],
+  "stratum": "new_only"
+ },
+ "defect_new_only_IA-impurity_Fr": {
+  "campaign": "defect_set",
+  "fold": 0,
+  "run_identifiers": [
+   "a9d5ea28a3138aa9",
+   "f46767e582f1bf8a"
+  ],
+  "run_paths": [
+   "diamond/single_defects_new-only-GGA-PBE/IA-impurity/Fr/GGA-PBE",
+   "diamond/single_defects_new-only-HSE06/IA-impurity/Fr/hse06"
+  ],
+  "stratum": "new_only"
+ },
+ "defect_new_only_IA-impurity_K": {
+  "campaign": "defect_set",
+  "fold": 2,
+  "run_identifiers": [
+   "7ddfe000ba17dc66",
+   "822f3e4735fcd924"
+  ],
+  "run_paths": [
+   "diamond/single_defects_new-only-GGA-PBE/IA-impurity/K/GGA-PBE",
+   "diamond/single_defects_new-only-HSE06/IA-impurity/K/hse06"
+  ],
+  "stratum": "new_only"
+ },
+ "defect_new_only_IA-impurity_Rb": {
+  "campaign": "defect_set",
+  "fold": 3,
+  "run_identifiers": [
+   "7ed3ccbd7c60ef5c",
+   "5ba12ada06822a92"
+  ],
+  "run_paths": [
+   "diamond/single_defects_new-only-GGA-PBE/IA-impurity/Rb/GGA-PBE",
+   "diamond/single_defects_new-only-HSE06/IA-impurity/Rb/hse06"
+  ],
+  "stratum": "new_only"
+ },
+ "defect_new_only_IIA-impurity_Ba": {
+  "campaign": "defect_set",
+  "fold": 0,
+  "run_identifiers": [
+   "7be0f5d15b4971b4",
+   "88ae88e72a92a45f"
+  ],
+  "run_paths": [
+   "diamond/single_defects_new-only-GGA-PBE/IIA-impurity/Ba/GGA-PBE",
+   "diamond/single_defects_new-only-HSE06/IIA-impurity/Ba/hse06"
+  ],
+  "stratum": "new_only"
+ },
+ "defect_new_only_IIA-impurity_Ca": {
+  "campaign": "defect_set",
+  "fold": 4,
+  "run_identifiers": [
+   "a57c71c7199a2f19",
+   "4378213889d232d5"
+  ],
+  "run_paths": [
+   "diamond/single_defects_new-only-GGA-PBE/IIA-impurity/Ca/GGA-PBE",
+   "diamond/single_defects_new-only-HSE06/IIA-impurity/Ca/hse06"
+  ],
+  "stratum": "new_only"
+ },
+ "defect_new_only_IIA-impurity_Ra": {
+  "campaign": "defect_set",
+  "fold": 3,
+  "run_identifiers": [
+   "6c1b375091c3e041",
+   "a08b9d936f48eb48"
+  ],
+  "run_paths": [
+   "diamond/single_defects_new-only-GGA-PBE/IIA-impurity/Ra/GGA-PBE",
+   "diamond/single_defects_new-only-HSE06/IIA-impurity/Ra/hse06"
+  ],
+  "stratum": "new_only"
+ },
+ "defect_new_only_IIA-impurity_Sr": {
+  "campaign": "defect_set",
+  "fold": 1,
+  "run_identifiers": [
+   "a3bbb65defec6ec5",
+   "6bd3cab97fdbdfe5"
+  ],
+  "run_paths": [
+   "diamond/single_defects_new-only-GGA-PBE/IIA-impurity/Sr/GGA-PBE",
+   "diamond/single_defects_new-only-HSE06/IIA-impurity/Sr/hse06"
+  ],
+  "stratum": "new_only"
+ },
+ "defect_new_only_III-A_Al": {
+  "campaign": "defect_set",
+  "fold": 0,
+  "run_identifiers": [
+   "49d542fa250b2b0d",
+   "a849f55332313401"
+  ],
+  "run_paths": [
+   "diamond/single_defects_new-only-GGA-PBE/III-A/Al/GGA-PBE",
+   "diamond/single_defects_new-only-HSE06/III-A/Al/hse06"
+  ],
+  "stratum": "new_only"
+ },
+ "defect_new_only_III-A_Ga": {
+  "campaign": "defect_set",
+  "fold": 3,
+  "run_identifiers": [
+   "efcc92835a4fefea",
+   "3f7fe99079e8ea4d"
+  ],
+  "run_paths": [
+   "diamond/single_defects_new-only-GGA-PBE/III-A/Ga/GGA-PBE",
+   "diamond/single_defects_new-only-HSE06/III-A/Ga/hse06"
+  ],
+  "stratum": "new_only"
+ },
+ "defect_new_only_III-A_In": {
+  "campaign": "defect_set",
+  "fold": 4,
+  "run_identifiers": [
+   "138e6119547614c4",
+   "30c792a765f0029b"
+  ],
+  "run_paths": [
+   "diamond/single_defects_new-only-GGA-PBE/III-A/In/GGA-PBE",
+   "diamond/single_defects_new-only-HSE06/III-A/In/hse06"
+  ],
+  "stratum": "new_only"
+ },
+ "defect_new_only_III-A_Tl": {
+  "campaign": "defect_set",
+  "fold": 0,
+  "run_identifiers": [
+   "08d9a1ead4fe9cff",
+   "e188f1c3930a2c7e"
+  ],
+  "run_paths": [
+   "diamond/single_defects_new-only-GGA-PBE/III-A/Tl/GGA-PBE",
+   "diamond/single_defects_new-only-HSE06/III-A/Tl/hse06"
+  ],
+  "stratum": "new_only"
+ },
+ "defect_new_only_IV-A_Ge": {
+  "campaign": "defect_set",
+  "fold": 4,
+  "run_identifiers": [
+   "cb764a55f2b77b49",
+   "514bba07abbae95f"
+  ],
+  "run_paths": [
+   "diamond/single_defects_new-only-GGA-PBE/IV-A/Ge/GGA-PBE",
+   "diamond/single_defects_new-only-HSE06/IV-A/Ge/hse06"
+  ],
+  "stratum": "new_only"
+ },
+ "defect_new_only_IV-A_Pb": {
+  "campaign": "defect_set",
+  "fold": 1,
+  "run_identifiers": [
+   "d449223abf98433c",
+   "46dde9e822d34530"
+  ],
+  "run_paths": [
+   "diamond/single_defects_new-only-GGA-PBE/IV-A/Pb/GGA-PBE",
+   "diamond/single_defects_new-only-HSE06/IV-A/Pb/hse06"
+  ],
+  "stratum": "new_only"
+ },
+ "defect_new_only_IV-A_Sn": {
+  "campaign": "defect_set",
+  "fold": 4,
+  "run_identifiers": [
+   "0840c4b60eff5b09",
+   "71592aa21e1b1456"
+  ],
+  "run_paths": [
+   "diamond/single_defects_new-only-GGA-PBE/IV-A/Sn/GGA-PBE",
+   "diamond/single_defects_new-only-HSE06/IV-A/Sn/hse06"
+  ],
+  "stratum": "new_only"
+ },
+ "defect_new_only_Transition-Metals_Ag": {
+  "campaign": "defect_set",
+  "fold": 2,
+  "run_identifiers": [
+   "a5e10ef76566b06a",
+   "356fb7fa02eadc0b"
+  ],
+  "run_paths": [
+   "diamond/single_defects_new-only-GGA-PBE/Transition-Metals/Ag/GGA-PBE",
+   "diamond/single_defects_new-only-HSE06/Transition-Metals/Ag/hse06"
+  ],
+  "stratum": "new_only"
+ },
+ "defect_new_only_Transition-Metals_Cd": {
+  "campaign": "defect_set",
+  "fold": 4,
+  "run_identifiers": [
+   "acb0b7cbfb6d4912",
+   "e051cc61b309a101"
+  ],
+  "run_paths": [
+   "diamond/single_defects_new-only-GGA-PBE/Transition-Metals/Cd/GGA-PBE",
+   "diamond/single_defects_new-only-HSE06/Transition-Metals/Cd/hse06"
+  ],
+  "stratum": "new_only"
+ },
+ "defect_new_only_Transition-Metals_Co": {
+  "campaign": "defect_set",
+  "fold": 3,
+  "run_identifiers": [
+   "18952196e65d6e6b",
+   "39165a8df8aaa609"
+  ],
+  "run_paths": [
+   "diamond/single_defects_new-only-GGA-PBE/Transition-Metals/Co/GGA-PBE",
+   "diamond/single_defects_new-only-HSE06/Transition-Metals/Co/hse06"
+  ],
+  "stratum": "new_only"
+ },
+ "defect_new_only_Transition-Metals_Cr": {
+  "campaign": "defect_set",
+  "fold": 2,
+  "run_identifiers": [
+   "e0e41ab148c4cf54",
+   "2168f878dfe9f760"
+  ],
+  "run_paths": [
+   "diamond/single_defects_new-only-GGA-PBE/Transition-Metals/Cr/GGA-PBE",
+   "diamond/single_defects_new-only-HSE06/Transition-Metals/Cr/hse06"
+  ],
+  "stratum": "new_only"
+ },
+ "defect_new_only_Transition-Metals_Cu": {
+  "campaign": "defect_set",
+  "fold": 0,
+  "run_identifiers": [
+   "e956c571191b0631",
+   "fb5a962459358fda"
+  ],
+  "run_paths": [
+   "diamond/single_defects_new-only-GGA-PBE/Transition-Metals/Cu/GGA-PBE",
+   "diamond/single_defects_new-only-HSE06/Transition-Metals/Cu/hse06"
+  ],
+  "stratum": "new_only"
+ },
+ "defect_new_only_Transition-Metals_Fe": {
+  "campaign": "defect_set",
+  "fold": 1,
+  "run_identifiers": [
+   "a2a6ead81c62bb46",
+   "e68101db1d9f427b"
+  ],
+  "run_paths": [
+   "diamond/single_defects_new-only-GGA-PBE/Transition-Metals/Fe/GGA-PBE",
+   "diamond/single_defects_new-only-HSE06/Transition-Metals/Fe/hse06"
+  ],
+  "stratum": "new_only"
+ },
+ "defect_new_only_Transition-Metals_Mn": {
+  "campaign": "defect_set",
+  "fold": 4,
+  "run_identifiers": [
+   "6afbaf0d3a32560b",
+   "37df299c7cfd8a3c"
+  ],
+  "run_paths": [
+   "diamond/single_defects_new-only-GGA-PBE/Transition-Metals/Mn/sigma-0.0001",
+   "diamond/single_defects_new-only-HSE06/Transition-Metals/Mn/hse06"
+  ],
+  "stratum": "new_only"
+ },
+ "defect_new_only_Transition-Metals_Mo": {
+  "campaign": "defect_set",
+  "fold": 2,
+  "run_identifiers": [
+   "19a74b3c4646e975",
+   "3900434836f45d05"
+  ],
+  "run_paths": [
+   "diamond/single_defects_new-only-GGA-PBE/Transition-Metals/Mo/GGA-PBE",
+   "diamond/single_defects_new-only-HSE06/Transition-Metals/Mo/hse06"
+  ],
+  "stratum": "new_only"
+ },
+ "defect_new_only_Transition-Metals_Nb": {
+  "campaign": "defect_set",
+  "fold": 3,
+  "run_identifiers": [
+   "d83dce918d4f6952",
+   "9f3b63520b6c74f6"
+  ],
+  "run_paths": [
+   "diamond/single_defects_new-only-GGA-PBE/Transition-Metals/Nb/GGA-PBE",
+   "diamond/single_defects_new-only-HSE06/Transition-Metals/Nb/hse06"
+  ],
+  "stratum": "new_only"
+ },
+ "defect_new_only_Transition-Metals_Ni": {
+  "campaign": "defect_set",
+  "fold": 2,
+  "run_identifiers": [
+   "569b2431333f5aa9",
+   "623152c81bbbcfe1"
+  ],
+  "run_paths": [
+   "diamond/single_defects_new-only-GGA-PBE/Transition-Metals/Ni/GGA-PBE",
+   "diamond/single_defects_new-only-HSE06/Transition-Metals/Ni/hse06"
+  ],
+  "stratum": "new_only"
+ },
+ "defect_new_only_Transition-Metals_Pd": {
+  "campaign": "defect_set",
+  "fold": 1,
+  "run_identifiers": [
+   "c5fb1bc36d899359",
+   "32c20e06cb407f4f"
+  ],
+  "run_paths": [
+   "diamond/single_defects_new-only-GGA-PBE/Transition-Metals/Pd/GGA-PBE",
+   "diamond/single_defects_new-only-HSE06/Transition-Metals/Pd/hse06"
+  ],
+  "stratum": "new_only"
+ },
+ "defect_new_only_Transition-Metals_Rh": {
+  "campaign": "defect_set",
+  "fold": 0,
+  "run_identifiers": [
+   "7d478332b1e567ff",
+   "c5cdcd9a6162571e"
+  ],
+  "run_paths": [
+   "diamond/single_defects_new-only-GGA-PBE/Transition-Metals/Rh/GGA-PBE",
+   "diamond/single_defects_new-only-HSE06/Transition-Metals/Rh/hse06"
+  ],
+  "stratum": "new_only"
+ },
+ "defect_new_only_Transition-Metals_Ru": {
+  "campaign": "defect_set",
+  "fold": 3,
+  "run_identifiers": [
+   "8624f2b3afb41ccd",
+   "e4a1051b0d32fa90"
+  ],
+  "run_paths": [
+   "diamond/single_defects_new-only-GGA-PBE/Transition-Metals/Ru/GGA-PBE",
+   "diamond/single_defects_new-only-HSE06/Transition-Metals/Ru/hse06"
+  ],
+  "stratum": "new_only"
+ },
+ "defect_new_only_Transition-Metals_Sc": {
+  "campaign": "defect_set",
+  "fold": 0,
+  "run_identifiers": [
+   "abc264079111d5ef",
+   "cd6fbfc9f9dc8a0e"
+  ],
+  "run_paths": [
+   "diamond/single_defects_new-only-GGA-PBE/Transition-Metals/Sc/GGA-PBE",
+   "diamond/single_defects_new-only-HSE06/Transition-Metals/Sc/hse06"
+  ],
+  "stratum": "new_only"
+ },
+ "defect_new_only_Transition-Metals_Tc": {
+  "campaign": "defect_set",
+  "fold": 2,
+  "run_identifiers": [
+   "c68adf25f9e7ab2e",
+   "5da849c650f0a9a1"
+  ],
+  "run_paths": [
+   "diamond/single_defects_new-only-GGA-PBE/Transition-Metals/Tc/GGA-PBE",
+   "diamond/single_defects_new-only-HSE06/Transition-Metals/Tc/hse06"
+  ],
+  "stratum": "new_only"
+ },
+ "defect_new_only_Transition-Metals_Ti": {
+  "campaign": "defect_set",
+  "fold": 3,
+  "run_identifiers": [
+   "2f33a696e55ae464",
+   "e87fa248155e39c3"
+  ],
+  "run_paths": [
+   "diamond/single_defects_new-only-GGA-PBE/Transition-Metals/Ti/GGA-PBE",
+   "diamond/single_defects_new-only-HSE06/Transition-Metals/Ti/hse06"
+  ],
+  "stratum": "new_only"
+ },
+ "defect_new_only_Transition-Metals_V": {
+  "campaign": "defect_set",
+  "fold": 1,
+  "run_identifiers": [
+   "656adeffd15d0093",
+   "64ed1d63ba95a081"
+  ],
+  "run_paths": [
+   "diamond/single_defects_new-only-GGA-PBE/Transition-Metals/V/GGA-PBE",
+   "diamond/single_defects_new-only-HSE06/Transition-Metals/V/hse06"
+  ],
+  "stratum": "new_only"
+ },
+ "defect_new_only_Transition-Metals_Y": {
+  "campaign": "defect_set",
+  "fold": 1,
+  "run_identifiers": [
+   "2bfccc3eaa9aac93",
+   "cf5d53f41df5781a"
+  ],
+  "run_paths": [
+   "diamond/single_defects_new-only-GGA-PBE/Transition-Metals/Y/GGA-PBE",
+   "diamond/single_defects_new-only-HSE06/Transition-Metals/Y/hse06"
+  ],
+  "stratum": "new_only"
+ },
+ "defect_new_only_Transition-Metals_Zn": {
+  "campaign": "defect_set",
+  "fold": 2,
+  "run_identifiers": [
+   "58f629dbc4a84694",
+   "931ba970a18f3f56"
+  ],
+  "run_paths": [
+   "diamond/single_defects_new-only-GGA-PBE/Transition-Metals/Zn/GGA-PBE",
+   "diamond/single_defects_new-only-HSE06/Transition-Metals/Zn/hse06"
+  ],
+  "stratum": "new_only"
+ },
+ "defect_new_only_Transition-Metals_Zr": {
+  "campaign": "defect_set",
+  "fold": 4,
+  "run_identifiers": [
+   "9e8f66328db7875b"
+  ],
+  "run_paths": [
+   "diamond/single_defects_new-only-GGA-PBE/Transition-Metals/Zr/GGA-PBE"
+  ],
+  "stratum": "new_only"
+ },
+ "defect_new_only_VA_Bi": {
+  "campaign": "defect_set",
+  "fold": 0,
+  "run_identifiers": [
+   "de13ca887e2b79d6",
+   "0998e4e13befd85e"
+  ],
+  "run_paths": [
+   "diamond/single_defects_new-only-GGA-PBE/VA/Bi/GGA-PBE",
+   "diamond/single_defects_new-only-HSE06/VA/Bi/hse06"
+  ],
+  "stratum": "new_only"
+ },
+ "defect_new_only_VIA_Po": {
+  "campaign": "defect_set",
+  "fold": 1,
+  "run_identifiers": [
+   "f7072be273e6c6dd",
+   "c8528151897667f5"
+  ],
+  "run_paths": [
+   "diamond/single_defects_new-only-GGA-PBE/VIA/Po/GGA-PBE",
+   "diamond/single_defects_new-only-HSE06/VIA/Po/hse06"
+  ],
+  "stratum": "new_only"
+ },
+ "defect_new_only_VIIA_At": {
+  "campaign": "defect_set",
+  "fold": 2,
+  "run_identifiers": [
+   "b7648e0ae0b02b36",
+   "9479bcdc1282ff6d"
+  ],
+  "run_paths": [
+   "diamond/single_defects_new-only-GGA-PBE/VIIA/At/GGA-PBE",
+   "diamond/single_defects_new-only-HSE06/VIIA/At/hse06"
+  ],
+  "stratum": "new_only"
+ },
+ "defect_pair_B-Li_C8-C1-were_replaced": {
+  "campaign": "defect_set",
+  "fold": 3,
+  "run_identifiers": [
+   "0933eca9758c19f1",
+   "64242f33cab47895"
+  ],
+  "run_paths": [
+   "diamond/pair_defects/B-Li/C8-C1-were_replaced/GGA-PBE",
+   "diamond/pair_defects/B-Li/C8-C1-were_replaced/HSE06"
+  ],
+  "stratum": "pair"
+ },
+ "defect_pair_B-Li_C8-C53-were_replaced": {
+  "campaign": "defect_set",
+  "fold": 1,
+  "run_identifiers": [
+   "b57b22bdbfa7ed13",
+   "f9b55eb5eb6f261e"
+  ],
+  "run_paths": [
+   "diamond/pair_defects/B-Li/C8-C53-were_replaced/GGA-PBE",
+   "diamond/pair_defects/B-Li/C8-C53-were_replaced/HSE06"
+  ],
+  "stratum": "pair"
+ },
+ "defect_pair_B-P_C8-C1-were_replaced": {
+  "campaign": "defect_set",
+  "fold": 2,
+  "run_identifiers": [
+   "0eda9d50ae1b6ee5",
+   "c91929e1e217f093"
+  ],
+  "run_paths": [
+   "diamond/pair_defects/B-P/C8-C1-were_replaced/GGA-PBE",
+   "diamond/pair_defects/B-P/C8-C1-were_replaced/HSE06"
+  ],
+  "stratum": "pair"
+ },
+ "defect_pair_B-P_C8-C53-were_replaced": {
+  "campaign": "defect_set",
+  "fold": 2,
+  "run_identifiers": [
+   "426181e2064bb75d",
+   "cd80b68bb71b9f33"
+  ],
+  "run_paths": [
+   "diamond/pair_defects/B-P/C8-C53-were_replaced/GGA-PBE",
+   "diamond/pair_defects/B-P/C8-C53-were_replaced/HSE06"
+  ],
+  "stratum": "pair"
+ },
+ "defect_pair_B-S_C8-C1-were_replaced": {
+  "campaign": "defect_set",
+  "fold": 4,
+  "run_identifiers": [
+   "417b0fb95bd70713",
+   "e935775ca1665a92"
+  ],
+  "run_paths": [
+   "diamond/pair_defects/B-S/C8-C1-were_replaced/GGA-PBE",
+   "diamond/pair_defects/B-S/C8-C1-were_replaced/HSE06"
+  ],
+  "stratum": "pair"
+ },
+ "defect_pair_B-S_C8-C53-were_replaced": {
+  "campaign": "defect_set",
+  "fold": 4,
+  "run_identifiers": [
+   "7186001fce610420",
+   "9940b0c13e219e9c"
+  ],
+  "run_paths": [
+   "diamond/pair_defects/B-S/C8-C53-were_replaced/GGA-PBE",
+   "diamond/pair_defects/B-S/C8-C53-were_replaced/HSE06"
+  ],
+  "stratum": "pair"
+ },
+ "defect_pair_B-Se_C8-C1-were_replaced": {
+  "campaign": "defect_set",
+  "fold": 3,
+  "run_identifiers": [
+   "0d26327a8dd63791",
+   "2531d625f8f4c089"
+  ],
+  "run_paths": [
+   "diamond/pair_defects/B-Se/C8-C1-were_replaced/GGA-PBE",
+   "diamond/pair_defects/B-Se/C8-C1-were_replaced/HSE06"
+  ],
+  "stratum": "pair"
+ },
+ "defect_pair_B-Se_C8-C53-were_replaced": {
+  "campaign": "defect_set",
+  "fold": 2,
+  "run_identifiers": [
+   "b4db77e3229509c9",
+   "3ddfad62cc777994"
+  ],
+  "run_paths": [
+   "diamond/pair_defects/B-Se/C8-C53-were_replaced/GGA-PBE",
+   "diamond/pair_defects/B-Se/C8-C53-were_replaced/HSE06"
+  ],
+  "stratum": "pair"
+ },
+ "defect_pair_N-H_C8-C1-were_replaced": {
+  "campaign": "defect_set",
+  "fold": 3,
+  "run_identifiers": [
+   "07d1b79473bd012c",
+   "771bc6984143f439"
+  ],
+  "run_paths": [
+   "diamond/pair_defects/N-H/C8-C1-were_replaced/GGA-PBE",
+   "diamond/pair_defects/N-H/C8-C1-were_replaced/HSE06"
+  ],
+  "stratum": "pair"
+ },
+ "defect_pair_N-H_C8-C53-were_replaced": {
+  "campaign": "defect_set",
+  "fold": 4,
+  "run_identifiers": [
+   "345731cc0ba37e45",
+   "55a17f8897ac59cf"
+  ],
+  "run_paths": [
+   "diamond/pair_defects/N-H/C8-C53-were_replaced/GGA-PBE",
+   "diamond/pair_defects/N-H/C8-C53-were_replaced/HSE06"
+  ],
+  "stratum": "pair"
+ },
+ "defect_pair_N-Li_C8-C1-were_replaced": {
+  "campaign": "defect_set",
+  "fold": 0,
+  "run_identifiers": [
+   "90f928b5bc4e4897",
+   "4de3b781c5e81bb8"
+  ],
+  "run_paths": [
+   "diamond/pair_defects/N-Li/C8-C1-were_replaced/GGA-PBE",
+   "diamond/pair_defects/N-Li/C8-C1-were_replaced/HSE06"
+  ],
+  "stratum": "pair"
+ },
+ "defect_pair_N-Li_C8-C53-were_replaced": {
+  "campaign": "defect_set",
+  "fold": 1,
+  "run_identifiers": [
+   "69a56e53796dc84f",
+   "19fccbe1caa022aa"
+  ],
+  "run_paths": [
+   "diamond/pair_defects/N-Li/C8-C53-were_replaced/GGA-PBE",
+   "diamond/pair_defects/N-Li/C8-C53-were_replaced/HSE06"
+  ],
+  "stratum": "pair"
+ },
+ "defect_pair_N-S_C8-C1-were_replaced": {
+  "campaign": "defect_set",
+  "fold": 0,
+  "run_identifiers": [
+   "85f3133f99c43191",
+   "4f92f5fc69bb6fba"
+  ],
+  "run_paths": [
+   "diamond/pair_defects/N-S/C8-C1-were_replaced/GGA-PBE",
+   "diamond/pair_defects/N-S/C8-C1-were_replaced/HSE06"
+  ],
+  "stratum": "pair"
+ },
+ "defect_pair_N-S_C8-C53-were_replaced": {
+  "campaign": "defect_set",
+  "fold": 1,
+  "run_identifiers": [
+   "6cd3789632dfe8c7",
+   "29ad62eb1819a7ea"
+  ],
+  "run_paths": [
+   "diamond/pair_defects/N-S/C8-C53-were_replaced/GGA-PBE",
+   "diamond/pair_defects/N-S/C8-C53-were_replaced/HSE06"
+  ],
+  "stratum": "pair"
+ },
+ "defect_pair_N-Si_C8-C1-were_replaced": {
+  "campaign": "defect_set",
+  "fold": 0,
+  "run_identifiers": [
+   "ebef2fc38eb16c97",
+   "e88774b3ed2f5e84"
+  ],
+  "run_paths": [
+   "diamond/pair_defects/N-Si/C8-C1-were_replaced/GGA-PBE",
+   "diamond/pair_defects/N-Si/C8-C1-were_replaced/HSE06"
+  ],
+  "stratum": "pair"
+ },
+ "defect_pair_N-Si_C8-C53-were_replaced": {
+  "campaign": "defect_set",
+  "fold": 0,
+  "run_identifiers": [
+   "71451b87153a39e1",
+   "403b728a70296129"
+  ],
+  "run_paths": [
+   "diamond/pair_defects/N-Si/C8-C53-were_replaced/GGA-PBE",
+   "diamond/pair_defects/N-Si/C8-C53-were_replaced/HSE06"
+  ],
+  "stratum": "pair"
+ },
+ "defect_single_IA-element-single-impurity_H": {
+  "campaign": "defect_set",
+  "fold": 3,
+  "run_identifiers": [
+   "123f0568753bb34e",
+   "a10960a0a72cc74f"
+  ],
+  "run_paths": [
+   "diamond/single_defect/IA-element-single-impurity/H/gga-pbe",
+   "diamond/single_defect/IA-element-single-impurity/H/hse06"
+  ],
+  "stratum": "single"
+ },
+ "defect_single_IA-element-single-impurity_Li": {
+  "campaign": "defect_set",
+  "fold": 0,
+  "run_identifiers": [
+   "0c319e6bff1ac46e",
+   "2c8d9c1f1e9d4848"
+  ],
+  "run_paths": [
+   "diamond/single_defect/IA-element-single-impurity/Li/gga-pbe",
+   "diamond/single_defect/IA-element-single-impurity/Li/hse06"
+  ],
+  "stratum": "single"
+ },
+ "defect_single_IA-element-single-impurity_Na": {
+  "campaign": "defect_set",
+  "fold": 3,
+  "run_identifiers": [
+   "66fc48bdd8d723a1",
+   "a12da389469e8b8d"
+  ],
+  "run_paths": [
+   "diamond/single_defect/IA-element-single-impurity/Na/gga-pbe",
+   "diamond/single_defect/IA-element-single-impurity/Na/hse06"
+  ],
+  "stratum": "single"
+ },
+ "defect_single_IIA-element-single-impurity_Be": {
+  "campaign": "defect_set",
+  "fold": 2,
+  "run_identifiers": [
+   "c704dd50631d27cb",
+   "d85a3be4fdd8ca60"
+  ],
+  "run_paths": [
+   "diamond/single_defect/IIA-element-single-impurity/Be/gga-pbe",
+   "diamond/single_defect/IIA-element-single-impurity/Be/hse06"
+  ],
+  "stratum": "single"
+ },
+ "defect_single_IIA-element-single-impurity_Mg": {
+  "campaign": "defect_set",
+  "fold": 4,
+  "run_identifiers": [
+   "da2307b0992d7109",
+   "a3e7082921af41e6"
+  ],
+  "run_paths": [
+   "diamond/single_defect/IIA-element-single-impurity/Mg/gga-pbe",
+   "diamond/single_defect/IIA-element-single-impurity/Mg/hse06"
+  ],
+  "stratum": "single"
+ },
+ "defect_single_IIIA-element-single-imputiry_B": {
+  "campaign": "defect_set",
+  "fold": 1,
+  "run_identifiers": [
+   "c01e8cc099920e75",
+   "deef7ffc28ec6898"
+  ],
+  "run_paths": [
+   "diamond/single_defect/IIIA-element-single-imputiry/B/GGA-PBE",
+   "diamond/single_defect/IIIA-element-single-imputiry/B/hse06"
+  ],
+  "stratum": "single"
+ },
+ "defect_single_IVA-element-single-impurity_Si": {
+  "campaign": "defect_set",
+  "fold": 0,
+  "run_identifiers": [
+   "34c5ebd36d43713f",
+   "bd39ceefa779d83c"
+  ],
+  "run_paths": [
+   "diamond/single_defect/IVA-element-single-impurity/Si/GGA-PBE",
+   "diamond/single_defect/IVA-element-single-impurity/Si/HSE06"
+  ],
+  "stratum": "single"
+ },
+ "defect_single_VA-element-single-impurity_As": {
+  "campaign": "defect_set",
+  "fold": 1,
+  "run_identifiers": [
+   "4f2e59af14127104",
+   "56e7e9cdb6ca6b64"
+  ],
+  "run_paths": [
+   "diamond/single_defect/VA-element-single-impurity/As/GGA-PBE",
+   "diamond/single_defect/VA-element-single-impurity/As/HSE06"
+  ],
+  "stratum": "single"
+ },
+ "defect_single_VA-element-single-impurity_N": {
+  "campaign": "defect_set",
+  "fold": 2,
+  "run_identifiers": [
+   "71b3f0647aa976d8",
+   "515f99ec1d6b5eea"
+  ],
+  "run_paths": [
+   "diamond/single_defect/VA-element-single-impurity/N/GGA-PBE",
+   "diamond/single_defect/VA-element-single-impurity/N/HSE06"
+  ],
+  "stratum": "single"
+ },
+ "defect_single_VA-element-single-impurity_P": {
+  "campaign": "defect_set",
+  "fold": 2,
+  "run_identifiers": [
+   "8805a080d25a02f4",
+   "187363b5c96915d4"
+  ],
+  "run_paths": [
+   "diamond/single_defect/VA-element-single-impurity/P/GGA-PBE",
+   "diamond/single_defect/VA-element-single-impurity/P/HSE06"
+  ],
+  "stratum": "single"
+ },
+ "defect_single_VA-element-single-impurity_Sb": {
+  "campaign": "defect_set",
+  "fold": 1,
+  "run_identifiers": [
+   "72b3390aee66599b",
+   "c060460431894869"
+  ],
+  "run_paths": [
+   "diamond/single_defect/VA-element-single-impurity/Sb/GGA-PBE",
+   "diamond/single_defect/VA-element-single-impurity/Sb/HSE06"
+  ],
+  "stratum": "single"
+ },
+ "defect_single_VIA-element-single-impurity_O": {
+  "campaign": "defect_set",
+  "fold": 0,
+  "run_identifiers": [
+   "00ce52c5ff6842d9",
+   "96d8d8baa06a1f62"
+  ],
+  "run_paths": [
+   "diamond/single_defect/VIA-element-single-impurity/O/GGA-PBE",
+   "diamond/single_defect/VIA-element-single-impurity/O/HSE06"
+  ],
+  "stratum": "single"
+ },
+ "defect_single_VIA-element-single-impurity_S": {
+  "campaign": "defect_set",
+  "fold": 1,
+  "run_identifiers": [
+   "673a920f3c0f1f5a",
+   "b63d1cef73c77909"
+  ],
+  "run_paths": [
+   "diamond/single_defect/VIA-element-single-impurity/S/GGA-PBE",
+   "diamond/single_defect/VIA-element-single-impurity/S/HSE06"
+  ],
+  "stratum": "single"
+ },
+ "defect_single_VIA-element-single-impurity_Se": {
+  "campaign": "defect_set",
+  "fold": 2,
+  "run_identifiers": [
+   "19ebb162a92a691a",
+   "052b4eeda26bf4d4"
+  ],
+  "run_paths": [
+   "diamond/single_defect/VIA-element-single-impurity/Se/GGA-PBE",
+   "diamond/single_defect/VIA-element-single-impurity/Se/HSE06"
+  ],
+  "stratum": "single"
+ },
+ "defect_single_VIA-element-single-impurity_Te": {
+  "campaign": "defect_set",
+  "fold": 4,
+  "run_identifiers": [
+   "9c1827a6785361b4",
+   "24d37951ea280e62"
+  ],
+  "run_paths": [
+   "diamond/single_defect/VIA-element-single-impurity/Te/GGA-PBE",
+   "diamond/single_defect/VIA-element-single-impurity/Te/HSE06"
+  ],
+  "stratum": "single"
+ },
+ "defect_single_VIIA-element-single-impurity_Br": {
+  "campaign": "defect_set",
+  "fold": 4,
+  "run_identifiers": [
+   "c5f1ddb890981638",
+   "b9bddfdab3a049bd"
+  ],
+  "run_paths": [
+   "diamond/single_defect/VIIA-element-single-impurity/Br/GGA-PBE",
+   "diamond/single_defect/VIIA-element-single-impurity/Br/HSE06"
+  ],
+  "stratum": "single"
+ },
+ "defect_single_VIIA-element-single-impurity_Cl": {
+  "campaign": "defect_set",
+  "fold": 3,
+  "run_identifiers": [
+   "e97e2a1f1651fb32",
+   "2907327018b0d43e"
+  ],
+  "run_paths": [
+   "diamond/single_defect/VIIA-element-single-impurity/Cl/GGA-PBE",
+   "diamond/single_defect/VIIA-element-single-impurity/Cl/HSE06"
+  ],
+  "stratum": "single"
+ },
+ "defect_single_VIIA-element-single-impurity_F": {
+  "campaign": "defect_set",
+  "fold": 3,
+  "run_identifiers": [
+   "1e48246bd52a053c",
+   "367c4b086cb0bc0c"
+  ],
+  "run_paths": [
+   "diamond/single_defect/VIIA-element-single-impurity/F/GGA-PBE",
+   "diamond/single_defect/VIIA-element-single-impurity/F/HSE06"
+  ],
+  "stratum": "single"
+ },
+ "defect_single_VIIA-element-single-impurity_I": {
+  "campaign": "defect_set",
+  "fold": 0,
+  "run_identifiers": [
+   "5a490832c6658a1c",
+   "86e7a703d75b3ecd"
+  ],
+  "run_paths": [
+   "diamond/single_defect/VIIA-element-single-impurity/I/GGA-PBE",
+   "diamond/single_defect/VIIA-element-single-impurity/I/HSE06"
+  ],
+  "stratum": "single"
+ },
+ "defect_triads_B-N-S_C8-C53-C1-were_replaced_config1": {
+  "campaign": "defect_set",
+  "fold": 0,
+  "run_identifiers": [
+   "09a2ab1ecd49575d",
+   "de858f388095819c"
+  ],
+  "run_paths": [
+   "diamond/triads_defects/B-N-S/C8-C53-C1-were_replaced/config1/GGA-PBE",
+   "diamond/triads_defects/B-N-S/C8-C53-C1-were_replaced/config1/HSE06"
+  ],
+  "stratum": "triads"
+ },
+ "defect_triads_B-N-S_C8-C53-C1-were_replaced_config2": {
+  "campaign": "defect_set",
+  "fold": 1,
+  "run_identifiers": [
+   "53330b7aa9244d81",
+   "3e374a4e4ed2783e"
+  ],
+  "run_paths": [
+   "diamond/triads_defects/B-N-S/C8-C53-C1-were_replaced/config2/GGA-PBE",
+   "diamond/triads_defects/B-N-S/C8-C53-C1-were_replaced/config2/HSE06"
+  ],
+  "stratum": "triads"
+ },
+ "defect_triads_B-N-S_C8-C53-C1-were_replaced_config3": {
+  "campaign": "defect_set",
+  "fold": 2,
+  "run_identifiers": [
+   "89b8c90fa8d4b982",
+   "5c123ef11de4e0df"
+  ],
+  "run_paths": [
+   "diamond/triads_defects/B-N-S/C8-C53-C1-were_replaced/config3/GGA-PBE",
+   "diamond/triads_defects/B-N-S/C8-C53-C1-were_replaced/config3/HSE06"
+  ],
+  "stratum": "triads"
+ },
+ "defect_triads_H-B-Si_C8-C53-C1-were_replaced_config1": {
+  "campaign": "defect_set",
+  "fold": 4,
+  "run_identifiers": [
+   "80d8655ef947680f",
+   "952000c9493a952c"
+  ],
+  "run_paths": [
+   "diamond/triads_defects/H-B-Si/C8-C53-C1-were_replaced/config1/GGA-PBE",
+   "diamond/triads_defects/H-B-Si/C8-C53-C1-were_replaced/config1/HSE06"
+  ],
+  "stratum": "triads"
+ },
+ "defect_triads_H-B-Si_C8-C53-C1-were_replaced_config2": {
+  "campaign": "defect_set",
+  "fold": 0,
+  "run_identifiers": [
+   "e12212a6ed71b4e7",
+   "18dbea25e96f7979"
+  ],
+  "run_paths": [
+   "diamond/triads_defects/H-B-Si/C8-C53-C1-were_replaced/config2/GGA-PBE",
+   "diamond/triads_defects/H-B-Si/C8-C53-C1-were_replaced/config2/HSE06"
+  ],
+  "stratum": "triads"
+ },
+ "defect_triads_H-B-Si_C8-C53-C1-were_replaced_config3": {
+  "campaign": "defect_set",
+  "fold": 2,
+  "run_identifiers": [
+   "8c26e05a567da600",
+   "6d0ba11005ae4496"
+  ],
+  "run_paths": [
+   "diamond/triads_defects/H-B-Si/C8-C53-C1-were_replaced/config3/GGA-PBE",
+   "diamond/triads_defects/H-B-Si/C8-C53-C1-were_replaced/config3/HSE06"
+  ],
+  "stratum": "triads"
+ },
+ "defect_triads_H-B-Si_C8-C55-C1-were_replaced_config1": {
+  "campaign": "defect_set",
+  "fold": 4,
+  "run_identifiers": [
+   "18452a486bcd1f51",
+   "36bfacf3d58289d4"
+  ],
+  "run_paths": [
+   "diamond/triads_defects/H-B-Si/C8-C55-C1-were_replaced/config1/GGA-PBE",
+   "diamond/triads_defects/H-B-Si/C8-C55-C1-were_replaced/config1/HSE06"
+  ],
+  "stratum": "triads"
+ },
+ "defect_triads_H-B-Si_C8-C55-C1-were_replaced_config2": {
+  "campaign": "defect_set",
+  "fold": 0,
+  "run_identifiers": [
+   "f781339f454e7ab4",
+   "f81e06dc2342c2dc"
+  ],
+  "run_paths": [
+   "diamond/triads_defects/H-B-Si/C8-C55-C1-were_replaced/config2/GGA-PBE",
+   "diamond/triads_defects/H-B-Si/C8-C55-C1-were_replaced/config2/HSE06"
+  ],
+  "stratum": "triads"
+ },
+ "defect_triads_H-B-Si_C8-C55-C1-were_replaced_config3": {
+  "campaign": "defect_set",
+  "fold": 0,
+  "run_identifiers": [
+   "8b72ca99d16e99bf",
+   "f3a7432467d00a76"
+  ],
+  "run_paths": [
+   "diamond/triads_defects/H-B-Si/C8-C55-C1-were_replaced/config3/GGA-PBE",
+   "diamond/triads_defects/H-B-Si/C8-C55-C1-were_replaced/config3/HSE06"
+  ],
+  "stratum": "triads"
+ },
+ "defect_triads_H-N-O_c8-c53-c1_config1": {
+  "campaign": "defect_set",
+  "fold": 3,
+  "run_identifiers": [
+   "c8310b35091a6983",
+   "aff7d63b1fca17c9"
+  ],
+  "run_paths": [
+   "diamond/triads_defects/H-N-O/c8-c53-c1/config1/GGA-PBE",
+   "diamond/triads_defects/H-N-O/c8-c53-c1/config1/HSE06"
+  ],
+  "stratum": "triads"
+ },
+ "defect_triads_H-N-O_c8-c53-c1_config2": {
+  "campaign": "defect_set",
+  "fold": 2,
+  "run_identifiers": [
+   "41d0b498fb3c2981",
+   "863025c4264d9ecb",
+   "d452bf970edb1069"
+  ],
+  "run_paths": [
+   "diamond/triads_defects/H-N-O/c8-c53-c1/config2",
+   "diamond/triads_defects/H-N-O/c8-c53-c1/config2/sigma00001",
+   "diamond/triads_defects/H-N-O/c8-c53-c1/config2/sigma00001/hse06"
+  ],
+  "stratum": "triads"
+ },
+ "defect_triads_H-N-O_c8-c53-c1_config3": {
+  "campaign": "defect_set",
+  "fold": 4,
+  "run_identifiers": [
+   "d1150271524d5eea",
+   "c1659f0bedd5d8a8",
+   "1d6a58289dc9c31f"
+  ],
+  "run_paths": [
+   "diamond/triads_defects/H-N-O/c8-c53-c1/config3",
+   "diamond/triads_defects/H-N-O/c8-c53-c1/config3/sigma00001",
+   "diamond/triads_defects/H-N-O/c8-c53-c1/config3/sigma00001/hse06"
+  ],
+  "stratum": "triads"
+ },
+ "defect_triads_H-N-O_c8-c55-c1_config1": {
+  "campaign": "defect_set",
+  "fold": 0,
+  "run_identifiers": [
+   "d086cd10f861f27b",
+   "a94a6177eebe1435"
+  ],
+  "run_paths": [
+   "diamond/triads_defects/H-N-O/c8-c55-c1/config1/GGA-PBE",
+   "diamond/triads_defects/H-N-O/c8-c55-c1/config1/HSE06"
+  ],
+  "stratum": "triads"
+ },
+ "defect_triads_H-N-O_c8-c55-c1_config2": {
+  "campaign": "defect_set",
+  "fold": 4,
+  "run_identifiers": [
+   "f614e3d2955f2a27",
+   "2f267e7a78fa0f06"
+  ],
+  "run_paths": [
+   "diamond/triads_defects/H-N-O/c8-c55-c1/config2/GGA-PBE",
+   "diamond/triads_defects/H-N-O/c8-c55-c1/config2/HSE06"
+  ],
+  "stratum": "triads"
+ },
+ "defect_triads_H-N-O_c8-c55-c1_config3": {
+  "campaign": "defect_set",
+  "fold": 3,
+  "run_identifiers": [
+   "3d4121a623f77e44",
+   "4a0ced9c1088bc01"
+  ],
+  "run_paths": [
+   "diamond/triads_defects/H-N-O/c8-c55-c1/config3/GGA-PBE",
+   "diamond/triads_defects/H-N-O/c8-c55-c1/config3/HSE06"
+  ],
+  "stratum": "triads"
+ },
+ "defect_triads_Li-B-P_c8-c53-c1_config1": {
+  "campaign": "defect_set",
+  "fold": 1,
+  "run_identifiers": [
+   "048f00ed0fd628b6",
+   "92076e15afc7d521"
+  ],
+  "run_paths": [
+   "diamond/triads_defects/Li-B-P/c8-c53-c1/config1/GGA-PBE",
+   "diamond/triads_defects/Li-B-P/c8-c53-c1/config1/HSE06"
+  ],
+  "stratum": "triads"
+ },
+ "defect_triads_Li-B-P_c8-c53-c1_config2": {
+  "campaign": "defect_set",
+  "fold": 1,
+  "run_identifiers": [
+   "8c7513908f838bdd",
+   "dfd4d34ad1d63578"
+  ],
+  "run_paths": [
+   "diamond/triads_defects/Li-B-P/c8-c53-c1/config2/GGA-PBE",
+   "diamond/triads_defects/Li-B-P/c8-c53-c1/config2/HSE06"
+  ],
+  "stratum": "triads"
+ },
+ "defect_triads_Li-B-P_c8-c53-c1_config3": {
+  "campaign": "defect_set",
+  "fold": 1,
+  "run_identifiers": [
+   "31952cebffddb6fd",
+   "1fb4fa4f1c86aa2c"
+  ],
+  "run_paths": [
+   "diamond/triads_defects/Li-B-P/c8-c53-c1/config3/GGA-PBE",
+   "diamond/triads_defects/Li-B-P/c8-c53-c1/config3/HSE06"
+  ],
+  "stratum": "triads"
+ },
+ "defect_triads_Li-B-P_c8-c55-c1_config1": {
+  "campaign": "defect_set",
+  "fold": 3,
+  "run_identifiers": [
+   "c700ffe72e011ad6",
+   "05b04ad6922a757e"
+  ],
+  "run_paths": [
+   "diamond/triads_defects/Li-B-P/c8-c55-c1/config1/GGA-PBE",
+   "diamond/triads_defects/Li-B-P/c8-c55-c1/config1/HSE06"
+  ],
+  "stratum": "triads"
+ },
+ "defect_triads_Li-B-P_c8-c55-c1_config2": {
+  "campaign": "defect_set",
+  "fold": 3,
+  "run_identifiers": [
+   "39314302e9013174",
+   "97f5d0ae96cb2ce3"
+  ],
+  "run_paths": [
+   "diamond/triads_defects/Li-B-P/c8-c55-c1/config2/GGA-PBE",
+   "diamond/triads_defects/Li-B-P/c8-c55-c1/config2/HSE06"
+  ],
+  "stratum": "triads"
+ },
+ "defect_triads_Li-B-P_c8-c55-c1_config3": {
+  "campaign": "defect_set",
+  "fold": 2,
+  "run_identifiers": [
+   "30d04e53f48ed955",
+   "dedb9e0f4915484c"
+  ],
+  "run_paths": [
+   "diamond/triads_defects/Li-B-P/c8-c55-c1/config3/GGA-PBE",
+   "diamond/triads_defects/Li-B-P/c8-c55-c1/config3/HSE06"
+  ],
+  "stratum": "triads"
+ },
+ "supercell_+0.0000_+0.0000_+0.0000_+0.0050_+0.0000_+0.0000": {
+  "campaign": "supercell_strains",
+  "fold": 0,
+  "run_identifiers": [
+   "5a830b6fe01ad1d0",
+   "adbad3cfd83381b9",
+   "a3f671560ae7f6e0",
+   "5fcc5652ef71eaf5",
+   "730c8c6015bdcd05",
+   "87203fa95e6a8b5c"
+  ],
+  "run_paths": [
+   "diamond/Pure/New_files/angular-distortion/shear_xy_g-0.005",
+   "diamond/Pure/New_files/angular-distortion/shear_xy_g0.005",
+   "diamond/Pure/New_files/angular-distortion/shear_xz_g-0.005",
+   "diamond/Pure/New_files/angular-distortion/shear_xz_g0.005",
+   "diamond/Pure/New_files/angular-distortion/shear_yz_g-0.005",
+   "diamond/Pure/New_files/angular-distortion/shear_yz_g0.005"
+  ],
+  "stratum": "angular-distortion"
+ },
+ "supercell_+0.0000_+0.0000_+0.0000_+0.0100_+0.0000_+0.0000": {
+  "campaign": "supercell_strains",
+  "fold": 0,
+  "run_identifiers": [
+   "b9c5843488684af9",
+   "73a1785ef852f1e9",
+   "1cb8903e79456051",
+   "3d8b4e9314040b01",
+   "67660a2c44727060"
+  ],
+  "run_paths": [
+   "diamond/Pure/New_files/angular-distortion/shear_xy_g-0.010",
+   "diamond/Pure/New_files/angular-distortion/shear_xz_g-0.010",
+   "diamond/Pure/New_files/angular-distortion/shear_xz_g0.010",
+   "diamond/Pure/New_files/angular-distortion/shear_yz_g-0.010",
+   "diamond/Pure/New_files/angular-distortion/shear_yz_g0.010"
+  ],
+  "stratum": "angular-distortion"
+ },
+ "supercell_+0.0000_+0.0000_+0.0000_+0.0150_+0.0000_+0.0000": {
+  "campaign": "supercell_strains",
+  "fold": 3,
+  "run_identifiers": [
+   "b2b23f6c9aac0cc7",
+   "eb5689f707bcb610",
+   "b37277c2341eb60d",
+   "adafe5a9b686ca8f",
+   "d72fae5267f3a5f0",
+   "35790c435afe850b"
+  ],
+  "run_paths": [
+   "diamond/Pure/New_files/angular-distortion/shear_xy_g-0.015",
+   "diamond/Pure/New_files/angular-distortion/shear_xy_g0.015",
+   "diamond/Pure/New_files/angular-distortion/shear_xz_g-0.015",
+   "diamond/Pure/New_files/angular-distortion/shear_xz_g0.015",
+   "diamond/Pure/New_files/angular-distortion/shear_yz_g-0.015",
+   "diamond/Pure/New_files/angular-distortion/shear_yz_g0.015"
+  ],
+  "stratum": "angular-distortion"
+ },
+ "supercell_+0.0000_+0.0000_+0.0000_+0.0200_+0.0000_+0.0000": {
+  "campaign": "supercell_strains",
+  "fold": 3,
+  "run_identifiers": [
+   "fc445f509cbd3e7e",
+   "26a71f63f5170fde",
+   "b4c785f996fa3d85",
+   "daecd90ab542f01b",
+   "c91584717a5cc34a",
+   "683bdae3f3c8fbd0"
+  ],
+  "run_paths": [
+   "diamond/Pure/New_files/angular-distortion/shear_xy_g-0.020",
+   "diamond/Pure/New_files/angular-distortion/shear_xy_g0.020",
+   "diamond/Pure/New_files/angular-distortion/shear_xz_g-0.020",
+   "diamond/Pure/New_files/angular-distortion/shear_xz_g0.020",
+   "diamond/Pure/New_files/angular-distortion/shear_yz_g-0.020",
+   "diamond/Pure/New_files/angular-distortion/shear_yz_g0.020"
+  ],
+  "stratum": "angular-distortion"
+ },
+ "supercell_+0.0000_+0.0000_+0.0000_+0.0250_+0.0000_+0.0000": {
+  "campaign": "supercell_strains",
+  "fold": 2,
+  "run_identifiers": [
+   "bab153e800ca3c57",
+   "1066400825d1f8bf",
+   "0757f9eaafdfebc2",
+   "0e50f0624c287558",
+   "2ebc8fd68f6c309d",
+   "598c6ca670a63bf9"
+  ],
+  "run_paths": [
+   "diamond/Pure/New_files/angular-distortion/shear_xy_g-0.025",
+   "diamond/Pure/New_files/angular-distortion/shear_xy_g0.025",
+   "diamond/Pure/New_files/angular-distortion/shear_xz_g-0.025",
+   "diamond/Pure/New_files/angular-distortion/shear_xz_g0.025",
+   "diamond/Pure/New_files/angular-distortion/shear_yz_g-0.025",
+   "diamond/Pure/New_files/angular-distortion/shear_yz_g0.025"
+  ],
+  "stratum": "angular-distortion"
+ },
+ "supercell_+0.0000_+0.0000_+0.0000_+0.0300_+0.0000_+0.0000": {
+  "campaign": "supercell_strains",
+  "fold": 2,
+  "run_identifiers": [
+   "f512daf5b705b704",
+   "8f06131a413f55b2",
+   "05b5e966d5361a89",
+   "73913993a1d4a5c6",
+   "aa08ff979213c2c5",
+   "5c27ee41eab45acd"
+  ],
+  "run_paths": [
+   "diamond/Pure/New_files/angular-distortion/shear_xy_g-0.030",
+   "diamond/Pure/New_files/angular-distortion/shear_xy_g0.030",
+   "diamond/Pure/New_files/angular-distortion/shear_xz_g-0.030",
+   "diamond/Pure/New_files/angular-distortion/shear_xz_g0.030",
+   "diamond/Pure/New_files/angular-distortion/shear_yz_g-0.030",
+   "diamond/Pure/New_files/angular-distortion/shear_yz_g0.030"
+  ],
+  "stratum": "angular-distortion"
+ },
+ "supercell_+0.0000_+0.0000_+0.0000_+0.0350_+0.0000_+0.0000": {
+  "campaign": "supercell_strains",
+  "fold": 4,
+  "run_identifiers": [
+   "aa875453b68d038f",
+   "d24ad2815d6e8ee6",
+   "d70c51e8fcd09195",
+   "14d27af486abee4a",
+   "bfd503002230260b",
+   "29017f9f85afc1d3"
+  ],
+  "run_paths": [
+   "diamond/Pure/New_files/angular-distortion/shear_xy_g-0.035",
+   "diamond/Pure/New_files/angular-distortion/shear_xy_g0.035",
+   "diamond/Pure/New_files/angular-distortion/shear_xz_g-0.035",
+   "diamond/Pure/New_files/angular-distortion/shear_xz_g0.035",
+   "diamond/Pure/New_files/angular-distortion/shear_yz_g-0.035",
+   "diamond/Pure/New_files/angular-distortion/shear_yz_g0.035"
+  ],
+  "stratum": "angular-distortion"
+ },
+ "supercell_+0.0000_+0.0000_+0.0000_+0.0400_+0.0000_+0.0000": {
+  "campaign": "supercell_strains",
+  "fold": 1,
+  "run_identifiers": [
+   "5c753b8a9eb7cb39",
+   "015350e6f5fe0825",
+   "0da86c241f485909",
+   "6cf02b1da6822b9b",
+   "3c73cd4d80e83ee8",
+   "c69f5322e3cd2357"
+  ],
+  "run_paths": [
+   "diamond/Pure/New_files/angular-distortion/shear_xy_g-0.040",
+   "diamond/Pure/New_files/angular-distortion/shear_xy_g0.040",
+   "diamond/Pure/New_files/angular-distortion/shear_xz_g-0.040",
+   "diamond/Pure/New_files/angular-distortion/shear_xz_g0.040",
+   "diamond/Pure/New_files/angular-distortion/shear_yz_g-0.040",
+   "diamond/Pure/New_files/angular-distortion/shear_yz_g0.040"
+  ],
+  "stratum": "angular-distortion"
+ },
+ "supercell_+0.0000_+0.0000_+0.0000_+0.0450_+0.0000_+0.0000": {
+  "campaign": "supercell_strains",
+  "fold": 4,
+  "run_identifiers": [
+   "c08e95d855406d1a",
+   "0185170e193164ca",
+   "8d28216494e05fd9",
+   "05c6f3529d84a591",
+   "b31d87f2783f807a",
+   "09147fefb2b556e4"
+  ],
+  "run_paths": [
+   "diamond/Pure/New_files/angular-distortion/shear_xy_g-0.045",
+   "diamond/Pure/New_files/angular-distortion/shear_xy_g0.045",
+   "diamond/Pure/New_files/angular-distortion/shear_xz_g-0.045",
+   "diamond/Pure/New_files/angular-distortion/shear_xz_g0.045",
+   "diamond/Pure/New_files/angular-distortion/shear_yz_g-0.045",
+   "diamond/Pure/New_files/angular-distortion/shear_yz_g0.045"
+  ],
+  "stratum": "angular-distortion"
+ },
+ "supercell_+0.0000_+0.0000_+0.0000_+0.0500_+0.0000_+0.0000": {
+  "campaign": "supercell_strains",
+  "fold": 1,
+  "run_identifiers": [
+   "40bed0641f7b8b51",
+   "0b7b78ab219972ed",
+   "70585fa0a91b8f27",
+   "15a0a51434e892da",
+   "14f34414b7d91a38",
+   "cc2a2ae91df17329"
+  ],
+  "run_paths": [
+   "diamond/Pure/New_files/angular-distortion/shear_xy_g-0.050",
+   "diamond/Pure/New_files/angular-distortion/shear_xy_g0.050",
+   "diamond/Pure/New_files/angular-distortion/shear_xz_g-0.050",
+   "diamond/Pure/New_files/angular-distortion/shear_xz_g0.050",
+   "diamond/Pure/New_files/angular-distortion/shear_yz_g-0.050",
+   "diamond/Pure/New_files/angular-distortion/shear_yz_g0.050"
+  ],
+  "stratum": "angular-distortion"
+ },
+ "supercell_+0.0000_+0.0000_+0.0000_+0.0550_+0.0000_+0.0000": {
+  "campaign": "supercell_strains",
+  "fold": 4,
+  "run_identifiers": [
+   "802ecc8562eecac9",
+   "c139c805b5579448",
+   "7b9f19e5e1746612",
+   "a1c78fa061169491",
+   "d67844a5e949936a",
+   "2c25870d24d83502"
+  ],
+  "run_paths": [
+   "diamond/Pure/New_files/angular-distortion-new/shear_xy_g-0.055",
+   "diamond/Pure/New_files/angular-distortion-new/shear_xy_g0.055",
+   "diamond/Pure/New_files/angular-distortion-new/shear_xz_g-0.055",
+   "diamond/Pure/New_files/angular-distortion-new/shear_xz_g0.055",
+   "diamond/Pure/New_files/angular-distortion-new/shear_yz_g-0.055",
+   "diamond/Pure/New_files/angular-distortion-new/shear_yz_g0.055"
+  ],
+  "stratum": "angular-distortion-new"
+ },
+ "supercell_+0.0000_+0.0000_+0.0000_+0.0600_+0.0000_+0.0000": {
+  "campaign": "supercell_strains",
+  "fold": 0,
+  "run_identifiers": [
+   "262b36e44d232da9",
+   "a6abfcc5023b5c8e",
+   "c76ee661626148de",
+   "bd75b8f9256c186f",
+   "a9f2e993e472c8d7",
+   "d4282389a52c2112"
+  ],
+  "run_paths": [
+   "diamond/Pure/New_files/angular-distortion-new/shear_xy_g-0.060",
+   "diamond/Pure/New_files/angular-distortion-new/shear_xy_g0.060",
+   "diamond/Pure/New_files/angular-distortion-new/shear_xz_g-0.060",
+   "diamond/Pure/New_files/angular-distortion-new/shear_xz_g0.060",
+   "diamond/Pure/New_files/angular-distortion-new/shear_yz_g-0.060",
+   "diamond/Pure/New_files/angular-distortion-new/shear_yz_g0.060"
+  ],
+  "stratum": "angular-distortion-new"
+ },
+ "supercell_+0.0000_+0.0000_+0.0000_+0.0650_+0.0000_+0.0000": {
+  "campaign": "supercell_strains",
+  "fold": 2,
+  "run_identifiers": [
+   "436aa1b2433672a1",
+   "3e15f636b5761296",
+   "31a30e1f4927ed7a",
+   "61870e5c82cfbe1e",
+   "e740b73543aa26c4",
+   "8468c211155639a6"
+  ],
+  "run_paths": [
+   "diamond/Pure/New_files/angular-distortion-new/shear_xy_g-0.065",
+   "diamond/Pure/New_files/angular-distortion-new/shear_xy_g0.065",
+   "diamond/Pure/New_files/angular-distortion-new/shear_xz_g-0.065",
+   "diamond/Pure/New_files/angular-distortion-new/shear_xz_g0.065",
+   "diamond/Pure/New_files/angular-distortion-new/shear_yz_g-0.065",
+   "diamond/Pure/New_files/angular-distortion-new/shear_yz_g0.065"
+  ],
+  "stratum": "angular-distortion-new"
+ },
+ "supercell_+0.0000_+0.0000_+0.0000_+0.0700_+0.0000_+0.0000": {
+  "campaign": "supercell_strains",
+  "fold": 1,
+  "run_identifiers": [
+   "b78a5edba8691390",
+   "0eb32d7daa12b3fc",
+   "39dacf21b4ced6f8",
+   "6ee2db754970497e",
+   "1569d79b426ddfa4",
+   "12ee75764f279770"
+  ],
+  "run_paths": [
+   "diamond/Pure/New_files/angular-distortion-new/shear_xy_g-0.070",
+   "diamond/Pure/New_files/angular-distortion-new/shear_xy_g0.070",
+   "diamond/Pure/New_files/angular-distortion-new/shear_xz_g-0.070",
+   "diamond/Pure/New_files/angular-distortion-new/shear_xz_g0.070",
+   "diamond/Pure/New_files/angular-distortion-new/shear_yz_g-0.070",
+   "diamond/Pure/New_files/angular-distortion-new/shear_yz_g0.070"
+  ],
+  "stratum": "angular-distortion-new"
+ },
+ "supercell_+0.0000_+0.0000_+0.0000_+0.0750_+0.0000_+0.0000": {
+  "campaign": "supercell_strains",
+  "fold": 1,
+  "run_identifiers": [
+   "8214f3483329c5f3",
+   "51d38dcc52a06d95",
+   "4c0293cc6e6b4fa0",
+   "6104045fb16230c5",
+   "534cd40db0af9830",
+   "58e4eb08b5f5da4d"
+  ],
+  "run_paths": [
+   "diamond/Pure/New_files/angular-distortion-new/shear_xy_g-0.075",
+   "diamond/Pure/New_files/angular-distortion-new/shear_xy_g0.075",
+   "diamond/Pure/New_files/angular-distortion-new/shear_xz_g-0.075",
+   "diamond/Pure/New_files/angular-distortion-new/shear_xz_g0.075",
+   "diamond/Pure/New_files/angular-distortion-new/shear_yz_g-0.075",
+   "diamond/Pure/New_files/angular-distortion-new/shear_yz_g0.075"
+  ],
+  "stratum": "angular-distortion-new"
+ },
+ "supercell_+0.0000_+0.0000_+0.0000_+0.0800_+0.0000_+0.0000": {
+  "campaign": "supercell_strains",
+  "fold": 0,
+  "run_identifiers": [
+   "8a3b7663d7a75387",
+   "04ce1fcb2148ae22",
+   "74a7ef57bfc75052",
+   "a0d28ac20086aacc",
+   "01852d163e6ad1a0",
+   "bd21997b36bd2afe"
+  ],
+  "run_paths": [
+   "diamond/Pure/New_files/angular-distortion-new/shear_xy_g-0.080",
+   "diamond/Pure/New_files/angular-distortion-new/shear_xy_g0.080",
+   "diamond/Pure/New_files/angular-distortion-new/shear_xz_g-0.080",
+   "diamond/Pure/New_files/angular-distortion-new/shear_xz_g0.080",
+   "diamond/Pure/New_files/angular-distortion-new/shear_yz_g-0.080",
+   "diamond/Pure/New_files/angular-distortion-new/shear_yz_g0.080"
+  ],
+  "stratum": "angular-distortion-new"
+ },
+ "supercell_+0.0000_+0.0000_+0.0000_+0.0850_+0.0000_+0.0000": {
+  "campaign": "supercell_strains",
+  "fold": 2,
+  "run_identifiers": [
+   "92833c3fd630ed19",
+   "899de89756502938",
+   "4546ed02f5c843e2",
+   "09a6adabe2188366",
+   "9997d5ebae1daab8",
+   "5b30432db5001e9f"
+  ],
+  "run_paths": [
+   "diamond/Pure/New_files/angular-distortion-new/shear_xy_g-0.085",
+   "diamond/Pure/New_files/angular-distortion-new/shear_xy_g0.085",
+   "diamond/Pure/New_files/angular-distortion-new/shear_xz_g-0.085",
+   "diamond/Pure/New_files/angular-distortion-new/shear_xz_g0.085",
+   "diamond/Pure/New_files/angular-distortion-new/shear_yz_g-0.085",
+   "diamond/Pure/New_files/angular-distortion-new/shear_yz_g0.085"
+  ],
+  "stratum": "angular-distortion-new"
+ },
+ "supercell_+0.0000_+0.0000_+0.0000_+0.0900_+0.0000_+0.0000": {
+  "campaign": "supercell_strains",
+  "fold": 4,
+  "run_identifiers": [
+   "a14d1247209ca16b",
+   "34eab7240f82d3cc",
+   "4d847f9371c09605",
+   "108217486420ebd0",
+   "eba7afaa12f4c473",
+   "a41c67ac11ebd5f3"
+  ],
+  "run_paths": [
+   "diamond/Pure/New_files/angular-distortion-new/shear_xy_g-0.090",
+   "diamond/Pure/New_files/angular-distortion-new/shear_xy_g0.090",
+   "diamond/Pure/New_files/angular-distortion-new/shear_xz_g-0.090",
+   "diamond/Pure/New_files/angular-distortion-new/shear_xz_g0.090",
+   "diamond/Pure/New_files/angular-distortion-new/shear_yz_g-0.090",
+   "diamond/Pure/New_files/angular-distortion-new/shear_yz_g0.090"
+  ],
+  "stratum": "angular-distortion-new"
+ },
+ "supercell_+0.0000_+0.0000_+0.0000_+0.0950_+0.0000_+0.0000": {
+  "campaign": "supercell_strains",
+  "fold": 3,
+  "run_identifiers": [
+   "35506cca7e562ba0",
+   "e357e2c7a3c2224b",
+   "744e44613e6fdb7c",
+   "fb42b5d751200a99",
+   "1cfdbae0f756c313",
+   "e20d616e8b6c0664"
+  ],
+  "run_paths": [
+   "diamond/Pure/New_files/angular-distortion-new/shear_xy_g-0.095",
+   "diamond/Pure/New_files/angular-distortion-new/shear_xy_g0.095",
+   "diamond/Pure/New_files/angular-distortion-new/shear_xz_g-0.095",
+   "diamond/Pure/New_files/angular-distortion-new/shear_xz_g0.095",
+   "diamond/Pure/New_files/angular-distortion-new/shear_yz_g-0.095",
+   "diamond/Pure/New_files/angular-distortion-new/shear_yz_g0.095"
+  ],
+  "stratum": "angular-distortion-new"
+ },
+ "supercell_+0.0000_+0.0000_+0.0000_+0.1000_+0.0000_+0.0000": {
+  "campaign": "supercell_strains",
+  "fold": 3,
+  "run_identifiers": [
+   "6b88180b39cf9ab0",
+   "c829b03b2022f466",
+   "71066c6793f11e5f",
+   "4c03b713b2dcee47",
+   "ec7adb04e9fbbbee",
+   "df1b937c72e468dd"
+  ],
+  "run_paths": [
+   "diamond/Pure/New_files/angular-distortion-new/shear_xy_g-0.100",
+   "diamond/Pure/New_files/angular-distortion-new/shear_xy_g0.100",
+   "diamond/Pure/New_files/angular-distortion-new/shear_xz_g-0.100",
+   "diamond/Pure/New_files/angular-distortion-new/shear_xz_g0.100",
+   "diamond/Pure/New_files/angular-distortion-new/shear_yz_g-0.100",
+   "diamond/Pure/New_files/angular-distortion-new/shear_yz_g0.100"
+  ],
+  "stratum": "angular-distortion-new"
+ },
+ "supercell_+0.0000_+0.0000_-0.0100_+0.0000_+0.0000_+0.0000": {
+  "campaign": "supercell_strains",
+  "fold": 0,
+  "run_identifiers": [
+   "45b39435070ebc3d",
+   "5fa3cd9a9694ad3a",
+   "2d2a94dbfe8e6e13"
+  ],
+  "run_paths": [
+   "diamond/Pure/New_files/Distortion-anisotropic/uniax_x_eps-0.01",
+   "diamond/Pure/New_files/Distortion-anisotropic/uniax_y_eps-0.01",
+   "diamond/Pure/New_files/Distortion-anisotropic/uniax_z_eps-0.01"
+  ],
+  "stratum": "Distortion-anisotropic"
+ },
+ "supercell_+0.0000_+0.0000_-0.0300_+0.0000_+0.0000_+0.0000": {
+  "campaign": "supercell_strains",
+  "fold": 2,
+  "run_identifiers": [
+   "5f68c28b0d9b1671",
+   "4664892e770f5522",
+   "218c6b426e374509"
+  ],
+  "run_paths": [
+   "diamond/Pure/New_files/Distortion-anisotropic/uniax_x_eps-0.03",
+   "diamond/Pure/New_files/Distortion-anisotropic/uniax_y_eps-0.03",
+   "diamond/Pure/New_files/Distortion-anisotropic/uniax_z_eps-0.03"
+  ],
+  "stratum": "Distortion-anisotropic"
+ },
+ "supercell_+0.0000_+0.0000_-0.0500_+0.0000_+0.0000_+0.0000": {
+  "campaign": "supercell_strains",
+  "fold": 3,
+  "run_identifiers": [
+   "d1a9f08980f4cb9d",
+   "2d91731b67cf716e",
+   "2765876d7f019106"
+  ],
+  "run_paths": [
+   "diamond/Pure/New_files/Distortion-anisotropic/uniax_x_eps-0.05",
+   "diamond/Pure/New_files/Distortion-anisotropic/uniax_y_eps-0.05",
+   "diamond/Pure/New_files/Distortion-anisotropic/uniax_z_eps-0.05"
+  ],
+  "stratum": "Distortion-anisotropic"
+ },
+ "supercell_+0.0000_+0.0000_-0.0700_+0.0000_+0.0000_+0.0000": {
+  "campaign": "supercell_strains",
+  "fold": 2,
+  "run_identifiers": [
+   "82c97394d9c94e31",
+   "65e8700b864988fa",
+   "67d4f3a2141411c4"
+  ],
+  "run_paths": [
+   "diamond/Pure/New_files/Distortion-anisotropic/uniax_x_eps-0.07",
+   "diamond/Pure/New_files/Distortion-anisotropic/uniax_y_eps-0.07",
+   "diamond/Pure/New_files/Distortion-anisotropic/uniax_z_eps-0.07"
+  ],
+  "stratum": "Distortion-anisotropic"
+ },
+ "supercell_+0.0000_+0.0000_-0.0900_+0.0000_+0.0000_+0.0000": {
+  "campaign": "supercell_strains",
+  "fold": 0,
+  "run_identifiers": [
+   "573c3432e5d25cce",
+   "18adfd60107e0b3e",
+   "5fa5473eb4f54047"
+  ],
+  "run_paths": [
+   "diamond/Pure/New_files/Distortion-anisotropic/uniax_x_eps-0.09",
+   "diamond/Pure/New_files/Distortion-anisotropic/uniax_y_eps-0.09",
+   "diamond/Pure/New_files/Distortion-anisotropic/uniax_z_eps-0.09"
+  ],
+  "stratum": "Distortion-anisotropic"
+ },
+ "supercell_+0.0000_-0.0100_-0.0100_+0.0000_+0.0000_+0.0000": {
+  "campaign": "supercell_strains",
+  "fold": 4,
+  "run_identifiers": [
+   "3523935474a1b6fa",
+   "177a3edf3363fe26",
+   "a34e8c1fc3b1afcb"
+  ],
+  "run_paths": [
+   "diamond/Pure/New_files/Distortion-anisotropic/biax_xy_eps-0.01",
+   "diamond/Pure/New_files/Distortion-anisotropic/biax_xz_eps-0.01",
+   "diamond/Pure/New_files/Distortion-anisotropic/biax_yz_eps-0.01"
+  ],
+  "stratum": "Distortion-anisotropic"
+ },
+ "supercell_+0.0000_-0.0300_-0.0300_+0.0000_+0.0000_+0.0000": {
+  "campaign": "supercell_strains",
+  "fold": 4,
+  "run_identifiers": [
+   "73b92f3e277c30b8",
+   "b98e514553e3afe6",
+   "c4d64085e9d197aa"
+  ],
+  "run_paths": [
+   "diamond/Pure/New_files/Distortion-anisotropic/biax_xy_eps-0.03",
+   "diamond/Pure/New_files/Distortion-anisotropic/biax_xz_eps-0.03",
+   "diamond/Pure/New_files/Distortion-anisotropic/biax_yz_eps-0.03"
+  ],
+  "stratum": "Distortion-anisotropic"
+ },
+ "supercell_+0.0000_-0.0500_-0.0500_+0.0000_+0.0000_+0.0000": {
+  "campaign": "supercell_strains",
+  "fold": 1,
+  "run_identifiers": [
+   "2c3045764a522287",
+   "5645fa3be807b314",
+   "6f721e6f60bb36b2"
+  ],
+  "run_paths": [
+   "diamond/Pure/New_files/Distortion-anisotropic/biax_xy_eps-0.05",
+   "diamond/Pure/New_files/Distortion-anisotropic/biax_xz_eps-0.05",
+   "diamond/Pure/New_files/Distortion-anisotropic/biax_yz_eps-0.05"
+  ],
+  "stratum": "Distortion-anisotropic"
+ },
+ "supercell_+0.0100_+0.0000_+0.0000_+0.0000_+0.0000_+0.0000": {
+  "campaign": "supercell_strains",
+  "fold": 2,
+  "run_identifiers": [
+   "6eaf93de7c7fd8d7",
+   "3fa6316be9de2d83",
+   "feb92c72e6d9b472"
+  ],
+  "run_paths": [
+   "diamond/Pure/New_files/Distortion-anisotropic/uniax_x_eps0.01",
+   "diamond/Pure/New_files/Distortion-anisotropic/uniax_y_eps0.01",
+   "diamond/Pure/New_files/Distortion-anisotropic/uniax_z_eps0.01"
+  ],
+  "stratum": "Distortion-anisotropic"
+ },
+ "supercell_+0.0100_+0.0100_+0.0000_+0.0000_+0.0000_+0.0000": {
+  "campaign": "supercell_strains",
+  "fold": 0,
+  "run_identifiers": [
+   "191483766d822aed",
+   "527eb775cebc7f5a",
+   "1f068b6abb829246"
+  ],
+  "run_paths": [
+   "diamond/Pure/New_files/Distortion-anisotropic/biax_xy_eps0.01",
+   "diamond/Pure/New_files/Distortion-anisotropic/biax_xz_eps0.01",
+   "diamond/Pure/New_files/Distortion-anisotropic/biax_yz_eps0.01"
+  ],
+  "stratum": "Distortion-anisotropic"
+ },
+ "supercell_+0.0300_+0.0000_+0.0000_+0.0000_+0.0000_+0.0000": {
+  "campaign": "supercell_strains",
+  "fold": 4,
+  "run_identifiers": [
+   "4bc986f2f83e36a6",
+   "74df571bd230ff28",
+   "dc90deaa3773faa5"
+  ],
+  "run_paths": [
+   "diamond/Pure/New_files/Distortion-anisotropic/uniax_x_eps0.03",
+   "diamond/Pure/New_files/Distortion-anisotropic/uniax_y_eps0.03",
+   "diamond/Pure/New_files/Distortion-anisotropic/uniax_z_eps0.03"
+  ],
+  "stratum": "Distortion-anisotropic"
+ },
+ "supercell_+0.0300_+0.0300_+0.0000_+0.0000_+0.0000_+0.0000": {
+  "campaign": "supercell_strains",
+  "fold": 0,
+  "run_identifiers": [
+   "3603e179b45916d8",
+   "8fe24d6e9f3551b0",
+   "37eae386a8cee864"
+  ],
+  "run_paths": [
+   "diamond/Pure/New_files/Distortion-anisotropic/biax_xy_eps0.03",
+   "diamond/Pure/New_files/Distortion-anisotropic/biax_xz_eps0.03",
+   "diamond/Pure/New_files/Distortion-anisotropic/biax_yz_eps0.03"
+  ],
+  "stratum": "Distortion-anisotropic"
+ },
+ "supercell_+0.0500_+0.0000_+0.0000_+0.0000_+0.0000_+0.0000": {
+  "campaign": "supercell_strains",
+  "fold": 1,
+  "run_identifiers": [
+   "969bd969ce541053",
+   "9a073f59284a7727",
+   "afd4e07e97515304"
+  ],
+  "run_paths": [
+   "diamond/Pure/New_files/Distortion-anisotropic/uniax_x_eps0.05",
+   "diamond/Pure/New_files/Distortion-anisotropic/uniax_y_eps0.05",
+   "diamond/Pure/New_files/Distortion-anisotropic/uniax_z_eps0.05"
+  ],
+  "stratum": "Distortion-anisotropic"
+ },
+ "supercell_+0.0500_+0.0500_+0.0000_+0.0000_+0.0000_+0.0000": {
+  "campaign": "supercell_strains",
+  "fold": 3,
+  "run_identifiers": [
+   "599a6025afd95ae3",
+   "ba1448878378ac7f",
+   "9353bd51503611fd"
+  ],
+  "run_paths": [
+   "diamond/Pure/New_files/Distortion-anisotropic/biax_xy_eps0.05",
+   "diamond/Pure/New_files/Distortion-anisotropic/biax_xz_eps0.05",
+   "diamond/Pure/New_files/Distortion-anisotropic/biax_yz_eps0.05"
+  ],
+  "stratum": "Distortion-anisotropic"
+ },
+ "supercell_+0.0700_+0.0000_+0.0000_+0.0000_+0.0000_+0.0000": {
+  "campaign": "supercell_strains",
+  "fold": 3,
+  "run_identifiers": [
+   "8cefdacd6bb71345",
+   "47ee5cb2ab987c16",
+   "82ae3d328f148855"
+  ],
+  "run_paths": [
+   "diamond/Pure/New_files/Distortion-anisotropic/uniax_x_eps0.07",
+   "diamond/Pure/New_files/Distortion-anisotropic/uniax_y_eps0.07",
+   "diamond/Pure/New_files/Distortion-anisotropic/uniax_z_eps0.07"
+  ],
+  "stratum": "Distortion-anisotropic"
+ },
+ "supercell_+0.0900_+0.0000_+0.0000_+0.0000_+0.0000_+0.0000": {
+  "campaign": "supercell_strains",
+  "fold": 1,
+  "run_identifiers": [
+   "9db5c986a0572ec4",
+   "c2dcd8d9b0f14a65",
+   "b0e0c4a1c00640df"
+  ],
+  "run_paths": [
+   "diamond/Pure/New_files/Distortion-anisotropic/uniax_x_eps0.09",
+   "diamond/Pure/New_files/Distortion-anisotropic/uniax_y_eps0.09",
+   "diamond/Pure/New_files/Distortion-anisotropic/uniax_z_eps0.09"
+  ],
+  "stratum": "Distortion-anisotropic"
+ },
+ "supercell_pristine_reference": {
+  "campaign": "supercell_strains",
+  "fold": 0,
+  "run_identifiers": [
+   "78e29cde81149eca",
+   "ca08841df18b43df"
+  ],
+  "run_paths": [
+   "diamond/Pure/Converged_for_doping_analyze/GGA-PBE",
+   "diamond/Pure/Converged_for_doping_analyze/HSE06"
+  ],
+  "stratum": "pristine_reference"
+ }
+}

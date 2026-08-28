@@ -343,15 +343,24 @@ convenient, not by what the part knows.
 4. **Backend-agnostic until dictated:** arrays are an opaque `Array` alias; the array and autodiff
    substrate is specified in the implementation documents, not here.
 5. **Code style:** variables `with_underscores_between`, functions `Start_With_A_Capital`,
-   datatypes `HaveNoSpaces`; docstrings and comments explain code only, never motivation, never
-   inline, never longer than one line; two blank lines between every function and class. Rationale
-   belongs in this file and in the `IMPLEMENTATION.md` documents.
+   datatypes `HaveNoSpaces`; two blank lines between every function and class. Rationale belongs
+   in this file and in the `IMPLEMENTATION.md` documents.
    **Names are prose:** every variable, function, parameter, and type parameter is a phrase
    that says what it names (`census_row`, `load_charge_density`, `x_coordinate`); established
    domain nouns (Operator, Quadrature, Kernel, …) keep their normal names; single- and
    double-letter identifiers are banned except `_` for discarded values and the `In` type
-   parameter; abbreviations only when they are established mathematics; import aliases are
-   banned — `import numpy`, never `as np`. Enforced by `Test_The_Names_Are_Prosaic`.
+   parameter; abbreviations only when they are established mathematics. **A counter names what
+   it indexes** — `kpoint_index`, `sliced_axis`, `perturbed_entry`, `first_axis` — or it stops
+   existing, because the loop walks its objects directly; a placeholder like `index` or
+   `row_index` says no more than `i` did and is banned by name. Import aliases are fine
+   (`import numpy as np`). Enforced by `Test_The_Names_Are_Prosaic`.
+   **Comments describe the code and nothing else:** one line, starting lowercase, ending without
+   a period, as little punctuation as the sense allows, standing alone above what they describe
+   and never beside it. A comment earns its place where the mechanics are not readable off the
+   code — index gymnastics, a corpus law baked into arithmetic, a numerical convention, an
+   ordering that must match another site — and never restates the name above it or explains why
+   the design exists. Docstrings obey the same register. Enforced by
+   `Test_The_Comments_Describe_The_Code`.
 6. Data discipline is inherited from `test-suite.md` at the repository root: spin-block-aware
    parsing, densities divided by cell volume, orbit-aware splits, the exclusion registry, and
    nothing volumetric or license-derived ever leaving `/Pool`.

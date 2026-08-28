@@ -10,7 +10,7 @@ from numpy.typing import NDArray
 from operators.data.orbits import Orbit_Map
 from operators.substrate.fourier import Cartesian_Wavevectors
 from operators.data.spectra import Occupancy_Walk_Gap
-from operators.data.store import POOL_ROOT, CensusRow, Run_Identifier
+from operators.data.store import POOL_ROOT, Archive_Path, CensusRow, Run_Identifier
 
 COULOMB_CONSTANT = 14.39964
 
@@ -24,11 +24,6 @@ class FunctionalPair:
     point: str
     cheap_identifier: str
     accurate_identifier: str
-
-
-def Archive_Path(campaign: str, identifier: str, pool_root: Path = POOL_ROOT) -> Path:
-    """the store archive path of one run"""
-    return pool_root / "_derived" / campaign / f"{identifier}.npz"
 
 
 def Load_Field(campaign: str, identifier: str, name: str, pool_root: Path = POOL_ROOT) -> Field:

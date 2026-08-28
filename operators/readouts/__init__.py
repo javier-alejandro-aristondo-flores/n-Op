@@ -116,9 +116,3 @@ class BasisExpansion(Operator[Coefficients, Representation]):
         if self.last_trunk_features is not None:
             state["last_trunk_features"] = self.last_trunk_features
         return state
-
-
-__all__ = [
-    "PointwiseProjection",
-    "BasisExpansion",
-]

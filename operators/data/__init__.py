@@ -1,5 +1,7 @@
 """corpus parsers, the derived tensor store, the split engine and the floors"""
 
+# pyright: reportUnusedImport=false
+
 from operators.data.exclusions import EXCLUSIONS, Excluded_Paths_For_Scope, Exclusion, Read_Byte_Alias_Groups, Resolve_Exclusion
 from operators.data.floors import (
     Fit_Per_Shell_Filter,
@@ -35,6 +37,7 @@ from operators.data.spectra import (
     Valence_Band_Maximum,
 )
 from operators.data.splits import (
+    ARTIFACT_DIRECTORY,
     Fold_Assignment,
     Paired_Fields_Units,
     Perovskite_Units,
@@ -45,6 +48,7 @@ from operators.data.splits import (
     Write_Split_Artifacts,
 )
 from operators.data.store import (
+    Archive_Path,
     Build_Store,
     Campaign_Of,
     CensusRow,
@@ -52,67 +56,7 @@ from operators.data.store import (
     POOL_ROOT,
     Read_Census,
     Run_Identifier,
+    STORE_NAME,
     Stale_Report,
     StoreError,
 )
-
-__all__ = [
-    "EXCLUSIONS",
-    "Excluded_Paths_For_Scope",
-    "Exclusion",
-    "Read_Byte_Alias_Groups",
-    "Resolve_Exclusion",
-    "Fit_Per_Shell_Filter",
-    "FunctionalPair",
-    "Hartree_Potential",
-    "Identity_And_Affine_Floors",
-    "Load_Field",
-    "Scissor_Floor",
-    "Strain_Pairs",
-    "Superposed_Atomic_Density_Errors",
-    "Canonical_Orbit",
-    "Orbit_Map",
-    "OrbitError",
-    "Strain_Tensor_Of",
-    "StrainAssignment",
-    "Cell_Volume",
-    "EigenvalueSet",
-    "FieldFile",
-    "Geometry",
-    "Grid_Dimensions_On_Line",
-    "OutcarEchoes",
-    "ParseError",
-    "Read_Eigenvalues",
-    "Read_Field_File",
-    "Read_Final_Magnetization",
-    "Read_Geometry",
-    "Read_Grid_Block",
-    "Read_Outcar_Echoes",
-    "Basis_Decay_Gate",
-    "Gram_Pod",
-    "PodBasis",
-    "Project",
-    "Reconstruct",
-    "Reconstruction_Error_Curve",
-    "SMEARING_WIDTH_BY_CAMPAIGN",
-    "Occupancy_Walk_Gap",
-    "Rebuild_Density_Of_States",
-    "Valence_Band_Maximum",
-    "Fold_Assignment",
-    "Paired_Fields_Units",
-    "Perovskite_Units",
-    "Regenerated_Artifacts_Match",
-    "SplitUnit",
-    "Strain_Holdout_Assignment",
-    "Twin_Shear_Map",
-    "Write_Split_Artifacts",
-    "Build_Store",
-    "Campaign_Of",
-    "CensusRow",
-    "Extract_Run",
-    "POOL_ROOT",
-    "Read_Census",
-    "Run_Identifier",
-    "Stale_Report",
-    "StoreError",
-]

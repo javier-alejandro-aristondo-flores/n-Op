@@ -9,7 +9,6 @@ from numpy.typing import NDArray
 
 from operators.data.floors import (
     Apply_Per_Shell_Filter,
-    Archive_Path,
     Fit_Per_Shell_Filter,
     Hartree_Potential,
     Identity_And_Affine_Floors,
@@ -24,7 +23,7 @@ from operators.data.floors import (
 )
 from operators.data.pod import Basis_Decay_Gate, Reconstruction_Error_Curve
 from operators.data.splits import ARTIFACT_DIRECTORY
-from operators.data.store import POOL_ROOT, Read_Census
+from operators.data.store import POOL_ROOT, Archive_Path, Read_Census
 from operators.framework.invariance import Spectral_Truncation_Resample
 from operators.metrics import Median_And_Interquartile
 

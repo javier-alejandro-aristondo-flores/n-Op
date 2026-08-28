@@ -103,10 +103,3 @@ class BasisProjectionEncoder(Operator[GridFunction, Coefficients]):
         if self.last_coefficients is not None:
             state["last_coefficients"] = self.last_coefficients
         return state
-
-
-__all__ = [
-    "PointwiseLift",
-    "SensorEncoder",
-    "BasisProjectionEncoder",
-]

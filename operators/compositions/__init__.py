@@ -45,8 +45,3 @@ class ExplicitStack(Composition[GridFunction]):
         if self.last_layer_norms is not None:
             state["last_layer_norms"] = self.last_layer_norms
         return state
-
-
-__all__ = [
-    "ExplicitStack",
-]

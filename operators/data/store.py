@@ -116,6 +116,11 @@ def Run_Identifier(path: str) -> str:
     return hashlib.sha1(path.encode()).hexdigest()[:16]
 
 
+def Archive_Path(campaign: str, identifier: str, pool_root: Path = POOL_ROOT) -> Path:
+    """the store archive path of one run"""
+    return pool_root / STORE_NAME / campaign / f"{identifier}.npz"
+
+
 def Guard_Volumetric_Destination(destination: Path, pool_root: Path) -> None:
     """raises unless the destination resolves inside the corpus partition"""
     if not destination.resolve().is_relative_to(pool_root.resolve()):

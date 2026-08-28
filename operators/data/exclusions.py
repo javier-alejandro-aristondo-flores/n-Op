@@ -43,23 +43,23 @@ def Read_Byte_Alias_Groups(pool_root: Path) -> tuple[tuple[str, ...], ...]:
     return tuple(sorted(groups))
 
 
-def Fractional_Occupancy_Paths(rows: Sequence[CensusRow], pool_root: Path) -> tuple[str, ...]:
+def Fractional_Occupancy_Paths(census_rows: Sequence[CensusRow], pool_root: Path) -> tuple[str, ...]:
     """Lists perovskite runs whose eigenvalue occupancies sit strictly between filled and empty."""
     flagged: list[str] = []
-    for row in rows:
-        if Campaign_Of(row.path) != "perovskite_grid" or row.file_sizes.get("EIGENVAL", 0) == 0:
+    for census_row in census_rows:
+        if Campaign_Of(census_row.path) != "perovskite_grid" or census_row.file_sizes.get("EIGENVAL", 0) == 0:
             continue
-        occupancies = Read_Eigenvalues(pool_root / row.path / "EIGENVAL").occupancies
+        occupancies = Read_Eigenvalues(pool_root / census_row.path / "EIGENVAL").occupancies
         ceiling = float(occupancies.max())
         interior = (occupancies > 0.005) & (occupancies < ceiling - 0.005)
         if bool(interior.any()):
-            flagged.append(row.path)
+            flagged.append(census_row.path)
     return tuple(flagged)
 
 
-def Resolve_Exclusion(identifier: str, rows: Sequence[CensusRow], pool_root: Path) -> tuple[str, ...]:
+def Resolve_Exclusion(identifier: str, census_rows: Sequence[CensusRow], pool_root: Path) -> tuple[str, ...]:
     """Returns the run paths one exclusion names, resolved against the census."""
-    paths = [row.path for row in rows]
+    paths = [census_row.path for census_row in census_rows]
     if identifier == "E1":
         copies: list[str] = []
         for group in Read_Byte_Alias_Groups(pool_root):
@@ -77,31 +77,31 @@ def Resolve_Exclusion(identifier: str, rows: Sequence[CensusRow], pool_root: Pat
     if identifier == "E5":
         return tuple(path for path in paths if Campaign_Of(path) == "supercell_strains" and path.endswith("shear_xy_g0.015"))
     if identifier == "E6":
-        return tuple(row.path for row in rows if Campaign_Of(row.path) == "relaxation_pool" and not row.record.get("o_complete"))
+        return tuple(census_row.path for census_row in census_rows if Campaign_Of(census_row.path) == "relaxation_pool" and not census_row.record.get("o_complete"))
     if identifier == "E7":
-        return tuple(row.path for row in rows if Campaign_Of(row.path) == "perovskite_grid" and row.record.get("eig_gap") == 0.0)
+        return tuple(census_row.path for census_row in census_rows if Campaign_Of(census_row.path) == "perovskite_grid" and census_row.record.get("eig_gap") == 0.0)
     if identifier == "E8":
-        return Fractional_Occupancy_Paths(rows, pool_root)
+        return Fractional_Occupancy_Paths(census_rows, pool_root)
     if identifier == "E9":
         selected: list[str] = []
-        for row in rows:
-            if Campaign_Of(row.path) != "defect_set":
+        for census_row in census_rows:
+            if Campaign_Of(census_row.path) != "defect_set":
                 continue
-            step_cap = int(str(row.record.get("o_nsw", 0) or 0))
-            steps_taken = int(str(row.record.get("o_ionic_steps", 0) or 0))
-            converged = row.record.get("o_ionic_conv")
+            step_cap = int(str(census_row.record.get("o_nsw", 0) or 0))
+            steps_taken = int(str(census_row.record.get("o_ionic_steps", 0) or 0))
+            converged = census_row.record.get("o_ionic_conv")
             if step_cap > 1 and steps_taken >= step_cap and not converged:
-                selected.append(row.path)
+                selected.append(census_row.path)
         return tuple(selected)
     if identifier == "E10":
         return tuple(path for path in paths if Campaign_Of(path) == "uncatalogued" and path.startswith("diamond"))
     raise KeyError(f"unknown exclusion {identifier}")
 
 
-def Excluded_Paths_For_Scope(scope: str, rows: Sequence[CensusRow], pool_root: Path) -> frozenset[str]:
+def Excluded_Paths_For_Scope(scope: str, census_rows: Sequence[CensusRow], pool_root: Path) -> frozenset[str]:
     """Unions every exclusion whose scope tags cover the given scope or all tasks."""
     excluded: set[str] = set()
     for exclusion in EXCLUSIONS:
         if "all_tasks" in exclusion.scopes or scope in exclusion.scopes:
-            excluded.update(Resolve_Exclusion(exclusion.identifier, rows, pool_root))
+            excluded.update(Resolve_Exclusion(exclusion.identifier, census_rows, pool_root))
     return frozenset(excluded)

@@ -3,7 +3,7 @@
 import ast
 from pathlib import Path
 
-import numpy as np
+import numpy
 import pytest
 
 from operators.data.store import POOL_ROOT
@@ -44,14 +44,14 @@ def Test_The_Rendering_Seam_Holds() -> None:
 
 def Test_The_Renderers_Write_Images(tmp_path: Path) -> None:
     """Draws a synthetic field and a synthetic curve and checks the files exist."""
-    generator = np.random.default_rng(2)
+    generator = numpy.random.default_rng(2)
     field = generator.random((12, 12, 12))
     slices_path = Render_Field_Slices(field, tmp_path / "slices.png", "synthetic")
     assert slices_path.is_file() and slices_path.stat().st_size > 1000
-    horizontal = np.linspace(-1.0, 1.0, 50)
+    horizontal = numpy.linspace(-1.0, 1.0, 50)
     curves_path = Render_Curves(
         horizontal,
-        {"first": np.sin(horizontal), "second": np.cos(horizontal)},
+        {"first": numpy.sin(horizontal), "second": numpy.cos(horizontal)},
         tmp_path / "curves.png",
         "synthetic curves",
         "energy",

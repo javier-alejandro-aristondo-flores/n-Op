@@ -12,10 +12,10 @@ type Activation = Literal["pointwise", "alias_free"]
 
 
 @dataclass(slots=True)
-class Layer[R: Representation]:
+class Layer[State: Representation]:
     """Applies an activation to the sum of a local linear map and a kernel integral."""
 
-    kernel: Kernel[R, R]
+    kernel: Kernel[State, State]
     local_linear: Callable[[Array], Array]
     activation: Activation = "pointwise"
     residual: bool = False

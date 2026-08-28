@@ -4,7 +4,7 @@ import json
 from collections.abc import Callable, Sequence
 from pathlib import Path
 
-import numpy as np
+import numpy
 from numpy.typing import NDArray
 
 from operators.data.floors import (
@@ -30,7 +30,7 @@ from operators.metrics import Median_And_Interquartile
 
 REPORT_PATH = Path(__file__).parent.parent / "stage0-report.md"
 
-type Field = NDArray[np.float64]
+type Field = NDArray[numpy.float64]
 
 
 def Fold_Of_Runs() -> dict[str, tuple[int, str]]:
@@ -58,7 +58,7 @@ def Eighty_Cubed_Block() -> tuple[list[str], list[str], dict[str, str]]:
     for identifier, (fold, campaign) in membership.items():
         if campaign not in ("supercell_strains", "defect_set"):
             continue
-        with np.load(Archive_Path(campaign, identifier)) as archive:
+        with numpy.load(Archive_Path(campaign, identifier)) as archive:
             if "charge_density" not in archive or archive["charge_density"].shape != (80, 80, 80):
                 continue
             complete = "electron_localization_up" in archive and "local_potential_up" in archive
@@ -71,10 +71,10 @@ def Eighty_Cubed_Block() -> tuple[list[str], list[str], dict[str, str]]:
 
 def Spin_Mean_Potential(campaign: str, identifier: str) -> Field:
     """Loads the spin-averaged local potential of one run."""
-    with np.load(Archive_Path(campaign, identifier)) as archive:
-        up = np.asarray(archive["local_potential_up"], dtype=np.float64)
-        down = np.asarray(archive["local_potential_down"], dtype=np.float64)
-    return (up + down) / 2.0
+    with numpy.load(Archive_Path(campaign, identifier)) as archive:
+        spin_up_potential = numpy.asarray(archive["local_potential_up"], dtype=numpy.float64)
+        spin_down_potential = numpy.asarray(archive["local_potential_down"], dtype=numpy.float64)
+    return (spin_up_potential + spin_down_potential) / 2.0
 
 
 def Mean_Removed(field: Field) -> Field:
@@ -84,23 +84,23 @@ def Mean_Removed(field: Field) -> Field:
 
 def Relative_Error(prediction: Field, truth: Field) -> float:
     """Returns the relative L2 error of flattened fields."""
-    return float(np.linalg.norm((prediction - truth).ravel()) / np.linalg.norm(truth.ravel()))
+    return float(numpy.linalg.norm((prediction - truth).ravel()) / numpy.linalg.norm(truth.ravel()))
 
 
-def Cross_Fidelity_Lines(pairs: Sequence[FunctionalPair]) -> list[str]:
+def Cross_Fidelity_Lines(functional_pairs: Sequence[FunctionalPair]) -> list[str]:
     """Measures the identity, affine, and scissor floors on the strain pairs."""
     identity, affine, slopes = Identity_And_Affine_Floors(
-        pairs, lambda identifier: Load_Field("strain_atlas", identifier, "charge_density")
+        functional_pairs, lambda identifier: Load_Field("strain_atlas", identifier, "charge_density")
     )
     identity_median, identity_iqr = Median_And_Interquartile(identity)
     affine_median, affine_iqr = Median_And_Interquartile(affine)
-    scissor = Scissor_Floor(pairs, "strain_atlas")
+    scissor = Scissor_Floor(functional_pairs, "strain_atlas")
     return [
         "## Cross-fidelity floors (strain atlas, all same-grid pairs)",
         "",
-        f"- pairs with matching grids: {identity.shape[0]} of {len(pairs)}",
+        f"- pairs with matching grids: {identity.shape[0]} of {len(functional_pairs)}",
         f"- identity floor: median {100 * identity_median:.3f}% relative L2, interquartile {100 * identity_iqr:.3f}%",
-        f"- global affine floor: median {100 * affine_median:.3f}%, interquartile {100 * affine_iqr:.3f}%, median slope {float(np.median(slopes)):.4f}",
+        f"- global affine floor: median {100 * affine_median:.3f}%, interquartile {100 * affine_iqr:.3f}%, median slope {float(numpy.median(slopes)):.4f}",
         f"- scissor over {int(scissor['pair_count'])} eigenvalue pairs: shift {scissor['mean_shift']:.4f} ± {scissor['shift_deviation']:.4f} eV;"
         f" linear residual {1000 * scissor['linear_residual_deviation']:.1f} meV; r-squared {scissor['r_squared']:.4f}",
         "- recorded for comparison (667 CSV-joined pairs): shift 1.2612 ± 0.0317 eV; residual 31.7 meV; r-squared 0.9967",
@@ -135,7 +135,7 @@ def Pod_Lines(train: Sequence[str], campaign_of: dict[str, str]) -> list[str]:
         ).ravel(),
     }
     for name, loader in loaders.items():
-        snapshots = np.stack([loader(identifier) for identifier in train])
+        snapshots = numpy.stack([loader(identifier) for identifier in train])
         curve = Reconstruction_Error_Curve(snapshots)
         passes, rank = Basis_Decay_Gate(snapshots)
         checkpoints = ", ".join(
@@ -145,7 +145,7 @@ def Pod_Lines(train: Sequence[str], campaign_of: dict[str, str]) -> list[str]:
         lines.append(f"- {name} ({snapshots.shape[0]} snapshots): {checkpoints}; gate {verdict}")
         del snapshots
     defect_only = [identifier for identifier in train if campaign_of[identifier] == "defect_set"]
-    snapshots = np.stack([Load_Field("defect_set", identifier, "charge_density").ravel() for identifier in defect_only])
+    snapshots = numpy.stack([Load_Field("defect_set", identifier, "charge_density").ravel() for identifier in defect_only])
     passes, rank = Basis_Decay_Gate(snapshots)
     curve = Reconstruction_Error_Curve(snapshots)
     lines.append(
@@ -182,13 +182,13 @@ def Shell_Filter_Lines(train: Sequence[str], evaluation: Sequence[str], campaign
         coarse = Spectral_Truncation_Resample(Load_Field(campaign, identifier, "charge_density")[None], (40, 40, 40))[0]
         predicted = Apply_Per_Shell_Filter(localization_gains, coarse)
         truth = Load_Field(campaign, identifier, "electron_localization_up")
-        localization_errors.append(float(np.mean(np.abs(predicted - truth))))
+        localization_errors.append(float(numpy.mean(numpy.abs(predicted - truth))))
         fine = Load_Field(campaign, identifier, "charge_density")
         predicted_potential = Mean_Removed(Apply_Per_Shell_Filter(potential_gains, fine))
         truth_potential = Mean_Removed(Spin_Mean_Potential(campaign, identifier))
         potential_errors.append(Relative_Error(predicted_potential, truth_potential))
-    localization_median, localization_iqr = Median_And_Interquartile(np.asarray(localization_errors))
-    potential_median, potential_iqr = Median_And_Interquartile(np.asarray(potential_errors))
+    localization_median, localization_iqr = Median_And_Interquartile(numpy.asarray(localization_errors))
+    potential_median, potential_iqr = Median_And_Interquartile(numpy.asarray(potential_errors))
     return [
         "## Per-shell isotropic linear filter (train folds 1-4, evaluated on fold 0)",
         "",
@@ -206,9 +206,9 @@ def Poisson_Lines(train: Sequence[str], evaluation: Sequence[str], campaign_of: 
     defect_evaluation = [identifier for identifier in evaluation if campaign_of[identifier] == "defect_set"]
     remainder_sum: Field | None = None
     for identifier in defect_train:
-        with np.load(Archive_Path("defect_set", identifier)) as archive:
-            density = np.asarray(archive["charge_density"], dtype=np.float64)
-            lattice = np.asarray(archive["lattice"], dtype=np.float64)
+        with numpy.load(Archive_Path("defect_set", identifier)) as archive:
+            density = numpy.asarray(archive["charge_density"], dtype=numpy.float64)
+            lattice = numpy.asarray(archive["lattice"], dtype=numpy.float64)
         hartree = Hartree_Potential(density, lattice)
         remainder = Mean_Removed(Spin_Mean_Potential("defect_set", identifier)) - Mean_Removed(hartree)
         remainder_sum = remainder if remainder_sum is None else remainder_sum + remainder
@@ -218,9 +218,9 @@ def Poisson_Lines(train: Sequence[str], evaluation: Sequence[str], campaign_of: 
     climatology_only: list[float] = []
     combined: list[float] = []
     for identifier in defect_evaluation:
-        with np.load(Archive_Path("defect_set", identifier)) as archive:
-            density = np.asarray(archive["charge_density"], dtype=np.float64)
-            lattice = np.asarray(archive["lattice"], dtype=np.float64)
+        with numpy.load(Archive_Path("defect_set", identifier)) as archive:
+            density = numpy.asarray(archive["charge_density"], dtype=numpy.float64)
+            lattice = numpy.asarray(archive["lattice"], dtype=numpy.float64)
         truth = Mean_Removed(Spin_Mean_Potential("defect_set", identifier))
         hartree = Mean_Removed(Hartree_Potential(density, lattice))
         hartree_only.append(Relative_Error(hartree, truth))
@@ -229,9 +229,9 @@ def Poisson_Lines(train: Sequence[str], evaluation: Sequence[str], campaign_of: 
     return [
         "## Spectral-Poisson floor (defect campaign; the units test)",
         "",
-        f"- Hartree only: median {100 * float(np.median(hartree_only)):.2f}% mean-removed relative L2",
-        f"- climatology only: median {100 * float(np.median(climatology_only)):.2f}%",
-        f"- Hartree + climatology: median {100 * float(np.median(combined)):.2f}% over {len(combined)} held-out runs",
+        f"- Hartree only: median {100 * float(numpy.median(hartree_only)):.2f}% mean-removed relative L2",
+        f"- climatology only: median {100 * float(numpy.median(climatology_only)):.2f}%",
+        f"- Hartree + climatology: median {100 * float(numpy.median(combined)):.2f}% over {len(combined)} held-out runs",
         "- the units test passes when the combined floor beats both of its parts",
         "- the raw Hartree term anti-correlates with the total potential (electrons pile up where",
         "  ionic attraction is deepest), which is why Hartree alone exceeds one hundred percent;",
@@ -244,42 +244,42 @@ def Poisson_Lines(train: Sequence[str], evaluation: Sequence[str], campaign_of: 
 
 def Elf_Ridge_Lines(train: Sequence[str], evaluation: Sequence[str], campaign_of: dict[str, str]) -> list[str]:
     """Measures the semilocal pointwise localization floor by per-spin ridge."""
-    generator = np.random.default_rng(20260828)
+    generator = numpy.random.default_rng(20260828)
     feature_rows: list[Field] = []
     target_rows: list[Field] = []
     for identifier in list(train)[:80]:
         campaign = campaign_of[identifier]
-        with np.load(Archive_Path(campaign, identifier)) as archive:
-            density = np.asarray(archive["charge_density"], dtype=np.float64)
-            magnetization = np.asarray(archive["magnetization_density"], dtype=np.float64)
-            lattice = np.asarray(archive["lattice"], dtype=np.float64)
+        with numpy.load(Archive_Path(campaign, identifier)) as archive:
+            density = numpy.asarray(archive["charge_density"], dtype=numpy.float64)
+            magnetization = numpy.asarray(archive["magnetization_density"], dtype=numpy.float64)
+            lattice = numpy.asarray(archive["lattice"], dtype=numpy.float64)
         for sign, channel in ((1.0, "electron_localization_up"), (-1.0, "electron_localization_down")):
             spin_density = Spectral_Truncation_Resample(((density + sign * magnetization) / 2.0)[None], (40, 40, 40))[0]
             gradient, laplacian = Spectral_Gradient_Magnitude_And_Laplacian(spin_density, lattice)
             target = Load_Field(campaign, identifier, channel)
             chosen = generator.choice(spin_density.size, size=2000, replace=False)
-            features = np.stack([spin_density.ravel(), gradient.ravel(), laplacian.ravel()], axis=1)
+            features = numpy.stack([spin_density.ravel(), gradient.ravel(), laplacian.ravel()], axis=1)
             feature_rows.append(features[chosen])
             target_rows.append(target.ravel()[chosen])
-    features = np.concatenate(feature_rows)
-    targets = np.concatenate(target_rows)
+    features = numpy.concatenate(feature_rows)
+    targets = numpy.concatenate(target_rows)
     scales = features.std(axis=0)
     coefficients = Ridge_Fit(features / scales, targets)
     errors: list[float] = []
     for identifier in evaluation:
         campaign = campaign_of[identifier]
-        with np.load(Archive_Path(campaign, identifier)) as archive:
-            density = np.asarray(archive["charge_density"], dtype=np.float64)
-            magnetization = np.asarray(archive["magnetization_density"], dtype=np.float64)
-            lattice = np.asarray(archive["lattice"], dtype=np.float64)
+        with numpy.load(Archive_Path(campaign, identifier)) as archive:
+            density = numpy.asarray(archive["charge_density"], dtype=numpy.float64)
+            magnetization = numpy.asarray(archive["magnetization_density"], dtype=numpy.float64)
+            lattice = numpy.asarray(archive["lattice"], dtype=numpy.float64)
         for sign, channel in ((1.0, "electron_localization_up"), (-1.0, "electron_localization_down")):
             spin_density = Spectral_Truncation_Resample(((density + sign * magnetization) / 2.0)[None], (40, 40, 40))[0]
             gradient, laplacian = Spectral_Gradient_Magnitude_And_Laplacian(spin_density, lattice)
-            evaluated = np.stack([spin_density.ravel(), gradient.ravel(), laplacian.ravel()], axis=1) / scales
-            predicted = np.clip(Ridge_Apply(coefficients, evaluated), 0.0, 1.0)
+            evaluated = numpy.stack([spin_density.ravel(), gradient.ravel(), laplacian.ravel()], axis=1) / scales
+            predicted = numpy.clip(Ridge_Apply(coefficients, evaluated), 0.0, 1.0)
             truth = Load_Field(campaign, identifier, channel).ravel()
-            errors.append(float(np.mean(np.abs(predicted - truth))))
-    median, interquartile = Median_And_Interquartile(np.asarray(errors))
+            errors.append(float(numpy.mean(numpy.abs(predicted - truth))))
+    median, interquartile = Median_And_Interquartile(numpy.asarray(errors))
     return [
         "## Semilocal pointwise localization floor (per-spin ridge on density features)",
         "",
@@ -292,8 +292,8 @@ def Elf_Ridge_Lines(train: Sequence[str], evaluation: Sequence[str], campaign_of
 
 def Main() -> int:
     """Measures every floor and writes the Stage-0 report."""
-    rows = Read_Census(POOL_ROOT)
-    pairs = Strain_Pairs(rows)
+    census_rows = Read_Census(POOL_ROOT)
+    functional_pairs = Strain_Pairs(census_rows)
     train, evaluation, campaign_of = Eighty_Cubed_Block()
     lines = [
         "# Stage-0 floor report",
@@ -302,7 +302,7 @@ def Main() -> int:
         f"Cubic-block folds: {len(train)} train runs, {len(evaluation)} evaluation runs (fold 0).",
         "",
     ]
-    lines += Cross_Fidelity_Lines(pairs)
+    lines += Cross_Fidelity_Lines(functional_pairs)
     lines += Superposition_Lines()
     lines += Pod_Lines(train, campaign_of)
     lines += Shell_Filter_Lines(train, evaluation, campaign_of)

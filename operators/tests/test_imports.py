@@ -1,5 +1,6 @@
 """Checks that every package imports and that the framework's contracts hold their shape."""
 
+import ast
 import importlib
 import inspect
 import shutil
@@ -92,6 +93,33 @@ def Test_Every_Assembly_Carries_The_Inspection_Contract() -> None:
         assembly = getattr(module, class_name)
         assert Inspectable in assembly.__mro__
         assert callable(getattr(assembly, "Inspect"))
+
+
+def Test_The_Names_Are_Prosaic() -> None:
+    """Asserts no cryptic identifiers and no import aliases anywhere in the package."""
+    allowed_short_names = {"_", "In"}
+    package_root = Path(__file__).resolve().parent.parent
+    offenses: list[str] = []
+    for source_path in sorted(package_root.rglob("*.py")):
+        if ".pytest_cache" in source_path.parts:
+            continue
+        tree = ast.parse(source_path.read_text())
+        for node in ast.walk(tree):
+            found: list[str] = []
+            if isinstance(node, ast.Name) and isinstance(node.ctx, ast.Store):
+                found.append(node.id)
+            elif isinstance(node, ast.arg):
+                found.append(node.arg)
+            elif isinstance(node, (ast.FunctionDef, ast.AsyncFunctionDef, ast.ClassDef)):
+                found.append(node.name)
+            elif isinstance(node, ast.TypeVar):
+                found.append(node.name)
+            elif isinstance(node, ast.alias) and node.asname is not None:
+                offenses.append(f"{source_path.name}:{node.lineno} import alias {node.asname}")
+            for name in found:
+                if len(name) <= 2 and name not in allowed_short_names:
+                    offenses.append(f"{source_path.name}:{getattr(node, 'lineno', 0)} name {name!r}")
+    assert offenses == [], offenses
 
 
 def Test_The_Package_Type_Checks_Strictly() -> None:

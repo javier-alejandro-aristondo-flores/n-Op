@@ -8,7 +8,7 @@ from dataclasses import dataclass
 from pathlib import Path
 from typing import Any, cast
 
-import numpy as np
+import numpy
 from numpy.typing import NDArray
 
 from operators.data.parsers import (
@@ -65,7 +65,7 @@ UNIT_BY_FIELD: dict[str, str] = {
     "eigenvalue_electron_count": "electrons",
 }
 
-type StoreArray = NDArray[np.float32] | NDArray[np.float64] | NDArray[np.str_]
+type StoreArray = NDArray[numpy.float32] | NDArray[numpy.float64] | NDArray[numpy.str_]
 
 
 class StoreError(Exception):
@@ -85,13 +85,13 @@ class CensusRow:
 
 def Read_Census(pool_root: Path) -> tuple[CensusRow, ...]:
     """Reads runs.jsonl into census rows with per-line hashes."""
-    rows: list[CensusRow] = []
+    census_rows: list[CensusRow] = []
     for line in (pool_root / CENSUS_NAME).read_text().splitlines():
         if not line.strip():
             continue
         record = cast(dict[str, object], json.loads(line))
         sizes = {name: int(cast(int, size)) for name, size in cast(dict[str, object], record.get("files", {})).items()}
-        rows.append(
+        census_rows.append(
             CensusRow(
                 path=cast(str, record["path"]),
                 corpus=cast(str, record.get("corpus", "?")),
@@ -100,7 +100,7 @@ def Read_Census(pool_root: Path) -> tuple[CensusRow, ...]:
                 record=record,
             )
         )
-    return tuple(rows)
+    return tuple(census_rows)
 
 
 def Campaign_Of(path: str) -> str:
@@ -122,19 +122,19 @@ def Guard_Volumetric_Destination(destination: Path, pool_root: Path) -> None:
         raise StoreError(f"volumetric write outside the corpus partition refused: {destination}")
 
 
-def Spin_Pair_Entries(name: str, field: FieldFile, divisor: float) -> dict[str, NDArray[np.float32]]:
+def Spin_Pair_Entries(name: str, field: FieldFile, divisor: float) -> dict[str, NDArray[numpy.float32]]:
     """Names one block plainly or two blocks as up and down channels."""
-    blocks = [(block / divisor).astype(np.float32) for block in field.blocks]
+    blocks = [(block / divisor).astype(numpy.float32) for block in field.blocks]
     if len(blocks) == 1:
         return {name: blocks[0]}
     return {f"{name}_up": blocks[0], f"{name}_down": blocks[1]}
 
 
-def Charge_Entries(field: FieldFile, volume: float) -> dict[str, NDArray[np.float32]]:
+def Charge_Entries(field: FieldFile, volume: float) -> dict[str, NDArray[numpy.float32]]:
     """Names the charge block and, when present, the magnetization block."""
-    entries = {"charge_density": (field.blocks[0] / volume).astype(np.float32)}
+    entries = {"charge_density": (field.blocks[0] / volume).astype(numpy.float32)}
     if len(field.blocks) > 1:
-        entries["magnetization_density"] = (field.blocks[1] / volume).astype(np.float32)
+        entries["magnetization_density"] = (field.blocks[1] / volume).astype(numpy.float32)
     return entries
 
 
@@ -144,19 +144,19 @@ def Geometry_Entries(geometry: Geometry) -> dict[str, StoreArray]:
     return {
         "lattice": geometry.lattice,
         "positions": geometry.positions,
-        "species": np.asarray(symbols),
+        "species": numpy.asarray(symbols),
     }
 
 
-def Extract_Run(row: CensusRow, pool_root: Path) -> tuple[dict[str, StoreArray], dict[str, object]]:
+def Extract_Run(census_row: CensusRow, pool_root: Path) -> tuple[dict[str, StoreArray], dict[str, object]]:
     """Extracts one run's arrays and sidecar record from its corpus files."""
-    run_directory = pool_root / row.path
+    run_directory = pool_root / census_row.path
     arrays: dict[str, StoreArray] = {}
     geometry: Geometry | None = None
 
     def Present(name: str) -> bool:
         """Returns whether the census and the filesystem agree the file is usable."""
-        return row.file_sizes.get(name, 0) > 0 and (run_directory / name).is_file()
+        return census_row.file_sizes.get(name, 0) > 0 and (run_directory / name).is_file()
 
     if Present("CHGCAR"):
         field = Read_Field_File(run_directory / "CHGCAR")
@@ -171,7 +171,7 @@ def Extract_Run(row: CensusRow, pool_root: Path) -> tuple[dict[str, StoreArray],
         if Present(file_name):
             field = Read_Field_File(run_directory / file_name)
             geometry = geometry or field.geometry
-            arrays[field_name] = (field.blocks[0] / Cell_Volume(field.geometry.lattice)).astype(np.float32)
+            arrays[field_name] = (field.blocks[0] / Cell_Volume(field.geometry.lattice)).astype(numpy.float32)
     if Present("ELFCAR"):
         field = Read_Field_File(run_directory / "ELFCAR")
         geometry = geometry or field.geometry
@@ -180,16 +180,16 @@ def Extract_Run(row: CensusRow, pool_root: Path) -> tuple[dict[str, StoreArray],
         field = Read_Field_File(run_directory / "LOCPOT")
         geometry = geometry or field.geometry
         arrays.update(Spin_Pair_Entries("local_potential", field, 1.0))
-        arrays["local_potential_mean"] = np.asarray([float(np.mean(block)) for block in field.blocks], dtype=np.float64)
+        arrays["local_potential_mean"] = numpy.asarray([float(numpy.mean(block)) for block in field.blocks], dtype=numpy.float64)
     if geometry is None:
         for geometry_file in ("CONTCAR", "POSCAR"):
             if Present(geometry_file):
                 geometry, _ = Read_Geometry((run_directory / geometry_file).read_text().splitlines())
                 break
     if geometry is None:
-        raise StoreError(f"no geometry source in {row.path}")
+        raise StoreError(f"no geometry source in {census_row.path}")
     arrays.update(Geometry_Entries(geometry))
-    arrays["cell_volume"] = np.asarray(Cell_Volume(geometry.lattice), dtype=np.float64)
+    arrays["cell_volume"] = numpy.asarray(Cell_Volume(geometry.lattice), dtype=numpy.float64)
     unreadable: list[str] = []
     if Present("EIGENVAL"):
         try:
@@ -198,33 +198,33 @@ def Extract_Run(row: CensusRow, pool_root: Path) -> tuple[dict[str, StoreArray],
             arrays["kpoint_weights"] = eigenvalues.kpoint_weights
             arrays["eigenvalue_energies"] = eigenvalues.energies
             arrays["eigenvalue_occupancies"] = eigenvalues.occupancies
-            arrays["eigenvalue_electron_count"] = np.asarray(eigenvalues.electron_count, dtype=np.float64)
+            arrays["eigenvalue_electron_count"] = numpy.asarray(eigenvalues.electron_count, dtype=numpy.float64)
         except (ParseError, ValueError, IndexError):
             unreadable.append("EIGENVAL")
     titles: tuple[str, ...] = ()
     if Present("OUTCAR"):
         try:
             echoes = Read_Outcar_Echoes(run_directory / "OUTCAR")
-            arrays["electron_count"] = np.asarray(echoes.electron_count, dtype=np.float64)
+            arrays["electron_count"] = numpy.asarray(echoes.electron_count, dtype=numpy.float64)
             titles = echoes.pseudopotential_titles
         except (ParseError, ValueError, IndexError):
             unreadable.append("OUTCAR")
     if Present("OSZICAR"):
         magnetization = Read_Final_Magnetization(run_directory / "OSZICAR")
         if magnetization is not None:
-            arrays["final_magnetization"] = np.asarray(magnetization, dtype=np.float64)
+            arrays["final_magnetization"] = numpy.asarray(magnetization, dtype=numpy.float64)
     sidecar: dict[str, object] = {
-        "run_path": row.path,
-        "run_identifier": Run_Identifier(row.path),
-        "campaign": Campaign_Of(row.path),
-        "corpus": row.corpus,
-        "census_row_hash": row.row_hash,
+        "run_path": census_row.path,
+        "run_identifier": Run_Identifier(census_row.path),
+        "campaign": Campaign_Of(census_row.path),
+        "corpus": census_row.corpus,
+        "row_hash": census_row.row_hash,
         "extractor_version": EXTRACTOR_VERSION,
         "fields": sorted(arrays),
         "units": {name: UNIT_BY_FIELD.get(name.removesuffix("_up").removesuffix("_down"), "") for name in sorted(arrays)},
         "pseudopotential_titles": list(titles),
         "unreadable_files": unreadable,
-        "census_row": row.record,
+        "row": census_row.record,
     }
     return arrays, sidecar
 
@@ -236,7 +236,7 @@ def Write_Run(arrays: dict[str, StoreArray], sidecar: dict[str, object], pool_ro
     campaign_directory.mkdir(parents=True, exist_ok=True)
     identifier = cast(str, sidecar["run_identifier"])
     archive_path = campaign_directory / f"{identifier}.npz"
-    np.savez(archive_path, **cast(dict[str, Any], arrays))
+    numpy.savez(archive_path, **cast(dict[str, Any], arrays))
     (campaign_directory / f"{identifier}.json").write_text(json.dumps(sidecar, indent=1))
     return archive_path
 
@@ -252,8 +252,8 @@ def Sidecar_Paths(pool_root: Path) -> tuple[Path, ...]:
 def Stale_Report(pool_root: Path) -> dict[str, list[str]]:
     """Compares the store against the census and the extractor version."""
     expected: dict[str, str] = {}
-    for row in Read_Census(pool_root):
-        expected[Run_Identifier(row.path)] = row.row_hash
+    for census_row in Read_Census(pool_root):
+        expected[Run_Identifier(census_row.path)] = census_row.row_hash
     fresh: list[str] = []
     stale: list[str] = []
     orphaned: list[str] = []
@@ -264,7 +264,7 @@ def Stale_Report(pool_root: Path) -> dict[str, list[str]]:
         seen.add(identifier)
         if identifier not in expected:
             orphaned.append(identifier)
-        elif sidecar.get("census_row_hash") != expected[identifier] or sidecar.get("extractor_version") != EXTRACTOR_VERSION:
+        elif sidecar.get("row_hash") != expected[identifier] or sidecar.get("extractor_version") != EXTRACTOR_VERSION:
             stale.append(identifier)
         else:
             fresh.append(identifier)
@@ -272,14 +272,14 @@ def Stale_Report(pool_root: Path) -> dict[str, list[str]]:
     return {"fresh": fresh, "stale": stale, "missing": missing, "orphaned": orphaned}
 
 
-def Build_One(row: CensusRow, pool_root: Path) -> tuple[str, str | None]:
+def Build_One(census_row: CensusRow, pool_root: Path) -> tuple[str, str | None]:
     """Extracts and writes one run, returning its identifier and any error text."""
     try:
-        arrays, sidecar = Extract_Run(row, pool_root)
+        arrays, sidecar = Extract_Run(census_row, pool_root)
         Write_Run(arrays, sidecar, pool_root)
-        return Run_Identifier(row.path), None
+        return Run_Identifier(census_row.path), None
     except (ParseError, StoreError, OSError, ValueError, IndexError) as error:
-        return Run_Identifier(row.path), f"{row.path}: {error}"
+        return Run_Identifier(census_row.path), f"{census_row.path}: {error}"
 
 
 def Write_Manifests(pool_root: Path) -> None:
@@ -310,12 +310,12 @@ def Build_Store(
     report = Stale_Report(pool_root)
     wanted = set(report["missing"]) | set(report["stale"]) if not rebuild else None
     selected: list[CensusRow] = []
-    for row in Read_Census(pool_root):
-        if campaign is not None and Campaign_Of(row.path) != campaign:
+    for census_row in Read_Census(pool_root):
+        if campaign is not None and Campaign_Of(census_row.path) != campaign:
             continue
-        if wanted is not None and Run_Identifier(row.path) not in wanted:
+        if wanted is not None and Run_Identifier(census_row.path) not in wanted:
             continue
-        selected.append(row)
+        selected.append(census_row)
         if limit is not None and len(selected) >= limit:
             break
     failures: list[str] = []
@@ -325,8 +325,8 @@ def Build_Store(
                 if error is not None:
                     failures.append(error)
     else:
-        for row in selected:
-            _, error = Build_One(row, pool_root)
+        for census_row in selected:
+            _, error = Build_One(census_row, pool_root)
             if error is not None:
                 failures.append(error)
     Write_Manifests(pool_root)

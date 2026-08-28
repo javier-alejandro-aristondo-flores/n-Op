@@ -105,7 +105,13 @@ def Tensor_Images(tensor: StrainTensor) -> Iterator[StrainTensor]:
     ]
     for permutation in permutations((0, 1, 2)):
         for signs in product((1.0, -1.0), repeat=3):
-            image = [[signs[i] * signs[j] * matrix[permutation[i]][permutation[j]] for j in range(3)] for i in range(3)]
+            image = [
+        [
+            signs[row_index] * signs[column_index] * matrix[permutation[row_index]][permutation[column_index]]
+            for column_index in range(3)
+        ]
+        for row_index in range(3)
+    ]
             yield (image[0][0], image[1][1], image[2][2], image[0][1], image[0][2], image[1][2])
 
 
@@ -121,33 +127,33 @@ def Canonical_Orbit(tensor: StrainTensor) -> str:
     return "_".join(f"{component:+.4f}" for component in canonical)
 
 
-def Reference_Axis_Length(rows: Sequence[CensusRow]) -> float:
+def Reference_Axis_Length(census_rows: Sequence[CensusRow]) -> float:
     """Reads the unstrained axis length from the reference runs' census geometry."""
-    for row in rows:
-        if "reference_2_atoms" in row.path:
-            return cast(list[float], row.record["p_abc"])[0]
+    for census_row in census_rows:
+        if "reference_2_atoms" in census_row.path:
+            return cast(list[float], census_row.record["p_abc"])[0]
     raise OrbitError("no reference run in the census rows")
 
 
-def Orbit_Map(rows: Sequence[CensusRow]) -> tuple[StrainAssignment, ...]:
+def Orbit_Map(census_rows: Sequence[CensusRow]) -> tuple[StrainAssignment, ...]:
     """Assigns every strain-atlas run to its point, family, functional, and orbit."""
-    strain_rows = [row for row in rows if Campaign_Of(row.path) == "strain_atlas"]
+    strain_rows = [census_row for census_row in census_rows if Campaign_Of(census_row.path) == "strain_atlas"]
     reference_length = Reference_Axis_Length(strain_rows)
     assignments: list[StrainAssignment] = []
-    for row in strain_rows:
-        point = Strain_Point_Name(row.path)
+    for census_row in strain_rows:
+        point = Strain_Point_Name(census_row.path)
         isotropic_strain: float | None = None
         if Strain_Family(point) == "isotropic":
-            axis_length = cast(list[float], row.record["p_abc"])[0]
+            axis_length = cast(list[float], census_row.record["p_abc"])[0]
             isotropic_strain = round(axis_length / reference_length - 1.0, 4)
         tensor = Strain_Tensor_Of(point, isotropic_strain)
         assignments.append(
             StrainAssignment(
-                run_path=row.path,
+                run_path=census_row.path,
                 point=point,
                 family=Strain_Family(point),
-                functional=Strain_Functional(row.path),
-                auxiliary="/new/" in row.path,
+                functional=Strain_Functional(census_row.path),
+                auxiliary="/new/" in census_row.path,
                 orbit=Canonical_Orbit(tensor),
             )
         )

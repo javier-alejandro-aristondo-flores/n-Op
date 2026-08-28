@@ -55,8 +55,8 @@ def Test_The_Recorded_Orbit_Collapses_Replicate() -> None:
 
     def Family_Counts(family: str) -> tuple[int, int]:
         """Returns distinct points and distinct orbits in one family."""
-        members = [a for a in atlas if a.family == family]
-        return len({a.point for a in members}), len({a.orbit for a in members})
+        members = [assignment for assignment in atlas if assignment.family == family]
+        return len({assignment.point for assignment in members}), len({assignment.orbit for assignment in members})
 
     assert Family_Counts("triaxial") == (512, 120)
     assert Family_Counts("one_angle_shear") == (120, 20)
@@ -70,16 +70,16 @@ def Test_The_Auxiliary_Sweep_Adds_No_Orbits() -> None:
     """Asserts the 160-point auxiliary sweep contributes zero new orbit units."""
     Require_The_Pool()
     atlas = Atlas()
-    with_auxiliary = {a.orbit for a in atlas}
-    without_auxiliary = {a.orbit for a in atlas if not a.auxiliary}
+    with_auxiliary = {assignment.orbit for assignment in atlas}
+    without_auxiliary = {assignment.orbit for assignment in atlas if not assignment.auxiliary}
     assert with_auxiliary == without_auxiliary
-    assert sum(1 for a in atlas if a.auxiliary) == 320
+    assert sum(1 for assignment in atlas if assignment.auxiliary) == 320
 
 
 @pytest.mark.pool
 def Test_The_Label_Unit_Count_Is_Near_The_Recorded_Number() -> None:
     """Asserts the exact-symmetry label units land near the recorded two hundred ninety-nine."""
     Require_The_Pool()
-    orbit_count = len({a.orbit for a in Atlas()})
+    orbit_count = len({assignment.orbit for assignment in Atlas()})
     print(f"exact orbit unit count: {orbit_count}")
     assert 260 <= orbit_count <= 340

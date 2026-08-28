@@ -58,10 +58,10 @@ def Fold_Balance(artifact_directory: Path = ARTIFACT_DIRECTORY) -> Table:
 
 def Exclusion_Summary(pool_root: Path = POOL_ROOT) -> Table:
     """Tabulates every exclusion with its resolved run count."""
-    rows_census = Read_Census(pool_root)
+    census_rows = Read_Census(pool_root)
     rows: list[dict[str, object]] = []
     for exclusion in EXCLUSIONS:
-        resolved = Resolve_Exclusion(exclusion.identifier, rows_census, pool_root)
+        resolved = Resolve_Exclusion(exclusion.identifier, census_rows, pool_root)
         rows.append(
             {
                 "identifier": exclusion.identifier,

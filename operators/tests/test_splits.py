@@ -53,8 +53,8 @@ def Test_Fold_Assignment_Balances_Within_Strata() -> None:
 def Test_The_Defect_Pairing_Matches_The_Record() -> None:
     """Asserts 56 chained pairs, 37 new-only pairs, and zirconium alone unpaired."""
     Require_The_Pool()
-    rows = Read_Census(POOL_ROOT)
-    units = Defect_Units(rows, Hard_Excluded_Paths(rows, POOL_ROOT))
+    census_rows = Read_Census(POOL_ROOT)
+    units = Defect_Units(census_rows, Hard_Excluded_Paths(census_rows, POOL_ROOT))
     chained = [unit for unit in units if unit.stratum in ("single", "pair", "triads")]
     new_only = [unit for unit in units if unit.stratum == "new_only"]
     assert len(chained) == 56 and all(Has_Both_Functionals(unit) for unit in chained)
@@ -68,8 +68,8 @@ def Test_The_Defect_Pairing_Matches_The_Record() -> None:
 def Test_The_Alloy_Units_Cover_The_Ensemble() -> None:
     """Asserts 76 configuration units covering all 182 runs with the measured pattern."""
     Require_The_Pool()
-    rows = Read_Census(POOL_ROOT)
-    units = Alloy_Units(rows, Hard_Excluded_Paths(rows, POOL_ROOT))
+    census_rows = Read_Census(POOL_ROOT)
+    units = Alloy_Units(census_rows, Hard_Excluded_Paths(census_rows, POOL_ROOT))
     assert len(units) == 76
     assert sum(len(unit.run_paths) for unit in units) == 182
     sizes = Counter(len(unit.run_paths) for unit in units)
@@ -80,8 +80,8 @@ def Test_The_Alloy_Units_Cover_The_Ensemble() -> None:
 def Test_The_Supercell_Units_See_The_Full_Field_Block() -> None:
     """Asserts the 169 full-field runs group into shear orbits with the E4 gap visible."""
     Require_The_Pool()
-    rows = Read_Census(POOL_ROOT)
-    units = Supercell_Units(rows, Hard_Excluded_Paths(rows, POOL_ROOT))
+    census_rows = Read_Census(POOL_ROOT)
+    units = Supercell_Units(census_rows, Hard_Excluded_Paths(census_rows, POOL_ROOT))
     assert sum(len(unit.run_paths) for unit in units) == 169
     sizes = Counter(len(unit.run_paths) for unit in units)
     assert sizes[6] == 19 and sizes[5] == 1 and sizes[3] == 16 and sizes[2] == 1
@@ -91,8 +91,8 @@ def Test_The_Supercell_Units_See_The_Full_Field_Block() -> None:
 def Test_The_Twin_Map_Covers_Both_Campaigns() -> None:
     """Asserts all twenty shear orbits carry both sides and 119 usable supercell runs."""
     Require_The_Pool()
-    rows = Read_Census(POOL_ROOT)
-    twins = Twin_Shear_Map(rows, POOL_ROOT)
+    census_rows = Read_Census(POOL_ROOT)
+    twins = Twin_Shear_Map(census_rows, POOL_ROOT)
     assert len(twins) == 20
     assert all(record["strain_atlas"] and record["supercell_strains"] for record in twins.values())
     assert sum(len(record["supercell_strains"]) for record in twins.values()) == 119
@@ -102,8 +102,8 @@ def Test_The_Twin_Map_Covers_Both_Campaigns() -> None:
 def Test_The_Strain_Holdout_Partitions_Every_Orbit() -> None:
     """Asserts the 296 orbits split into train, validation, and test with the anchor in train."""
     Require_The_Pool()
-    rows = Read_Census(POOL_ROOT)
-    holdout = Strain_Holdout_Assignment(rows)
+    census_rows = Read_Census(POOL_ROOT)
+    holdout = Strain_Holdout_Assignment(census_rows)
     assert len(holdout) == 296
     assignments = Counter(record.assignment for record in holdout.values())
     assert assignments["validation"] >= 25 and assignments["test"] >= 25
@@ -116,8 +116,8 @@ def Test_The_Strain_Holdout_Partitions_Every_Orbit() -> None:
 def Test_The_Paired_Fields_Folds_Balance_And_The_Artifacts_Regenerate() -> None:
     """Asserts per-stratum fold balance and bit-for-bit artifact reproducibility."""
     Require_The_Pool()
-    rows = Read_Census(POOL_ROOT)
-    units = Paired_Fields_Units(rows, POOL_ROOT)
+    census_rows = Read_Census(POOL_ROOT)
+    units = Paired_Fields_Units(census_rows, POOL_ROOT)
     folds = Fold_Assignment(units)
     by_stratum: dict[str, Counter[int]] = {}
     for unit in units:
@@ -125,4 +125,4 @@ def Test_The_Paired_Fields_Folds_Balance_And_The_Artifacts_Regenerate() -> None:
     for stratum, counts in by_stratum.items():
         spread = max(counts.values()) - min(list(counts.values()) + [0] * (5 - len(counts)))
         assert spread <= 1, (stratum, counts)
-    assert Regenerated_Artifacts_Match(rows, POOL_ROOT)
+    assert Regenerated_Artifacts_Match(census_rows, POOL_ROOT)

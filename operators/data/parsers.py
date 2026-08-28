@@ -4,7 +4,7 @@ from collections.abc import Sequence
 from dataclasses import dataclass
 from pathlib import Path
 
-import numpy as np
+import numpy
 from numpy.typing import NDArray
 
 
@@ -17,10 +17,10 @@ class Geometry:
     """A periodic cell with its species, per-species counts, and fractional positions."""
 
     comment: str
-    lattice: NDArray[np.float64]
+    lattice: NDArray[numpy.float64]
     species: tuple[str, ...]
     species_counts: tuple[int, ...]
-    positions: NDArray[np.float64]
+    positions: NDArray[numpy.float64]
 
 
 @dataclass(frozen=True, slots=True)
@@ -29,7 +29,7 @@ class FieldFile:
 
     geometry: Geometry
     dimensions: tuple[int, int, int]
-    blocks: tuple[NDArray[np.float64], ...]
+    blocks: tuple[NDArray[numpy.float64], ...]
 
 
 @dataclass(frozen=True, slots=True)
@@ -37,10 +37,10 @@ class EigenvalueSet:
     """Eigenvalues and occupancies indexed by spin, k-point, and band."""
 
     electron_count: float
-    kpoints: NDArray[np.float64]
-    kpoint_weights: NDArray[np.float64]
-    energies: NDArray[np.float64]
-    occupancies: NDArray[np.float64]
+    kpoints: NDArray[numpy.float64]
+    kpoint_weights: NDArray[numpy.float64]
+    energies: NDArray[numpy.float64]
+    occupancies: NDArray[numpy.float64]
 
 
 @dataclass(frozen=True, slots=True)
@@ -51,19 +51,19 @@ class OutcarEchoes:
     pseudopotential_titles: tuple[str, ...]
 
 
-def Cell_Volume(lattice: NDArray[np.float64]) -> float:
+def Cell_Volume(lattice: NDArray[numpy.float64]) -> float:
     """Returns the absolute determinant of the lattice rows in cubic angstrom."""
-    return float(abs(np.linalg.det(lattice)))
+    return float(abs(numpy.linalg.det(lattice)))
 
 
 def Read_Geometry(lines: Sequence[str], start: int = 0) -> tuple[Geometry, int]:
     """Reads one POSCAR-style header and returns it with the index of the next line."""
     comment = lines[start].strip()
     scale = float(lines[start + 1].split()[0])
-    rows = [[float(token) for token in lines[start + 2 + i].split()[:3]] for i in range(3)]
-    lattice = np.asarray(rows, dtype=np.float64)
+    lattice_rows = [[float(token) for token in lines[start + 2 + row_index].split()[:3]] for row_index in range(3)]
+    lattice = numpy.asarray(lattice_rows, dtype=numpy.float64)
     if scale < 0.0:
-        scale = (-scale / float(abs(np.linalg.det(lattice)))) ** (1.0 / 3.0)
+        scale = (-scale / float(abs(numpy.linalg.det(lattice)))) ** (1.0 / 3.0)
     lattice = lattice * scale
     species = tuple(lines[start + 5].split())
     species_counts = tuple(int(token) for token in lines[start + 6].split())
@@ -73,10 +73,10 @@ def Read_Geometry(lines: Sequence[str], start: int = 0) -> tuple[Geometry, int]:
     mode = lines[cursor].strip().lower()
     cursor += 1
     total = sum(species_counts)
-    coordinate_rows = [[float(token) for token in lines[cursor + i].split()[:3]] for i in range(total)]
-    positions = np.asarray(coordinate_rows, dtype=np.float64)
+    coordinate_rows = [[float(token) for token in lines[cursor + position_index].split()[:3]] for position_index in range(total)]
+    positions = numpy.asarray(coordinate_rows, dtype=numpy.float64)
     if mode.startswith(("c", "k")):
-        positions = positions @ np.linalg.inv(lattice)
+        positions = positions @ numpy.linalg.inv(lattice)
     return Geometry(comment, lattice, species, species_counts, positions), cursor + total
 
 
@@ -88,7 +88,7 @@ def Grid_Dimensions_On_Line(line: str) -> tuple[int, int, int] | None:
     return int(tokens[0]), int(tokens[1]), int(tokens[2])
 
 
-def Read_Grid_Block(lines: Sequence[str], start: int, value_count: int) -> tuple[NDArray[np.float64], int]:
+def Read_Grid_Block(lines: Sequence[str], start: int, value_count: int) -> tuple[NDArray[numpy.float64], int]:
     """Reads value_count whitespace-separated floats beginning at the start line."""
     first_width = len(lines[start].split())
     if first_width == 0:
@@ -97,7 +97,7 @@ def Read_Grid_Block(lines: Sequence[str], start: int, value_count: int) -> tuple
     tokens = " ".join(lines[start : start + line_count]).split()
     if len(tokens) < value_count:
         raise ParseError(f"grid block at line {start + 1} holds {len(tokens)} of {value_count} values")
-    values = np.asarray(tokens[:value_count], dtype=np.float64)
+    values = numpy.asarray(tokens[:value_count], dtype=numpy.float64)
     return values, start + line_count
 
 
@@ -106,7 +106,7 @@ def Read_Field_File(path: Path) -> FieldFile:
     lines = path.read_text().splitlines()
     geometry, cursor = Read_Geometry(lines)
     dimensions: tuple[int, int, int] | None = None
-    blocks: list[NDArray[np.float64]] = []
+    blocks: list[NDArray[numpy.float64]] = []
     while cursor < len(lines):
         found = Grid_Dimensions_On_Line(lines[cursor])
         if found is None or (dimensions is not None and found != dimensions):
@@ -129,10 +129,10 @@ def Read_Eigenvalues(path: Path) -> EigenvalueSet:
     electron_count = float(header[0])
     kpoint_count = int(header[1])
     band_count = int(header[2])
-    kpoints = np.zeros((kpoint_count, 3), dtype=np.float64)
-    kpoint_weights = np.zeros(kpoint_count, dtype=np.float64)
-    energies = np.zeros((spin_count, kpoint_count, band_count), dtype=np.float64)
-    occupancies = np.zeros((spin_count, kpoint_count, band_count), dtype=np.float64)
+    kpoints = numpy.zeros((kpoint_count, 3), dtype=numpy.float64)
+    kpoint_weights = numpy.zeros(kpoint_count, dtype=numpy.float64)
+    energies = numpy.zeros((spin_count, kpoint_count, band_count), dtype=numpy.float64)
+    occupancies = numpy.zeros((spin_count, kpoint_count, band_count), dtype=numpy.float64)
     cursor = 6
     for kpoint_index in range(kpoint_count):
         while lines[cursor].strip() == "":

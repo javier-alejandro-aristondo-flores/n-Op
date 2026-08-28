@@ -16,10 +16,10 @@ def Require_The_Pool() -> None:
 def Test_The_Exclusion_Counts_Match_The_Registry() -> None:
     """Asserts each cheap-to-resolve exclusion names exactly its recorded runs."""
     Require_The_Pool()
-    rows = Read_Census(POOL_ROOT)
+    census_rows = Read_Census(POOL_ROOT)
     expected = {"E1": 6, "E2": 1, "E3": 1, "E4": 1, "E5": 1, "E6": 73, "E7": 4, "E9": 12, "E10": 1}
     for identifier, count in expected.items():
-        resolved = Resolve_Exclusion(identifier, rows, POOL_ROOT)
+        resolved = Resolve_Exclusion(identifier, census_rows, POOL_ROOT)
         assert len(resolved) == count, f"{identifier}: {len(resolved)} != {count}: {resolved[:4]}"
 
 
@@ -27,8 +27,8 @@ def Test_The_Exclusion_Counts_Match_The_Registry() -> None:
 def Test_The_Fractional_Occupancy_Counts_Match() -> None:
     """Asserts the perovskite fractional-occupancy flags split 106 angle and 22 length."""
     Require_The_Pool()
-    rows = Read_Census(POOL_ROOT)
-    flagged = Resolve_Exclusion("E8", rows, POOL_ROOT)
+    census_rows = Read_Census(POOL_ROOT)
+    flagged = Resolve_Exclusion("E8", census_rows, POOL_ROOT)
     angle = sum(1 for path in flagged if "angle_distortions" in path)
     length = sum(1 for path in flagged if "length_distortions" in path)
     assert (angle, length) == (106, 22), (angle, length)

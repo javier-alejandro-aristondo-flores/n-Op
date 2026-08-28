@@ -7,13 +7,13 @@ from operators.framework.inspectable import Inspectable
 from operators.framework.representation import Coefficients, Representation
 
 
-class Composition[R: Representation](Inspectable, Protocol):
+class Composition[State: Representation](Inspectable, Protocol):
     """Applies a scheme's layers to a representation in channel space."""
 
 
     @abstractmethod
     def Apply(
         self,
-        input_function: R,
+        input_function: State,
         condition: Coefficients | None = None,
-    ) -> R: ...
+    ) -> State: ...

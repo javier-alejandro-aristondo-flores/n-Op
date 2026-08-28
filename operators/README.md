@@ -312,6 +312,12 @@ convenient, not by what the part knows.
    datatypes `HaveNoSpaces`; docstrings and comments explain code only, never motivation, never
    inline, never longer than one line; two blank lines between every function and class. Rationale
    belongs in this file and in the `IMPLEMENTATION.md` documents.
+   **Names are prose:** every variable, function, parameter, and type parameter is a phrase
+   that says what it names (`census_row`, `load_charge_density`, `x_coordinate`); established
+   domain nouns (Operator, Quadrature, Kernel, …) keep their normal names; single- and
+   double-letter identifiers are banned except `_` for discarded values and the `In` type
+   parameter; abbreviations only when they are established mathematics; import aliases are
+   banned — `import numpy`, never `as np`. Enforced by `Test_The_Names_Are_Prosaic`.
 6. Data discipline is inherited from `test-suite.md` at the repository root: spin-block-aware
    parsing, densities divided by cell volume, orbit-aware splits, the exclusion registry, and
    nothing volumetric or license-derived ever leaving `/Pool`.

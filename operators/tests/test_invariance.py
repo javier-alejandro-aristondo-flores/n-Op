@@ -1,6 +1,6 @@
 """Checks the invariance axes: exact resampling, the diamond operations, and the nulls."""
 
-import numpy as np
+import numpy
 
 from operators.framework.domain import Array
 from operators.framework.invariance import (
@@ -23,11 +23,11 @@ KNOWN_SPLITS = {
 
 def Band_Limited_Field(extent: int) -> Array:
     """Returns a two-channel field holding only modes below any test Nyquist."""
-    coordinates = np.arange(extent) / extent
-    x, y, z = np.meshgrid(coordinates, coordinates, coordinates, indexing="ij")
-    first = 1.0 + np.cos(2 * np.pi * x) + np.sin(2 * np.pi * (y - z))
-    second = 0.5 + np.sin(2 * np.pi * y) * np.cos(2 * np.pi * x)
-    return np.stack([first, second])
+    coordinates = numpy.arange(extent) / extent
+    x_coordinate, y_coordinate, z_coordinate = numpy.meshgrid(coordinates, coordinates, coordinates, indexing="ij")
+    first = 1.0 + numpy.cos(2 * numpy.pi * x_coordinate) + numpy.sin(2 * numpy.pi * (y_coordinate - z_coordinate))
+    second = 0.5 + numpy.sin(2 * numpy.pi * y_coordinate) * numpy.cos(2 * numpy.pi * x_coordinate)
+    return numpy.stack([first, second])
 
 
 def Test_Resampling_Is_Exact_On_Band_Limited_Fields() -> None:
@@ -35,16 +35,16 @@ def Test_Resampling_Is_Exact_On_Band_Limited_Fields() -> None:
     fine = Band_Limited_Field(8)
     coarse = Spectral_Truncation_Resample(fine, (6, 6, 6))
     reference = Band_Limited_Field(6)
-    assert np.allclose(coarse, reference, atol=1e-12)
+    assert numpy.allclose(coarse, reference, atol=1e-12)
     round_trip = Spectral_Truncation_Resample(coarse, (8, 8, 8))
-    assert np.allclose(round_trip, fine, atol=1e-12)
+    assert numpy.allclose(round_trip, fine, atol=1e-12)
 
 
 def Test_The_Diamond_Group_Has_Its_Recorded_Structure() -> None:
     """Asserts 48 operations, half translation-free and half glide-or-center shifted."""
     operations = Diamond_Grid_Operations()
     assert len(operations) == 48
-    translation_free = sum(1 for _, translation in operations if float(np.abs(translation).sum()) == 0.0)
+    translation_free = sum(1 for _, translation in operations if float(numpy.abs(translation).sum()) == 0.0)
     assert translation_free == 24
 
 
@@ -54,7 +54,7 @@ def Test_Grid_Operations_Compose_Exactly() -> None:
     for matrix, shift in Diamond_Grid_Operations()[:6]:
         moved = Apply_Grid_Operation(field, matrix, shift)
         assert moved.shape == field.shape
-        assert np.allclose(np.sort(moved.ravel()), np.sort(field.ravel()))
+        assert numpy.allclose(numpy.sort(moved.ravel()), numpy.sort(field.ravel()))
 
 
 def Test_An_Equivariant_Model_Scores_Zero() -> None:
@@ -68,7 +68,7 @@ def Test_An_Equivariant_Model_Scores_Zero() -> None:
 def Test_The_Block_Gap_Null_Is_Zero_For_Exact_Tiling() -> None:
     """Asserts a tiled primitive field has zero gap to itself and a real gap when perturbed."""
     primitive = Band_Limited_Field(4)
-    supercell = np.tile(primitive, (1, 2, 2, 2))
+    supercell = numpy.tile(primitive, (1, 2, 2, 2))
     assert Block_Gap_Null(primitive, supercell, (2, 2, 2)) < 1e-12
     assert Block_Gap_Null(primitive, supercell + 0.05, (2, 2, 2)) > 0.0
 

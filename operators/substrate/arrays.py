@@ -2,7 +2,7 @@
 
 from typing import Any, Protocol, runtime_checkable
 
-import numpy
+import numpy as np
 
 
 @runtime_checkable
@@ -13,4 +13,4 @@ class ArrayLike(Protocol):
     def shape(self) -> tuple[int, ...]: ...
 
 
-    def __array__(self) -> "numpy.ndarray[tuple[int, ...], numpy.dtype[Any]]": ...
+    def __array__(self) -> np.ndarray[tuple[int, ...], np.dtype[Any]]: ...

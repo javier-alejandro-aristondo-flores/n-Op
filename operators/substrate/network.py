@@ -2,7 +2,7 @@
 
 from typing import Any
 
-import numpy
+import numpy as np
 from numpy.typing import NDArray
 
 from operators.substrate.operations import Gaussian_Error_Linear_Unit
@@ -15,16 +15,16 @@ class MultilayerPerceptron:
     def __init__(self, layer_widths: tuple[int, ...], name_prefix: str, seed: int = 0) -> None:
         self.layer_widths = layer_widths
         self.name_prefix = name_prefix
-        generator = numpy.random.default_rng(seed)
-        self.parameter_values: dict[str, NDArray[numpy.float64]] = {}
+        generator = np.random.default_rng(seed)
+        self.parameter_values: dict[str, NDArray[np.float64]] = {}
         for layer_index in range(len(layer_widths) - 1):
             fan_in = layer_widths[layer_index]
             fan_out = layer_widths[layer_index + 1]
-            scale = numpy.sqrt(2.0 / (fan_in + fan_out))
+            scale = np.sqrt(2.0 / (fan_in + fan_out))
             self.parameter_values[f"{name_prefix}_layer_{layer_index}_weights"] = generator.normal(
                 0.0, scale, size=(fan_out, fan_in)
             )
-            self.parameter_values[f"{name_prefix}_layer_{layer_index}_biases"] = numpy.zeros(fan_out)
+            self.parameter_values[f"{name_prefix}_layer_{layer_index}_biases"] = np.zeros(fan_out)
 
 
     def Forward(self, lifted: dict[str, Any], inputs: Any) -> Any:
@@ -39,5 +39,5 @@ class MultilayerPerceptron:
         return value
 
 
-    def Apply(self, inputs: NDArray[numpy.float64]) -> NDArray[numpy.float64]:
-        return numpy.asarray(self.Forward(self.parameter_values, inputs), dtype=numpy.float64)
+    def Apply(self, inputs: NDArray[np.float64]) -> NDArray[np.float64]:
+        return np.asarray(self.Forward(self.parameter_values, inputs), dtype=np.float64)

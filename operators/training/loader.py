@@ -5,7 +5,7 @@ from collections.abc import Iterator
 from dataclasses import dataclass
 from pathlib import Path
 
-import numpy
+import numpy as np
 from numpy.typing import NDArray
 
 from operators.data.splits import ARTIFACT_DIRECTORY
@@ -24,21 +24,21 @@ class TrainingExample:
 
 
 def Field_From_Archive(
-    archive: "numpy.lib.npyio.NpzFile",
+    archive: "np.lib.npyio.NpzFile",
     channel_names: tuple[str, ...],
 ) -> GridFunction | None:
     """Builds one field from named channels, injecting zeros for an absent magnetization."""
-    channels: list[NDArray[numpy.float64]] = []
+    channels: list[NDArray[np.float64]] = []
     for name in channel_names:
         if name in archive:
-            channels.append(numpy.asarray(archive[name], dtype=numpy.float64))
+            channels.append(np.asarray(archive[name], dtype=np.float64))
         elif name == "magnetization_density" and "charge_density" in archive:
-            channels.append(numpy.zeros_like(numpy.asarray(archive["charge_density"], dtype=numpy.float64)))
+            channels.append(np.zeros_like(np.asarray(archive["charge_density"], dtype=np.float64)))
         else:
             return None
-    stacked = numpy.stack(channels)
-    lattice = numpy.asarray(archive["lattice"], dtype=numpy.float64)
-    cell_volume = float(numpy.asarray(archive["cell_volume"], dtype=numpy.float64))
+    stacked = np.stack(channels)
+    lattice = np.asarray(archive["lattice"], dtype=np.float64)
+    cell_volume = float(np.asarray(archive["cell_volume"], dtype=np.float64))
     point_count = int(stacked[0].size)
     return GridFunction(
         values=stacked,
@@ -75,14 +75,14 @@ def Strain_Charge_Pairs(
             fields: dict[str, GridFunction] = {}
             for side, run_path in sides.items():
                 archive_path = pool_root / "_derived/strain_atlas" / f"{Run_Identifier(run_path)}.npz"
-                with numpy.load(archive_path) as archive:
+                with np.load(archive_path) as archive:
                     field = Field_From_Archive(archive, ("charge_density",))
                 if field is None:
                     break
                 fields[side] = field
             if len(fields) != 2:
                 continue
-            if numpy.asarray(fields["cheap"].values).shape != numpy.asarray(fields["accurate"].values).shape:
+            if np.asarray(fields["cheap"].values).shape != np.asarray(fields["accurate"].values).shape:
                 continue
             yield point, fields["cheap"], fields["accurate"]
             produced += 1
@@ -108,7 +108,7 @@ def Paired_Field_Examples(
             archive_path = pool_root / "_derived" / unit["campaign"] / f"{identifier}.npz"
             if not archive_path.exists():
                 continue
-            with numpy.load(archive_path) as archive:
+            with np.load(archive_path) as archive:
                 input_function = Field_From_Archive(archive, card.inputs)
                 target_function = Field_From_Archive(archive, card.targets)
             if input_function is None or target_function is None:
@@ -119,9 +119,9 @@ def Paired_Field_Examples(
                 return
 
 
-def Per_Channel_Statistics(fields: list[GridFunction]) -> tuple[NDArray[numpy.float64], NDArray[numpy.float64]]:
+def Per_Channel_Statistics(fields: list[GridFunction]) -> tuple[NDArray[np.float64], NDArray[np.float64]]:
     """Returns per-channel means and deviations over a list of same-channel fields."""
-    stacked = numpy.stack([numpy.asarray(field.values, dtype=numpy.float64).reshape(len(field.channel_labels), -1) for field in fields])
+    stacked = np.stack([np.asarray(field.values, dtype=np.float64).reshape(len(field.channel_labels), -1) for field in fields])
     means = stacked.mean(axis=(0, 2))
     deviations = stacked.std(axis=(0, 2))
-    return means, numpy.maximum(deviations, 1e-12)
+    return means, np.maximum(deviations, 1e-12)

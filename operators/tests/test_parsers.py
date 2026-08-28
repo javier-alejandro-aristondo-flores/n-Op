@@ -2,7 +2,7 @@
 
 from pathlib import Path
 
-import numpy
+import numpy as np
 import pytest
 from numpy.typing import NDArray
 
@@ -78,9 +78,9 @@ def Require_The_Pool() -> None:
         pytest.fail("the corpus at /Pool/VASP_DATA is not mounted on this machine")
 
 
-def Normalized_Mean_Absolute_Error(candidate: NDArray[numpy.float64], reference: NDArray[numpy.float64]) -> float:
+def Normalized_Mean_Absolute_Error(candidate: NDArray[np.float64], reference: NDArray[np.float64]) -> float:
     """Returns mean absolute error divided by the mean absolute reference value."""
-    return float(numpy.mean(numpy.abs(candidate - reference)) / numpy.mean(numpy.abs(reference)))
+    return float(np.mean(np.abs(candidate - reference)) / np.mean(np.abs(reference)))
 
 
 def Test_A_Two_Block_File_Parses_Past_Augmentation(tmp_path: Path) -> None:
@@ -101,7 +101,7 @@ def Test_Cartesian_Selective_Geometry_Converts_To_Fractional(tmp_path: Path) -> 
     """Reads a Cartesian header behind a selective-dynamics line."""
     geometry, _ = Read_Geometry(SYNTHETIC_CARTESIAN.splitlines())
     assert geometry.species == ("X",)
-    assert numpy.allclose(geometry.positions, [[0.5, 0.5, 0.5]])
+    assert np.allclose(geometry.positions, [[0.5, 0.5, 0.5]])
 
 
 def Test_Eigenvalues_Read_The_Spin_Polarized_Layout(tmp_path: Path) -> None:
@@ -123,7 +123,7 @@ def Test_Charge_Mean_Equals_The_Electron_Count() -> None:
     for run in (ARSENIC_DEFECT, STRAIN_REFERENCE):
         field = Read_Field_File(run / "CHGCAR")
         echoes = Read_Outcar_Echoes(run / "OUTCAR")
-        assert abs(float(numpy.mean(field.blocks[0])) - echoes.electron_count) < 1e-3
+        assert abs(float(np.mean(field.blocks[0])) - echoes.electron_count) < 1e-3
 
 
 @pytest.mark.pool
@@ -152,7 +152,7 @@ def Test_The_Magnetization_Calibration_Replicates() -> None:
     """Asserts the magnetization block integrates to the recorded two-magneton moment."""
     Require_The_Pool()
     field = Read_Field_File(MAGNESIUM_DEFECT / "CHGCAR")
-    moment = float(numpy.mean(field.blocks[1]))
+    moment = float(np.mean(field.blocks[1]))
     assert abs(moment - 2.000000) < 1e-3
     final = Read_Final_Magnetization(MAGNESIUM_DEFECT / "OSZICAR")
     assert final is not None and abs(moment - final) < 1e-3

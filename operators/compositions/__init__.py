@@ -1,6 +1,6 @@
 """Compositions: schemes for chaining layers, each owning its topology."""
 
-import numpy
+import numpy as np
 from numpy.typing import NDArray
 
 from operators.framework import Coefficients, Composition, GridFunction, GridSpec, Layer
@@ -14,24 +14,24 @@ class ExplicitStack(Composition[GridFunction]):
 
     def __init__(self, layers: tuple[Layer[GridFunction], ...]) -> None:
         self.layers = layers
-        self.last_layer_norms: NDArray[numpy.float64] | None = None
+        self.last_layer_norms: NDArray[np.float64] | None = None
 
 
     def Apply(self, input_function: GridFunction, condition: Coefficients | None = None) -> GridFunction:
         current = input_function
         norms: list[float] = []
         for layer in self.layers:
-            grid_shape = numpy.asarray(current.values).shape[1:]
+            grid_shape = np.asarray(current.values).shape[1:]
             integrated = layer.kernel.Integrate(current, GridSpec((grid_shape[0], grid_shape[1], grid_shape[2])), condition)
-            summed = numpy.asarray(layer.local_linear(current.values)) + numpy.asarray(integrated.values)
+            summed = np.asarray(layer.local_linear(current.values)) + np.asarray(integrated.values)
             if layer.activation == "alias_free":
                 raise NotImplementedError("the alias-free activation is the convolutional entry's own build")
-            activated = numpy.asarray(Gaussian_Error_Linear_Unit(summed), dtype=numpy.float64)
-            if layer.residual and activated.shape == numpy.asarray(current.values).shape:
-                activated = activated + numpy.asarray(current.values)
-            norms.append(float(numpy.linalg.norm(activated)))
+            activated = np.asarray(Gaussian_Error_Linear_Unit(summed), dtype=np.float64)
+            if layer.residual and activated.shape == np.asarray(current.values).shape:
+                activated = activated + np.asarray(current.values)
+            norms.append(float(np.linalg.norm(activated)))
             current = GridFunction(activated, current.channel_labels, current.domain, current.quadrature)
-        self.last_layer_norms = numpy.asarray(norms, dtype=numpy.float64)
+        self.last_layer_norms = np.asarray(norms, dtype=np.float64)
         return current
 
 

@@ -3,7 +3,7 @@
 from collections.abc import Callable
 from itertools import permutations, product
 
-import numpy
+import numpy as np
 
 from numpy.typing import NDArray
 
@@ -12,22 +12,22 @@ from operators.framework.representation import Representation
 from operators.tasks import TaskCard
 
 
-def Spectral_Truncation_Resample(values: NDArray[numpy.float64], target_shape: tuple[int, int, int]) -> NDArray[numpy.float64]:
+def Spectral_Truncation_Resample(values: NDArray[np.float64], target_shape: tuple[int, int, int]) -> NDArray[np.float64]:
     """Resamples channel fields between grids by exact Fourier truncation or zero-padding."""
-    stacked = numpy.asarray(values, dtype=numpy.float64)
-    spectrum = numpy.fft.fftn(stacked, axes=(1, 2, 3))
-    result = numpy.zeros((stacked.shape[0], *target_shape), dtype=numpy.complex128)
-    source_index: list[NDArray[numpy.int64]] = []
-    target_index: list[NDArray[numpy.int64]] = []
+    stacked = np.asarray(values, dtype=np.float64)
+    spectrum = np.fft.fftn(stacked, axes=(1, 2, 3))
+    result = np.zeros((stacked.shape[0], *target_shape), dtype=np.complex128)
+    source_index: list[NDArray[np.int64]] = []
+    target_index: list[NDArray[np.int64]] = []
     for source_extent, target_extent in zip(stacked.shape[1:], target_shape):
         largest_kept_mode = (min(source_extent, target_extent) - 1) // 2
-        modes = numpy.arange(-largest_kept_mode, largest_kept_mode + 1, dtype=numpy.int64)
-        source_index.append(numpy.mod(modes, source_extent))
-        target_index.append(numpy.mod(modes, target_extent))
-    channel_index = numpy.arange(stacked.shape[0], dtype=numpy.int64)
-    result[numpy.ix_(channel_index, *target_index)] = spectrum[numpy.ix_(channel_index, *source_index)]
-    scale = float(numpy.prod(target_shape)) / float(numpy.prod(stacked.shape[1:]))
-    return numpy.real(numpy.fft.ifftn(result, axes=(1, 2, 3))) * scale
+        modes = np.arange(-largest_kept_mode, largest_kept_mode + 1, dtype=np.int64)
+        source_index.append(np.mod(modes, source_extent))
+        target_index.append(np.mod(modes, target_extent))
+    channel_index = np.arange(stacked.shape[0], dtype=np.int64)
+    result[np.ix_(channel_index, *target_index)] = spectrum[np.ix_(channel_index, *source_index)]
+    scale = float(np.prod(target_shape)) / float(np.prod(stacked.shape[1:]))
+    return np.real(np.fft.ifftn(result, axes=(1, 2, 3))) * scale
 
 
 def Diamond_Conventional_Motif() -> tuple[tuple[float, float, float], ...]:
@@ -41,19 +41,19 @@ def Diamond_Conventional_Motif() -> tuple[tuple[float, float, float], ...]:
     return tuple(positions)
 
 
-def Diamond_Grid_Operations() -> tuple[tuple[NDArray[numpy.int64], NDArray[numpy.float64]], ...]:
+def Diamond_Grid_Operations() -> tuple[tuple[NDArray[np.int64], NDArray[np.float64]], ...]:
     """Returns the 48 signed permutations with the fractional translation each needs."""
-    motif = {tuple(numpy.round(position, 6)) for position in Diamond_Conventional_Motif()}
-    candidate_translations = [numpy.asarray(position, dtype=numpy.float64) for position in Diamond_Conventional_Motif()]
-    operations: list[tuple[NDArray[numpy.int64], NDArray[numpy.float64]]] = []
+    motif = {tuple(np.round(position, 6)) for position in Diamond_Conventional_Motif()}
+    candidate_translations = [np.asarray(position, dtype=np.float64) for position in Diamond_Conventional_Motif()]
+    operations: list[tuple[NDArray[np.int64], NDArray[np.float64]]] = []
     for permutation in permutations((0, 1, 2)):
         for signs in product((1, -1), repeat=3):
-            matrix = numpy.zeros((3, 3), dtype=numpy.int64)
+            matrix = np.zeros((3, 3), dtype=np.int64)
             for row, (column, sign) in enumerate(zip(permutation, signs)):
                 matrix[row, column] = sign
             for translation in candidate_translations:
                 mapped = {
-                    tuple(numpy.mod(matrix @ numpy.asarray(atom) + translation, 1.0).round(6)) for atom in motif
+                    tuple(np.mod(matrix @ np.asarray(atom) + translation, 1.0).round(6)) for atom in motif
                 }
                 if mapped == motif:
                     operations.append((matrix, translation))
@@ -61,44 +61,44 @@ def Diamond_Grid_Operations() -> tuple[tuple[NDArray[numpy.int64], NDArray[numpy
     return tuple(operations)
 
 
-def Apply_Grid_Operation(values: NDArray[numpy.float64], matrix: NDArray[numpy.int64], translation: NDArray[numpy.float64]) -> NDArray[numpy.float64]:
+def Apply_Grid_Operation(values: NDArray[np.float64], matrix: NDArray[np.int64], translation: NDArray[np.float64]) -> NDArray[np.float64]:
     """Applies one exact symmetry operation to channel fields on a compatible cubic grid."""
-    stacked = numpy.asarray(values)
+    stacked = np.asarray(values)
     extent = stacked.shape[1]
-    grid = numpy.indices((extent, extent, extent)).reshape(3, -1)
-    shifts = numpy.asarray(numpy.asarray(translation, dtype=numpy.float64) * extent + 0.5, dtype=numpy.int64).reshape(3, 1)
-    inverse = numpy.asarray(matrix, dtype=numpy.int64).T
-    source = numpy.mod(inverse @ (grid - shifts), extent)
+    grid = np.indices((extent, extent, extent)).reshape(3, -1)
+    shifts = np.asarray(np.asarray(translation, dtype=np.float64) * extent + 0.5, dtype=np.int64).reshape(3, 1)
+    inverse = np.asarray(matrix, dtype=np.int64).T
+    source = np.mod(inverse @ (grid - shifts), extent)
     gathered = stacked[:, source[0], source[1], source[2]]
     return gathered.reshape(stacked.shape)
 
 
 def Equivariance_Errors(
-    apply_model: Callable[[NDArray[numpy.float64]], NDArray[numpy.float64]],
-    values: NDArray[numpy.float64],
-    operations: tuple[tuple[NDArray[numpy.int64], NDArray[numpy.float64]], ...],
-) -> NDArray[numpy.float64]:
+    apply_model: Callable[[NDArray[np.float64]], NDArray[np.float64]],
+    values: NDArray[np.float64],
+    operations: tuple[tuple[NDArray[np.int64], NDArray[np.float64]], ...],
+) -> NDArray[np.float64]:
     """Returns the relative equivariance error of a model under each operation."""
-    base_output = numpy.asarray(apply_model(values), dtype=numpy.float64)
-    scale = numpy.linalg.norm(base_output.ravel())
+    base_output = np.asarray(apply_model(values), dtype=np.float64)
+    scale = np.linalg.norm(base_output.ravel())
     errors: list[float] = []
     for matrix, translation in operations:
         transformed_input = Apply_Grid_Operation(values, matrix, translation)
-        output_of_transformed = numpy.asarray(apply_model(transformed_input), dtype=numpy.float64)
+        output_of_transformed = np.asarray(apply_model(transformed_input), dtype=np.float64)
         transformed_output = Apply_Grid_Operation(base_output, matrix, translation)
-        errors.append(float(numpy.linalg.norm((output_of_transformed - transformed_output).ravel()) / scale))
-    return numpy.asarray(errors, dtype=numpy.float64)
+        errors.append(float(np.linalg.norm((output_of_transformed - transformed_output).ravel()) / scale))
+    return np.asarray(errors, dtype=np.float64)
 
 
-def Block_Gap_Null(primitive_values: NDArray[numpy.float64], supercell_values: NDArray[numpy.float64], tiles: tuple[int, int, int]) -> float:
+def Block_Gap_Null(primitive_values: NDArray[np.float64], supercell_values: NDArray[np.float64], tiles: tuple[int, int, int]) -> float:
     """Returns the relative distance between the tiled primitive truth and the supercell truth."""
-    primitive = numpy.asarray(primitive_values, dtype=numpy.float64)
-    supercell = numpy.asarray(supercell_values, dtype=numpy.float64)
-    tiled = numpy.tile(primitive, (1, *tiles))
+    primitive = np.asarray(primitive_values, dtype=np.float64)
+    supercell = np.asarray(supercell_values, dtype=np.float64)
+    tiled = np.tile(primitive, (1, *tiles))
     if tiled.shape != supercell.shape:
         tiled = Spectral_Truncation_Resample(tiled, supercell.shape[1:])
-    difference = numpy.linalg.norm((tiled - supercell).ravel())
-    return float(difference / numpy.linalg.norm(supercell.ravel()))
+    difference = np.linalg.norm((tiled - supercell).ravel())
+    return float(difference / np.linalg.norm(supercell.ravel()))
 
 
 def K_Quality_Tier(irreducible_kpoint_count: int) -> str:

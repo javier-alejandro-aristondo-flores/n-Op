@@ -5,7 +5,7 @@ from collections.abc import Callable
 from dataclasses import dataclass
 from typing import Any, Protocol
 
-import numpy
+import numpy as np
 from numpy.typing import NDArray
 
 
@@ -13,7 +13,7 @@ from numpy.typing import NDArray
 class ParameterSet:
     """Named parameter values held canonically as double-precision numpy arrays."""
 
-    values: dict[str, NDArray[numpy.float64]]
+    values: dict[str, NDArray[np.float64]]
 
 
 class Engine(Protocol):
@@ -27,11 +27,11 @@ class Engine(Protocol):
     @abstractmethod
     def Gradients(
         self, parameters: ParameterSet, forward: Callable[[dict[str, Any]], Any]
-    ) -> dict[str, NDArray[numpy.float64]]: ...
+    ) -> dict[str, NDArray[np.float64]]: ...
 
 
     @abstractmethod
-    def Lift_Constant(self, value: NDArray[numpy.float64]) -> Any: ...
+    def Lift_Constant(self, value: NDArray[np.float64]) -> Any: ...
 
 
 class NumpyEngine:
@@ -46,16 +46,16 @@ class NumpyEngine:
         return float(forward(dict(parameters.values)))
 
 
-    def Lift_Constant(self, value: NDArray[numpy.float64]) -> Any:
+    def Lift_Constant(self, value: NDArray[np.float64]) -> Any:
         return value
 
 
     def Gradients(
         self, parameters: ParameterSet, forward: Callable[[dict[str, Any]], Any]
-    ) -> dict[str, NDArray[numpy.float64]]:
-        gradients: dict[str, NDArray[numpy.float64]] = {}
+    ) -> dict[str, NDArray[np.float64]]:
+        gradients: dict[str, NDArray[np.float64]] = {}
         for name, value in parameters.values.items():
-            gradient = numpy.zeros_like(value)
+            gradient = np.zeros_like(value)
             flat_value = value.reshape(-1)
             flat_gradient = gradient.reshape(-1)
             for entry_index in range(flat_value.shape[0]):

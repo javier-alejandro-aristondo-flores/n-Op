@@ -3,7 +3,7 @@
 from pathlib import Path
 from typing import Any
 
-import numpy
+import numpy as np
 import pytest
 
 from operators.substrate import (
@@ -40,7 +40,7 @@ def Quadratic_Loss(lifted: dict[str, Any]) -> Any:
 @pytest.mark.parametrize("engine", ENGINE_CASES)
 def Test_Engine_Gradients_Match_The_Analytic_Quadratic(engine: Engine) -> None:
     """Asserts each engine differentiates the quadratic exactly."""
-    parameters = ParameterSet(values={"scale": numpy.asarray([1.0]), "offset": numpy.asarray([2.0])})
+    parameters = ParameterSet(values={"scale": np.asarray([1.0]), "offset": np.asarray([2.0])})
     gradients = engine.Gradients(parameters, Quadratic_Loss)
     assert abs(float(gradients["scale"][0]) - 2.0 * (1.0 - 3.0)) < 1e-4
     assert abs(float(gradients["offset"][0]) - 2.0 * (2.0 + 1.0)) < 1e-4
@@ -50,7 +50,7 @@ def Test_Engine_Gradients_Match_The_Analytic_Quadratic(engine: Engine) -> None:
 @pytest.mark.parametrize("engine", ENGINE_CASES)
 def Test_Adam_Descends_The_Quadratic(engine: Engine) -> None:
     """Asserts the in-house optimizer reaches the quadratic's minimum on each engine."""
-    parameters = ParameterSet(values={"scale": numpy.asarray([0.0]), "offset": numpy.asarray([0.0])})
+    parameters = ParameterSet(values={"scale": np.asarray([0.0]), "offset": np.asarray([0.0])})
     state = Fresh_Adam_State(parameters)
     for _ in range(400):
         gradients = engine.Gradients(parameters, Quadratic_Loss)
@@ -61,18 +61,18 @@ def Test_Adam_Descends_The_Quadratic(engine: Engine) -> None:
 
 def Test_The_Nonlinearities_Have_Their_Known_Values() -> None:
     """Asserts the softplus and the smooth unit at anchor points."""
-    assert abs(float(Softplus(numpy.asarray(0.0))) - numpy.log(2.0)) < 1e-12
-    assert float(Gaussian_Error_Linear_Unit(numpy.asarray(0.0))) == 0.0
-    assert abs(float(Gaussian_Error_Linear_Unit(numpy.asarray(3.0))) - 3.0) < 2e-2
+    assert abs(float(Softplus(np.asarray(0.0))) - np.log(2.0)) < 1e-12
+    assert float(Gaussian_Error_Linear_Unit(np.asarray(0.0))) == 0.0
+    assert abs(float(Gaussian_Error_Linear_Unit(np.asarray(3.0))) - 3.0) < 2e-2
 
 
 def Test_The_Transform_Round_Trips() -> None:
     """Asserts the three-dimensional transform inverts on the reference arrays."""
-    generator = numpy.random.default_rng(4)
+    generator = np.random.default_rng(4)
     field = generator.random((2, 6, 6, 6))
     spectrum = Fourier_Transform_3d(field)
-    returned = numpy.real(Inverse_Fourier_Transform_3d(spectrum))
-    assert numpy.allclose(returned, field, atol=1e-12)
+    returned = np.real(Inverse_Fourier_Transform_3d(spectrum))
+    assert np.allclose(returned, field, atol=1e-12)
 
 
 def Test_The_Torch_Seam_Holds() -> None:

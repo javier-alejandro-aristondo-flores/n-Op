@@ -1,6 +1,6 @@
 """Spectral derivations: the density-of-states rebuild and the occupancy-walk gap."""
 
-import numpy
+import numpy as np
 from numpy.typing import NDArray
 
 SMEARING_WIDTH_BY_CAMPAIGN: dict[str, float] = {
@@ -13,8 +13,8 @@ SMEARING_WIDTH_BY_CAMPAIGN: dict[str, float] = {
 
 
 def Occupancy_Walk_Gap(
-    energies: NDArray[numpy.float64],
-    occupancies: NDArray[numpy.float64],
+    energies: NDArray[np.float64],
+    occupancies: NDArray[np.float64],
     minimum_occupied_fraction: float = 0.5,
 ) -> float:
     """Returns the gap between the highest occupied and lowest empty state, floored at zero."""
@@ -29,8 +29,8 @@ def Occupancy_Walk_Gap(
 
 
 def Valence_Band_Maximum(
-    energies: NDArray[numpy.float64],
-    occupancies: NDArray[numpy.float64],
+    energies: NDArray[np.float64],
+    occupancies: NDArray[np.float64],
     minimum_occupied_fraction: float = 0.5,
 ) -> float:
     """Returns the highest occupied eigenvalue."""
@@ -39,18 +39,18 @@ def Valence_Band_Maximum(
 
 
 def Rebuild_Density_Of_States(
-    energies: NDArray[numpy.float64],
-    kpoint_weights: NDArray[numpy.float64],
+    energies: NDArray[np.float64],
+    kpoint_weights: NDArray[np.float64],
     smearing_width: float,
-    energy_grid: NDArray[numpy.float64],
-) -> NDArray[numpy.float64]:
+    energy_grid: NDArray[np.float64],
+) -> NDArray[np.float64]:
     """Rebuilds a Gaussian-smeared, spin-summed, weight-normalized state-density curve."""
     weights = kpoint_weights / kpoint_weights.sum()
-    curve = numpy.zeros_like(energy_grid)
-    prefactor = 1.0 / (smearing_width * numpy.sqrt(2.0 * numpy.pi))
+    curve = np.zeros_like(energy_grid)
+    prefactor = 1.0 / (smearing_width * np.sqrt(2.0 * np.pi))
     for spin_index in range(energies.shape[0]):
         for kpoint_index in range(energies.shape[1]):
             offsets = energy_grid[:, None] - energies[spin_index, kpoint_index][None, :]
-            gaussians = prefactor * numpy.exp(-0.5 * (offsets / smearing_width) ** 2)
+            gaussians = prefactor * np.exp(-0.5 * (offsets / smearing_width) ** 2)
             curve = curve + weights[kpoint_index] * gaussians.sum(axis=1)
     return curve

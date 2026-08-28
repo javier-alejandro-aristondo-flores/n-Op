@@ -2,7 +2,7 @@
 
 from typing import Literal
 
-import numpy
+import numpy as np
 from numpy.typing import NDArray
 
 from operators.framework import Coefficients, Discretization, GridFunction, Operator
@@ -21,7 +21,7 @@ class Conserving(Operator[GridFunction, GridFunction]):
     ) -> None:
         self.inner = inner
         self.law = law
-        self.last_correction_scale: NDArray[numpy.float64] | None = None
+        self.last_correction_scale: NDArray[np.float64] | None = None
 
 
     def __call__(
@@ -31,20 +31,20 @@ class Conserving(Operator[GridFunction, GridFunction]):
         condition: Coefficients | None = None,
     ) -> GridFunction:
         produced = self.inner(input_function, output_discretization, condition)
-        values = numpy.asarray(produced.values, dtype=numpy.float64)
+        values = np.asarray(produced.values, dtype=np.float64)
         weights = Quadrature_Weights(produced)
         weight_each = float(weights[0])
         if self.law == "zero_mean":
             corrected = values - values.mean(axis=(1, 2, 3), keepdims=True)
-            self.last_correction_scale = numpy.asarray([float(values.mean())])
+            self.last_correction_scale = np.asarray([float(values.mean())])
         else:
             if condition is None:
                 raise ValueError("renormalization needs the electron count as the condition")
-            target_integral = float(numpy.asarray(condition.vector)[0])
+            target_integral = float(np.asarray(condition.vector)[0])
             integral = float(values.sum() * weight_each)
             scale = target_integral / integral
             corrected = values * scale
-            self.last_correction_scale = numpy.asarray([scale])
+            self.last_correction_scale = np.asarray([scale])
         return GridFunction(corrected, produced.channel_labels, produced.domain, produced.quadrature)
 
 
@@ -70,8 +70,8 @@ class Residual(Operator[GridFunction, GridFunction]):
         condition: Coefficients | None = None,
     ) -> GridFunction:
         produced = self.inner(input_function, output_discretization, condition)
-        summed = numpy.asarray(input_function.values, dtype=numpy.float64) + numpy.asarray(
-            produced.values, dtype=numpy.float64
+        summed = np.asarray(input_function.values, dtype=np.float64) + np.asarray(
+            produced.values, dtype=np.float64
         )
         return GridFunction(summed, input_function.channel_labels, produced.domain, produced.quadrature)
 
@@ -86,9 +86,9 @@ class Conditioned(Operator[GridFunction, GridFunction]):
 
     def __init__(self, inner: Operator[GridFunction, GridFunction], channels: int, condition_width: int, seed: int = 0) -> None:
         self.inner = inner
-        generator = numpy.random.default_rng(seed)
-        scale = 1.0 / numpy.sqrt(condition_width)
-        self.parameter_values: dict[str, NDArray[numpy.float64]] = {
+        generator = np.random.default_rng(seed)
+        scale = 1.0 / np.sqrt(condition_width)
+        self.parameter_values: dict[str, NDArray[np.float64]] = {
             "condition_scale_weights": generator.normal(0.0, scale, size=(channels, condition_width)),
             "condition_shift_weights": generator.normal(0.0, scale, size=(channels, condition_width)),
         }
@@ -103,10 +103,10 @@ class Conditioned(Operator[GridFunction, GridFunction]):
         produced = self.inner(input_function, output_discretization, condition)
         if condition is None:
             return produced
-        condition_vector = numpy.asarray(condition.vector, dtype=numpy.float64)
+        condition_vector = np.asarray(condition.vector, dtype=np.float64)
         channel_scales = 1.0 + self.parameter_values["condition_scale_weights"] @ condition_vector
         channel_shifts = self.parameter_values["condition_shift_weights"] @ condition_vector
-        values = numpy.asarray(produced.values, dtype=numpy.float64)
+        values = np.asarray(produced.values, dtype=np.float64)
         modulated = values * channel_scales[:, None, None, None] + channel_shifts[:, None, None, None]
         return GridFunction(modulated, produced.channel_labels, produced.domain, produced.quadrature)
 

@@ -8,7 +8,7 @@ from dataclasses import dataclass
 from pathlib import Path
 from typing import Any, cast
 
-import numpy
+import numpy as np
 from numpy.typing import NDArray
 
 from operators.data.parsers import (
@@ -65,7 +65,7 @@ UNIT_BY_FIELD: dict[str, str] = {
     "eigenvalue_electron_count": "electrons",
 }
 
-type StoreArray = NDArray[numpy.float32] | NDArray[numpy.float64] | NDArray[numpy.str_]
+type StoreArray = NDArray[np.float32] | NDArray[np.float64] | NDArray[np.str_]
 
 
 class StoreError(Exception):
@@ -122,19 +122,19 @@ def Guard_Volumetric_Destination(destination: Path, pool_root: Path) -> None:
         raise StoreError(f"volumetric write outside the corpus partition refused: {destination}")
 
 
-def Spin_Pair_Entries(name: str, field: FieldFile, divisor: float) -> dict[str, NDArray[numpy.float32]]:
+def Spin_Pair_Entries(name: str, field: FieldFile, divisor: float) -> dict[str, NDArray[np.float32]]:
     """Names one block plainly or two blocks as up and down channels."""
-    blocks = [(block / divisor).astype(numpy.float32) for block in field.blocks]
+    blocks = [(block / divisor).astype(np.float32) for block in field.blocks]
     if len(blocks) == 1:
         return {name: blocks[0]}
     return {f"{name}_up": blocks[0], f"{name}_down": blocks[1]}
 
 
-def Charge_Entries(field: FieldFile, volume: float) -> dict[str, NDArray[numpy.float32]]:
+def Charge_Entries(field: FieldFile, volume: float) -> dict[str, NDArray[np.float32]]:
     """Names the charge block and, when present, the magnetization block."""
-    entries = {"charge_density": (field.blocks[0] / volume).astype(numpy.float32)}
+    entries = {"charge_density": (field.blocks[0] / volume).astype(np.float32)}
     if len(field.blocks) > 1:
-        entries["magnetization_density"] = (field.blocks[1] / volume).astype(numpy.float32)
+        entries["magnetization_density"] = (field.blocks[1] / volume).astype(np.float32)
     return entries
 
 
@@ -144,7 +144,7 @@ def Geometry_Entries(geometry: Geometry) -> dict[str, StoreArray]:
     return {
         "lattice": geometry.lattice,
         "positions": geometry.positions,
-        "species": numpy.asarray(symbols),
+        "species": np.asarray(symbols),
     }
 
 
@@ -171,7 +171,7 @@ def Extract_Run(census_row: CensusRow, pool_root: Path) -> tuple[dict[str, Store
         if Present(file_name):
             field = Read_Field_File(run_directory / file_name)
             geometry = geometry or field.geometry
-            arrays[field_name] = (field.blocks[0] / Cell_Volume(field.geometry.lattice)).astype(numpy.float32)
+            arrays[field_name] = (field.blocks[0] / Cell_Volume(field.geometry.lattice)).astype(np.float32)
     if Present("ELFCAR"):
         field = Read_Field_File(run_directory / "ELFCAR")
         geometry = geometry or field.geometry
@@ -180,7 +180,7 @@ def Extract_Run(census_row: CensusRow, pool_root: Path) -> tuple[dict[str, Store
         field = Read_Field_File(run_directory / "LOCPOT")
         geometry = geometry or field.geometry
         arrays.update(Spin_Pair_Entries("local_potential", field, 1.0))
-        arrays["local_potential_mean"] = numpy.asarray([float(numpy.mean(block)) for block in field.blocks], dtype=numpy.float64)
+        arrays["local_potential_mean"] = np.asarray([float(np.mean(block)) for block in field.blocks], dtype=np.float64)
     if geometry is None:
         for geometry_file in ("CONTCAR", "POSCAR"):
             if Present(geometry_file):
@@ -189,7 +189,7 @@ def Extract_Run(census_row: CensusRow, pool_root: Path) -> tuple[dict[str, Store
     if geometry is None:
         raise StoreError(f"no geometry source in {census_row.path}")
     arrays.update(Geometry_Entries(geometry))
-    arrays["cell_volume"] = numpy.asarray(Cell_Volume(geometry.lattice), dtype=numpy.float64)
+    arrays["cell_volume"] = np.asarray(Cell_Volume(geometry.lattice), dtype=np.float64)
     unreadable: list[str] = []
     if Present("EIGENVAL"):
         try:
@@ -198,21 +198,21 @@ def Extract_Run(census_row: CensusRow, pool_root: Path) -> tuple[dict[str, Store
             arrays["kpoint_weights"] = eigenvalues.kpoint_weights
             arrays["eigenvalue_energies"] = eigenvalues.energies
             arrays["eigenvalue_occupancies"] = eigenvalues.occupancies
-            arrays["eigenvalue_electron_count"] = numpy.asarray(eigenvalues.electron_count, dtype=numpy.float64)
+            arrays["eigenvalue_electron_count"] = np.asarray(eigenvalues.electron_count, dtype=np.float64)
         except (ParseError, ValueError, IndexError):
             unreadable.append("EIGENVAL")
     titles: tuple[str, ...] = ()
     if Present("OUTCAR"):
         try:
             echoes = Read_Outcar_Echoes(run_directory / "OUTCAR")
-            arrays["electron_count"] = numpy.asarray(echoes.electron_count, dtype=numpy.float64)
+            arrays["electron_count"] = np.asarray(echoes.electron_count, dtype=np.float64)
             titles = echoes.pseudopotential_titles
         except (ParseError, ValueError, IndexError):
             unreadable.append("OUTCAR")
     if Present("OSZICAR"):
         magnetization = Read_Final_Magnetization(run_directory / "OSZICAR")
         if magnetization is not None:
-            arrays["final_magnetization"] = numpy.asarray(magnetization, dtype=numpy.float64)
+            arrays["final_magnetization"] = np.asarray(magnetization, dtype=np.float64)
     sidecar: dict[str, object] = {
         "run_path": census_row.path,
         "run_identifier": Run_Identifier(census_row.path),
@@ -236,7 +236,7 @@ def Write_Run(arrays: dict[str, StoreArray], sidecar: dict[str, object], pool_ro
     campaign_directory.mkdir(parents=True, exist_ok=True)
     identifier = cast(str, sidecar["run_identifier"])
     archive_path = campaign_directory / f"{identifier}.npz"
-    numpy.savez(archive_path, **cast(dict[str, Any], arrays))
+    np.savez(archive_path, **cast(dict[str, Any], arrays))
     (campaign_directory / f"{identifier}.json").write_text(json.dumps(sidecar, indent=1))
     return archive_path
 

@@ -5,7 +5,7 @@ from collections.abc import Callable
 from importlib import import_module
 from typing import Any
 
-import numpy
+import numpy as np
 from numpy.typing import NDArray
 
 from operators.substrate.engine import ParameterSet
@@ -29,7 +29,7 @@ class TorchEngine:
         self.device_name = device_name
 
 
-    def Lift(self, values: dict[str, NDArray[numpy.float64]], requires_gradient: bool) -> dict[str, Any]:
+    def Lift(self, values: dict[str, NDArray[np.float64]], requires_gradient: bool) -> dict[str, Any]:
         torch = Torch_Module()
         return {
             name: torch.tensor(value, dtype=torch.float64, device=self.device_name, requires_grad=requires_gradient)
@@ -43,16 +43,16 @@ class TorchEngine:
             return float(forward(self.Lift(parameters.values, requires_gradient=False)))
 
 
-    def Lift_Constant(self, value: NDArray[numpy.float64]) -> Any:
+    def Lift_Constant(self, value: NDArray[np.float64]) -> Any:
         torch = Torch_Module()
         return torch.tensor(value, dtype=torch.float64, device=self.device_name)
 
 
-    def Gradients(self, parameters: ParameterSet, forward: Callable[[dict[str, Any]], Any]) -> dict[str, NDArray[numpy.float64]]:
+    def Gradients(self, parameters: ParameterSet, forward: Callable[[dict[str, Any]], Any]) -> dict[str, NDArray[np.float64]]:
         lifted = self.Lift(parameters.values, requires_gradient=True)
         loss = forward(lifted)
         loss.backward()
         return {
-            name: numpy.asarray(tensor.grad.detach().cpu().numpy(), dtype=numpy.float64)
+            name: np.asarray(tensor.grad.detach().cpu().numpy(), dtype=np.float64)
             for name, tensor in lifted.items()
         }

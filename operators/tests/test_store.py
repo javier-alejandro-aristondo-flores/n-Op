@@ -3,7 +3,7 @@
 import json
 from pathlib import Path
 
-import numpy
+import numpy as np
 import pytest
 from numpy.typing import NDArray
 
@@ -61,9 +61,9 @@ Direct
 """
 
 
-def As_Float_Array(value: StoreArray) -> NDArray[numpy.float64]:
+def As_Float_Array(value: StoreArray) -> NDArray[np.float64]:
     """Coerces a stored array to float64 for assertions."""
-    return numpy.asarray(value, dtype=numpy.float64)
+    return np.asarray(value, dtype=np.float64)
 
 
 def Fake_Pool(tmp_path: Path) -> Path:
@@ -116,14 +116,14 @@ def Test_A_Synthetic_Run_Extracts_Writes_And_Freshens(tmp_path: Path) -> None:
     pool = Fake_Pool(tmp_path)
     census_rows = Read_Census(pool)
     arrays, sidecar = Extract_Run(census_rows[0], pool)
-    assert arrays["charge_density"].dtype == numpy.float32
-    assert abs(float(numpy.mean(As_Float_Array(arrays["charge_density"]))) * 8.0 - 1.75) < 1e-6
+    assert arrays["charge_density"].dtype == np.float32
+    assert abs(float(np.mean(As_Float_Array(arrays["charge_density"]))) * 8.0 - 1.75) < 1e-6
     assert "magnetization_density" in arrays
     assert float(As_Float_Array(arrays["final_magnetization"])) == 0.25
     assert sidecar["campaign"] == "defect_set"
     assert sidecar["pseudopotential_titles"] == ["PAW_FAKE X 01Jan2000", "PAW_FAKE Y 01Jan2000"]
     archive_path = Write_Run(arrays, sidecar, pool)
-    reloaded = numpy.load(archive_path)
+    reloaded = np.load(archive_path)
     assert reloaded["charge_density"].shape == (2, 2, 2)
     bare_arrays, bare_sidecar = Extract_Run(census_rows[1], pool)
     assert "charge_density" not in bare_arrays
@@ -161,9 +161,9 @@ def Test_The_Arsenic_Run_Extracts_Faithfully() -> None:
         "all_electron_valence_density",
     ):
         assert name in arrays
-    assert arrays["charge_density"].dtype == numpy.float32
+    assert arrays["charge_density"].dtype == np.float32
     volume = float(As_Float_Array(arrays["cell_volume"]))
-    integrated = float(numpy.mean(As_Float_Array(arrays["charge_density"]))) * volume
+    integrated = float(np.mean(As_Float_Array(arrays["charge_density"]))) * volume
     assert abs(integrated - 257.0) < 1e-2
     assert As_Float_Array(arrays["local_potential_mean"]).shape == (2,)
     assert sidecar["campaign"] == "defect_set"

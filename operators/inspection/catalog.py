@@ -4,7 +4,7 @@ import json
 from pathlib import Path
 from typing import cast
 
-import numpy
+import numpy as np
 from numpy.typing import NDArray
 
 from operators.data.store import POOL_ROOT, STORE_NAME
@@ -44,7 +44,7 @@ def Describe_Run(campaign: str, identifier: str, pool_root: Path = POOL_ROOT) ->
     base = pool_root / STORE_NAME / campaign / identifier
     sidecar = cast(dict[str, object], json.loads(base.with_suffix(".json").read_text()))
     shapes: dict[str, list[int]] = {}
-    with numpy.load(base.with_suffix(".npz")) as archive:
+    with np.load(base.with_suffix(".npz")) as archive:
         for name in archive.files:
             shapes[name] = list(archive[name].shape)
     sidecar["shapes"] = shapes
@@ -53,11 +53,11 @@ def Describe_Run(campaign: str, identifier: str, pool_root: Path = POOL_ROOT) ->
 
 def Load_Run_Field(
     campaign: str, identifier: str, name: str, pool_root: Path = POOL_ROOT
-) -> NDArray[numpy.float64] | NDArray[numpy.str_]:
+) -> NDArray[np.float64] | NDArray[np.str_]:
     """Loads one named array of one run, numeric arrays as float64."""
     base = pool_root / STORE_NAME / campaign / identifier
-    with numpy.load(base.with_suffix(".npz")) as archive:
+    with np.load(base.with_suffix(".npz")) as archive:
         value = archive[name]
         if value.dtype.kind in ("U", "S"):
-            return numpy.asarray(value, dtype=numpy.str_)
-        return numpy.asarray(value, dtype=numpy.float64)
+            return np.asarray(value, dtype=np.str_)
+        return np.asarray(value, dtype=np.float64)

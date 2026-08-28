@@ -2,7 +2,7 @@
 
 from typing import Any
 
-import numpy
+import numpy as np
 from numpy.typing import NDArray
 
 from operators.framework import Coefficients, Discretization, GridFunction, Operator
@@ -15,11 +15,11 @@ class PointwiseLift(Operator[GridFunction, GridFunction]):
 
 
     def __init__(self, hidden_channels: int, input_channels: int, seed: int = 0) -> None:
-        generator = numpy.random.default_rng(seed)
-        scale = numpy.sqrt(2.0 / (hidden_channels + input_channels))
-        self.parameter_values: dict[str, NDArray[numpy.float64]] = {
+        generator = np.random.default_rng(seed)
+        scale = np.sqrt(2.0 / (hidden_channels + input_channels))
+        self.parameter_values: dict[str, NDArray[np.float64]] = {
             "lift_weights": generator.normal(0.0, scale, size=(hidden_channels, input_channels)),
-            "lift_biases": numpy.zeros(hidden_channels),
+            "lift_biases": np.zeros(hidden_channels),
         }
 
 
@@ -35,7 +35,7 @@ class PointwiseLift(Operator[GridFunction, GridFunction]):
         output_discretization: Discretization,
         condition: Coefficients | None = None,
     ) -> GridFunction:
-        produced = numpy.asarray(self.Forward(self.parameter_values, numpy.asarray(input_function.values)))
+        produced = np.asarray(self.Forward(self.parameter_values, np.asarray(input_function.values)))
         labels = tuple(f"hidden_{index}" for index in range(produced.shape[0]))
         return GridFunction(produced, labels, input_function.domain, input_function.quadrature)
 
@@ -63,7 +63,7 @@ class SensorEncoder(Operator[Coefficients, Coefficients]):
         output_discretization: Discretization,
         condition: Coefficients | None = None,
     ) -> Coefficients:
-        produced = self.network.Apply(numpy.asarray(input_function.vector, dtype=numpy.float64))
+        produced = self.network.Apply(np.asarray(input_function.vector, dtype=np.float64))
         return Coefficients(vector=produced, domain=input_function.domain)
 
 
@@ -75,10 +75,10 @@ class BasisProjectionEncoder(Operator[GridFunction, Coefficients]):
     """Projects a field onto a fixed orthonormal basis by quadrature-weighted inner products."""
 
 
-    def __init__(self, basis_modes: NDArray[numpy.float64], basis_mean: NDArray[numpy.float64]) -> None:
+    def __init__(self, basis_modes: NDArray[np.float64], basis_mean: NDArray[np.float64]) -> None:
         self.basis_modes = basis_modes
         self.basis_mean = basis_mean
-        self.last_coefficients: NDArray[numpy.float64] | None = None
+        self.last_coefficients: NDArray[np.float64] | None = None
 
 
     def __call__(
@@ -87,7 +87,7 @@ class BasisProjectionEncoder(Operator[GridFunction, Coefficients]):
         output_discretization: Discretization,
         condition: Coefficients | None = None,
     ) -> Coefficients:
-        flattened = numpy.asarray(input_function.values, dtype=numpy.float64).reshape(-1)
+        flattened = np.asarray(input_function.values, dtype=np.float64).reshape(-1)
         coefficients = self.basis_modes @ (flattened - self.basis_mean)
         self.last_coefficients = coefficients
         return Coefficients(vector=coefficients, domain=input_function.domain)
@@ -95,7 +95,7 @@ class BasisProjectionEncoder(Operator[GridFunction, Coefficients]):
 
     def Inspect(self) -> dict[str, Array]:
         state: dict[str, Array] = {
-            "basis_mode_norms": numpy.linalg.norm(self.basis_modes, axis=1),
+            "basis_mode_norms": np.linalg.norm(self.basis_modes, axis=1),
             "basis_mean": self.basis_mean,
         }
         if self.last_coefficients is not None:

@@ -6,7 +6,7 @@ from dataclasses import dataclass
 from pathlib import Path
 from typing import Any, cast
 
-import numpy
+import numpy as np
 from numpy.typing import NDArray
 
 from operators.inspection.plots import Render_Curves
@@ -19,7 +19,7 @@ class TrainingResult:
     """The trained parameters, the loss curve, and the run manifest."""
 
     parameters: ParameterSet
-    loss_curve: NDArray[numpy.float64]
+    loss_curve: NDArray[np.float64]
     manifest: dict[str, object]
 
 
@@ -39,8 +39,8 @@ def Train(
     losses: list[float] = []
     for step_index in range(step_count):
         batch = batches[step_index % len(batches)]
-        if isinstance(batch, numpy.ndarray):
-            lifted_batch = engine.Lift_Constant(cast("numpy.typing.NDArray[numpy.float64]", batch))
+        if isinstance(batch, np.ndarray):
+            lifted_batch = engine.Lift_Constant(cast(NDArray[np.float64], batch))
         else:
             lifted_batch = batch
 
@@ -50,7 +50,7 @@ def Train(
         gradients = engine.Gradients(parameters, Loss_Of)
         parameters = Adam_Step(parameters, gradients, state, learning_rate=learning_rate)
         losses.append(engine.Evaluate(parameters, Loss_Of))
-    loss_curve = numpy.asarray(losses, dtype=numpy.float64)
+    loss_curve = np.asarray(losses, dtype=np.float64)
     manifest: dict[str, object] = {
         "run_name": run_name,
         "step_count": step_count,
@@ -62,10 +62,10 @@ def Train(
     }
     if artifact_directory is not None:
         artifact_directory.mkdir(parents=True, exist_ok=True)
-        numpy.savez(artifact_directory / f"{run_name}_curves.npz", loss_curve=loss_curve)
+        np.savez(artifact_directory / f"{run_name}_curves.npz", loss_curve=loss_curve)
         (artifact_directory / f"{run_name}_manifest.json").write_text(json.dumps(manifest, indent=1))
         Render_Curves(
-            numpy.arange(loss_curve.shape[0], dtype=numpy.float64),
+            np.arange(loss_curve.shape[0], dtype=np.float64),
             {"training_loss": loss_curve},
             artifact_directory / f"{run_name}_curves.png",
             run_name,

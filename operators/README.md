@@ -260,25 +260,40 @@ representation its kernel is endomorphic over.
 
 ---
 
-## Everything is inspectable
+## The inspection doctrine
 
 A standing requirement from the project's original specification, restored to canon 2026-08-28
-after an audit found it had not survived the restructure: every quantity the framework computes
-must be reachable as data — weights, intermediate fields, spectral coefficients, attention
-scores, predictions. The convention is the one the tensor store already uses on disk: **named,
-plain-word arrays**.
+after an audit found it had not survived the restructure, and now **equal in rank to the house
+style and the pyright gate**: everything the code computes, learns, or stores must be reachable
+through a deliberate inspection API — weights, per-layer intermediate fields, kernel internals
+(spectral mode weights, attention scores, message-passing edges), training curves, floors,
+split maps, metrics. The convention is the one the tensor store already uses on disk: **named,
+plain-word-keyed arrays** (scalars as zero-dimensional arrays), never anonymous tensors, never
+state locked inside an engine object.
 
-- Every concrete framework part (kernel, encoder, composition, readout, wrapper, assembly)
-  exposes `Inspection_State()` returning its learned arrays and its last forward pass's
-  intermediates as a dictionary of plain-word-named arrays.
-- The engine seam carries this as a facet obligation — named parameters, per-layer intermediate
-  representations on request, gradient access — so the in-house engine must satisfy the same
-  inspection contract the first open-source engine does.
-- A visualization module renders what the arrays hold (fields, curves, spectra, orbit maps).
-  Volumetric renders obey the egress rule: §9.1's quota — metrics plus at most five example
-  fields — governs what leaves `/Pool`.
-- Each operator's implementation specification carries an "Inspection surface" section naming
-  what that operator exposes beyond the shared contract.
+Why named arrays: a name is what makes a quantity findable, comparable across models, and
+storable beside the corpus's own fields without translation. Why the renderer may consume only
+the inspection API: if a plot needs something the API does not expose, the API is incomplete,
+and that is the bug — the renderer is the completeness test. Why a part lands **in the same
+commit** as its inspection surface: a surface added later is a surface shaped by what was
+convenient, not by what the part knows.
+
+- `framework/inspectable.py` holds the contract: `Inspect() -> dict[str, Array]`. `Operator`,
+  `Kernel`, and `Composition` inherit it; `NeuralOperator.Inspect` aggregates its parts under
+  prefixed keys (`encoder.<name>`, `composition.<name>`, `readout.<name>`) so an assembled
+  operator is one flat, browsable namespace. The import tests gate the contract.
+- `inspection/` is the data-layer surface: the catalog (campaigns, runs, shapes, units,
+  provenance, field loading), the summary tables (orbit map, fold balance, exclusions), and
+  `plots.py` — the one module allowed to import the plotting library (a seam test enforces
+  it), rendering axis slices and curves from inspection arrays alone.
+- The engine seam (Phase B) carries the obligation onward: parameters as named arrays at any
+  time, a capture mode for declared forward intermediates, training loops emitting loss and
+  metric curves as stored artifacts. Engine-native objects never cross the seam outward —
+  named arrays do.
+- Each operator's implementation specification must contain an "Inspection" section naming
+  what that operator exposes; a specification without one does not launch its build.
+- Plots and metric tables are exactly the artifacts `test-suite.md` §9.7 permits off `/Pool`;
+  volumetric arrays themselves still never leave.
 
 ---
 
@@ -301,4 +316,5 @@ plain-word arrays**.
    parsing, densities divided by cell volume, orbit-aware splits, the exclusion registry, and
    nothing volumetric or license-derived ever leaving `/Pool`.
 7. **Everything is inspectable:** weights, outputs, and intermediates are reachable as named
-   plain-word arrays through `Inspection_State()` on every part; see the section above.
+   plain-word arrays through `Inspect()` on every part, and renderable through `inspection/`;
+   a part lands in the same commit as its inspection surface. See "The inspection doctrine".

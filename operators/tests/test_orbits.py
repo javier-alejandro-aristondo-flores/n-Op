@@ -2,8 +2,7 @@
 
 import pytest
 
-from operators.data.orbits import Canonical_Orbit, Orbit_Map, Strain_Tensor_Of, StrainAssignment
-from operators.data.store import POOL_ROOT, Read_Census
+from operators.data import Canonical_Orbit, Orbit_Map, POOL_ROOT, Read_Census, Strain_Tensor_Of, StrainAssignment
 
 
 def Require_The_Pool() -> None:

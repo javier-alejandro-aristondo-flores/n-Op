@@ -142,6 +142,34 @@ def Test_The_Names_Are_Prosaic() -> None:
     assert offenses == [], offenses
 
 
+def Test_Cross_Package_Imports_Use_The_Root() -> None:
+    """imports crossing a package boundary land on an init, never on a part"""
+    package_root = Path(__file__).resolve().parent.parent
+    offenses: list[str] = []
+    for source_path in sorted(package_root.rglob("*.py")):
+        if ".pytest_cache" in source_path.parts or source_path.parent.name == "tests":
+            continue
+        tree = ast.parse(source_path.read_text())
+        for node in ast.walk(tree):
+            if isinstance(node, ast.ImportFrom) and node.module is not None and node.module.startswith("operators."):
+                targets = [node.module]
+                import_line = node.lineno
+            elif isinstance(node, ast.Import):
+                targets = [alias.name for alias in node.names if alias.name.startswith("operators.")]
+                import_line = node.lineno
+            else:
+                continue
+            for target in targets:
+                relative = Path(*target.split(".")[1:])
+                if (package_root / relative / "__init__.py").is_file():
+                    continue
+                part_file = package_root / relative.with_suffix(".py")
+                owning_package = (package_root / relative).parent
+                if part_file.is_file() and owning_package not in source_path.parents:
+                    offenses.append(f"{source_path.name}:{import_line} reaches into {target}")
+    assert offenses == [], offenses
+
+
 def Test_The_Comments_Describe_The_Code() -> None:
     """every docstring and comment is one lowercase line, with no closing period"""
     pragma_prefixes = ("#!", "# type:", "# pyright:", "# noqa")

@@ -7,19 +7,8 @@ import numpy as np
 import pytest
 from numpy.typing import NDArray
 
-from operators.data.store import (
-    POOL_ROOT,
-    Campaign_Of,
-    Extract_Run,
-    Guard_Volumetric_Destination,
-    Read_Census,
-    Run_Identifier,
-    Stale_Report,
-    StoreArray,
-    StoreError,
-    Write_Manifests,
-    Write_Run,
-)
+from operators.data import POOL_ROOT, Campaign_Of, Extract_Run, Read_Census, Run_Identifier, Stale_Report, StoreError
+from operators.data.store import Guard_Volumetric_Destination, StoreArray, Write_Manifests, Write_Run
 
 SYNTHETIC_CHGCAR = """synthetic
    1.0

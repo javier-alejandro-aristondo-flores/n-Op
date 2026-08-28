@@ -3,7 +3,8 @@
 import numpy as np
 
 from numpy.typing import NDArray
-from operators.framework.invariance import (
+
+from operators.framework import (
     Apply_Grid_Operation,
     Block_Gap_Null,
     Diamond_Grid_Operations,

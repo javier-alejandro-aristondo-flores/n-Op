@@ -2,18 +2,16 @@
 
 import numpy as np
 
+from operators.data import Basis_Decay_Gate, Fit_Per_Shell_Filter, Gram_Pod, Hartree_Potential, Project, Reconstruct, Reconstruction_Error_Curve
 from operators.data.floors import (
     Apply_Per_Shell_Filter,
-    Fit_Per_Shell_Filter,
-    Hartree_Potential,
+    COULOMB_CONSTANT,
     Ridge_Apply,
     Ridge_Fit,
     Shell_Index_Grid,
     Spectral_Gradient_Magnitude_And_Laplacian,
-    COULOMB_CONSTANT,
 )
-from operators.substrate.fourier import Cartesian_Wavevectors, Reciprocal_Rows
-from operators.data.pod import Basis_Decay_Gate, Gram_Pod, Project, Reconstruct, Reconstruction_Error_Curve
+from operators.substrate import Cartesian_Wavevectors, Reciprocal_Rows
 
 
 def Test_Reciprocal_Rows_Are_Dual_To_The_Lattice() -> None:

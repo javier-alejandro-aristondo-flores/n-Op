@@ -8,7 +8,7 @@ import numpy as np
 from numpy.typing import NDArray
 
 from operators.data.orbits import Orbit_Map
-from operators.substrate.fourier import Cartesian_Wavevectors
+from operators.substrate import Cartesian_Wavevectors
 from operators.data.spectra import Occupancy_Walk_Gap
 from operators.data.store import POOL_ROOT, Archive_Path, CensusRow, Run_Identifier
 

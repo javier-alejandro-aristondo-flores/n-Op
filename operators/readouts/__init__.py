@@ -6,19 +6,18 @@ import numpy as np
 from numpy.typing import NDArray
 
 from operators.framework import (
+    Array,
     Coefficients,
     Discretization,
     GridFunction,
     GridSpec,
     Operator,
+    Output_Points,
     PointSet,
     Representation,
     UniformGridQuadrature,
 )
-from operators.framework.domain import Array
-from operators.framework.integral import Output_Points
-from operators.substrate.network import MultilayerPerceptron
-from operators.substrate.operations import Softplus
+from operators.substrate import MultilayerPerceptron, Softplus
 
 
 class PointwiseProjection(Operator[GridFunction, GridFunction]):

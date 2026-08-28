@@ -6,7 +6,7 @@ from pathlib import Path
 import numpy as np
 import pytest
 
-from operators.data.store import POOL_ROOT
+from operators.data import POOL_ROOT
 from operators.inspection import (
     Describe_Run,
     Exclusion_Summary,
@@ -16,9 +16,10 @@ from operators.inspection import (
     List_Runs,
     Load_Run_Field,
     Orbit_Summary,
+    Render_Curves,
+    Render_Field_Slices,
     Render_Table,
 )
-from operators.inspection.plots import Render_Curves, Render_Field_Slices
 
 PACKAGE_ROOT = Path(__file__).resolve().parent.parent
 

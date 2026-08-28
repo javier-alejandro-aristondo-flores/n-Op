@@ -3,9 +3,8 @@
 import numpy as np
 from numpy.typing import NDArray
 
-from operators.framework import Coefficients, Composition, GridFunction, GridSpec, Layer
-from operators.framework.domain import Array
-from operators.substrate.operations import Gaussian_Error_Linear_Unit
+from operators.framework import Array, Coefficients, Composition, GridFunction, GridSpec, Layer
+from operators.substrate import Gaussian_Error_Linear_Unit
 
 
 class ExplicitStack(Composition[GridFunction]):

@@ -4,10 +4,7 @@ import json
 from collections import Counter
 from pathlib import Path
 
-from operators.data.exclusions import EXCLUSIONS, Resolve_Exclusion
-from operators.data.orbits import Orbit_Map
-from operators.data.splits import ARTIFACT_DIRECTORY
-from operators.data.store import POOL_ROOT, Read_Census
+from operators.data import ARTIFACT_DIRECTORY, EXCLUSIONS, Orbit_Map, POOL_ROOT, Read_Census, Resolve_Exclusion
 
 type Table = tuple[dict[str, object], ...]
 

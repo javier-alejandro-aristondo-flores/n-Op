@@ -24,7 +24,7 @@ from operators.data.floors import (
 from operators.data.pod import Basis_Decay_Gate, Reconstruction_Error_Curve
 from operators.data.splits import ARTIFACT_DIRECTORY
 from operators.data.store import POOL_ROOT, Archive_Path, Read_Census
-from operators.framework.invariance import Spectral_Truncation_Resample
+from operators.framework import Spectral_Truncation_Resample
 from operators.metrics import Median_And_Interquartile
 
 REPORT_PATH = Path(__file__).parent.parent / "stage0-report.md"

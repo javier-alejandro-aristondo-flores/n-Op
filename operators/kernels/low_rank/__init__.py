@@ -7,16 +7,18 @@ import numpy as np
 from numpy.typing import NDArray
 
 from operators.framework import (
+    Array,
     Coefficients,
     Discretization,
     GridFunction,
     Kernel,
+    Output_Points,
     PointSet,
     PointSpec,
+    Quadrature_Weights,
     Representation,
+    Source_Points_And_Values,
 )
-from operators.framework.domain import Array
-from operators.framework.integral import Output_Points, Quadrature_Weights, Source_Points_And_Values
 
 
 class DenseKernel(Kernel[Coefficients, Coefficients]):

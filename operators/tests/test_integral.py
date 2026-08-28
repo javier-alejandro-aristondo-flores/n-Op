@@ -2,18 +2,20 @@
 
 import numpy as np
 
+from numpy.typing import NDArray
+
 from operators.framework import (
     Coefficients,
     CountingQuadrature,
+    Dense_Reference_Integral,
     Domain,
     GridFunction,
     GridSpec,
     PointSet,
     PointSpec,
+    Quadrature_Weights,
     UniformGridQuadrature,
 )
-from numpy.typing import NDArray
-from operators.framework.integral import Dense_Reference_Integral, Quadrature_Weights
 
 CUBE = Domain(lattice=np.eye(3) * 2.0)
 

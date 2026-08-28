@@ -8,8 +8,7 @@ from pathlib import Path
 import numpy as np
 from numpy.typing import NDArray
 
-from operators.data.splits import ARTIFACT_DIRECTORY
-from operators.data.store import POOL_ROOT
+from operators.data import ARTIFACT_DIRECTORY, Archive_Path, POOL_ROOT, Run_Identifier
 from operators.framework import Domain, GridFunction, UniformGridQuadrature
 from operators.tasks import TaskCard
 
@@ -56,8 +55,6 @@ def Strain_Charge_Pairs(
 ) -> Iterator[tuple[str, GridFunction, GridFunction]]:
     """same-grid cheap and accurate charge fields, for one holdout assignment"""
     holdout = json.loads((ARTIFACT_DIRECTORY / "strain_atlas_holdout.json").read_text())
-    from operators.data.store import Run_Identifier
-
     produced = 0
     for orbit_record in holdout.values():
         if orbit_record["assignment"] != assignment:
@@ -76,7 +73,7 @@ def Strain_Charge_Pairs(
                 continue
             fields: dict[str, GridFunction] = {}
             for side, run_path in sides.items():
-                archive_path = pool_root / "_derived/strain_atlas" / f"{Run_Identifier(run_path)}.npz"
+                archive_path = Archive_Path("strain_atlas", Run_Identifier(run_path), pool_root)
                 with np.load(archive_path) as archive:
                     field = Field_From_Archive(archive, ("charge_density",))
                 if field is None:
@@ -108,7 +105,7 @@ def Paired_Field_Examples(
         if (role == "evaluation") != in_evaluation:
             continue
         for identifier in unit["run_identifiers"]:
-            archive_path = pool_root / "_derived" / unit["campaign"] / f"{identifier}.npz"
+            archive_path = Archive_Path(unit["campaign"], identifier, pool_root)
             if not archive_path.exists():
                 continue
             with np.load(archive_path) as archive:

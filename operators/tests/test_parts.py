@@ -5,8 +5,10 @@ import numpy as np
 from operators.compositions import ExplicitStack
 from operators.encoders import BasisProjectionEncoder, PointwiseLift, SensorEncoder
 from operators.framework import (
+    Array,
     Coefficients,
     Domain,
+    Fractional_Grid_Coordinates,
     GridFunction,
     GridSpec,
     Layer,
@@ -14,9 +16,7 @@ from operators.framework import (
     PointSpec,
     UniformGridQuadrature,
 )
-from operators.framework.domain import Array
-from operators.framework.integral import Fractional_Grid_Coordinates
-from operators.kernels.spectral import SpectralKernel
+from operators.kernels import SpectralKernel
 from operators.readouts import BasisExpansion, PointwiseProjection
 from operators.wrappers import Conditioned, Conserving, Residual
 

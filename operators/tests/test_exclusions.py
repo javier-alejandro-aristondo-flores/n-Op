@@ -2,8 +2,7 @@
 
 import pytest
 
-from operators.data.exclusions import Read_Byte_Alias_Groups, Resolve_Exclusion
-from operators.data.store import POOL_ROOT, Campaign_Of, Read_Census
+from operators.data import Campaign_Of, POOL_ROOT, Read_Byte_Alias_Groups, Read_Census, Resolve_Exclusion
 
 
 def Require_The_Pool() -> None:

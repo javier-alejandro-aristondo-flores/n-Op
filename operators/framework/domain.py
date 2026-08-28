@@ -2,7 +2,7 @@
 
 from dataclasses import dataclass
 
-from operators.substrate.arrays import ArrayLike
+from operators.substrate import ArrayLike
 
 type Array = ArrayLike
 

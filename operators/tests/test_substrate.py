@@ -8,6 +8,7 @@ import pytest
 
 from operators.substrate import (
     Adam_Step,
+    Engine,
     Fresh_Adam_State,
     Fourier_Transform_3d,
     Gaussian_Error_Linear_Unit,
@@ -18,7 +19,6 @@ from operators.substrate import (
     Torch_Is_Available,
     TorchEngine,
 )
-from operators.substrate.engine import Engine
 
 PACKAGE_ROOT = Path(__file__).resolve().parent.parent
 

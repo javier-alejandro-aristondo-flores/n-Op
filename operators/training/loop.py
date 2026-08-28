@@ -9,9 +9,8 @@ from typing import Any, cast
 import numpy as np
 from numpy.typing import NDArray
 
-from operators.inspection.plots import Render_Curves
-from operators.substrate.engine import Engine, ParameterSet
-from operators.substrate.optimize import Adam_Step, Fresh_Adam_State
+from operators.inspection import Render_Curves
+from operators.substrate import Adam_Step, Engine, Fresh_Adam_State, ParameterSet
 
 
 @dataclass(frozen=True, slots=True)

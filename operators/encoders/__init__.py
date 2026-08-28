@@ -5,9 +5,8 @@ from typing import Any
 import numpy as np
 from numpy.typing import NDArray
 
-from operators.framework import Coefficients, Discretization, GridFunction, Operator
-from operators.framework.domain import Array
-from operators.substrate.network import MultilayerPerceptron
+from operators.framework import Array, Coefficients, Discretization, GridFunction, Operator
+from operators.substrate import MultilayerPerceptron
 
 
 class PointwiseLift(Operator[GridFunction, GridFunction]):

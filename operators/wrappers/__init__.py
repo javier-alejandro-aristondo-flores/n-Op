@@ -5,9 +5,7 @@ from typing import Literal
 import numpy as np
 from numpy.typing import NDArray
 
-from operators.framework import Coefficients, Discretization, GridFunction, Operator
-from operators.framework.domain import Array
-from operators.framework.integral import Quadrature_Weights
+from operators.framework import Array, Coefficients, Discretization, GridFunction, Operator, Quadrature_Weights
 
 
 class Conserving(Operator[GridFunction, GridFunction]):

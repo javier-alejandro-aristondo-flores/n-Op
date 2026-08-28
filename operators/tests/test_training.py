@@ -6,10 +6,8 @@ from typing import Any
 import numpy as np
 import pytest
 
-from operators.data.store import POOL_ROOT
-from operators.substrate import NumpyEngine, ParameterSet, Torch_Is_Available, TorchEngine
-from operators.substrate.engine import Engine
-from operators.substrate.linear_algebra import Least_Squares_Solution
+from operators.data import POOL_ROOT
+from operators.substrate import Engine, Least_Squares_Solution, NumpyEngine, ParameterSet, Torch_Is_Available, TorchEngine
 from operators.tasks import Card_Named
 from operators.training import Paired_Field_Examples, Strain_Charge_Pairs, Train
 

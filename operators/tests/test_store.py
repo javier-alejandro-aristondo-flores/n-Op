@@ -17,6 +17,7 @@ from operators.data.store import (
     Stale_Report,
     StoreArray,
     StoreError,
+    Write_Manifests,
     Write_Run,
 )
 
@@ -128,6 +129,7 @@ def Test_A_Synthetic_Run_Extracts_Writes_And_Freshens(tmp_path: Path) -> None:
     assert "charge_density" not in bare_arrays
     assert abs(float(As_Float_Array(bare_arrays["cell_volume"])) - 27.0) < 1e-9
     Write_Run(bare_arrays, bare_sidecar, pool)
+    Write_Manifests(pool)
     report = Stale_Report(pool)
     assert sorted(report["fresh"]) == sorted(Run_Identifier(row.path) for row in rows)
     assert report["stale"] == [] and report["missing"] == []

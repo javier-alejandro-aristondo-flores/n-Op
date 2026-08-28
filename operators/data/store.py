@@ -190,18 +190,25 @@ def Extract_Run(row: CensusRow, pool_root: Path) -> tuple[dict[str, StoreArray],
         raise StoreError(f"no geometry source in {row.path}")
     arrays.update(Geometry_Entries(geometry))
     arrays["cell_volume"] = np.asarray(Cell_Volume(geometry.lattice), dtype=np.float64)
+    unreadable: list[str] = []
     if Present("EIGENVAL"):
-        eigenvalues = Read_Eigenvalues(run_directory / "EIGENVAL")
-        arrays["kpoints"] = eigenvalues.kpoints
-        arrays["kpoint_weights"] = eigenvalues.kpoint_weights
-        arrays["eigenvalue_energies"] = eigenvalues.energies
-        arrays["eigenvalue_occupancies"] = eigenvalues.occupancies
-        arrays["eigenvalue_electron_count"] = np.asarray(eigenvalues.electron_count, dtype=np.float64)
+        try:
+            eigenvalues = Read_Eigenvalues(run_directory / "EIGENVAL")
+            arrays["kpoints"] = eigenvalues.kpoints
+            arrays["kpoint_weights"] = eigenvalues.kpoint_weights
+            arrays["eigenvalue_energies"] = eigenvalues.energies
+            arrays["eigenvalue_occupancies"] = eigenvalues.occupancies
+            arrays["eigenvalue_electron_count"] = np.asarray(eigenvalues.electron_count, dtype=np.float64)
+        except (ParseError, ValueError, IndexError):
+            unreadable.append("EIGENVAL")
     titles: tuple[str, ...] = ()
     if Present("OUTCAR"):
-        echoes = Read_Outcar_Echoes(run_directory / "OUTCAR")
-        arrays["electron_count"] = np.asarray(echoes.electron_count, dtype=np.float64)
-        titles = echoes.pseudopotential_titles
+        try:
+            echoes = Read_Outcar_Echoes(run_directory / "OUTCAR")
+            arrays["electron_count"] = np.asarray(echoes.electron_count, dtype=np.float64)
+            titles = echoes.pseudopotential_titles
+        except (ParseError, ValueError, IndexError):
+            unreadable.append("OUTCAR")
     if Present("OSZICAR"):
         magnetization = Read_Final_Magnetization(run_directory / "OSZICAR")
         if magnetization is not None:
@@ -216,6 +223,7 @@ def Extract_Run(row: CensusRow, pool_root: Path) -> tuple[dict[str, StoreArray],
         "fields": sorted(arrays),
         "units": {name: UNIT_BY_FIELD.get(name.removesuffix("_up").removesuffix("_down"), "") for name in sorted(arrays)},
         "pseudopotential_titles": list(titles),
+        "unreadable_files": unreadable,
         "census_row": row.record,
     }
     return arrays, sidecar
@@ -238,7 +246,7 @@ def Sidecar_Paths(pool_root: Path) -> tuple[Path, ...]:
     store_directory = pool_root / STORE_NAME
     if not store_directory.exists():
         return ()
-    return tuple(sorted(store_directory.glob("*/*.json")))
+    return tuple(sorted(path for path in store_directory.glob("*/*.json") if path.name != "manifest.json"))
 
 
 def Stale_Report(pool_root: Path) -> dict[str, list[str]]:

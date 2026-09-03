@@ -12,17 +12,25 @@ from numpy.typing import NDArray
 from operators.data import (
     ARTIFACT_DIRECTORY,
     Archive_Path,
+    Occupancy_Walk_Gap,
     Orbit_Map,
     POOL_ROOT,
     Read_Census,
+    Rebuild_Density_Of_States,
     Run_Identifier,
+    SMEARING_WIDTH_BY_CAMPAIGN,
     StrainAssignment,
+    Valence_Band_Maximum,
 )
 from operators.framework import Coefficients, Domain, GridFunction, UniformGridQuadrature
 from operators.tasks import TaskCard
 
 LATTICE_FACTOR_NAMES = ("a", "b", "c", "alpha", "beta", "gamma")
 AUXILIARY_PROBE_ROLE = "auxiliary_probe"
+# measured over all 2,680 atlas runs: the lowest top-band minimum sits 8.357 eV above the
+# valence-band maximum, so a ceiling of 8.0 never reaches a region some run left uncomputed
+STATE_DENSITY_WINDOW_BY_CAMPAIGN: dict[str, tuple[float, float]] = {"strain_atlas": (-28.0, 8.0)}
+STATE_DENSITY_POINT_COUNT = 601
 
 
 @dataclass(frozen=True, slots=True)
@@ -196,8 +204,8 @@ def Parameter_Example_From_Run(
     )
 
 
-def Strain_Atlas_Examples(card: TaskCard, role: str, pool_root: Path) -> Iterator[ParameterExample]:
-    """strain tensors and their target fields for one holdout assignment or the probe"""
+def Strain_Atlas_Runs(role: str, pool_root: Path) -> Iterator[tuple[str, str, StrainAssignment]]:
+    """orbit key, store identifier and resolved assignment for every run under one role"""
     holdout = json.loads((ARTIFACT_DIRECTORY / "strain_atlas_holdout.json").read_text())
     assignments = Strain_Assignments_By_Run(pool_root)
     wants_probe = role == AUXILIARY_PROBE_ROLE
@@ -212,20 +220,25 @@ def Strain_Atlas_Examples(card: TaskCard, role: str, pool_root: Path) -> Iterato
             if (run_path in auxiliary) != wants_probe:
                 continue
             assignment = assignments.get(run_path)
-            if assignment is None:
-                continue
-            example = Parameter_Example_From_Run(
-                "strain_atlas",
-                identifier,
-                run_path,
-                orbit,
-                assignment.tensor,
-                {"functional": assignment.functional},
-                card.targets,
-                pool_root,
-            )
-            if example is not None:
-                yield example
+            if assignment is not None:
+                yield orbit, identifier, assignment
+
+
+def Strain_Atlas_Examples(card: TaskCard, role: str, pool_root: Path) -> Iterator[ParameterExample]:
+    """strain tensors and their target fields for one holdout assignment or the probe"""
+    for orbit, identifier, assignment in Strain_Atlas_Runs(role, pool_root):
+        example = Parameter_Example_From_Run(
+            "strain_atlas",
+            identifier,
+            assignment.run_path,
+            orbit,
+            assignment.tensor,
+            {"functional": assignment.functional},
+            card.targets,
+            pool_root,
+        )
+        if example is not None:
+            yield example
 
 
 def Perovskite_Examples(
@@ -276,3 +289,84 @@ def Parameter_Field_Examples(
     else:
         raise ValueError(f"card {card.name} is not split by a parameter sweep")
     return examples if limit is None else islice(examples, limit)
+
+
+@dataclass(frozen=True, slots=True)
+class StateDensityExample:
+    """one run's parameter vector and its rebuilt curve on the valence-aligned window"""
+
+    identifier: str
+    run_path: str
+    unit_key: str
+    parameters: Coefficients
+    energy_grid: NDArray[np.float64]
+    state_density: NDArray[np.float64]
+    valence_band_maximum: float
+    occupancy_walk_gap: float
+    covariate_values: dict[str, str]
+
+
+def Aligned_Energy_Grid(campaign: str, point_count: int = STATE_DENSITY_POINT_COUNT) -> NDArray[np.float64]:
+    """a campaign's shared window, in electronvolts from the valence-band maximum"""
+    lower_bound, upper_bound = STATE_DENSITY_WINDOW_BY_CAMPAIGN[campaign]
+    return np.linspace(lower_bound, upper_bound, point_count)
+
+
+def State_Density_Of_Archive(
+    archive: "np.lib.npyio.NpzFile",
+    campaign: str,
+    energy_grid: NDArray[np.float64],
+) -> tuple[NDArray[np.float64], float, float] | None:
+    """a run's curve, valence-band maximum and occupancy-walk gap, or nothing without eigenvalues"""
+    if "eigenvalue_energies" not in archive:
+        return None
+    energies = np.asarray(archive["eigenvalue_energies"], dtype=np.float64)
+    occupancies = np.asarray(archive["eigenvalue_occupancies"], dtype=np.float64)
+    kpoint_weights = np.asarray(archive["kpoint_weights"], dtype=np.float64)
+    valence_band_maximum = Valence_Band_Maximum(energies, occupancies)
+    curve = Rebuild_Density_Of_States(
+        energies,
+        kpoint_weights,
+        SMEARING_WIDTH_BY_CAMPAIGN[campaign],
+        # the window is carried relative to the alignment, so it moves onto absolute energies here
+        energy_grid + valence_band_maximum,
+    )
+    return curve, valence_band_maximum, Occupancy_Walk_Gap(energies, occupancies)
+
+
+def State_Density_Examples(
+    card: TaskCard,
+    role: str,
+    pool_root: Path = POOL_ROOT,
+    point_count: int = STATE_DENSITY_POINT_COUNT,
+    limit: int | None = None,
+) -> Iterator[StateDensityExample]:
+    """parameter vectors and their rebuilt state-density curves, under the committed holdout"""
+    if card.split != "strain_atlas_holdout":
+        raise ValueError(f"card {card.name} has no rebuilt curve block yet")
+    energy_grid = Aligned_Energy_Grid("strain_atlas", point_count)
+    produced = 0
+    for orbit, identifier, assignment in Strain_Atlas_Runs(role, pool_root):
+        archive_path = Archive_Path("strain_atlas", identifier, pool_root)
+        if not archive_path.exists():
+            continue
+        with np.load(archive_path) as archive:
+            rebuilt = State_Density_Of_Archive(archive, "strain_atlas", energy_grid)
+            lattice = np.asarray(archive["lattice"], dtype=np.float64)
+        if rebuilt is None:
+            continue
+        curve, valence_band_maximum, gap = rebuilt
+        yield StateDensityExample(
+            identifier=identifier,
+            run_path=assignment.run_path,
+            unit_key=orbit,
+            parameters=Coefficients(vector=np.asarray(assignment.tensor, dtype=np.float64), domain=Domain(lattice)),
+            energy_grid=energy_grid,
+            state_density=curve,
+            valence_band_maximum=valence_band_maximum,
+            occupancy_walk_gap=gap,
+            covariate_values={"functional": assignment.functional},
+        )
+        produced += 1
+        if limit is not None and produced >= limit:
+            return

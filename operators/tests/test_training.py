@@ -18,9 +18,11 @@ from operators.data import Strain_Tensor_Of
 from operators.tasks import Card_Named
 from operators.training import (
     AUXILIARY_PROBE_ROLE,
+    Aligned_Energy_Grid,
     Lattice_Factors_Of,
     Paired_Field_Examples,
     Parameter_Field_Examples,
+    State_Density_Examples,
     Strain_Charge_Pairs,
     Train,
 )
@@ -178,3 +180,34 @@ def Test_The_Perovskite_Loader_Splits_By_Fold_And_By_Factor() -> None:
         held = list(Parameter_Field_Examples(card, "evaluation", extrapolation_holdout=holdout_tag))
         assert len(held) == 122
         assert all(holdout_tag.removeprefix("holdout_factor_") in example.run_path for example in held)
+
+
+@pytest.mark.pool
+def Test_The_State_Density_Curves_Rebuild_On_The_Aligned_Window() -> None:
+    """asserts curves are non-negative on the shared window and empty across the gap"""
+    grid = Aligned_Energy_Grid("strain_atlas")
+    assert (float(grid[0]), float(grid[-1])) == (-28.0, 8.0)
+    for example in State_Density_Examples(Card_Named("strain_to_states"), "validation", limit=8):
+        assert example.state_density.shape == grid.shape
+        assert bool((example.state_density >= 0.0).all())
+        assert example.occupancy_walk_gap > 1.0
+        across_the_gap = (example.energy_grid > 0.2) & (example.energy_grid < example.occupancy_walk_gap - 0.2)
+        below_the_edge = example.energy_grid < -1.0
+        assert float(example.state_density[across_the_gap].mean()) < 0.01
+        assert float(example.state_density[below_the_edge].mean()) > 0.05
+
+
+@pytest.mark.pool
+def Test_The_Rebuilt_Gaps_Reproduce_The_Recorded_Scissor() -> None:
+    """asserts the occupancy walk through the curve loader lands on the Stage-0 scissor"""
+    by_point: dict[str, dict[str, float]] = {}
+    for example in State_Density_Examples(Card_Named("strain_to_states"), "validation"):
+        point = example.run_path.rsplit("/", 1)[0]
+        by_point.setdefault(point, {})[example.covariate_values["functional"]] = example.occupancy_walk_gap
+    differences = np.asarray(
+        [sides["accurate"] - sides["cheap"] for sides in by_point.values() if len(sides) == 2]
+    )
+    assert differences.shape[0] > 100
+    # the report records 1.223 +/- 0.057 eV over all pairs, reached by a different route
+    assert 1.19 < float(differences.mean()) < 1.25
+    assert float(differences.std()) < 0.07

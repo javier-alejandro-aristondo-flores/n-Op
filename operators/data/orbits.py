@@ -18,13 +18,14 @@ class OrbitError(Exception):
 
 @dataclass(frozen=True, slots=True)
 class StrainAssignment:
-    """one strain-atlas run resolved to its point, family, functional and orbit"""
+    """one strain-atlas run resolved to its point, family, functional, tensor and orbit"""
 
     run_path: str
     point: str
     family: str
     functional: str
     auxiliary: bool
+    tensor: StrainTensor
     orbit: str
 
 
@@ -159,6 +160,7 @@ def Orbit_Map(census_rows: Sequence[CensusRow]) -> tuple[StrainAssignment, ...]:
                 functional=Strain_Functional(census_row.path),
                 # the later sweep lives under new, and adds no orbit of its own
                 auxiliary="/new/" in census_row.path,
+                tensor=tensor,
                 orbit=Canonical_Orbit(tensor),
             )
         )

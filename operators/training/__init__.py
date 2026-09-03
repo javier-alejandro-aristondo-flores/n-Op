@@ -3,9 +3,14 @@
 # pyright: reportUnusedImport=false
 
 from operators.training.loader import (
+    AUXILIARY_PROBE_ROLE,
     Field_From_Archive,
+    Lattice_Factors_Of,
     Paired_Field_Examples,
+    Parameter_Field_Examples,
+    ParameterExample,
     Per_Channel_Statistics,
+    Strain_Assignments_By_Run,
     Strain_Charge_Pairs,
     TrainingExample,
 )

@@ -108,3 +108,17 @@ def Test_The_Spectral_Kernel_Transfers_Discretization() -> None:
     assert np.allclose(np.asarray(produced.values), reference, atol=1e-10)
     inspected = kernel.Inspect()
     assert inspected["mode_magnitudes"].shape == (3, 3, 3, 1, 1)
+
+
+def Test_The_Spectral_Kernel_Publishes_Its_Phase() -> None:
+    """the two stored real arrays are one complex weight, and phase is half of what it means"""
+    kernel = SpectralKernel(kept_modes=(1, 1, 1), output_channels=2, input_channels=2, seed=3)
+    inspected = kernel.Inspect()
+    real_part = np.asarray(inspected["mode_weights_real"], dtype=np.float64)
+    imaginary_part = np.asarray(inspected["mode_weights_imaginary"], dtype=np.float64)
+    magnitudes = np.asarray(inspected["mode_magnitudes"], dtype=np.float64)
+    phases = np.asarray(inspected["mode_phases"], dtype=np.float64)
+    assert phases.shape == real_part.shape
+    # magnitude and phase must reconstruct the pair they were derived from
+    assert np.allclose(magnitudes * np.cos(phases), real_part)
+    assert np.allclose(magnitudes * np.sin(phases), imaginary_part)

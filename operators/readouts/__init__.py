@@ -133,6 +133,7 @@ class BasisExpansion(Operator[Coefficients, Representation]):
         )
         self.parameter_values = self.trunk.parameter_values
         self.last_trunk_features: NDArray[np.float64] | None = None
+        self.last_query_grid_shape: tuple[int, int, int] | None = None
 
 
     def Coordinate_Features(self, points: NDArray[np.float64]) -> NDArray[np.float64]:
@@ -157,6 +158,10 @@ class BasisExpansion(Operator[Coefficients, Representation]):
         points = Output_Points(output_discretization)
         trunk_features = self.Coordinate_Features(points)
         self.last_trunk_features = trunk_features
+        # whether the query was a grid decides whether a feature column is a field or a bare list
+        self.last_query_grid_shape = (
+            output_discretization.shape if isinstance(output_discretization, GridSpec) else None
+        )
         branch_coefficients = np.asarray(input_function.vector, dtype=np.float64)
         channel_count = len(self.output_channel_labels)
         if branch_coefficients.ndim == 2 and branch_coefficients.shape[0] != channel_count:
@@ -187,7 +192,11 @@ class BasisExpansion(Operator[Coefficients, Representation]):
     def Inspect(self) -> dict[str, Array]:
         state: dict[str, Array] = dict(self.parameter_values)
         if self.last_trunk_features is not None:
-            state["last_trunk_features"] = self.last_trunk_features
+            features = self.last_trunk_features
+            if self.last_query_grid_shape is not None:
+                # a feature evaluated over a grid is a field, and is inspected with that shape
+                features = features.reshape(*self.last_query_grid_shape, features.shape[1])
+            state["last_trunk_features"] = features
         return state
 
 
@@ -235,10 +244,11 @@ class FixedModeExpansion(Operator[Coefficients, GridFunction]):
 
 
     def Inspect(self) -> dict[str, Array]:
+        # a mode is a field, so it is inspected with the shape that makes it one
         state: dict[str, Array] = {
-            "basis_modes": self.basis.modes,
+            "basis_modes": self.basis.modes.reshape(self.basis.modes.shape[0], *self.grid_shape),
             "basis_singular_values": self.basis.singular_values,
-            "basis_mean": self.basis.mean,
+            "basis_mean": self.basis.mean.reshape(self.grid_shape),
         }
         if self.last_coefficients is not None:
             state["last_coefficients"] = self.last_coefficients

@@ -51,6 +51,7 @@ class SensorEncoder(Operator[Coefficients, Coefficients]):
     def __init__(self, layer_widths: tuple[int, ...], seed: int = 0) -> None:
         self.network = MultilayerPerceptron(layer_widths, "sensor_encoder", seed)
         self.parameter_values = self.network.parameter_values
+        self.last_latent_vector: NDArray[np.float64] | None = None
 
 
     def Forward(self, lifted: dict[str, Any], input_vector: Any) -> Any:
@@ -64,11 +65,15 @@ class SensorEncoder(Operator[Coefficients, Coefficients]):
         condition: Coefficients | None = None,
     ) -> Coefficients:
         produced = self.network.Apply(np.asarray(input_function.vector, dtype=np.float64))
+        self.last_latent_vector = produced
         return Coefficients(vector=produced, domain=input_function.domain)
 
 
     def Inspect(self) -> dict[str, Array]:
-        return dict(self.parameter_values)
+        state: dict[str, Array] = dict(self.parameter_values)
+        if self.last_latent_vector is not None:
+            state["last_latent_vector"] = self.last_latent_vector
+        return state
 
 
 class BasisProjectionEncoder(Operator[GridFunction, Coefficients]):
@@ -79,6 +84,7 @@ class BasisProjectionEncoder(Operator[GridFunction, Coefficients]):
         self.basis_modes = basis_modes
         self.basis_mean = basis_mean
         self.last_coefficients: NDArray[np.float64] | None = None
+        self.last_grid_shape: tuple[int, ...] | None = None
 
 
     def __call__(
@@ -87,6 +93,8 @@ class BasisProjectionEncoder(Operator[GridFunction, Coefficients]):
         output_discretization: Discretization,
         condition: Coefficients | None = None,
     ) -> Coefficients:
+        # the shape arrives with the field and is the only place this encoder can learn it
+        self.last_grid_shape = np.asarray(input_function.values).shape[1:]
         flattened = np.asarray(input_function.values, dtype=np.float64).reshape(-1)
         # the basis was built on mean-removed fields, so the mean comes off here too
         coefficients = self.basis_modes @ (flattened - self.basis_mean)
@@ -95,10 +103,13 @@ class BasisProjectionEncoder(Operator[GridFunction, Coefficients]):
 
 
     def Inspect(self) -> dict[str, Array]:
-        state: dict[str, Array] = {
-            "basis_mode_norms": np.linalg.norm(self.basis_modes, axis=1),
-            "basis_mean": self.basis_mean,
-        }
+        state: dict[str, Array] = {"basis_mode_norms": np.linalg.norm(self.basis_modes, axis=1)}
+        # until a field has been seen this encoder does not know the shape its mean lives on
+        if self.last_grid_shape is not None:
+            state["basis_mean"] = self.basis_mean.reshape(self.last_grid_shape)
+            state["basis_modes"] = self.basis_modes.reshape(self.basis_modes.shape[0], *self.last_grid_shape)
+        else:
+            state["basis_mean"] = self.basis_mean
         if self.last_coefficients is not None:
             state["last_coefficients"] = self.last_coefficients
         return state

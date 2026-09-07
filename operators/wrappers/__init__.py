@@ -19,7 +19,8 @@ class Conserving(Operator[GridFunction, GridFunction]):
     ) -> None:
         self.inner = inner
         self.law = law
-        self.last_correction_scale: NDArray[np.float64] | None = None
+        self.last_removed_mean: NDArray[np.float64] | None = None
+        self.last_renormalization_scale: NDArray[np.float64] | None = None
 
 
     def __call__(
@@ -36,7 +37,7 @@ class Conserving(Operator[GridFunction, GridFunction]):
         if self.law == "zero_mean":
             # channel by channel, so no channel borrows another's offset
             corrected = values - values.mean(axis=(1, 2, 3), keepdims=True)
-            self.last_correction_scale = np.asarray([float(values.mean())])
+            self.last_removed_mean = np.asarray(float(values.mean()))
         else:
             if condition is None:
                 raise ValueError("renormalization needs the electron count as the condition")
@@ -45,14 +46,16 @@ class Conserving(Operator[GridFunction, GridFunction]):
             integral = float(values.sum() * weight_each)
             scale = target_integral / integral
             corrected = values * scale
-            self.last_correction_scale = np.asarray([scale])
+            self.last_renormalization_scale = np.asarray(scale)
         return GridFunction(corrected, produced.channel_labels, produced.domain, produced.quadrature)
 
 
     def Inspect(self) -> dict[str, Array]:
         state: dict[str, Array] = {f"inner.{name}": value for name, value in self.inner.Inspect().items()}
-        if self.last_correction_scale is not None:
-            state["last_correction_scale"] = self.last_correction_scale
+        if self.last_removed_mean is not None:
+            state["last_removed_mean"] = self.last_removed_mean
+        if self.last_renormalization_scale is not None:
+            state["last_renormalization_scale"] = self.last_renormalization_scale
         return state
 
 

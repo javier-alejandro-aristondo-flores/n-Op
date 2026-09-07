@@ -135,9 +135,11 @@ class SpectralKernel(Kernel[GridFunction, GridFunction]):
 
     def Inspect(self) -> dict[str, Array]:
         state: dict[str, Array] = dict(self.parameter_values)
-        state["mode_magnitudes"] = np.sqrt(
-            self.parameter_values["mode_weights_real"] ** 2 + self.parameter_values["mode_weights_imaginary"] ** 2
-        )
+        real_part = self.parameter_values["mode_weights_real"]
+        imaginary_part = self.parameter_values["mode_weights_imaginary"]
+        state["mode_magnitudes"] = np.sqrt(real_part**2 + imaginary_part**2)
+        # the pair is one complex weight, and its phase is half of what that weight means
+        state["mode_phases"] = np.arctan2(imaginary_part, real_part)
         if self.last_output_values is not None:
             state["last_output_values"] = self.last_output_values
         return state

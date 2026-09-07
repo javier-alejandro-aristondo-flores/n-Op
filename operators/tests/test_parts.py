@@ -201,9 +201,13 @@ def Test_The_Fixed_Mode_Expansion_Inspects_Its_Basis() -> None:
     assert set(readout.Inspect()) == {"basis_modes", "basis_singular_values", "basis_mean"}
     readout(Coefficients(vector=np.ones(4), domain=CUBE), GridSpec((4, 4, 4)))
     inspected = readout.Inspect()
-    assert inspected["basis_modes"].shape == (4, 64)
+    # a mode is a field, and is inspected with the shape that makes it one
+    assert inspected["basis_modes"].shape == (4, 4, 4, 4)
+    assert inspected["basis_mean"].shape == (4, 4, 4)
     assert inspected["basis_singular_values"].shape == (4,)
     assert inspected["last_coefficients"].shape == (4,)
+    # and the shaping must be a view of the same numbers, not a different quantity
+    assert np.array_equal(np.asarray(inspected["basis_modes"]).reshape(4, 64), basis.modes)
 
 
 def Test_The_Fixed_Mode_Expansion_Lifts_Its_Basis_As_Constants() -> None:
@@ -321,3 +325,61 @@ def Test_The_Multi_Channel_Trunk_Still_Queries_Anywhere() -> None:
     grid_values = np.asarray(on_grid.values, dtype=np.float64).reshape(2, -1)
     point_values = np.asarray(at_points.values, dtype=np.float64).T
     assert np.allclose(grid_values, point_values, atol=1e-12)
+
+
+def Test_The_Sensor_Encoder_Captures_The_Latent_It_Produces() -> None:
+    """the branch's output is the thing the member exists to make, so it must be reachable"""
+    encoder = SensorEncoder((3, 8, 5), seed=1)
+    assert "last_latent_vector" not in encoder.Inspect()
+    produced = encoder(Coefficients(vector=np.asarray([0.2, -0.4, 0.6]), domain=CUBE), GridSpec((2, 2, 2)))
+    inspected = encoder.Inspect()
+    assert inspected["last_latent_vector"].shape == (5,)
+    assert np.allclose(inspected["last_latent_vector"], np.asarray(produced.vector))
+
+
+def Test_The_Trunk_Features_Carry_The_Grid_When_The_Query_Had_One() -> None:
+    """a feature evaluated over a grid is a field, and a feature over loose points is not"""
+    readout = BasisExpansion(latent_width=4, trunk_widths=(8,), seed=2)
+    feature_count = readout.coordinate_features.feature_count
+    branch = Coefficients(vector=np.ones(4), domain=CUBE)
+    readout(branch, GridSpec((4, 4, 4)))
+    assert readout.Inspect()["last_trunk_features"].shape == (4, 4, 4, feature_count)
+    readout(branch, PointSpec(np.asarray([[0.1, 0.2, 0.3], [0.4, 0.5, 0.6]])))
+    assert readout.Inspect()["last_trunk_features"].shape == (2, feature_count)
+
+
+def Test_The_Basis_Projection_Encoder_Regains_The_Grid_It_Was_Shown() -> None:
+    """this encoder is handed the shape with the field, and keeps it once it has seen one"""
+    generator = np.random.default_rng(15)
+    orthonormal, _ = np.linalg.qr(generator.normal(size=(64, 64)))
+    encoder = BasisProjectionEncoder(orthonormal.T[:3], np.zeros(64))
+    # before any field it cannot know, and says so by leaving the mean flat
+    assert encoder.Inspect()["basis_mean"].shape == (64,)
+    field = GridFunction(
+        generator.normal(size=(1, 4, 4, 4)), ("charge_density",), CUBE, UniformGridQuadrature(1.0, 64)
+    )
+    encoder(field, GridSpec((4, 4, 4)))
+    inspected = encoder.Inspect()
+    assert inspected["basis_mean"].shape == (4, 4, 4)
+    assert inspected["basis_modes"].shape == (3, 4, 4, 4)
+
+
+def Test_The_Conservation_Laws_Are_Named_Apart() -> None:
+    """one key meaning a removed mean under one law and a scale under the other told nobody which"""
+    generator = np.random.default_rng(16)
+    values = generator.normal(size=(1, 4, 4, 4)) + 3.0
+    field = GridFunction(values, ("charge_density",), CUBE, UniformGridQuadrature(8.0, 64))
+    inner = PointwiseProjection(output_channels=1, hidden_channels=1, seed=0)
+
+    zero_mean = Conserving(inner, "zero_mean")
+    zero_mean(field, GridSpec((4, 4, 4)))
+    removed = zero_mean.Inspect()
+    assert "last_removed_mean" in removed and "last_renormalization_scale" not in removed
+    # the doctrine asks for scalars as zero-dimensional arrays, and this is one
+    assert np.asarray(removed["last_removed_mean"]).ndim == 0
+
+    renormalizing = Conserving(inner, "renormalize_to_electron_count")
+    renormalizing(field, GridSpec((4, 4, 4)), Coefficients(vector=np.asarray([8.0]), domain=CUBE))
+    scaled = renormalizing.Inspect()
+    assert "last_renormalization_scale" in scaled and "last_removed_mean" not in scaled
+    assert np.asarray(scaled["last_renormalization_scale"]).ndim == 0

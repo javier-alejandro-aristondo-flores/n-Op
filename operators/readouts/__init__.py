@@ -198,6 +198,8 @@ class FixedModeExpansion(Operator[Coefficients, GridFunction]):
     def __init__(self, basis: PodBasis, grid_shape: tuple[int, int, int]) -> None:
         self.basis = basis
         self.grid_shape = grid_shape
+        # the basis is given rather than learned, so the readout owns no parameters of its own
+        self.parameter_values: dict[str, NDArray[np.float64]] = {}
         self.last_coefficients: NDArray[np.float64] | None = None
 
 

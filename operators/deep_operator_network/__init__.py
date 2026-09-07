@@ -1,11 +1,68 @@
-"""strain or lattice parameters to charge density, by branch and trunk"""
+"""strain or lattice parameters to a charge density field, by a branch read against a basis"""
 
-from operators.framework import Coefficients, GridFunction, NeuralOperator, PointSet
+from typing import Any
+
+import numpy as np
+from numpy.typing import NDArray
+
+from operators.compositions import WithoutIntegralLayers
+from operators.data import PodBasis
+from operators.encoders import SensorEncoder
+from operators.framework import Coefficients, Discretization, NeuralOperator, Representation
+from operators.readouts import BasisExpansion, FixedModeExpansion
+
+CONFIGURATIONS = ("canonical", "proper_orthogonal", "principal_component", "energy_trunk")
 
 
-class DeepOperatorNetwork(NeuralOperator[Coefficients | GridFunction, Coefficients, GridFunction | PointSet]):
-    """sensor encoder, dense layers, basis-expansion readout"""
+class DeepOperatorNetwork(NeuralOperator[Coefficients, Coefficients, Representation]):
+    """a branch network over run parameters, read against a fixed or learned basis"""
 
 
-    def __init__(self) -> None:
-        raise NotImplementedError
+    def __init__(
+        self,
+        branch: SensorEncoder,
+        readout: BasisExpansion | FixedModeExpansion,
+        configuration: str,
+    ) -> None:
+        if configuration not in CONFIGURATIONS:
+            raise ValueError(f"{configuration} is not one of the member's configurations")
+        super().__init__(branch, WithoutIntegralLayers(), readout)
+        self.branch = branch
+        self.basis_readout = readout
+        self.configuration = configuration
+
+
+    def __call__(
+        self,
+        input_function: Coefficients,
+        output_discretization: Discretization,
+        condition: Coefficients | None = None,
+    ) -> Representation:
+        latent = self.encoder(input_function, output_discretization, condition)
+        carried = self.composition.Apply(latent, condition)
+        return self.readout(carried, output_discretization, condition)
+
+
+    def Parameter_Values(self) -> dict[str, NDArray[np.float64]]:
+        """every learned array of the assembly under one namespace, ready for the trainer"""
+        collected = dict(self.branch.parameter_values)
+        collected.update(self.basis_readout.parameter_values)
+        return collected
+
+
+    def Forward_Coefficients(self, lifted: dict[str, Any], branch_input: Any) -> Any:
+        """the branch's latent coefficients, differentiable through whichever engine lifted them"""
+        return self.branch.network.Forward(lifted, branch_input)
+
+
+def Principal_Component_Network(
+    basis: PodBasis,
+    grid_shape: tuple[int, int, int],
+    parameter_width: int,
+    hidden_widths: tuple[int, ...],
+    seed: int = 0,
+) -> DeepOperatorNetwork:
+    """the fixed-basis member: run parameters mapped onto stored mode coefficients"""
+    rank = int(basis.modes.shape[0])
+    branch = SensorEncoder((parameter_width, *hidden_widths, rank), seed=seed)
+    return DeepOperatorNetwork(branch, FixedModeExpansion(basis, grid_shape), "principal_component")

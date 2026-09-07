@@ -45,3 +45,23 @@ class ExplicitStack(Composition[GridFunction]):
         if self.last_layer_norms is not None:
             state["last_layer_norms"] = self.last_layer_norms
         return state
+
+
+class WithoutIntegralLayers(Composition[Coefficients]):
+    """the branch's latent vector carried through unchanged, for a map with no integral to take"""
+
+
+    def __init__(self) -> None:
+        self.last_carried_vector: NDArray[np.float64] | None = None
+
+
+    def Apply(self, input_function: Coefficients, condition: Coefficients | None = None) -> Coefficients:
+        self.last_carried_vector = np.asarray(input_function.vector, dtype=np.float64)
+        return input_function
+
+
+    def Inspect(self) -> dict[str, Array]:
+        state: dict[str, Array] = {}
+        if self.last_carried_vector is not None:
+            state["last_carried_vector"] = self.last_carried_vector
+        return state

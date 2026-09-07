@@ -15,4 +15,5 @@ from operators.inspection.tables import (
     Fold_Balance,
     Orbit_Summary,
     Render_Table,
+    Table,
 )

@@ -77,7 +77,7 @@ def Test_The_Thread_Reproduces_The_Affine_Floor() -> None:
         cheap_values = np.asarray(cheap_field.values, dtype=np.float64).reshape(-1)[::977]
         accurate_values = np.asarray(accurate_field.values, dtype=np.float64).reshape(-1)[::977]
         sampled_rows.append(np.stack([cheap_values, accurate_values], axis=1))
-    batch = np.concatenate(sampled_rows)
+    batch = np.asarray(np.concatenate(sampled_rows), dtype=np.float64)
     assert batch.shape[0] > 1000
 
     design = np.stack([batch[:, 0], np.ones(batch.shape[0])], axis=1)
@@ -94,10 +94,8 @@ def Test_The_Thread_Reproduces_The_Affine_Floor() -> None:
     parameters = ParameterSet(values={"scale": np.asarray([1.0]), "offset": np.asarray([0.0])})
     result = Train(NumpyEngine(), parameters, Affine_Loss, [batch], step_count=300, learning_rate=0.004)
     trained = result.parameters.values
-    trained_error = float(
-        np.linalg.norm(batch[:, 0] * trained["scale"][0] + trained["offset"][0] - batch[:, 1])
-        / np.linalg.norm(batch[:, 1])
-    )
+    predicted = np.asarray(batch[:, 0] * trained["scale"][0] + trained["offset"][0], dtype=np.float64)
+    trained_error = float(np.linalg.norm(predicted - batch[:, 1]) / np.linalg.norm(batch[:, 1]))
     assert 0.004 < closed_error < 0.025
     assert trained_error < closed_error * 1.1
     assert abs(float(trained["scale"][0]) - float(closed_coefficients[0])) < 0.01

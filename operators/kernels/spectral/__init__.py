@@ -1,6 +1,7 @@
 """translation-invariant kernels as per-mode weights on the torus spectrum"""
 
 from collections.abc import Callable
+from math import prod
 from typing import Any
 
 import numpy as np
@@ -71,7 +72,7 @@ class SpectralKernel(Kernel[GridFunction, GridFunction]):
         output_channel_index = np.arange(self.output_channels, dtype=np.int64)
         placed[np.ix_(output_channel_index, *target_positions)] = mixed
         # the point-count ratio carries the amplitude across that size change
-        scale = float(np.prod(output_shape)) / float(np.prod(input_array.shape[1:]))
+        scale = prod(output_shape) / prod(input_array.shape[1:])
         return np.real(np.fft.ifftn(placed, axes=(1, 2, 3))) * scale
 
 

@@ -35,7 +35,7 @@ def Gaussian_Error_Linear_Unit(value: Any) -> Any:
 
 
 def Sum_Over_Last_Axis(value: Any) -> Any:
-    return Torch_Module().sum(value, dim=-1) if Is_Engine_Native(value) else np.sum(value, axis=-1)
+    return Torch_Module().sum(value, dim=-1) if Is_Engine_Native(value) else np.asarray(value).sum(axis=-1)
 
 
 def Mean_Over_Last_Axis(value: Any) -> Any:

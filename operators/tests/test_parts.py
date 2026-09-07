@@ -174,14 +174,15 @@ def Test_The_Fixed_Mode_Expansion_Inverts_The_Projection() -> None:
 def Test_The_Fixed_Mode_Expansion_Truncates_To_Its_Rank() -> None:
     """a rank-limited basis leaves exactly the error its singular values predict"""
     generator = np.random.default_rng(12)
-    snapshots = generator.normal(size=(10, 64)) @ generator.normal(size=(64, 64))
+    snapshots = np.asarray(generator.normal(size=(10, 64)) @ generator.normal(size=(64, 64)), dtype=np.float64)
     truncated = Gram_Pod(snapshots, rank=3)
     readout = FixedModeExpansion(truncated, (4, 4, 4))
-    coefficients = Project(truncated, snapshots[0][None, :])[0]
+    first_snapshot = np.asarray(snapshots[0], dtype=np.float64)
+    coefficients = Project(truncated, first_snapshot[None, :])[0]
     rebuilt = readout(Coefficients(vector=coefficients, domain=CUBE), GridSpec((4, 4, 4)))
-    residual = np.asarray(rebuilt.values).reshape(-1) - snapshots[0]
+    residual = np.asarray(rebuilt.values, dtype=np.float64).reshape(-1) - first_snapshot
     assert coefficients.shape == (3,)
-    assert 0.0 < float(np.linalg.norm(residual)) < float(np.linalg.norm(snapshots[0] - truncated.mean))
+    assert 0.0 < float(np.linalg.norm(residual)) < float(np.linalg.norm(first_snapshot - truncated.mean))
 
 
 def Test_The_Fixed_Mode_Expansion_Inspects_Its_Basis() -> None:

@@ -3,7 +3,13 @@ name = "operators"
 version = "0.0.1"
 description = "Neural operators over the n-Op DFT corpus, as one integral-transform framework"
 requires-python = ">=3.14"
-dependencies = ["numpy"]
+dependencies = ["numpy>=2.5", "matplotlib>=3.11"]
+
+# torch is optional by construction: only operators/substrate may import it, and the
+# conformance rows skip when it is absent
+[project.optional-dependencies]
+substrate = ["torch>=2.14"]
+development = ["pytest>=9.1", "pyright>=1.1.411"]
 
 [tool.pytest.ini_options]
 python_files = ["test_*.py"]

@@ -198,3 +198,37 @@ def Ridge_Apply(coefficients: Field, features: Field) -> Field:
     """fitted ridge coefficients applied to features"""
     design = np.concatenate([features, np.ones((features.shape[0], 1))], axis=1)
     return design @ coefficients
+
+
+@dataclass(frozen=True, slots=True)
+class StandardizedRidge:
+    """fitted ridge coefficients beside the parameter spreads they were fitted under"""
+
+    coefficients: Field
+    parameter_spreads: Field
+
+
+def Fit_Standardized_Ridge(
+    parameters: Field,
+    targets: Field,
+    regularization: float = 1e-6,
+) -> StandardizedRidge:
+    """ridge from run parameters to targets, each parameter divided by its own spread first"""
+    spreads = np.asarray(parameters.std(axis=0), dtype=np.float64)
+    # a parameter that never varies would divide the design by zero
+    spreads[spreads == 0.0] = 1.0
+    return StandardizedRidge(
+        coefficients=Ridge_Fit(parameters / spreads, targets, regularization),
+        parameter_spreads=spreads,
+    )
+
+
+def Apply_Standardized_Ridge(fitted: StandardizedRidge, parameters: Field) -> Field:
+    """a fitted standardized ridge applied to fresh run parameters"""
+    return Ridge_Apply(fitted.coefficients, parameters / fitted.parameter_spreads)
+
+
+def Nearest_Training_Run(train_parameters: Field, evaluation_parameters: Field) -> NDArray[np.int64]:
+    """the closest training run to each evaluation run, by distance in parameter space"""
+    distances = np.linalg.norm(evaluation_parameters[:, None, :] - train_parameters[None, :, :], axis=2)
+    return np.asarray(np.argmin(distances, axis=1), dtype=np.int64)

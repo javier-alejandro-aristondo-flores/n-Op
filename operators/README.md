@@ -318,8 +318,14 @@ convenient, not by what the part knows.
   operator is one flat, browsable namespace. The import tests gate the contract.
 - `inspection/` is the data-layer surface: the catalog (campaigns, runs, shapes, units,
   provenance, field loading), the summary tables (orbit map, fold balance, exclusions), and
-  `plots.py` — the one module allowed to import the plotting library (a seam test enforces
-  it), rendering axis slices and curves from inspection arrays alone.
+  `plots/` — the one package allowed to import the plotting library (a seam test enforces
+  it), rendering every operator's figure suite from inspection arrays alone. It was a single
+  `plots.py` until the figure suites arrived: mode galleries, mode-magnitude spectra, attention
+  maps and message-passing graphs across eight members do not fit one module, and the alternative
+  — re-exporting the plotting handle into a sibling — is the loophole the parallel torch seam
+  exists to forbid. Widening the seam to a directory keeps it exactly one named place. The
+  backend is pinned in `plots/backend.py`, which every drawing module imports from, so the
+  file-writing backend is chosen before pyplot loads no matter which module is reached first.
 - The engine seam (Phase B) carries the obligation onward: parameters as named arrays at any
   time, a capture mode for declared forward intermediates, training loops emitting loss and
   metric curves as stored artifacts. Engine-native objects never cross the seam outward —

@@ -1,6 +1,7 @@
 """the inspection catalog, the summary tables, the renderers and the rendering seam"""
 
 import ast
+import hashlib
 from pathlib import Path
 
 import numpy as np
@@ -17,18 +18,19 @@ from operators.inspection import (
     Orbit_Summary,
     Render_Curves,
     Render_Field_Slices,
+    Render_Inspection_Suite,
     Render_Table,
 )
 
 PACKAGE_ROOT = Path(__file__).resolve().parent.parent
 
-RENDERING_SEAM = PACKAGE_ROOT / "inspection" / "plots.py"
+RENDERING_SEAM = PACKAGE_ROOT / "inspection" / "plots"
 
 
 def Test_The_Rendering_Seam_Holds() -> None:
-    """the plotting library is imported by the one rendering module alone"""
+    """the plotting library is imported inside the one rendering package alone"""
     for source_path in PACKAGE_ROOT.rglob("*.py"):
-        if source_path == RENDERING_SEAM or ".pytest_cache" in source_path.parts:
+        if RENDERING_SEAM in source_path.parents or ".pytest_cache" in source_path.parts:
             continue
         tree = ast.parse(source_path.read_text())
         for node in ast.walk(tree):
@@ -98,3 +100,72 @@ def Test_The_Summary_Tables_Match_The_Records() -> None:
     exclusion_rows = Exclusion_Summary()
     by_identifier = {str(row["identifier"]): int(str(row["runs"])) for row in exclusion_rows}
     assert by_identifier["E1"] == 6 and by_identifier["E6"] == 73 and by_identifier["E10"] == 1
+
+
+def Test_The_Suite_Draws_Every_Rank_The_Package_Produces() -> None:
+    """each rank an inspection dict can hold reaches a renderer, and none is skipped"""
+    generator = np.random.default_rng(31)
+    inspected = {
+        "part.a_scalar": np.asarray(2.5),
+        "part.layer_0_biases": np.zeros(8),
+        "part.basis_singular_values": np.asarray([9.0, 4.0, 1.0, 0.25]),
+        "part.basis_mode_norms": np.ones(4),
+        "part.layer_0_weights": generator.normal(size=(8, 5)),
+        "part.basis_mean": generator.normal(size=(6, 6, 6)),
+        "part.basis_modes": generator.normal(size=(4, 6, 6, 6)),
+        "part.mode_weights_real": generator.normal(size=(3, 3, 3, 2, 2)),
+    }
+    directory = Path(__file__).resolve().parent / "_suite_scratch"
+    suite = Render_Inspection_Suite(inspected, directory, "part")
+    assert suite.skipped == ()
+    # one figure per array, plus the one panel every scalar shares
+    assert len(suite.written) == len(inspected)
+    for path in suite.written:
+        assert path.is_file() and path.stat().st_size > 1000
+    for path in suite.written:
+        path.unlink()
+    directory.rmdir()
+
+
+def Test_A_Constant_Array_Does_Not_Break_The_Colour_Scale(tmp_path: Path) -> None:
+    """every bias in the package initializes to exactly zero, and a flat colour bar is degenerate"""
+    inspected = {"part.layer_0_weights": np.zeros((4, 4)), "part.flat_field": np.zeros((5, 5, 5))}
+    suite = Render_Inspection_Suite(inspected, tmp_path, "part")
+    assert suite.skipped == ()
+    assert all(path.stat().st_size > 1000 for path in suite.written)
+
+
+def Test_The_Suite_Is_Byte_Deterministic(tmp_path: Path) -> None:
+    """committed figures are only cheap if unchanged arrays re-render to the same bytes"""
+    generator = np.random.default_rng(32)
+    inspected = {"part.basis_modes": generator.normal(size=(3, 6, 6, 6))}
+    digests: list[str] = []
+    for attempt in ("first", "second"):
+        suite = Render_Inspection_Suite(inspected, tmp_path / attempt, "part")
+        digests.append(hashlib.sha256(suite.written[0].read_bytes()).hexdigest())
+    assert digests[0] == digests[1]
+    moved = {"part.basis_modes": np.asarray(inspected["part.basis_modes"]) * 2.0}
+    changed = Render_Inspection_Suite(moved, tmp_path / "changed", "part")
+    assert hashlib.sha256(changed.written[0].read_bytes()).hexdigest() != digests[0]
+
+
+def Test_An_Owner_Path_Survives_Into_The_File_Name(tmp_path: Path) -> None:
+    """a key nested under its owner must not collide with the same name under another"""
+    inspected = {
+        "encoder.last_coefficients": np.arange(4.0),
+        "readout.last_coefficients": np.arange(4.0) + 1.0,
+    }
+    suite = Render_Inspection_Suite(inspected, tmp_path, "member")
+    assert len(suite.written) == 2
+    assert {path.name for path in suite.written} == {
+        "encoder__last_coefficients.png",
+        "readout__last_coefficients.png",
+    }
+
+
+def Test_An_Unrenderable_Key_Is_Reported_Rather_Than_Dropped(tmp_path: Path) -> None:
+    """a key with no renderer is a missing renderer, and the suite has to say so"""
+    inspected = {"part.six_dimensional": np.zeros((2, 2, 2, 2, 2, 2))}
+    suite = Render_Inspection_Suite(inspected, tmp_path, "part")
+    assert suite.written == ()
+    assert suite.skipped == ("part.six_dimensional",)

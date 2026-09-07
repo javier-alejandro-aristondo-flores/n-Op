@@ -17,8 +17,11 @@ from operators.inspection import (
     Load_Run_Field,
     Orbit_Summary,
     Render_Curves,
+    Render_Error_Spread,
     Render_Field_Slices,
+    Render_Floor_Comparison,
     Render_Inspection_Suite,
+    Render_Prediction_Against_Truth,
     Render_Table,
 )
 
@@ -169,3 +172,34 @@ def Test_An_Unrenderable_Key_Is_Reported_Rather_Than_Dropped(tmp_path: Path) -> 
     suite = Render_Inspection_Suite(inspected, tmp_path, "part")
     assert suite.written == ()
     assert suite.skipped == ("part.six_dimensional",)
+
+
+def Test_A_One_Sided_Difference_Is_Not_Drawn_As_A_Sign_Change(tmp_path: Path) -> None:
+    """a diverging map over a range that never crosses zero reads as a sign change that is not there"""
+    from operators.inspection.plots import Centred_On_Zero
+
+    assert Centred_On_Zero(np.asarray([-0.006, -0.001])) == (-0.006, 0.006)
+    assert Centred_On_Zero(np.asarray([0.2, 0.5])) == (-0.5, 0.5)
+    truth = np.abs(np.random.default_rng(41).normal(size=(8, 8, 8))) + 1.0
+    # a prediction that is low everywhere, which is exactly the one-sided case
+    written = Render_Prediction_Against_Truth(truth - 0.01, truth, tmp_path / "one_sided.png", "low everywhere")
+    assert written.is_file() and written.stat().st_size > 1000
+
+
+def Test_The_Result_Figures_Draw_From_Scored_Numbers(tmp_path: Path) -> None:
+    """the error spread and the floor comparison render from the same numbers the report tabulates"""
+    generator = np.random.default_rng(42)
+    spread = Render_Error_Spread(
+        {"uniaxial": np.abs(generator.normal(size=6)), "isotropic": np.abs(generator.normal(size=3))},
+        tmp_path / "spread.png",
+        "test error by family",
+    )
+    floors = Render_Floor_Comparison(
+        {"ridge_to_coefficients": 0.0041, "nearest_neighbor_copy": 0.0090},
+        0.0011,
+        {"ridge_to_coefficients": 0.25, "nearest_neighbor_copy": 0.5},
+        tmp_path / "floors.png",
+        "against its floors",
+    )
+    for path in (spread, floors):
+        assert path.is_file() and path.stat().st_size > 1000

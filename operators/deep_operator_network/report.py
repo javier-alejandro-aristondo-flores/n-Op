@@ -1,7 +1,7 @@
 """the member measured against its floors, written as one committed markdown artifact"""
 
 from pathlib import Path
-from typing import Any
+from typing import Any, cast
 
 import numpy as np
 from numpy.typing import NDArray
@@ -13,9 +13,11 @@ from operators.data import (
     Nearest_Training_Run,
     PodBasis,
     Project,
+    POOL_ROOT,
     Reconstruct,
+    STORE_NAME,
 )
-from operators.deep_operator_network import Principal_Component_Network
+from operators.deep_operator_network import DeepOperatorNetwork, Principal_Component_Network
 from operators.evaluation import (
     Compare_To_Floor,
     Comparison_Table,
@@ -25,13 +27,23 @@ from operators.evaluation import (
     Summarize_By,
     Summary_Table,
 )
-from operators.inspection import Render_Table
+from operators.framework import Coefficients, Domain, GridSpec
+from operators.inspection import (
+    Render_Error_Spread,
+    Render_Floor_Comparison,
+    Render_Inspection_Suite,
+    Render_Prediction_Against_Truth,
+    Render_Table,
+)
 from operators.metrics import Relative_L2
 from operators.substrate import ParameterSet, TorchEngine
 from operators.tasks import Card_Named
 from operators.training import Parameter_Field_Examples, Strain_Assignments_By_Run, Train
 
 REPORT_PATH = Path(__file__).parent / "report.md"
+FIGURES_PATH = Path(__file__).parent / "figures"
+# the inspection arrays are fields, and a field never leaves the pool -- only the drawing does
+ARRAY_CACHE_PATH = POOL_ROOT / STORE_NAME / "_figures" / "deep_operator_network"
 COMMON_GRID_SHAPE = (40, 40, 40)
 BASIS_RANK = 32
 HIDDEN_WIDTHS = (64, 64, 64)
@@ -99,7 +111,7 @@ def Trained_Member_Predictions(
     train: StrainBlock,
     validation: StrainBlock,
     evaluated: StrainBlock,
-) -> tuple[NDArray[np.float64], int]:
+) -> tuple[NDArray[np.float64], int, DeepOperatorNetwork]:
     """the member trained at the step count validation prefers, then read on the evaluated block"""
     coefficients = Project(basis, train.fields)
     parameter_spreads = train.parameters.std(axis=0)
@@ -145,7 +157,60 @@ def Trained_Member_Predictions(
         )
         if score < best_score:
             best_score, best_values, best_step_count = score, result.parameters.values, step_count
-    return Rebuild(best_values, evaluated), best_step_count
+    # the member carries its initial weights until the chosen ones are written back into it
+    for name, value in best_values.items():
+        member.branch.parameter_values[name] = value
+    member(Coefficients(vector=evaluated.parameters[0] / parameter_spreads, domain=Domain(np.eye(3))),
+           GridSpec(COMMON_GRID_SHAPE))
+    return Rebuild(best_values, evaluated), best_step_count, member
+
+
+def Write_Figures(
+    functional: str,
+    member: DeepOperatorNetwork,
+    test: "StrainBlock",
+    member_rebuilt: NDArray[np.float64],
+    floor_medians: dict[str, float],
+    member_median: float,
+) -> int:
+    """the member's whole visual surface, drawn from arrays cached on the pool"""
+    cache = ARRAY_CACHE_PATH / functional
+    cache.mkdir(parents=True, exist_ok=True)
+    inspected = {name: np.asarray(value, dtype=np.float64) for name, value in member.Inspect().items()}
+    # cached so a re-render needs no retrain, which is what keeps committed figures stable
+    np.savez(cache / "inspection.npz", **cast(dict[str, Any], inspected))
+    with np.load(cache / "inspection.npz") as archive:
+        restored = {name: np.asarray(archive[name], dtype=np.float64) for name in archive.files}
+
+    directory = FIGURES_PATH / functional
+    suite = Render_Inspection_Suite(restored, directory / "components", f"deep_operator_network {functional}")
+    if suite.skipped:
+        raise ValueError(f"no renderer for {suite.skipped}, which means the suite is incomplete")
+
+    scored = [Relative_L2(member_rebuilt[run], test.fields[run]) for run in range(test.fields.shape[0])]
+    for rank, run in enumerate(np.argsort(scored)[[0, -1]]):
+        Render_Prediction_Against_Truth(
+            member_rebuilt[run].reshape(COMMON_GRID_SHAPE),
+            test.fields[run].reshape(COMMON_GRID_SHAPE),
+            directory / f"prediction_{'best' if rank == 0 else 'worst'}.png",
+            f"{functional} {'best' if rank == 0 else 'worst'} test run, {test.unit_keys[run]}",
+        )
+    by_family: dict[str, list[float]] = {}
+    for run in range(test.fields.shape[0]):
+        by_family.setdefault(test.families[run], []).append(Relative_L2(member_rebuilt[run], test.fields[run]))
+    Render_Error_Spread(
+        {name: np.asarray(values) for name, values in by_family.items()},
+        directory / "error_by_family.png",
+        f"{functional} test error by strain family",
+    )
+    Render_Floor_Comparison(
+        floor_medians,
+        member_median,
+        {"ridge_to_coefficients": RIDGE_MARGIN, "nearest_neighbor_copy": NEAREST_NEIGHBOR_MARGIN},
+        directory / "floors.png",
+        f"{functional} against its floors",
+    )
+    return len(suite.written) + 4
 
 
 def Block_Lines(functional: str) -> tuple[list[str], tuple[FloorComparison, ...], int]:
@@ -157,7 +222,7 @@ def Block_Lines(functional: str) -> tuple[list[str], tuple[FloorComparison, ...]
 
     ridge_runs = test.Scored(Ridge_Predictions(basis, train, test))
     copy_runs = test.Scored(Nearest_Neighbor_Predictions(train, test))
-    member_rebuilt, step_count = Trained_Member_Predictions(basis, train, validation, test)
+    member_rebuilt, step_count, member = Trained_Member_Predictions(basis, train, validation, test)
     member_runs = test.Scored(member_rebuilt)
     ceiling_runs = test.Scored(Reconstruct(basis, Project(basis, test.fields)))
 
@@ -171,12 +236,20 @@ def Block_Lines(functional: str) -> tuple[list[str], tuple[FloorComparison, ...]
         Summarize(copy_runs, "relative_l2", "nearest_neighbor_floor"),
         Summarize(member_runs, "relative_l2", "member"),
     )
+    floor_medians = {
+        "ridge_to_coefficients": comparisons[0].floor_median,
+        "nearest_neighbor_copy": comparisons[1].floor_median,
+    }
+    figure_count = Write_Figures(
+        functional, member, test, member_rebuilt, floor_medians, comparisons[0].member_median
+    )
     lines = [
         f"## {functional} functional — strain to charge density, held-out test orbits",
         "",
         f"Train {train.fields.shape[0]} runs, validation {validation.fields.shape[0]},"
         f" test {test.fields.shape[0]} over {len(set(test.unit_keys))} orbits."
-        f" Basis rank {BASIS_RANK}; branch widths {HIDDEN_WIDTHS}; {step_count} steps chosen on validation.",
+        f" Basis rank {BASIS_RANK}; branch widths {HIDDEN_WIDTHS}; {step_count} steps chosen on validation."
+        f" {figure_count} figures under `figures/{functional}/`.",
         "",
         "```",
         Render_Table(Summary_Table(summaries)),

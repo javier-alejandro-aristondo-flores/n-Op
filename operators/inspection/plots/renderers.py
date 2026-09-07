@@ -118,7 +118,9 @@ def Render_Field_Sheet(fields: NDArray[np.float64], path: Path, title: str, most
         field = fields[panel]
         plane = np.take(field, field.shape[0] // 2, axis=0)
         lowest, highest = Symmetric_Limits(field)
-        axis.imshow(plane.T, origin="lower", cmap="RdBu_r", vmin=lowest, vmax=highest)
+        # a diverging map is only readable over a range that actually crosses zero
+        colours = "RdBu_r" if lowest < 0.0 < highest else "viridis"
+        axis.imshow(plane.T, origin="lower", cmap=colours, vmin=lowest, vmax=highest)
         axis.set_title(f"{panel}", fontsize=9)
     # each panel autoscales to its own structure, so the overall range is stated rather than shown
     figure.suptitle(
@@ -143,3 +145,10 @@ def Render_Scalars(named_values: dict[str, float], path: Path, title: str) -> Pa
     figure.savefig(path, dpi=120)
     PYPLOT.close(figure)
     return path
+
+
+def Centred_On_Zero(values: NDArray[np.float64]) -> tuple[float, float]:
+    """colour limits a diverging map may be read against, symmetric about zero even one-sided"""
+    reach = float(np.max(np.abs(values)))
+    # a diverging map over a range that never crosses zero reads as a sign change that is not there
+    return (-reach, reach) if reach > 0.0 else (-0.5, 0.5)

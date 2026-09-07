@@ -12,10 +12,13 @@ from operators.inspection.catalog import (
 from operators.inspection.plots import (
     Render_Bars,
     Render_Curves,
+    Render_Error_Spread,
     Render_Field_Sheet,
     Render_Field_Slices,
+    Render_Floor_Comparison,
     Render_Inspection_Suite,
     Render_Matrix,
+    Render_Prediction_Against_Truth,
     Render_Scalars,
     Render_Spectrum,
     RenderedSuite,

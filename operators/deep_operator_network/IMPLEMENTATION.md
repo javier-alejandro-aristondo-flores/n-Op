@@ -50,6 +50,43 @@ within three percent at rank ≤ N/2, per campaign. The defect campaign is the e
 localized features that move are the classic weakness of a fixed basis — and a failing block goes
 to the grid-native members instead.
 
+## Inspection
+
+Everything this member computes, learns or holds is reachable as named plain-word arrays through
+`Inspect()`, and the figure suite under `figures/` is drawn from that dict alone — if a plot ever
+needs something the dict does not carry, the dict is what is wrong.
+
+**The branch** publishes one weight matrix and one bias vector per layer
+(`encoder.sensor_encoder_layer_<n>_weights` / `_biases`) and the latent vector it last produced
+(`encoder.last_latent_vector`) — the quantity the whole member exists to make.
+
+**The composition** holds no layers, and says so by publishing only the vector it carried through
+(`composition.last_carried_vector`).
+
+**The readout** depends on the configuration, and the two sets are disjoint. The fixed-basis
+configurations publish the modes as fields (`readout.basis_modes`, shaped rank × grid), the
+training mean as a field (`readout.basis_mean`), the spectrum (`readout.basis_singular_values`)
+and the coefficients last predicted (`readout.last_coefficients`). The coordinate-trunk
+configurations publish the trunk's weights and biases instead, plus the features it last read
+(`readout.last_trunk_features`), shaped as fields when the query was a grid and as a plain
+points-by-features table when it was not.
+
+**Wrapped for inference**, the conservation law publishes what it did: `last_renormalization_scale`
+under the electron-count law, `last_removed_mean` under the zero-mean law. Both are exact
+diagnostics rather than corrections — ground truth already integrates to the archived electron
+count within 2e-7, so any scale away from one is the model's own error.
+
+**Beyond the parts**, training emits its loss curve, and the report emits the per-run errors it
+tabulates. The suite renders the components, the best and worst test predictions against truth
+with their signed difference, the error spread by strain family, and the member against its
+floors with the level it had to reach drawn across each.
+
+The inspection arrays are cached under `_derived/_figures/` on the corpus volume, because modes
+and means are fields and a field never leaves it. Only the rendered images enter this repository,
+which is exactly the egress the suite document permits.
+
 ## Implementation specification
 
-To be written.
+Measured, and in `report.md`; regenerate both it and the figures with
+`python -m operators.deep_operator_network.report`. The `principal_component` configuration is
+built and judged; `proper_orthogonal`, `canonical` and `energy_trunk` follow.

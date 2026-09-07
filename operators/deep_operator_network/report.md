@@ -6,7 +6,7 @@ one orbit are exact copies of each other. Configuration: `principal_component`.
 
 ## cheap functional — strain to charge density, held-out test orbits
 
-Train 608 runs, validation 83, test 88 over 22 orbits. Basis rank 32; branch widths (64, 64, 64); 16000 steps chosen on validation.
+Train 608 runs, validation 83, test 88 over 22 orbits. Basis rank 32; branch widths (64, 64, 64); 16000 steps chosen on validation. 18 figures under `figures/cheap/`.
 
 ```
 group                       metric       units  runs  median    interquartile  mean_interval       
@@ -35,7 +35,7 @@ uniaxial           relative_l2  3      3     0.000981  0.000360       [0.000435,
 
 ## accurate functional — strain to charge density, held-out test orbits
 
-Train 608 runs, validation 83, test 88 over 22 orbits. Basis rank 32; branch widths (64, 64, 64); 32000 steps chosen on validation.
+Train 608 runs, validation 83, test 88 over 22 orbits. Basis rank 32; branch widths (64, 64, 64); 32000 steps chosen on validation. 18 figures under `figures/accurate/`.
 
 ```
 group                       metric       units  runs  median    interquartile  mean_interval       

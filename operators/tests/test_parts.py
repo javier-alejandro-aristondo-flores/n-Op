@@ -1,8 +1,10 @@
 """the shared encoders, readouts, compositions and wrappers"""
 
 import numpy as np
+import pytest
 
 from operators.compositions import ExplicitStack
+from operators.data import Gram_Pod, Project
 from operators.encoders import BasisProjectionEncoder, PointwiseLift, SensorEncoder
 from operators.framework import (
     Array,
@@ -17,7 +19,6 @@ from operators.framework import (
     UniformGridQuadrature,
 )
 from operators.kernels import SpectralKernel
-from operators.data import Gram_Pod, Project
 from operators.readouts import (
     BasisExpansion,
     FixedModeExpansion,
@@ -268,3 +269,55 @@ def Test_The_Feature_Counts_Match_What_The_Trunk_Was_Built_For() -> None:
         readout = BasisExpansion(latent_width=4, trunk_widths=(8,), coordinate_features=features)
         first_layer = readout.parameter_values["trunk_layer_0_weights"]
         assert first_layer.shape[1] == features.feature_count
+
+
+def Test_The_Trunk_Splits_The_Branch_Across_Output_Channels() -> None:
+    """one shared trunk, one latent row per channel, each channel its own field"""
+    labels = ("electron_localization_up", "electron_localization_down")
+    readout = BasisExpansion(latent_width=6, trunk_widths=(16,), output_channel_labels=labels, seed=2)
+    generator = np.random.default_rng(3)
+    branch = np.asarray(generator.normal(size=(2, 6)), dtype=np.float64)
+    produced = readout(Coefficients(vector=branch, domain=CUBE), GridSpec((4, 4, 4)))
+    assert isinstance(produced, GridFunction)
+    assert produced.channel_labels == labels
+    values = np.asarray(produced.values, dtype=np.float64)
+    assert values.shape == (2, 4, 4, 4)
+    # the channels share a trunk but not a branch row, so they must not come out equal
+    assert not np.allclose(values[0], values[1])
+
+
+def Test_Each_Channel_Matches_The_Trunk_Run_On_Its_Own() -> None:
+    """a split branch agrees channel for channel with single-channel readouts sharing the trunk"""
+    labels = ("first_channel", "second_channel")
+    together = BasisExpansion(latent_width=6, trunk_widths=(16,), output_channel_labels=labels, seed=7)
+    alone = BasisExpansion(latent_width=6, trunk_widths=(16,), seed=7)
+    generator = np.random.default_rng(8)
+    branch = np.asarray(generator.normal(size=(2, 6)), dtype=np.float64)
+    both_channels = together(Coefficients(vector=branch, domain=CUBE), GridSpec((4, 4, 4)))
+    assert isinstance(both_channels, GridFunction)
+    joint = np.asarray(both_channels.values, dtype=np.float64)
+    for channel_index in range(2):
+        one_channel = alone(Coefficients(vector=branch[channel_index], domain=CUBE), GridSpec((4, 4, 4)))
+        assert isinstance(one_channel, GridFunction)
+        assert np.allclose(joint[channel_index], np.asarray(one_channel.values, dtype=np.float64)[0])
+
+
+def Test_The_Trunk_Refuses_A_Branch_That_Miscounts_Its_Channels() -> None:
+    """a branch offering the wrong number of rows is a mistake, not a broadcast"""
+    readout = BasisExpansion(latent_width=6, trunk_widths=(16,), output_channel_labels=("only_one",), seed=1)
+    branch = np.zeros((3, 6), dtype=np.float64)
+    with pytest.raises(ValueError):
+        readout(Coefficients(vector=branch, domain=CUBE), GridSpec((4, 4, 4)))
+
+
+def Test_The_Multi_Channel_Trunk_Still_Queries_Anywhere() -> None:
+    """both channels answer identically on a grid and on the same explicit points"""
+    labels = ("first_channel", "second_channel")
+    readout = BasisExpansion(latent_width=5, trunk_widths=(12,), output_channel_labels=labels, seed=5)
+    branch = Coefficients(vector=np.arange(10.0).reshape(2, 5) / 10.0, domain=CUBE)
+    on_grid = readout(branch, GridSpec((4, 4, 4)))
+    at_points = readout(branch, PointSpec(Fractional_Grid_Coordinates((4, 4, 4))))
+    assert isinstance(on_grid, GridFunction) and isinstance(at_points, PointSet)
+    grid_values = np.asarray(on_grid.values, dtype=np.float64).reshape(2, -1)
+    point_values = np.asarray(at_points.values, dtype=np.float64).T
+    assert np.allclose(grid_values, point_values, atol=1e-12)

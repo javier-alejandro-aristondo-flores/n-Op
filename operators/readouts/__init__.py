@@ -121,8 +121,10 @@ class BasisExpansion(Operator[Coefficients, Representation]):
         latent_width: int,
         trunk_widths: tuple[int, ...],
         coordinate_features: CoordinateFeatures | None = None,
+        output_channel_labels: tuple[str, ...] = ("predicted_field",),
         seed: int = 0,
     ) -> None:
+        self.output_channel_labels = output_channel_labels
         self.coordinate_features = (
             coordinate_features if coordinate_features is not None else PeriodicCoordinateFeatures()
         )
@@ -138,9 +140,12 @@ class BasisExpansion(Operator[Coefficients, Representation]):
         return self.coordinate_features(points)
 
 
-    def Forward(self, lifted: dict[str, Any], branch_vector: Any, trunk_features: Any) -> Any:
+    def Forward(self, lifted: dict[str, Any], branch_coefficients: Any, trunk_features: Any) -> Any:
         trunk_values = self.trunk.Forward(lifted, trunk_features)
-        return trunk_values @ branch_vector
+        # one channel arrives as a bare latent vector, several as one latent row each
+        if branch_coefficients.ndim == 1:
+            return trunk_values @ branch_coefficients
+        return trunk_values @ branch_coefficients.T
 
 
     def __call__(
@@ -152,18 +157,31 @@ class BasisExpansion(Operator[Coefficients, Representation]):
         points = Output_Points(output_discretization)
         trunk_features = self.Coordinate_Features(points)
         self.last_trunk_features = trunk_features
-        branch_vector = np.asarray(input_function.vector, dtype=np.float64)
+        branch_coefficients = np.asarray(input_function.vector, dtype=np.float64)
+        channel_count = len(self.output_channel_labels)
+        if branch_coefficients.ndim == 2 and branch_coefficients.shape[0] != channel_count:
+            raise ValueError(
+                f"the branch offered {branch_coefficients.shape[0]} channels for {channel_count} labels"
+            )
         produced = np.asarray(
-            self.Forward(self.parameter_values, branch_vector, trunk_features), dtype=np.float64
+            self.Forward(self.parameter_values, branch_coefficients, trunk_features), dtype=np.float64
         )
+        # every path below reads one column per output channel
+        if produced.ndim == 1:
+            produced = produced[:, None]
         # the same trunk answers a grid and a bare list of points, only the wrapper differs
         if isinstance(output_discretization, GridSpec):
             shape = output_discretization.shape
             point_count = shape[0] * shape[1] * shape[2]
             cell_volume = abs(float(np.linalg.det(np.asarray(input_function.domain.lattice))))
             quadrature = UniformGridQuadrature(cell_volume, point_count)
-            return GridFunction(produced.reshape(1, *shape), ("predicted_field",), input_function.domain, quadrature)
-        return PointSet(positions=points, domain=input_function.domain, values=produced.reshape(-1, 1))
+            return GridFunction(
+                produced.T.reshape(channel_count, *shape),
+                self.output_channel_labels,
+                input_function.domain,
+                quadrature,
+            )
+        return PointSet(positions=points, domain=input_function.domain, values=produced)
 
 
     def Inspect(self) -> dict[str, Array]:

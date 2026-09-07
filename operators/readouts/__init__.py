@@ -17,7 +17,8 @@ from operators.framework import (
     Representation,
     UniformGridQuadrature,
 )
-from operators.substrate import MultilayerPerceptron, Softplus
+from operators.data import PodBasis
+from operators.substrate import Engine, MultilayerPerceptron, Softplus
 
 
 class PointwiseProjection(Operator[GridFunction, GridFunction]):
@@ -117,4 +118,56 @@ class BasisExpansion(Operator[Coefficients, Representation]):
         state: dict[str, Array] = dict(self.parameter_values)
         if self.last_trunk_features is not None:
             state["last_trunk_features"] = self.last_trunk_features
+        return state
+
+
+class FixedModeExpansion(Operator[Coefficients, GridFunction]):
+    """branch coefficients carried onto a field by fixed modes and the training mean"""
+
+
+    def __init__(self, basis: PodBasis, grid_shape: tuple[int, int, int]) -> None:
+        self.basis = basis
+        self.grid_shape = grid_shape
+        self.last_coefficients: NDArray[np.float64] | None = None
+
+
+    def Forward(self, branch_vector: Any, basis_modes: Any, basis_mean: Any) -> Any:
+        """the published form, modes weighted by the branch with the training mean added back"""
+        return branch_vector @ basis_modes + basis_mean
+
+
+    def Lifted_Constants(self, engine: Engine) -> tuple[Any, Any]:
+        """the modes and mean as engine constants, so gradients reach only the branch"""
+        return engine.Lift_Constant(self.basis.modes), engine.Lift_Constant(self.basis.mean)
+
+
+    def __call__(
+        self,
+        input_function: Coefficients,
+        output_discretization: Discretization,
+        condition: Coefficients | None = None,
+    ) -> GridFunction:
+        coefficients = np.asarray(input_function.vector, dtype=np.float64)
+        self.last_coefficients = coefficients
+        produced = np.asarray(
+            self.Forward(coefficients, self.basis.modes, self.basis.mean), dtype=np.float64
+        )
+        cell_volume = abs(float(np.linalg.det(np.asarray(input_function.domain.lattice))))
+        quadrature = UniformGridQuadrature(cell_volume, produced.size)
+        return GridFunction(
+            produced.reshape(1, *self.grid_shape),
+            ("predicted_field",),
+            input_function.domain,
+            quadrature,
+        )
+
+
+    def Inspect(self) -> dict[str, Array]:
+        state: dict[str, Array] = {
+            "basis_modes": self.basis.modes,
+            "basis_singular_values": self.basis.singular_values,
+            "basis_mean": self.basis.mean,
+        }
+        if self.last_coefficients is not None:
+            state["last_coefficients"] = self.last_coefficients
         return state

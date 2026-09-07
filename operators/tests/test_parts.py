@@ -17,7 +17,9 @@ from operators.framework import (
     UniformGridQuadrature,
 )
 from operators.kernels import SpectralKernel
-from operators.readouts import BasisExpansion, PointwiseProjection
+from operators.data import Gram_Pod, Project
+from operators.readouts import BasisExpansion, FixedModeExpansion, PointwiseProjection
+from operators.substrate import NumpyEngine
 from operators.wrappers import Conditioned, Conserving, Residual
 
 CUBE = Domain(lattice=np.eye(3) * 2.0)
@@ -152,3 +154,56 @@ def Test_The_Wrappers_Enforce_Their_Laws() -> None:
     assert np.allclose(np.asarray(plain.values), np.asarray(field.values))
     modulated = conditioned(field, GridSpec((4, 4, 4)), Coefficients(vector=np.asarray([1.0, -0.5]), domain=CUBE))
     assert not np.allclose(np.asarray(modulated.values), np.asarray(field.values))
+
+
+def Test_The_Fixed_Mode_Expansion_Inverts_The_Projection() -> None:
+    """coefficients projected out of a field expand back to it through the same basis"""
+    generator = np.random.default_rng(11)
+    shape = (4, 4, 4)
+    snapshots = generator.normal(size=(12, 4 * 4 * 4))
+    basis = Gram_Pod(snapshots)
+    readout = FixedModeExpansion(basis, shape)
+    for snapshot in snapshots[:3]:
+        coefficients = Project(basis, snapshot[None, :])[0]
+        rebuilt = readout(Coefficients(vector=coefficients, domain=CUBE), GridSpec(shape))
+        assert isinstance(rebuilt, GridFunction)
+        # a full-rank basis rebuilds its own snapshots exactly
+        assert np.allclose(np.asarray(rebuilt.values).reshape(-1), snapshot, atol=1e-10)
+
+
+def Test_The_Fixed_Mode_Expansion_Truncates_To_Its_Rank() -> None:
+    """a rank-limited basis leaves exactly the error its singular values predict"""
+    generator = np.random.default_rng(12)
+    snapshots = generator.normal(size=(10, 64)) @ generator.normal(size=(64, 64))
+    truncated = Gram_Pod(snapshots, rank=3)
+    readout = FixedModeExpansion(truncated, (4, 4, 4))
+    coefficients = Project(truncated, snapshots[0][None, :])[0]
+    rebuilt = readout(Coefficients(vector=coefficients, domain=CUBE), GridSpec((4, 4, 4)))
+    residual = np.asarray(rebuilt.values).reshape(-1) - snapshots[0]
+    assert coefficients.shape == (3,)
+    assert 0.0 < float(np.linalg.norm(residual)) < float(np.linalg.norm(snapshots[0] - truncated.mean))
+
+
+def Test_The_Fixed_Mode_Expansion_Inspects_Its_Basis() -> None:
+    """the modes, their singular values, the mean and the last coefficients are all reachable"""
+    generator = np.random.default_rng(13)
+    basis = Gram_Pod(generator.normal(size=(6, 64)), rank=4)
+    readout = FixedModeExpansion(basis, (4, 4, 4))
+    assert set(readout.Inspect()) == {"basis_modes", "basis_singular_values", "basis_mean"}
+    readout(Coefficients(vector=np.ones(4), domain=CUBE), GridSpec((4, 4, 4)))
+    inspected = readout.Inspect()
+    assert inspected["basis_modes"].shape == (4, 64)
+    assert inspected["basis_singular_values"].shape == (4,)
+    assert inspected["last_coefficients"].shape == (4,)
+
+
+def Test_The_Fixed_Mode_Expansion_Lifts_Its_Basis_As_Constants() -> None:
+    """the modes and mean cross the engine facet unchanged, so only the branch carries gradient"""
+    generator = np.random.default_rng(14)
+    basis = Gram_Pod(generator.normal(size=(6, 64)), rank=4)
+    readout = FixedModeExpansion(basis, (4, 4, 4))
+    lifted_modes, lifted_mean = readout.Lifted_Constants(NumpyEngine())
+    branch = np.ones(4)
+    through_the_facet = readout.Forward(branch, lifted_modes, lifted_mean)
+    directly = readout.Forward(branch, basis.modes, basis.mean)
+    assert np.allclose(np.asarray(through_the_facet), np.asarray(directly))

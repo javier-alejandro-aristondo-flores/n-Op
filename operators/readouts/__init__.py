@@ -1,6 +1,7 @@
 """maps from the channel space back to corpus fields, queryable anywhere"""
 
-from typing import Any
+from abc import abstractmethod
+from typing import Any, Protocol
 
 import numpy as np
 from numpy.typing import NDArray
@@ -61,29 +62,80 @@ class PointwiseProjection(Operator[GridFunction, GridFunction]):
         return dict(self.parameter_values)
 
 
+class CoordinateFeatures(Protocol):
+    """turns evaluation points into the numbers a trunk reads"""
+
+    feature_count: int
+
+
+    @abstractmethod
+    def __call__(self, points: NDArray[np.float64]) -> NDArray[np.float64]: ...
+
+
+def Integer_Frequency_Waves(points: NDArray[np.float64], fourier_orders: int) -> list[NDArray[np.float64]]:
+    """cosine and sine blocks at whole numbers of cycles across the cell"""
+    blocks: list[NDArray[np.float64]] = []
+    for order in range(1, fourier_orders + 1):
+        angle = 2.0 * np.pi * order * points
+        blocks.append(np.cos(angle))
+        blocks.append(np.sin(angle))
+    return blocks
+
+
+class PeriodicCoordinateFeatures(CoordinateFeatures):
+    """a constant beside the waves, so every feature repeats where the cell does"""
+
+
+    def __init__(self, fourier_orders: int = 4, axis_count: int = 3) -> None:
+        self.fourier_orders = fourier_orders
+        self.axis_count = axis_count
+        self.feature_count = 1 + 2 * fourier_orders * axis_count
+
+
+    def __call__(self, points: NDArray[np.float64]) -> NDArray[np.float64]:
+        # a constant stands where the raw coordinate would, which is the one block that does not wrap
+        constant = np.ones((points.shape[0], 1), dtype=np.float64)
+        return np.concatenate([constant, *Integer_Frequency_Waves(points, self.fourier_orders)], axis=1)
+
+
+class RampedCoordinateFeatures(CoordinateFeatures):
+    """the raw coordinate beside the waves, for an axis that does not repeat"""
+
+
+    def __init__(self, fourier_orders: int = 4, axis_count: int = 1) -> None:
+        self.fourier_orders = fourier_orders
+        self.axis_count = axis_count
+        self.feature_count = axis_count + 2 * fourier_orders * axis_count
+
+
+    def __call__(self, points: NDArray[np.float64]) -> NDArray[np.float64]:
+        return np.concatenate([points, *Integer_Frequency_Waves(points, self.fourier_orders)], axis=1)
+
+
 class BasisExpansion(Operator[Coefficients, Representation]):
     """a coordinate trunk evaluated against branch coefficients at any requested points"""
 
 
     def __init__(
-        self, latent_width: int, trunk_widths: tuple[int, ...], fourier_orders: int = 4, seed: int = 0
+        self,
+        latent_width: int,
+        trunk_widths: tuple[int, ...],
+        coordinate_features: CoordinateFeatures | None = None,
+        seed: int = 0,
     ) -> None:
-        self.fourier_orders = fourier_orders
-        feature_count = 3 + 6 * fourier_orders
-        self.trunk = MultilayerPerceptron((feature_count, *trunk_widths, latent_width), "trunk", seed)
+        self.coordinate_features = (
+            coordinate_features if coordinate_features is not None else PeriodicCoordinateFeatures()
+        )
+        self.trunk = MultilayerPerceptron(
+            (self.coordinate_features.feature_count, *trunk_widths, latent_width), "trunk", seed
+        )
         self.parameter_values = self.trunk.parameter_values
         self.last_trunk_features: NDArray[np.float64] | None = None
 
 
     def Coordinate_Features(self, points: NDArray[np.float64]) -> NDArray[np.float64]:
-        """raw fractional coordinates and integer-frequency waves"""
-        # integer frequencies keep the features periodic across the cell boundary
-        feature_blocks = [points]
-        for order in range(1, self.fourier_orders + 1):
-            angle = 2.0 * np.pi * order * points
-            feature_blocks.append(np.cos(angle))
-            feature_blocks.append(np.sin(angle))
-        return np.concatenate(feature_blocks, axis=1)
+        """the features the configured map reads off the points"""
+        return self.coordinate_features(points)
 
 
     def Forward(self, lifted: dict[str, Any], branch_vector: Any, trunk_features: Any) -> Any:

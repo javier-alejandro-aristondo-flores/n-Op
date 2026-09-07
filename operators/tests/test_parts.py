@@ -18,7 +18,13 @@ from operators.framework import (
 )
 from operators.kernels import SpectralKernel
 from operators.data import Gram_Pod, Project
-from operators.readouts import BasisExpansion, FixedModeExpansion, PointwiseProjection
+from operators.readouts import (
+    BasisExpansion,
+    FixedModeExpansion,
+    PeriodicCoordinateFeatures,
+    PointwiseProjection,
+    RampedCoordinateFeatures,
+)
 from operators.substrate import NumpyEngine
 from operators.wrappers import Conditioned, Conserving, Residual
 
@@ -73,7 +79,8 @@ def Test_The_Basis_Projection_Recovers_Exact_Coefficients() -> None:
 
 def Test_The_Basis_Expansion_Queries_Anywhere() -> None:
     """the trunk answers identically on a grid and on the same explicit points"""
-    readout = BasisExpansion(latent_width=6, trunk_widths=(16,), fourier_orders=2, seed=4)
+    features = PeriodicCoordinateFeatures(fourier_orders=2)
+    readout = BasisExpansion(latent_width=6, trunk_widths=(16,), coordinate_features=features, seed=4)
     branch = Coefficients(vector=np.arange(6.0) / 6.0, domain=CUBE)
     on_grid = readout(branch, GridSpec((4, 4, 4)))
     assert isinstance(on_grid, GridFunction)
@@ -208,3 +215,56 @@ def Test_The_Fixed_Mode_Expansion_Lifts_Its_Basis_As_Constants() -> None:
     through_the_facet = readout.Forward(branch, lifted_modes, lifted_mean)
     directly = readout.Forward(branch, basis.modes, basis.mean)
     assert np.allclose(np.asarray(through_the_facet), np.asarray(directly))
+
+
+def Test_The_Periodic_Features_Repeat_Where_The_Cell_Does() -> None:
+    """the same physical point reached from either face reads identically, exactly"""
+    features = PeriodicCoordinateFeatures(fourier_orders=4)
+    # x = 0 and x = 1 are one place in a repeating cell, as are y = 0 and y = 1
+    same_place = np.asarray([[0.0, 0.3, 0.7], [1.0, 0.3, 0.7], [0.0, 1.3, 0.7], [0.0, 0.3, -0.3]])
+    read = features(same_place)
+    assert read.shape == (4, features.feature_count)
+    # a whole turn of a sine leaves floating dust, nothing a field could carry
+    assert float(np.abs(read[1:] - read[0]).max()) < 1e-12
+
+
+def Test_The_Periodic_Trunk_Cannot_Seam_At_The_Cell_Face() -> None:
+    """a whole trunk answers one number at one point, whichever face names it"""
+    readout = BasisExpansion(latent_width=8, trunk_widths=(32, 32), seed=0)
+    branch = Coefficients(vector=np.arange(8.0) / 8.0, domain=CUBE)
+    same_place = np.asarray([[0.0, 0.3, 0.7], [1.0, 0.3, 0.7]])
+    values = np.asarray(
+        readout.Forward(
+            readout.parameter_values,
+            np.asarray(branch.vector, dtype=np.float64),
+            readout.Coordinate_Features(same_place),
+        ),
+        dtype=np.float64,
+    )
+    # the ramped map disagreed with itself by 0.079 here, fourteen orders of magnitude worse
+    assert float(abs(values[1] - values[0])) < 1e-12
+
+
+def Test_The_Ramped_Features_Keep_The_Axis_That_Does_Not_Repeat() -> None:
+    """the ramped map carries the raw coordinate, which is what an energy axis needs"""
+    energy_features = RampedCoordinateFeatures(fourier_orders=3, axis_count=1)
+    assert energy_features.feature_count == 1 + 2 * 3 * 1
+    read = energy_features(np.asarray([[0.0], [1.0]]))
+    assert read.shape == (2, energy_features.feature_count)
+    # the raw column is exactly what separates the two ends of a window that does not wrap
+    assert float(read[1][0] - read[0][0]) == 1.0
+    assert np.allclose(read[1][1:], read[0][1:])
+
+
+def Test_The_Feature_Counts_Match_What_The_Trunk_Was_Built_For() -> None:
+    """each map reports the width the perceptron's first layer is sized to"""
+    for features in (
+        PeriodicCoordinateFeatures(fourier_orders=2),
+        RampedCoordinateFeatures(fourier_orders=2, axis_count=3),
+        RampedCoordinateFeatures(fourier_orders=5, axis_count=1),
+    ):
+        points = np.zeros((3, features.axis_count), dtype=np.float64)
+        assert features(points).shape[1] == features.feature_count
+        readout = BasisExpansion(latent_width=4, trunk_widths=(8,), coordinate_features=features)
+        first_layer = readout.parameter_values["trunk_layer_0_weights"]
+        assert first_layer.shape[1] == features.feature_count

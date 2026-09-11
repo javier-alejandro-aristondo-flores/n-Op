@@ -11,7 +11,7 @@ from numpy.typing import NDArray
 
 from operators.compositions import ExplicitStack
 from operators.data import Gram_Pod, Project
-from operators.encoders import BasisProjectionEncoder, PointwiseLift, SensorEncoder
+from operators.encoders import AtomEmbedding, BasisProjectionEncoder, PointwiseLift, SensorEncoder, VariableEncoding
 from operators.framework import (
     Array,
     Coefficients,
@@ -58,6 +58,12 @@ def Small_Field(channels: int, seed: int) -> GridFunction:
     return GridFunction(generator.random((channels, 4, 4, 4)), labels, CUBE, GRID_QUADRATURE)
 
 
+def Labeled_Field(labels: tuple[str, ...], seed: int) -> GridFunction:
+    """a random four-cubed field carrying the given physical channel labels"""
+    generator = np.random.default_rng(seed)
+    return GridFunction(generator.random((len(labels), 4, 4, 4)), labels, CUBE, GRID_QUADRATURE)
+
+
 def Test_The_Lift_And_Projection_Mix_Channels() -> None:
     """channel counts change while the grid stays, and the bounded head stays in range"""
     field = Small_Field(2, seed=1)
@@ -78,6 +84,118 @@ def Test_The_Sensor_Encoder_Reads_Parameters() -> None:
     parameters = Coefficients(vector=np.asarray([0.1, -0.2, 0.3]), domain=CUBE)
     latent = encoder(parameters, PointSpec(np.zeros((1, 1))))
     assert np.asarray(latent.vector).shape == (8,)
+
+
+ATOM_VOCABULARY = (
+    ("C", "PAW_PBE C 08Apr2002"),
+    ("C", "PAW_PBE C 06Sep2000"),
+    ("Si", "PAW_PBE Si 05Jan2001"),
+)
+
+
+def Test_The_Atom_Embedding_Looks_Up_Each_Atom_By_Its_Pair() -> None:
+    """the table row an atom gets depends on both its element and its pseudopotential title"""
+    embedding = AtomEmbedding(ATOM_VOCABULARY, embedding_width=4, seed=41)
+    species = np.asarray([["C", "PAW_PBE C 08Apr2002"], ["C", "PAW_PBE C 06Sep2000"]])
+    point_set = PointSet(positions=np.zeros((2, 3)), domain=CUBE, species=species, roles=np.zeros(2))
+    produced = embedding(point_set, PointSpec(np.zeros((1, 1))))
+    assert np.asarray(produced.values).shape == (2, 4)
+    assert produced.positions is point_set.positions
+    assert produced.roles is point_set.roles
+    # the same element under two pseudopotential titles must not share a row
+    assert not np.allclose(np.asarray(produced.values)[0], np.asarray(produced.values)[1])
+    assert "atom_embedding_table" in embedding.Inspect()
+
+
+def Test_The_Atom_Embedding_Refuses_An_Unseen_Pair() -> None:
+    """a pair the vocabulary never saw would otherwise silently reuse a stranger's row"""
+    embedding = AtomEmbedding(ATOM_VOCABULARY, embedding_width=3, seed=42)
+    species = np.asarray([["Si", "PAW_PBE Si 12Jan2000"]])
+    point_set = PointSet(positions=np.zeros((1, 3)), domain=CUBE, species=species)
+    with pytest.raises(ValueError):
+        embedding(point_set, PointSpec(np.zeros((1, 1))))
+
+
+def Test_The_Atom_Embedding_Paths_Agree() -> None:
+    """the direct forward and the inference call produce the same numbers"""
+    embedding = AtomEmbedding(ATOM_VOCABULARY, embedding_width=4, seed=43)
+    species = np.asarray(
+        [["Si", "PAW_PBE Si 05Jan2001"], ["C", "PAW_PBE C 08Apr2002"], ["Si", "PAW_PBE Si 05Jan2001"]]
+    )
+    point_set = PointSet(positions=np.zeros((3, 3)), domain=CUBE, species=species)
+    through_call = np.asarray(embedding(point_set, PointSpec(np.zeros((1, 1)))).values)
+    vocabulary_indices = embedding.Vocabulary_Indices(species)
+    through_forward = np.asarray(embedding.Forward(embedding.parameter_values, vocabulary_indices))
+    assert np.allclose(through_call, through_forward, atol=1e-12)
+
+
+CHANNEL_VOCABULARY = ("charge_density", "magnetization", "local_potential_up")
+
+
+def Test_The_Variable_Encoding_Widens_Each_Present_Channel() -> None:
+    """every channel present becomes its own block of hidden_channels tokens"""
+    encoding = VariableEncoding(CHANNEL_VOCABULARY, hidden_channels=4, condition_width=2, seed=44)
+    field = Labeled_Field(("local_potential_up", "charge_density"), seed=45)
+    produced = encoding(field, GridSpec((4, 4, 4)))
+    assert np.asarray(produced.values).shape == (8, 4, 4, 4)
+    assert len(produced.channel_labels) == 8
+    assert "label_encodings" in encoding.Inspect()
+
+
+def Test_The_Variable_Encoding_Refuses_An_Unknown_Channel_Label() -> None:
+    """a channel outside the corpus vocabulary would otherwise silently borrow another label's row"""
+    encoding = VariableEncoding(("charge_density",), hidden_channels=2, condition_width=1, seed=46)
+    field = Labeled_Field(("electron_localization_up",), seed=47)
+    with pytest.raises(ValueError):
+        encoding(field, GridSpec((4, 4, 4)))
+
+
+def Test_The_Variable_Encoding_Shares_Weights_Across_Present_Channels() -> None:
+    """a channel's own encoding cannot depend on which other channels rode along with it"""
+    encoding = VariableEncoding(CHANNEL_VOCABULARY, hidden_channels=3, condition_width=2, seed=48)
+    generator = np.random.default_rng(49)
+    density = generator.random((4, 4, 4))
+    magnetization = generator.random((4, 4, 4))
+    potential = generator.random((4, 4, 4))
+    full = GridFunction(np.stack([density, magnetization, potential]), CHANNEL_VOCABULARY, CUBE, GRID_QUADRATURE)
+    partial = GridFunction(
+        np.stack([density, potential]), ("charge_density", "local_potential_up"), CUBE, GRID_QUADRATURE
+    )
+    full_produced = np.asarray(encoding(full, GridSpec((4, 4, 4))).values)
+    partial_produced = np.asarray(encoding(partial, GridSpec((4, 4, 4))).values)
+    # charge_density sits first in both channel sets, whatever else rides along with it
+    assert np.allclose(full_produced[0:3], partial_produced[0:3])
+    # local_potential_up moves from the last slot to the second, and must carry the same values there
+    assert np.allclose(full_produced[6:9], partial_produced[3:6])
+
+
+def Test_The_Variable_Encoding_Places_The_Covariate_In_The_Encoding_Not_A_New_Channel() -> None:
+    """the functional covariate enters the encoding slot, so the token count never grows for it"""
+    encoding = VariableEncoding(CHANNEL_VOCABULARY, hidden_channels=2, condition_width=3, seed=50)
+    field = Labeled_Field(("charge_density", "magnetization"), seed=51)
+    plain = encoding(field, GridSpec((4, 4, 4)), None)
+    modulated = encoding(field, GridSpec((4, 4, 4)), Coefficients(vector=np.asarray([0.4, -0.2, 0.9]), domain=CUBE))
+    assert np.asarray(plain.values).shape == np.asarray(modulated.values).shape == (4, 4, 4, 4)
+    assert plain.channel_labels == modulated.channel_labels
+    assert not np.allclose(np.asarray(plain.values), np.asarray(modulated.values))
+
+
+def Test_The_Variable_Encoding_Paths_Agree() -> None:
+    """the direct forward and the inference call produce the same numbers"""
+    encoding = VariableEncoding(CHANNEL_VOCABULARY, hidden_channels=3, condition_width=2, seed=52)
+    field = Labeled_Field(("magnetization", "charge_density"), seed=53)
+    condition = Coefficients(vector=np.asarray([0.3, -0.7]), domain=CUBE)
+    through_call = np.asarray(encoding(field, GridSpec((4, 4, 4)), condition).values)
+    label_indices = encoding.Label_Indices(field.channel_labels)
+    through_forward = np.asarray(
+        encoding.Forward(
+            encoding.parameter_values,
+            np.asarray(field.values, dtype=np.float64),
+            label_indices,
+            np.asarray(condition.vector, dtype=np.float64),
+        )
+    )
+    assert np.allclose(through_call, through_forward, atol=1e-12)
 
 
 def Test_The_Basis_Projection_Recovers_Exact_Coefficients() -> None:
@@ -451,6 +569,30 @@ def Conditioned_Loss(
     return Loss
 
 
+def Atom_Embedding_Loss(
+    embedding: AtomEmbedding, vocabulary_indices: Any, target: Any
+) -> Callable[[dict[str, Any]], Any]:
+    """the squared gap between the gathered rows and a fixed target, as a forward an engine drives"""
+
+    def Loss(lifted: dict[str, Any]) -> Any:
+        difference = embedding.Forward(lifted, vocabulary_indices) - target
+        return (difference * difference).sum()
+
+    return Loss
+
+
+def Variable_Encoding_Loss(
+    encoding: VariableEncoding, channel_values: Any, label_indices: Any, condition_vector: Any, target: Any
+) -> Callable[[dict[str, Any]], Any]:
+    """the squared gap between the produced tokens and a fixed target, as a forward an engine drives"""
+
+    def Loss(lifted: dict[str, Any]) -> Any:
+        difference = encoding.Forward(lifted, channel_values, label_indices, condition_vector) - target
+        return (difference * difference).sum()
+
+    return Loss
+
+
 def Agreeing_Gradients(
     parameters: ParameterSet,
     lifted_loss: Callable[[dict[str, Any]], Any],
@@ -558,6 +700,85 @@ def Test_The_Conditioning_Weights_Are_Reached_Alongside_The_Operator_Inside() ->
         "condition_scale_weights",
         "condition_shift_weights",
     }
+    for name, gradient in gradients.items():
+        assert float(np.abs(gradient).max()) > 1e-6, name
+
+
+@pytest.mark.skipif(not Torch_Is_Available(), reason="torch is not installed yet")
+def Test_The_Atom_Embedding_Carries_Gradients_To_Its_Table() -> None:
+    """the table is what training moves, so a forward that could not reach it could not be trained"""
+    embedding = AtomEmbedding(ATOM_VOCABULARY, embedding_width=3, seed=54)
+    species = np.asarray(
+        [["Si", "PAW_PBE Si 05Jan2001"], ["C", "PAW_PBE C 08Apr2002"], ["Si", "PAW_PBE Si 05Jan2001"]]
+    )
+    vocabulary_indices = embedding.Vocabulary_Indices(species)
+    target = np.random.default_rng(55).random((3, 3))
+    parameters = ParameterSet(values={name: value.copy() for name, value in embedding.parameter_values.items()})
+    engine = TorchEngine()
+    gradients = Agreeing_Gradients(
+        parameters,
+        Atom_Embedding_Loss(embedding, vocabulary_indices, engine.Lift_Constant(target)),
+        Atom_Embedding_Loss(embedding, vocabulary_indices, target),
+    )
+    assert float(np.abs(gradients["atom_embedding_table"]).max()) > 1e-6
+    # this vocabulary's second row never appears among these atoms, and must get exactly no gradient
+    untouched_rows = sorted(set(range(len(ATOM_VOCABULARY))) - set(vocabulary_indices.tolist()))
+    assert untouched_rows == [1]
+    assert float(np.abs(gradients["atom_embedding_table"][1]).max()) < 1e-12
+
+
+@pytest.mark.skipif(not Torch_Is_Available(), reason="torch is not installed yet")
+def Test_The_Variable_Encoding_Carries_Gradients_To_Its_Tables() -> None:
+    """the lift, the per-label rows and the covariate projection are all what training moves"""
+    encoding = VariableEncoding(CHANNEL_VOCABULARY, hidden_channels=2, condition_width=2, seed=56)
+    field = Labeled_Field(("charge_density", "magnetization"), seed=57)
+    label_indices = encoding.Label_Indices(field.channel_labels)
+    channel_values = np.asarray(field.values, dtype=np.float64)
+    condition_vector = np.asarray([0.5, -0.1], dtype=np.float64)
+    target = np.random.default_rng(58).random((4, 4, 4, 4))
+    parameters = ParameterSet(values={name: value.copy() for name, value in encoding.parameter_values.items()})
+    engine = TorchEngine()
+    gradients = Agreeing_Gradients(
+        parameters,
+        Variable_Encoding_Loss(
+            encoding,
+            engine.Lift_Constant(channel_values),
+            label_indices,
+            engine.Lift_Constant(condition_vector),
+            engine.Lift_Constant(target),
+        ),
+        Variable_Encoding_Loss(encoding, channel_values, label_indices, condition_vector, target),
+    )
+    assert set(gradients) == {
+        "token_lift_weights",
+        "token_lift_biases",
+        "label_encodings",
+        "condition_projection_weights",
+    }
+    for name, gradient in gradients.items():
+        assert float(np.abs(gradient).max()) > 1e-6, name
+    # this vocabulary's third row, local_potential_up, never appears among these channels
+    assert float(np.abs(gradients["label_encodings"][2]).max()) < 1e-12
+
+
+@pytest.mark.skipif(not Torch_Is_Available(), reason="torch is not installed yet")
+def Test_The_Variable_Encoding_Trains_Without_A_Covariate() -> None:
+    """the encoding slot's covariate is optional, so the rest of the table must not need it either"""
+    encoding = VariableEncoding(CHANNEL_VOCABULARY, hidden_channels=2, condition_width=2, seed=59)
+    field = Labeled_Field(("charge_density", "magnetization"), seed=60)
+    label_indices = encoding.Label_Indices(field.channel_labels)
+    channel_values = np.asarray(field.values, dtype=np.float64)
+    target = np.random.default_rng(61).random((4, 4, 4, 4))
+    trainable_names = ("token_lift_weights", "token_lift_biases", "label_encodings")
+    parameters = ParameterSet(values={name: encoding.parameter_values[name].copy() for name in trainable_names})
+    engine = TorchEngine()
+    gradients = Agreeing_Gradients(
+        parameters,
+        Variable_Encoding_Loss(
+            encoding, engine.Lift_Constant(channel_values), label_indices, None, engine.Lift_Constant(target)
+        ),
+        Variable_Encoding_Loss(encoding, channel_values, label_indices, None, target),
+    )
     for name, gradient in gradients.items():
         assert float(np.abs(gradient).max()) > 1e-6, name
 

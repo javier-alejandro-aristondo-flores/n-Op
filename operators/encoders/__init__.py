@@ -5,7 +5,7 @@ from typing import Any
 import numpy as np
 from numpy.typing import NDArray
 
-from operators.framework import Array, Coefficients, Discretization, GridFunction, Operator
+from operators.framework import Array, Coefficients, Discretization, GridFunction, Operator, PointSet
 from operators.substrate import MultilayerPerceptron
 
 
@@ -112,4 +112,135 @@ class BasisProjectionEncoder(Operator[GridFunction, Coefficients]):
             state["basis_mean"] = self.basis_mean
         if self.last_coefficients is not None:
             state["last_coefficients"] = self.last_coefficients
+        return state
+
+
+class AtomEmbedding(Operator[PointSet, PointSet]):
+    """atoms carrying a learned feature vector keyed by element and pseudopotential title"""
+
+
+    def __init__(self, vocabulary: tuple[tuple[str, str], ...], embedding_width: int, seed: int = 0) -> None:
+        generator = np.random.default_rng(seed)
+        scale = 1.0 / np.sqrt(embedding_width)
+        self.vocabulary = vocabulary
+        self.index_by_key = {key: position for position, key in enumerate(vocabulary)}
+        self.parameter_values: dict[str, NDArray[np.float64]] = {
+            "atom_embedding_table": generator.normal(0.0, scale, size=(len(vocabulary), embedding_width)),
+        }
+        self.last_vocabulary_indices: NDArray[np.intp] | None = None
+
+
+    def Forward(self, lifted: dict[str, Any], vocabulary_indices: Any) -> Any:
+        # one table row gathered per atom, from whichever engine holds the table
+        return lifted["atom_embedding_table"][vocabulary_indices]
+
+
+    def Vocabulary_Indices(self, species: Any) -> NDArray[np.intp]:
+        # a pair the vocabulary has never seen has no row to fall back to
+        keys = [(str(element), str(title)) for element, title in species]
+        unknown = sorted({key for key in keys if key not in self.index_by_key})
+        if unknown:
+            raise ValueError(f"atom embedding has no row for (element, pseudopotential title) pairs: {unknown}")
+        return np.asarray([self.index_by_key[key] for key in keys], dtype=np.intp)
+
+
+    def __call__(
+        self,
+        input_function: PointSet,
+        output_discretization: Discretization,
+        condition: Coefficients | None = None,
+    ) -> PointSet:
+        species = input_function.species
+        # each row pairs the element symbol in column zero with its pseudopotential title in column one
+        if species is None:
+            raise ValueError("atom embedding needs a species column to key its lookup")
+        vocabulary_indices = self.Vocabulary_Indices(np.asarray(species))
+        produced = np.asarray(self.Forward(self.parameter_values, vocabulary_indices))
+        self.last_vocabulary_indices = vocabulary_indices
+        return PointSet(
+            positions=input_function.positions,
+            domain=input_function.domain,
+            values=produced,
+            species=input_function.species,
+            roles=input_function.roles,
+            quadrature=input_function.quadrature,
+        )
+
+
+    def Inspect(self) -> dict[str, Array]:
+        state: dict[str, Array] = dict(self.parameter_values)
+        if self.last_vocabulary_indices is not None:
+            state["last_vocabulary_indices"] = self.last_vocabulary_indices
+        return state
+
+
+class VariableEncoding(Operator[GridFunction, GridFunction]):
+    """each channel lifted into a shared token width by one learned encoding per channel label"""
+
+
+    def __init__(
+        self, vocabulary: tuple[str, ...], hidden_channels: int, condition_width: int, seed: int = 0
+    ) -> None:
+        generator = np.random.default_rng(seed)
+        scale = 1.0 / np.sqrt(hidden_channels)
+        self.vocabulary = vocabulary
+        self.index_by_label = {label: position for position, label in enumerate(vocabulary)}
+        self.parameter_values: dict[str, NDArray[np.float64]] = {
+            "token_lift_weights": generator.normal(0.0, scale, size=(hidden_channels,)),
+            "token_lift_biases": np.zeros(hidden_channels),
+            "label_encodings": generator.normal(0.0, scale, size=(len(vocabulary), hidden_channels)),
+            "condition_projection_weights": generator.normal(0.0, scale, size=(hidden_channels, condition_width)),
+        }
+        self.last_label_indices: NDArray[np.intp] | None = None
+
+
+    def Forward(self, lifted: dict[str, Any], channel_values: Any, label_indices: Any, condition_vector: Any) -> Any:
+        hidden_channels = lifted["token_lift_weights"].shape[0]
+        grid_rank = len(channel_values.shape) - 1
+        token_shape = (1, hidden_channels) + (1,) * grid_rank
+        lifted_weights = lifted["token_lift_weights"].reshape(token_shape)
+        lifted_biases = lifted["token_lift_biases"].reshape(token_shape)
+        channel_shape = (channel_values.shape[0], hidden_channels) + (1,) * grid_rank
+        # every token is lifted by the same weights, and only this row says which token it is
+        channel_encodings = lifted["label_encodings"][label_indices].reshape(channel_shape)
+        tokens = channel_values[:, None] * lifted_weights + lifted_biases + channel_encodings
+        if condition_vector is not None:
+            # a run-level covariate, so every present token's encoding takes the same shift
+            condition_shift = (lifted["condition_projection_weights"] @ condition_vector).reshape(token_shape)
+            tokens = tokens + condition_shift
+        return tokens.reshape(-1, *channel_values.shape[1:])
+
+
+    def Label_Indices(self, channel_labels: tuple[str, ...]) -> NDArray[np.intp]:
+        # a label the vocabulary has never seen has no row to fall back to
+        unknown = sorted(label for label in channel_labels if label not in self.index_by_label)
+        if unknown:
+            raise ValueError(f"variable encoding has no row for channel labels: {unknown}")
+        return np.asarray([self.index_by_label[label] for label in channel_labels], dtype=np.intp)
+
+
+    def __call__(
+        self,
+        input_function: GridFunction,
+        output_discretization: Discretization,
+        condition: Coefficients | None = None,
+    ) -> GridFunction:
+        label_indices = self.Label_Indices(input_function.channel_labels)
+        channel_values = np.asarray(input_function.values, dtype=np.float64)
+        condition_vector = None if condition is None else np.asarray(condition.vector, dtype=np.float64)
+        produced = np.asarray(self.Forward(self.parameter_values, channel_values, label_indices, condition_vector))
+        hidden_channels = self.parameter_values["token_lift_weights"].shape[0]
+        labels = tuple(
+            f"{label}_{hidden_channel}"
+            for label in input_function.channel_labels
+            for hidden_channel in range(hidden_channels)
+        )
+        self.last_label_indices = label_indices
+        return GridFunction(produced, labels, input_function.domain, input_function.quadrature)
+
+
+    def Inspect(self) -> dict[str, Array]:
+        state: dict[str, Array] = dict(self.parameter_values)
+        if self.last_label_indices is not None:
+            state["last_label_indices"] = self.last_label_indices
         return state

@@ -1,14 +1,23 @@
 """how far an operator's output moves when its discretization changes"""
 
-from collections.abc import Callable
+from collections.abc import Callable, Sequence
+from dataclasses import dataclass
 from itertools import permutations, product
 
 import numpy as np
 from numpy.typing import NDArray
 
+from operators.framework.domain import Array, GridSpec
 from operators.framework.operator import Operator
-from operators.framework.representation import Representation
+from operators.framework.representation import GridFunction, UniformGridQuadrature
+from operators.metrics import Relative_L2
 from operators.tasks import TaskCard
+
+CURVE_SUFFIX = "_curve"
+
+QUARTER_CELL_DIVISOR = 4
+
+TRAINING_SHAPE = (40, 40, 40)
 
 
 def Spectral_Truncation_Resample(
@@ -128,8 +137,175 @@ def K_Quality_Tier(irreducible_kpoint_count: int) -> str:
     return "below_gate"
 
 
+@dataclass(frozen=True, slots=True)
+class InvarianceProbe:
+    """one run's input field beside the truth an operator is scored against"""
+
+    input_function: GridFunction
+    truth_values: NDArray[np.float64]
+
+
+@dataclass(frozen=True, slots=True)
+class SupercellTwin:
+    """a supercell run beside the primitive truth its own truth is priced against"""
+
+    input_function: GridFunction
+    supercell_truth: NDArray[np.float64]
+    primitive_truth: NDArray[np.float64]
+    tiles: tuple[int, int, int]
+
+
+def Grid_Shape_Of(values: Array) -> tuple[int, int, int]:
+    """the three spatial extents of a channel-first field"""
+    first_extent, second_extent, third_extent = np.asarray(values).shape[1:]
+    return int(first_extent), int(second_extent), int(third_extent)
+
+
+def Applied_On_Grid(
+    operator: Operator[GridFunction, GridFunction],
+    carried: GridFunction,
+    output_shape: tuple[int, int, int],
+) -> NDArray[np.float64]:
+    """the operator's output values on one requested grid"""
+    return np.asarray(operator(carried, GridSpec(output_shape)).values, dtype=np.float64)
+
+
+def Carried_On_Grid(carried: GridFunction, output_shape: tuple[int, int, int]) -> GridFunction:
+    """the same function on another grid, by exact Fourier truncation or zero-padding"""
+    values = Spectral_Truncation_Resample(np.asarray(carried.values, dtype=np.float64), output_shape)
+    point_count = output_shape[0] * output_shape[1] * output_shape[2]
+    quadrature = UniformGridQuadrature(carried.quadrature.cell_volume, point_count)
+    return GridFunction(values, carried.channel_labels, carried.domain, quadrature)
+
+
+def Grid_Application(
+    operator: Operator[GridFunction, GridFunction], carried: GridFunction
+) -> Callable[[NDArray[np.float64]], NDArray[np.float64]]:
+    """the operator as an array-to-array map on the grid its input already carries"""
+    output_shape = Grid_Shape_Of(carried.values)
+
+    def Apply_To_Values(values: NDArray[np.float64]) -> NDArray[np.float64]:
+        """one field array in, one field array out"""
+        moved = GridFunction(values, carried.channel_labels, carried.domain, carried.quadrature)
+        return Applied_On_Grid(operator, moved, output_shape)
+
+    return Apply_To_Values
+
+
+def Exactly_Operable_Grid(shape: tuple[int, int, int]) -> bool:
+    """whether the 48 operations land on whole voxels, which needs a quarter-divisible cube"""
+    # the glide translations are quarter cells, and a quarter cell is whole voxels only here
+    return len(set(shape)) == 1 and shape[0] % QUARTER_CELL_DIVISOR == 0
+
+
+def Skill_Against_Null(
+    model_errors: NDArray[np.float64], null_errors: NDArray[np.float64]
+) -> NDArray[np.float64]:
+    """the share of the null's error the operator removes, run by run"""
+    # a null that scores nothing cannot be improved on by a fraction of itself
+    divisible = np.where(null_errors > 0.0, null_errors, 1.0)
+    return np.where(null_errors > 0.0, 1.0 - model_errors / divisible, 0.0)
+
+
+def Resolution_Axis(
+    operator: Operator[GridFunction, GridFunction],
+    probes: Sequence[InvarianceProbe],
+    training_shape: tuple[int, int, int],
+) -> tuple[NDArray[np.float64], NDArray[np.float64]]:
+    """every probe's coarse-input error beside the truncation floor it is judged against"""
+    model_errors: list[float] = []
+    null_errors: list[float] = []
+    for probe in probes:
+        evaluation_shape = Grid_Shape_Of(probe.truth_values)
+        coarse_input = Carried_On_Grid(probe.input_function, training_shape)
+        predicted = Applied_On_Grid(operator, coarse_input, evaluation_shape)
+        model_errors.append(Relative_L2(predicted, probe.truth_values))
+        # the null is the coarse truth carried back up, which no operator on coarse input can beat
+        coarse_truth = Spectral_Truncation_Resample(probe.truth_values, training_shape)
+        upsampled_truth = Spectral_Truncation_Resample(coarse_truth, evaluation_shape)
+        null_errors.append(Relative_L2(upsampled_truth, probe.truth_values))
+    return np.asarray(model_errors, dtype=np.float64), np.asarray(null_errors, dtype=np.float64)
+
+
+def Symmetry_Axis(
+    operator: Operator[GridFunction, GridFunction], probes: Sequence[InvarianceProbe]
+) -> NDArray[np.float64]:
+    """every probe's equivariance error under each of the 48 diamond operations"""
+    operations = Diamond_Grid_Operations()
+    return np.stack(
+        [
+            Equivariance_Errors(
+                Grid_Application(operator, probe.input_function),
+                np.asarray(probe.input_function.values, dtype=np.float64),
+                operations,
+            )
+            for probe in probes
+        ]
+    )
+
+
+def Supercell_Axis(
+    operator: Operator[GridFunction, GridFunction], twins: Sequence[SupercellTwin]
+) -> tuple[NDArray[np.float64], NDArray[np.float64]]:
+    """every twin's supercell error beside the block gap between the two campaigns' own truths"""
+    model_errors: list[float] = []
+    null_errors: list[float] = []
+    for twin in twins:
+        predicted = Applied_On_Grid(operator, twin.input_function, Grid_Shape_Of(twin.supercell_truth))
+        model_errors.append(Relative_L2(predicted, twin.supercell_truth))
+        null_errors.append(Block_Gap_Null(twin.primitive_truth, twin.supercell_truth, twin.tiles))
+    return np.asarray(model_errors, dtype=np.float64), np.asarray(null_errors, dtype=np.float64)
+
+
 def Discretization_Invariance_Report(
-    operator: Operator[Representation, Representation], task: TaskCard
-) -> dict[str, object]:
+    operator: Operator[GridFunction, GridFunction],
+    task: TaskCard,
+    probes: Sequence[InvarianceProbe] = (),
+    training_shape: tuple[int, int, int] = TRAINING_SHAPE,
+    twins: Sequence[SupercellTwin] = (),
+    irreducible_kpoint_counts: Sequence[int] = (),
+) -> dict[str, Array]:
     """every invariance axis that applies to one operator on one task card"""
-    raise NotImplementedError
+    measured: dict[str, Array] = {}
+    reported: list[str] = []
+    skipped: list[str] = []
+    on_a_curve = any(target.endswith(CURVE_SUFFIX) for target in task.targets)
+    if on_a_curve or not probes:
+        withheld = "the card's target is a curve, not a field on a grid" if on_a_curve else "no probes supplied"
+        skipped += [f"resolution: {withheld}", f"symmetry: {withheld}"]
+    else:
+        model_errors, null_errors = Resolution_Axis(operator, probes, training_shape)
+        measured["resolution_training_shape"] = np.asarray(training_shape)
+        measured["resolution_model_error"] = model_errors
+        measured["resolution_truncation_null"] = null_errors
+        measured["resolution_skill"] = Skill_Against_Null(model_errors, null_errors)
+        reported.append("resolution")
+        if all(Exactly_Operable_Grid(Grid_Shape_Of(probe.input_function.values)) for probe in probes):
+            equivariance_errors = Symmetry_Axis(operator, probes)
+            measured["symmetry_equivariance_error"] = equivariance_errors
+            measured["symmetry_median_equivariance_error"] = np.asarray(float(np.median(equivariance_errors)))
+            reported.append("symmetry")
+        else:
+            skipped.append("symmetry: a probe grid is not a cube the 48 operations land on exactly")
+    if twins:
+        model_errors, null_errors = Supercell_Axis(operator, twins)
+        measured["supercell_model_error"] = model_errors
+        measured["supercell_block_gap_null"] = null_errors
+        # an error at or under the block gap prices in the campaigns' own systematics, not the model
+        measured["supercell_resolves_model_quality"] = model_errors > null_errors
+        reported.append("supercell")
+    else:
+        skipped.append("supercell: no twin runs supplied")
+    if irreducible_kpoint_counts:
+        counts = np.asarray(irreducible_kpoint_counts, dtype=np.int64)
+        measured["kpoint_irreducible_count"] = counts
+        measured["kpoint_quality_tier"] = np.asarray([K_Quality_Tier(int(count)) for count in counts])
+        reported.append("k_quality")
+    else:
+        skipped.append("k_quality: no irreducible k-point counts supplied")
+    return {
+        "task_name": np.asarray(task.name),
+        "axes_reported": np.asarray(reported),
+        "axes_skipped": np.asarray(skipped),
+        **measured,
+    }

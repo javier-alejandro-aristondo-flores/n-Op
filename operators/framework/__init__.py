@@ -19,8 +19,10 @@ from operators.framework.invariance import (
     Diamond_Grid_Operations,
     Discretization_Invariance_Report,
     Equivariance_Errors,
+    InvarianceProbe,
     K_Quality_Tier,
     Spectral_Truncation_Resample,
+    SupercellTwin,
 )
 from operators.framework.kernel import Kernel
 from operators.framework.layer import Layer

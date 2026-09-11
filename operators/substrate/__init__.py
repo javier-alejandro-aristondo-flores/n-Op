@@ -5,12 +5,28 @@
 from operators.substrate.arrays import NUMPY_DTYPE_BY_PRECISION, ArrayLike, Precision
 from operators.substrate.engine import Engine, NumpyEngine, ParameterSet
 from operators.substrate.fourier import (
+    COMPLEX_DTYPE_BY_PRECISION,
+    GRID_AXES,
+    GRID_AXIS_COUNT,
     Cartesian_Wavevectors,
     Centered_Modes,
+    Complex_From_Parts,
+    Conjugate,
+    Effective_Precision,
+    Einstein_Summation,
+    Half_Spectrum_Extent,
+    Hermitian_Mode_Part,
     Inverse_Fourier_Transform_3d,
+    Inverse_Real_Fourier_Transform_3d,
     Fourier_Transform_3d,
+    Join_Along_Axis,
+    Real_Fourier_Transform_3d,
     Real_Part,
     Reciprocal_Rows,
+    Reverse_Axes,
+    Sliced_Along_Axis,
+    Split_Batch_From_Grid,
+    Zeros_Beside,
 )
 from operators.substrate.linear_algebra import Least_Squares_Solution, Solve_Linear_System
 from operators.substrate.network import MultilayerPerceptron

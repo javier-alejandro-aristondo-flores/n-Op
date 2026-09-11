@@ -60,14 +60,21 @@ class TorchEngine:
         return torch.tensor(np.asarray(value, dtype=self.Host_Dtype()), device=self.device_name)
 
 
-    def Gradients(
+    def Value_And_Gradients(
         self, parameters: ParameterSet, forward: Callable[[dict[str, Any]], Any]
-    ) -> dict[str, NDArray[np.float64]]:
+    ) -> tuple[float, dict[str, NDArray[np.float64]]]:
         lifted = self.Lift(parameters.values, requires_gradient=True)
         loss = forward(lifted)
         loss.backward()
         # the gradients come home as plain arrays, off whatever device they were computed on
-        return {
+        gradients = {
             name: np.asarray(tensor.grad.detach().cpu().numpy(), dtype=np.float64)
             for name, tensor in lifted.items()
         }
+        return float(loss.detach()), gradients
+
+
+    def Gradients(
+        self, parameters: ParameterSet, forward: Callable[[dict[str, Any]], Any]
+    ) -> dict[str, NDArray[np.float64]]:
+        return self.Value_And_Gradients(parameters, forward)[1]

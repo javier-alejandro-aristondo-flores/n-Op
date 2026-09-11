@@ -66,6 +66,18 @@ def Test_Every_Engine_Works_In_Double_Until_It_Is_Asked_Otherwise(engine: Engine
     assert engine.working_precision == "double"
 
 
+@pytest.mark.parametrize("engine", ENGINE_CASES)
+def Test_The_Fused_Value_And_Gradients_Answers_Both_Separate_Calls(engine: Engine) -> None:
+    """the loss and its gradients arrive together as the numbers each call gives on its own"""
+    parameters = ParameterSet(values={"scale": np.asarray([1.0]), "offset": np.asarray([2.0])})
+    value, gradients = engine.Value_And_Gradients(parameters, Quadratic_Loss)
+    assert abs(value - engine.Evaluate(parameters, Quadratic_Loss)) < 1e-12
+    separately = engine.Gradients(parameters, Quadratic_Loss)
+    assert set(gradients) == set(separately)
+    for name, gradient in gradients.items():
+        assert np.allclose(gradient, separately[name], atol=1e-12)
+
+
 @pytest.mark.skipif(not Torch_Is_Available(), reason="torch is not installed yet")
 def Test_A_Single_Precision_Engine_Never_Promotes_To_Double() -> None:
     """everything a narrowed engine lifts stays narrow, parameters and constants and what a network makes of them"""

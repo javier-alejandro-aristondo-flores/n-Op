@@ -35,6 +35,12 @@ class Engine(Protocol):
 
 
     @abstractmethod
+    def Value_And_Gradients(
+        self, parameters: ParameterSet, forward: Callable[[dict[str, Any]], Any]
+    ) -> tuple[float, dict[str, NDArray[np.float64]]]: ...
+
+
+    @abstractmethod
     def Lift_Constant(self, value: NDArray[np.float64]) -> Any: ...
 
 
@@ -76,3 +82,10 @@ class NumpyEngine:
                 flat_gradient[perturbed_entry] = (loss_above - loss_below) / (2.0 * self.step_size)
             gradients[name] = gradient
         return gradients
+
+
+    def Value_And_Gradients(
+        self, parameters: ParameterSet, forward: Callable[[dict[str, Any]], Any]
+    ) -> tuple[float, dict[str, NDArray[np.float64]]]:
+        # the value is one more forward on a path that already spends two per scalar parameter
+        return self.Evaluate(parameters, forward), self.Gradients(parameters, forward)

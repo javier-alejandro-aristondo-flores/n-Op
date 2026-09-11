@@ -4,15 +4,16 @@ citation = "Lu, Jin, Pang, Zhang, Karniadakis — Nat. Mach. Intell. 3:218 (2021
 mapping = "strain or lattice parameters → charge density field (projection variant: density → electron localization field; energy-trunk variant: parameters → density-of-states curve)"
 suite_card = "test-suite.md §3, II.1 + §7, VI.1 — IN-LOCAL, cheapest builds"
 role = "interface shakedown (wave 1); validates store, splits, and metrics before anything expensive exists"
+assembled = "the principal_component configuration, the one report.md measures; the other three are declared, not built"
 
 [parts]
-encoder = "encoders.SensorEncoder (branch); BasisProjectionEncoder for the fixed-basis variants"
-kernel = "kernels.low_rank.DenseKernel (zero integral layers is the honest description)"
-composition = "compositions.ExplicitStack"
-readout = "readouts.BasisExpansion (trunk; energy trunk in the energy_trunk configuration)"
+encoder = "encoders.SensorEncoder (branch); encoders.BasisProjectionEncoder for the declared projection variant"
+kernel = "none: zero integral layers is the honest description, so no kernel is assembled at all"
+composition = "compositions.WithoutIntegralLayers"
+readout = "readouts.FixedModeExpansion over a stored basis; readouts.BasisExpansion where the trunk is learned"
 wrappers = "per task card"
 
 [depends_on]
 framework = true
-kernels = ["low_rank"]
+kernels = []
 shared_note = "fp64 Gram proper-orthogonal decomposition in data/; the projection variant is gated by the measured basis-decay check (test-suite.md Stage-0)"

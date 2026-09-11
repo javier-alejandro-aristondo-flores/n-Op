@@ -1,5 +1,7 @@
 """the branch-trunk member's assembly, its parameters and its path through the engine"""
 
+import tomllib
+from pathlib import Path
 from typing import Any
 
 import numpy as np
@@ -13,6 +15,8 @@ from operators.readouts import FixedModeExpansion
 from operators.substrate import NumpyEngine, ParameterSet
 
 CUBE = Domain(lattice=np.eye(3) * 3.57)
+
+MANIFEST_PATH = Path(__file__).resolve().parent.parent / "deep_operator_network" / "manifest.toml"
 
 
 def Small_Basis(rank: int = 6) -> Any:
@@ -100,3 +104,19 @@ def Test_Exact_Coefficients_Rebuild_The_Field_They_Came_From() -> None:
         rebuilt = readout(Coefficients(vector=exact, domain=CUBE), GridSpec((4, 4, 4)))
         assert isinstance(rebuilt, GridFunction)
         assert np.allclose(np.asarray(rebuilt.values).reshape(-1), snapshot, atol=1e-10)
+
+
+def Test_The_Manifest_Names_The_Parts_The_Member_Actually_Assembles() -> None:
+    """a manifest is a description of the code, and a description that drifts is fiction"""
+    manifest = tomllib.loads(MANIFEST_PATH.read_text())
+    member = Principal_Component_Network(Small_Basis(), (4, 4, 4), parameter_width=6, hidden_widths=(16,))
+    for part_name, assembled in (
+        ("encoder", member.branch),
+        ("composition", member.composition),
+        ("readout", member.basis_readout),
+    ):
+        assert type(assembled).__name__ in manifest["parts"][part_name], part_name
+    # the branch-trunk map takes no integral, so claiming a kernel would be inventing one
+    assert manifest["parts"]["kernel"].startswith("none")
+    assert manifest["depends_on"]["kernels"] == []
+    assert member.configuration in manifest["assembled"]

@@ -19,7 +19,7 @@ from operators.framework import (
     UniformGridQuadrature,
 )
 from operators.data import PodBasis
-from operators.substrate import Engine, MultilayerPerceptron, Softplus
+from operators.substrate import Concatenate_Channels, Engine, MultilayerPerceptron, Softplus
 
 
 class PointwiseProjection(Operator[GridFunction, GridFunction]):
@@ -308,6 +308,107 @@ class BiasedModeExpansion(Operator[Coefficients, GridFunction]):
         }
         if self.last_coefficients is not None:
             state["last_coefficients"] = self.last_coefficients
+        return state
+
+
+class NonlinearDecoder(Operator[Coefficients, GridFunction | PointSet]):
+    """a latent row and a point's own coordinate features, read together by one nonlinear network"""
+
+
+    def __init__(
+        self,
+        latent_width: int,
+        hidden_widths: tuple[int, ...],
+        coordinate_features: CoordinateFeatures | None = None,
+        output_channel_labels: tuple[str, ...] = ("predicted_field",),
+        seed: int = 0,
+    ) -> None:
+        self.output_channel_labels = output_channel_labels
+        self.coordinate_features = (
+            coordinate_features if coordinate_features is not None else PeriodicCoordinateFeatures()
+        )
+        self.network = MultilayerPerceptron(
+            (self.coordinate_features.feature_count + latent_width, *hidden_widths, 1), "decoder", seed
+        )
+        self.parameter_values = self.network.parameter_values
+        self.last_point_features: NDArray[np.float64] | None = None
+        self.last_query_grid_shape: tuple[int, int, int] | None = None
+
+
+    def Coordinate_Features(self, points: NDArray[np.float64]) -> NDArray[np.float64]:
+        """the features the configured map reads off the points"""
+        return self.coordinate_features(points)
+
+
+    def Lifted_Constants(self, engine: Engine, points: NDArray[np.float64]) -> Any:
+        """this query's point features as an engine constant, so gradients reach only the latent and the network"""
+        return engine.Lift_Constant(self.Coordinate_Features(points))
+
+
+    def Channel_Values(self, lifted: dict[str, Any], channel_latent: Any, point_features: Any) -> Any:
+        """one channel's field values, that channel's latent row broadcast onto every point's own features"""
+        # a zeroed feature column plus the latent row broadcasts one channel onto every point at once
+        broadcast_latent = point_features[:, :1] * 0.0 + channel_latent
+        # the channel dispatch concatenates rows, so the feature axis is transposed there and back
+        combined = Concatenate_Channels([point_features.T, broadcast_latent.T]).T
+        return self.network.Forward(lifted, combined)[:, 0]
+
+
+    def Forward(self, lifted: dict[str, Any], latent_vector: Any, point_features: Any) -> Any:
+        """the network read at every point, each channel's latent row concatenated onto that point's own features"""
+        # one channel arrives as a bare latent row, several as one latent row each
+        if latent_vector.ndim == 1:
+            return self.Channel_Values(lifted, latent_vector, point_features)
+        channel_rows = [
+            self.Channel_Values(lifted, channel_latent, point_features)[None, :] for channel_latent in latent_vector
+        ]
+        return Concatenate_Channels(channel_rows).T
+
+
+    def __call__(
+        self,
+        input_function: Coefficients,
+        output_discretization: Discretization,
+        condition: Coefficients | None = None,
+    ) -> GridFunction | PointSet:
+        points = Output_Points(output_discretization)
+        point_features = self.Coordinate_Features(points)
+        self.last_point_features = point_features
+        # whether the query was a grid decides whether a feature column is a field or a bare list
+        self.last_query_grid_shape = (
+            output_discretization.shape if isinstance(output_discretization, GridSpec) else None
+        )
+        latent_vector = np.asarray(input_function.vector, dtype=np.float64)
+        channel_count = len(self.output_channel_labels)
+        if latent_vector.ndim == 2 and latent_vector.shape[0] != channel_count:
+            raise ValueError(f"the latent offered {latent_vector.shape[0]} channels for {channel_count} labels")
+        produced = np.asarray(self.Forward(self.parameter_values, latent_vector, point_features), dtype=np.float64)
+        # every path below reads one column per output channel
+        if produced.ndim == 1:
+            produced = produced[:, None]
+        # the same network answers a grid and a bare list of points, only the wrapper differs
+        if isinstance(output_discretization, GridSpec):
+            shape = output_discretization.shape
+            point_count = shape[0] * shape[1] * shape[2]
+            cell_volume = abs(float(np.linalg.det(np.asarray(input_function.domain.lattice))))
+            quadrature = UniformGridQuadrature(cell_volume, point_count)
+            return GridFunction(
+                produced.T.reshape(channel_count, *shape),
+                self.output_channel_labels,
+                input_function.domain,
+                quadrature,
+            )
+        return PointSet(positions=points, domain=input_function.domain, values=produced)
+
+
+    def Inspect(self) -> dict[str, Array]:
+        state: dict[str, Array] = dict(self.parameter_values)
+        if self.last_point_features is not None:
+            features = self.last_point_features
+            if self.last_query_grid_shape is not None:
+                # a feature evaluated over a grid is a field, and is inspected with that shape
+                features = features.reshape(*self.last_query_grid_shape, features.shape[1])
+            state["last_point_features"] = features
         return state
 
 

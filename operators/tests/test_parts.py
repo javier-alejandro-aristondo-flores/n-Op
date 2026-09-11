@@ -29,6 +29,7 @@ from operators.kernels import SpectralKernel
 from operators.readouts import (
     BasisExpansion,
     FixedModeExpansion,
+    NonlinearDecoder,
     PeriodicCoordinateFeatures,
     PointwiseProjection,
     RampedCoordinateFeatures,
@@ -968,3 +969,145 @@ def Test_The_Calibrator_Is_Built_From_The_Configuration_As_It_Is_Written() -> No
         assert calibrator.level == 0.90
         assert calibrator.unit == "symmetry_orbit"
         assert str(calibrator.Inspect()["exchangeable_unit"]) == "symmetry_orbit"
+
+
+def Test_The_Nonlinear_Decoder_Queries_Anywhere() -> None:
+    """the network answers identically on a grid and on the same explicit points"""
+    features = PeriodicCoordinateFeatures(fourier_orders=2)
+    readout = NonlinearDecoder(latent_width=6, hidden_widths=(16,), coordinate_features=features, seed=9)
+    latent = Coefficients(vector=np.arange(6.0) / 6.0, domain=CUBE)
+    on_grid = readout(latent, GridSpec((4, 4, 4)))
+    assert isinstance(on_grid, GridFunction)
+    grid_points = Fractional_Grid_Coordinates((4, 4, 4))
+    at_points = readout(latent, PointSpec(grid_points))
+    assert isinstance(at_points, PointSet)
+    grid_values = np.asarray(on_grid.values).reshape(-1)
+    point_values = np.asarray(at_points.values).reshape(-1)
+    assert np.allclose(grid_values, point_values, atol=1e-12)
+
+
+def Test_The_Nonlinear_Decoder_Paths_Agree() -> None:
+    """the direct forward and the inference call produce the same numbers"""
+    readout = NonlinearDecoder(latent_width=4, hidden_widths=(8,), seed=10)
+    latent = Coefficients(vector=np.linspace(-1.0, 1.0, 4), domain=CUBE)
+    through_call = np.asarray(readout(latent, GridSpec((4, 4, 4))).values)
+    points = Fractional_Grid_Coordinates((4, 4, 4))
+    point_features = readout.Coordinate_Features(points)
+    through_forward = np.asarray(
+        readout.Forward(readout.parameter_values, np.asarray(latent.vector, dtype=np.float64), point_features)
+    )
+    assert np.allclose(through_call.reshape(-1), through_forward, atol=1e-12)
+
+
+def Test_The_Nonlinear_Decoder_Cannot_Be_Written_As_A_Linear_Map_Of_Its_Latent() -> None:
+    """the branch-trunk readout is linear in its latent by construction, and this decoder must not be"""
+    points = np.asarray([[0.1, 0.2, 0.3], [0.6, 0.4, 0.9]])
+    generator = np.random.default_rng(60)
+    first_latent = generator.normal(size=5)
+    second_latent = generator.normal(size=5)
+    summed_latent = first_latent + second_latent
+    zero_latent = np.zeros(5)
+
+    def Departure_From_Linearity(readout: Any) -> float:
+        """the worst gap between the readout at a plus b and the sum of its readouts at a and at b"""
+        features = readout.Coordinate_Features(points)
+        zero_output = np.asarray(readout.Forward(readout.parameter_values, zero_latent, features), dtype=np.float64)
+        first_output = (
+            np.asarray(readout.Forward(readout.parameter_values, first_latent, features), dtype=np.float64)
+            - zero_output
+        )
+        second_output = (
+            np.asarray(readout.Forward(readout.parameter_values, second_latent, features), dtype=np.float64)
+            - zero_output
+        )
+        summed_output = (
+            np.asarray(readout.Forward(readout.parameter_values, summed_latent, features), dtype=np.float64)
+            - zero_output
+        )
+        return float(np.abs(summed_output - (first_output + second_output)).max())
+
+    nonlinear = NonlinearDecoder(latent_width=5, hidden_widths=(16, 16), seed=61)
+    linear = BasisExpansion(latent_width=5, trunk_widths=(16,), seed=61)
+    # a network with a smooth unit between its layers has no reason to land back on additivity here
+    assert Departure_From_Linearity(nonlinear) > 1e-3
+    # the branch-trunk product is linear in the branch by construction, exactly to numerical noise
+    assert Departure_From_Linearity(linear) < 1e-10
+
+
+def Test_The_Nonlinear_Decoder_Splits_The_Latent_Across_Output_Channels() -> None:
+    """one shared network, one latent row per channel, each channel matching a decoder run on its own"""
+    labels = ("electron_localization_up", "electron_localization_down")
+    together = NonlinearDecoder(latent_width=5, hidden_widths=(12,), output_channel_labels=labels, seed=12)
+    alone = NonlinearDecoder(latent_width=5, hidden_widths=(12,), seed=12)
+    generator = np.random.default_rng(13)
+    latent = np.asarray(generator.normal(size=(2, 5)), dtype=np.float64)
+    produced = together(Coefficients(vector=latent, domain=CUBE), GridSpec((4, 4, 4)))
+    assert isinstance(produced, GridFunction)
+    assert produced.channel_labels == labels
+    values = np.asarray(produced.values, dtype=np.float64)
+    assert values.shape == (2, 4, 4, 4)
+    # the channels share a network but not a latent row, so they must not come out equal
+    assert not np.allclose(values[0], values[1])
+    for channel_index in range(2):
+        one_channel = alone(Coefficients(vector=latent[channel_index], domain=CUBE), GridSpec((4, 4, 4)))
+        assert isinstance(one_channel, GridFunction)
+        assert np.allclose(values[channel_index], np.asarray(one_channel.values, dtype=np.float64)[0], atol=1e-10)
+
+
+def Test_The_Nonlinear_Decoder_Refuses_A_Latent_That_Miscounts_Its_Channels() -> None:
+    """a latent offering the wrong number of rows is a mistake, not a broadcast"""
+    readout = NonlinearDecoder(latent_width=4, hidden_widths=(8,), output_channel_labels=("only_one",), seed=14)
+    latent = np.zeros((3, 4), dtype=np.float64)
+    with pytest.raises(ValueError):
+        readout(Coefficients(vector=latent, domain=CUBE), GridSpec((4, 4, 4)))
+
+
+def Test_The_Nonlinear_Decoder_Inspects_Its_Network_And_Last_Features() -> None:
+    """the network's layers and the last query's point features are both reachable by name"""
+    readout = NonlinearDecoder(latent_width=3, hidden_widths=(8,), seed=11)
+    assert "decoder_layer_0_weights" in readout.Inspect()
+    assert "last_point_features" not in readout.Inspect()
+    latent = Coefficients(vector=np.ones(3), domain=CUBE)
+    readout(latent, GridSpec((2, 2, 2)))
+    inspected = readout.Inspect()
+    feature_count = readout.coordinate_features.feature_count
+    assert inspected["last_point_features"].shape == (2, 2, 2, feature_count)
+    readout(latent, PointSpec(np.asarray([[0.1, 0.2, 0.3]])))
+    assert readout.Inspect()["last_point_features"].shape == (1, feature_count)
+
+
+def Nonlinear_Decoder_Loss(
+    decoder: NonlinearDecoder, latent_vector: Any, point_features: Any, target: Any
+) -> Callable[[dict[str, Any]], Any]:
+    """the squared gap between the decoder's field values and a fixed target, as a forward an engine drives"""
+
+    def Loss(lifted: dict[str, Any]) -> Any:
+        difference = decoder.Forward(lifted, latent_vector, point_features) - target
+        return (difference * difference).sum()
+
+    return Loss
+
+
+@pytest.mark.skipif(not Torch_Is_Available(), reason="torch is not installed yet")
+def Test_Gradients_Reach_Every_Nonlinear_Decoder_Array_Through_Forward() -> None:
+    """the network the decoder owns is what training moves, so a severed tape would show as an untouched array"""
+    decoder = NonlinearDecoder(latent_width=4, hidden_widths=(8,), seed=62)
+    points = np.asarray([[0.1, 0.2, 0.3], [0.4, 0.6, 0.8], [0.9, 0.1, 0.2]])
+    point_features = decoder.Coordinate_Features(points)
+    generator = np.random.default_rng(63)
+    latent_vector = np.asarray(generator.normal(size=4), dtype=np.float64)
+    target = np.asarray(generator.normal(size=points.shape[0]), dtype=np.float64)
+    parameters = ParameterSet(values={name: value.copy() for name, value in decoder.parameter_values.items()})
+    engine = TorchEngine()
+    gradients = Agreeing_Gradients(
+        parameters,
+        Nonlinear_Decoder_Loss(
+            decoder,
+            engine.Lift_Constant(latent_vector),
+            engine.Lift_Constant(point_features),
+            engine.Lift_Constant(target),
+        ),
+        Nonlinear_Decoder_Loss(decoder, latent_vector, point_features, target),
+    )
+    for name, gradient in gradients.items():
+        assert float(np.abs(gradient).max()) > 1e-6, name

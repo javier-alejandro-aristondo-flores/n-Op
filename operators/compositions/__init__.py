@@ -1,10 +1,13 @@
 """schemes for chaining layers, each owning its topology"""
 
+# pyright: reportUnusedImport=false
+
 from typing import Any
 
 import numpy as np
 from numpy.typing import NDArray
 
+from operators.compositions.multi_scale import MultiScale
 from operators.framework import Array, Coefficients, Composition, GridFunction, Layer
 from operators.substrate import Gaussian_Error_Linear_Unit
 

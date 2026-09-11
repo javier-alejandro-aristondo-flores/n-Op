@@ -1,5 +1,8 @@
 """the invariance axes, exact resampling and the diamond operations and the nulls"""
 
+import re
+from pathlib import Path
+
 import numpy as np
 from numpy.typing import NDArray
 
@@ -19,6 +22,9 @@ KNOWN_SPLITS = {
     "perovskite_folds",
     "supercell_defect_train_alloy_holdout",
 }
+
+
+SUITE_PATH = Path(__file__).resolve().parent.parent.parent / "test-suite.md"
 
 
 def Band_Limited_Field(extent: int) -> NDArray[np.float64]:
@@ -88,3 +94,27 @@ def Test_Task_Cards_Are_Unique_And_Point_At_Known_Splits() -> None:
     for card in CARDS:
         assert Card_Named(card.name) is card
         assert card.split in KNOWN_SPLITS
+
+def Test_Every_Card_Cites_A_Section_And_Entry_The_Suite_Really_Has() -> None:
+    """a card is a claim about canon, so its citation has to resolve to a heading that exists"""
+    canon = SUITE_PATH.read_text()
+    unresolved: list[str] = []
+    for card in CARDS:
+        for section in re.findall(r"§(\d+)", card.suite_card):
+            if f"\n## {section}. " not in canon:
+                unresolved.append(f"{card.name}: no section {section}")
+        for entry in re.findall(r"\b([IVX]+\.\d+)[a-z]?\b", card.suite_card):
+            if f"\n#### {entry} " not in canon:
+                unresolved.append(f"{card.name}: no entry {entry}")
+    assert unresolved == [], unresolved
+
+
+def Test_The_Cross_Fidelity_Pattern_Has_Both_Of_Its_Members() -> None:
+    """pattern IV names a field member and a spectral one, and the conformal entry is no member"""
+    cross_fidelity = [card for card in CARDS if "§5" in card.suite_card]
+    assert [card.name for card in cross_fidelity] == ["cheap_to_accurate_charge", "cheap_to_accurate_states"]
+    for card in cross_fidelity:
+        assert card.inputs == card.targets
+        assert card.loss == "delta_mean_squared_error"
+        assert card.split == "strain_atlas_holdout"
+    assert Card_Named("cheap_to_accurate_states").metrics[0] == "gap_edge_error"

@@ -119,6 +119,17 @@ CARDS: tuple[TaskCard, ...] = (
         split="strain_atlas_holdout",
     ),
     TaskCard(
+        name="cheap_to_accurate_states",
+        suite_card="test-suite.md §5, IV.2",
+        inputs=("density_of_states_curve",),
+        targets=("density_of_states_curve",),
+        loss="delta_mean_squared_error",
+        metrics=("gap_edge_error", "curve_l1", "wasserstein_1d"),
+        conservation=None,
+        covariates=("campaign", "exact_exchange_fraction"),
+        split="strain_atlas_holdout",
+    ),
+    TaskCard(
         name="field_completion",
         suite_card="test-suite.md §6, V.1",
         inputs=("any_field_subset",),

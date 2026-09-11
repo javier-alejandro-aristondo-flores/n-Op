@@ -6,7 +6,7 @@ import numpy as np
 from numpy.typing import NDArray
 
 from operators.inspection import Table
-from operators.metrics import Bootstrap_Confidence_Interval, Median_And_Interquartile
+from operators.metrics import Bootstrap_Confidence_Interval, Median_And_Interquartile, Median_Per_Unit
 
 INTERPOLATION = "interpolation"
 EXTRAPOLATION = "extrapolation"
@@ -68,10 +68,10 @@ def Label_Of(scored_run: ScoredRun, label_name: str) -> str:
 
 def Unit_Medians(scored_runs: list[ScoredRun], metric_name: str) -> NDArray[np.float64]:
     """each exchangeable unit's own median, so symmetry copies inside one orbit count once"""
-    by_unit: dict[str, list[float]] = {}
-    for scored_run in scored_runs:
-        by_unit.setdefault(scored_run.unit_key, []).append(scored_run.errors[metric_name])
-    return np.asarray([float(np.median(values)) for _, values in sorted(by_unit.items())], dtype=np.float64)
+    return Median_Per_Unit(
+        np.asarray([scored_run.errors[metric_name] for scored_run in scored_runs], dtype=np.float64),
+        [scored_run.unit_key for scored_run in scored_runs],
+    )
 
 
 def Summarize(scored_runs: list[ScoredRun], metric_name: str, group_name: str = "all") -> MetricSummary:

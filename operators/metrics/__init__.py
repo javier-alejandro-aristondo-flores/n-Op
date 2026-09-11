@@ -1,5 +1,7 @@
 """comparison metrics, field errors and curve distances and unit-level aggregates"""
 
+from collections.abc import Sequence
+
 import numpy as np
 from numpy.typing import NDArray
 
@@ -10,6 +12,21 @@ def Relative_L2(prediction: Field, truth: Field) -> float:
     """the L2 error divided by the L2 size of the truth"""
     difference = np.asarray(prediction, dtype=np.float64) - np.asarray(truth, dtype=np.float64)
     return float(np.linalg.norm(difference.ravel()) / np.linalg.norm(np.asarray(truth, dtype=np.float64).ravel()))
+
+
+def Mean_Squared_Error(prediction: Field, truth: Field) -> float:
+    """the mean squared difference"""
+    difference = np.asarray(prediction, dtype=np.float64) - np.asarray(truth, dtype=np.float64)
+    return float(np.mean(difference * difference))
+
+
+def Masked_Mean_Squared_Error(prediction: Field, truth: Field, mask: NDArray[np.bool_]) -> float:
+    """the mean squared difference over the entries the mask selects"""
+    selected = np.asarray(mask, dtype=np.bool_)
+    if not bool(selected.any()):
+        raise ValueError("a completion loss needs at least one hidden entry to score")
+    difference = (np.asarray(prediction, dtype=np.float64) - np.asarray(truth, dtype=np.float64))[selected]
+    return float(np.mean(difference * difference))
 
 
 def Mean_Absolute_Error(prediction: Field, truth: Field) -> float:
@@ -29,6 +46,57 @@ def Mean_Removed_Relative_L2(prediction: Field, truth: Field) -> float:
     prediction_values = np.asarray(prediction, dtype=np.float64)
     truth_values = np.asarray(truth, dtype=np.float64)
     return Relative_L2(prediction_values - prediction_values.mean(), truth_values - truth_values.mean())
+
+
+def Mean_Removed_Mean_Squared_Error(prediction: Field, truth: Field) -> float:
+    """mean squared error after each field loses its own spatial mean"""
+    prediction_values = np.asarray(prediction, dtype=np.float64)
+    truth_values = np.asarray(truth, dtype=np.float64)
+    return Mean_Squared_Error(prediction_values - prediction_values.mean(), truth_values - truth_values.mean())
+
+
+def Mean_Removed_Mean_Absolute_Error(prediction: Field, truth: Field) -> float:
+    """mean absolute error after each field loses its own spatial mean"""
+    prediction_values = np.asarray(prediction, dtype=np.float64)
+    truth_values = np.asarray(truth, dtype=np.float64)
+    return Mean_Absolute_Error(prediction_values - prediction_values.mean(), truth_values - truth_values.mean())
+
+
+def Mean_Discrepancy(prediction: Field, truth: Field) -> float:
+    """how far the prediction's spatial mean sits from the truth's, signed"""
+    prediction_mean = float(np.mean(np.asarray(prediction, dtype=np.float64)))
+    return prediction_mean - float(np.mean(np.asarray(truth, dtype=np.float64)))
+
+
+def Delta_Mean_Squared_Error(prediction: Field, truth: Field, cheap_input: Field) -> float:
+    """squared error over the squared error the cheap input already carried"""
+    identity_error = Mean_Squared_Error(cheap_input, truth)
+    if identity_error <= 0.0:
+        raise ValueError("the cheap input already equals the truth, so there is no correction to score")
+    return Mean_Squared_Error(prediction, truth) / identity_error
+
+
+def Delta_R_Squared(prediction: Field, truth: Field, cheap_input: Field) -> float:
+    """the share of the correction's squared size the prediction explains"""
+    return 1.0 - Delta_Mean_Squared_Error(prediction, truth, cheap_input)
+
+
+def Mean_Squared_Error_With_Moment_Normalized_Magnetization(
+    predicted_density: Field,
+    truth_density: Field,
+    predicted_magnetization: Field | None = None,
+    truth_magnetization: Field | None = None,
+    absolute_moment: float | None = None,
+) -> float:
+    """the density error plus the magnetization error divided by the run's own absolute moment squared"""
+    density_error = Mean_Squared_Error(predicted_density, truth_density)
+    # a spin-restricted run carries no magnetization channel, and the term is masked away
+    if predicted_magnetization is None or truth_magnetization is None:
+        return density_error
+    if absolute_moment is None or absolute_moment <= 0.0:
+        raise ValueError("the magnetization term needs the run's own integrated absolute moment")
+    magnetization_error = Mean_Squared_Error(predicted_magnetization, truth_magnetization)
+    return density_error + magnetization_error / (absolute_moment * absolute_moment)
 
 
 def Mode_Radius_Grid(shape: tuple[int, ...]) -> NDArray[np.float64]:
@@ -106,9 +174,49 @@ def Wasserstein_1d(prediction: NDArray[np.float64], truth: NDArray[np.float64], 
     return float(np.sum(np.abs(cumulative_gap)) * spacing)
 
 
+def Gap_Edge_Energies(
+    curve: NDArray[np.float64],
+    energies: NDArray[np.float64],
+    gap_reference: float = 0.0,
+    support_fraction: float = 0.01,
+) -> tuple[float, float]:
+    """the energies where a state-density curve's support ends below and resumes above the gap"""
+    carried = np.asarray(curve, dtype=np.float64)
+    peak = float(carried.max())
+    if peak <= 0.0:
+        raise ValueError("a curve with no positive support anywhere has no band edges to read")
+    supported = carried >= support_fraction * peak
+    occupied_side = np.asarray(energies, dtype=np.float64)[supported & (energies <= gap_reference)]
+    empty_side = np.asarray(energies, dtype=np.float64)[supported & (energies >= gap_reference)]
+    if occupied_side.size == 0 or empty_side.size == 0:
+        raise ValueError("a curve with no support on one side of the reference has no band edge there")
+    return float(occupied_side.max()), float(empty_side.min())
+
+
+def Gap_Edge_Error(
+    prediction: NDArray[np.float64],
+    truth: NDArray[np.float64],
+    energies: NDArray[np.float64],
+    gap_reference: float = 0.0,
+    support_fraction: float = 0.01,
+) -> float:
+    """how far the predicted curve puts the two band edges, averaged over the pair"""
+    predicted_valence, predicted_conduction = Gap_Edge_Energies(prediction, energies, gap_reference, support_fraction)
+    true_valence, true_conduction = Gap_Edge_Energies(truth, energies, gap_reference, support_fraction)
+    return 0.5 * (abs(predicted_valence - true_valence) + abs(predicted_conduction - true_conduction))
+
+
 def Fraction_Within(errors: NDArray[np.float64], tolerance: float) -> float:
     """the fraction of absolute errors at or below the tolerance"""
     return float(np.mean(np.abs(errors) <= tolerance))
+
+
+def Median_Per_Unit(values: NDArray[np.float64], unit_keys: Sequence[str]) -> NDArray[np.float64]:
+    """each exchangeable unit's own median, so copies inside one unit count once"""
+    by_unit: dict[str, list[float]] = {}
+    for value, unit_key in zip(values, unit_keys):
+        by_unit.setdefault(unit_key, []).append(float(value))
+    return np.asarray([float(np.median(carried)) for _, carried in sorted(by_unit.items())], dtype=np.float64)
 
 
 def Median_And_Interquartile(values: NDArray[np.float64]) -> tuple[float, float]:

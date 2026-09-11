@@ -12,7 +12,14 @@ from operators.compositions.fixed_point import Anderson_Mixing_Weights, Sliced_L
 from operators.encoders import PointwiseLift
 from operators.framework import Domain, GridFunction, Layer, UniformGridQuadrature
 from operators.kernels import SpectralKernel
-from operators.substrate import Detached, NumpyEngine, ParameterSet, Torch_Is_Available, TorchEngine
+from operators.substrate import (
+    Detached,
+    NumpyEngine,
+    ParameterSet,
+    Torch_Is_Available,
+    TorchEngine,
+    Vector_Jacobian_Product,
+)
 
 CUBE = Domain(lattice=np.eye(3) * 2.0)
 GRID_QUADRATURE = UniformGridQuadrature(cell_volume=8.0, point_count=8 * 8 * 8)
@@ -38,6 +45,9 @@ def Contractive_Layer(seed: int, channels: int = 2) -> Layer[GridFunction]:
     kernel.Hermitian_Symmetrize()
     kernel = Scaled(kernel, 0.05)
     local_linear = Scaled(PointwiseLift(hidden_channels=channels, input_channels=channels, seed=seed + 1), 0.05)
+    # a zero bias would leave the origin as the map's only fixed point, pinning most weights' true gradient at zero
+    generator = np.random.default_rng(seed + 2)
+    local_linear.parameter_values["lift_biases"] = generator.normal(size=channels) * 0.1
     return Layer(kernel=kernel, local_linear=local_linear)
 
 
@@ -191,13 +201,29 @@ def Test_Phantom_Reentry_Stays_Near_The_Equilibrium_As_Its_Depth_Grows() -> None
     assert np.allclose(produced_shallow, produced_deep, atol=1e-2)
 
 
-def Test_The_Implicit_Backward_Rule_Is_Not_Available_Yet() -> None:
-    """the adjoint needs a vector-jacobian-product primitive substrate does not expose, so it fails loudly"""
+def Test_The_Implicit_Rule_Applies_Through_The_Numpy_Path() -> None:
+    """the declared backward is never reached off the foreign engine, so apply needs nothing but the forward"""
     layer = Contractive_Layer(seed=23)
     stack = FixedPoint(layer, backward="implicit")
     field = Small_Field(2, seed=24)
-    with pytest.raises(NotImplementedError):
-        stack.Apply(field)
+    produced = stack.Apply(field)
+    assert np.all(np.isfinite(np.asarray(produced.values)))
+    assert stack.last_solve is not None
+    assert stack.last_solve.cap_was_hit is False
+
+
+@pytest.mark.skipif(not Torch_Is_Available(), reason="the foreign engine is not installed yet")
+def Test_Forward_Agrees_With_Apply_On_The_Implicit_Rule_Across_Engines() -> None:
+    """the equilibrium the declared backward's forward returns matches the numpy solve exactly, not approximately"""
+    layer = Contractive_Layer(seed=23)
+    stack = FixedPoint(layer, backward="implicit")
+    field = Small_Field(2, seed=24)
+    through_apply = np.asarray(stack.Apply(field).values, dtype=np.float64)
+    engine = TorchEngine()
+    field_values = engine.Lift_Constant(np.asarray(field.values, dtype=np.float64))
+    lifted = engine.Lift(stack.Parameter_Values(), requires_gradient=False)
+    through_engine = np.asarray(stack.Forward(lifted, field_values).detach().cpu().numpy(), dtype=np.float64)
+    assert np.allclose(through_apply, through_engine, atol=1e-10)
 
 
 def Fixed_Point_Equilibrium_Loss(
@@ -254,7 +280,7 @@ def Test_Inspect_Exposes_The_Health_Signals_The_Canon_Requires() -> None:
     assert int(np.asarray(inspected["last_iterations_taken"])) == history.shape[0]
 
 
-# the substrate primitives this stream added: detached here, the vector-jacobian product in the second commit
+# the substrate primitives this stream added: detached, and the vector-jacobian product the adjoint needs
 
 
 @pytest.mark.skipif(not Torch_Is_Available(), reason="the foreign engine is not installed yet")
@@ -275,6 +301,31 @@ def Test_Detached_Is_The_Identity_On_The_Reference_Engine() -> None:
     """there is no tape to cut on a plain array, so detaching one returns the same values unchanged"""
     value = np.asarray([1.0, 2.0, 3.0])
     assert np.array_equal(Detached(value), value)
+
+
+@pytest.mark.skipif(not Torch_Is_Available(), reason="the foreign engine is not installed yet")
+def Test_Vector_Jacobian_Product_Matches_A_Known_Jacobian_On_Both_Engines() -> None:
+    """a linear map's jacobian is the matrix itself, so the pulled-back cotangent has a closed form to check"""
+    generator = np.random.default_rng(41)
+    matrix = generator.normal(size=(4, 3))
+    point = generator.normal(size=(3,))
+    cotangent = generator.normal(size=(4,))
+    expected = matrix.T @ cotangent
+
+    reference_result = Vector_Jacobian_Product(lambda value: matrix @ value, point, cotangent)
+    assert np.allclose(reference_result, expected, atol=1e-8)
+
+    engine = TorchEngine()
+    lifted_matrix = engine.Lift_Constant(matrix)
+
+    def Engine_Function(value: Any) -> Any:
+        return lifted_matrix @ value
+
+    engine_point = engine.Lift_Constant(point)
+    engine_cotangent = engine.Lift_Constant(cotangent)
+    engine_result = Vector_Jacobian_Product(Engine_Function, engine_point, engine_cotangent)
+    engine_result_values = np.asarray(engine_result.detach().cpu().numpy(), dtype=np.float64)
+    assert np.allclose(engine_result_values, expected, atol=1e-8)
 
 
 def Test_Anderson_Mixing_Weights_Declines_A_Near_Parallel_History() -> None:
@@ -300,8 +351,8 @@ def Test_Anderson_Mixing_Weights_Sums_To_One_On_A_Well_Conditioned_History() -> 
     assert abs(float(weights.sum()) - 1.0) < 1e-10
 
 
-# the mandatory 8-cubed gradient audit -- phantom against finite differences and against the full unroll,
-# both grounded on the same contractive layer as the health-floor tests above; implicit joins in the next commit
+# the mandatory 8-cubed gradient audit -- phantom and implicit against finite differences and the full unroll,
+# all four grounded on the same contractive layer as the health-floor tests above
 
 
 def Relative_Gap(candidate: dict[str, NDArray[np.float64]], ground_truth: dict[str, NDArray[np.float64]]) -> float:
@@ -364,3 +415,24 @@ def Test_Phantom_Gradient_Bias_Shrinks_As_Its_Depth_Grows(phantom_depth: int) ->
         # three reentries closes nearly all of the gap phantom's truncation opens at depth one
         assert gap_to_finite_difference < 0.005
         assert gap_to_full_unroll < 0.005
+
+
+@pytest.mark.skipif(not Torch_Is_Available(), reason="the foreign engine is not installed yet")
+def Test_Implicit_Gradient_Closes_The_Audit_Tighter_Than_Phantom_Against_Both_Ground_Truths() -> None:
+    """the mandatory audit's fourth column: the exact adjoint, which the canon expects to beat phantom's bias"""
+    layer = Contractive_Layer(seed=71)
+    field_values = np.asarray(Small_Field(2, seed=72).values, dtype=np.float64)
+    target = np.random.default_rng(73).random((2, 8, 8, 8))
+    parameters, finite_difference_gradients, full_unroll_gradients = Audit_Ground_Truths(layer, field_values, target)
+    stack = FixedPoint(layer, backward="implicit")
+    engine = TorchEngine()
+    lifted_loss = Fixed_Point_Equilibrium_Loss(
+        stack, engine.Lift_Constant(field_values), engine.Lift_Constant(target)
+    )
+    _, implicit_gradients = engine.Value_And_Gradients(parameters, lifted_loss)
+    gap_to_finite_difference = Relative_Gap(implicit_gradients, finite_difference_gradients)
+    gap_to_full_unroll = Relative_Gap(implicit_gradients, full_unroll_gradients)
+    # the exact adjoint sits at the two ground truths' own mutual distance, not at phantom's percent-scale bias
+    assert gap_to_finite_difference < 0.0005
+    assert gap_to_full_unroll < 0.0005
+    assert gap_to_finite_difference < Relative_Gap(full_unroll_gradients, finite_difference_gradients) * 10.0

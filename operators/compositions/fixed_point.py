@@ -7,7 +7,13 @@ import numpy as np
 from numpy.typing import NDArray
 
 from operators.framework import Array, Coefficients, Composition, GridFunction, Layer
-from operators.substrate import Detached, Gaussian_Error_Linear_Unit, Solve_Linear_System
+from operators.substrate import (
+    CustomGradient,
+    Detached,
+    Gaussian_Error_Linear_Unit,
+    Solve_Linear_System,
+    Vector_Jacobian_Product,
+)
 
 type FixedPointBackward = Literal["phantom", "jacobian_free", "implicit"]
 
@@ -202,8 +208,7 @@ class FixedPoint(Composition[GridFunction]):
     def Resolved(self, lifted: dict[str, Any], input_values: Any) -> tuple[Any, FixedPointSolve]:
         """the backward rule's state beside the solve that reached it, computed once for forward and apply alike"""
         if self.backward == "implicit":
-            # the adjoint needs a vector-jacobian-product primitive that substrate does not expose yet
-            raise NotImplementedError("the implicit backward rule is not available yet, ask the fixed-point stream")
+            return self.Implicit_Resolved(lifted, input_values)
         kernel_lifted = Sliced_Lifted(lifted, "kernel.")
         local_linear_lifted = Sliced_Lifted(lifted, "local_linear.")
         solved = self.Solved(kernel_lifted, local_linear_lifted, input_values)
@@ -213,6 +218,63 @@ class FixedPoint(Composition[GridFunction]):
         for _ in range(depth):
             state = Applied_Once(self.layer, kernel_lifted, local_linear_lifted, state)
         return state, solved
+
+
+    def Implicit_Resolved(self, lifted: dict[str, Any], input_values: Any) -> tuple[Any, FixedPointSolve]:
+        """the equilibrium reached by the declared adjoint rather than any reentry, rung three's exact backward"""
+        parameter_names = sorted(lifted)
+        solve_holder: list[FixedPointSolve] = []
+
+        def Split(arguments: tuple[Any, ...]) -> tuple[dict[str, Any], dict[str, Any]]:
+            """the flat positional arguments read back as the two named dicts applied once expects"""
+            by_name = dict(zip(parameter_names, arguments))
+            return Sliced_Lifted(by_name, "kernel."), Sliced_Lifted(by_name, "local_linear.")
+
+        def Implicit_Forward(arguments: tuple[Any, ...]) -> Any:
+            """the equilibrium alone, the solve itself never asked to carry a declared gradient"""
+            kernel_lifted, local_linear_lifted = Split(arguments)
+            solved = self.Solved(kernel_lifted, local_linear_lifted, input_values)
+            solve_holder.append(solved)
+            return solved.equilibrium
+
+        def Implicit_Backward(cotangent: Any, output: Any, saved_arguments: tuple[Any, ...]) -> tuple[Any, ...]:
+            """the cotangent solved through i minus j transpose, then pulled back onto every saved parameter"""
+            kernel_lifted, local_linear_lifted = Split(saved_arguments)
+
+            def Applied_At_The_Equilibrium(state: Any) -> Any:
+                """applied once at the fixed state, differentiable only through the state itself"""
+                return Applied_Once(self.layer, kernel_lifted, local_linear_lifted, state)
+
+            adjoint = cotangent
+            for _ in range(self.iteration_cap):
+                updated = Vector_Jacobian_Product(Applied_At_The_Equilibrium, output, adjoint) + cotangent
+                change = float(np.linalg.norm(np.asarray(Detached(updated - adjoint), dtype=np.float64)))
+                adjoint = updated
+                if change < self.tolerance:
+                    break
+
+            gradients: list[Any] = []
+            for varying_position in range(len(parameter_names)):
+
+                def Applied_Varying_One_Parameter(
+                    parameter_value: Any, varying_position: int = varying_position
+                ) -> Any:
+                    """applied once at the fixed equilibrium, with every parameter but this one held fixed too"""
+                    varied_arguments = tuple(
+                        parameter_value if position == varying_position else saved_arguments[position]
+                        for position in range(len(saved_arguments))
+                    )
+                    varied_kernel_lifted, varied_local_linear_lifted = Split(varied_arguments)
+                    return Applied_Once(self.layer, varied_kernel_lifted, varied_local_linear_lifted, output)
+
+                gradients.append(
+                    Vector_Jacobian_Product(Applied_Varying_One_Parameter, saved_arguments[varying_position], adjoint)
+                )
+            return tuple(gradients)
+
+        rule = CustomGradient(forward=Implicit_Forward, backward=Implicit_Backward)
+        equilibrium = rule.Apply(*(lifted[name] for name in parameter_names))
+        return equilibrium, solve_holder[0]
 
 
     def Forward(self, lifted: dict[str, Any], input_values: Any) -> Any:

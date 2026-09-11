@@ -13,6 +13,7 @@ from operators.substrate import (
     Fourier_Transform_3d,
     Gaussian_Error_Linear_Unit,
     Inverse_Fourier_Transform_3d,
+    MultilayerPerceptron,
     NumpyEngine,
     ParameterSet,
     Softplus,
@@ -57,6 +58,28 @@ def Test_Adam_Descends_The_Quadratic(engine: Engine) -> None:
         parameters = Adam_Step(parameters, gradients, state, learning_rate=0.05)
     assert abs(float(parameters.values["scale"][0]) - 3.0) < 1e-2
     assert abs(float(parameters.values["offset"][0]) + 1.0) < 1e-2
+
+
+@pytest.mark.parametrize("engine", ENGINE_CASES)
+def Test_Every_Engine_Works_In_Double_Until_It_Is_Asked_Otherwise(engine: Engine) -> None:
+    """no engine narrows on its own, so every conformance row above still means what it meant"""
+    assert engine.working_precision == "double"
+
+
+@pytest.mark.skipif(not Torch_Is_Available(), reason="torch is not installed yet")
+def Test_A_Single_Precision_Engine_Never_Promotes_To_Double() -> None:
+    """everything a narrowed engine lifts stays narrow, parameters and constants and what a network makes of them"""
+    engine = TorchEngine(working_precision="single")
+    network = MultilayerPerceptron(layer_widths=(3, 8, 2), name_prefix="probe", seed=5)
+    lifted = engine.Lift(network.parameter_values, requires_gradient=True)
+    assert {str(tensor.dtype) for tensor in lifted.values()} == {"torch.float32"}
+    lifted_inputs = engine.Lift_Constant(np.zeros((4, 3)))
+    assert str(lifted_inputs.dtype) == "torch.float32"
+    produced = network.Forward(lifted, lifted_inputs)
+    assert str(produced.dtype) == "torch.float32"
+    # the hazard this design exists for: a double constant meeting the graph promotes it back, and nothing raises
+    promoted = produced - TorchEngine().Lift_Constant(np.zeros((4, 2)))
+    assert str(promoted.dtype) == "torch.float64"
 
 
 def Test_The_Nonlinearities_Have_Their_Known_Values() -> None:

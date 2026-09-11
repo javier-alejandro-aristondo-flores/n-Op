@@ -8,16 +8,20 @@ from typing import Any, Protocol
 import numpy as np
 from numpy.typing import NDArray
 
+from operators.substrate.arrays import Precision
+
 
 @dataclass(frozen=True, slots=True)
 class ParameterSet:
-    """named parameter values, held canonically in double precision"""
+    """named parameter values, double master weights and double moments behind a graph that may run narrower"""
 
     values: dict[str, NDArray[np.float64]]
 
 
 class Engine(Protocol):
     """evaluates and differentiates a forward computation over named parameters"""
+
+    working_precision: Precision
 
 
     @abstractmethod
@@ -40,6 +44,8 @@ class NumpyEngine:
 
     def __init__(self, step_size: float = 1e-6) -> None:
         self.step_size = step_size
+        # central differences at a step of 1e-6 cancel six digits, and single precision has only seven
+        self.working_precision: Precision = "double"
 
 
     def Evaluate(self, parameters: ParameterSet, forward: Callable[[dict[str, Any]], Any]) -> float:

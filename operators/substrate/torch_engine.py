@@ -8,6 +8,7 @@ from typing import Any
 import numpy as np
 from numpy.typing import NDArray
 
+from operators.substrate.arrays import NUMPY_DTYPE_BY_PRECISION, Precision
 from operators.substrate.engine import ParameterSet
 
 
@@ -25,15 +26,25 @@ class TorchEngine:
     """parameterized computations evaluated and differentiated by torch autograd"""
 
 
-    def __init__(self, device_name: str = "cpu") -> None:
+    def __init__(self, device_name: str = "cpu", working_precision: Precision = "double") -> None:
         self.device_name = device_name
+        # without the annotation inference widens the literal to a bare string, and the protocol asks for the literal
+        self.working_precision: Precision = working_precision
+
+
+    def Host_Dtype(self) -> np.dtype[Any]:
+        """the numpy type every array is narrowed to before it crosses to the device"""
+        return NUMPY_DTYPE_BY_PRECISION[self.working_precision]
 
 
     def Lift(self, values: dict[str, NDArray[np.float64]], requires_gradient: bool) -> dict[str, Any]:
         torch = Torch_Module()
-        # double precision throughout, to answer the reference engine number for number
+        host_dtype = self.Host_Dtype()
+        # narrowed on the host, so the bus carries the graph's precision and not the master weights'
         return {
-            name: torch.tensor(value, dtype=torch.float64, device=self.device_name, requires_grad=requires_gradient)
+            name: torch.tensor(
+                np.asarray(value, dtype=host_dtype), device=self.device_name, requires_grad=requires_gradient
+            )
             for name, value in values.items()
         }
 
@@ -46,7 +57,7 @@ class TorchEngine:
 
     def Lift_Constant(self, value: NDArray[np.float64]) -> Any:
         torch = Torch_Module()
-        return torch.tensor(value, dtype=torch.float64, device=self.device_name)
+        return torch.tensor(np.asarray(value, dtype=self.Host_Dtype()), device=self.device_name)
 
 
     def Gradients(

@@ -2,7 +2,7 @@
 
 # pyright: reportUnusedImport=false
 
-from operators.substrate.arrays import ArrayLike
+from operators.substrate.arrays import NUMPY_DTYPE_BY_PRECISION, ArrayLike, Precision
 from operators.substrate.engine import Engine, NumpyEngine, ParameterSet
 from operators.substrate.fourier import (
     Cartesian_Wavevectors,

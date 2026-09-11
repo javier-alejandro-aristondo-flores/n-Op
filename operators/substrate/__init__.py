@@ -3,6 +3,7 @@
 # pyright: reportUnusedImport=false
 
 from operators.substrate.arrays import NUMPY_DTYPE_BY_PRECISION, ArrayLike, Precision
+from operators.substrate.custom_gradient import CustomGradient
 from operators.substrate.devices import (
     ACCELERATOR_DEVICE_NAME,
     Accelerator_Is_Available,

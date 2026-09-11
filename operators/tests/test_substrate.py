@@ -1,5 +1,6 @@
 """the substrate facets, engine conformance and the optimizer and transforms and the seam"""
 
+from collections.abc import Callable
 from pathlib import Path
 from typing import Any
 
@@ -10,6 +11,7 @@ from operators.substrate import (
     ACCELERATOR_DEVICE_NAME,
     Accelerator_Is_Available,
     Adam_Step,
+    CustomGradient,
     Device_Name_Of,
     Engine,
     HOST_DEVICE_NAME,
@@ -81,6 +83,86 @@ def Test_The_Fused_Value_And_Gradients_Answers_Both_Separate_Calls(engine: Engin
     assert set(gradients) == set(separately)
     for name, gradient in gradients.items():
         assert np.allclose(gradient, separately[name], atol=1e-12)
+
+
+def Cubed_Forward(arguments: tuple[Any, ...]) -> Any:
+    """the one argument, cubed"""
+    (value,) = arguments
+    return value * value * value
+
+
+def Cubed_Backward_Correct(cotangent: Any, output: Any, arguments: tuple[Any, ...]) -> tuple[Any, ...]:
+    """the cube's own derivative, three times the square, carried by the cotangent"""
+    (value,) = arguments
+    return (cotangent * 3.0 * value * value,)
+
+
+def Cubed_Backward_Missing_Factor(cotangent: Any, output: Any, arguments: tuple[Any, ...]) -> tuple[Any, ...]:
+    """the correct rule with its leading factor of three dropped"""
+    (value,) = arguments
+    return (cotangent * value * value,)
+
+
+def Backward_That_Must_Not_Run(cotangent: Any, output: Any, arguments: tuple[Any, ...]) -> tuple[Any, ...]:
+    """a backward that fails the test outright if the reference engine ever reaches it"""
+    raise AssertionError("the reference engine reached the declared backward instead of ignoring it")
+
+
+def Analytic_Gradient_Of_The_Cubed_Loss(value: float, scale: float) -> float:
+    """the closed-form derivative of the squared distance from eight through the cube of a scaled parameter"""
+    transformed = scale * value
+    return 2.0 * (transformed**3 - 8.0) * 3.0 * transformed**2 * scale
+
+
+def Loss_Through_A_Custom_Cube(rule: CustomGradient, scale: float = 1.0) -> Callable[[dict[str, Any]], Any]:
+    """the squared distance from eight, through the given rule cubing a scaled copy of the one parameter"""
+
+    def Loss_Of(lifted: dict[str, Any]) -> Any:
+        return ((rule.Apply(lifted["value"] * scale) - 8.0) ** 2).sum()
+
+    return Loss_Of
+
+
+def Test_The_Reference_Engine_Never_Reaches_The_Declared_Backward() -> None:
+    """plain arrays take the forward alone, so a backward built to raise never runs"""
+    rule = CustomGradient(forward=Cubed_Forward, backward=Backward_That_Must_Not_Run)
+    produced = rule.Apply(np.asarray([2.0, 3.0]))
+    assert np.allclose(produced, np.asarray([8.0, 27.0]))
+
+
+@pytest.mark.skipif(not Torch_Is_Available(), reason="torch is not installed yet")
+def Test_A_Correct_Custom_Backward_Agrees_With_Finite_Differences() -> None:
+    """the foreign engine's declared rule and the reference engine's numeric derivative land on the same number"""
+    parameters = ParameterSet(values={"value": np.asarray([1.7])})
+    rule = CustomGradient(forward=Cubed_Forward, backward=Cubed_Backward_Correct)
+    loss = Loss_Through_A_Custom_Cube(rule)
+    numeric_gradient = float(NumpyEngine().Gradients(parameters, loss)["value"][0])
+    foreign_gradient = float(TorchEngine().Gradients(parameters, loss)["value"][0])
+    analytic_gradient = Analytic_Gradient_Of_The_Cubed_Loss(1.7, scale=1.0)
+    assert abs(foreign_gradient - numeric_gradient) < 1e-4
+    assert abs(foreign_gradient - analytic_gradient) < 1e-4
+
+
+@pytest.mark.skipif(not Torch_Is_Available(), reason="torch is not installed yet")
+def Test_A_Wrong_Custom_Backward_Is_Caught_Against_The_Reference() -> None:
+    """a declared rule missing its leading factor is caught by disagreeing with the numeric derivative"""
+    parameters = ParameterSet(values={"value": np.asarray([1.7])})
+    rule = CustomGradient(forward=Cubed_Forward, backward=Cubed_Backward_Missing_Factor)
+    loss = Loss_Through_A_Custom_Cube(rule)
+    numeric_gradient = float(NumpyEngine().Gradients(parameters, loss)["value"][0])
+    foreign_gradient = float(TorchEngine().Gradients(parameters, loss)["value"][0])
+    # the dropped factor of three leaves the declared rule at a third of the true slope, never within noise
+    assert abs(foreign_gradient - numeric_gradient) > 0.5 * abs(numeric_gradient)
+
+
+@pytest.mark.parametrize("engine", ENGINE_CASES)
+def Test_Gradients_Reach_A_Parameter_Standing_Before_A_Custom_Rule(engine: Engine) -> None:
+    """an ordinary rescaling before the custom node still carries a gradient back to the parameter behind it"""
+    parameters = ParameterSet(values={"value": np.asarray([0.85])})
+    rule = CustomGradient(forward=Cubed_Forward, backward=Cubed_Backward_Correct)
+    gradient = engine.Gradients(parameters, Loss_Through_A_Custom_Cube(rule, scale=2.0))["value"]
+    analytic_gradient = Analytic_Gradient_Of_The_Cubed_Loss(0.85, scale=2.0)
+    assert abs(float(gradient[0]) - analytic_gradient) < 1e-3
 
 
 @pytest.mark.skipif(not Torch_Is_Available(), reason="torch is not installed yet")

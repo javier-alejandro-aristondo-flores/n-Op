@@ -17,4 +17,4 @@ from operators.kernels.compact_support import (
     TabulatedStencilKernel,
 )
 from operators.kernels.low_rank import DenseKernel, LowRankKernel, Point_Spec_Over_Indices
-from operators.kernels.spectral import SpectralKernel
+from operators.kernels.spectral import ModeMixing, SpectralKernel

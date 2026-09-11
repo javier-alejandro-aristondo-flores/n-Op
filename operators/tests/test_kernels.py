@@ -1,6 +1,7 @@
 """every shared kernel against the dense reference integral"""
 
 import numpy as np
+import pytest
 from numpy.typing import NDArray
 
 from operators.framework import (
@@ -14,7 +15,21 @@ from operators.framework import (
     PointSpec,
     UniformGridQuadrature,
 )
-from operators.kernels import DenseKernel, LowRankKernel, Point_Spec_Over_Indices, SpectralKernel
+from operators.kernels import (
+    Cell_Heights,
+    ContinuousDisplacementKernel,
+    DenseKernel,
+    Folded_Fractional_Gaps,
+    Image_Reach,
+    Lattice_Images,
+    LowRankKernel,
+    Periodic_Radius_Graph,
+    Point_Spec_Over_Indices,
+    Radial_Profile_Features,
+    SpectralKernel,
+    Stencil_From_Weights,
+    TabulatedStencilKernel,
+)
 
 CUBE = Domain(lattice=np.eye(3) * 2.0)
 
@@ -122,3 +137,267 @@ def Test_The_Spectral_Kernel_Publishes_Its_Phase() -> None:
     # magnitude and phase must reconstruct the pair they were derived from
     assert np.allclose(magnitudes * np.cos(phases), real_part)
     assert np.allclose(magnitudes * np.sin(phases), imaginary_part)
+
+
+SHEARED = Domain(lattice=np.asarray([[4.0, 0.0, 0.0], [1.6, 3.4, 0.0], [0.9, -1.2, 4.1]]))
+
+SHEARED_VOLUME = float(abs(np.linalg.det(np.asarray(SHEARED.lattice))))
+
+SHEARED_SLAB = Domain(lattice=np.asarray([[6.0, 0.0, 0.0], [0.0, 6.0, 0.0], [5.5, 0.0, 1.2]]))
+
+
+def Test_The_Continuous_Kernel_Matches_The_Dense_Oracle() -> None:
+    """the fused radius graph equals the closed-form pair kernel summed over a sheared slab"""
+    kernel = ContinuousDisplacementKernel(
+        cutoff_radius=2.5, basis_count=4, output_channels=3, input_channels=2, seed=8
+    )
+    lattice = np.asarray(SHEARED_SLAB.lattice, dtype=np.float64)
+    # the cutoff crosses three cells along the short height, so the images are what is being checked
+    assert Image_Reach(lattice, 2.5) == (2, 1, 3)
+    generator = np.random.default_rng(9)
+    cloud = PointSet(
+        positions=generator.random((7, 3)),
+        domain=SHEARED_SLAB,
+        values=generator.random((7, 2)),
+        quadrature=CountingQuadrature(),
+    )
+    query = PointSpec(generator.random((5, 3)))
+    reference = Dense_Reference_Integral(kernel.Dense_Kernel_Function(lattice), cloud, query)
+    produced = kernel.Integrate(cloud, query)
+    assert isinstance(produced, PointSet)
+    assert np.asarray(produced.values).shape == (5, 3)
+    assert np.allclose(np.asarray(produced.values), reference, atol=1e-12)
+    assert "last_edge_distances" in kernel.Inspect()
+
+
+def Test_The_Continuous_Kernel_Transfers_Discretization() -> None:
+    """the same weights read one field onto a coarse grid, a finer grid and loose probe points"""
+    kernel = ContinuousDisplacementKernel(
+        cutoff_radius=1.4, basis_count=3, output_channels=2, input_channels=1, seed=10
+    )
+    lattice = np.asarray(SHEARED.lattice, dtype=np.float64)
+    generator = np.random.default_rng(11)
+    field = GridFunction(
+        values=generator.random((1, 6, 6, 6)),
+        channel_labels=("charge_density",),
+        domain=SHEARED,
+        quadrature=UniformGridQuadrature(cell_volume=SHEARED_VOLUME, point_count=216),
+    )
+    pair_kernel = kernel.Dense_Kernel_Function(lattice)
+    for requested in (GridSpec((6, 6, 6)), GridSpec((8, 8, 8))):
+        reference = Dense_Reference_Integral(pair_kernel, field, requested)
+        produced = kernel.Integrate(field, requested)
+        assert isinstance(produced, GridFunction)
+        assert np.asarray(produced.values).shape == (2, *requested.shape)
+        assert np.allclose(np.asarray(produced.values), reference, atol=1e-12)
+    probes = PointSpec(generator.random((9, 3)))
+    reference = Dense_Reference_Integral(pair_kernel, field, probes)
+    queried = kernel.Integrate(field, probes)
+    assert isinstance(queried, PointSet)
+    assert np.allclose(np.asarray(queried.values), reference, atol=1e-12)
+
+
+def Test_Probe_Points_Receive_And_Never_Send() -> None:
+    """a zero role keeps a point out of every message it would otherwise have sent"""
+    kernel = ContinuousDisplacementKernel(
+        cutoff_radius=2.0, basis_count=3, output_channels=2, input_channels=2, seed=12
+    )
+    lattice = np.asarray(SHEARED.lattice, dtype=np.float64)
+    generator = np.random.default_rng(13)
+    positions = generator.random((6, 3))
+    values = generator.random((6, 2))
+    roles = np.asarray([1, 1, 1, 1, 0, 0])
+    with_probes = PointSet(
+        positions=positions,
+        domain=SHEARED,
+        values=values,
+        roles=roles,
+        quadrature=CountingQuadrature(),
+    )
+    query = PointSpec(positions)
+    reference = Dense_Reference_Integral(
+        kernel.Dense_Kernel_Function(lattice, np.asarray(roles != 0, dtype=np.bool_)),
+        with_probes,
+        query,
+    )
+    produced = kernel.Integrate(with_probes, query)
+    assert isinstance(produced, PointSet)
+    assert np.allclose(np.asarray(produced.values), reference, atol=1e-12)
+    everyone_sends = PointSet(
+        positions=positions, domain=SHEARED, values=values, quadrature=CountingQuadrature()
+    )
+    undirected = kernel.Integrate(everyone_sends, query)
+    assert isinstance(undirected, PointSet)
+    # the control: if the roles were ignored the two probes would have changed every answer
+    assert not np.allclose(np.asarray(produced.values), np.asarray(undirected.values))
+
+
+def Test_Image_Enumeration_Follows_Cell_Heights() -> None:
+    """in a sheared cell the images a cutoff reaches come from the height, not the vector length"""
+    lattice = np.asarray(SHEARED_SLAB.lattice, dtype=np.float64)
+    cutoff_radius = 2.5
+    vector_lengths = np.sqrt((lattice**2).sum(axis=-1))
+    by_length = (
+        int(np.ceil(cutoff_radius / float(vector_lengths[0]))),
+        int(np.ceil(cutoff_radius / float(vector_lengths[1]))),
+        int(np.ceil(cutoff_radius / float(vector_lengths[2]))),
+    )
+    by_height = Image_Reach(lattice, cutoff_radius)
+    assert float(Cell_Heights(lattice)[2]) < float(vector_lengths[2])
+    assert by_height[2] > by_length[2]
+    kernel = ContinuousDisplacementKernel(
+        cutoff_radius=cutoff_radius, basis_count=2, output_channels=1, input_channels=1, seed=14
+    )
+    generator = np.random.default_rng(15)
+    targets = generator.random((3, 3))
+    cloud = PointSet(
+        positions=generator.random((4, 3)),
+        domain=SHEARED_SLAB,
+        values=generator.random((4, 1)),
+        quadrature=CountingQuadrature(),
+    )
+    query = PointSpec(targets)
+
+    def Shortened_Pair_Kernel(
+        query_points: NDArray[np.float64], cloud_points: NDArray[np.float64]
+    ) -> NDArray[np.float64]:
+        """the same profile with images enumerated from the lattice-vector lengths instead"""
+        folded = Folded_Fractional_Gaps(query_points, cloud_points)
+        values = np.zeros((query_points.shape[0], cloud_points.shape[0], 1, 1))
+        for image in Lattice_Images(by_length):
+            length = np.sqrt((((folded + image) @ lattice) ** 2).sum(axis=-1))
+            inside = length <= cutoff_radius
+            features = Radial_Profile_Features(length[inside], cutoff_radius, 2)
+            values[inside] += np.einsum("eb,boc->eoc", features, kernel.parameter_values["radial_weights"])
+        return values
+
+    complete = Periodic_Radius_Graph(targets, np.asarray(cloud.positions), lattice, cutoff_radius)
+    shortened_edges = 0
+    for image in Lattice_Images(by_length):
+        folded = Folded_Fractional_Gaps(targets, np.asarray(cloud.positions))
+        length = np.sqrt((((folded + image) @ lattice) ** 2).sum(axis=-1))
+        shortened_edges += int(np.count_nonzero(length <= cutoff_radius))
+    # the control: the shorter reach really does drop edges that lie inside the cutoff
+    assert complete.distances.shape[0] > shortened_edges
+    produced = kernel.Integrate(cloud, query)
+    assert isinstance(produced, PointSet)
+    assert not np.allclose(
+        np.asarray(produced.values), Dense_Reference_Integral(Shortened_Pair_Kernel, cloud, query)
+    )
+
+
+def Test_The_Tabulated_Stencil_Matches_The_Dense_Oracle() -> None:
+    """the periodic shift and accumulate equals the reference summation over the same offsets"""
+    kernel = TabulatedStencilKernel(
+        half_widths=(1, 1, 1), output_channels=2, input_channels=2, seed=16
+    )
+    generator = np.random.default_rng(17)
+    field = GridFunction(
+        values=generator.random((2, 6, 6, 6)),
+        channel_labels=("first_channel", "second_channel"),
+        domain=SHEARED,
+        quadrature=UniformGridQuadrature(cell_volume=SHEARED_VOLUME, point_count=216),
+    )
+    pair_kernel = kernel.Dense_Kernel_Function((6, 6, 6), SHEARED_VOLUME / 216.0)
+    reference = Dense_Reference_Integral(pair_kernel, field, GridSpec((6, 6, 6)))
+    produced = kernel.Integrate(field, GridSpec((6, 6, 6)))
+    assert np.asarray(produced.values).shape == (2, 6, 6, 6)
+    assert np.allclose(np.asarray(produced.values), reference, atol=1e-12)
+
+
+def Test_The_Tabulated_Stencil_Carries_The_Continuous_Profile() -> None:
+    """one continuous profile, tabulated at each grid's own offsets, reproduces its integral there"""
+    kernel = ContinuousDisplacementKernel(
+        cutoff_radius=1.0, basis_count=3, output_channels=2, input_channels=2, seed=18
+    )
+    generator = np.random.default_rng(19)
+    tabulated_shapes: list[tuple[int, ...]] = []
+    coarse_field: GridFunction | None = None
+    coarse_stencil: TabulatedStencilKernel | None = None
+    for shape in ((6, 6, 6), (8, 8, 8)):
+        quadrature = UniformGridQuadrature(
+            cell_volume=SHEARED_VOLUME, point_count=int(np.prod(shape))
+        )
+        field = GridFunction(
+            values=generator.random((2, *shape)),
+            channel_labels=("first_channel", "second_channel"),
+            domain=SHEARED,
+            quadrature=quadrature,
+        )
+        stencil = kernel.Tabulate_On_Grid(SHEARED, GridSpec(shape), quadrature)
+        tabulated_shapes.append(tuple(int(extent) for extent in stencil.Inspect()["stencil_weights"].shape))
+        continuous = kernel.Integrate(field, GridSpec(shape))
+        assert isinstance(continuous, GridFunction)
+        tabulated = stencil.Integrate(field, GridSpec(shape))
+        assert np.allclose(np.asarray(tabulated.values), np.asarray(continuous.values), atol=1e-12)
+        reference = Dense_Reference_Integral(
+            kernel.Dense_Kernel_Function(np.asarray(SHEARED.lattice, dtype=np.float64)),
+            field,
+            GridSpec(shape),
+        )
+        assert np.allclose(np.asarray(tabulated.values), reference, atol=1e-12)
+        if coarse_field is None:
+            coarse_field, coarse_stencil = field, stencil
+    # the physical support carried across, the table did not: a finer grid needs a wider box
+    assert tabulated_shapes[0] != tabulated_shapes[1]
+    assert coarse_field is not None and coarse_stencil is not None
+    with pytest.raises(ValueError):
+        coarse_stencil.Integrate(coarse_field, GridSpec((8, 8, 8)))
+
+
+def Test_The_Compact_Support_Kernels_Publish_Their_Fields() -> None:
+    """the stencil is inspected as a field over its offsets, the profile as a curve over the radius"""
+    stencil = TabulatedStencilKernel(
+        half_widths=(1, 2, 1), output_channels=3, input_channels=2, seed=20
+    )
+    inspected = stencil.Inspect()
+    assert inspected["stencil_weights"].shape == (3, 5, 3, 3, 2)
+    assert inspected["stencil_magnitudes"].shape == (3, 5, 3)
+    assert inspected["stencil_offsets"].shape == (3, 5, 3, 3)
+    kernel = ContinuousDisplacementKernel(
+        cutoff_radius=2.0, basis_count=5, output_channels=2, input_channels=3, seed=21
+    )
+    inspected = kernel.Inspect()
+    assert inspected["radial_weights"].shape == (5, 2, 3)
+    assert inspected["basis_over_radius"].shape == (64, 5)
+    assert inspected["profile_over_radius"].shape == (64, 2, 3)
+    # compact support asks the profile to be flat into the cutoff, not merely zero at it
+    profile = np.abs(np.asarray(inspected["profile_over_radius"]))
+    assert float(profile[-4:].max()) < 1e-3 * float(profile.max())
+
+
+def Test_The_Tabulated_Stencil_Refuses_What_It_Cannot_Represent() -> None:
+    """the three shapes a whole-voxel table cannot carry are refused rather than approximated"""
+    quadrature = UniformGridQuadrature(cell_volume=SHEARED_VOLUME, point_count=216)
+    reaching = ContinuousDisplacementKernel(
+        cutoff_radius=3.0, basis_count=2, output_channels=1, input_channels=1, seed=22
+    )
+    # a cutoff past half the cell would put two offsets of one box on the same voxel
+    with pytest.raises(ValueError):
+        reaching.Tabulate_On_Grid(SHEARED, GridSpec((6, 6, 6)), quadrature)
+    stencil = TabulatedStencilKernel(half_widths=(1, 1, 1), output_channels=1, input_channels=1, seed=23)
+    field = GridFunction(
+        values=np.zeros((1, 6, 6, 6)),
+        channel_labels=("charge_density",),
+        domain=SHEARED,
+        quadrature=quadrature,
+    )
+    with pytest.raises(TypeError):
+        stencil.Integrate(field, PointSpec(np.zeros((2, 3))))
+    with pytest.raises(ValueError):
+        Stencil_From_Weights(np.zeros((3, 4, 3, 1, 1)))
+
+
+def Test_The_Periodic_Geometry_Says_What_It_Carries() -> None:
+    """gaps fold into the half cell and every edge's distance is the length of its displacement"""
+    ahead = np.asarray([[0.02, 0.5, 0.99]])
+    behind = np.asarray([[0.98, 0.5, 0.01]])
+    folded = Folded_Fractional_Gaps(ahead, behind)
+    assert np.all(np.abs(folded) <= 0.5 + 1e-12)
+    assert np.allclose(folded[0, 0], [0.04, 0.0, -0.02])
+    lattice = np.asarray(SHEARED_SLAB.lattice, dtype=np.float64)
+    generator = np.random.default_rng(24)
+    graph = Periodic_Radius_Graph(generator.random((4, 3)), generator.random((5, 3)), lattice, 2.5)
+    assert graph.distances.shape[0] == graph.displacements.shape[0]
+    assert np.allclose(graph.distances, np.sqrt((graph.displacements**2).sum(axis=-1)), atol=1e-12)
+    assert bool(np.all(graph.distances <= 2.5))

@@ -105,7 +105,7 @@ def Test_The_Summary_Tables_Match_The_Records() -> None:
     assert by_identifier["E1"] == 6 and by_identifier["E6"] == 73 and by_identifier["E10"] == 1
 
 
-def Test_The_Suite_Draws_Every_Rank_The_Package_Produces() -> None:
+def Test_The_Suite_Draws_Every_Rank_The_Package_Produces(tmp_path: Path) -> None:
     """each rank an inspection dict can hold reaches a renderer, and none is skipped"""
     generator = np.random.default_rng(31)
     inspected = {
@@ -118,16 +118,12 @@ def Test_The_Suite_Draws_Every_Rank_The_Package_Produces() -> None:
         "part.basis_modes": generator.normal(size=(4, 6, 6, 6)),
         "part.mode_weights_real": generator.normal(size=(3, 3, 3, 2, 2)),
     }
-    directory = Path(__file__).resolve().parent / "_suite_scratch"
-    suite = Render_Inspection_Suite(inspected, directory, "part")
+    suite = Render_Inspection_Suite(inspected, tmp_path, "part")
     assert suite.skipped == ()
     # one figure per array, plus the one panel every scalar shares
     assert len(suite.written) == len(inspected)
     for path in suite.written:
         assert path.is_file() and path.stat().st_size > 1000
-    for path in suite.written:
-        path.unlink()
-    directory.rmdir()
 
 
 def Test_A_Constant_Array_Does_Not_Break_The_Colour_Scale(tmp_path: Path) -> None:

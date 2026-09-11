@@ -20,3 +20,6 @@ markers = ["pool: touches the live corpus on /Pool; machine-bound"]
 typeCheckingMode = "strict"
 pythonVersion = "3.14"
 extraPaths = [".."]
+# the environment whose stubs the checker reads, so the verdict is the project's and not the shell's
+venvPath = ".."
+venv = ".venv"

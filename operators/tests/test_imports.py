@@ -6,6 +6,7 @@ import inspect
 import io
 import shutil
 import subprocess
+import sys
 import tokenize
 from pathlib import Path
 from typing import Any, cast, is_protocol
@@ -30,6 +31,8 @@ PACKAGES = [
     "operators.substrate",
     "operators.tasks",
     "operators.training",
+    "operators.evaluation",
+    "operators.inspection.plots",
     "operators.factorized_fourier",
     "operators.alias_free_convolutional",
     "operators.deep_operator_network",
@@ -206,15 +209,25 @@ def Test_The_Comments_Describe_The_Code() -> None:
     assert offenses == [], offenses
 
 
+def Type_Checker_Beside_The_Interpreter() -> Path | None:
+    """the checker installed alongside the running interpreter, before any on the wider path"""
+    # resolving through the path alone lets the caller's shell decide which version grades the package
+    beside_interpreter = Path(sys.executable).parent / "pyright"
+    if beside_interpreter.is_file():
+        return beside_interpreter
+    found_on_path = shutil.which("pyright")
+    return Path(found_on_path) if found_on_path is not None else None
+
+
 def Test_The_Package_Type_Checks_Strictly() -> None:
     """pyright strict over the package, failing on any error or a missing binary"""
-    pyright_binary = shutil.which("pyright")
-    assert pyright_binary is not None
+    type_checker = Type_Checker_Beside_The_Interpreter()
+    assert type_checker is not None, "no type checker beside the interpreter or on the path"
     package_root = Path(__file__).resolve().parent.parent
     finished = subprocess.run(
-        [pyright_binary, "--project", str(package_root), str(package_root)],
+        [str(type_checker), "--project", str(package_root), str(package_root)],
         capture_output=True,
         text=True,
         check=False,
     )
-    assert finished.returncode == 0, finished.stdout
+    assert finished.returncode == 0, f"{type_checker}\n{finished.stdout}"

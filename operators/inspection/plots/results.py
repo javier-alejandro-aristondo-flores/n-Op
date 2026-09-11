@@ -52,8 +52,8 @@ def Render_Error_Spread(
     generator = np.random.default_rng(0)
     for position, name in enumerate(names, start=1):
         values = errors_by_group[name]
-        scatter = position + generator.uniform(-0.12, 0.12, size=values.shape[0])
-        axes.plot(scatter, values, ".", markersize=5, alpha=0.7)
+        jittered = np.asarray(position + generator.uniform(-0.12, 0.12, size=values.shape[0]), np.float64)
+        axes.plot(jittered, values, ".", markersize=5, alpha=0.7)
     axes.set_yscale("log")
     axes.set_ylabel(vertical_label)
     unit_count = sum(group.shape[0] for group in errors_by_group.values())

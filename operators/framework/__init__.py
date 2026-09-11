@@ -7,6 +7,7 @@ from operators.framework.domain import Array, Discretization, Domain, GridSpec, 
 from operators.framework.inspectable import Inspectable
 from operators.framework.integral import (
     Dense_Reference_Integral,
+    Fractional_Coordinates_Of_Flat_Indices,
     Fractional_Grid_Coordinates,
     Output_Points,
     Quadrature_Weights,

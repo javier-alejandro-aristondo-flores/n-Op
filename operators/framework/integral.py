@@ -1,6 +1,7 @@
 """direct evaluation of the kernel integral by summation over source points"""
 
 from collections.abc import Callable
+from typing import Any
 
 import numpy as np
 from numpy.typing import NDArray
@@ -21,6 +22,17 @@ def Fractional_Grid_Coordinates(shape: tuple[int, ...]) -> NDArray[np.float64]:
     # ij indexing is the order the field values flatten in
     grids = np.meshgrid(*axes, indexing="ij")
     return np.stack([grid.reshape(-1) for grid in grids], axis=1)
+
+
+def Fractional_Coordinates_Of_Flat_Indices(
+    shape: tuple[int, ...],
+    flat_indices: NDArray[np.integer[Any]],
+) -> NDArray[np.float64]:
+    """fractional coordinates of chosen flattened positions, without building the whole grid"""
+    # unravelling in C order is the exact converse of the flattening the field values carry
+    axis_positions = np.unravel_index(flat_indices, shape)
+    stacked = np.stack([np.asarray(positions, dtype=np.float64) for positions in axis_positions], axis=1)
+    return stacked / np.asarray(shape, dtype=np.float64)
 
 
 def Quadrature_Weights(representation: Representation) -> NDArray[np.float64]:

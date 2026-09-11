@@ -8,6 +8,8 @@ from operators.framework import (
     CountingQuadrature,
     Dense_Reference_Integral,
     Domain,
+    Fractional_Coordinates_Of_Flat_Indices,
+    Fractional_Grid_Coordinates,
     GridFunction,
     GridSpec,
     PointSet,
@@ -90,3 +92,16 @@ def Test_Quadrature_Weights_Read_The_Measure() -> None:
     assert np.allclose(Quadrature_Weights(field), 1.0)
     cloud = PointSet(positions=np.zeros((3, 3)), domain=CUBE, values=np.zeros((3, 1)))
     assert np.allclose(Quadrature_Weights(cloud), 1.0)
+
+
+def Test_The_Flat_Index_Converse_Is_The_Grid_Itself() -> None:
+    """asserts coordinates of chosen flattened positions are the grid's own rows, to the last bit"""
+    generator = np.random.default_rng(6)
+    for shape in ((4, 5, 6), (7, 1, 3), (2, 2), (9,), (40, 40, 40)):
+        whole_grid = Fractional_Grid_Coordinates(shape)
+        every_point = np.arange(whole_grid.shape[0], dtype=np.intp)
+        assert np.array_equal(Fractional_Coordinates_Of_Flat_Indices(shape, every_point), whole_grid)
+        drawn = generator.integers(0, whole_grid.shape[0], size=64)
+        assert np.array_equal(Fractional_Coordinates_Of_Flat_Indices(shape, drawn), whole_grid[drawn])
+    # an empty draw still answers with a row per point and a column per axis
+    assert Fractional_Coordinates_Of_Flat_Indices((3, 4, 5), np.asarray([], dtype=np.intp)).shape == (0, 3)

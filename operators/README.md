@@ -161,7 +161,7 @@ rather than inventing a fake integral to satisfy the template.
 | Directory | Contents |
 |---|---|
 | `framework/` | the four contracts, the `NeuralOperator` template, `Layer`, the dense reference integral, and the discretization-invariance harness |
-| `kernels/spectral/` | translation-invariant kernels: full and factorized per-axis mode weights, mode truncation, physical-wavevector features from the reciprocal lattice, spectral resampling (truncation and zero-padding), and the batched three-dimensional real Fourier transform with autodiff through complex tensors |
+| `kernels/spectral/` | translation-invariant kernels: full and factorized per-axis mode weights, mode truncation, physical-wavevector features from the reciprocal lattice, spectral resampling (truncation and zero-padding), and the per-mode mixings — full and separable — that reach the transform through the substrate facet rather than owning it |
 | `kernels/compact_support/` | small-support kernels in two parametrizations — tabulated at integer offsets on a grid (convolution) and continuous in the displacement (message passing) — plus periodic neighbor finding and the alias-free activation machinery |
 | `kernels/low_rank/` | separable kernels φ(x)·ψ(y) evaluated as inner products, and the dense kernel over a finite index set |
 | `kernels/codomain_attention/` | attention over the channel index, with weights shared across channel tokens |
@@ -173,7 +173,7 @@ rather than inventing a fake integral to satisfy the template.
 | `training/` | split-aware loading from the store and the engine-facet training loop with curve artifacts |
 | `data/` | corpus parsers, the derived tensor store, the split engine, the exclusion registry, the orbit map, spectral derivations, the floors, and the Stage-0 report generator |
 | `metrics/` | comparison metrics — field errors, curve distances, and unit-level aggregates |
-| `inspection/` | the catalog over the store, the summary tables, and `plots.py` behind the rendering seam |
+| `inspection/` | the catalog over the store, the summary tables, and `plots/` behind the rendering seam |
 | `tasks/` | task cards — inputs, targets, loss, metrics, conservation law, covariates, split |
 
 ### Notes that the code deliberately does not carry
@@ -220,8 +220,10 @@ Adopted 2026-08-26, before any implementation code exists, so every line that fo
 against a modern contract rather than retrofitted to one. The package floor is **Python 3.14**
 (annotations are natively lazy, so no `from __future__ import annotations` anywhere), and
 **pyright in strict mode is a test gate**: `Test_The_Package_Type_Checks_Strictly` runs it over
-the whole package, so a type error fails `pytest`. This is distinct from the standing "no style
-checker" decision — naming, docstring, and spacing rules remain enforced by review only.
+the whole package, so a type error fails `pytest`. The standing "no style checker" decision has
+since been drawn narrower than it started: **naming and the comment register are gates too**
+(`Test_The_Names_Are_Prosaic`, `Test_The_Comments_Describe_The_Code`), and what remains enforced by
+review alone is spacing, import grouping, and the column limit.
 
 **The behavioral contracts are generic Protocols that implementations still inherit by name.**
 `Operator`, `Kernel`, and `Composition` are `Protocol` classes with `@abstractmethod` members,
@@ -275,8 +277,8 @@ in, a scalar loss out, gradients back, plus constant lifting), the Fourier trans
 algebra, and the optimizer.
 
 Three rules keep the seams honest. **Only `substrate/` may name the foreign engine** — a text
-seam test fails the suite if any production module mentions torch, exactly as `plots.py` is
-the one module allowed matplotlib. **The reference implementation is the conformance oracle**:
+seam test fails the suite if any production module mentions torch, exactly as `plots/` is
+the one package allowed matplotlib. **The reference implementation is the conformance oracle**:
 the numpy engine differentiates by central finite differences — slow and correct — and every
 conformance case runs against all available engines, so a torch (or future in-house) engine
 earns its slot by matching the reference, never by assumption. The torch engine is reached
@@ -288,10 +290,11 @@ code runs plain for inference and lifted for gradients. Adam is in-house from da
 twenty lines above the gradient dictionary and owing an engine for it would be borrowing what
 we already have.
 
-Two deliberate seam residues, recorded: the spectral kernel's forward is numpy-native (its
-engine-lifted form is the Fourier lineage's own build, per the wave order), and the low-rank
-kernel's learned core trains through the dense path first. The dense and low-rank kernels, the
-perceptron, and every encoder, readout, and wrapper are engine-lifted already.
+One deliberate seam residue is left, recorded: the low-rank kernel's learned core trains through
+the dense path first. The spectral kernel's forward was the other one and is no longer — it runs
+through the transform facet and carries gradients in both the full and separable mode mixings. The
+dense, low-rank and spectral kernels, the compact-support kernels, the perceptron, and every
+encoder, readout and wrapper are engine-lifted.
 
 ---
 

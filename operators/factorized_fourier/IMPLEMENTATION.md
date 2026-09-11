@@ -44,5 +44,9 @@ a failure.
 
 ## Implementation specification
 
-To be written. Open first: the Fourier-transform substrate (vendor-wrapped versus written in
+To be written. The substrate question that used to open this section is answered: the transform
+is wrapped behind `operators/substrate/fourier.py`, priced by the canon in days against multi-week
+for an own Stockham transform, and the seam means replacing its body later touches no member. The
+separable kernel this entry is named for now exists and carries gradients; what remains is the
+assembly. Superseded, kept for the reasoning: the Fourier-transform substrate (vendor-wrapped versus written in
 house), which is this entry's largest cost lever and is shared with every other spectral member.

@@ -191,8 +191,9 @@ because they are reasons, and reasons do not belong in the modules.
 - **The atom embedding is keyed by element *and* pseudopotential title.** Twelve elements ship
   with two pseudopotential variants across campaigns, and conflating them mixes incompatible
   references.
-- **The Fourier-transform substrate is an open decision** (vendor-wrapped versus written in
-  house); both cost figures are carried until it is made.
+- **The Fourier-transform substrate is decided**: wrapped behind the substrate facet now, written
+  in house later, because the seam makes that a substitution rather than a dependency. The
+  wrapper names its own successor in `substrate/fourier.py`.
 - **Probe sampling is importance-weighted and de-biased**, because error mass concentrates in
   atom-centered volumes.
 - **Density-of-states curves are rebuilt from eigenvalues**, never read from the pre-computed

@@ -15,4 +15,4 @@ wrappers = "per task card: Conserving on density/potential heads only"
 [depends_on]
 framework = true
 kernels = ["spectral"]
-shared_note = "the batched 3-D real Fourier transform with complex autodiff; substrate decision open (test-suite.md §0)"
+shared_note = "the batched 3-D real Fourier transform with complex autodiff, wrapped behind the substrate facet; the in-house transform replaces its body later without touching a member"

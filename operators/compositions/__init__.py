@@ -11,6 +11,8 @@ from operators.compositions.multi_scale import MultiScale
 from operators.framework import Array, Coefficients, Composition, GridFunction, Layer
 from operators.substrate import Gaussian_Error_Linear_Unit
 
+from operators.compositions.fixed_point import FixedPoint, WeightTied
+
 
 def Sliced_Lifted(lifted: dict[str, Any], prefix: str) -> dict[str, Any]:
     """the slice of a shared lifted dict that belongs to one part, its own names restored"""

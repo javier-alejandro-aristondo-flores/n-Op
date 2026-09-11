@@ -106,7 +106,7 @@ with optional values and a `roles` field expresses that; two classes could not.
 | | `quadrature` | uniform grid: weight = cell volume ÷ point count |
 | `PointSet` | `positions` | shape (n, 3), fractional coordinates |
 | | `values` | shape (n, channels) when features ride on the points; absent for a bare structure |
-| | `species` | per-point element identity when the points are atoms |
+| | `species` | shape (n, 2) when the points are atoms — element beside pseudopotential title, because twelve elements ship two variants across campaigns and the pair is what identifies a reference |
 | | `roles` | message-passing asymmetries — receive-only probe points |
 | `Coefficients` | `vector` | shape (k,) — sensor readings, basis coefficients, or parameters |
 

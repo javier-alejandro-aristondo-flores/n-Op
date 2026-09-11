@@ -40,6 +40,22 @@ ENGINE_CASES = [
 ]
 
 
+@pytest.mark.parametrize("engine", ENGINE_CASES)
+def Test_A_Parameter_The_Loss_Never_Touches_Gets_A_Zero_Gradient(engine: Engine) -> None:
+    """asserts an untouched parameter comes back as zeros rather than crashing on an absent gradient"""
+    parameters = ParameterSet(values={"reached": np.full(3, 2.0), "untouched": np.full(4, 5.0)})
+
+    def Loss_Touching_One(lifted: dict[str, Any]) -> Any:
+        """a loss that mentions one parameter and never the other"""
+        return (lifted["reached"] * lifted["reached"]).sum()
+
+    gradients = engine.Gradients(parameters, Loss_Touching_One)
+    assert set(gradients) == {"reached", "untouched"}
+    assert gradients["untouched"].shape == (4,)
+    assert np.array_equal(gradients["untouched"], np.zeros(4))
+    assert np.allclose(gradients["reached"], 2.0 * parameters.values["reached"])
+
+
 def Quadratic_Loss(lifted: dict[str, Any]) -> Any:
     """a two-parameter quadratic with its minimum at three and minus one"""
     return ((lifted["scale"] - 3.0) ** 2).sum() + ((lifted["offset"] + 1.0) ** 2).sum()

@@ -47,6 +47,7 @@ class PointSet(Representation):
     positions: Array
     domain: Domain
     values: Array | None = None
+    # species carries the pair the corpus identifies an atom by, element beside pseudopotential title
     species: Array | None = None
     roles: Array | None = None
     quadrature: Quadrature = field(default_factory=CountingQuadrature)

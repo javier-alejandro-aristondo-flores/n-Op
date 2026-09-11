@@ -66,9 +66,13 @@ class TorchEngine:
         lifted = self.Lift(parameters.values, requires_gradient=True)
         loss = forward(lifted)
         loss.backward()
-        # the gradients come home as plain arrays, off whatever device they were computed on
+        # a parameter the loss never touched has no gradient recorded, and its true derivative is zero
         gradients = {
-            name: np.asarray(tensor.grad.detach().cpu().numpy(), dtype=np.float64)
+            name: (
+                np.zeros_like(parameters.values[name])
+                if tensor.grad is None
+                else np.asarray(tensor.grad.detach().cpu().numpy(), dtype=np.float64)
+            )
             for name, tensor in lifted.items()
         }
         return float(loss.detach()), gradients

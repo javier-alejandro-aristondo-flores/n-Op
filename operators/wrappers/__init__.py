@@ -2,15 +2,29 @@
 
 from collections.abc import Sequence
 from dataclasses import dataclass
-from typing import Literal
+from typing import Any, Literal
 
 import numpy as np
 from numpy.typing import NDArray
 
 from operators.framework import Array, Coefficients, Discretization, GridFunction, Operator, Quadrature_Weights
 from operators.metrics import Median_Per_Unit
+from operators.substrate import Mean_Over_Last_Axis, Sum_Over_Last_Axis
 
 SYMMETRY_ORBIT = "symmetry_orbit"
+
+
+def Channel_Means(values: Any) -> Any:
+    """the mean of each channel on its own, shaped to broadcast back over the grid it came from"""
+    flattened = values.reshape(values.shape[0], -1)
+    grid_axes = (1,) * (len(values.shape) - 1)
+    return Mean_Over_Last_Axis(flattened).reshape(values.shape[0], *grid_axes)
+
+
+def Renormalization_Scale(values: Any, weight_each: float, target_integral: Any) -> Any:
+    """the single factor that puts the quadrature integral of the values on the requested total"""
+    integral = Sum_Over_Last_Axis(values.reshape(-1)) * weight_each
+    return target_integral / integral
 
 
 class Conserving(Operator[GridFunction, GridFunction]):
@@ -28,6 +42,16 @@ class Conserving(Operator[GridFunction, GridFunction]):
         self.last_renormalization_scale: NDArray[np.float64] | None = None
 
 
+    def Forward(self, produced_values: Any, weight_each: float, condition_vector: Any = None) -> Any:
+        """the law imposed on values from whichever engine made them, with nothing coerced on the way"""
+        if self.law == "zero_mean":
+            # channel by channel, so no channel borrows another's offset
+            return produced_values - Channel_Means(produced_values)
+        if condition_vector is None:
+            raise ValueError("renormalization needs the electron count as the condition")
+        return produced_values * Renormalization_Scale(produced_values, weight_each, condition_vector[0])
+
+
     def __call__(
         self,
         input_function: GridFunction,
@@ -40,19 +64,19 @@ class Conserving(Operator[GridFunction, GridFunction]):
         # a uniform grid gives every point the same weight, so one of them is the whole rule
         weight_each = float(weights[0])
         if self.law == "zero_mean":
-            # channel by channel, so no channel borrows another's offset
-            corrected = values - values.mean(axis=(1, 2, 3), keepdims=True)
+            corrected = self.Forward(values, weight_each)
             self.last_removed_mean = np.asarray(float(values.mean()))
         else:
             if condition is None:
                 raise ValueError("renormalization needs the electron count as the condition")
-            # one scale puts the integrated density back on the electron count
-            target_integral = float(np.asarray(condition.vector)[0])
-            integral = float(values.sum() * weight_each)
-            scale = target_integral / integral
-            corrected = values * scale
-            self.last_renormalization_scale = np.asarray(scale)
-        return GridFunction(corrected, produced.channel_labels, produced.domain, produced.quadrature)
+            condition_vector = np.asarray(condition.vector, dtype=np.float64)
+            corrected = self.Forward(values, weight_each, condition_vector)
+            self.last_renormalization_scale = np.asarray(
+                float(Renormalization_Scale(values, weight_each, condition_vector[0]))
+            )
+        return GridFunction(
+            np.asarray(corrected, dtype=np.float64), produced.channel_labels, produced.domain, produced.quadrature
+        )
 
 
     def Inspect(self) -> dict[str, Array]:
@@ -72,6 +96,11 @@ class Residual(Operator[GridFunction, GridFunction]):
         self.inner = inner
 
 
+    def Forward(self, input_values: Any, produced_values: Any) -> Any:
+        """the correction laid back onto the field it corrects, on whichever engine holds the two"""
+        return input_values + produced_values
+
+
     def __call__(
         self,
         input_function: GridFunction,
@@ -79,8 +108,12 @@ class Residual(Operator[GridFunction, GridFunction]):
         condition: Coefficients | None = None,
     ) -> GridFunction:
         produced = self.inner(input_function, output_discretization, condition)
-        summed = np.asarray(input_function.values, dtype=np.float64) + np.asarray(
-            produced.values, dtype=np.float64
+        summed = np.asarray(
+            self.Forward(
+                np.asarray(input_function.values, dtype=np.float64),
+                np.asarray(produced.values, dtype=np.float64),
+            ),
+            dtype=np.float64,
         )
         return GridFunction(summed, input_function.channel_labels, produced.domain, produced.quadrature)
 
@@ -105,6 +138,16 @@ class Conditioned(Operator[GridFunction, GridFunction]):
         }
 
 
+    def Forward(self, lifted: dict[str, Any], produced_values: Any, condition_vector: Any) -> Any:
+        """the channels modulated by weights the caller has lifted, so an engine can differentiate them"""
+        # one plus the learned scale, so untrained weights leave the channels alone
+        channel_scales = 1.0 + lifted["condition_scale_weights"] @ condition_vector
+        channel_shifts = lifted["condition_shift_weights"] @ condition_vector
+        grid_axes = (1,) * (len(produced_values.shape) - 1)
+        scaled = produced_values * channel_scales.reshape(channel_scales.shape[0], *grid_axes)
+        return scaled + channel_shifts.reshape(channel_shifts.shape[0], *grid_axes)
+
+
     def __call__(
         self,
         input_function: GridFunction,
@@ -114,12 +157,14 @@ class Conditioned(Operator[GridFunction, GridFunction]):
         produced = self.inner(input_function, output_discretization, condition)
         if condition is None:
             return produced
-        condition_vector = np.asarray(condition.vector, dtype=np.float64)
-        # one plus the learned scale, so untrained weights leave the channels alone
-        channel_scales = 1.0 + self.parameter_values["condition_scale_weights"] @ condition_vector
-        channel_shifts = self.parameter_values["condition_shift_weights"] @ condition_vector
-        values = np.asarray(produced.values, dtype=np.float64)
-        modulated = values * channel_scales[:, None, None, None] + channel_shifts[:, None, None, None]
+        modulated = np.asarray(
+            self.Forward(
+                self.parameter_values,
+                np.asarray(produced.values, dtype=np.float64),
+                np.asarray(condition.vector, dtype=np.float64),
+            ),
+            dtype=np.float64,
+        )
         return GridFunction(modulated, produced.channel_labels, produced.domain, produced.quadrature)
 
 

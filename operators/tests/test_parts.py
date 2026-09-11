@@ -1,10 +1,13 @@
 """the shared encoders, readouts, compositions and wrappers"""
 
 import tomllib
+from collections.abc import Callable
 from pathlib import Path
+from typing import Any, Literal
 
 import numpy as np
 import pytest
+from numpy.typing import NDArray
 
 from operators.compositions import ExplicitStack
 from operators.data import Gram_Pod, Project
@@ -17,6 +20,7 @@ from operators.framework import (
     GridFunction,
     GridSpec,
     Layer,
+    Operator,
     PointSet,
     PointSpec,
     UniformGridQuadrature,
@@ -29,7 +33,7 @@ from operators.readouts import (
     PointwiseProjection,
     RampedCoordinateFeatures,
 )
-from operators.substrate import NumpyEngine
+from operators.substrate import NumpyEngine, ParameterSet, Torch_Is_Available, TorchEngine
 from operators.wrappers import (
     Conditioned,
     ConformalCalibrator,
@@ -396,6 +400,256 @@ def Test_The_Conservation_Laws_Are_Named_Apart() -> None:
     scaled = renormalizing.Inspect()
     assert "last_renormalization_scale" in scaled and "last_removed_mean" not in scaled
     assert np.asarray(scaled["last_renormalization_scale"]).ndim == 0
+
+
+CONSERVATION_LAWS: tuple[Literal["renormalize_to_electron_count", "zero_mean"], ...] = (
+    "renormalize_to_electron_count",
+    "zero_mean",
+)
+
+SMALL_GRID = GridSpec((4, 4, 4))
+
+WEIGHT_EACH = GRID_QUADRATURE.cell_volume / GRID_QUADRATURE.point_count
+
+ELECTRON_COUNT = Coefficients(vector=np.asarray([8.0]), domain=CUBE)
+
+
+def Residual_Loss(
+    wrapper: Residual, inner: PointwiseLift, field_values: Any, target: Any
+) -> Callable[[dict[str, Any]], Any]:
+    """the squared gap between the residual wrapper's field and a fixed target, as a forward an engine drives"""
+
+    def Loss(lifted: dict[str, Any]) -> Any:
+        difference = wrapper.Forward(field_values, inner.Forward(lifted, field_values)) - target
+        return (difference * difference).sum()
+
+    return Loss
+
+
+def Conserving_Loss(
+    wrapper: Conserving, inner: PointwiseLift, field_values: Any, target: Any, condition_vector: Any
+) -> Callable[[dict[str, Any]], Any]:
+    """the same squared gap, taken after the conservation law has been imposed"""
+
+    def Loss(lifted: dict[str, Any]) -> Any:
+        corrected = wrapper.Forward(inner.Forward(lifted, field_values), WEIGHT_EACH, condition_vector)
+        difference = corrected - target
+        return (difference * difference).sum()
+
+    return Loss
+
+
+def Conditioned_Loss(
+    wrapper: Conditioned, inner: PointwiseLift, field_values: Any, target: Any, condition_vector: Any
+) -> Callable[[dict[str, Any]], Any]:
+    """the same squared gap, taken after the conditioning weights have modulated the channels"""
+
+    def Loss(lifted: dict[str, Any]) -> Any:
+        difference = wrapper.Forward(lifted, inner.Forward(lifted, field_values), condition_vector) - target
+        return (difference * difference).sum()
+
+    return Loss
+
+
+def Agreeing_Gradients(
+    parameters: ParameterSet,
+    lifted_loss: Callable[[dict[str, Any]], Any],
+    reference_loss: Callable[[dict[str, Any]], Any],
+) -> dict[str, NDArray[np.float64]]:
+    """the differentiable engine's gradients, checked against the finite-difference oracle and handed back"""
+    value, gradients = TorchEngine().Value_And_Gradients(parameters, lifted_loss)
+    reference = NumpyEngine()
+    assert abs(value - reference.Evaluate(parameters, reference_loss)) < 1e-10
+    reference_gradients = reference.Gradients(parameters, reference_loss)
+    assert set(gradients) == set(reference_gradients)
+    for name, gradient in gradients.items():
+        assert np.allclose(gradient, reference_gradients[name], rtol=1e-5, atol=1e-6), name
+    return gradients
+
+
+def Largest_Gap(through_the_engine: Any, through_numpy: Any) -> float:
+    """the worst the two paths disagree by anywhere, in the units the field is written in"""
+    engine_values = np.asarray(through_the_engine, dtype=np.float64)
+    numpy_values = np.asarray(through_numpy, dtype=np.float64)
+    return float(np.abs(engine_values - numpy_values).max())
+
+
+@pytest.mark.skipif(not Torch_Is_Available(), reason="torch is not installed yet")
+def Test_The_Residual_Wrapper_Carries_Gradients_To_The_Operator_Inside_It() -> None:
+    """the member whose whole identity is wrappers over a backbone could not be trained through this one at all"""
+    inner = PointwiseLift(hidden_channels=2, input_channels=2, seed=21)
+    wrapper = Residual(inner)
+    field_values = np.asarray(Small_Field(2, seed=22).values, dtype=np.float64)
+    target = np.random.default_rng(23).random((2, 4, 4, 4))
+    parameters = ParameterSet(values={name: value.copy() for name, value in inner.parameter_values.items()})
+    engine = TorchEngine()
+    gradients = Agreeing_Gradients(
+        parameters,
+        Residual_Loss(wrapper, inner, engine.Lift_Constant(field_values), engine.Lift_Constant(target)),
+        Residual_Loss(wrapper, inner, field_values, target),
+    )
+    for name, gradient in gradients.items():
+        # a tape severed anywhere between the weight and the loss reads here as an exactly zero gradient
+        assert float(np.abs(gradient).max()) > 1e-6, name
+
+
+@pytest.mark.skipif(not Torch_Is_Available(), reason="torch is not installed yet")
+@pytest.mark.parametrize("law", CONSERVATION_LAWS)
+def Test_Each_Conservation_Law_Carries_Gradients_To_The_Operator_Inside_It(
+    law: Literal["renormalize_to_electron_count", "zero_mean"],
+) -> None:
+    """the projection is part of the model, so the gradient has to come home through it"""
+    inner = PointwiseLift(hidden_channels=2, input_channels=2, seed=24)
+    wrapper = Conserving(inner, law)
+    field_values = np.asarray(Small_Field(2, seed=25).values, dtype=np.float64)
+    target = np.random.default_rng(26).random((2, 4, 4, 4))
+    count_vector = np.asarray(ELECTRON_COUNT.vector, dtype=np.float64)
+    parameters = ParameterSet(values={name: value.copy() for name, value in inner.parameter_values.items()})
+    engine = TorchEngine()
+    gradients = Agreeing_Gradients(
+        parameters,
+        Conserving_Loss(
+            wrapper,
+            inner,
+            engine.Lift_Constant(field_values),
+            engine.Lift_Constant(target),
+            engine.Lift_Constant(count_vector),
+        ),
+        Conserving_Loss(wrapper, inner, field_values, target, count_vector),
+    )
+    assert float(np.abs(gradients["lift_weights"]).max()) > 1e-6
+    if law == "zero_mean":
+        # the law takes any uniform offset back off again, so a bias that only shifts cannot reach the loss
+        assert float(np.abs(gradients["lift_biases"]).max()) < 1e-12
+    else:
+        assert float(np.abs(gradients["lift_biases"]).max()) > 1e-6
+
+
+@pytest.mark.skipif(not Torch_Is_Available(), reason="torch is not installed yet")
+def Test_The_Conditioning_Weights_Are_Reached_Alongside_The_Operator_Inside() -> None:
+    """these weights sat outside every parameter set, where nothing that trains the model could move them"""
+    inner = PointwiseLift(hidden_channels=2, input_channels=2, seed=27)
+    wrapper = Conditioned(inner, channels=2, condition_width=1, seed=28)
+    field_values = np.asarray(Small_Field(2, seed=29).values, dtype=np.float64)
+    target = np.random.default_rng(30).random((2, 4, 4, 4))
+    count_vector = np.asarray(ELECTRON_COUNT.vector, dtype=np.float64)
+    parameters = ParameterSet(
+        values={
+            name: value.copy()
+            for source in (inner.parameter_values, wrapper.parameter_values)
+            for name, value in source.items()
+        }
+    )
+    engine = TorchEngine()
+    gradients = Agreeing_Gradients(
+        parameters,
+        Conditioned_Loss(
+            wrapper,
+            inner,
+            engine.Lift_Constant(field_values),
+            engine.Lift_Constant(target),
+            engine.Lift_Constant(count_vector),
+        ),
+        Conditioned_Loss(wrapper, inner, field_values, target, count_vector),
+    )
+    assert set(gradients) == {
+        "lift_weights",
+        "lift_biases",
+        "condition_scale_weights",
+        "condition_shift_weights",
+    }
+    for name, gradient in gradients.items():
+        assert float(np.abs(gradient).max()) > 1e-6, name
+
+
+@pytest.mark.skipif(not Torch_Is_Available(), reason="torch is not installed yet")
+def Test_Each_Wrapper_Answers_The_Same_On_Either_Engine() -> None:
+    """the differentiable engine is a way of differentiating the wrappers, not a different set of wrappers"""
+    inner = PointwiseLift(hidden_channels=2, input_channels=2, seed=31)
+    field = Small_Field(2, seed=32)
+    count_vector = np.asarray(ELECTRON_COUNT.vector, dtype=np.float64)
+    engine = TorchEngine()
+    lifted = engine.Lift(inner.parameter_values, requires_gradient=False)
+    lifted_field = engine.Lift_Constant(np.asarray(field.values, dtype=np.float64))
+    lifted_count = engine.Lift_Constant(count_vector)
+    produced = inner.Forward(lifted, lifted_field)
+
+    residual = Residual(inner)
+    inferred = residual(field, SMALL_GRID, ELECTRON_COUNT)
+    assert Largest_Gap(residual.Forward(lifted_field, produced), inferred.values) < 1e-12
+
+    for law in CONSERVATION_LAWS:
+        conserving = Conserving(inner, law)
+        inferred = conserving(field, SMALL_GRID, ELECTRON_COUNT)
+        through_the_engine = conserving.Forward(produced, WEIGHT_EACH, lifted_count)
+        assert Largest_Gap(through_the_engine, inferred.values) < 1e-12, law
+
+    conditioned = Conditioned(inner, channels=2, condition_width=1, seed=33)
+    lifted_conditioning = engine.Lift(conditioned.parameter_values, requires_gradient=False)
+    inferred = conditioned(field, SMALL_GRID, ELECTRON_COUNT)
+    through_the_engine = conditioned.Forward(lifted_conditioning, produced, lifted_count)
+    assert Largest_Gap(through_the_engine, inferred.values) < 1e-12
+
+
+@pytest.mark.skipif(not Torch_Is_Available(), reason="torch is not installed yet")
+def Test_The_Zero_Mean_Law_Holds_Channel_By_Channel_On_Both_Paths() -> None:
+    """each channel's own mean, not the field's, and on the engine that trains as well as the one that infers"""
+    inner = PointwiseLift(hidden_channels=3, input_channels=2, seed=34)
+    field = Small_Field(2, seed=35)
+    wrapper = Conserving(inner, "zero_mean")
+    balanced = np.asarray(wrapper(field, SMALL_GRID).values, dtype=np.float64)
+    assert float(np.abs(balanced.mean(axis=(1, 2, 3))).max()) < 1e-14
+    # channels that already shared an offset would let a single global mean pass this unnoticed
+    before = np.asarray(inner(field, SMALL_GRID).values, dtype=np.float64).mean(axis=(1, 2, 3))
+    assert float(before.max() - before.min()) > 1e-3
+
+    engine = TorchEngine()
+    lifted = engine.Lift(inner.parameter_values, requires_gradient=False)
+    produced = inner.Forward(lifted, engine.Lift_Constant(np.asarray(field.values, dtype=np.float64)))
+    through_the_engine = np.asarray(wrapper.Forward(produced, WEIGHT_EACH), dtype=np.float64)
+    assert float(np.abs(through_the_engine.mean(axis=(1, 2, 3))).max()) < 1e-14
+
+
+@pytest.mark.skipif(not Torch_Is_Available(), reason="torch is not installed yet")
+def Test_The_Renormalized_Density_Lands_On_The_Requested_Count_On_Both_Paths() -> None:
+    """the archived fields integrate to their own count within 2e-7, so a scale left over here is model error"""
+    inner = PointwiseLift(hidden_channels=1, input_channels=1, seed=36)
+    field = Small_Field(1, seed=37)
+    wrapper = Conserving(inner, "renormalize_to_electron_count")
+    conserved = np.asarray(wrapper(field, SMALL_GRID, ELECTRON_COUNT).values, dtype=np.float64)
+    assert abs(float(conserved.sum()) * WEIGHT_EACH - 8.0) < 1e-13
+
+    scale = float(np.asarray(wrapper.Inspect()["last_renormalization_scale"]))
+    # a diagnostic that is not the factor actually applied diagnoses nothing
+    unscaled = np.asarray(inner(field, SMALL_GRID, ELECTRON_COUNT).values, dtype=np.float64)
+    assert Largest_Gap(conserved, unscaled * scale) < 1e-14
+
+    engine = TorchEngine()
+    lifted = engine.Lift(inner.parameter_values, requires_gradient=False)
+    produced = inner.Forward(lifted, engine.Lift_Constant(np.asarray(field.values, dtype=np.float64)))
+    lifted_count = engine.Lift_Constant(np.asarray(ELECTRON_COUNT.vector, dtype=np.float64))
+    through_the_engine = np.asarray(wrapper.Forward(produced, WEIGHT_EACH, lifted_count), dtype=np.float64)
+    assert abs(float(through_the_engine.sum()) * WEIGHT_EACH - 8.0) < 1e-13
+
+
+def Test_Each_Wrapper_Inspects_The_Operator_It_Wraps() -> None:
+    """a wrapper that swallowed its backbone's state would hide the whole model from every renderer"""
+    inner = PointwiseLift(hidden_channels=2, input_channels=2, seed=38)
+    field = Small_Field(2, seed=39)
+    conditioned = Conditioned(inner, channels=2, condition_width=1, seed=40)
+    wrappers: tuple[Operator[GridFunction, GridFunction], ...] = (
+        Residual(inner),
+        Conserving(inner, "zero_mean"),
+        Conserving(inner, "renormalize_to_electron_count"),
+        conditioned,
+    )
+    for wrapper in wrappers:
+        wrapper(field, SMALL_GRID, ELECTRON_COUNT)
+        inspected = wrapper.Inspect()
+        assert set(inspected) >= {f"inner.{name}" for name in inner.Inspect()}
+        for name, value in inner.Inspect().items():
+            assert np.array_equal(np.asarray(inspected[f"inner.{name}"]), np.asarray(value))
+    assert {"condition_scale_weights", "condition_shift_weights"} <= set(conditioned.Inspect())
 
 
 def Lone_Orbits(count: int) -> list[str]:

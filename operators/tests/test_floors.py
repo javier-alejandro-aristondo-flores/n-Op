@@ -5,6 +5,7 @@ import pytest
 
 from operators.data import (
     Apply_Standardized_Ridge,
+    Archive_Path,
     Basis_Decay_Gate,
     Fit_Per_Shell_Filter,
     Fit_Standardized_Ridge,
@@ -15,17 +16,20 @@ from operators.data import (
     Reconstruct,
     Reconstruction_Error_Curve,
 )
-from operators.metrics import Relative_L2
+from operators.metrics import Mean_Removed_Relative_L2, Relative_L2
 from operators.tasks import Card_Named
 from operators.training import Parameter_Field_Examples
 from operators.data.floors import (
     Apply_Per_Shell_Filter,
     COULOMB_CONSTANT,
+    Field,
     Ridge_Apply,
     Ridge_Fit,
+    Semilocal_Xc_Ridge_Features,
     Shell_Index_Grid,
     Spectral_Gradient_Magnitude_And_Laplacian,
 )
+from operators.data.stage0 import Eighty_Cubed_Block, Mean_Removed, Spin_Mean_Potential
 from operators.substrate import Cartesian_Wavevectors, Reciprocal_Rows
 
 
@@ -61,6 +65,39 @@ def Test_Spectral_Derivatives_Match_Closed_Forms() -> None:
     gradient, laplacian = Spectral_Gradient_Magnitude_And_Laplacian(field, lattice)
     assert np.allclose(gradient, np.abs(wavenumber * np.cos(wavenumber * x_coordinate)), atol=1e-9)
     assert np.allclose(laplacian, -(wavenumber**2) * field, atol=1e-9)
+
+
+def Test_The_Semilocal_Xc_Ridge_Features_Are_The_Three_Closed_Form_Fields() -> None:
+    """the stacked ridge columns are density, then the closed-form gradient magnitude and Laplacian"""
+    extent = 16
+    length = 2.0
+    lattice = np.eye(3) * length
+    coordinates = np.arange(extent) / extent * length
+    x_coordinate = coordinates[:, None, None] * np.ones((1, extent, extent))
+    wavenumber = 2.0 * np.pi / length
+    density = np.sin(wavenumber * x_coordinate)
+    features = Semilocal_Xc_Ridge_Features(density, lattice)
+    expected_gradient = np.abs(wavenumber * np.cos(wavenumber * x_coordinate))
+    expected_laplacian = -(wavenumber**2) * density
+    assert features.shape == (extent**3, 3)
+    assert np.allclose(features[:, 0], density.ravel())
+    assert np.allclose(features[:, 1], expected_gradient.ravel(), atol=1e-9)
+    assert np.allclose(features[:, 2], expected_laplacian.ravel(), atol=1e-9)
+
+
+def Test_The_Semilocal_Xc_Ridge_Recovers_A_Noiseless_Pointwise_Law() -> None:
+    """the standardized ridge on density, gradient and Laplacian features recovers an exact linear remainder"""
+    extent = 12
+    length = 3.0
+    lattice = np.eye(3) * length
+    coordinates = np.arange(extent) / extent * length
+    grid = coordinates[:, None, None] * np.ones((1, extent, extent))
+    density = 0.4 * np.sin(2.0 * np.pi * grid / length) + 0.1 * np.cos(4.0 * np.pi * grid / length) + 1.0
+    features = Semilocal_Xc_Ridge_Features(density, lattice)
+    true_coefficients = np.asarray([2.0, -1.5, 0.3])
+    remainder = features @ true_coefficients + 0.7
+    fitted = Fit_Standardized_Ridge(features, remainder, regularization=1e-10)
+    assert np.allclose(Apply_Standardized_Ridge(fitted, features), remainder, atol=1e-6)
 
 
 def Test_The_Shell_Filter_Recovers_A_Diagonal_Map() -> None:
@@ -195,3 +232,60 @@ def Test_The_Parameter_Floors_Land_Where_They_Were_Measured() -> None:
     assert ridge_median < copy_median
     # rank 32 reconstructs these fields to near nothing, so the error is all in the parameter map
     assert float(np.median(ceiling_errors)) < 1e-4
+
+
+@pytest.mark.pool
+def Test_The_Semilocal_Xc_Ridge_Floor_Beats_Hartree_Plus_Climatology() -> None:
+    """the ridge extension measured on the defect campaign, pinned against the committed report"""
+    train, evaluation, campaign_of = Eighty_Cubed_Block()
+    defect_train = [identifier for identifier in train if campaign_of[identifier] == "defect_set"][:80]
+    defect_evaluation = [identifier for identifier in evaluation if campaign_of[identifier] == "defect_set"]
+    assert len(defect_train) == 80
+    assert len(defect_evaluation) == 42
+
+    generator = np.random.default_rng(20260911)
+    remainder_sum: Field | None = None
+    feature_rows: list[Field] = []
+    target_rows: list[Field] = []
+    for identifier in defect_train:
+        with np.load(Archive_Path("defect_set", identifier)) as archive:
+            density = np.asarray(archive["charge_density"], dtype=np.float64)
+            lattice = np.asarray(archive["lattice"], dtype=np.float64)
+        hartree = Hartree_Potential(density, lattice)
+        remainder = Mean_Removed(Spin_Mean_Potential("defect_set", identifier)) - Mean_Removed(hartree)
+        remainder_sum = remainder if remainder_sum is None else remainder_sum + remainder
+        features = Semilocal_Xc_Ridge_Features(density, lattice)
+        chosen = generator.choice(features.shape[0], size=2000, replace=False)
+        feature_rows.append(features[chosen])
+        target_rows.append(remainder.ravel()[chosen])
+    assert remainder_sum is not None
+    climatology = remainder_sum / len(defect_train)
+    fitted = Fit_Standardized_Ridge(np.concatenate(feature_rows), np.concatenate(target_rows))
+
+    hartree_errors: list[float] = []
+    climatology_errors: list[float] = []
+    combined_errors: list[float] = []
+    ridge_errors: list[float] = []
+    for identifier in defect_evaluation:
+        with np.load(Archive_Path("defect_set", identifier)) as archive:
+            density = np.asarray(archive["charge_density"], dtype=np.float64)
+            lattice = np.asarray(archive["lattice"], dtype=np.float64)
+        truth = Mean_Removed(Spin_Mean_Potential("defect_set", identifier))
+        hartree = Mean_Removed(Hartree_Potential(density, lattice))
+        hartree_errors.append(Relative_L2(hartree, truth))
+        climatology_errors.append(Relative_L2(climatology, truth))
+        combined_errors.append(Relative_L2(hartree + climatology, truth))
+        predicted_remainder = Apply_Standardized_Ridge(fitted, Semilocal_Xc_Ridge_Features(density, lattice))
+        ridge_errors.append(Mean_Removed_Relative_L2(hartree + predicted_remainder.reshape(density.shape), truth))
+
+    hartree_median = float(np.median(hartree_errors))
+    climatology_median = float(np.median(climatology_errors))
+    combined_median = float(np.median(combined_errors))
+    ridge_median = float(np.median(ridge_errors))
+    assert 1.575 < hartree_median < 1.605
+    assert 0.610 < climatology_median < 0.625
+    assert 0.565 < combined_median < 0.580
+    assert 0.550 < ridge_median < 0.568
+    # the pointwise ridge only sees each voxel's own density features, not its grid position, so it
+    # edges past the positionally-templated climatology rather than routing around it
+    assert ridge_median < combined_median

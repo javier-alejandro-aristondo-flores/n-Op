@@ -187,6 +187,12 @@ def Spectral_Gradient_Magnitude_And_Laplacian(field: Field, lattice: Field) -> t
     return np.sqrt(gradient_squared), laplacian
 
 
+def Semilocal_Xc_Ridge_Features(density: Field, lattice: Field) -> Field:
+    """density, gradient magnitude and Laplacian stacked as pointwise ridge feature columns"""
+    gradient, laplacian = Spectral_Gradient_Magnitude_And_Laplacian(density, lattice)
+    return np.stack([density.ravel(), gradient.ravel(), laplacian.ravel()], axis=1)
+
+
 def Ridge_Fit(features: Field, targets: Field, regularization: float = 1e-6) -> Field:
     """ridge coefficients, with an intercept column appended"""
     design = np.concatenate([features, np.ones((features.shape[0], 1))], axis=1)

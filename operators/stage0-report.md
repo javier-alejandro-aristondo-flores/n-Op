@@ -34,12 +34,16 @@ Cubic-block folds: 261 train runs, 76 evaluation runs (fold 0).
 - Hartree only: median 159.22% mean-removed relative L2
 - climatology only: median 61.92%
 - Hartree + climatology: median 57.26% over 42 held-out runs
+- Hartree + semilocal-XC ridge: median 56.20% over 42 held-out runs
 - the units test passes when the combined floor beats both of its parts
 - the raw Hartree term anti-correlates with the total potential (electrons pile up where
   ionic attraction is deepest), which is why Hartree alone exceeds one hundred percent;
   the analytic single-mode test validates the conventions independently
-- the semilocal exchange-correlation ridge extension of this floor is pending; it lands
-  with the cross-fidelity implementation specifications
+- the ridge fits density, gradient magnitude and Laplacian pointwise against the same
+  remainder the climatology averages, trained on the same runs; it is coordinate-blind
+  where the climatology is a positional template over near-identical defect geometries,
+  so it only edges past Hartree + climatology, and this combination is now the canonical
+  ρ→V floor every entry cites
 
 ## Semilocal pointwise localization floor (per-spin ridge on density features)
 

@@ -21,6 +21,7 @@ from operators.data.floors import (
     Ridge_Apply,
     Ridge_Fit,
     Scissor_Floor,
+    Semilocal_Xc_Ridge_Features,
     StandardizedRidge,
     Strain_Pairs,
     Superposed_Atomic_Density_Errors,

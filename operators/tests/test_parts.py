@@ -1,5 +1,8 @@
 """the shared encoders, readouts, compositions and wrappers"""
 
+import tomllib
+from pathlib import Path
+
 import numpy as np
 import pytest
 
@@ -27,7 +30,17 @@ from operators.readouts import (
     RampedCoordinateFeatures,
 )
 from operators.substrate import NumpyEngine
-from operators.wrappers import Conditioned, Conserving, Residual
+from operators.wrappers import (
+    Conditioned,
+    ConformalCalibrator,
+    Conserving,
+    Coverage_Deviation,
+    Coverage_Guarantee,
+    Nonconformity_Scores,
+    Residual,
+)
+
+CONFIGURATION_DIRECTORY = Path(__file__).resolve().parent.parent / "residual_correction" / "configs"
 
 CUBE = Domain(lattice=np.eye(3) * 2.0)
 
@@ -383,3 +396,100 @@ def Test_The_Conservation_Laws_Are_Named_Apart() -> None:
     scaled = renormalizing.Inspect()
     assert "last_renormalization_scale" in scaled and "last_removed_mean" not in scaled
     assert np.asarray(scaled["last_renormalization_scale"]).ndim == 0
+
+
+def Lone_Orbits(count: int) -> list[str]:
+    """one exchangeable unit per run, which is the loosest the calibrator is ever given"""
+    return [f"orbit_{place}" for place in range(count)]
+
+
+def Test_The_Offset_Sits_At_The_Rank_A_Finite_Calibration_Set_Needs() -> None:
+    """the claim is distribution-free only at the rank the sample size pays for"""
+    truth = np.arange(1.0, 61.0) / 60.0
+    calibrator = ConformalCalibrator(level=0.90)
+    # an interval pinned on zero makes each run's score its own truth, which is the rank we can read
+    offset = calibrator.Calibrate(np.zeros(60), np.zeros(60), truth, Lone_Orbits(60))
+    assert abs(offset - 55.0 / 60.0) < 1e-12
+    widened = calibrator(np.zeros(4), np.zeros(4))
+    assert np.allclose(widened.upper - widened.lower, 2.0 * offset)
+
+
+def Test_The_Guarantee_Reproduces_The_Numbers_The_Suite_Recorded() -> None:
+    """the suite states the arithmetic in the document, and this is it"""
+    guarantee_low, guarantee_high = Coverage_Guarantee(60, 0.90)
+    assert guarantee_low == 0.90
+    assert round(guarantee_high, 3) == 0.916
+    assert abs(Coverage_Deviation(60, 0.90) - 0.04) < 0.002
+    assert abs(Coverage_Deviation(90, 0.90) - 0.032) < 0.001
+
+
+def Test_A_Crowded_Orbit_Cannot_Buy_A_Wider_Interval() -> None:
+    """1,291 points are 299 units, and a forty-copy orbit is one of them"""
+    crowded = np.full(40, 10.0)
+    lone = np.ones(20)
+    truth = np.concatenate([crowded, lone])
+    unit_keys = ["one_orbit"] * 40 + Lone_Orbits(20)
+    calibrator = ConformalCalibrator(level=0.90)
+    offset = calibrator.Calibrate(np.zeros(60), np.zeros(60), truth, unit_keys)
+    assert int(np.asarray(calibrator.Inspect()["calibration_unit_count"])) == 21
+    assert abs(offset - 1.0) < 1e-12
+    # counting the points instead of the units would have read the crowded orbit's 10.0 here
+    counted_by_point = ConformalCalibrator(level=0.90)
+    assert abs(counted_by_point.Calibrate(np.zeros(60), np.zeros(60), truth, Lone_Orbits(60)) - 10.0) < 1e-12
+
+
+def Test_The_Calibrated_Interval_Covers_Held_Out_Units_At_Its_Level() -> None:
+    """a head whose own quantiles cover 38% of the time is dragged up to its stated 90%"""
+    generator = np.random.default_rng(2026)
+    unit_count = 299
+    calibration_truth = generator.normal(size=unit_count)
+    calibrator = ConformalCalibrator(level=0.90)
+    calibrator.Calibrate(
+        np.full(unit_count, -0.5), np.full(unit_count, 0.5), calibration_truth, Lone_Orbits(unit_count)
+    )
+    held_out = generator.normal(size=4000)
+    widened = calibrator(np.full(4000, -0.5), np.full(4000, 0.5))
+    covered = float(np.mean((widened.lower <= held_out) & (held_out <= widened.upper)))
+    uncalibrated = float(np.mean(np.abs(held_out) <= 0.5))
+    assert uncalibrated < 0.45
+    guarantee_low, guarantee_high = Coverage_Guarantee(unit_count, 0.90)
+    # one calibration draw scatters by its own deviation, and three of those is the honest band
+    assert guarantee_low - 3.0 * Coverage_Deviation(unit_count, 0.90) <= covered <= guarantee_high + 0.03
+
+
+def Test_A_Field_Score_Is_The_Largest_Miss_Anywhere_In_The_Run() -> None:
+    """a band over a whole field is only honest if one bad voxel costs the whole run"""
+    lower = np.zeros((2, 1, 2, 2, 2))
+    upper = np.ones((2, 1, 2, 2, 2))
+    truth = np.full((2, 1, 2, 2, 2), 0.7)
+    truth[0, 0, 1, 1, 1] = 3.0
+    scores = Nonconformity_Scores(lower, upper, truth)
+    assert abs(float(scores[0]) - 2.0) < 1e-12
+    assert abs(float(scores[1]) + 0.3) < 1e-12
+
+
+def Test_Too_Few_Units_Cannot_Carry_The_Claim() -> None:
+    """at five units no offset makes a 90 percent distribution-free statement true"""
+    calibrator = ConformalCalibrator(level=0.90)
+    with pytest.raises(ValueError):
+        calibrator.Calibrate(np.zeros(5), np.zeros(5), np.arange(5.0), Lone_Orbits(5))
+
+
+def Test_An_Uncalibrated_Calibrator_Widens_Nothing() -> None:
+    """an interval with no calibration behind it carries no guarantee, so it is refused"""
+    calibrator = ConformalCalibrator()
+    assert set(calibrator.Inspect()) == {"requested_level", "exchangeable_unit"}
+    with pytest.raises(ValueError):
+        calibrator(np.zeros(3), np.ones(3))
+
+
+def Test_The_Calibrator_Is_Built_From_The_Configuration_As_It_Is_Written() -> None:
+    """the configuration files were written before the calibrator, and they name its arguments"""
+    configurations = sorted(CONFIGURATION_DIRECTORY.glob("*.toml"))
+    assert len(configurations) == 2
+    for configuration_path in configurations:
+        settings = tomllib.loads(configuration_path.read_text())
+        calibrator = ConformalCalibrator(**settings["conformal"])
+        assert calibrator.level == 0.90
+        assert calibrator.unit == "symmetry_orbit"
+        assert str(calibrator.Inspect()["exchangeable_unit"]) == "symmetry_orbit"

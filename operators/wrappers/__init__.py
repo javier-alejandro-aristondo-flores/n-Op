@@ -1,11 +1,16 @@
-"""conservation, residual and conditioning behavior around inner operators"""
+"""conservation, residual and conditioning behavior around inner operators, and the conformal calibrator"""
 
+from collections.abc import Sequence
+from dataclasses import dataclass
 from typing import Literal
 
 import numpy as np
 from numpy.typing import NDArray
 
 from operators.framework import Array, Coefficients, Discretization, GridFunction, Operator, Quadrature_Weights
+from operators.metrics import Median_Per_Unit
+
+SYMMETRY_ORBIT = "symmetry_orbit"
 
 
 class Conserving(Operator[GridFunction, GridFunction]):
@@ -121,4 +126,92 @@ class Conditioned(Operator[GridFunction, GridFunction]):
     def Inspect(self) -> dict[str, Array]:
         state: dict[str, Array] = {f"inner.{name}": value for name, value in self.inner.Inspect().items()}
         state.update(self.parameter_values)
+        return state
+
+
+@dataclass(frozen=True, slots=True)
+class ConformalInterval:
+    """a two-quantile prediction after the calibrated offset has widened it"""
+
+    lower: NDArray[np.float64]
+    upper: NDArray[np.float64]
+
+
+def Nonconformity_Scores(
+    lower: NDArray[np.float64], upper: NDArray[np.float64], truth: NDArray[np.float64]
+) -> NDArray[np.float64]:
+    """one score per run: the largest amount the interval misses the truth by anywhere in it"""
+    missed_low = np.asarray(lower, dtype=np.float64) - np.asarray(truth, dtype=np.float64)
+    missed_high = np.asarray(truth, dtype=np.float64) - np.asarray(upper, dtype=np.float64)
+    worst = np.maximum(missed_low, missed_high)
+    return np.asarray(worst.reshape(worst.shape[0], -1).max(axis=1), dtype=np.float64)
+
+
+def Conformal_Offset(unit_scores: NDArray[np.float64], level: float) -> float:
+    """the score at the rank a finite calibration set needs for the level to hold"""
+    unit_count = int(unit_scores.shape[0])
+    rank = int(np.ceil((unit_count + 1) * level))
+    if rank > unit_count:
+        raise ValueError(f"{unit_count} units cannot carry a {level:.2f} claim, which needs at least {rank}")
+    return float(np.sort(unit_scores)[rank - 1])
+
+
+def Coverage_Guarantee(unit_count: int, level: float) -> tuple[float, float]:
+    """the band the marginal coverage is guaranteed to land in, at this many units"""
+    return level, level + 1.0 / (unit_count + 1)
+
+
+def Coverage_Deviation(unit_count: int, level: float) -> float:
+    """the spread of realized coverage across calibration sets of this size"""
+    return float(np.sqrt(level * (1.0 - level) / unit_count))
+
+
+class ConformalCalibrator:
+    """split-conformal offsets for a two-quantile head, calibrated over exchangeable units"""
+
+
+    def __init__(self, level: float = 0.90, unit: str = SYMMETRY_ORBIT) -> None:
+        self.level = level
+        self.unit = unit
+        self.offset: float | None = None
+        self.unit_scores = np.zeros(0, dtype=np.float64)
+
+
+    def Calibrate(
+        self,
+        lower: NDArray[np.float64],
+        upper: NDArray[np.float64],
+        truth: NDArray[np.float64],
+        unit_keys: Sequence[str],
+    ) -> float:
+        """the offset the held-out units require, remembered and returned"""
+        self.unit_scores = Median_Per_Unit(Nonconformity_Scores(lower, upper, truth), unit_keys)
+        self.offset = Conformal_Offset(self.unit_scores, self.level)
+        return self.offset
+
+
+    def __call__(self, lower: NDArray[np.float64], upper: NDArray[np.float64]) -> ConformalInterval:
+        """the two quantiles widened by the calibrated offset"""
+        if self.offset is None:
+            raise ValueError("the calibrator has no offset until it has seen a calibration set")
+        return ConformalInterval(
+            np.asarray(lower, dtype=np.float64) - self.offset, np.asarray(upper, dtype=np.float64) + self.offset
+        )
+
+
+    def Inspect(self) -> dict[str, Array]:
+        state: dict[str, Array] = {
+            "requested_level": np.asarray(self.level),
+            "exchangeable_unit": np.asarray(self.unit),
+        }
+        if self.offset is None:
+            return state
+        unit_count = int(self.unit_scores.shape[0])
+        guarantee_low, guarantee_high = Coverage_Guarantee(unit_count, self.level)
+        state["calibration_unit_scores"] = self.unit_scores
+        state["calibration_unit_count"] = np.asarray(unit_count)
+        state["conformal_offset"] = np.asarray(self.offset)
+        state["coverage_guarantee_low"] = np.asarray(guarantee_low)
+        state["coverage_guarantee_high"] = np.asarray(guarantee_high)
+        state["coverage_deviation"] = np.asarray(Coverage_Deviation(unit_count, self.level))
         return state

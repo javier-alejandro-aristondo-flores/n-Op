@@ -11,8 +11,16 @@ from numpy.typing import NDArray
 
 from operators.framework import Array
 from operators.inspection import Render_Curves
-from operators.substrate import Adam_Step, AdamState, Engine, Fresh_Adam_State, ParameterSet, Precision
-from operators.training.hardware import DeviceChoice, Device_Name_Of, Training_Engine
+from operators.substrate import (
+    Adam_Step,
+    AdamState,
+    Device_Name_Of,
+    Engine,
+    Fresh_Adam_State,
+    ParameterSet,
+    Precision,
+)
+from operators.training.hardware import DeviceChoice, Training_Engine
 from operators.training.sampling import BatchSource, TrainingBatch
 
 type LiftedArrays = dict[str, Any]

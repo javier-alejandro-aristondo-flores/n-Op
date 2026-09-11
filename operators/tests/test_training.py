@@ -10,7 +10,10 @@ from numpy.typing import NDArray
 
 from operators.framework import Array
 from operators.substrate import (
+    ACCELERATOR_DEVICE_NAME,
+    Accelerator_Is_Available,
     Engine,
+    HOST_DEVICE_NAME,
     Least_Squares_Solution,
     NumpyEngine,
     ParameterSet,
@@ -21,13 +24,10 @@ from operators.substrate import (
 from operators.data import Strain_Tensor_Of
 from operators.tasks import Card_Named
 from operators.training import (
-    ACCELERATOR_DEVICE_NAME,
     AUXILIARY_PROBE_ROLE,
-    Accelerator_Is_Available,
     Aligned_Energy_Grid,
     BatchSource,
     FixedBatches,
-    HOST_DEVICE_NAME,
     Lattice_Factors_Of,
     Paired_Field_Examples,
     Parameter_Field_Examples,

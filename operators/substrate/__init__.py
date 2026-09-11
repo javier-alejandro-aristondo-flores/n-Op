@@ -3,6 +3,13 @@
 # pyright: reportUnusedImport=false
 
 from operators.substrate.arrays import NUMPY_DTYPE_BY_PRECISION, ArrayLike, Precision
+from operators.substrate.devices import (
+    ACCELERATOR_DEVICE_NAME,
+    Accelerator_Is_Available,
+    Device_Name_Of,
+    HOST_DEVICE_NAME,
+    Preferred_Device_Name,
+)
 from operators.substrate.engine import Engine, NumpyEngine, ParameterSet
 from operators.substrate.fourier import (
     COMPLEX_DTYPE_BY_PRECISION,

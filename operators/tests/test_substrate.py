@@ -7,8 +7,13 @@ import numpy as np
 import pytest
 
 from operators.substrate import (
+    ACCELERATOR_DEVICE_NAME,
+    Accelerator_Is_Available,
     Adam_Step,
+    Device_Name_Of,
     Engine,
+    HOST_DEVICE_NAME,
+    Preferred_Device_Name,
     Fresh_Adam_State,
     Fourier_Transform_3d,
     Gaussian_Error_Linear_Unit,
@@ -92,6 +97,47 @@ def Test_A_Single_Precision_Engine_Never_Promotes_To_Double() -> None:
     # the hazard this design exists for: a double constant meeting the graph promotes it back, and nothing raises
     promoted = produced - TorchEngine().Lift_Constant(np.zeros((4, 2)))
     assert str(promoted.dtype) == "torch.float64"
+
+
+def Forward_Devices_And_Widths(engine: TorchEngine) -> tuple[set[str], set[str]]:
+    """the devices and the widths every tensor of one whole forward actually lands on"""
+    network = MultilayerPerceptron(layer_widths=(3, 8, 2), name_prefix="probe", seed=5)
+    lifted = engine.Lift(network.parameter_values, requires_gradient=True)
+    produced = network.Forward(lifted, engine.Lift_Constant(np.zeros((4, 3))))
+    reached = [*lifted.values(), produced]
+    return {tensor.device.type for tensor in reached}, {str(tensor.dtype) for tensor in reached}
+
+
+def Test_No_Card_Answering_Means_The_Host_Is_What_Is_Preferred() -> None:
+    """asserts the preference is the card exactly when this machine has one, and the host otherwise"""
+    available = Accelerator_Is_Available()
+    assert Preferred_Device_Name() == (ACCELERATOR_DEVICE_NAME if available else HOST_DEVICE_NAME)
+    # a machine without the foreign package has no card either, whatever else it may have
+    assert not available or Torch_Is_Available()
+    assert Device_Name_Of(NumpyEngine()) == HOST_DEVICE_NAME
+
+
+@pytest.mark.skipif(not Torch_Is_Available(), reason="torch is not installed yet")
+def Test_A_Device_Name_Is_Obeyed_And_Not_Merely_Accepted() -> None:
+    """asserts the host word keeps a whole forward on the host, which nothing would otherwise raise about"""
+    engine = TorchEngine(device_name=HOST_DEVICE_NAME)
+    devices, widths = Forward_Devices_And_Widths(engine)
+    assert devices == {HOST_DEVICE_NAME}
+    assert widths == {"torch.float64"}
+    assert Device_Name_Of(engine) == HOST_DEVICE_NAME
+
+
+@pytest.mark.skipif(not Accelerator_Is_Available(), reason="this machine reports no accelerator")
+def Test_The_Preferred_Device_Is_Where_The_Forward_Actually_Lands() -> None:
+    """asserts the preferred name is the device the graph reaches, at the narrow width it was asked for"""
+    preferred = Preferred_Device_Name()
+    assert preferred != HOST_DEVICE_NAME
+    engine = TorchEngine(device_name=preferred, working_precision="single")
+    devices, widths = Forward_Devices_And_Widths(engine)
+    assert devices == {preferred}
+    # the silent failure this guards: a graph that reverts to double on the card raises nothing at all
+    assert widths == {"torch.float32"}
+    assert Device_Name_Of(engine) == preferred
 
 
 def Test_The_Nonlinearities_Have_Their_Known_Values() -> None:

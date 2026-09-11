@@ -1,7 +1,13 @@
-"""split-aware loading and the engine-facet training loop"""
+"""split-aware loading, the fields it holds resident, the batches drawn from them and the training loop"""
 
 # pyright: reportUnusedImport=false
 
+from operators.training.cache import (
+    Build_Field_Cache,
+    CachedField,
+    Cached_Field_Statistics,
+    FieldCache,
+)
 from operators.training.loader import (
     AUXILIARY_PROBE_ROLE,
     Aligned_Energy_Grid,
@@ -22,3 +28,11 @@ from operators.training.loader import (
     TrainingExample,
 )
 from operators.training.loop import Train, TrainingResult
+from operators.training.sampling import (
+    Batch_Of_Fields,
+    BatchArray,
+    BatchSource,
+    Evenly_Spaced_Flat_Indices,
+    PointSampledBatches,
+    TrainingBatch,
+)

@@ -73,6 +73,34 @@ def Batch_Of_Fields(
     )
 
 
+class FixedBatches(BatchSource):
+    """one batch handed back on every step, for a caller holding its whole training set at once"""
+
+
+    def __init__(self, batch: TrainingBatch, validation_batch: TrainingBatch | None = None) -> None:
+        self.batch = batch
+        self.validation_batch = batch if validation_batch is None else validation_batch
+        self.held: tuple[tuple[str, TrainingBatch], ...] = (("whole_batch", self.validation_batch),)
+
+
+    def Next_Batch(self, generator: np.random.Generator) -> TrainingBatch:
+        """the one batch, handed back without spending the generator so a replay reaches the same place"""
+        return self.batch
+
+
+    def Validation_Batches(self) -> tuple[tuple[str, TrainingBatch], ...]:
+        """the single unit this source can offer, which is the whole batch unless one was held out"""
+        return self.held
+
+
+    def Inspect(self) -> dict[str, Array]:
+        """the fixed batch's own arrays, and the held-out batch's beside them"""
+        state: dict[str, Array] = {f"batch_{name}": array for name, array in self.batch.Inspect().items()}
+        for name, array in self.validation_batch.Inspect().items():
+            state[f"validation_{name}"] = array
+        return state
+
+
 class PointSampledBatches(BatchSource):
     """runs drawn with replacement, and fresh points drawn inside each of them every step"""
 

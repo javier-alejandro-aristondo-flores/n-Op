@@ -39,7 +39,13 @@ from operators.inspection import (
 from operators.metrics import Relative_L2
 from operators.substrate import ParameterSet, TorchEngine
 from operators.tasks import Card_Named
-from operators.training import Parameter_Field_Examples, Strain_Assignments_By_Run, Train
+from operators.training import (
+    FixedBatches,
+    Parameter_Field_Examples,
+    Strain_Assignments_By_Run,
+    Train,
+    TrainingBatch,
+)
 
 REPORT_PATH = Path(__file__).parent / "report.md"
 FIGURES_PATH = Path(__file__).parent / "figures"
@@ -125,12 +131,14 @@ def Trained_Member_Predictions(
         axis=1,
     )
     parameter_width = train.parameters.shape[1]
+    whole_batch = FixedBatches(TrainingBatch({"rows": batch}))
     member = Principal_Component_Network(basis, COMMON_GRID_SHAPE, parameter_width, HIDDEN_WIDTHS)
 
-    def Coefficient_Loss(lifted: dict[str, Any], lifted_batch: Any) -> Any:
+    def Coefficient_Loss(lifted: dict[str, Any], lifted_batch: dict[str, Any]) -> Any:
         """mean squared error between the branch's coefficients and the projected truth"""
-        predicted = member.Forward_Coefficients(lifted, lifted_batch[:, :parameter_width])
-        residuals = predicted - lifted_batch[:, parameter_width:]
+        rows = lifted_batch["rows"]
+        predicted = member.Forward_Coefficients(lifted, rows[:, :parameter_width])
+        residuals = predicted - rows[:, parameter_width:]
         return (residuals * residuals).mean()
 
     def Rebuild(values: dict[str, NDArray[np.float64]], block: StrainBlock) -> NDArray[np.float64]:
@@ -148,7 +156,7 @@ def Trained_Member_Predictions(
             TorchEngine(),
             ParameterSet(values=member.Parameter_Values()),
             Coefficient_Loss,
-            [batch],
+            whole_batch,
             step_count=step_count,
             learning_rate=3e-3,
             run_name=f"principal_component_{train.functional}_{step_count}",

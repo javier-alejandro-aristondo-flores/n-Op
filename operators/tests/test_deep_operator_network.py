@@ -12,6 +12,7 @@ from operators.data import Gram_Pod, Project
 from operators.deep_operator_network import (
     CONFIGURATIONS,
     DeepOperatorNetwork,
+    Pointwise_Statistics,
     Principal_Component_Network,
     Proper_Orthogonal_Network,
 )
@@ -176,6 +177,20 @@ def Test_The_Pointwise_Standardized_Readout_Is_Not_A_Global_Rescaling_In_Disguis
     varying_field = np.asarray(varying(coefficients, GridSpec((4, 4, 4))).values)
     uniform_field = np.asarray(uniform(coefficients, GridSpec((4, 4, 4))).values)
     assert not np.allclose(varying_field, uniform_field)
+
+
+def Test_A_Constant_Voxel_Does_Not_Make_The_Readout_Non_Finite() -> None:
+    """a voxel with no spread across the training block is guarded rather than divided by zero"""
+    generator = np.random.default_rng(11)
+    training_fields = np.asarray(generator.normal(size=(20, 64)), dtype=np.float64)
+    # one voxel that never moves across every training run, the case the guard exists for
+    training_fields[:, 0] = 3.0
+    voxel_mean, voxel_scale = Pointwise_Statistics(training_fields)
+    assert voxel_scale[0] == 1.0
+    basis = Gram_Pod((training_fields - voxel_mean) / voxel_scale, rank=6)
+    readout = PointwiseStandardizedExpansion(basis, (4, 4, 4), voxel_mean, voxel_scale)
+    produced = readout(Coefficients(vector=np.ones(6), domain=CUBE), GridSpec((4, 4, 4)))
+    assert np.isfinite(np.asarray(produced.values)).all()
 
 
 def Test_The_Proper_Orthogonal_Member_Collects_Its_Offset_Beside_The_Branch_Arrays() -> None:

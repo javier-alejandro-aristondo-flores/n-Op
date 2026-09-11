@@ -73,6 +73,15 @@ def Principal_Component_Network(
     return DeepOperatorNetwork(branch, FixedModeExpansion(basis, grid_shape), "principal_component")
 
 
+def Pointwise_Statistics(training_fields: NDArray[np.float64]) -> tuple[NDArray[np.float64], NDArray[np.float64]]:
+    """each voxel's own mean and spread across a training block, spread guarded away from zero"""
+    voxel_mean = training_fields.mean(axis=0)
+    voxel_scale = training_fields.std(axis=0)
+    # a voxel with no spread across every training run would otherwise divide by zero
+    voxel_scale[voxel_scale == 0.0] = 1.0
+    return voxel_mean, voxel_scale
+
+
 def Proper_Orthogonal_Network(
     basis: PodBasis,
     grid_shape: tuple[int, int, int],

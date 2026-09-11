@@ -33,10 +33,28 @@ reason; the interface earns tenure by surviving two real implementations.
 
 ## Configurations
 
-`canonical` (learned branch and trunk) · `proper_orthogonal` (output basis fixed from the
-training fields) · `principal_component` (fixed bases both sides; its linear form is
-simultaneously the suite floor that kills unearned nonlinearity) · `energy_trunk` (the trunk runs
-over energy, giving the density-of-states operator).
+`canonical` (learned branch and trunk) · `proper_orthogonal` (basis fit on a per-voxel standardized
+training block, with one learned offset added on top) · `principal_component` (fixed bases both
+sides; its linear form is simultaneously the suite floor that kills unearned nonlinearity) ·
+`energy_trunk` (the trunk runs over energy, giving the density-of-states operator).
+
+**What actually tells `proper_orthogonal` apart from `principal_component` took two corrections to
+find, and both are worth recording so the next person does not re-derive them.** First: modes and
+the training mean are not the difference — `FixedModeExpansion` already adds the training mean back
+on every call, and both configurations fit their basis on training-fold-only data by the identical
+`Gram_Pod` call (verified empirically, not just read: a rank-32 ceiling computed independently
+reproduces report.md's committed 0.000017 to all six digits). Second: the explicit learned bias
+from the published POD-DeepONet form is real but measures as a structural zero here — `Gram_Pod`
+centers on the mean, so the projection residual it leaves behind sums to exactly zero over the same
+training block the basis was fit on, at any rank, whether or not the fields were standardized
+first. The bias is kept (`BiasedModeExpansion`, and `output_bias` on the configuration's own
+readout) because it is faithful to the published form and costs one scalar, not because it moves
+the number. The actual difference is pointwise output standardization: each voxel's own mean and
+spread across the training runs, computed because this configuration lives on a same-shape block
+where per-voxel statistics exist (unlike `canonical`, which spans varying grids and is why decision
+D5 chose global standardization there instead) — the fields are standardized voxel-by-voxel before
+`Gram_Pod` ever runs, so the modes themselves are fit in a different space, not merely rescaled
+after the fact.
 
 ## Floors and kill thresholds
 
@@ -66,8 +84,11 @@ needs something the dict does not carry, the dict is what is wrong.
 **The readout** depends on the configuration, and the two sets are disjoint. The fixed-basis
 configurations publish the modes as fields (`readout.basis_modes`, shaped rank × grid), the
 training mean as a field (`readout.basis_mean`), the spectrum (`readout.basis_singular_values`)
-and the coefficients last predicted (`readout.last_coefficients`). The coordinate-trunk
-configurations publish the trunk's weights and biases instead, plus the features it last read
+and the coefficients last predicted (`readout.last_coefficients`). `proper_orthogonal` additionally
+publishes its learned offset (`readout.output_bias`) and the two arrays that carry its actual
+distinction — the per-voxel mean and spread its basis was standardized against
+(`readout.voxel_mean`, `readout.voxel_scale`), both fields. The coordinate-trunk configurations
+publish the trunk's weights and biases instead, plus the features it last read
 (`readout.last_trunk_features`), shaped as fields when the query was a grid and as a plain
 points-by-features table when it was not.
 
@@ -89,4 +110,7 @@ which is exactly the egress the suite document permits.
 
 Measured, and in `report.md`; regenerate both it and the figures with
 `python -m operators.deep_operator_network.report`. The `principal_component` configuration is
-built and judged; `proper_orthogonal`, `canonical` and `energy_trunk` follow.
+built and judged there. `proper_orthogonal` is now built too, assembled by
+`Proper_Orthogonal_Network` on the same split and basis rank, but its measured numbers are not yet
+folded into the committed report or figures — those are regenerated separately, as one deliberate
+step. `canonical` and `energy_trunk` remain declared, not built.

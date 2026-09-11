@@ -253,3 +253,148 @@ class FixedModeExpansion(Operator[Coefficients, GridFunction]):
         if self.last_coefficients is not None:
             state["last_coefficients"] = self.last_coefficients
         return state
+
+
+class BiasedModeExpansion(Operator[Coefficients, GridFunction]):
+    """branch coefficients carried onto a field by fixed modes, the training mean and one learned offset"""
+
+
+    def __init__(self, basis: PodBasis, grid_shape: tuple[int, int, int]) -> None:
+        self.basis = basis
+        self.grid_shape = grid_shape
+        # the offset is the readout's only trained array, held apart from the fixed modes and mean
+        self.parameter_values: dict[str, NDArray[np.float64]] = {"output_bias": np.zeros(1)}
+        self.last_coefficients: NDArray[np.float64] | None = None
+
+
+    def Forward(self, lifted: dict[str, Any], branch_vector: Any, basis_modes: Any, basis_mean: Any) -> Any:
+        """the published form, modes weighted by the branch, the training mean and the learned offset"""
+        return branch_vector @ basis_modes + basis_mean + lifted["output_bias"]
+
+
+    def Lifted_Constants(self, engine: Engine) -> tuple[Any, Any]:
+        """the modes and mean as engine constants, so gradients reach only the branch and the offset"""
+        return engine.Lift_Constant(self.basis.modes), engine.Lift_Constant(self.basis.mean)
+
+
+    def __call__(
+        self,
+        input_function: Coefficients,
+        output_discretization: Discretization,
+        condition: Coefficients | None = None,
+    ) -> GridFunction:
+        coefficients = np.asarray(input_function.vector, dtype=np.float64)
+        self.last_coefficients = coefficients
+        produced = np.asarray(
+            self.Forward(self.parameter_values, coefficients, self.basis.modes, self.basis.mean), dtype=np.float64
+        )
+        cell_volume = abs(float(np.linalg.det(np.asarray(input_function.domain.lattice))))
+        quadrature = UniformGridQuadrature(cell_volume, produced.size)
+        return GridFunction(
+            produced.reshape(1, *self.grid_shape),
+            ("predicted_field",),
+            input_function.domain,
+            quadrature,
+        )
+
+
+    def Inspect(self) -> dict[str, Array]:
+        # a mode is a field, so it is inspected with the shape that makes it one
+        state: dict[str, Array] = {
+            "basis_modes": self.basis.modes.reshape(self.basis.modes.shape[0], *self.grid_shape),
+            "basis_singular_values": self.basis.singular_values,
+            "basis_mean": self.basis.mean.reshape(self.grid_shape),
+            "output_bias": self.parameter_values["output_bias"],
+        }
+        if self.last_coefficients is not None:
+            state["last_coefficients"] = self.last_coefficients
+        return state
+
+
+class PointwiseStandardizedExpansion(Operator[Coefficients, GridFunction]):
+    """fixed modes read in a per-voxel standardized field, carried back to the training block's scale"""
+
+
+    def __init__(
+        self,
+        basis: PodBasis,
+        grid_shape: tuple[int, int, int],
+        voxel_mean: NDArray[np.float64],
+        voxel_scale: NDArray[np.float64],
+    ) -> None:
+        self.basis = basis
+        self.grid_shape = grid_shape
+        # each voxel's own mean and spread across the training runs, fixed rather than trained
+        self.voxel_mean = voxel_mean
+        self.voxel_scale = voxel_scale
+        # the offset is the readout's only trained array, held apart from every fixed statistic
+        self.parameter_values: dict[str, NDArray[np.float64]] = {"output_bias": np.zeros(1)}
+        self.last_coefficients: NDArray[np.float64] | None = None
+
+
+    def Forward(
+        self,
+        lifted: dict[str, Any],
+        branch_vector: Any,
+        basis_modes: Any,
+        basis_mean: Any,
+        voxel_mean: Any,
+        voxel_scale: Any,
+    ) -> Any:
+        """modes weighted by the branch and the learned offset, standardized, then carried back"""
+        standardized = branch_vector @ basis_modes + basis_mean + lifted["output_bias"]
+        return standardized * voxel_scale + voxel_mean
+
+
+    def Lifted_Constants(self, engine: Engine) -> tuple[Any, Any, Any, Any]:
+        """the modes, the standardized-space mean and the pointwise statistics, as engine constants"""
+        return (
+            engine.Lift_Constant(self.basis.modes),
+            engine.Lift_Constant(self.basis.mean),
+            engine.Lift_Constant(self.voxel_mean),
+            engine.Lift_Constant(self.voxel_scale),
+        )
+
+
+    def __call__(
+        self,
+        input_function: Coefficients,
+        output_discretization: Discretization,
+        condition: Coefficients | None = None,
+    ) -> GridFunction:
+        coefficients = np.asarray(input_function.vector, dtype=np.float64)
+        self.last_coefficients = coefficients
+        produced = np.asarray(
+            self.Forward(
+                self.parameter_values,
+                coefficients,
+                self.basis.modes,
+                self.basis.mean,
+                self.voxel_mean,
+                self.voxel_scale,
+            ),
+            dtype=np.float64,
+        )
+        cell_volume = abs(float(np.linalg.det(np.asarray(input_function.domain.lattice))))
+        quadrature = UniformGridQuadrature(cell_volume, produced.size)
+        return GridFunction(
+            produced.reshape(1, *self.grid_shape),
+            ("predicted_field",),
+            input_function.domain,
+            quadrature,
+        )
+
+
+    def Inspect(self) -> dict[str, Array]:
+        # a mode or a pointwise statistic is a field, so each is inspected with the shape that makes it one
+        state: dict[str, Array] = {
+            "basis_modes": self.basis.modes.reshape(self.basis.modes.shape[0], *self.grid_shape),
+            "basis_singular_values": self.basis.singular_values,
+            "basis_mean": self.basis.mean.reshape(self.grid_shape),
+            "voxel_mean": self.voxel_mean.reshape(self.grid_shape),
+            "voxel_scale": self.voxel_scale.reshape(self.grid_shape),
+            "output_bias": self.parameter_values["output_bias"],
+        }
+        if self.last_coefficients is not None:
+            state["last_coefficients"] = self.last_coefficients
+        return state

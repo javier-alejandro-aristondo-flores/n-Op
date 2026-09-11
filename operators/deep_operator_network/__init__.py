@@ -9,7 +9,12 @@ from operators.compositions import WithoutIntegralLayers
 from operators.data import PodBasis
 from operators.encoders import SensorEncoder
 from operators.framework import Coefficients, Discretization, NeuralOperator, Representation
-from operators.readouts import BasisExpansion, FixedModeExpansion
+from operators.readouts import (
+    BasisExpansion,
+    BiasedModeExpansion,
+    FixedModeExpansion,
+    PointwiseStandardizedExpansion,
+)
 
 CONFIGURATIONS = ("canonical", "proper_orthogonal", "principal_component", "energy_trunk")
 
@@ -21,7 +26,7 @@ class DeepOperatorNetwork(NeuralOperator[Coefficients, Coefficients, Representat
     def __init__(
         self,
         branch: SensorEncoder,
-        readout: BasisExpansion | FixedModeExpansion,
+        readout: BasisExpansion | FixedModeExpansion | BiasedModeExpansion | PointwiseStandardizedExpansion,
         configuration: str,
     ) -> None:
         if configuration not in CONFIGURATIONS:
@@ -66,3 +71,19 @@ def Principal_Component_Network(
     rank = int(basis.modes.shape[0])
     branch = SensorEncoder((parameter_width, *hidden_widths, rank), seed=seed)
     return DeepOperatorNetwork(branch, FixedModeExpansion(basis, grid_shape), "principal_component")
+
+
+def Proper_Orthogonal_Network(
+    basis: PodBasis,
+    grid_shape: tuple[int, int, int],
+    voxel_mean: NDArray[np.float64],
+    voxel_scale: NDArray[np.float64],
+    parameter_width: int,
+    hidden_widths: tuple[int, ...],
+    seed: int = 0,
+) -> DeepOperatorNetwork:
+    """the fixed-basis member on a per-voxel standardized field: run parameters mapped onto its coefficients"""
+    rank = int(basis.modes.shape[0])
+    branch = SensorEncoder((parameter_width, *hidden_widths, rank), seed=seed)
+    readout = PointwiseStandardizedExpansion(basis, grid_shape, voxel_mean, voxel_scale)
+    return DeepOperatorNetwork(branch, readout, "proper_orthogonal")

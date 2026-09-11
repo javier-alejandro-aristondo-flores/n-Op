@@ -9,9 +9,14 @@ import pytest
 
 from operators.compositions import WithoutIntegralLayers
 from operators.data import Gram_Pod, Project
-from operators.deep_operator_network import CONFIGURATIONS, DeepOperatorNetwork, Principal_Component_Network
+from operators.deep_operator_network import (
+    CONFIGURATIONS,
+    DeepOperatorNetwork,
+    Principal_Component_Network,
+    Proper_Orthogonal_Network,
+)
 from operators.framework import Coefficients, Domain, GridFunction, GridSpec
-from operators.readouts import FixedModeExpansion
+from operators.readouts import BiasedModeExpansion, FixedModeExpansion, PointwiseStandardizedExpansion
 from operators.substrate import NumpyEngine, ParameterSet
 
 CUBE = Domain(lattice=np.eye(3) * 3.57)
@@ -23,6 +28,15 @@ def Small_Basis(rank: int = 6) -> Any:
     """a basis over a tiny grid, enough to assemble the member against"""
     generator = np.random.default_rng(5)
     return Gram_Pod(np.asarray(generator.normal(size=(20, 64)), dtype=np.float64), rank=rank)
+
+
+def Voxel_Statistics(seed: int = 9) -> tuple[Any, Any]:
+    """a per-voxel mean and a spread that varies from voxel to voxel on purpose"""
+    generator = np.random.default_rng(seed)
+    mean = generator.normal(size=64)
+    # a spread that is not the same everywhere is what a global rescaling could not stand in for
+    scale = 0.5 + generator.random(64)
+    return mean, scale
 
 
 def Test_The_Layerless_Composition_Carries_Its_Vector_Through() -> None:
@@ -120,3 +134,118 @@ def Test_The_Manifest_Names_The_Parts_The_Member_Actually_Assembles() -> None:
     assert manifest["parts"]["kernel"].startswith("none")
     assert manifest["depends_on"]["kernels"] == []
     assert member.configuration in manifest["assembled"]
+
+
+def Test_The_Biased_Mode_Expansion_Matches_The_Fixed_Expansion_Until_Its_Offset_Moves() -> None:
+    """the learned offset is the one thing that tells this general-purpose variant from the plain one"""
+    basis = Small_Basis(rank=5)
+    plain = FixedModeExpansion(basis, (4, 4, 4))
+    offset = BiasedModeExpansion(basis, (4, 4, 4))
+    coefficients = Coefficients(vector=np.linspace(-1.0, 1.0, 5), domain=CUBE)
+    plain_field = np.asarray(plain(coefficients, GridSpec((4, 4, 4))).values)
+    zero_offset_field = np.asarray(offset(coefficients, GridSpec((4, 4, 4))).values)
+    assert np.allclose(zero_offset_field, plain_field, atol=1e-12)
+    offset.parameter_values["output_bias"] = np.asarray([0.25])
+    shifted_field = np.asarray(offset(coefficients, GridSpec((4, 4, 4))).values)
+    assert np.allclose(shifted_field - plain_field, 0.25, atol=1e-12)
+
+
+def Test_The_Pointwise_Standardized_Readout_Matches_Its_Published_Formula() -> None:
+    """modes weighted by the branch, the standardized-space mean and the offset, then carried onto the block"""
+    basis = Small_Basis(rank=5)
+    voxel_mean, voxel_scale = Voxel_Statistics()
+    readout = PointwiseStandardizedExpansion(basis, (4, 4, 4), voxel_mean, voxel_scale)
+    readout.parameter_values["output_bias"] = np.asarray([0.3])
+    coefficients_vector = np.linspace(-1.0, 1.0, 5)
+    produced = np.asarray(
+        readout(Coefficients(vector=coefficients_vector, domain=CUBE), GridSpec((4, 4, 4))).values
+    ).reshape(-1)
+    standardized = coefficients_vector @ basis.modes + basis.mean + 0.3
+    expected = standardized * voxel_scale + voxel_mean
+    assert np.allclose(produced, expected, atol=1e-10)
+
+
+def Test_The_Pointwise_Standardized_Readout_Is_Not_A_Global_Rescaling_In_Disguise() -> None:
+    """a spread that differs by voxel must move voxels by different amounts than one shared spread would"""
+    basis = Small_Basis(rank=5)
+    voxel_mean, varying_scale = Voxel_Statistics()
+    uniform_scale = np.full(64, float(varying_scale.mean()))
+    coefficients = Coefficients(vector=np.linspace(-1.0, 1.0, 5), domain=CUBE)
+    varying = PointwiseStandardizedExpansion(basis, (4, 4, 4), voxel_mean, varying_scale)
+    uniform = PointwiseStandardizedExpansion(basis, (4, 4, 4), voxel_mean, uniform_scale)
+    varying_field = np.asarray(varying(coefficients, GridSpec((4, 4, 4))).values)
+    uniform_field = np.asarray(uniform(coefficients, GridSpec((4, 4, 4))).values)
+    assert not np.allclose(varying_field, uniform_field)
+
+
+def Test_The_Proper_Orthogonal_Member_Collects_Its_Offset_Beside_The_Branch_Arrays() -> None:
+    """the learned offset is the one array the fixed basis now contributes to the trainer"""
+    voxel_mean, voxel_scale = Voxel_Statistics()
+    member = Proper_Orthogonal_Network(
+        Small_Basis(), (4, 4, 4), voxel_mean, voxel_scale, parameter_width=6, hidden_widths=(16, 16)
+    )
+    collected = member.Parameter_Values()
+    assert sum(1 for name in collected if name.startswith("sensor_encoder_")) == 6
+    assert member.basis_readout.parameter_values.keys() == {"output_bias"}
+    assert collected.keys() >= {"output_bias"}
+    assert len(collected) == 7
+
+
+def Test_The_Proper_Orthogonal_Member_Inspects_Its_Offset_And_Its_Pointwise_Statistics() -> None:
+    """the offset and the per-voxel statistics are reachable by name under the readout prefix"""
+    voxel_mean, voxel_scale = Voxel_Statistics()
+    member = Proper_Orthogonal_Network(
+        Small_Basis(), (4, 4, 4), voxel_mean, voxel_scale, parameter_width=6, hidden_widths=(16,)
+    )
+    member(Coefficients(vector=np.zeros(6), domain=CUBE), GridSpec((4, 4, 4)))
+    inspected = member.Inspect()
+    assert "readout.output_bias" in inspected
+    assert "readout.voxel_mean" in inspected
+    assert "readout.voxel_scale" in inspected
+    assert "readout.basis_modes" in inspected
+    assert "readout.last_coefficients" in inspected
+
+
+def Test_The_Proper_Orthogonal_Member_Reads_Out_A_Field_On_The_Requested_Grid() -> None:
+    """parameters in, a field of the asked-for shape out, exactly as the fixed-basis sibling does"""
+    voxel_mean, voxel_scale = Voxel_Statistics()
+    member = Proper_Orthogonal_Network(
+        Small_Basis(), (4, 4, 4), voxel_mean, voxel_scale, parameter_width=6, hidden_widths=(16,)
+    )
+    produced = member(Coefficients(vector=np.ones(6), domain=CUBE), GridSpec((4, 4, 4)))
+    assert isinstance(produced, GridFunction)
+    assert np.asarray(produced.values).shape == (1, 4, 4, 4)
+
+
+def Test_Gradients_Reach_The_Proper_Orthogonal_Offset_Too() -> None:
+    """a field-space loss differentiates onto the offset exactly as it does onto the branch"""
+    basis = Small_Basis(rank=4)
+    voxel_mean, voxel_scale = Voxel_Statistics()
+    member = Proper_Orthogonal_Network(
+        basis, (4, 4, 4), voxel_mean, voxel_scale, parameter_width=6, hidden_widths=(8,)
+    )
+    generator = np.random.default_rng(8)
+    parameters = np.asarray(generator.normal(size=(10, 6)), dtype=np.float64)
+    targets = np.asarray(generator.normal(size=(10, 64)), dtype=np.float64)
+    batch = np.concatenate([parameters, targets], axis=1)
+    engine = NumpyEngine()
+    # the union narrows here, since only this configuration's readout carries an offset to reach
+    readout = member.basis_readout
+    assert isinstance(readout, PointwiseStandardizedExpansion)
+    modes_constant, mean_constant, voxel_mean_constant, voxel_scale_constant = readout.Lifted_Constants(engine)
+
+    def Field_Loss(lifted: dict[str, Any], lifted_batch: Any) -> Any:
+        predicted_coefficients = member.Forward_Coefficients(lifted, lifted_batch[:, :6])
+        predicted_fields = readout.Forward(
+            lifted, predicted_coefficients, modes_constant, mean_constant, voxel_mean_constant, voxel_scale_constant
+        )
+        residuals = predicted_fields - lifted_batch[:, 6:]
+        return (residuals * residuals).mean()
+
+    gradients = engine.Gradients(
+        ParameterSet(values=member.Parameter_Values()), lambda lifted: Field_Loss(lifted, batch)
+    )
+    assert set(gradients) == set(member.Parameter_Values())
+    assert "output_bias" in gradients
+    assert all(np.isfinite(gradient).all() for gradient in gradients.values())
+    assert all(np.abs(gradient).max() > 0.0 for gradient in gradients.values())

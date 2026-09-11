@@ -1,16 +1,22 @@
 """every shared kernel against the dense reference integral"""
 
+from collections.abc import Callable
+from typing import Any
+
 import numpy as np
 import pytest
 from numpy.typing import NDArray
 
 from operators.framework import (
+    Array,
     Coefficients,
     CountingQuadrature,
     Dense_Reference_Integral,
     Domain,
     GridFunction,
     GridSpec,
+    Layer,
+    LiftedKernel,
     PointSet,
     PointSpec,
     UniformGridQuadrature,
@@ -30,8 +36,25 @@ from operators.kernels import (
     Stencil_From_Weights,
     TabulatedStencilKernel,
 )
+from operators.substrate import NumpyEngine, ParameterSet, Torch_Is_Available, TorchEngine
 
 CUBE = Domain(lattice=np.eye(3) * 2.0)
+
+
+def Agreeing_Gradients(
+    parameters: ParameterSet,
+    lifted_loss: Callable[[dict[str, Any]], Any],
+    reference_loss: Callable[[dict[str, Any]], Any],
+) -> dict[str, NDArray[np.float64]]:
+    """the differentiable engine's gradients, checked against the finite-difference oracle and handed back"""
+    value, gradients = TorchEngine().Value_And_Gradients(parameters, lifted_loss)
+    reference = NumpyEngine()
+    assert abs(value - reference.Evaluate(parameters, reference_loss)) < 1e-10
+    reference_gradients = reference.Gradients(parameters, reference_loss)
+    assert set(gradients) == set(reference_gradients)
+    for name, gradient in gradients.items():
+        assert np.allclose(gradient, reference_gradients[name], rtol=1e-5, atol=1e-6), name
+    return gradients
 
 
 def Test_The_Dense_Kernel_Matches_The_Oracle() -> None:
@@ -86,6 +109,82 @@ def Test_The_Low_Rank_Kernel_Matches_The_Oracle_On_Points_And_Grids() -> None:
     reference = Dense_Reference_Integral(Pair_Kernel, field, query)
     produced = kernel.Integrate(field, query)
     assert np.allclose(np.asarray(produced.vector), reference.reshape(-1), atol=1e-12)
+
+
+def Test_The_Low_Rank_Kernel_Forward_And_Integrate_Agree() -> None:
+    """the lifted forward, fed its own constants, produces the identical coefficients integrate returns"""
+    kernel = LowRankKernel(Fourier_Feature_Map, feature_count=4, seed=36)
+    generator = np.random.default_rng(37)
+    cloud = PointSet(
+        positions=generator.random((7, 3)),
+        domain=CUBE,
+        values=generator.random((7, 1)),
+        quadrature=CountingQuadrature(),
+    )
+    query = PointSpec(generator.random((5, 3)))
+    integrated = kernel.Integrate(cloud, query)
+    constants = kernel.Lifted_Constants(NumpyEngine(), cloud, query)
+    produced = np.asarray(kernel.Forward(kernel.parameter_values, *constants), dtype=np.float64)
+    assert np.allclose(produced.reshape(-1), np.asarray(integrated.vector), atol=1e-12)
+
+
+def Test_The_Low_Rank_Kernel_Forward_Matches_The_Dense_Oracle() -> None:
+    """the lifted forward, called directly through its own constants, still lands on the dense reference"""
+    kernel = LowRankKernel(Fourier_Feature_Map, feature_count=4, seed=34)
+    core = kernel.parameter_values["core"]
+
+    def Pair_Kernel(targets: NDArray[np.float64], sources: NDArray[np.float64]) -> NDArray[np.float64]:
+        return Fourier_Feature_Map(targets) @ core @ Fourier_Feature_Map(sources).T
+
+    generator = np.random.default_rng(35)
+    cloud = PointSet(
+        positions=generator.random((7, 3)),
+        domain=CUBE,
+        values=generator.random((7, 1)),
+        quadrature=CountingQuadrature(),
+    )
+    query = PointSpec(generator.random((5, 3)))
+    reference = Dense_Reference_Integral(Pair_Kernel, cloud, query)
+    constants = kernel.Lifted_Constants(NumpyEngine(), cloud, query)
+    produced = np.asarray(kernel.Forward(kernel.parameter_values, *constants), dtype=np.float64)
+    assert np.allclose(produced.reshape(-1), reference.reshape(-1), atol=1e-12)
+
+
+def Low_Rank_Loss(
+    kernel: LowRankKernel, target_features: Any, source_features: Any, weighted_values: Any, target: Any
+) -> Callable[[dict[str, Any]], Any]:
+    """the summed squared gap between the low-rank kernel's lifted forward and a fixed target"""
+
+    def Loss(lifted: dict[str, Any]) -> Any:
+        difference = kernel.Forward(lifted, target_features, source_features, weighted_values) - target
+        return (difference * difference).sum()
+
+    return Loss
+
+
+@pytest.mark.skipif(not Torch_Is_Available(), reason="torch is not installed yet")
+def Test_Gradients_Reach_The_Low_Rank_Kernel_Core() -> None:
+    """a tape severed between the feature matrices and the core would leave it untrainable"""
+    kernel = LowRankKernel(Fourier_Feature_Map, feature_count=4, seed=32)
+    generator = np.random.default_rng(33)
+    cloud = PointSet(
+        positions=generator.random((7, 3)),
+        domain=CUBE,
+        values=generator.random((7, 1)),
+        quadrature=CountingQuadrature(),
+    )
+    query = PointSpec(generator.random((5, 3)))
+    target = generator.random((5, 1))
+    parameters = ParameterSet(values={name: value.copy() for name, value in kernel.parameter_values.items()})
+    engine = TorchEngine()
+    engine_constants = kernel.Lifted_Constants(engine, cloud, query)
+    numpy_constants = kernel.Lifted_Constants(NumpyEngine(), cloud, query)
+    gradients = Agreeing_Gradients(
+        parameters,
+        Low_Rank_Loss(kernel, *engine_constants, engine.Lift_Constant(target)),
+        Low_Rank_Loss(kernel, *numpy_constants, target),
+    )
+    assert float(np.abs(gradients["core"]).max()) > 1e-6
 
 
 def Test_The_Spectral_Kernel_Matches_The_Dense_Oracle() -> None:
@@ -386,6 +485,120 @@ def Test_The_Tabulated_Stencil_Refuses_What_It_Cannot_Represent() -> None:
         stencil.Integrate(field, PointSpec(np.zeros((2, 3))))
     with pytest.raises(ValueError):
         Stencil_From_Weights(np.zeros((3, 4, 3, 1, 1)))
+
+
+class ZeroLocalLinear:
+    """a local linear map that always returns zero, so a layer can be built around a kernel under test"""
+
+
+    def __init__(self) -> None:
+        self.parameter_values: dict[str, NDArray[np.float64]] = {}
+
+
+    def Forward(self, lifted: dict[str, Any], input_values: Any) -> Any:
+        return input_values * 0.0
+
+
+    def Inspect(self) -> dict[str, Array]:
+        return {}
+
+
+def Test_The_Tabulated_Stencil_Satisfies_The_Lifted_Kernel_Protocol() -> None:
+    """pyright strict is the judge of structural conformance, this exercises the assignment and layer it checks"""
+    kernel = TabulatedStencilKernel(half_widths=(1, 1, 1), output_channels=2, input_channels=2, seed=25)
+    lifted_kernel: LiftedKernel[GridFunction, GridFunction] = kernel
+    layer = Layer(kernel=lifted_kernel, local_linear=ZeroLocalLinear())
+    assert layer.kernel is kernel
+
+
+def Test_The_Tabulated_Stencil_Forward_Refuses_A_Foreign_Shape() -> None:
+    """a shape the table was not built for is refused by the lifted forward directly, not merely by integrate"""
+    kernel = TabulatedStencilKernel(half_widths=(1, 1, 1), output_channels=1, input_channels=1, seed=26)
+    values = np.random.default_rng(27).random((1, 6, 6, 6))
+    with pytest.raises(ValueError):
+        kernel.Forward(kernel.parameter_values, values, (8, 8, 8))
+
+
+def Test_The_Tabulated_Stencil_Forward_And_Integrate_Agree() -> None:
+    """the lifted forward and the numpy wrapper around it produce the identical field"""
+    kernel = TabulatedStencilKernel(half_widths=(1, 1, 1), output_channels=2, input_channels=2, seed=38)
+    generator = np.random.default_rng(39)
+    field = GridFunction(
+        values=generator.random((2, 6, 6, 6)),
+        channel_labels=("first_channel", "second_channel"),
+        domain=SHEARED,
+        quadrature=UniformGridQuadrature(cell_volume=SHEARED_VOLUME, point_count=216),
+    )
+    integrated = kernel.Integrate(field, GridSpec((6, 6, 6)))
+    values = np.asarray(field.values, dtype=np.float64)
+    produced = np.asarray(kernel.Forward(kernel.parameter_values, values, (6, 6, 6)), dtype=np.float64)
+    assert np.allclose(produced, np.asarray(integrated.values), atol=1e-12)
+
+
+def Test_The_Tabulated_Stencil_Forward_Matches_The_Dense_Oracle() -> None:
+    """the numpy lifted forward, called directly rather than through integrate, still lands on the oracle"""
+    kernel = TabulatedStencilKernel(half_widths=(1, 1, 1), output_channels=2, input_channels=2, seed=28)
+    generator = np.random.default_rng(29)
+    field = GridFunction(
+        values=generator.random((2, 6, 6, 6)),
+        channel_labels=("first_channel", "second_channel"),
+        domain=SHEARED,
+        quadrature=UniformGridQuadrature(cell_volume=SHEARED_VOLUME, point_count=216),
+    )
+    pair_kernel = kernel.Dense_Kernel_Function((6, 6, 6), SHEARED_VOLUME / 216.0)
+    reference = Dense_Reference_Integral(pair_kernel, field, GridSpec((6, 6, 6)))
+    values = np.asarray(field.values, dtype=np.float64)
+    produced = kernel.Forward(kernel.parameter_values, values, (6, 6, 6))
+    assert np.allclose(np.asarray(produced, dtype=np.float64), reference, atol=1e-12)
+
+
+@pytest.mark.skipif(not Torch_Is_Available(), reason="torch is not installed yet")
+def Test_The_Tabulated_Stencil_Forward_Matches_The_Dense_Oracle_On_The_Foreign_Engine() -> None:
+    """the roll and the channel contraction dispatch correctly, landing on the oracle on the foreign engine too"""
+    kernel = TabulatedStencilKernel(half_widths=(1, 1, 1), output_channels=2, input_channels=2, seed=28)
+    generator = np.random.default_rng(29)
+    field = GridFunction(
+        values=generator.random((2, 6, 6, 6)),
+        channel_labels=("first_channel", "second_channel"),
+        domain=SHEARED,
+        quadrature=UniformGridQuadrature(cell_volume=SHEARED_VOLUME, point_count=216),
+    )
+    pair_kernel = kernel.Dense_Kernel_Function((6, 6, 6), SHEARED_VOLUME / 216.0)
+    reference = Dense_Reference_Integral(pair_kernel, field, GridSpec((6, 6, 6)))
+    engine = TorchEngine()
+    lifted = engine.Lift(kernel.parameter_values, requires_gradient=False)
+    lifted_values = engine.Lift_Constant(np.asarray(field.values, dtype=np.float64))
+    produced = kernel.Forward(lifted, lifted_values, (6, 6, 6))
+    assert np.allclose(np.asarray(produced, dtype=np.float64), reference, atol=1e-10)
+
+
+def Tabulated_Stencil_Loss(
+    kernel: TabulatedStencilKernel, field_values: Any, output_shape: tuple[int, int, int], target: Any
+) -> Callable[[dict[str, Any]], Any]:
+    """the summed squared gap between the stencil's lifted forward and a fixed target"""
+
+    def Loss(lifted: dict[str, Any]) -> Any:
+        difference = kernel.Forward(lifted, field_values, output_shape) - target
+        return (difference * difference).sum()
+
+    return Loss
+
+
+@pytest.mark.skipif(not Torch_Is_Available(), reason="torch is not installed yet")
+def Test_Gradients_Reach_The_Tabulated_Stencil_Weights() -> None:
+    """a tape severed at the roll or the channel contraction would leave the stencil weights untrainable"""
+    kernel = TabulatedStencilKernel(half_widths=(1, 1, 1), output_channels=2, input_channels=2, seed=30)
+    generator = np.random.default_rng(31)
+    field_values = generator.random((2, 6, 6, 6))
+    target = generator.random((2, 6, 6, 6))
+    parameters = ParameterSet(values={name: value.copy() for name, value in kernel.parameter_values.items()})
+    engine = TorchEngine()
+    gradients = Agreeing_Gradients(
+        parameters,
+        Tabulated_Stencil_Loss(kernel, engine.Lift_Constant(field_values), (6, 6, 6), engine.Lift_Constant(target)),
+        Tabulated_Stencil_Loss(kernel, field_values, (6, 6, 6), target),
+    )
+    assert float(np.abs(gradients["stencil_weights"]).max()) > 1e-6
 
 
 def Test_The_Periodic_Geometry_Says_What_It_Carries() -> None:

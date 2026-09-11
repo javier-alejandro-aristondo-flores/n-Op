@@ -19,6 +19,7 @@ from operators.framework import (
     Representation,
     Source_Points_And_Values,
 )
+from operators.substrate import Engine
 
 
 class DenseKernel(Kernel[Coefficients, Coefficients]):
@@ -80,9 +81,31 @@ class LowRankKernel(Kernel[Representation, Coefficients]):
 
 
     def Kernel_Matrix(self, targets: NDArray[np.float64], sources: NDArray[np.float64]) -> NDArray[np.float64]:
+        """the dense pairwise kernel this low-rank form is never forced to integrate through"""
         target_features = self.feature_map(targets)
         source_features = self.feature_map(sources)
         return target_features @ self.parameter_values["core"] @ source_features.T
+
+
+    def Forward(self, lifted: dict[str, Any], target_features: Any, source_features: Any, weighted_values: Any) -> Any:
+        """branch coefficients, the fixed feature matrices contracted against the learned core between them"""
+        kernel_values = target_features @ lifted["core"] @ source_features.T
+        return kernel_values @ weighted_values
+
+
+    def Lifted_Constants(
+        self, engine: Engine, input_function: Representation, output_discretization: Discretization
+    ) -> tuple[Any, Any, Any]:
+        """this query's feature matrices and quadrature-weighted source values, as engine constants"""
+        sources, values = Source_Points_And_Values(input_function)
+        weights = Quadrature_Weights(input_function)
+        targets = Output_Points(output_discretization)
+        weighted_values = np.asarray(values, dtype=np.float64) * weights[:, None]
+        return (
+            engine.Lift_Constant(np.asarray(self.feature_map(targets), dtype=np.float64)),
+            engine.Lift_Constant(np.asarray(self.feature_map(sources), dtype=np.float64)),
+            engine.Lift_Constant(weighted_values),
+        )
 
 
     def Integrate(
@@ -94,11 +117,16 @@ class LowRankKernel(Kernel[Representation, Coefficients]):
         sources, values = Source_Points_And_Values(input_function)
         weights = Quadrature_Weights(input_function)
         targets = Output_Points(output_discretization)
-        kernel_values = self.Kernel_Matrix(targets, sources)
-        self.last_kernel_values = kernel_values
+        self.last_kernel_values = self.Kernel_Matrix(targets, sources)
+        target_features = np.asarray(self.feature_map(targets), dtype=np.float64)
+        source_features = np.asarray(self.feature_map(sources), dtype=np.float64)
         # the quadrature is paid here, exactly as the dense reference pays it
-        integrated = kernel_values @ (values * weights[:, None])
-        return Coefficients(vector=integrated.reshape(-1), domain=input_function.domain)
+        weighted_values = np.asarray(values, dtype=np.float64) * weights[:, None]
+        produced = np.asarray(
+            self.Forward(self.parameter_values, target_features, source_features, weighted_values),
+            dtype=np.float64,
+        )
+        return Coefficients(vector=produced.reshape(-1), domain=input_function.domain)
 
 
     def Inspect(self) -> dict[str, Array]:

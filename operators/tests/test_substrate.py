@@ -11,6 +11,7 @@ from operators.substrate import (
     ACCELERATOR_DEVICE_NAME,
     Accelerator_Is_Available,
     Adam_Step,
+    Contract_Channel_Axis,
     CustomGradient,
     Device_Name_Of,
     Engine,
@@ -23,6 +24,7 @@ from operators.substrate import (
     MultilayerPerceptron,
     NumpyEngine,
     ParameterSet,
+    Roll_Along_Axes,
     Softplus,
     Torch_Is_Available,
     TorchEngine,
@@ -243,6 +245,46 @@ def Test_The_Nonlinearities_Have_Their_Known_Values() -> None:
     assert abs(float(Softplus(np.asarray(0.0))) - np.log(2.0)) < 1e-12
     assert float(Gaussian_Error_Linear_Unit(np.asarray(0.0))) == 0.0
     assert abs(float(Gaussian_Error_Linear_Unit(np.asarray(3.0))) - 3.0) < 2e-2
+
+
+def Test_Roll_Along_Axes_Matches_Plain_Numpy() -> None:
+    """the dispatched roll lands on exactly what a plain numpy roll returns"""
+    generator = np.random.default_rng(40)
+    values = generator.random((2, 4, 5, 6))
+    reference = np.roll(values, shift=(1, -2, 3), axis=(1, 2, 3))
+    assert np.allclose(Roll_Along_Axes(values, (1, -2, 3), (1, 2, 3)), reference)
+
+
+@pytest.mark.skipif(not Torch_Is_Available(), reason="torch is not installed yet")
+def Test_Roll_Along_Axes_Agrees_Between_Engines() -> None:
+    """the periodic shift lands on the same numbers whether numpy or the foreign engine carries the array"""
+    generator = np.random.default_rng(40)
+    values = generator.random((2, 4, 5, 6))
+    reference = Roll_Along_Axes(values, (1, -2, 3), (1, 2, 3))
+    lifted = TorchEngine().Lift_Constant(values)
+    produced = Roll_Along_Axes(lifted, (1, -2, 3), (1, 2, 3))
+    assert np.allclose(np.asarray(produced, dtype=np.float64), reference)
+
+
+def Test_Contract_Channel_Axis_Matches_Plain_Numpy() -> None:
+    """the dispatched contraction lands on exactly what a plain numpy tensordot returns"""
+    generator = np.random.default_rng(41)
+    block = generator.random((3, 2))
+    values = generator.random((2, 4, 5, 6))
+    reference = np.tensordot(block, values, axes=([1], [0]))
+    assert np.allclose(Contract_Channel_Axis(block, values), reference)
+
+
+@pytest.mark.skipif(not Torch_Is_Available(), reason="torch is not installed yet")
+def Test_Contract_Channel_Axis_Agrees_Between_Engines() -> None:
+    """the channel contraction lands on the same numbers whether numpy or the foreign engine carries the arrays"""
+    generator = np.random.default_rng(41)
+    block = generator.random((3, 2))
+    values = generator.random((2, 4, 5, 6))
+    reference = Contract_Channel_Axis(block, values)
+    engine = TorchEngine()
+    produced = Contract_Channel_Axis(engine.Lift_Constant(block), engine.Lift_Constant(values))
+    assert np.allclose(np.asarray(produced, dtype=np.float64), reference)
 
 
 def Test_The_Transform_Round_Trips() -> None:

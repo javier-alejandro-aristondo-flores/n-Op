@@ -40,10 +40,12 @@ from operators.substrate.linear_algebra import Least_Squares_Solution, Solve_Lin
 from operators.substrate.network import MultilayerPerceptron
 from operators.substrate.operations import (
     Concatenate_Channels,
+    Contract_Channel_Axis,
     Exponential,
     Gaussian_Error_Linear_Unit,
     Hyperbolic_Tangent,
     Mean_Over_Last_Axis,
+    Roll_Along_Axes,
     Softplus,
     Sum_Over_Last_Axis,
 )

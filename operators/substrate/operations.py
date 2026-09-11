@@ -46,3 +46,17 @@ def Concatenate_Channels(values: list[Any]) -> Any:
     if any(Is_Engine_Native(value) for value in values):
         return Torch_Module().cat(values, dim=0)
     return np.concatenate(values, axis=0)
+
+
+def Roll_Along_Axes(value: Any, shift: tuple[int, ...], axes: tuple[int, ...]) -> Any:
+    """the array rolled by an offset per axis with torus wraparound, on whichever engine carries it"""
+    if Is_Engine_Native(value):
+        return Torch_Module().roll(value, shifts=shift, dims=axes)
+    return np.roll(value, shift=shift, axis=axes)
+
+
+def Contract_Channel_Axis(block: Any, values: Any) -> Any:
+    """a channel-mixing block contracted against a value's leading channel axis, on whichever engine carries them"""
+    if Is_Engine_Native(block) or Is_Engine_Native(values):
+        return Torch_Module().tensordot(block, values, dims=([1], [0]))
+    return np.tensordot(block, values, axes=([1], [0]))

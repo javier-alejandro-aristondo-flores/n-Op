@@ -15,6 +15,7 @@ from operators.framework import (
     Kernel,
 )
 from operators.kernels.compact_support.geometry import Grid_Offsets, Voxel_Indices
+from operators.substrate import Contract_Channel_Axis, Roll_Along_Axes
 
 
 class TabulatedStencilKernel(Kernel[GridFunction, GridFunction]):
@@ -60,15 +61,18 @@ class TabulatedStencilKernel(Kernel[GridFunction, GridFunction]):
         ]
 
 
-    def Forward(self, lifted: dict[str, Any], input_values: Any) -> Any:
-        values = np.asarray(input_values, dtype=np.float64)
+    def Forward(self, lifted: dict[str, Any], input_values: Any, output_shape: tuple[int, int, int]) -> Any:
+        spatial_shape = tuple(int(extent) for extent in input_values.shape[1:])
+        if output_shape != spatial_shape:
+            raise ValueError("a tabulated stencil evaluates on the grid it was tabulated for, not another one")
         weights = lifted["stencil_weights"]
-        produced: Any = np.zeros((self.output_channels, *values.shape[1:]))
+        produced: Any = None
         for offset in self.Offsets():
             shift = (int(offset[0]), int(offset[1]), int(offset[2]))
             # rolling forward by the offset brings the source voxel that offset names onto the target
-            shifted = np.roll(values, shift=shift, axis=(1, 2, 3))
-            produced = produced + np.tensordot(self.Block_At(weights, offset), shifted, axes=([1], [0]))
+            shifted = Roll_Along_Axes(input_values, shift, (1, 2, 3))
+            contribution = Contract_Channel_Axis(self.Block_At(weights, offset), shifted)
+            produced = contribution if produced is None else produced + contribution
         return produced
 
 
@@ -81,9 +85,9 @@ class TabulatedStencilKernel(Kernel[GridFunction, GridFunction]):
         if not isinstance(output_discretization, GridSpec):
             raise TypeError("the tabulated stencil evaluates on grids only")
         values = np.asarray(input_function.values, dtype=np.float64)
-        if tuple(int(extent) for extent in values.shape[1:]) != output_discretization.shape:
-            raise ValueError("a tabulated stencil evaluates on the grid it was tabulated for, not another one")
-        produced = np.asarray(self.Forward(self.parameter_values, values), dtype=np.float64)
+        produced = np.asarray(
+            self.Forward(self.parameter_values, values, output_discretization.shape), dtype=np.float64
+        )
         self.last_output_values = produced
         output_labels = tuple(f"channel_{output_channel}" for output_channel in range(self.output_channels))
         return GridFunction(

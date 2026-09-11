@@ -23,7 +23,7 @@ from operators.data.floors import (
 )
 from operators.data.pod import Basis_Decay_Gate, Reconstruction_Error_Curve
 from operators.data.splits import ARTIFACT_DIRECTORY
-from operators.data.store import POOL_ROOT, Archive_Path, Read_Census
+from operators.data.store import POOL_ROOT, Archive_Path, Guard_Fresh_Archives, Read_Census
 from operators.framework import Spectral_Truncation_Resample
 from operators.metrics import Median_And_Interquartile, Relative_L2
 
@@ -43,17 +43,22 @@ def Fold_Of_Runs() -> dict[str, tuple[int, str]]:
 def Campaign_Identifiers(campaign: str) -> tuple[str, ...]:
     """the store identifiers of one campaign, from its manifest"""
     manifest = json.loads((POOL_ROOT / "_derived" / campaign / "manifest.json").read_text())
+    Guard_Fresh_Archives(manifest)
     return tuple(sorted(manifest))
 
 
 def Eighty_Cubed_Block() -> tuple[list[str], list[str], dict[str, str]]:
     """train and evaluation identifiers of the full-field cubic block, split by fold"""
     membership = Fold_Of_Runs()
+    cubic_campaigns = ("supercell_strains", "defect_set")
+    Guard_Fresh_Archives(
+        identifier for identifier, (_, campaign) in membership.items() if campaign in cubic_campaigns
+    )
     train: list[str] = []
     evaluation: list[str] = []
     campaign_of: dict[str, str] = {}
     for identifier, (fold, campaign) in membership.items():
-        if campaign not in ("supercell_strains", "defect_set"):
+        if campaign not in cubic_campaigns:
             continue
         with np.load(Archive_Path(campaign, identifier)) as archive:
             if "charge_density" not in archive or archive["charge_density"].shape != (80, 80, 80):
@@ -82,6 +87,11 @@ def Mean_Removed(field: Field) -> Field:
 
 def Cross_Fidelity_Lines(functional_pairs: Sequence[FunctionalPair]) -> list[str]:
     """the identity, affine and scissor floors on the strain pairs"""
+    Guard_Fresh_Archives(
+        identifier
+        for functional_pair in functional_pairs
+        for identifier in (functional_pair.cheap_identifier, functional_pair.accurate_identifier)
+    )
     identity, affine, slopes = Identity_And_Affine_Floors(
         functional_pairs, lambda identifier: Load_Field("strain_atlas", identifier, "charge_density")
     )

@@ -3,6 +3,7 @@
 import argparse
 import hashlib
 import json
+from collections.abc import Iterable
 from concurrent.futures import ProcessPoolExecutor
 from dataclasses import dataclass
 from pathlib import Path
@@ -30,6 +31,10 @@ POOL_ROOT = Path("/Pool/VASP_DATA")
 CENSUS_NAME = "_census/runs.jsonl"
 
 STORE_NAME = "_derived"
+
+UNUSABLE_CONDITIONS = ("stale", "missing", "orphaned")
+
+FRESHNESS_BY_CENSUS: dict[tuple[str, int, int], dict[str, list[str]]] = {}
 
 CAMPAIGN_PREFIXES: tuple[tuple[str, str], ...] = (
     ("alloy/", "alloy_ensemble"),
@@ -228,7 +233,7 @@ def Extract_Run(census_row: CensusRow, pool_root: Path) -> tuple[dict[str, Store
         "run_identifier": Run_Identifier(census_row.path),
         "campaign": Campaign_Of(census_row.path),
         "corpus": census_row.corpus,
-        "row_hash": census_row.row_hash,
+        "census_row_hash": census_row.row_hash,
         "extractor_version": EXTRACTOR_VERSION,
         "fields": sorted(arrays),
         "units": {
@@ -236,7 +241,7 @@ def Extract_Run(census_row: CensusRow, pool_root: Path) -> tuple[dict[str, Store
         },
         "pseudopotential_titles": list(titles),
         "unreadable_files": unreadable,
-        "row": census_row.record,
+        "census_row": census_row.record,
     }
     return arrays, sidecar
 
@@ -275,14 +280,48 @@ def Stale_Report(pool_root: Path) -> dict[str, list[str]]:
         sidecar = cast(dict[str, object], json.loads(sidecar_path.read_text()))
         identifier = cast(str, sidecar["run_identifier"])
         seen.add(identifier)
+        rebuilt_from = sidecar.get("census_row_hash")
+        built_by = sidecar.get("extractor_version")
         if identifier not in expected:
             orphaned.append(identifier)
-        elif sidecar.get("row_hash") != expected[identifier] or sidecar.get("extractor_version") != EXTRACTOR_VERSION:
+        elif rebuilt_from != expected[identifier] or built_by != EXTRACTOR_VERSION:
             stale.append(identifier)
         else:
             fresh.append(identifier)
     missing = sorted(set(expected) - seen)
     return {"fresh": fresh, "stale": stale, "missing": missing, "orphaned": orphaned}
+
+
+def Census_Fingerprint(pool_root: Path) -> tuple[str, int, int]:
+    """the corpus root beside the size and modification time of its census file"""
+    census_status = (pool_root / CENSUS_NAME).stat()
+    return str(pool_root.resolve()), census_status.st_size, census_status.st_mtime_ns
+
+
+def Freshness_Of_Store(pool_root: Path = POOL_ROOT) -> dict[str, list[str]]:
+    """the staleness report, read once per process for each census the caller names"""
+    fingerprint = Census_Fingerprint(pool_root)
+    remembered = FRESHNESS_BY_CENSUS.get(fingerprint)
+    if remembered is None:
+        remembered = Stale_Report(pool_root)
+        FRESHNESS_BY_CENSUS[fingerprint] = remembered
+    return remembered
+
+
+def Guard_Fresh_Archives(identifiers: Iterable[str], pool_root: Path = POOL_ROOT) -> None:
+    """raises unless every named archive still matches the census row and extractor behind it"""
+    report = Freshness_Of_Store(pool_root)
+    asked = set(identifiers)
+    unusable = {condition: sorted(asked & set(report[condition])) for condition in UNUSABLE_CONDITIONS}
+    if not any(unusable.values()):
+        return
+    counted = ", ".join(f"{len(found)} {condition}" for condition, found in unusable.items() if found)
+    named = [f"{condition} {name}" for condition, found in unusable.items() for name in found[:3]]
+    raise StoreError(
+        f"the store is not fresh for {len(asked)} runs a metric was about to be read from:"
+        f" {counted} ({'; '.join(named)});"
+        " rebuild with python -m operators.data.store before reporting any number"
+    )
 
 
 def Build_One(census_row: CensusRow, pool_root: Path) -> tuple[str, str | None]:

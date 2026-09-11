@@ -7,7 +7,16 @@ import numpy as np
 import pytest
 from numpy.typing import NDArray
 
-from operators.data import POOL_ROOT, Campaign_Of, Extract_Run, Read_Census, Run_Identifier, Stale_Report, StoreError
+from operators.data import (
+    Campaign_Of,
+    Extract_Run,
+    Guard_Fresh_Archives,
+    POOL_ROOT,
+    Read_Census,
+    Run_Identifier,
+    Stale_Report,
+    StoreError,
+)
 from operators.data.store import Guard_Volumetric_Destination, StoreArray, Write_Manifests, Write_Run
 
 SYNTHETIC_CHGCAR = """synthetic
@@ -129,6 +138,91 @@ def Test_A_Synthetic_Run_Extracts_Writes_And_Freshens(tmp_path: Path) -> None:
     census_path.write_text("\n".join([json.dumps(edited), lines[1]]) + "\n")
     report = Stale_Report(pool)
     assert report["stale"] == [Run_Identifier(census_rows[0].path)]
+
+
+def Built_Fake_Pool(tmp_path: Path) -> Path:
+    """the synthetic corpus with both of its runs extracted into the store"""
+    pool = Fake_Pool(tmp_path)
+    for census_row in Read_Census(pool):
+        arrays, sidecar = Extract_Run(census_row, pool)
+        Write_Run(arrays, sidecar, pool)
+    Write_Manifests(pool)
+    return pool
+
+
+def Age_The_Census(pool: Path) -> None:
+    """the first census line rewritten, which is what makes its archive stale"""
+    census_path = pool / "_census/runs.jsonl"
+    lines = census_path.read_text().splitlines()
+    edited = json.loads(lines[0])
+    edited["mtime"] = 1
+    census_path.write_text("\n".join([json.dumps(edited), lines[1]]) + "\n")
+
+
+def Test_The_Sidecar_Keeps_The_Names_The_Store_On_Disk_Was_Written_With(tmp_path: Path) -> None:
+    """the sidecar is a data schema, and renaming its keys silently condemns every archive"""
+    pool = Built_Fake_Pool(tmp_path)
+    hash_by_identifier = {Run_Identifier(row.path): row.row_hash for row in Read_Census(pool)}
+    for sidecar_path in sorted((pool / "_derived").glob("*/*.json")):
+        if sidecar_path.name == "manifest.json":
+            continue
+        sidecar = json.loads(sidecar_path.read_text())
+        assert "census_row_hash" in sidecar and "census_row" in sidecar
+        assert sidecar["census_row_hash"] == hash_by_identifier[sidecar["run_identifier"]]
+
+
+def Test_The_Guard_Lets_A_Store_Built_From_This_Census_Through(tmp_path: Path) -> None:
+    """every archive of a freshly built store is usable, and the guard says nothing"""
+    pool = Built_Fake_Pool(tmp_path)
+    identifiers = [Run_Identifier(census_row.path) for census_row in Read_Census(pool)]
+    assert sorted(Stale_Report(pool)["fresh"]) == sorted(identifiers)
+    Guard_Fresh_Archives(identifiers, pool)
+
+
+def Test_The_Guard_Refuses_An_Archive_Its_Census_Row_Has_Moved_Under(tmp_path: Path) -> None:
+    """a stale archive is a raised error naming the run, never a quietly reported number"""
+    pool = Built_Fake_Pool(tmp_path)
+    census_rows = Read_Census(pool)
+    Guard_Fresh_Archives([Run_Identifier(census_row.path) for census_row in census_rows], pool)
+    Age_The_Census(pool)
+    aged = Run_Identifier(census_rows[0].path)
+    still_fresh = Run_Identifier(census_rows[1].path)
+    with pytest.raises(StoreError) as refusal:
+        Guard_Fresh_Archives([aged, still_fresh], pool)
+    assert aged in str(refusal.value)
+    assert "1 stale" in str(refusal.value)
+    Guard_Fresh_Archives([still_fresh], pool)
+
+
+def Test_The_Guard_Refuses_A_Run_That_Was_Never_Extracted(tmp_path: Path) -> None:
+    """a census row with no archive behind it is missing, and just as loud"""
+    pool = Fake_Pool(tmp_path)
+    census_row = Read_Census(pool)[0]
+    arrays, sidecar = Extract_Run(census_row, pool)
+    Write_Run(arrays, sidecar, pool)
+    with pytest.raises(StoreError) as refusal:
+        Guard_Fresh_Archives([Run_Identifier(row.path) for row in Read_Census(pool)], pool)
+    assert "1 missing" in str(refusal.value)
+
+
+def Test_The_Guard_Refuses_An_Archive_The_Census_No_Longer_Names(tmp_path: Path) -> None:
+    """an archive whose run left the census is orphaned, and its numbers are unattributable"""
+    pool = Built_Fake_Pool(tmp_path)
+    census_path = pool / "_census/runs.jsonl"
+    lines = census_path.read_text().splitlines()
+    dropped = Run_Identifier(json.loads(lines[0])["path"])
+    census_path.write_text(lines[1] + "\n")
+    with pytest.raises(StoreError) as refusal:
+        Guard_Fresh_Archives([dropped], pool)
+    assert "1 orphaned" in str(refusal.value)
+
+
+@pytest.mark.pool
+def Test_The_Live_Store_Is_Fresh_Against_Its_Own_Census() -> None:
+    """the recorded state of the built store: every archive of all 5,085 runs current"""
+    report = Stale_Report(POOL_ROOT)
+    assert report["stale"] == [] and report["orphaned"] == []
+    assert len(report["fresh"]) >= 5085
 
 
 @pytest.mark.pool

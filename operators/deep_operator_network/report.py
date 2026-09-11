@@ -10,6 +10,7 @@ from operators.data import (
     Apply_Standardized_Ridge,
     Fit_Standardized_Ridge,
     Gram_Pod,
+    Guard_Fresh_Archives,
     Nearest_Training_Run,
     PodBasis,
     Project,
@@ -74,6 +75,7 @@ class StrainBlock:
             self.unit_keys.append(example.unit_key)
             self.families.append(assignments[example.run_path].family)
             self.identifiers.append(example.identifier)
+        Guard_Fresh_Archives(self.identifiers)
         self.parameters = np.asarray(parameters)
         self.fields = np.asarray(fields)
         self.functional = functional

@@ -73,6 +73,8 @@ from operators.data.store import (
     Campaign_Of,
     CensusRow,
     Extract_Run,
+    Freshness_Of_Store,
+    Guard_Fresh_Archives,
     POOL_ROOT,
     Read_Census,
     Run_Identifier,

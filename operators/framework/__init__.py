@@ -25,7 +25,7 @@ from operators.framework.invariance import (
     SupercellTwin,
 )
 from operators.framework.kernel import Kernel
-from operators.framework.layer import Layer
+from operators.framework.layer import Layer, LiftedKernel, LocalLinearMap
 from operators.framework.operator import NeuralOperator, Operator
 from operators.framework.representation import (
     Coefficients,

@@ -1,10 +1,17 @@
 """schemes for chaining layers, each owning its topology"""
 
+from typing import Any
+
 import numpy as np
 from numpy.typing import NDArray
 
-from operators.framework import Array, Coefficients, Composition, GridFunction, GridSpec, Layer
+from operators.framework import Array, Coefficients, Composition, GridFunction, Layer
 from operators.substrate import Gaussian_Error_Linear_Unit
+
+
+def Sliced_Lifted(lifted: dict[str, Any], prefix: str) -> dict[str, Any]:
+    """the slice of a shared lifted dict that belongs to one part, its own names restored"""
+    return {name[len(prefix):]: value for name, value in lifted.items() if name.startswith(prefix)}
 
 
 class ExplicitStack(Composition[GridFunction]):
@@ -16,25 +23,55 @@ class ExplicitStack(Composition[GridFunction]):
         self.last_layer_norms: NDArray[np.float64] | None = None
 
 
-    def Apply(self, input_function: GridFunction, condition: Coefficients | None = None) -> GridFunction:
-        current = input_function
-        norms: list[float] = []
-        for layer in self.layers:
+    def Layer_Outputs(self, lifted: dict[str, Any], input_values: Any) -> list[Any]:
+        """the value after each layer in turn, differentiable through whichever engine lifted the dict"""
+        current = input_values
+        outputs: list[Any] = []
+        for layer_index, layer in enumerate(self.layers):
+            kernel_lifted = Sliced_Lifted(lifted, f"layer_{layer_index}.kernel.")
+            local_linear_lifted = Sliced_Lifted(lifted, f"layer_{layer_index}.local_linear.")
             # every layer answers on the grid it was handed
-            grid_shape = np.asarray(current.values).shape[1:]
-            grid_spec = GridSpec((grid_shape[0], grid_shape[1], grid_shape[2]))
-            integrated = layer.kernel.Integrate(current, grid_spec, condition)
-            summed = np.asarray(layer.local_linear(current.values)) + np.asarray(integrated.values)
+            spatial_shape = current.shape[1:]
+            output_shape = (int(spatial_shape[0]), int(spatial_shape[1]), int(spatial_shape[2]))
+            kernel_output = layer.kernel.Forward(kernel_lifted, current, output_shape)
+            local_output = layer.local_linear.Forward(local_linear_lifted, current)
+            summed = local_output + kernel_output
             if layer.activation == "alias_free":
                 raise NotImplementedError("the alias-free activation is the convolutional entry's own build")
-            activated = np.asarray(Gaussian_Error_Linear_Unit(summed), dtype=np.float64)
+            activated = Gaussian_Error_Linear_Unit(summed)
             # a residual layer can only add its input back when the channel count survived
-            if layer.residual and activated.shape == np.asarray(current.values).shape:
-                activated = activated + np.asarray(current.values)
-            norms.append(float(np.linalg.norm(activated)))
-            current = GridFunction(activated, current.channel_labels, current.domain, current.quadrature)
-        self.last_layer_norms = np.asarray(norms, dtype=np.float64)
-        return current
+            if layer.residual and activated.shape == current.shape:
+                activated = activated + current
+            outputs.append(activated)
+            current = activated
+        return outputs
+
+
+    def Forward(self, lifted: dict[str, Any], input_values: Any) -> Any:
+        """the stack's final value, differentiable through whichever engine lifted the shared dict"""
+        outputs = self.Layer_Outputs(lifted, input_values)
+        return outputs[-1] if outputs else input_values
+
+
+    def Parameter_Values(self) -> dict[str, NDArray[np.float64]]:
+        """every layer's kernel and local linear arrays, prefixed so no two layers' names collide"""
+        collected: dict[str, NDArray[np.float64]] = {}
+        for layer_index, layer in enumerate(self.layers):
+            for name, value in layer.kernel.parameter_values.items():
+                collected[f"layer_{layer_index}.kernel.{name}"] = value
+            for name, value in layer.local_linear.parameter_values.items():
+                collected[f"layer_{layer_index}.local_linear.{name}"] = value
+        return collected
+
+
+    def Apply(self, input_function: GridFunction, condition: Coefficients | None = None) -> GridFunction:
+        values = np.asarray(input_function.values, dtype=np.float64)
+        outputs = self.Layer_Outputs(self.Parameter_Values(), values)
+        self.last_layer_norms = np.asarray(
+            [float(np.linalg.norm(np.asarray(output, dtype=np.float64))) for output in outputs], dtype=np.float64
+        )
+        produced = np.asarray(outputs[-1], dtype=np.float64) if outputs else values
+        return GridFunction(produced, input_function.channel_labels, input_function.domain, input_function.quadrature)
 
 
     def Inspect(self) -> dict[str, Array]:
@@ -42,6 +79,8 @@ class ExplicitStack(Composition[GridFunction]):
         for layer_index, layer in enumerate(self.layers):
             for name, value in layer.kernel.Inspect().items():
                 state[f"layer_{layer_index}.kernel.{name}"] = value
+            for name, value in layer.local_linear.Inspect().items():
+                state[f"layer_{layer_index}.local_linear.{name}"] = value
         if self.last_layer_norms is not None:
             state["last_layer_norms"] = self.last_layer_norms
         return state

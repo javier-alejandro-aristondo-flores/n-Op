@@ -230,20 +230,115 @@ def Test_The_Basis_Expansion_Queries_Anywhere() -> None:
 
 
 def Test_The_Explicit_Stack_Chains_And_Inspects() -> None:
-    """the stack applies its layers, and exposes prefixed kernel state"""
+    """the stack applies its layers, and exposes prefixed kernel and local linear state"""
     kernel = SpectralKernel(kept_modes=(1, 1, 1), output_channels=2, input_channels=2, seed=5)
     kernel.Hermitian_Symmetrize()
-
-    def Halving_Local_Linear(values: Array) -> Array:
-        return np.asarray(values) * 0.5
-
-    stack = ExplicitStack((Layer(kernel=kernel, local_linear=Halving_Local_Linear),))
+    local_linear = PointwiseLift(hidden_channels=2, input_channels=2, seed=6)
+    stack = ExplicitStack((Layer(kernel=kernel, local_linear=local_linear),))
     field = Small_Field(2, seed=6)
     produced = stack.Apply(field)
     assert np.asarray(produced.values).shape == (2, 4, 4, 4)
     inspected = stack.Inspect()
     assert "layer_0.kernel.mode_magnitudes" in inspected
+    assert "layer_0.local_linear.lift_weights" in inspected
     assert "last_layer_norms" in inspected
+
+
+def Test_Forward_And_Apply_Agree_On_The_Explicit_Stack() -> None:
+    """the lifted path and the numpy wrapper around it read the same numbers off the same input"""
+    first_kernel = SpectralKernel(kept_modes=(1, 1, 1), output_channels=3, input_channels=2, seed=7)
+    first_kernel.Hermitian_Symmetrize()
+    first_local_linear = PointwiseLift(hidden_channels=3, input_channels=2, seed=8)
+    second_kernel = SpectralKernel(kept_modes=(1, 1, 1), output_channels=2, input_channels=3, seed=9)
+    second_kernel.Hermitian_Symmetrize()
+    second_local_linear = PointwiseLift(hidden_channels=2, input_channels=3, seed=10)
+    stack = ExplicitStack(
+        (
+            Layer(kernel=first_kernel, local_linear=first_local_linear),
+            Layer(kernel=second_kernel, local_linear=second_local_linear),
+        )
+    )
+    field = Small_Field(2, seed=11)
+    through_apply = np.asarray(stack.Apply(field).values, dtype=np.float64)
+    through_forward = np.asarray(
+        stack.Forward(stack.Parameter_Values(), np.asarray(field.values, dtype=np.float64)), dtype=np.float64
+    )
+    assert through_apply.shape == (2, 4, 4, 4)
+    assert np.allclose(through_apply, through_forward, atol=1e-12)
+
+
+def Test_The_Stack_Collects_Every_Layer_Under_A_Distinct_Prefix() -> None:
+    """a two-layer stack's parameters cover every learned array and never let one layer's name shadow another's"""
+    first_kernel = SpectralKernel(kept_modes=(1, 1, 1), output_channels=2, input_channels=2, seed=12)
+    first_kernel.Hermitian_Symmetrize()
+    first_local_linear = PointwiseLift(hidden_channels=2, input_channels=2, seed=13)
+    second_kernel = SpectralKernel(kept_modes=(1, 1, 1), output_channels=2, input_channels=2, seed=14)
+    second_kernel.Hermitian_Symmetrize()
+    second_local_linear = PointwiseLift(hidden_channels=2, input_channels=2, seed=15)
+    stack = ExplicitStack(
+        (
+            Layer(kernel=first_kernel, local_linear=first_local_linear),
+            Layer(kernel=second_kernel, local_linear=second_local_linear),
+        )
+    )
+    collected = stack.Parameter_Values()
+    expected_count = (
+        len(first_kernel.parameter_values)
+        + len(first_local_linear.parameter_values)
+        + len(second_kernel.parameter_values)
+        + len(second_local_linear.parameter_values)
+    )
+    assert len(collected) == expected_count
+    assert {f"layer_0.kernel.{name}" for name in first_kernel.parameter_values} <= set(collected)
+    assert {f"layer_0.local_linear.{name}" for name in first_local_linear.parameter_values} <= set(collected)
+    assert {f"layer_1.kernel.{name}" for name in second_kernel.parameter_values} <= set(collected)
+    assert {f"layer_1.local_linear.{name}" for name in second_local_linear.parameter_values} <= set(collected)
+    # the two layers' kernels share every unprefixed name, so only the prefix keeps them apart
+    shared_unprefixed_names = set(first_kernel.parameter_values) & set(second_kernel.parameter_values)
+    assert shared_unprefixed_names == set(first_kernel.parameter_values)
+
+
+def Explicit_Stack_Loss(stack: ExplicitStack, field_values: Any, target: Any) -> Callable[[dict[str, Any]], Any]:
+    """the summed squared gap between the stack's output and a fixed target, as a forward an engine can drive"""
+
+    def Loss(lifted: dict[str, Any]) -> Any:
+        difference = stack.Forward(lifted, field_values) - target
+        return (difference * difference).sum()
+
+    return Loss
+
+
+@pytest.mark.skipif(not Torch_Is_Available(), reason="torch is not installed yet")
+def Test_Gradients_Reach_Every_Layers_Kernel_And_Local_Linear_Weights() -> None:
+    """a tape severed at the composition would leave every member built on the stack untrainable"""
+    first_kernel = SpectralKernel(kept_modes=(1, 1, 1), output_channels=2, input_channels=2, seed=16)
+    first_kernel.Hermitian_Symmetrize()
+    first_local_linear = PointwiseLift(hidden_channels=2, input_channels=2, seed=17)
+    second_kernel = SpectralKernel(kept_modes=(1, 1, 1), output_channels=2, input_channels=2, seed=18)
+    second_kernel.Hermitian_Symmetrize()
+    second_local_linear = PointwiseLift(hidden_channels=2, input_channels=2, seed=19)
+    stack = ExplicitStack(
+        (
+            Layer(kernel=first_kernel, local_linear=first_local_linear, residual=True),
+            Layer(kernel=second_kernel, local_linear=second_local_linear, residual=True),
+        )
+    )
+    field = Small_Field(2, seed=20)
+    field_values = np.asarray(field.values, dtype=np.float64)
+    generator = np.random.default_rng(21)
+    target = generator.random((2, 4, 4, 4))
+    parameters = ParameterSet(values={name: value.copy() for name, value in stack.Parameter_Values().items()})
+
+    engine = TorchEngine()
+    gradients = Agreeing_Gradients(
+        parameters,
+        Explicit_Stack_Loss(stack, engine.Lift_Constant(field_values), engine.Lift_Constant(target)),
+        Explicit_Stack_Loss(stack, field_values, target),
+    )
+    assert set(gradients) == set(stack.Parameter_Values())
+    for name, gradient in gradients.items():
+        # a tape severed anywhere between a weight and the loss shows up here as an exactly zero gradient
+        assert float(np.abs(gradient).max()) > 1e-6, name
 
 
 class FieldIdentity:

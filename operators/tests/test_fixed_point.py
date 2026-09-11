@@ -5,12 +5,14 @@ from typing import Any
 
 import numpy as np
 import pytest
+from numpy.typing import NDArray
 
 from operators.compositions import FixedPoint, WeightTied
+from operators.compositions.fixed_point import Anderson_Mixing_Weights, Sliced_Lifted
 from operators.encoders import PointwiseLift
 from operators.framework import Domain, GridFunction, Layer, UniformGridQuadrature
 from operators.kernels import SpectralKernel
-from operators.substrate import NumpyEngine, ParameterSet, Torch_Is_Available, TorchEngine
+from operators.substrate import Detached, NumpyEngine, ParameterSet, Torch_Is_Available, TorchEngine
 
 CUBE = Domain(lattice=np.eye(3) * 2.0)
 GRID_QUADRATURE = UniformGridQuadrature(cell_volume=8.0, point_count=8 * 8 * 8)
@@ -250,3 +252,115 @@ def Test_Inspect_Exposes_The_Health_Signals_The_Canon_Requires() -> None:
     history = np.asarray(inspected["last_residual_norm_history"])
     assert history.ndim == 1
     assert int(np.asarray(inspected["last_iterations_taken"])) == history.shape[0]
+
+
+# the substrate primitives this stream added: detached here, the vector-jacobian product in the second commit
+
+
+@pytest.mark.skipif(not Torch_Is_Available(), reason="the foreign engine is not installed yet")
+def Test_Detached_Severs_The_Foreign_Engines_Gradient_Path() -> None:
+    """a value pulled through detached casts no gradient back, beside a control path that still carries one"""
+    parameters = ParameterSet(values={"severed": np.asarray([2.0, 3.0]), "control": np.asarray([5.0, 7.0])})
+    engine = TorchEngine()
+
+    def Loss(lifted: dict[str, Any]) -> Any:
+        return (Detached(lifted["severed"]) * 2.0).sum() + (lifted["control"] * 3.0).sum()
+
+    _, gradients = engine.Value_And_Gradients(parameters, Loss)
+    assert np.allclose(gradients["severed"], 0.0)
+    assert np.allclose(gradients["control"], 3.0)
+
+
+def Test_Detached_Is_The_Identity_On_The_Reference_Engine() -> None:
+    """there is no tape to cut on a plain array, so detaching one returns the same values unchanged"""
+    value = np.asarray([1.0, 2.0, 3.0])
+    assert np.array_equal(Detached(value), value)
+
+
+def Test_Anderson_Mixing_Weights_Declines_A_Near_Parallel_History() -> None:
+    """a residual history whose differences are nearly collinear returns none rather than an unstable mix"""
+    near_parallel_history = [
+        np.asarray([2.0, 0.0, 0.0]),
+        np.asarray([2.0000001, 0.0, 0.0]),
+        np.asarray([1.0, 0.0, 0.0]),
+    ]
+    weights = Anderson_Mixing_Weights(near_parallel_history, regularization=1e-4, condition_ceiling=1e6)
+    assert weights is None
+
+
+def Test_Anderson_Mixing_Weights_Sums_To_One_On_A_Well_Conditioned_History() -> None:
+    """the constraint the derivation depends on, checked directly on the small linear-algebra helper"""
+    well_conditioned_history = [
+        np.asarray([1.0, 0.0, 0.0]),
+        np.asarray([0.0, 1.0, 0.0]),
+        np.asarray([0.3, 0.3, 0.3]),
+    ]
+    weights = Anderson_Mixing_Weights(well_conditioned_history, regularization=1e-4, condition_ceiling=1e6)
+    assert weights is not None
+    assert abs(float(weights.sum()) - 1.0) < 1e-10
+
+
+# the mandatory 8-cubed gradient audit -- phantom against finite differences and against the full unroll,
+# both grounded on the same contractive layer as the health-floor tests above; implicit joins in the next commit
+
+
+def Relative_Gap(candidate: dict[str, NDArray[np.float64]], ground_truth: dict[str, NDArray[np.float64]]) -> float:
+    """how far one named gradient dict sits from another, as one fraction of the ground truth's own size"""
+    flat_candidate = np.concatenate([value.reshape(-1) for value in candidate.values()])
+    flat_truth = np.concatenate([value.reshape(-1) for value in ground_truth.values()])
+    return float(np.linalg.norm(flat_candidate - flat_truth) / (np.linalg.norm(flat_truth) + 1e-12))
+
+
+def Audit_Ground_Truths(
+    layer: Layer[GridFunction], field_values: NDArray[np.float64], target: NDArray[np.float64]
+) -> tuple[ParameterSet, dict[str, NDArray[np.float64]], dict[str, NDArray[np.float64]]]:
+    """the audit's parameters beside its two ground truths: finite differences, and the depth-matched full unroll"""
+    probe = FixedPoint(layer)
+    parameters = ParameterSet(values={name: value.copy() for name, value in probe.Parameter_Values().items()})
+    reference_loss = Fixed_Point_Equilibrium_Loss(probe, field_values, target)
+    finite_difference_gradients = NumpyEngine().Gradients(parameters, reference_loss)
+    kernel_lifted = Sliced_Lifted(probe.Parameter_Values(), "kernel.")
+    local_linear_lifted = Sliced_Lifted(probe.Parameter_Values(), "local_linear.")
+    depth = probe.Solved(kernel_lifted, local_linear_lifted, field_values).iterations_taken
+    tied = WeightTied(layer, depth=depth)
+    engine = TorchEngine()
+    _, full_unroll_gradients = engine.Value_And_Gradients(
+        parameters, Weight_Tied_Loss(tied, engine.Lift_Constant(field_values), engine.Lift_Constant(target))
+    )
+    return parameters, finite_difference_gradients, full_unroll_gradients
+
+
+@pytest.mark.skipif(not Torch_Is_Available(), reason="the foreign engine is not installed yet")
+def Test_The_Audits_Two_Ground_Truths_Agree_With_Each_Other() -> None:
+    """finite differences on the converged solve and a depth-matched full unroll measure the same gradient"""
+    layer = Contractive_Layer(seed=71)
+    field_values = np.asarray(Small_Field(2, seed=72).values, dtype=np.float64)
+    target = np.random.default_rng(73).random((2, 8, 8, 8))
+    _, finite_difference_gradients, full_unroll_gradients = Audit_Ground_Truths(layer, field_values, target)
+    assert Relative_Gap(full_unroll_gradients, finite_difference_gradients) < 0.005
+
+
+@pytest.mark.skipif(not Torch_Is_Available(), reason="the foreign engine is not installed yet")
+@pytest.mark.parametrize("phantom_depth", [1, 3])
+def Test_Phantom_Gradient_Bias_Shrinks_As_Its_Depth_Grows(phantom_depth: int) -> None:
+    """the mandatory audit column: phantom's measured disagreement with both ground truths, bounded and reported"""
+    layer = Contractive_Layer(seed=71)
+    field_values = np.asarray(Small_Field(2, seed=72).values, dtype=np.float64)
+    target = np.random.default_rng(73).random((2, 8, 8, 8))
+    parameters, finite_difference_gradients, full_unroll_gradients = Audit_Ground_Truths(layer, field_values, target)
+    stack = FixedPoint(layer, backward="phantom", phantom_depth=phantom_depth)
+    engine = TorchEngine()
+    lifted_loss = Fixed_Point_Equilibrium_Loss(
+        stack, engine.Lift_Constant(field_values), engine.Lift_Constant(target)
+    )
+    _, phantom_gradients = engine.Value_And_Gradients(parameters, lifted_loss)
+    gap_to_finite_difference = Relative_Gap(phantom_gradients, finite_difference_gradients)
+    gap_to_full_unroll = Relative_Gap(phantom_gradients, full_unroll_gradients)
+    if phantom_depth == 1:
+        # a real, bounded bias at the cheapest setting, not an exact match and not an unbounded one either
+        assert 0.005 < gap_to_finite_difference < 0.08
+        assert 0.005 < gap_to_full_unroll < 0.08
+    else:
+        # three reentries closes nearly all of the gap phantom's truncation opens at depth one
+        assert gap_to_finite_difference < 0.005
+        assert gap_to_full_unroll < 0.005

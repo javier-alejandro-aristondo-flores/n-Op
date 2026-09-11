@@ -7,11 +7,10 @@ from typing import Any
 import numpy as np
 from numpy.typing import NDArray
 
+from operators.compositions.fixed_point import FixedPoint, WeightTied
 from operators.compositions.multi_scale import MultiScale
 from operators.framework import Array, Coefficients, Composition, GridFunction, Layer
 from operators.substrate import Gaussian_Error_Linear_Unit
-
-from operators.compositions.fixed_point import FixedPoint, WeightTied
 
 
 def Sliced_Lifted(lifted: dict[str, Any], prefix: str) -> dict[str, Any]:

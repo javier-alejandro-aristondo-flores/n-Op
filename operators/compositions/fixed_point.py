@@ -7,7 +7,7 @@ import numpy as np
 from numpy.typing import NDArray
 
 from operators.framework import Array, Coefficients, Composition, GridFunction, Layer
-from operators.substrate import Gaussian_Error_Linear_Unit, Solve_Linear_System
+from operators.substrate import Detached, Gaussian_Error_Linear_Unit, Solve_Linear_System
 
 type FixedPointBackward = Literal["phantom", "jacobian_free", "implicit"]
 
@@ -163,21 +163,20 @@ class FixedPoint(Composition[GridFunction]):
         self, kernel_lifted: dict[str, Any], local_linear_lifted: dict[str, Any], input_values: Any
     ) -> FixedPointSolve:
         """damped picard toward the shared layer's fixed point, anderson-accelerated once two residuals exist"""
-        state = input_values
+        # every iterate is detached the moment it is made, so the whole solve stays off whichever tape lifted it
+        state = Detached(input_values)
         residual_history: list[NDArray[np.float64]] = []
-        applied_history: list[NDArray[np.float64]] = []
+        applied_history: list[Any] = []
         residual_norm_history: list[float] = []
         for iteration_index in range(self.iteration_cap):
-            applied = Applied_Once(self.layer, kernel_lifted, local_linear_lifted, state)
-            applied_values = np.asarray(applied, dtype=np.float64)
-            state_values = np.asarray(state, dtype=np.float64)
-            residual = applied_values - state_values
-            residual_norm = float(np.linalg.norm(residual))
+            applied = Detached(Applied_Once(self.layer, kernel_lifted, local_linear_lifted, state))
+            residual_values = np.asarray(applied, dtype=np.float64) - np.asarray(state, dtype=np.float64)
+            residual_norm = float(np.linalg.norm(residual_values))
             residual_norm_history.append(residual_norm)
             if residual_norm < self.tolerance:
                 return FixedPointSolve(applied, iteration_index + 1, residual_norm, False, residual_norm_history)
-            residual_history.append(residual)
-            applied_history.append(applied_values)
+            residual_history.append(residual_values)
+            applied_history.append(applied)
             if len(residual_history) > self.history_depth:
                 residual_history.pop(0)
                 applied_history.pop(0)
@@ -187,7 +186,10 @@ class FixedPoint(Composition[GridFunction]):
                 else None
             )
             if weights is not None:
-                state = sum(weight * applied_value for weight, applied_value in zip(weights, applied_history))
+                # the coefficients are host floats, so mixing never forces the field arrays off their own engine
+                state = sum(
+                    float(weight) * applied_value for weight, applied_value in zip(weights, applied_history)
+                )
             else:
                 if len(residual_history) >= 2:
                     # a residual history whose differences are nearly parallel is discarded rather than mixed
@@ -206,8 +208,8 @@ class FixedPoint(Composition[GridFunction]):
         local_linear_lifted = Sliced_Lifted(lifted, "local_linear.")
         solved = self.Solved(kernel_lifted, local_linear_lifted, input_values)
         depth = 1 if self.backward == "jacobian_free" else self.phantom_depth
-        # once the substrate exposes a detach primitive, that call belongs here before the reentry loop
-        state = solved.equilibrium
+        # detached again here, at the equilibrium itself, even though solved already leaves nothing tape-connected
+        state = Detached(solved.equilibrium)
         for _ in range(depth):
             state = Applied_Once(self.layer, kernel_lifted, local_linear_lifted, state)
         return state, solved

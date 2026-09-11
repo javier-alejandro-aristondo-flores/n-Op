@@ -60,3 +60,8 @@ def Contract_Channel_Axis(block: Any, values: Any) -> Any:
     if Is_Engine_Native(block) or Is_Engine_Native(values):
         return Torch_Module().tensordot(block, values, dims=([1], [0]))
     return np.tensordot(block, values, axes=([1], [0]))
+
+
+def Detached(value: Any) -> Any:
+    """the value with its gradient history cut, unchanged on the reference engine"""
+    return value.detach() if Is_Engine_Native(value) else value

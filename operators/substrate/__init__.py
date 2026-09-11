@@ -41,6 +41,7 @@ from operators.substrate.network import MultilayerPerceptron
 from operators.substrate.operations import (
     Concatenate_Channels,
     Contract_Channel_Axis,
+    Detached,
     Exponential,
     Gaussian_Error_Linear_Unit,
     Hyperbolic_Tangent,

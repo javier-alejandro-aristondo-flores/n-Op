@@ -4,8 +4,9 @@
 
 from operators.training.loader import (
     AUXILIARY_PROBE_ROLE,
-    Field_From_Archive,
     Aligned_Energy_Grid,
+    Field_From_Archive,
+    FieldPrecision,
     Lattice_Factors_Of,
     Paired_Field_Examples,
     Parameter_Field_Examples,
@@ -16,6 +17,7 @@ from operators.training.loader import (
     State_Density_Examples,
     StateDensityExample,
     Strain_Assignments_By_Run,
+    Strain_Assignments_Of_Pool,
     Strain_Charge_Pairs,
     TrainingExample,
 )

@@ -3,8 +3,10 @@
 import json
 from collections.abc import Iterator, Sequence
 from dataclasses import dataclass
+from functools import cache
 from itertools import islice
 from pathlib import Path
+from typing import Any, Literal
 
 import numpy as np
 from numpy.typing import NDArray
@@ -32,6 +34,13 @@ AUXILIARY_PROBE_ROLE = "auxiliary_probe"
 STATE_DENSITY_WINDOW_BY_CAMPAIGN: dict[str, tuple[float, float]] = {"strain_atlas": (-28.0, 8.0)}
 STATE_DENSITY_POINT_COUNT = 601
 
+type FieldPrecision = Literal["single", "double"]
+
+NUMBER_TYPE_BY_PRECISION: dict[str, type[np.float32] | type[np.float64]] = {
+    "single": np.float32,
+    "double": np.float64,
+}
+
 
 @dataclass(frozen=True, slots=True)
 class TrainingExample:
@@ -45,15 +54,18 @@ class TrainingExample:
 def Field_From_Archive(
     archive: "np.lib.npyio.NpzFile",
     channel_names: tuple[str, ...],
+    precision: FieldPrecision = "double",
 ) -> GridFunction | None:
     """one field from named channels, zeros standing in for an absent magnetization"""
-    channels: list[NDArray[np.float64]] = []
+    # the store writes every field in single, so asking for single is a residency choice and never a numerical one
+    number_type = NUMBER_TYPE_BY_PRECISION[precision]
+    channels: list[NDArray[np.floating[Any]]] = []
     for name in channel_names:
         if name in archive:
-            channels.append(np.asarray(archive[name], dtype=np.float64))
+            channels.append(np.asarray(archive[name], dtype=number_type))
         # an unpolarized run wrote no magnetization because it is zero everywhere
         elif name == "magnetization_density" and "charge_density" in archive:
-            channels.append(np.zeros_like(np.asarray(archive["charge_density"], dtype=np.float64)))
+            channels.append(np.zeros_like(np.asarray(archive["charge_density"], dtype=number_type)))
         else:
             return None
     stacked = np.stack(channels)
@@ -170,9 +182,16 @@ def Lattice_Factors_Of(run_path: str) -> tuple[float, ...]:
     return tuple(float(named[factor_name].replace("p", ".")) for factor_name in LATTICE_FACTOR_NAMES)
 
 
+@cache
+def Strain_Assignments_Of_Pool(pool_root: Path) -> tuple[StrainAssignment, ...]:
+    """every strain-atlas assignment of one pool root, as one tuple no caller can alter"""
+    # reading the census and mapping the orbits costs three quarters of a second, so it is paid once per process
+    return Orbit_Map(Read_Census(pool_root))
+
+
 def Strain_Assignments_By_Run(pool_root: Path = POOL_ROOT) -> dict[str, StrainAssignment]:
     """every strain-atlas run path mapped to the assignment carrying its own tensor"""
-    return {assignment.run_path: assignment for assignment in Orbit_Map(Read_Census(pool_root))}
+    return {assignment.run_path: assignment for assignment in Strain_Assignments_Of_Pool(pool_root)}
 
 
 def Parameter_Example_From_Run(
@@ -184,13 +203,14 @@ def Parameter_Example_From_Run(
     covariate_values: dict[str, str],
     target_names: tuple[str, ...],
     pool_root: Path,
+    precision: FieldPrecision = "double",
 ) -> ParameterExample | None:
     """one run read into a parameter vector and its target field, or nothing if incomplete"""
     archive_path = Archive_Path(campaign, identifier, pool_root)
     if not archive_path.exists():
         return None
     with np.load(archive_path) as archive:
-        target_function = Field_From_Archive(archive, target_names)
+        target_function = Field_From_Archive(archive, target_names, precision)
     if target_function is None:
         return None
     return ParameterExample(
@@ -224,7 +244,12 @@ def Strain_Atlas_Runs(role: str, pool_root: Path) -> Iterator[tuple[str, str, St
                 yield orbit, identifier, assignment
 
 
-def Strain_Atlas_Examples(card: TaskCard, role: str, pool_root: Path) -> Iterator[ParameterExample]:
+def Strain_Atlas_Examples(
+    card: TaskCard,
+    role: str,
+    pool_root: Path,
+    precision: FieldPrecision = "double",
+) -> Iterator[ParameterExample]:
     """strain tensors and their target fields for one holdout assignment or the probe"""
     for orbit, identifier, assignment in Strain_Atlas_Runs(role, pool_root):
         example = Parameter_Example_From_Run(
@@ -236,6 +261,7 @@ def Strain_Atlas_Examples(card: TaskCard, role: str, pool_root: Path) -> Iterato
             {"functional": assignment.functional},
             card.targets,
             pool_root,
+            precision,
         )
         if example is not None:
             yield example
@@ -247,6 +273,7 @@ def Perovskite_Examples(
     evaluation_fold: int,
     extrapolation_holdout: str | None,
     pool_root: Path,
+    precision: FieldPrecision = "double",
 ) -> Iterator[ParameterExample]:
     """lattice factors and their target fields, by fold or by a factor holdout"""
     folds = json.loads((ARTIFACT_DIRECTORY / "perovskite_folds.json").read_text())
@@ -268,6 +295,7 @@ def Perovskite_Examples(
                 {},
                 card.targets,
                 pool_root,
+                precision,
             )
             if example is not None:
                 yield example
@@ -280,12 +308,13 @@ def Parameter_Field_Examples(
     extrapolation_holdout: str | None = None,
     pool_root: Path = POOL_ROOT,
     limit: int | None = None,
+    precision: FieldPrecision = "double",
 ) -> Iterator[ParameterExample]:
     """parameter vectors and their target fields for one card, under its committed split"""
     if card.split == "strain_atlas_holdout":
-        examples = Strain_Atlas_Examples(card, role, pool_root)
+        examples = Strain_Atlas_Examples(card, role, pool_root, precision)
     elif card.split == "perovskite_folds":
-        examples = Perovskite_Examples(card, role, evaluation_fold, extrapolation_holdout, pool_root)
+        examples = Perovskite_Examples(card, role, evaluation_fold, extrapolation_holdout, pool_root, precision)
     else:
         raise ValueError(f"card {card.name} is not split by a parameter sweep")
     return examples if limit is None else islice(examples, limit)

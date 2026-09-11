@@ -7,7 +7,7 @@ role = "the skip-DFT-entirely direction; independent machinery, buildable in par
 
 [parts]
 encoder = "encoders.AtomEmbedding (keyed by element AND pseudopotential title)"
-kernel = "kernels.compact_support.CompactSupportKernel (continuous-per-pair; directed edges; probes receive-only)"
+kernel = "kernels.compact_support.ContinuousDisplacementKernel (continuous-per-pair; directed edges; probes receive-only)"
 composition = "compositions.ExplicitStack"
 readout = "readouts.PointwiseProjection"
 wrappers = "Conserving (renormalize to electron count) per task card"

@@ -7,7 +7,7 @@ role = "the anti-aliasing hedge; first three-dimensional build of this architect
 
 [parts]
 encoder = "encoders.PointwiseLift"
-kernel = "kernels.compact_support.CompactSupportKernel (tabulated-on-grid)"
+kernel = "kernels.compact_support.TabulatedStencilKernel (tabulated-on-grid)"
 composition = "compositions.MultiScale (U-shaped; output scale = the coarse grid)"
 readout = "readouts.PointwiseProjection"
 wrappers = "per task card"

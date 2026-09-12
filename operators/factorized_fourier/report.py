@@ -25,6 +25,8 @@ from operators.evaluation import MetricSummary, ScoredRun, Summarize, Summarize_
 from operators.factorized_fourier import (
     Factorized_Fourier_Network,
     FactorizedFourier,
+    FactorizedFourierConfiguration,
+    GRAM_CHANNEL_COUNT,
     Gram_Six,
     Gram_Statistics,
     Log_Compressed_Channels,
@@ -676,9 +678,105 @@ def Floor_Block_Lines() -> tuple[list[str], dict[str, float]]:
     return lines, bars
 
 
+# the deep-equilibrium ladder (canon I.3): parameter counts of all three rungs, computed now; every trained
+# number -- steps, wall-clock, peak memory, convergence rate, seed -- waits for the runs the integrator schedules
+
+
+def Rung_Parameter_Count(configuration: FactorizedFourierConfiguration, layer_count: int) -> int:
+    """one rung's total parameter count at the flagship's own width and mode budget, without training it"""
+    member = Factorized_Fourier_Network(
+        hidden_channels=HIDDEN_CHANNELS,
+        kept_modes=(KEPT_MODE, KEPT_MODE, KEPT_MODE),
+        layer_count=layer_count,
+        reference_density=1.0,
+        gram_mean=np.zeros(GRAM_CHANNEL_COUNT),
+        gram_scale=np.ones(GRAM_CHANNEL_COUNT),
+        processing_shape=COARSE_SHAPE,
+        configuration=configuration,
+    )
+    return sum(value.size for value in member.Parameter_Values().values())
+
+
+def Deep_Equilibrium_Ladder_Lines() -> list[str]:
+    """the I.3 ladder pre-registered: parameter counts of every rung, the matched-params comparator, both bars"""
+    explicit_same_width = Rung_Parameter_Count("explicit", LAYER_COUNT)
+    tied_and_fixed_point = Rung_Parameter_Count("weight_tied", LAYER_COUNT)
+    # one explicit layer at this width carries exactly the shared layer's own parameter count, an exact match
+    matched_params_layer_count = 1
+    explicit_matched_params = Rung_Parameter_Count("explicit", matched_params_layer_count)
+    assert explicit_matched_params == tied_and_fixed_point
+    return [
+        "## The deep-equilibrium ladder (canon I.3), pre-registered before any rung is trained",
+        "",
+        "Three configurations of the same factory (`operators.factorized_fourier.Factorized_Fourier_Network`,"
+        " `configuration=\"explicit\" | \"weight_tied\" | \"fixed_point\"`), differing only in composition and one"
+        " design choice the weight-tied and fixed-point rungs share: their one applied-repeatedly layer carries no"
+        " residual, unlike the explicit stack's twelve. A residual here would make repeated or iterated application"
+        " drift rather than contract, since the fixed point would then need the correction term itself to vanish"
+        " rather than the whole map to settle.",
+        "",
+        "```",
+        f"explicit (same width, {LAYER_COUNT} layers):     {explicit_same_width:>10} parameters",
+        f"weight_tied (depth {LAYER_COUNT}, one shared layer): {tied_and_fixed_point:>10} parameters"
+        f" ({explicit_same_width / tied_and_fixed_point:.2f}x fewer than the same-width explicit stack)",
+        f"fixed_point (one shared layer):        {tied_and_fixed_point:>10} parameters (identical to weight_tied,"
+        " same one layer)",
+        f"explicit, matched params ({matched_params_layer_count} layer):   {explicit_matched_params:>10} parameters"
+        " (exact match to the tied block, not merely approximate: one explicit layer at this width has precisely"
+        " the shared layer's own count)",
+        "```",
+        "",
+        "**Stability escalation.** The primitive (`operators.compositions.fixed_point.FixedPoint`) implements"
+        " damping and Anderson acceleration (history depth, regularization, a condition-number ceiling that"
+        " declines a near-parallel history) and three backward rules (phantom at a chosen depth, jacobian-free as"
+        " phantom depth one, and the exact implicit adjoint). It does **not** implement per-mode spectral clipping,"
+        " a Hutchinson Jacobian penalty, or a monotone parametrization -- the canon's own further escalation. These"
+        " are not built here, speculatively, against a convergence failure that has not happened: the toy audit"
+        " below converges cleanly with damping and Anderson acceleration alone. If a real 80³ run fails to"
+        " converge, that is the order to reach for them in.",
+        "",
+        "**The mandatory 8³ gradient audit** ran on this member's own separable layer (width 2, one kept mode,"
+        " nonzero local bias so the origin is not the map's only fixed point), not a generic one, in"
+        " `Test_The_Mandatory_Gradient_Audit_On_This_Members_Own_Layer`: phantom depth 1, phantom depth 3, the"
+        " exact implicit adjoint, central finite differences and the depth-matched full unroll all agree --"
+        " implicit within the finite-difference-versus-unroll disagreement itself, phantom depth 3 within an order"
+        " of magnitude of that same disagreement. The convergence and health-metric tests"
+        " (`Test_Fixed_Point_Inspect_Exposes_The_Health_Signals_After_A_Member_Call`,"
+        " `Test_The_Health_Metric_Is_A_Fraction_Of_Inputs_Converged_Read_Off_Inspect`) confirm the health floor is"
+        " readable off `Inspect()` after an ordinary member call, since the lifted forward path calls `Resolved`"
+        " directly and the member records the solve itself -- `FixedPoint.Forward` alone never does.",
+        "",
+        "### the two bars (test-suite.md, I.3), neither invented here",
+        "",
+        "- **kill**: the explicit comparator, at *both* matchings above, beats fixed-point at matched seeds (3) and"
+        " wall-clock (fixed-point is not judged the winner unless it is also at least 3x faster to train); the"
+        " health floor kills below 80% of validation samples converging to 1e-3 within 32 iterations after tuning,"
+        " and stands as a caution rather than a pass below 90%.",
+        "- **the honest deliverable is the decomposition curve** explicit → weight-tied → FNO-DEQ. \"Weight-tying"
+        " yes, DEQ no\" -- the middle rung matching the explicit comparator while the fixed-point rung does not"
+        " clear the wall-clock bar -- is a legitimate verdict and will be reported as such if that is what the"
+        " runs show.",
+        "",
+        "Every trained number below is the integrator's to schedule and this stream's to report once run: steps,"
+        " wall-clock seconds, peak memory, the convergence rate (fraction of the evaluation block converging to"
+        " 1e-3 within 32 iterations), and the seed -- for the explicit same-width comparator, the explicit"
+        " matched-params comparator, weight-tied, and fixed-point, three seeds each.",
+        "",
+        "```",
+        "rung                       | steps | wall_clock_s | peak_memory_MiB | convergence_rate | seed",
+        "explicit (same width)      |   --  |     --       |       --        |  n/a (not iterative)  |  --",
+        "explicit (matched params)  |   --  |     --       |       --        |  n/a (not iterative)  |  --",
+        "weight_tied                |   --  |     --       |       --        |  n/a (not iterative)  |  --",
+        "fixed_point                |   --  |     --       |       --        |          --           |  --",
+        "```",
+        "",
+    ]
+
+
 def Main() -> int:
-    """the block, its floors and the claim ladder, written as the report's first committed section"""
-    lines, bars = Floor_Block_Lines()
+    """the block, its floors, the claim ladder and the deep-equilibrium ladder, the report's first committed section"""
+    floor_lines, bars = Floor_Block_Lines()
+    deq_lines = Deep_Equilibrium_Ladder_Lines()
     header = [
         "# factorized_fourier — measured against its floors",
         "",
@@ -691,7 +789,7 @@ def Main() -> int:
         "land in a later commit once training has run.",
         "",
     ]
-    REPORT_PATH.write_text("\n".join(header + lines) + "\n")
+    REPORT_PATH.write_text("\n".join(header + floor_lines + deq_lines) + "\n")
     print(f"wrote {REPORT_PATH}")
     print(bars)
     return 0

@@ -1397,6 +1397,13 @@ SUPER_RESOLUTION_SAMPLE_STRIDE = 12
 COMPARABLE_CARD_METRIC_NAMES = ("mean_absolute_error", "relative_l2")
 _STAGE_CHECKPOINT_PATTERN = re.compile(r"_stage(\d+)_checkpoint\.npz$")
 
+CONFIGURATION_LABELS: dict[FactorizedFourierConfiguration, str] = {
+    "explicit": "explicit stack",
+    "explicit_matched": "explicit stack, matched params",
+    "weight_tied": "weight-tied",
+    "fixed_point": "fixed-point",
+}
+
 
 def Latest_Stage_Checkpoint(artifact_directory: Path, run_name: str) -> Path:
     """the furthest-along stage checkpoint a run has written to disk, its own closest thing to a final answer"""
@@ -1573,20 +1580,22 @@ def Write_Elf_Figures(
     member_rows: list[ScoredRun],
     floor_medians: dict[str, float],
     member_median: float,
+    configuration: FactorizedFourierConfiguration = "explicit",
     cache_root: Path = ARRAY_CACHE_PATH,
     figures_root: Path = FIGURES_PATH,
 ) -> int:
     """the localization evaluation's whole visual surface, drawn from arrays cached under the given roots"""
-    cache = cache_root / "fold_0" / "explicit"
+    configuration_label = CONFIGURATION_LABELS[configuration]
+    cache = cache_root / "fold_0" / configuration
     cache.mkdir(parents=True, exist_ok=True)
     inspected = {name: np.asarray(value, dtype=np.float64) for name, value in member.Inspect().items()}
     np.savez(cache / "inspection.npz", **cast(dict[str, Any], inspected))
     with np.load(cache / "inspection.npz") as archive:
         restored = {name: np.asarray(archive[name], dtype=np.float64) for name in archive.files}
 
-    directory = figures_root / "fold_0" / "explicit"
+    directory = figures_root / "fold_0" / configuration
     suite = Render_Inspection_Suite(
-        restored, directory / "components", "factorized_fourier electron localization fold 0 explicit"
+        restored, directory / "components", f"factorized_fourier electron localization fold 0 {configuration_label}"
     )
     if suite.skipped:
         raise ValueError(f"no renderer for {suite.skipped}, which means the suite is incomplete")
@@ -1605,8 +1614,8 @@ def Write_Elf_Figures(
             predicted_channels[channel_index],
             truth,
             directory / f"prediction_{'best' if rank == 0 else 'worst'}.png",
-            f"electron localization fold 0 explicit {'best' if rank == 0 else 'worst'} evaluation run,"
-            f" {row.identifier}",
+            f"electron localization fold 0 {configuration_label} {'best' if rank == 0 else 'worst'} evaluation"
+            f" run, {row.identifier}",
         )
     by_campaign: dict[str, list[float]] = {}
     for row in member_rows:
@@ -1614,15 +1623,15 @@ def Write_Elf_Figures(
     Render_Error_Spread(
         {name: np.asarray(values) for name, values in by_campaign.items()},
         directory / "error_by_campaign.png",
-        "electron localization fold 0 explicit evaluation error by campaign",
+        f"electron localization fold 0 {configuration_label} evaluation error by campaign",
     )
     Render_Floor_Comparison(
         floor_medians,
         member_median,
         {name: 0.0 for name in floor_medians},
         directory / "floors.png",
-        "electron localization fold 0 explicit against its floors (relative L2; the ladder itself is absolute"
-        " mean absolute error, tabulated separately)",
+        f"electron localization fold 0 {configuration_label} against its floors (relative L2; the ladder itself"
+        " is absolute mean absolute error, tabulated separately)",
     )
     return len(suite.written) + 4
 
@@ -1638,11 +1647,12 @@ def Elf_Evaluation_Lines(
     figures_root: Path = FIGURES_PATH,
 ) -> list[str]:
     """the member's own result once a checkpoint exists, floors through the alloy row, or a placeholder before one"""
+    configuration_label = CONFIGURATION_LABELS[configuration]
     try:
         checkpoint_path = Latest_Stage_Checkpoint(artifact_directory, run_name)
     except FileNotFoundError:
         return [
-            "## The member's own result (electron localization, fold 0, explicit stack)",
+            f"## The member's own result (electron localization, fold 0, {configuration_label})",
             "",
             f"Training is not yet run (no checkpoint for `{run_name}` under `{artifact_directory}` yet); this"
             " section fills in from `Elf_Evaluation_Lines` alone once one exists, no other change to this report"
@@ -1677,19 +1687,35 @@ def Elf_Evaluation_Lines(
     relative_l2_floor_medians = {name: Summarize(rows, "relative_l2", name).median for name, rows in floors.items()}
     relative_l2_member_median = Summarize(member_rows, "relative_l2", "member").median
     figures_written = Write_Elf_Figures(
-        member, member_rows, relative_l2_floor_medians, relative_l2_member_median, cache_root, figures_root
+        member, member_rows, relative_l2_floor_medians, relative_l2_member_median, configuration, cache_root,
+        figures_root,
     )
 
     sampled_run_count = len(super_resolution_rows) // len(LOCALIZATION_CHANNELS)
-    figures_directory = figures_root / "fold_0" / "explicit"
-    cache_directory = cache_root / "fold_0" / "explicit"
+    figures_directory = figures_root / "fold_0" / configuration
+    cache_directory = cache_root / "fold_0" / configuration
     try:
         # a worktree's own absolute path is meaningless once this report is read from a different checkout
         figures_directory = figures_directory.relative_to(Path.cwd())
     except ValueError:
         pass
+    def Named_Median(group_name: str, metric_name: str) -> float:
+        """one already-computed summary's own median, read back by the exact group and metric it was filed under"""
+        for summary in summaries:
+            if summary.group_name == group_name and summary.metric_name == metric_name:
+                return summary.median
+        raise ValueError(f"no summary named {group_name!r} for {metric_name!r} among this member's own rows")
+
+    copy_floor_mae = Summarize(copy_rows, "mean_absolute_error", "nearest_run_copy_floor").median
+    defect_mae = Named_Median("member__defect_set", "mean_absolute_error")
+    strain_mae = Named_Median("member__supercell_strains", "mean_absolute_error")
+    defect_relative_l2 = Named_Median("member__defect_set", "relative_l2")
+    strain_relative_l2 = Named_Median("member__supercell_strains", "relative_l2")
+    mae_ratio = defect_mae / strain_mae if strain_mae > 0.0 else float("inf")
+    relative_l2_ratio = defect_relative_l2 / strain_relative_l2 if strain_relative_l2 > 0.0 else float("inf")
+
     return [
-        "## The member's own result (electron localization, fold 0, explicit stack)",
+        f"## The member's own result (electron localization, fold 0, {configuration_label})",
         "",
         f"Loaded from `{checkpoint_path.name}`: {progress.completed_steps} completed steps, best validation score"
         f" {progress.best_score:.6f} at step {progress.best_step}.",
@@ -1701,13 +1727,13 @@ def Elf_Evaluation_Lines(
         " scheduled together with the rest of the deep-equilibrium ladder, not yet run.",
         "",
         "The block's geometries are near-identical within a campaign, which is why a verbatim copy of the nearest"
-        " training run already reaches a mean absolute error of 0.0062 without learning anything (the"
-        " nearest-run-copy floor, above), and why the strain rows read markedly better than the defect rows: 3.3x"
-        " lower mean absolute error (0.000704 against 0.002329) and 5.2x lower relative L2 (0.26% against 1.35%)."
-        " The supercell strains are small, smooth perturbations of one lattice, so a near neighbor is nearly the"
-        " true answer,"
-        " while the defect campaign varies impurity species and site by run. The defect rows, not the pooled"
-        " median, are this member's real test.",
+        f" training run already reaches a mean absolute error of {copy_floor_mae:.4f} without learning anything"
+        f" (the nearest-run-copy floor, above), and why the strain rows read markedly better than the defect"
+        f" rows: {mae_ratio:.1f}x lower mean absolute error ({strain_mae:.6f} against {defect_mae:.6f}) and"
+        f" {relative_l2_ratio:.1f}x lower relative L2 ({100 * strain_relative_l2:.2f}% against"
+        f" {100 * defect_relative_l2:.2f}%). The supercell strains are small, smooth perturbations of one lattice,"
+        " so a near neighbor is nearly the true answer, while the defect campaign varies impurity species and"
+        " site by run. The defect rows, not the pooled median, are this member's real test.",
         "",
         "An external calibration point, not a competitor: the 2026 hydrogen-ELF network's published error of"
         " 0.019 is the nearest number in the literature, but it answers a single-element system, an easier"

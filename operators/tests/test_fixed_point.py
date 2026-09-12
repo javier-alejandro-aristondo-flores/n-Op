@@ -263,7 +263,7 @@ def Test_The_Solver_Reaches_What_A_Long_Weight_Tied_Unroll_Also_Converges_Toward
     solved = FixedPoint(layer)
     produced = np.asarray(solved.Apply(field).values, dtype=np.float64)
     assert solved.last_solve is not None
-    unrolled = WeightTied(layer, depth=solved.last_solve.iterations_taken + 10)
+    unrolled = WeightTied(layer, depth=solved.last_solve.iterations_taken + 10, input_injection=True)
     produced_unrolled = np.asarray(unrolled.Apply(field).values, dtype=np.float64)
     assert np.allclose(produced, produced_unrolled, atol=1e-2)
 
@@ -303,6 +303,41 @@ def Test_Every_Backward_Rule_Solves_And_Differentiates_With_The_Iterate_On_The_A
     assert composition.last_solve.iterations_taken >= 1
     for name, gradient in gradients.items():
         assert np.all(np.isfinite(gradient)), name
+
+
+def Test_The_Equilibrium_Depends_On_The_Input_Through_The_Injection() -> None:
+    """a fixed point of the layer alone would forget its start; with the input injected it must move with the input"""
+    layer = Contractive_Layer(seed=41)
+    composition = FixedPoint(layer)
+    first = np.asarray(Small_Field(2, seed=42).values, dtype=np.float64)
+    second = np.asarray(Small_Field(2, seed=43).values, dtype=np.float64)
+    lifted = composition.Parameter_Values()
+    first_equilibrium = np.asarray(composition.Forward(lifted, first), dtype=np.float64)
+    second_equilibrium = np.asarray(composition.Forward(lifted, second), dtype=np.float64)
+    assert composition.last_solve is not None and not composition.last_solve.cap_was_hit
+    relative_gap = float(np.linalg.norm(first_equilibrium - second_equilibrium) / np.linalg.norm(first_equilibrium))
+    assert relative_gap > 1e-3
+
+
+@pytest.mark.skipif(not Torch_Is_Available(), reason="the foreign engine is not installed yet")
+@pytest.mark.parametrize("backward", ["phantom", "implicit"])
+def Test_The_Gradient_Reaches_The_Input_Through_The_Fixed_Point(backward: Any) -> None:
+    """the parts upstream of a fixed point can only train if its output moves with its input on the tape"""
+    layer = Contractive_Layer(seed=44)
+    composition = FixedPoint(layer, backward=backward)
+    engine = TorchEngine()
+    lifted = {name: engine.Lift_Constant(value) for name, value in composition.Parameter_Values().items()}
+    field_values = np.asarray(Small_Field(2, seed=45).values, dtype=np.float64)
+    cotangent = engine.Lift_Constant(np.ones_like(field_values))
+
+    def Through_The_Fixed_Point(input_values: Any) -> Any:
+        """the fixed point as a function of its input alone, every parameter held"""
+        return composition.Forward(lifted, input_values)
+
+    input_gradient = Vector_Jacobian_Product(Through_The_Fixed_Point, engine.Lift_Constant(field_values), cotangent)
+    host_gradient = np.asarray(input_gradient.detach().cpu().numpy(), dtype=np.float64)
+    assert np.all(np.isfinite(host_gradient))
+    assert float(np.abs(host_gradient).max()) > 1e-8
 
 
 def Test_Inspect_Exposes_The_Health_Signals_The_Canon_Requires() -> None:
@@ -429,7 +464,7 @@ def Audit_Ground_Truths(
     kernel_lifted = Sliced_Lifted(probe.Parameter_Values(), "kernel.")
     local_linear_lifted = Sliced_Lifted(probe.Parameter_Values(), "local_linear.")
     depth = probe.Solved(kernel_lifted, local_linear_lifted, field_values).iterations_taken
-    tied = WeightTied(layer, depth=depth)
+    tied = WeightTied(layer, depth=depth, input_injection=True)
     engine = TorchEngine()
     _, full_unroll_gradients = engine.Value_And_Gradients(
         parameters, Weight_Tied_Loss(tied, engine.Lift_Constant(field_values), engine.Lift_Constant(target))

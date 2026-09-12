@@ -338,7 +338,7 @@ def Test_The_Mandatory_Gradient_Audit_On_This_Members_Own_Layer() -> None:
     kernel_lifted = Sliced_Lifted(probe.Parameter_Values(), "kernel.")
     local_linear_lifted = Sliced_Lifted(probe.Parameter_Values(), "local_linear.")
     depth = probe.Solved(kernel_lifted, local_linear_lifted, field_values).iterations_taken
-    tied = WeightTied(layer, depth=depth)
+    tied = WeightTied(layer, depth=depth, input_injection=True)
     engine = TorchEngine()
     lifted_field_values = engine.Lift_Constant(field_values)
     lifted_target = engine.Lift_Constant(target)

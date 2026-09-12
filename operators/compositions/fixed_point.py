@@ -26,7 +26,11 @@ def Sliced_Lifted(lifted: dict[str, Any], prefix: str) -> dict[str, Any]:
 
 
 def Applied_Once(
-    layer: Layer[GridFunction], kernel_lifted: dict[str, Any], local_linear_lifted: dict[str, Any], state: Any
+    layer: Layer[GridFunction],
+    kernel_lifted: dict[str, Any],
+    local_linear_lifted: dict[str, Any],
+    state: Any,
+    injection: Any | None = None,
 ) -> Any:
     """one activated pass of a layer over the current value, differentiable through whichever engine holds it"""
     spatial_shape = state.shape[1:]
@@ -34,6 +38,9 @@ def Applied_Once(
     kernel_output = layer.kernel.Forward(kernel_lifted, state, output_shape)
     local_output = layer.local_linear.Forward(local_linear_lifted, state)
     summed = local_output + kernel_output
+    # the input injected before the activation is what makes an iterated map's fixed point depend on the input
+    if injection is not None:
+        summed = summed + injection
     if layer.activation == "alias_free":
         raise NotImplementedError("the alias-free activation is the convolutional entry's own build")
     activated = Gaussian_Error_Linear_Unit(summed)
@@ -66,9 +73,11 @@ class WeightTied(Composition[GridFunction]):
     """one layer applied a fixed number of times with the same weights, gradients accumulating across every use"""
 
 
-    def __init__(self, layer: Layer[GridFunction], depth: int) -> None:
+    def __init__(self, layer: Layer[GridFunction], depth: int, input_injection: bool = False) -> None:
         self.layer = layer
         self.depth = depth
+        # with the injection on, this is exactly the fixed point's own iteration unrolled a fixed number of times
+        self.input_injection = input_injection
         self.last_application_norms: NDArray[np.float64] | None = None
 
 
@@ -76,10 +85,11 @@ class WeightTied(Composition[GridFunction]):
         """the value after each application of the shared layer in turn, tape on throughout"""
         kernel_lifted = Sliced_Lifted(lifted, "kernel.")
         local_linear_lifted = Sliced_Lifted(lifted, "local_linear.")
+        injection = input_values if self.input_injection else None
         current = input_values
         outputs: list[Any] = []
         for _ in range(self.depth):
-            current = Applied_Once(self.layer, kernel_lifted, local_linear_lifted, current)
+            current = Applied_Once(self.layer, kernel_lifted, local_linear_lifted, current, injection)
             outputs.append(current)
         return outputs
 
@@ -198,11 +208,13 @@ class FixedPoint(Composition[GridFunction]):
         """damped picard toward the shared layer's fixed point, anderson-accelerated once two residuals exist"""
         # every iterate is detached the moment it is made, so the whole solve stays off whichever tape lifted it
         state = Detached(input_values)
+        # the input enters every iteration, so the equilibrium is a function of it and not of the starting point alone
+        injection = state
         residual_history: list[Any] = []
         applied_history: list[Any] = []
         residual_norm_history: list[float] = []
         for iteration_index in range(self.iteration_cap):
-            applied = Detached(Applied_Once(self.layer, kernel_lifted, local_linear_lifted, state))
+            applied = Detached(Applied_Once(self.layer, kernel_lifted, local_linear_lifted, state, injection))
             # the residuals stay on their engine, and only the scalars the host decides on come across
             residual_values = applied - state
             residual_norm = float(np.sqrt(Host_Inner_Product(residual_values, residual_values)))
@@ -244,7 +256,7 @@ class FixedPoint(Composition[GridFunction]):
         # detached again here, at the equilibrium itself, even though solved already leaves nothing tape-connected
         state = Detached(solved.equilibrium)
         for _ in range(depth):
-            state = Applied_Once(self.layer, kernel_lifted, local_linear_lifted, state)
+            state = Applied_Once(self.layer, kernel_lifted, local_linear_lifted, state, input_values)
         return state, solved
 
 
@@ -261,17 +273,18 @@ class FixedPoint(Composition[GridFunction]):
         def Implicit_Forward(arguments: tuple[Any, ...]) -> Any:
             """the equilibrium alone, the solve itself never asked to carry a declared gradient"""
             kernel_lifted, local_linear_lifted = Split(arguments)
-            solved = self.Solved(kernel_lifted, local_linear_lifted, input_values)
+            solved = self.Solved(kernel_lifted, local_linear_lifted, arguments[-1])
             solve_holder.append(solved)
             return solved.equilibrium
 
         def Implicit_Backward(cotangent: Any, output: Any, saved_arguments: tuple[Any, ...]) -> tuple[Any, ...]:
-            """the cotangent solved through i minus j transpose, then pulled back onto every saved parameter"""
+            """the cotangent solved through i minus j transpose, then pulled back onto every saved argument"""
             kernel_lifted, local_linear_lifted = Split(saved_arguments)
+            saved_injection = saved_arguments[-1]
 
             def Applied_At_The_Equilibrium(state: Any) -> Any:
                 """applied once at the fixed state, differentiable only through the state itself"""
-                return Applied_Once(self.layer, kernel_lifted, local_linear_lifted, state)
+                return Applied_Once(self.layer, kernel_lifted, local_linear_lifted, state, saved_injection)
 
             adjoint = cotangent
             for _ in range(self.iteration_cap):
@@ -294,15 +307,24 @@ class FixedPoint(Composition[GridFunction]):
                         for position in range(len(saved_arguments))
                     )
                     varied_kernel_lifted, varied_local_linear_lifted = Split(varied_arguments)
-                    return Applied_Once(self.layer, varied_kernel_lifted, varied_local_linear_lifted, output)
+                    return Applied_Once(
+                        self.layer, varied_kernel_lifted, varied_local_linear_lifted, output, saved_injection
+                    )
 
                 gradients.append(
                     Vector_Jacobian_Product(Applied_Varying_One_Parameter, saved_arguments[varying_position], adjoint)
                 )
+
+            def Applied_Varying_The_Injection(injection: Any) -> Any:
+                """applied once at the fixed equilibrium with every parameter held, so only the input moves"""
+                return Applied_Once(self.layer, kernel_lifted, local_linear_lifted, output, injection)
+
+            # the input is the last saved argument, and its gradient is what lets the parts upstream train
+            gradients.append(Vector_Jacobian_Product(Applied_Varying_The_Injection, saved_injection, adjoint))
             return tuple(gradients)
 
         rule = CustomGradient(forward=Implicit_Forward, backward=Implicit_Backward)
-        equilibrium = rule.Apply(*(lifted[name] for name in parameter_names))
+        equilibrium = rule.Apply(*(lifted[name] for name in parameter_names), input_values)
         return equilibrium, solve_holder[0]
 
 

@@ -1378,12 +1378,18 @@ def Deep_Equilibrium_Ladder_Lines() -> list[str]:
         " matched-params comparator, weight-tied, and fixed-point, three seeds each.",
         "",
         "```",
-        "rung                       | steps | wall_clock_s | peak_memory_MiB | convergence_rate | seed",
-        "explicit (same width)      |   --  |     --       |       --        |  n/a (not iterative)  |  --",
-        "explicit (matched params)  |   --  |     --       |       --        |  n/a (not iterative)  |  --",
-        "weight_tied                |   --  |     --       |       --        |  n/a (not iterative)  |  --",
+        "rung                       | steps | wall_clock_s | peak_memory_MiB | convergence_rate     | seed",
+        "explicit (same width)      | 24404 |    14183     |     ~3600       | n/a (not iterative)  | 20260912 (1 of 3)",
+        "explicit (matched params)  |   --  |     --       |       --        | n/a (not iterative)  |  --",
+        "weight_tied                | 23804 |     9670     |     ~3185       | n/a (not iterative)  | 20260912 (1 of 3)",
         "fixed_point                |   --  |     --       |       --        |          --           |  --",
         "```",
+        "",
+        "**Steps** are the sum actually completed across all three stages (the final stage's own patience can stop"
+        " it short of the stage plan, as it did for both rungs above: explicit at 24,404 of 35,505, weight-tied at"
+        " 23,804). **Wall-clock** and **peak memory** are one seed's own measured run, the first of the three the"
+        " kill bar needs -- peak memory is read from periodic `nvidia-smi` checks during the run, not a"
+        " continuously logged maximum, so it is reported to the nearest hundred MiB rather than claimed exact.",
         "",
     ]
 

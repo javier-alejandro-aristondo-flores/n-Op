@@ -157,12 +157,14 @@ explicit, matched params (1 layer):       963330 parameters (exact match to the 
 Every trained number below is the integrator's to schedule and this stream's to report once run: steps, wall-clock seconds, peak memory, the convergence rate (fraction of the evaluation block converging to 1e-3 within 32 iterations), and the seed -- for the explicit same-width comparator, the explicit matched-params comparator, weight-tied, and fixed-point, three seeds each.
 
 ```
-rung                       | steps | wall_clock_s | peak_memory_MiB | convergence_rate | seed
-explicit (same width)      |   --  |     --       |       --        |  n/a (not iterative)  |  --
-explicit (matched params)  |   --  |     --       |       --        |  n/a (not iterative)  |  --
-weight_tied                |   --  |     --       |       --        |  n/a (not iterative)  |  --
+rung                       | steps | wall_clock_s | peak_memory_MiB | convergence_rate     | seed
+explicit (same width)      | 24404 |    14183     |     ~3600       | n/a (not iterative)  | 20260912 (1 of 3)
+explicit (matched params)  |   --  |     --       |       --        | n/a (not iterative)  |  --
+weight_tied                | 23804 |     9670     |     ~3185       | n/a (not iterative)  | 20260912 (1 of 3)
 fixed_point                |   --  |     --       |       --        |          --           |  --
 ```
+
+**Steps** are the sum actually completed across all three stages (the final stage's own patience can stop it short of the stage plan, as it did for both rungs above: explicit at 24,404 of 35,505, weight-tied at 23,804). **Wall-clock** and **peak memory** are one seed's own measured run, the first of the three the kill bar needs -- peak memory is read from periodic `nvidia-smi` checks during the run, not a continuously logged maximum, so it is reported to the nearest hundred MiB rather than claimed exact.
 
 ## The potential task (`charge_to_potential`), host-only work
 
@@ -249,4 +251,208 @@ Stage zero (defect campaign only, spin-mean potential): Hartree + climatology 57
 - **added, as for ELF**: beat the training-mean template; beat the nearest-run copy.
 - **the per-shell linear filter is the linearity certificate, not a kill**: stage zero read 23.35% on the spin mean over cubic fold zero, 2.4x better than the physics floor; this recomputation's per-spin filter row (above) tests that same hypothesis on this block.
 - **the DEQ cross-entry bar**: fixed-point's error on this task within 1.5x of I.1's own error on the same split.
+
+## The parametric variant (canon II.4, `strain_to_charge`), host-only work
+
+Parameters (the six-component strain tensor) broadcast as constant channels into the same lift, plus periodic coordinate features of the requested grid's own fractional coordinates -- without the coordinate channels a spectral-plus-pointwise stack fed nothing but constants can only answer a constant field, proven directly in `Test_A_Constant_Only_Input_Can_Only_Answer_A_Constant_Field` and `Test_Coordinate_Features_Break_The_Constant_Output_Degeneracy_And_Answer_Any_Grid`. The same trained weights answer any grid shape because the coordinate channels are rebuilt for whatever shape is asked, never cached for one; `Test_The_Same_Parametric_Weights_Answer_Two_Different_Grids` checks this directly on the production member. The electron count rides in `__call__`'s own `condition` argument, unused by the other two tasks, exactly the seam `Conserving(law="renormalize_to_electron_count")` was built for.
+
+### arms and levels
+
+An arm is one strain family; a level is that family's own swept parameter vector (one component for uniaxial, biaxial, isotropic and one-angle shear; two for two-angle shear; three for triaxial and three-angle shear, confirmed against the real census as genuine multi-dimensional grids rather than single-factor lines). `Bracket_Corners` generalizes bracketing interpolation to any dimension: every one of a level's 2^D corner combinations must itself be a real level, which refuses a bracket across a grid hole (two-angle and three-angle shear both have real holes) rather than assuming a complete factorial design.
+
+- **biaxial**: 40 levels (38 interior, held out one at a time), 80 runs
+- **isotropic**: 47 levels (45 interior, held out one at a time), 94 runs
+- **one_angle_shear**: 40 levels (38 interior, held out one at a time), 240 runs
+- **three_angle_shear**: 192 levels (20 interior, held out one at a time), 384 runs
+- **triaxial**: 512 levels (216 interior, held out one at a time), 1024 runs
+- **two_angle_shear**: 76 levels (28 interior, held out one at a time), 456 runs
+- **uniaxial**: 40 levels (38 interior, held out one at a time), 80 runs
+
+### floors, leave-one-level-out block (every interior level held out, its own arm's boundary training it)
+
+```
+group                                              metric                    units  runs  median    interquartile  mean_interval       
+bracketing_interpolation_floor                     mean_absolute_error       423    423   0.000674  0.001117       [0.000565, 0.000676]
+bracketing_interpolation_floor__biaxial            mean_absolute_error       38     38    0.000056  0.000024       [0.000052, 0.000063]
+bracketing_interpolation_floor__isotropic          mean_absolute_error       45     45    0.000015  0.000005       [0.000014, 0.000016]
+bracketing_interpolation_floor__one_angle_shear    mean_absolute_error       38     38    0.000004  0.000000       [0.000004, 0.000004]
+bracketing_interpolation_floor__three_angle_shear  mean_absolute_error       20     20    0.000442  0.000118       [0.000380, 0.000445]
+bracketing_interpolation_floor__triaxial           mean_absolute_error       216    216   0.001137  0.000375       [0.001110, 0.001178]
+bracketing_interpolation_floor__two_angle_shear    mean_absolute_error       28     28    0.000134  0.000001       [0.000134, 0.000136]
+bracketing_interpolation_floor__uniaxial           mean_absolute_error       38     38    0.000019  0.000006       [0.000018, 0.000021]
+bracketing_interpolation_floor                     structural_similarity_3d  423    423   0.999997  0.000006       [0.999996, 0.999997]
+bracketing_interpolation_floor__biaxial            structural_similarity_3d  38     38    1.000000  0.000000       [1.000000, 1.000000]
+bracketing_interpolation_floor__isotropic          structural_similarity_3d  45     45    1.000000  0.000000       [1.000000, 1.000000]
+bracketing_interpolation_floor__one_angle_shear    structural_similarity_3d  38     38    1.000000  0.000000       [1.000000, 1.000000]
+bracketing_interpolation_floor__three_angle_shear  structural_similarity_3d  20     20    0.999997  0.000002       [0.999997, 0.999998]
+bracketing_interpolation_floor__triaxial           structural_similarity_3d  216    216   0.999994  0.000006       [0.999993, 0.999994]
+bracketing_interpolation_floor__two_angle_shear    structural_similarity_3d  28     28    1.000000  0.000000       [1.000000, 1.000000]
+bracketing_interpolation_floor__uniaxial           structural_similarity_3d  38     38    1.000000  0.000000       [1.000000, 1.000000]
+bracketing_interpolation_floor                     relative_l2               423    423   0.000911  0.001348       [0.000688, 0.000818]
+bracketing_interpolation_floor__biaxial            relative_l2               38     38    0.000066  0.000015       [0.000064, 0.000074]
+bracketing_interpolation_floor__isotropic          relative_l2               45     45    0.000020  0.000005       [0.000019, 0.000021]
+bracketing_interpolation_floor__one_angle_shear    relative_l2               38     38    0.000005  0.000001       [0.000005, 0.000006]
+bracketing_interpolation_floor__three_angle_shear  relative_l2               20     20    0.000649  0.000194       [0.000564, 0.000665]
+bracketing_interpolation_floor__triaxial           relative_l2               216    216   0.001374  0.000523       [0.001333, 0.001409]
+bracketing_interpolation_floor__two_angle_shear    relative_l2               28     28    0.000194  0.000003       [0.000194, 0.000197]
+bracketing_interpolation_floor__uniaxial           relative_l2               38     38    0.000025  0.000005       [0.000024, 0.000028]
+training_mean_trivial_floor                        mean_absolute_error       423    423   0.031721  0.038525       [0.037548, 0.043259]
+training_mean_trivial_floor__biaxial               mean_absolute_error       38     38    0.070862  0.065000       [0.058836, 0.084156]
+training_mean_trivial_floor__isotropic             mean_absolute_error       45     45    0.034765  0.034632       [0.029939, 0.042603]
+training_mean_trivial_floor__one_angle_shear       mean_absolute_error       38     38    0.010814  0.007984       [0.009818, 0.012612]
+training_mean_trivial_floor__three_angle_shear     mean_absolute_error       20     20    0.031841  0.003222       [0.032519, 0.034599]
+training_mean_trivial_floor__triaxial              mean_absolute_error       216    216   0.040519  0.035417       [0.041920, 0.049387]
+training_mean_trivial_floor__two_angle_shear       mean_absolute_error       28     28    0.015883  0.007105       [0.014766, 0.018689]
+training_mean_trivial_floor__uniaxial              mean_absolute_error       38     38    0.035700  0.032859       [0.029496, 0.041893]
+training_mean_trivial_floor                        structural_similarity_3d  423    423   0.995127  0.007848       [0.991395, 0.993019]
+training_mean_trivial_floor__biaxial               structural_similarity_3d  38     38    0.986538  0.024129       [0.978113, 0.987247]
+training_mean_trivial_floor__isotropic             structural_similarity_3d  45     45    0.996672  0.006226       [0.994450, 0.996769]
+training_mean_trivial_floor__one_angle_shear       structural_similarity_3d  38     38    0.998764  0.002089       [0.998032, 0.998811]
+training_mean_trivial_floor__three_angle_shear     structural_similarity_3d  20     20    0.989624  0.003045       [0.989194, 0.991006]
+training_mean_trivial_floor__triaxial              structural_similarity_3d  216    216   0.993678  0.007765       [0.990114, 0.992212]
+training_mean_trivial_floor__two_angle_shear       structural_similarity_3d  28     28    0.997240  0.002151       [0.996238, 0.997708]
+training_mean_trivial_floor__uniaxial              structural_similarity_3d  38     38    0.995970  0.007210       [0.993385, 0.996136]
+training_mean_trivial_floor                        relative_l2               423    423   0.045897  0.045848       [0.050827, 0.058042]
+training_mean_trivial_floor__biaxial               relative_l2               38     38    0.091052  0.084118       [0.075657, 0.107548]
+training_mean_trivial_floor__isotropic             relative_l2               45     45    0.044875  0.044286       [0.037868, 0.052992]
+training_mean_trivial_floor__one_angle_shear       relative_l2               38     38    0.016965  0.014036       [0.015004, 0.019889]
+training_mean_trivial_floor__three_angle_shear     relative_l2               20     20    0.052371  0.003551       [0.053264, 0.056513]
+training_mean_trivial_floor__triaxial              relative_l2               216    216   0.052355  0.047231       [0.056451, 0.065884]
+training_mean_trivial_floor__two_angle_shear       relative_l2               28     28    0.025532  0.012274       [0.023438, 0.030058]
+training_mean_trivial_floor__uniaxial              relative_l2               38     38    0.046979  0.044332       [0.039024, 0.055496]
+nearest_run_copy_floor                             mean_absolute_error       423    423   0.015082  0.009548       [0.016509, 0.018617]
+nearest_run_copy_floor__biaxial                    mean_absolute_error       38     38    0.018013  0.022782       [0.017908, 0.027328]
+nearest_run_copy_floor__isotropic                  mean_absolute_error       45     45    0.019321  0.019137       [0.018979, 0.027117]
+nearest_run_copy_floor__one_angle_shear            mean_absolute_error       38     38    0.008701  0.007526       [0.006783, 0.009822]
+nearest_run_copy_floor__three_angle_shear          mean_absolute_error       20     20    0.010777  0.000029       [0.010769, 0.010797]
+nearest_run_copy_floor__triaxial                   mean_absolute_error       216    216   0.015999  0.005347       [0.017103, 0.019111]
+nearest_run_copy_floor__two_angle_shear            mean_absolute_error       28     28    0.006418  0.000209       [0.006472, 0.007147]
+nearest_run_copy_floor__uniaxial                   mean_absolute_error       38     38    0.017380  0.024136       [0.018838, 0.029567]
+nearest_run_copy_floor                             structural_similarity_3d  423    423   0.999231  0.001302       [0.998503, 0.998762]
+nearest_run_copy_floor__biaxial                    structural_similarity_3d  38     38    0.998753  0.002053       [0.997560, 0.998614]
+nearest_run_copy_floor__isotropic                  structural_similarity_3d  45     45    0.998499  0.001662       [0.997462, 0.998440]
+nearest_run_copy_floor__one_angle_shear            structural_similarity_3d  38     38    0.999302  0.001049       [0.998951, 0.999395]
+nearest_run_copy_floor__three_angle_shear          structural_similarity_3d  20     20    0.999031  0.000027       [0.999023, 0.999037]
+nearest_run_copy_floor__triaxial                   structural_similarity_3d  216    216   0.999252  0.000260       [0.998653, 0.998938]
+nearest_run_copy_floor__two_angle_shear            structural_similarity_3d  28     28    0.999591  0.000022       [0.999456, 0.999588]
+nearest_run_copy_floor__uniaxial                   structural_similarity_3d  38     38    0.998533  0.002649       [0.996838, 0.998248]
+nearest_run_copy_floor                             relative_l2               423    423   0.019876  0.010944       [0.022205, 0.024712]
+nearest_run_copy_floor__biaxial                    relative_l2               38     38    0.024364  0.022644       [0.023751, 0.034560]
+nearest_run_copy_floor__isotropic                  relative_l2               45     45    0.025752  0.022191       [0.025184, 0.034881]
+nearest_run_copy_floor__one_angle_shear            relative_l2               38     38    0.014143  0.012087       [0.011017, 0.015981]
+nearest_run_copy_floor__three_angle_shear          relative_l2               20     20    0.016914  0.000080       [0.016890, 0.016955]
+nearest_run_copy_floor__triaxial                   relative_l2               216    216   0.019984  0.003366       [0.022379, 0.024928]
+nearest_run_copy_floor__two_angle_shear            relative_l2               28     28    0.010395  0.000602       [0.010466, 0.011595]
+nearest_run_copy_floor__uniaxial                   relative_l2               38     38    0.024575  0.029520       [0.025519, 0.038317]
+ridge_to_pod_32_floor                              mean_absolute_error       423    423   0.003459  0.005178       [0.004863, 0.005719]
+ridge_to_pod_32_floor__biaxial                     mean_absolute_error       38     38    0.004107  0.004357       [0.004111, 0.006598]
+ridge_to_pod_32_floor__isotropic                   mean_absolute_error       45     45    0.007765  0.002233       [0.006839, 0.007726]
+ridge_to_pod_32_floor__one_angle_shear             mean_absolute_error       38     38    0.012813  0.010319       [0.011431, 0.015042]
+ridge_to_pod_32_floor__three_angle_shear           mean_absolute_error       20     20    0.007687  0.001372       [0.007300, 0.008172]
+ridge_to_pod_32_floor__triaxial                    mean_absolute_error       216    216   0.002432  0.001259       [0.002516, 0.002913]
+ridge_to_pod_32_floor__two_angle_shear             mean_absolute_error       28     28    0.011589  0.008710       [0.010581, 0.014335]
+ridge_to_pod_32_floor__uniaxial                    mean_absolute_error       38     38    0.002993  0.002073       [0.002820, 0.003492]
+ridge_to_pod_32_floor                              structural_similarity_3d  423    423   0.999935  0.000197       [0.999617, 0.999744]
+ridge_to_pod_32_floor__biaxial                     structural_similarity_3d  38     38    0.999908  0.000105       [0.999764, 0.999899]
+ridge_to_pod_32_floor__isotropic                   structural_similarity_3d  45     45    0.999782  0.000105       [0.999780, 0.999820]
+ridge_to_pod_32_floor__one_angle_shear             structural_similarity_3d  38     38    0.998785  0.002029       [0.998050, 0.998833]
+ridge_to_pod_32_floor__three_angle_shear           structural_similarity_3d  20     20    0.999566  0.000208       [0.999492, 0.999614]
+ridge_to_pod_32_floor__triaxial                    structural_similarity_3d  216    216   0.999953  0.000025       [0.999941, 0.999953]
+ridge_to_pod_32_floor__two_angle_shear             structural_similarity_3d  28     28    0.999006  0.001608       [0.998258, 0.999035]
+ridge_to_pod_32_floor__uniaxial                    structural_similarity_3d  38     38    0.999920  0.000053       [0.999907, 0.999925]
+ridge_to_pod_32_floor                              relative_l2               423    423   0.004225  0.006619       [0.006818, 0.008186]
+ridge_to_pod_32_floor__biaxial                     relative_l2               38     38    0.005077  0.005108       [0.005221, 0.008272]
+ridge_to_pod_32_floor__isotropic                   relative_l2               45     45    0.009097  0.002726       [0.007981, 0.009086]
+ridge_to_pod_32_floor__one_angle_shear             relative_l2               38     38    0.020430  0.017725       [0.017808, 0.024029]
+ridge_to_pod_32_floor__three_angle_shear           relative_l2               20     20    0.011866  0.002519       [0.011071, 0.012817]
+ridge_to_pod_32_floor__triaxial                    relative_l2               216    216   0.003353  0.001252       [0.003411, 0.003955]
+ridge_to_pod_32_floor__two_angle_shear             relative_l2               28     28    0.018543  0.014941       [0.016728, 0.023092]
+ridge_to_pod_32_floor__uniaxial                    relative_l2               38     38    0.003994  0.002098       [0.003662, 0.004373]
+```
+
+### floors, development block (the committed `strain_atlas_holdout` split, `operators.data`'s own)
+
+The same three floors (training mean, nearest-run copy, ridge to a rank-32 POD basis), recomputed on the already-committed train/test split rather than the leave-one-level-out one, reported beside it as a second, independent read of the same block:
+
+```
+group                                           metric                    units  runs  median    interquartile  mean_interval       
+training_mean_trivial_floor                     mean_absolute_error       22     176   0.029702  0.033238       [0.027292, 0.045778]
+training_mean_trivial_floor__biaxial            mean_absolute_error       3      6     0.036861  0.015218       [0.029426, 0.059861]
+training_mean_trivial_floor__isotropic          mean_absolute_error       5      10    0.023437  0.009742       [0.014085, 0.061586]
+training_mean_trivial_floor__one_angle_shear    mean_absolute_error       2      18    0.020858  0.009348       [0.011510, 0.030207]
+training_mean_trivial_floor__three_angle_shear  mean_absolute_error       2      16    0.030664  0.013208       [0.017456, 0.043872]
+training_mean_trivial_floor__triaxial           mean_absolute_error       6      48    0.033547  0.031191       [0.023343, 0.060576]
+training_mean_trivial_floor__two_angle_shear    mean_absolute_error       2      72    0.016061  0.004552       [0.011510, 0.020613]
+training_mean_trivial_floor__uniaxial           mean_absolute_error       3      6     0.056310  0.022286       [0.016287, 0.060859]
+training_mean_trivial_floor                     structural_similarity_3d  22     176   0.996311  0.007637       [0.991486, 0.995798]
+training_mean_trivial_floor__biaxial            structural_similarity_3d  3      6     0.996301  0.003297       [0.990937, 0.997532]
+training_mean_trivial_floor__isotropic          structural_similarity_3d  5      10    0.998369  0.001195       [0.988965, 0.999047]
+training_mean_trivial_floor__one_angle_shear    structural_similarity_3d  2      18    0.995837  0.003185       [0.992652, 0.999022]
+training_mean_trivial_floor__three_angle_shear  structural_similarity_3d  2      16    0.990535  0.006926       [0.983609, 0.997462]
+training_mean_trivial_floor__triaxial           structural_similarity_3d  6      48    0.993044  0.005489       [0.988493, 0.995737]
+training_mean_trivial_floor__two_angle_shear    structural_similarity_3d  2      72    0.997912  0.001110       [0.996802, 0.999022]
+training_mean_trivial_floor__uniaxial           structural_similarity_3d  3      6     0.989312  0.005245       [0.988169, 0.998658]
+training_mean_trivial_floor                     relative_l2               22     176   0.041598  0.043404       [0.038920, 0.060405]
+training_mean_trivial_floor__biaxial            relative_l2               3      6     0.046988  0.017465       [0.038268, 0.073198]
+training_mean_trivial_floor__isotropic          relative_l2               5      10    0.031094  0.011480       [0.019812, 0.073702]
+training_mean_trivial_floor__one_angle_shear    relative_l2               2      18    0.033554  0.014395       [0.019159, 0.047948]
+training_mean_trivial_floor__three_angle_shear  relative_l2               2      16    0.050880  0.021217       [0.029662, 0.072097]
+training_mean_trivial_floor__triaxial           relative_l2               6      48    0.047809  0.040455       [0.035354, 0.076150]
+training_mean_trivial_floor__two_angle_shear    relative_l2               2      72    0.026450  0.007291       [0.019159, 0.033741]
+training_mean_trivial_floor__uniaxial           relative_l2               3      6     0.075355  0.029609       [0.023883, 0.083102]
+nearest_run_copy_floor                          mean_absolute_error       22     176   0.007849  0.006292       [0.006702, 0.009700]
+nearest_run_copy_floor__biaxial                 mean_absolute_error       3      6     0.008022  0.000603       [0.007677, 0.008883]
+nearest_run_copy_floor__isotropic               mean_absolute_error       5      10    0.004310  0.000400       [0.004074, 0.006620]
+nearest_run_copy_floor__one_angle_shear         mean_absolute_error       2      18    0.003896  0.000012       [0.003884, 0.003908]
+nearest_run_copy_floor__three_angle_shear       mean_absolute_error       2      16    0.011514  0.000021       [0.011493, 0.011535]
+nearest_run_copy_floor__triaxial                mean_absolute_error       6      48    0.013499  0.004544       [0.009545, 0.014343]
+nearest_run_copy_floor__two_angle_shear         mean_absolute_error       2      72    0.006808  0.002900       [0.003908, 0.009708]
+nearest_run_copy_floor__uniaxial                mean_absolute_error       3      6     0.005447  0.000560       [0.005001, 0.006120]
+nearest_run_copy_floor                          structural_similarity_3d  22     176   0.999627  0.000498       [0.999376, 0.999633]
+nearest_run_copy_floor__biaxial                 structural_similarity_3d  3      6     0.999729  0.000099       [0.999533, 0.999731]
+nearest_run_copy_floor__isotropic               structural_similarity_3d  5      10    0.999788  0.000004       [0.999662, 0.999792]
+nearest_run_copy_floor__one_angle_shear         structural_similarity_3d  2      18    0.999762  0.000003       [0.999758, 0.999765]
+nearest_run_copy_floor__three_angle_shear       structural_similarity_3d  2      16    0.998923  0.000016       [0.998907, 0.998939]
+nearest_run_copy_floor__triaxial                structural_similarity_3d  6      48    0.999302  0.000452       [0.999094, 0.999467]
+nearest_run_copy_floor__two_angle_shear         structural_similarity_3d  2      72    0.999489  0.000269       [0.999220, 0.999758]
+nearest_run_copy_floor__uniaxial                structural_similarity_3d  3      6     0.999733  0.000048       [0.999676, 0.999772]
+nearest_run_copy_floor                          relative_l2               22     176   0.011417  0.010004       [0.010642, 0.014690]
+nearest_run_copy_floor__biaxial                 relative_l2               3      6     0.011418  0.000297       [0.011415, 0.012009]
+nearest_run_copy_floor__isotropic               relative_l2               5      10    0.007641  0.000154       [0.007338, 0.009701]
+nearest_run_copy_floor__one_angle_shear         relative_l2               2      18    0.007116  0.000003       [0.007113, 0.007119]
+nearest_run_copy_floor__three_angle_shear       relative_l2               2      16    0.018558  0.000141       [0.018416, 0.018699]
+nearest_run_copy_floor__triaxial                relative_l2               6      48    0.019730  0.003806       [0.013965, 0.020162]
+nearest_run_copy_floor__two_angle_shear         relative_l2               2      72    0.011463  0.004344       [0.007119, 0.015807]
+nearest_run_copy_floor__uniaxial                relative_l2               3      6     0.008660  0.001722       [0.008061, 0.011505]
+ridge_to_pod_32_floor                           mean_absolute_error       22     176   0.004317  0.001596       [0.004099, 0.005175]
+ridge_to_pod_32_floor__biaxial                  mean_absolute_error       3      6     0.003158  0.000817       [0.003155, 0.004788]
+ridge_to_pod_32_floor__isotropic                mean_absolute_error       5      10    0.004978  0.000195       [0.004774, 0.005639]
+ridge_to_pod_32_floor__one_angle_shear          mean_absolute_error       2      18    0.003490  0.000009       [0.003481, 0.003499]
+ridge_to_pod_32_floor__three_angle_shear        mean_absolute_error       2      16    0.005602  0.001736       [0.003866, 0.007338]
+ridge_to_pod_32_floor__triaxial                 mean_absolute_error       6      48    0.004214  0.001788       [0.003590, 0.006134]
+ridge_to_pod_32_floor__two_angle_shear          mean_absolute_error       2      72    0.003573  0.000092       [0.003481, 0.003665]
+ridge_to_pod_32_floor__uniaxial                 mean_absolute_error       3      6     0.004386  0.001144       [0.003550, 0.005838]
+ridge_to_pod_32_floor                           structural_similarity_3d  22     176   0.999846  0.000070       [0.999761, 0.999840]
+ridge_to_pod_32_floor__biaxial                  structural_similarity_3d  3      6     0.999875  0.000015       [0.999846, 0.999875]
+ridge_to_pod_32_floor__isotropic                structural_similarity_3d  5      10    0.999834  0.000016       [0.999809, 0.999843]
+ridge_to_pod_32_floor__one_angle_shear          structural_similarity_3d  2      18    0.999858  0.000005       [0.999853, 0.999864]
+ridge_to_pod_32_floor__three_angle_shear        structural_similarity_3d  2      16    0.999656  0.000205       [0.999451, 0.999861]
+ridge_to_pod_32_floor__triaxial                 structural_similarity_3d  6      48    0.999805  0.000106       [0.999727, 0.999847]
+ridge_to_pod_32_floor__two_angle_shear          structural_similarity_3d  2      72    0.999860  0.000004       [0.999855, 0.999864]
+ridge_to_pod_32_floor__uniaxial                 structural_similarity_3d  3      6     0.999793  0.000086       [0.999689, 0.999861]
+ridge_to_pod_32_floor                           relative_l2               22     176   0.006817  0.001631       [0.006557, 0.007800]
+ridge_to_pod_32_floor__biaxial                  relative_l2               3      6     0.005705  0.000765       [0.005594, 0.007125]
+ridge_to_pod_32_floor__isotropic                relative_l2               5      10    0.007150  0.000426       [0.006881, 0.007908]
+ridge_to_pod_32_floor__one_angle_shear          relative_l2               2      18    0.005980  0.000156       [0.005825, 0.006136]
+ridge_to_pod_32_floor__three_angle_shear        relative_l2               2      16    0.008969  0.002878       [0.006091, 0.011847]
+ridge_to_pod_32_floor__triaxial                 relative_l2               6      48    0.006701  0.001706       [0.006330, 0.008550]
+ridge_to_pod_32_floor__two_angle_shear          relative_l2               2      72    0.005946  0.000122       [0.005825, 0.006068]
+ridge_to_pod_32_floor__uniaxial                 relative_l2               3      6     0.007824  0.000910       [0.006067, 0.007887]
+```
+
+### the pre-registered kill, neither bar invented here
+
+**Canon bar**: kill unless the member's own relative L2 is under 0.7x the best of these four floors on the leave-one-level-out block. The strongest floor measured is **bracketing_interpolation_floor**, pooled median relative L2 **0.091%** -- required absolute: **0.064%**.
+
+**The honesty note, stated before any member is trained**: the canon's own text calls this pattern's gate case the weakest in the suite, and says plainly that a linear-interpolation floor winning on a smooth factorial sweep is the *expected*, reportable outcome, not a failure to bury. Bracketing interpolation measures under 0.09% relative L2 pooled, and under 0.21% on every single family's own median (triaxial, the largest and least smooth arm, is the worst case). A trained member clearing a bar this tight, on a physical regime this close to linear, would be the genuinely informative result; one that does not is exactly what the canon predicted and precisely why this member is worth building anyway -- the parametric task is the suite's honest admission that not every gate is won by the network.
 

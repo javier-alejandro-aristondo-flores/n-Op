@@ -6,6 +6,7 @@ import numpy as np
 import pytest
 from numpy.typing import NDArray
 
+from operators.compositions import Spectral_Resampled
 from operators.data import Archive_Path
 from operators.factorized_fourier import (
     Factorized_Fourier_Network,
@@ -14,13 +15,13 @@ from operators.factorized_fourier import (
     Gram_Statistics,
     Log_Compressed_Channels,
     Reference_Density,
-    Resampled_To_Shape,
     Standardized_Gram,
 )
 from operators.factorized_fourier.report import (
     CARD_METRIC_NAMES,
     CubicBlock,
     Elf_Ridge_Rows,
+    Nearest_Run_Rows,
     Shell_Filter_Rows,
 )
 from operators.framework import Domain, GridFunction, GridSpec, UniformGridQuadrature
@@ -148,7 +149,7 @@ def Test_Truncate_Early_Equals_Lift_Then_Truncate() -> None:
     log_density_values, gram_vector = member.Input_Channels(input_function)
     parameters = member.Parameter_Values()
 
-    coarse_density = Resampled_To_Shape(log_density_values, (4, 4, 4))
+    coarse_density = Spectral_Resampled(log_density_values, (4, 4, 4))
     gram_field_coarse = gram_vector.reshape(6, 1, 1, 1) + Zeros_Beside(coarse_density, (6, 4, 4, 4))
     combined_coarse = Concatenate_Channels([coarse_density, gram_field_coarse])
     truncate_then_lift = member.lift.Forward(parameters, combined_coarse)
@@ -156,7 +157,7 @@ def Test_Truncate_Early_Equals_Lift_Then_Truncate() -> None:
     gram_field_fine = gram_vector.reshape(6, 1, 1, 1) + Zeros_Beside(log_density_values, (6, 8, 8, 8))
     combined_fine = Concatenate_Channels([log_density_values, gram_field_fine])
     lifted_fine = member.lift.Forward(parameters, combined_fine)
-    lift_then_truncate = Resampled_To_Shape(lifted_fine, (4, 4, 4))
+    lift_then_truncate = Spectral_Resampled(lifted_fine, (4, 4, 4))
 
     assert np.allclose(truncate_then_lift, lift_then_truncate, atol=1e-10)
 
@@ -265,7 +266,7 @@ def Test_A_Toy_Training_Run_Is_Deterministic_From_One_Seed() -> None:
 
 @pytest.mark.pool
 def Test_The_Recomputed_Floors_Land_Near_Stage_Zeros_Own_Numbers() -> None:
-    """both floor recipes, recomputed on this exact block, land close to the numbers stage zero committed"""
+    """both stage-zero floor recipes, recomputed on this exact block, land close to the numbers stage zero committed"""
     block = CubicBlock()
     assert len(block.floor_train) == 261
     assert len(block.evaluation) == 76
@@ -279,6 +280,21 @@ def Test_The_Recomputed_Floors_Land_Near_Stage_Zeros_Own_Numbers() -> None:
     # stage zero's own committed numbers: ridge 0.0964, filter 0.0816, both loosely bracketed here
     assert 0.06 < float(np.median(ridge_mean_absolute_errors)) < 0.14
     assert 0.05 < float(np.median(filter_mean_absolute_errors)) < 0.13
+
+
+@pytest.mark.pool
+def Test_The_Nearest_Run_Copy_Floor_Is_A_Genuine_Memorization_Null() -> None:
+    """the copy floor answers every evaluation run, from a training run only, on every card metric and both spins"""
+    block = CubicBlock()
+    copy_rows = Nearest_Run_Rows(block)
+    # both spin channels of every evaluation run, each carrying all three card metrics
+    assert len(copy_rows) == 2 * len(block.evaluation)
+    for scored_run in copy_rows:
+        assert set(scored_run.errors) == set(CARD_METRIC_NAMES)
+        assert 0.0 <= scored_run.errors["mean_absolute_error"] < 1.0
+    copy_mean_absolute_errors = np.asarray([row.errors["mean_absolute_error"] for row in copy_rows])
+    # a copy of an actual localization field is never worse than a wild guess, nor a perfect answer
+    assert 0.0 < float(np.median(copy_mean_absolute_errors)) < 0.5
 
 
 @pytest.mark.pool

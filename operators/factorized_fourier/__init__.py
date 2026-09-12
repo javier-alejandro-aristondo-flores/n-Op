@@ -60,8 +60,10 @@ def Standardized_Gram(
 def Spin_Channels(
     density: NDArray[np.float64], magnetization: NDArray[np.float64]
 ) -> tuple[NDArray[np.float64], NDArray[np.float64]]:
-    """the up and down spin densities, half the sum and half the difference"""
-    return (density + magnetization) / 2.0, (density - magnetization) / 2.0
+    """the up and down spin densities, half the sum and half the difference, clipped where the corpus goes negative"""
+    # a quarter of defect_set runs carry a voxel where the stored magnetization locally exceeds the density
+    # a spin-resolved density has no negative meaning, and log-compression cannot take a negative argument
+    return np.maximum((density + magnetization) / 2.0, 0.0), np.maximum((density - magnetization) / 2.0, 0.0)
 
 
 def Log_Compressed_Channels(

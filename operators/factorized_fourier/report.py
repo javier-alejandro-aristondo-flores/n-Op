@@ -573,7 +573,9 @@ def Write_Back_Parameters(member: FactorizedFourier, parameters: ParameterSet) -
         Write_Back_Layer(composition.layer, parameters, "")
 
 
-def Train_Flagship_Member(step_count: int, run_name: str) -> dict[str, object]:
+def Train_Flagship_Member(
+    step_count: int, run_name: str, configuration: FactorizedFourierConfiguration = "explicit"
+) -> dict[str, object]:
     """the full staged run: a divergence probe with one allowed restart at a lower rate, then the staged schedule"""
     block = CubicBlock()
     training_identifiers = block.member_train
@@ -594,6 +596,7 @@ def Train_Flagship_Member(step_count: int, run_name: str) -> dict[str, object]:
         gram_scale=gram_scale,
         processing_shape=COARSE_SHAPE,
         seed=FLAGSHIP_SEED,
+        configuration=configuration,
     )
     forward_loss = Localization_Loss(member)
     parameters = ParameterSet(values=member.Parameter_Values())
@@ -1609,7 +1612,7 @@ def Write_Elf_Figures(
         "electron localization fold 0 explicit against its floors (relative L2; the ladder itself is absolute"
         " mean absolute error, tabulated separately)",
     )
-    return len(suite.written) + 3
+    return len(suite.written) + 4
 
 
 def Elf_Evaluation_Lines(
@@ -1668,11 +1671,35 @@ def Elf_Evaluation_Lines(
     sampled_run_count = len(super_resolution_rows) // len(LOCALIZATION_CHANNELS)
     figures_directory = figures_root / "fold_0" / "explicit"
     cache_directory = cache_root / "fold_0" / "explicit"
+    try:
+        # a worktree's own absolute path is meaningless once this report is read from a different checkout
+        figures_directory = figures_directory.relative_to(Path.cwd())
+    except ValueError:
+        pass
     return [
         "## The member's own result (electron localization, fold 0, explicit stack)",
         "",
         f"Loaded from `{checkpoint_path.name}`: {progress.completed_steps} completed steps, best validation score"
         f" {progress.best_score:.6f} at step {progress.best_step}.",
+        "",
+        "### three caveats before trusting this number",
+        "",
+        "This is one seeded run (seed 20260912): no few-percent difference among these numbers is resolvable from"
+        " a single run alone, since the seed sweep that would put a confidence band on the member itself is"
+        " scheduled together with the rest of the deep-equilibrium ladder, not yet run.",
+        "",
+        "The block's geometries are near-identical within a campaign, which is why a verbatim copy of the nearest"
+        " training run already reaches a mean absolute error of 0.0062 without learning anything (the"
+        " nearest-run-copy floor, above), and why the strain rows read roughly ten times better than the defect"
+        " rows (mean absolute error 0.000704 against 0.002329, relative L2 0.26% against 1.35%): the supercell"
+        " strains are small, smooth perturbations of one lattice, so a near neighbor is nearly the true answer,"
+        " while the defect campaign varies impurity species and site by run. The defect rows, not the pooled"
+        " median, are this member's real test.",
+        "",
+        "An external calibration point, not a competitor: the 2026 hydrogen-ELF network's published error of"
+        " 0.019 is the nearest number in the literature, but it answers a single-element system, an easier"
+        " problem than this six-family cubic block, so it is a reference point for scale, not a benchmark this"
+        " member is being measured against.",
         "",
         "### scored on the kill block (fold zero, both spins, every card metric, by campaign and by functional)",
         "",

@@ -2,11 +2,7 @@
 
 Regenerate with `python3 -m operators.factorized_fourier.report`.
 
-Training is not yet run (the accelerator was held by another stream while this section was written);
-this first commit records the block, all four floors and the pre-registered claim ladder the member will
-be judged against, exactly as the doctrine asks for before a single training step is taken. The member's
-own result, the per-functional rows, the super-resolution self-consistency check and the figure suite
-land in a later commit once training has run.
+The block, all four floors and the pre-registered claim ladder below were measured before a single training step was taken, exactly as the doctrine asks. The member's own result, per-campaign and per-functional rows, the super-resolution self-consistency check and the figure suite follow once a checkpoint exists for it; until then that section says so plainly and nothing else about this command changes.
 
 ## The block
 
@@ -67,6 +63,76 @@ Every level is absolute mean absolute error; a lower number is stricter. The fir
 5. **added, the stretch level** (half the template's error — the level at which the member resolves the run-to-run variation, per-voxel spread 0.021, rather than reproducing the average): 0.007978
 
 **Measured out of order**: level 4 (beat the nearest-run copy) is *stricter* than level 5 (the stretch level) on this block — the nearest training run is close enough, on both campaigns, that copying it verbatim beats even half the template's error. The memorization null was not expected to be harder than the stretch goal designed to demand genuine operator behavior; on this block it is, so passing level 5 without also passing level 4 is not possible here, and level 4 is the real hard bar to read as the stretch goal.
+
+## The member's own result (electron localization, fold 0, explicit stack)
+
+Loaded from `elf_fold0_explicit_35505_stage2_checkpoint.npz`: 3100 completed steps, best validation score 0.000081 at step 1600.
+
+### three caveats before trusting this number
+
+This is one seeded run (seed 20260912): no few-percent difference among these numbers is resolvable from a single run alone, since the seed sweep that would put a confidence band on the member itself is scheduled together with the rest of the deep-equilibrium ladder, not yet run.
+
+The block's geometries are near-identical within a campaign, which is why a verbatim copy of the nearest training run already reaches a mean absolute error of 0.0062 without learning anything (the nearest-run-copy floor, above), and why the strain rows read roughly ten times better than the defect rows (mean absolute error 0.000704 against 0.002329, relative L2 0.26% against 1.35%): the supercell strains are small, smooth perturbations of one lattice, so a near neighbor is nearly the true answer, while the defect campaign varies impurity species and site by run. The defect rows, not the pooled median, are this member's real test.
+
+An external calibration point, not a competitor: the 2026 hydrogen-ELF network's published error of 0.019 is the nearest number in the literature, but it answers a single-element system, an easier problem than this six-family cubic block, so it is a reference point for scale, not a benchmark this member is being measured against.
+
+### scored on the kill block (fold zero, both spins, every card metric, by campaign and by functional)
+
+```
+group                        metric                    units  runs  median    interquartile  mean_interval       
+member                       mean_absolute_error       29     152   0.002170  0.001741       [0.001820, 0.003601]
+member__defect_set           mean_absolute_error       21     84    0.002329  0.001608       [0.002438, 0.004583]
+member__supercell_strains    mean_absolute_error       8      68    0.000704  0.000261       [0.000610, 0.000822]
+member__functional_accurate  mean_absolute_error       22     44    0.002364  0.002047       [0.002491, 0.004896]
+member__functional_cheap     mean_absolute_error       29     108   0.002041  0.001486       [0.001724, 0.003334]
+member                       structural_similarity_3d  29     152   0.999806  0.000715       [0.998027, 0.999645]
+member__defect_set           structural_similarity_3d  21     84    0.999526  0.000782       [0.997282, 0.999491]
+member__supercell_strains    structural_similarity_3d  8      68    0.999989  0.000008       [0.999985, 0.999992]
+member__functional_accurate  structural_similarity_3d  22     44    0.999368  0.000878       [0.997387, 0.999479]
+member__functional_cheap     structural_similarity_3d  29     108   0.999819  0.000779       [0.997943, 0.999665]
+member                       relative_l2               29     152   0.010538  0.013139       [0.010305, 0.023040]
+member__defect_set           relative_l2               21     84    0.013450  0.010546       [0.014100, 0.030074]
+member__supercell_strains    relative_l2               8      68    0.002568  0.000826       [0.002225, 0.003014]
+member__functional_accurate  relative_l2               22     44    0.014733  0.013078       [0.013949, 0.029636]
+member__functional_cheap     relative_l2               29     108   0.009677  0.013281       [0.009872, 0.022718]
+```
+
+### the pre-registered claim ladder, measured
+
+```
+group                                floor                        floor_median  member_median  improvement  required  verdict
+1_canon_kill                         semilocal_ridge_floor        0.097618      0.002170       97.8%        50.0%     pass   
+2_canon_pattern_rule                 semilocal_ridge_floor        0.097618      0.002170       97.8%        20.0%     pass   
+3_added_beat_training_mean_template  training_mean_trivial_floor  0.015957      0.002170       86.4%        0.0%      pass   
+4_added_beat_nearest_run_copy        nearest_run_copy_floor       0.006164      0.002170       64.8%        0.0%      pass   
+5_added_stretch_half_the_template    training_mean_trivial_floor  0.015957      0.002170       86.4%        50.0%     pass   
+```
+
+### every floor, on the two lower-is-better card metrics, beaten or not
+
+Structural similarity is higher-is-better and is reported only as a summary above (median per group), not as a floor-comparison ratio: `Compare_To_Floor`'s improvement formula assumes a lower-is-better error, which mean absolute error and relative L2 are and structural similarity is not.
+
+```
+group  floor                        floor_median  member_median  improvement  required  verdict
+all    training_mean_trivial_floor  0.015957      0.002170       86.4%        0.0%      pass   
+all    training_mean_trivial_floor  0.108952      0.010538       90.3%        0.0%      pass   
+all    nearest_run_copy_floor       0.006164      0.002170       64.8%        0.0%      pass   
+all    nearest_run_copy_floor       0.049138      0.010538       78.6%        0.0%      pass   
+all    per_shell_linear_filter      0.083022      0.002170       97.4%        0.0%      pass   
+all    per_shell_linear_filter      0.303498      0.010538       96.5%        0.0%      pass   
+all    semilocal_ridge_floor        0.097618      0.002170       97.8%        0.0%      pass   
+all    semilocal_ridge_floor        0.392865      0.010538       97.3%        0.0%      pass   
+```
+
+### super-resolution self-consistency
+
+The same trained weights, asked to answer directly on an 80³ grid rather than the 40³ grid they trained on, then spectrally truncated back to 40³, against the direct 40³ answer, on every 12th evaluation run (7 runs, both spins): median relative L2 **0.621%**. A small number here means the learned Fourier modes carry the same answer at a resolution the member never trained at, which is what makes the coarse-trunk design's answer at the fine grid (the potential task's own finish) trustworthy rather than a coincidence of the training resolution.
+
+### the alloy every-shape row
+
+Not applicable: the `alloy_ensemble` fold-zero archives checked all carry `has_localization: False` and non-cubic shapes (for example `(48, 96, 216)`); this campaign has no localization target for the member to be scored against, on any shape.
+
+Figures: 181 files written under `operators/factorized_fourier/figures/fold_0/explicit`, arrays cached at `/Pool/VASP_DATA/_derived/_figures/factorized_fourier/fold_0/explicit`.
 
 ## The deep-equilibrium ladder (canon I.3), pre-registered before any rung is trained
 

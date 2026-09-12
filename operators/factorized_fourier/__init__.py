@@ -12,6 +12,7 @@ from operators.framework import (
     Array,
     Coefficients,
     Discretization,
+    Fractional_Grid_Coordinates,
     GridFunction,
     GridSpec,
     Layer,
@@ -20,7 +21,7 @@ from operators.framework import (
 )
 from operators.kernels import SpectralKernel
 from operators.kernels.spectral import MODE_WAVEVECTOR_FEATURES_KEY, Mode_Wavevector_Features
-from operators.readouts import PointwiseProjection
+from operators.readouts import PeriodicCoordinateFeatures, PointwiseProjection
 from operators.substrate import Concatenate_Channels, Zeros_Beside
 from operators.wrappers import Conserving
 
@@ -28,7 +29,7 @@ type FourierComposition = ExplicitStack | WeightTied | FixedPoint
 
 type FactorizedFourierConfiguration = Literal["explicit", "explicit_matched", "weight_tied", "fixed_point"]
 
-type FactorizedFourierTask = Literal["localization", "potential"]
+type FactorizedFourierTask = Literal["localization", "potential", "parametric"]
 
 GRAM_CHANNEL_COUNT = 6
 
@@ -37,6 +38,17 @@ INPUT_CHANNEL_COUNT = 2 + GRAM_CHANNEL_COUNT
 LOCALIZATION_CHANNEL_LABELS = ("electron_localization_up", "electron_localization_down")
 
 POTENTIAL_CHANNEL_LABELS = ("local_potential_up", "local_potential_down")
+
+PARAMETRIC_CHANNEL_LABELS = ("charge_density",)
+
+# the strain tensor and the six lattice factors both happen to be six real numbers, so one width serves both blocks
+PARAMETRIC_PARAMETER_COUNT = 6
+
+PARAMETRIC_COORDINATE_FOURIER_ORDERS = 4
+
+PARAMETRIC_COORDINATE_FEATURES = PeriodicCoordinateFeatures(fourier_orders=PARAMETRIC_COORDINATE_FOURIER_ORDERS, axis_count=3)
+
+PARAMETRIC_INPUT_CHANNEL_COUNT = PARAMETRIC_PARAMETER_COUNT + PARAMETRIC_COORDINATE_FEATURES.feature_count
 
 # a positive floor under a training-block mean that would otherwise divide by zero
 REFERENCE_DENSITY_FLOOR = 1e-12
@@ -109,6 +121,24 @@ def Combined_Coarse_Input(log_density_values: Any, gram_vector: Any, target_shap
     return Concatenate_Channels([coarse_density, gram_field])
 
 
+def Coordinate_Feature_Channels(shape: tuple[int, int, int]) -> NDArray[np.float64]:
+    """periodic sine-cosine features of the grid's own fractional coordinates, channel-first at the given shape"""
+    points = Fractional_Grid_Coordinates(shape)
+    features = PARAMETRIC_COORDINATE_FEATURES(points)
+    return np.asarray(features.T.reshape(features.shape[1], *shape), dtype=np.float64)
+
+
+def Parametric_Input(parameters: Coefficients, shape: tuple[int, int, int]) -> GridFunction:
+    """the run's own parameter vector broadcast as constant channels over the requested grid, that grid's lattice"""
+    vector = np.asarray(parameters.vector, dtype=np.float64)
+    values = np.broadcast_to(vector[:, None, None, None], (vector.shape[0], *shape)).astype(np.float64).copy()
+    lattice = np.asarray(parameters.domain.lattice, dtype=np.float64)
+    point_count = shape[0] * shape[1] * shape[2]
+    quadrature = UniformGridQuadrature(cell_volume=float(abs(np.linalg.det(lattice))), point_count=point_count)
+    labels = tuple(f"parameter_{component_number}" for component_number in range(vector.shape[0]))
+    return GridFunction(values, labels, parameters.domain, quadrature)
+
+
 def Layer_Prefixes(composition: FourierComposition) -> tuple[str, ...]:
     """every layer-scoped prefix a composition's own kernels answer to, for injecting a shared lifted constant"""
     if isinstance(composition, ExplicitStack):
@@ -146,8 +176,14 @@ class FactorizedFourier(NeuralOperator[GridFunction, GridFunction, GridFunction]
         self.kept_modes = kept_modes
         self.metric_aware = metric_aware
         self.target_scale = target_scale
-        # the whole-field conservation law: each spin's uniform mode pinned to zero, the potential task's own gauge
-        self.conservation = Conserving(inner=self, law="zero_mean") if task == "potential" else None
+        # the whole-field conservation law: the potential task's own zero-mean gauge, the parametric task's own
+        # electron count, neither one touching the localization task's bounded head
+        if task == "potential":
+            self.conservation = Conserving(inner=self, law="zero_mean")
+        elif task == "parametric":
+            self.conservation = Conserving(inner=self, law="renormalize_to_electron_count")
+        else:
+            self.conservation = None
         self.last_gram_vector: NDArray[np.float64] | None = None
         self.last_predicted_values: NDArray[np.float64] | None = None
         self.last_fixed_point_iterations: int | None = None
@@ -170,8 +206,15 @@ class FactorizedFourier(NeuralOperator[GridFunction, GridFunction, GridFunction]
         combined_coarse_input: Any,
         mode_wavevector_features: Any | None = None,
         output_shape: tuple[int, int, int] | None = None,
+        weight_each: float | None = None,
+        condition_vector: Any | None = None,
     ) -> Any:
-        """the lifted path onward from the eight-channel coarse input, including the potential task's own finish"""
+        """the lifted path onward from the coarse input, including the potential and parametric tasks' own finish"""
+        if self.task == "parametric":
+            spatial_shape = combined_coarse_input.shape[1:]
+            combined_coarse_input = Concatenate_Channels(
+                [combined_coarse_input, Coordinate_Feature_Channels((spatial_shape[0], spatial_shape[1], spatial_shape[2]))]
+            )
         layer_lifted = lifted
         if mode_wavevector_features is not None:
             layer_lifted = dict(lifted)
@@ -194,6 +237,10 @@ class FactorizedFourier(NeuralOperator[GridFunction, GridFunction, GridFunction]
             if self.conservation is None:
                 raise ValueError("the potential task always carries its own conservation wrapper")
             produced = self.conservation.Forward(produced, weight_each=1.0)
+        elif self.task == "parametric":
+            if self.conservation is None or weight_each is None or condition_vector is None:
+                raise ValueError("the parametric task needs its conservation wrapper, weight_each and an electron count")
+            produced = self.conservation.Forward(produced, weight_each, condition_vector)
         return produced
 
 
@@ -237,6 +284,31 @@ class FactorizedFourier(NeuralOperator[GridFunction, GridFunction, GridFunction]
     ) -> GridFunction:
         if not isinstance(output_discretization, GridSpec):
             raise TypeError("the factorized Fourier operator evaluates on grids only")
+        if self.task == "parametric":
+            if condition is None:
+                raise ValueError("the parametric task reads the electron count off its own condition vector")
+            shape = output_discretization.shape
+            # the input is constant, so any one point carries the whole parameter vector it was broadcast from
+            parameter_vector = np.asarray(input_function.values, dtype=np.float64)[:, 0, 0, 0]
+            constant_channels = np.broadcast_to(
+                parameter_vector[:, None, None, None], (parameter_vector.shape[0], *shape)
+            ).astype(np.float64).copy()
+            point_count = shape[0] * shape[1] * shape[2]
+            lattice = np.asarray(input_function.domain.lattice, dtype=np.float64)
+            cell_volume = float(abs(np.linalg.det(lattice)))
+            weight_each = cell_volume / point_count
+            produced = np.asarray(
+                self.Forward_From_Coarse_Input(
+                    self.Parameter_Values(),
+                    constant_channels,
+                    weight_each=weight_each,
+                    condition_vector=np.asarray(condition.vector, dtype=np.float64),
+                ),
+                dtype=np.float64,
+            )
+            self.last_predicted_values = produced
+            quadrature = UniformGridQuadrature(cell_volume, point_count)
+            return GridFunction(produced, PARAMETRIC_CHANNEL_LABELS, input_function.domain, quadrature)
         log_density_values, gram_vector = self.Input_Channels(input_function)
         mode_wavevector_features = self.Mode_Wavevector_Features_For(input_function)
         if self.task == "potential":
@@ -270,6 +342,17 @@ class FactorizedFourier(NeuralOperator[GridFunction, GridFunction, GridFunction]
         quadrature = UniformGridQuadrature(input_function.quadrature.cell_volume, point_count)
         channel_labels = POTENTIAL_CHANNEL_LABELS if self.task == "potential" else LOCALIZATION_CHANNEL_LABELS
         return GridFunction(produced, channel_labels, input_function.domain, quadrature)
+
+
+    def Predict_Field(
+        self, parameters: Coefficients, output_discretization: Discretization, electron_count: float
+    ) -> GridFunction:
+        """the parametric task's own convenience: builds the constant field and calls __call__, not a second path"""
+        if not isinstance(output_discretization, GridSpec):
+            raise TypeError("the factorized Fourier operator evaluates on grids only")
+        input_function = Parametric_Input(parameters, output_discretization.shape)
+        condition = Coefficients(vector=np.asarray([electron_count], dtype=np.float64), domain=parameters.domain)
+        return self(input_function, output_discretization, condition)
 
 
     def Inspect(self) -> dict[str, Array]:
@@ -350,8 +433,10 @@ def Factorized_Fourier_Network(
 ) -> FactorizedFourier:
     """the flagship configuration: pointwise lift, a composition of factorized spectral layers, a task-shaped head"""
     # localization stays metric-blind, exactly as briefed; the potential task is the metric-aware kernel's own reason
+    # the parametric task never reads a density field at all, so there is no metric for it to be aware of either
     metric_aware = task == "potential"
-    lift = PointwiseLift(hidden_channels, INPUT_CHANNEL_COUNT, seed=seed)
+    input_channel_count = PARAMETRIC_INPUT_CHANNEL_COUNT if task == "parametric" else INPUT_CHANNEL_COUNT
+    lift = PointwiseLift(hidden_channels, input_channel_count, seed=seed)
     stack: FourierComposition
     if configuration == "explicit":
         stack = ExplicitStack(Explicit_Layers(hidden_channels, kept_modes, layer_count, seed, metric_aware))
@@ -370,7 +455,12 @@ def Factorized_Fourier_Network(
         )
     else:
         raise ValueError(f"{configuration} is not one of the member's configurations")
-    channel_labels = POTENTIAL_CHANNEL_LABELS if task == "potential" else LOCALIZATION_CHANNEL_LABELS
+    if task == "potential":
+        channel_labels: tuple[str, ...] = POTENTIAL_CHANNEL_LABELS
+    elif task == "parametric":
+        channel_labels = PARAMETRIC_CHANNEL_LABELS
+    else:
+        channel_labels = LOCALIZATION_CHANNEL_LABELS
     projection = PointwiseProjection(
         len(channel_labels), hidden_channels, bounded=(task == "localization"), seed=seed + 2 * layer_count + 1
     )

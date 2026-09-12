@@ -8,7 +8,7 @@ import pytest
 from numpy.typing import NDArray
 
 from operators.compositions import FixedPoint, WeightTied
-from operators.compositions.fixed_point import Anderson_Mixing_Weights, Sliced_Lifted
+from operators.compositions.fixed_point import Anderson_Gram, Anderson_Mixing_Weights, Sliced_Lifted
 from operators.encoders import PointwiseLift
 from operators.framework import Domain, GridFunction, Layer, UniformGridQuadrature
 from operators.kernels import SpectralKernel
@@ -376,6 +376,23 @@ def Test_Anderson_Mixing_Weights_Declines_A_Near_Parallel_History() -> None:
     ]
     weights = Anderson_Mixing_Weights(near_parallel_history, regularization=1e-4, condition_ceiling=1e6)
     assert weights is None
+
+
+@pytest.mark.skipif(not Torch_Is_Available(), reason="the foreign engine is not installed yet")
+def Test_The_Anderson_Gram_Agrees_Across_Engines_So_Only_Scalars_Cross_To_The_Host() -> None:
+    """the gram matrix and right-hand side from engine inner products must equal the host's own to round-off"""
+    generator = np.random.default_rng(31)
+    history = [generator.normal(size=(2, 4, 4, 4)) for _ in range(4)]
+    host_gram, host_right_hand_side = Anderson_Gram(history)
+    engine = TorchEngine()
+    lifted_history = [engine.Lift_Constant(residual) for residual in history]
+    foreign_gram, foreign_right_hand_side = Anderson_Gram(lifted_history)
+    assert np.allclose(foreign_gram, host_gram, rtol=1e-10, atol=1e-12)
+    assert np.allclose(foreign_right_hand_side, host_right_hand_side, rtol=1e-10, atol=1e-12)
+    host_weights = Anderson_Mixing_Weights(history, regularization=1e-4, condition_ceiling=1e8)
+    foreign_weights = Anderson_Mixing_Weights(lifted_history, regularization=1e-4, condition_ceiling=1e8)
+    assert host_weights is not None and foreign_weights is not None
+    assert np.allclose(foreign_weights, host_weights, rtol=1e-8, atol=1e-10)
 
 
 def Test_Anderson_Mixing_Weights_Sums_To_One_On_A_Well_Conditioned_History() -> None:

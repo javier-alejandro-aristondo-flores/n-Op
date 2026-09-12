@@ -11,6 +11,7 @@ from operators.substrate import (
     CustomGradient,
     Detached,
     Host_Array,
+    Sum_Over_Last_Axis,
     Gaussian_Error_Linear_Unit,
     Solve_Linear_System,
     Vector_Jacobian_Product,
@@ -122,20 +123,45 @@ class FixedPointSolve:
     residual_norm_history: list[float]
 
 
-def Anderson_Mixing_Weights(
-    residual_history: list[NDArray[np.float64]], regularization: float, condition_ceiling: float
+def Host_Inner_Product(first: Any, second: Any) -> float:
+    """the inner product of two fields taken on whichever engine holds them, and only the scalar brought to the host"""
+    product = (first * second).reshape(-1)
+    return float(Host_Array(Sum_Over_Last_Axis(product)))
+
+
+def Anderson_Gram(residual_history: list[Any]) -> tuple[NDArray[np.float64], NDArray[np.float64]]:
+    """the residual differences' gram matrix and right-hand side, small host arrays built from engine inner products"""
+    anchor = residual_history[-1]
+    differences = [earlier - anchor for earlier in residual_history[:-1]]
+    count = len(differences)
+    gram = np.zeros((count, count))
+    for row_position in range(count):
+        for column_position in range(row_position + 1):
+            entry = Host_Inner_Product(differences[row_position], differences[column_position])
+            gram[row_position, column_position] = entry
+            gram[column_position, row_position] = entry
+    right_hand_side = np.asarray([-Host_Inner_Product(difference, anchor) for difference in differences])
+    return gram, right_hand_side
+
+
+def Anderson_Mixing_Weights_From_Gram(
+    gram: NDArray[np.float64], right_hand_side: NDArray[np.float64], regularization: float, condition_ceiling: float
 ) -> NDArray[np.float64] | None:
     """weights summing to one that best cancel the residual history in a least-squares sense, none past the ceiling"""
-    flattened = [np.reshape(residual, -1) for residual in residual_history]
-    anchor = flattened[-1]
-    differences = np.stack([earlier - anchor for earlier in flattened[:-1]], axis=0)
-    if float(np.linalg.cond(differences)) > condition_ceiling:
+    # the differences' own condition number is the square root of their gram matrix's
+    if float(np.sqrt(np.linalg.cond(gram))) > condition_ceiling:
         return None
-    gram = differences @ differences.T
     regularized_gram = gram + regularization * np.eye(gram.shape[0])
-    right_hand_side = differences @ (-anchor)
     free_weights = Solve_Linear_System(regularized_gram, right_hand_side)
     return np.concatenate([free_weights, np.asarray([1.0 - float(np.sum(free_weights))])])
+
+
+def Anderson_Mixing_Weights(
+    residual_history: list[Any], regularization: float, condition_ceiling: float
+) -> NDArray[np.float64] | None:
+    """the mixing weights straight from a residual history, on whichever engine holds it"""
+    gram, right_hand_side = Anderson_Gram(residual_history)
+    return Anderson_Mixing_Weights_From_Gram(gram, right_hand_side, regularization, condition_ceiling)
 
 
 class FixedPoint(Composition[GridFunction]):
@@ -172,14 +198,14 @@ class FixedPoint(Composition[GridFunction]):
         """damped picard toward the shared layer's fixed point, anderson-accelerated once two residuals exist"""
         # every iterate is detached the moment it is made, so the whole solve stays off whichever tape lifted it
         state = Detached(input_values)
-        residual_history: list[NDArray[np.float64]] = []
+        residual_history: list[Any] = []
         applied_history: list[Any] = []
         residual_norm_history: list[float] = []
         for iteration_index in range(self.iteration_cap):
             applied = Detached(Applied_Once(self.layer, kernel_lifted, local_linear_lifted, state))
-            # the tolerance check and the mixing history live on the host; the iterate itself never leaves its engine
-            residual_values = Host_Array(applied) - Host_Array(state)
-            residual_norm = float(np.linalg.norm(residual_values))
+            # the residuals stay on their engine, and only the scalars the host decides on come across
+            residual_values = applied - state
+            residual_norm = float(np.sqrt(Host_Inner_Product(residual_values, residual_values)))
             residual_norm_history.append(residual_norm)
             if residual_norm < self.tolerance:
                 return FixedPointSolve(applied, iteration_index + 1, residual_norm, False, residual_norm_history)
@@ -250,7 +276,8 @@ class FixedPoint(Composition[GridFunction]):
             adjoint = cotangent
             for _ in range(self.iteration_cap):
                 updated = Vector_Jacobian_Product(Applied_At_The_Equilibrium, output, adjoint) + cotangent
-                change = float(np.linalg.norm(Host_Array(Detached(updated - adjoint))))
+                adjoint_step = Detached(updated - adjoint)
+                change = float(np.sqrt(Host_Inner_Product(adjoint_step, adjoint_step)))
                 adjoint = updated
                 if change < self.tolerance:
                     break

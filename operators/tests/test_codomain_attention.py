@@ -170,6 +170,13 @@ def Test_Softmax_Is_Invariant_To_A_Large_Additive_Constant_And_Stays_Finite() ->
         single_output = CodomainAttentionKernel.Softmax_Over_Last_Axis(single_engine.Lift_Constant(leveled_logits))
         single_array = np.asarray(single_output.detach().cpu().numpy(), dtype=np.float64)
         assert np.all(np.isfinite(single_array))
+
+        # one spiked entry is a large spread inside the row, which only a maximum shift can defuse
+        spiked_logits = np.asarray([[0.0, 1.0e4, 0.0]])
+        spiked_output = CodomainAttentionKernel.Softmax_Over_Last_Axis(single_engine.Lift_Constant(spiked_logits))
+        spiked_array = np.asarray(spiked_output.detach().cpu().numpy(), dtype=np.float64)
+        assert np.all(np.isfinite(spiked_array))
+        assert np.allclose(spiked_array, [[0.0, 1.0, 0.0]], atol=1e-6)
         assert np.allclose(single_array, [[0.24472847, 0.66524096, 0.09003057]], atol=1e-4)
 
 

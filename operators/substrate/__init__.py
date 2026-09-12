@@ -45,6 +45,7 @@ from operators.substrate.operations import (
     Exponential,
     Gaussian_Error_Linear_Unit,
     Hyperbolic_Tangent,
+    Maximum_Over_Last_Axis,
     Mean_Over_Last_Axis,
     Roll_Along_Axes,
     Softplus,

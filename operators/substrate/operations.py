@@ -42,6 +42,11 @@ def Mean_Over_Last_Axis(value: Any) -> Any:
     return Torch_Module().mean(value, dim=-1) if Is_Engine_Native(value) else np.mean(value, axis=-1)
 
 
+def Maximum_Over_Last_Axis(value: Any) -> Any:
+    # the foreign engine returns the maxima paired with their positions, and only the maxima are wanted
+    return Torch_Module().max(value, dim=-1).values if Is_Engine_Native(value) else np.asarray(value).max(axis=-1)
+
+
 def Concatenate_Channels(values: list[Any]) -> Any:
     if any(Is_Engine_Native(value) for value in values):
         return Torch_Module().cat(values, dim=0)

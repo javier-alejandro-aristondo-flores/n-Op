@@ -17,7 +17,7 @@ from operators.framework import (
 from operators.kernels.codomain_attention.layer_norm import FunctionSpaceLayerNorm
 from operators.kernels.codomain_attention.tokens import Token_Count
 from operators.kernels.spectral import ModeMixing, SpectralKernel
-from operators.substrate import Einstein_Summation, Exponential, Mean_Over_Last_Axis, Precision, Sum_Over_Last_Axis
+from operators.substrate import Einstein_Summation, Exponential, Maximum_Over_Last_Axis, Precision, Sum_Over_Last_Axis
 
 
 def Sliced_Lifted(lifted: dict[str, Any], prefix: str) -> dict[str, Any]:
@@ -133,9 +133,9 @@ class CodomainAttentionKernel(Kernel[GridFunction, GridFunction]):
 
     @staticmethod
     def Softmax_Over_Last_Axis(logits: Any) -> Any:
-        """the last axis turned into a probability distribution, shifted first so a large logit cannot overflow"""
-        # softmax is shift-invariant, so subtracting each row's own mean bounds the exponent by its spread alone
-        shifted = logits - Mean_Over_Last_Axis(logits)[..., None]
+        """the last axis turned into a probability distribution, shifted first so no logit can overflow"""
+        # softmax is shift-invariant, and subtracting each row's own maximum keeps every exponent at or below zero
+        shifted = logits - Maximum_Over_Last_Axis(logits)[..., None]
         exponentiated = Exponential(shifted)
         return exponentiated / Sum_Over_Last_Axis(exponentiated)[..., None]
 

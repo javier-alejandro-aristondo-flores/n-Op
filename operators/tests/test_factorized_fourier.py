@@ -6,7 +6,7 @@ import numpy as np
 import pytest
 from numpy.typing import NDArray
 
-from operators.compositions import FixedPoint, Spectral_Resampled, WeightTied
+from operators.compositions import ExplicitStack, FixedPoint, Spectral_Resampled, WeightTied
 from operators.compositions.fixed_point import Sliced_Lifted
 from operators.data import Archive_Path
 from operators.factorized_fourier import (
@@ -352,6 +352,156 @@ def Test_The_Mandatory_Gradient_Audit_On_This_Members_Own_Layer() -> None:
             # within an order of magnitude of the ground truths' own mutual disagreement
             assert gap_to_finite_difference < 10.0 * max(natural_disagreement, 1e-3), label
             assert gap_to_full_unroll < 10.0 * max(natural_disagreement, 1e-3), label
+
+
+SHEARED_CUBE = Domain(lattice=np.asarray([[4.0, 0.0, 0.0], [1.0, 3.5, 0.0], [0.5, -0.5, 4.0]]))
+
+
+def Toy_Potential_Member(seed: int = 5, layer_count: int = 3) -> FactorizedFourier:
+    """a small metric-aware potential member, coarse trunk 4-cubed, sized to run fast on an 8-cubed toy"""
+    return Factorized_Fourier_Network(
+        hidden_channels=4,
+        kept_modes=(1, 1, 1),
+        layer_count=layer_count,
+        reference_density=0.05,
+        gram_mean=np.zeros(6),
+        gram_scale=np.ones(6),
+        processing_shape=(4, 4, 4),
+        seed=seed,
+        task="potential",
+        target_scale=2.0,
+    )
+
+
+def Perturbed_Gain_Parameters(member: FactorizedFourier, seed: int, spread: float = 0.3) -> None:
+    """every kernel's own gain network, nudged off its zero-initialized last layer, mutated in the member itself"""
+    generator = np.random.default_rng(seed)
+    kernels = (
+        [layer.kernel for layer in member.spectral_stack.layers]
+        if isinstance(member.spectral_stack, ExplicitStack)
+        else [member.spectral_stack.layer.kernel]
+    )
+    for kernel in kernels:
+        for name in list(kernel.parameter_values):
+            if "gain_layer_" in name:
+                shape = kernel.parameter_values[name].shape
+                kernel.parameter_values[name] = kernel.parameter_values[name] + generator.normal(0.0, spread, size=shape)
+
+
+def Test_The_Potential_Head_Is_Unbounded_And_Resampled_To_The_Fine_Grid() -> None:
+    """the potential readout carries no head, and the coarse trunk answers at whatever fine shape is requested"""
+    member = Toy_Potential_Member()
+    output = member(Toy_Input((8, 8, 8), seed=60), GridSpec((8, 8, 8)))
+    values = np.asarray(output.values)
+    assert values.shape == (2, 8, 8, 8)
+    # a nonzero, zero-mean field cannot be entirely non-negative; only an unbounded head permits this
+    assert bool(np.any(values < 0.0))
+
+
+def Test_The_Potential_Output_Has_Zero_Mean_Per_Channel_To_Round_Off() -> None:
+    """the whole-field conservation law pins each spin's own uniform mode, regardless of the readout underneath"""
+    member = Toy_Potential_Member()
+    output = member(Toy_Input((8, 8, 8), seed=61), GridSpec((8, 8, 8)))
+    values = np.asarray(output.values)
+    for channel in range(values.shape[0]):
+        assert abs(float(values[channel].mean())) < 1e-10
+
+
+def Test_The_Same_Lattice_Twice_Agrees_And_Two_Lattices_Disagree() -> None:
+    """a metric-aware member is deterministic per lattice and genuinely reads the lattice it is given"""
+    member = Toy_Potential_Member()
+    Perturbed_Gain_Parameters(member, seed=62)
+    cube_input = Toy_Input((8, 8, 8), seed=63)
+    first = np.asarray(member(cube_input, GridSpec((8, 8, 8))).values)
+    second = np.asarray(member(cube_input, GridSpec((8, 8, 8))).values)
+    assert np.array_equal(first, second)
+    sheared_input = GridFunction(cube_input.values, cube_input.channel_labels, SHEARED_CUBE, cube_input.quadrature)
+    third = np.asarray(member(sheared_input, GridSpec((8, 8, 8))).values)
+    assert not np.allclose(first, third)
+
+
+def Test_The_Mode_Wavevector_Feature_Reaches_Every_Layer() -> None:
+    """perturbing one layer's gain alone changes the output, for every layer index in the stack"""
+    baseline_member = Toy_Potential_Member(seed=64, layer_count=3)
+    input_function = Toy_Input((8, 8, 8), seed=65)
+    baseline = np.asarray(baseline_member(input_function, GridSpec((8, 8, 8))).values)
+    for layer_index in range(3):
+        member = Toy_Potential_Member(seed=64, layer_count=3)
+        assert isinstance(member.spectral_stack, ExplicitStack)
+        kernel = member.spectral_stack.layers[layer_index].kernel
+        generator = np.random.default_rng(70 + layer_index)
+        for name in list(kernel.parameter_values):
+            if "gain_layer_" in name:
+                shape = kernel.parameter_values[name].shape
+                kernel.parameter_values[name] = kernel.parameter_values[name] + generator.normal(0.0, 0.3, size=shape)
+        perturbed = np.asarray(member(input_function, GridSpec((8, 8, 8))).values)
+        assert not np.allclose(baseline, perturbed), layer_index
+
+
+def Test_Gradients_Reach_The_Gain_Parameters_On_Both_Engines() -> None:
+    """the coarse trunk, the resample and the zero-mean pin all carry a tape back into every gain network"""
+    member = Toy_Potential_Member(seed=80, layer_count=2)
+    Perturbed_Gain_Parameters(member, seed=81)
+    input_function = Toy_Input((8, 8, 8), seed=82)
+    log_density_values, gram_vector = member.Input_Channels(input_function)
+    mode_wavevector_features = member.Mode_Wavevector_Features_For(input_function)
+    assert mode_wavevector_features is not None
+    generator = np.random.default_rng(83)
+    target = generator.random((2, 8, 8, 8))
+    parameters = ParameterSet(values={name: value.copy() for name, value in member.Parameter_Values().items()})
+
+    def Make_Loss(lifted_log_density: Any, lifted_gram_vector: Any, lifted_feature: Any, lifted_target: Any) -> Any:
+        def Loss(lifted: dict[str, Any]) -> Any:
+            predicted = member.Forward_Field(
+                lifted, lifted_log_density, lifted_gram_vector, (4, 4, 4), lifted_feature, (8, 8, 8)
+            )
+            residual = predicted - lifted_target
+            return (residual * residual).mean()
+
+        return Loss
+
+    reference = NumpyEngine()
+    reference_gradients = reference.Gradients(
+        parameters, Make_Loss(log_density_values, gram_vector, mode_wavevector_features, target)
+    )
+    torch_engine = TorchEngine()
+    torch_value, torch_gradients = torch_engine.Value_And_Gradients(
+        parameters,
+        Make_Loss(
+            torch_engine.Lift_Constant(log_density_values),
+            torch_engine.Lift_Constant(gram_vector),
+            torch_engine.Lift_Constant(mode_wavevector_features),
+            torch_engine.Lift_Constant(target),
+        ),
+    )
+    reference_value = reference.Evaluate(parameters, Make_Loss(log_density_values, gram_vector, mode_wavevector_features, target))
+    assert abs(torch_value - reference_value) < 1e-8
+    gain_names = [name for name in torch_gradients if "gain_layer_" in name]
+    assert gain_names
+    for name in gain_names:
+        assert float(np.abs(torch_gradients[name]).max()) > 1e-8, name
+        assert np.allclose(torch_gradients[name], reference_gradients[name], rtol=1e-4, atol=1e-6), name
+
+
+def Test_The_Cached_Coarse_Input_Path_Equals_The_On_The_Fly_Path_For_Potential() -> None:
+    """the caching split holds for the potential task too, resample, conservation and gain feature included"""
+    member = Toy_Potential_Member(seed=90, layer_count=2)
+    Perturbed_Gain_Parameters(member, seed=91)
+    input_function = Toy_Input((8, 8, 8), seed=92)
+    log_density_values, gram_vector = member.Input_Channels(input_function)
+    mode_wavevector_features = member.Mode_Wavevector_Features_For(input_function)
+    parameters = member.Parameter_Values()
+
+    on_the_fly = np.asarray(
+        member.Forward_Field(parameters, log_density_values, gram_vector, (4, 4, 4), mode_wavevector_features, (8, 8, 8))
+    )
+    combined_coarse_input = Combined_Coarse_Input(log_density_values, gram_vector, (4, 4, 4))
+    hidden_carried = member.Forward_From_Coarse_Input(parameters, combined_coarse_input, mode_wavevector_features)
+    resampled = Spectral_Resampled(hidden_carried, (8, 8, 8))
+    assert member.conservation is not None
+    from_the_cache = np.asarray(member.conservation.Forward(resampled, 1.0))
+
+    assert np.allclose(on_the_fly, from_the_cache, atol=1e-12)
 
 
 def Test_Inspection_Keys_Are_Covered_By_The_Generic_Renderer(tmp_path: Any) -> None:

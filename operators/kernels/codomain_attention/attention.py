@@ -17,7 +17,7 @@ from operators.framework import (
 from operators.kernels.codomain_attention.layer_norm import FunctionSpaceLayerNorm
 from operators.kernels.codomain_attention.tokens import Token_Count
 from operators.kernels.spectral import SpectralKernel
-from operators.substrate import Einstein_Summation, Exponential, Precision, Sum_Over_Last_Axis
+from operators.substrate import Einstein_Summation, Exponential, Mean_Over_Last_Axis, Precision, Sum_Over_Last_Axis
 
 
 def Sliced_Lifted(lifted: dict[str, Any], prefix: str) -> dict[str, Any]:
@@ -95,13 +95,21 @@ class CodomainAttentionKernel(Kernel[GridFunction, GridFunction]):
         )
 
 
+    @staticmethod
+    def Softmax_Over_Last_Axis(logits: Any) -> Any:
+        """the last axis turned into a probability distribution, shifted first so a large logit cannot overflow"""
+        # softmax is shift-invariant, so subtracting each row's own mean bounds the exponent by its spread alone
+        shifted = logits - Mean_Over_Last_Axis(logits)[..., None]
+        exponentiated = Exponential(shifted)
+        return exponentiated / Sum_Over_Last_Axis(exponentiated)[..., None]
+
+
     def Attention_Weights(self, lifted: dict[str, Any], query_heads: Any, key_heads: Any, grid_point_count: int) -> Any:
         """softmax over source tokens of the temperature-scaled mean channel-summed inner product"""
         raw_scores = Einstein_Summation("thcxyz,shcxyz->hts", query_heads, key_heads) / float(grid_point_count)
         # temperature multiplies the raw score, so a zeroed temperature collapses attention to uniform
         logits = raw_scores * lifted["temperature"][:, None, None]
-        exponentiated = Exponential(logits)
-        return exponentiated / Sum_Over_Last_Axis(exponentiated)[..., None]
+        return self.Softmax_Over_Last_Axis(logits)
 
 
     def Forward(self, lifted: dict[str, Any], input_values: Any, output_shape: tuple[int, int, int]) -> Any:

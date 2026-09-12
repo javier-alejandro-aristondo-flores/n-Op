@@ -120,6 +120,32 @@ def Test_Attention_Rows_Sum_To_One_And_Temperature_Sets_The_Concentration() -> N
     assert sharp_weights[0, 0, 1] > 0.99
 
 
+def Test_Softmax_Is_Invariant_To_A_Large_Additive_Constant_And_Stays_Finite() -> None:
+    """softmax is shift-invariant, so a huge additive constant on every score changes nothing but stays finite"""
+    generator = np.random.default_rng(26)
+    logits = generator.normal(0.0, 1.0, size=(2, 3, 3))
+    baseline = np.asarray(CodomainAttentionKernel.Softmax_Over_Last_Axis(logits))
+    shifted_logits = logits + 1e4
+    shifted = np.asarray(CodomainAttentionKernel.Softmax_Over_Last_Axis(shifted_logits))
+    assert np.all(np.isfinite(shifted))
+    assert np.allclose(shifted, baseline, atol=1e-9)
+
+    if Torch_Is_Available():
+        engine = TorchEngine()
+        torch_shifted = CodomainAttentionKernel.Softmax_Over_Last_Axis(engine.Lift_Constant(shifted_logits))
+        torch_array = np.asarray(torch_shifted.detach().cpu().numpy(), dtype=np.float64)
+        assert np.all(np.isfinite(torch_array))
+        assert np.allclose(torch_array, baseline, atol=1e-6)
+
+        # a common level past single precision's own exp overflow point, riding a modest and meaningful spread
+        single_engine = TorchEngine(working_precision="single")
+        leveled_logits = np.asarray([[1.0e4, 1.0e4 + 1.0, 1.0e4 - 1.0]])
+        single_output = CodomainAttentionKernel.Softmax_Over_Last_Axis(single_engine.Lift_Constant(leveled_logits))
+        single_array = np.asarray(single_output.detach().cpu().numpy(), dtype=np.float64)
+        assert np.all(np.isfinite(single_array))
+        assert np.allclose(single_array, [[0.24472847, 0.66524096, 0.09003057]], atol=1e-4)
+
+
 def Test_Integrate_And_Forward_Agree_On_Both_Engines() -> None:
     """integrate on a grid function equals forward on its values, on the reference engine and the foreign one"""
     kernel = CodomainAttentionKernel(hidden_channels=2, kept_modes=(1, 1, 1), head_count=1, seed=30)

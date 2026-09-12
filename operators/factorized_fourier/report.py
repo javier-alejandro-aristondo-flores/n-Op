@@ -11,13 +11,19 @@ from numpy.typing import NDArray
 
 from operators.compositions import ExplicitStack
 from operators.data import (
-    ARTIFACT_DIRECTORY,
     Apply_Per_Shell_Filter,
+    Apply_Standardized_Ridge,
     Archive_Path,
+    ARTIFACT_DIRECTORY,
     Fit_Per_Shell_Filter,
+    Fit_Standardized_Ridge,
+    Gram_Pod,
     Guard_Fresh_Archives,
     Hartree_Potential,
+    Nearest_Training_Run,
     POOL_ROOT,
+    Project,
+    Reconstruct,
     Ridge_Apply,
     Ridge_Fit,
     Run_Identifier,
@@ -72,6 +78,7 @@ from operators.training import (
     BatchSource,
     Field_From_Archive,
     Read_Checkpoint,
+    Strain_Assignments_Of_Pool,
     Train,
     Training_Engine,
     TrainingBatch,
@@ -1816,6 +1823,88 @@ def Strain_Bracketing_Floor_Rows(
                 )
             )
     return scored
+
+
+def Strain_Tensor_By_Run_Path() -> dict[str, NDArray[np.float64]]:
+    """every strain-atlas run's own full six-component tensor, keyed by run path, off the cached assignment map"""
+    return {
+        assignment.run_path: np.asarray(assignment.tensor, dtype=np.float64)
+        for assignment in Strain_Assignments_Of_Pool(POOL_ROOT)
+    }
+
+
+def Strain_Floor_Population(
+    arms: tuple[Arm, ...], shape: tuple[int, int, int] = STRAIN_ATLAS_COMMON_SHAPE
+) -> tuple[
+    list[tuple[str, Level]], list[tuple[str, Level]], dict[tuple[str, Level], NDArray[np.float64]], dict[str, Arm]
+]:
+    """every (arm, level) split into training (every level with no full bracket) and evaluation (every interior one)"""
+    arm_by_name = {arm.name: arm for arm in arms}
+    cache: dict[tuple[str, Level], NDArray[np.float64]] = {}
+    train_keys: list[tuple[str, Level]] = []
+    eval_keys: list[tuple[str, Level]] = []
+    for arm in arms:
+        interior = Interior_Levels(arm)
+        for level in arm.runs_by_level:
+            Cached_Level_Field(arm, level, shape, cache)
+            (eval_keys if level in interior else train_keys).append((arm.name, level))
+    return sorted(train_keys), sorted(eval_keys), cache, arm_by_name
+
+
+def Strain_Ridge_Nearest_Mean_Floor_Rows(
+    arms: tuple[Arm, ...], shape: tuple[int, int, int] = STRAIN_ATLAS_COMMON_SHAPE, pod_rank: int = 32
+) -> dict[str, list[ScoredRun]]:
+    """the ridge-to-POD, nearest-copy and training-mean floors, fit on the boundary levels, scored on the interior"""
+    tensor_of_run = Strain_Tensor_By_Run_Path()
+    train_keys, eval_keys, field_of, arm_by_name = Strain_Floor_Population(arms, shape)
+
+    def Representative_Tensor(arm_name: str, level: Level) -> NDArray[np.float64]:
+        run_path = arm_by_name[arm_name].runs_by_level[level][0]
+        return tensor_of_run[run_path]
+
+    train_tensors = np.stack([Representative_Tensor(name, level) for name, level in train_keys])
+    train_fields = np.stack([field_of[(name, level)] for name, level in train_keys])
+    eval_tensors = np.stack([Representative_Tensor(name, level) for name, level in eval_keys])
+    eval_fields = np.stack([field_of[(name, level)] for name, level in eval_keys])
+
+    flat_train_fields = train_fields.reshape(train_fields.shape[0], -1)
+    mean_field = train_fields.mean(axis=0)
+    nearest_indices = Nearest_Training_Run(train_tensors, eval_tensors)
+    pod_basis = Gram_Pod(flat_train_fields, rank=pod_rank)
+    train_coefficients = Project(pod_basis, flat_train_fields)
+    ridge = Fit_Standardized_Ridge(train_tensors, train_coefficients)
+    predicted_coefficients = Apply_Standardized_Ridge(ridge, eval_tensors)
+    ridge_flat_fields = Reconstruct(pod_basis, predicted_coefficients)
+
+    mean_rows: list[ScoredRun] = []
+    copy_rows: list[ScoredRun] = []
+    ridge_rows: list[ScoredRun] = []
+    for evaluation_position, (arm_name, level) in enumerate(eval_keys):
+        truth = eval_fields[evaluation_position]
+        identifier = f"{arm_name}_{level}"
+        mean_rows.append(
+            ScoredRun(
+                identifier=identifier, unit_key=identifier, campaign=STRAIN_ATLAS_CAMPAIGN, family=arm_name,
+                errors=Card_Metric_Errors(mean_field, truth),
+            )
+        )
+        copy_rows.append(
+            ScoredRun(
+                identifier=identifier, unit_key=identifier, campaign=STRAIN_ATLAS_CAMPAIGN, family=arm_name,
+                errors=Card_Metric_Errors(train_fields[nearest_indices[evaluation_position]], truth),
+            )
+        )
+        ridge_rows.append(
+            ScoredRun(
+                identifier=identifier, unit_key=identifier, campaign=STRAIN_ATLAS_CAMPAIGN, family=arm_name,
+                errors=Card_Metric_Errors(ridge_flat_fields[evaluation_position].reshape(shape), truth),
+            )
+        )
+    return {
+        "training_mean_trivial_floor": mean_rows,
+        "nearest_run_copy_floor": copy_rows,
+        "ridge_to_pod_32_floor": ridge_rows,
+    }
 
 
 def Main() -> int:

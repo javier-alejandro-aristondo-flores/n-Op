@@ -17,7 +17,12 @@ from operators.factorized_fourier.parametric import (
     PEROVSKITE_ARM_NAMES,
     STRAIN_ARM_NAMES,
 )
-from operators.factorized_fourier.report import Card_Metric_Errors, Multilinear_Interpolated_Field, Strain_Bracketing_Floor_Rows
+from operators.factorized_fourier.report import (
+    Card_Metric_Errors,
+    Multilinear_Interpolated_Field,
+    Strain_Bracketing_Floor_Rows,
+    Strain_Ridge_Nearest_Mean_Floor_Rows,
+)
 from operators.framework import Coefficients, Domain, Fractional_Grid_Coordinates, GridSpec, Layer
 from operators.kernels import SpectralKernel
 from operators.readouts import PeriodicCoordinateFeatures, PointwiseProjection
@@ -276,3 +281,24 @@ def Test_The_Same_Parametric_Weights_Answer_Two_Different_Grids() -> None:
         assert abs(integral - 8.0) < 1e-6
     assert small.values.shape == (1, 8, 8, 8)
     assert large.values.shape == (1, 10, 10, 10)
+
+
+@pytest.mark.pool
+def Test_The_Ridge_Nearest_And_Mean_Floors_Score_The_Same_Interior_Levels_In_The_Expected_Order() -> None:
+    """training mean is weakest, nearest copy beats it, ridge to POD beats both, on the identical evaluation rows"""
+    arms = All_Strain_Arms()
+    floors = Strain_Ridge_Nearest_Mean_Floor_Rows(arms)
+    interior_count = sum(len(Interior_Levels(arm)) for arm in arms)
+    identifiers = None
+    for name, rows in floors.items():
+        assert len(rows) == interior_count, name
+        these_identifiers = {row.identifier for row in rows}
+        if identifiers is None:
+            identifiers = these_identifiers
+        else:
+            assert these_identifiers == identifiers, name
+    mean_median = np.median([row.errors["relative_l2"] for row in floors["training_mean_trivial_floor"]])
+    copy_median = np.median([row.errors["relative_l2"] for row in floors["nearest_run_copy_floor"]])
+    ridge_median = np.median([row.errors["relative_l2"] for row in floors["ridge_to_pod_32_floor"]])
+    assert copy_median < mean_median
+    assert ridge_median < copy_median

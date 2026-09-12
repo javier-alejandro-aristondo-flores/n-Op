@@ -98,3 +98,89 @@ weight_tied                |   --  |     --       |       --        |  n/a (not 
 fixed_point                |   --  |     --       |       --        |          --           |  --
 ```
 
+## The potential task (`charge_to_potential`), host-only work
+
+**Truncation ceiling.** The target lives on the fine grid (80³), unlike the localization field's 40³, so truncate-early no longer matches the target as built for I.1. Measured on the evaluation block: each spin potential truncated to 40³ and zero-padded back to 80³, against its own untouched fine-grid original, mean-removed relative L2: median **2.13%**. This is the fraction of the potential a coarse trunk cannot carry by construction, before any model is judged.
+
+This is at or above 1%: per the pre-registered rule, this stream stops here on the potential member and asks the integrator before building the fine-grid trunk, which is the canon's own 9 GB super-later ablation and not built as a default response to a failed ceiling check.
+
+**Floors**, all three card metrics, per spin, unit-aggregated and broken out by campaign, following stage zero's recipes (`Poisson_Lines`, `Shell_Filter_Lines`) but on the full cubic block rather than the defect campaign alone, and per spin rather than on the spin-mean potential:
+
+```
+group                                               metric                            units  runs  median     interquartile  mean_interval         
+hartree_only                                        mean_removed_relative_l2          29     152   1.541687   0.122568       [1.559398, 1.682830]  
+hartree_only__defect_set                            mean_removed_relative_l2          21     84    1.589188   0.109431       [1.579744, 1.731626]  
+hartree_only__supercell_strains                     mean_removed_relative_l2          8      68    1.516123   0.003739       [1.514971, 1.519291]  
+hartree_only                                        mean_removed_mean_absolute_error  29     152   20.962231  0.848175       [21.106632, 22.343441]
+hartree_only__defect_set                            mean_removed_mean_absolute_error  21     84    21.245708  1.013059       [21.230667, 22.882708]
+hartree_only__supercell_strains                     mean_removed_mean_absolute_error  8      68    20.909806  0.124986       [20.718859, 20.926957]
+hartree_only                                        mean_discrepancy                  29     152   12.055770  0.150489       [12.138172, 12.477054]
+hartree_only__defect_set                            mean_discrepancy                  21     84    12.027126  0.145562       [12.000498, 12.061120]
+hartree_only__supercell_strains                     mean_discrepancy                  8      68    13.200200  0.147737       [12.701920, 13.200465]
+climatology_only                                    mean_removed_relative_l2          29     152   0.603281   0.051339       [0.593823, 0.644483]  
+climatology_only__defect_set                        mean_removed_relative_l2          21     84    0.614358   0.038128       [0.611299, 0.671906]  
+climatology_only__supercell_strains                 mean_removed_relative_l2          8      68    0.557831   0.006772       [0.555618, 0.574117]  
+climatology_only                                    mean_removed_mean_absolute_error  29     152   8.596947   0.450681       [8.404736, 8.882341]  
+climatology_only__defect_set                        mean_removed_mean_absolute_error  21     84    8.650301   0.251252       [8.598793, 9.152762]  
+climatology_only__supercell_strains                 mean_removed_mean_absolute_error  8      68    8.012737   0.107785       [7.994488, 8.188530]  
+climatology_only                                    mean_discrepancy                  29     152   12.055770  0.150489       [12.138172, 12.477054]
+climatology_only__defect_set                        mean_discrepancy                  21     84    12.027126  0.145562       [12.000498, 12.061120]
+climatology_only__supercell_strains                 mean_discrepancy                  8      68    13.200200  0.147737       [12.701920, 13.200465]
+hartree_plus_climatology                            mean_removed_relative_l2          29     152   0.403326   0.439054       [0.375792, 0.650875]  
+hartree_plus_climatology__defect_set                mean_removed_relative_l2          21     84    0.602769   0.406414       [0.478322, 0.803711]  
+hartree_plus_climatology__supercell_strains         mean_removed_relative_l2          8      68    0.166285   0.008935       [0.164780, 0.179722]  
+hartree_plus_climatology                            mean_removed_mean_absolute_error  29     152   3.934809   4.365773       [3.529815, 6.626013]  
+hartree_plus_climatology__defect_set                mean_removed_mean_absolute_error  21     84    5.519786   3.185378       [4.514307, 8.255244]  
+hartree_plus_climatology__supercell_strains         mean_removed_mean_absolute_error  8      68    1.478298   0.183963       [1.469124, 1.837148]  
+hartree_plus_climatology                            mean_discrepancy                  29     152   12.055770  0.150489       [12.138172, 12.477054]
+hartree_plus_climatology__defect_set                mean_discrepancy                  21     84    12.027126  0.145562       [12.000498, 12.061120]
+hartree_plus_climatology__supercell_strains         mean_discrepancy                  8      68    13.200200  0.147737       [12.701920, 13.200465]
+hartree_plus_semilocal_xc_ridge                     mean_removed_relative_l2          29     152   0.479646   0.237299       [0.459739, 0.669886]  
+hartree_plus_semilocal_xc_ridge__defect_set         mean_removed_relative_l2          21     84    0.551568   0.140164       [0.515281, 0.763812]  
+hartree_plus_semilocal_xc_ridge__supercell_strains  mean_removed_relative_l2          8      68    0.340906   0.001347       [0.340598, 0.347192]  
+hartree_plus_semilocal_xc_ridge                     mean_removed_mean_absolute_error  29     152   5.455839   3.160442       [4.985915, 7.090915]  
+hartree_plus_semilocal_xc_ridge__defect_set         mean_removed_mean_absolute_error  21     84    6.270380   2.002854       [5.692576, 8.259497]  
+hartree_plus_semilocal_xc_ridge__supercell_strains  mean_removed_mean_absolute_error  8      68    3.548233   0.033961       [3.536147, 3.566967]  
+hartree_plus_semilocal_xc_ridge                     mean_discrepancy                  29     152   12.167168  0.846892       [11.989958, 12.662590]
+hartree_plus_semilocal_xc_ridge__defect_set         mean_discrepancy                  21     84    11.959188  0.806135       [11.619695, 12.125577]
+hartree_plus_semilocal_xc_ridge__supercell_strains  mean_discrepancy                  8      68    13.383056  0.213636       [12.961424, 14.004092]
+per_shell_linear_filter                             mean_removed_relative_l2          29     152   0.282422   0.112483       [0.252105, 0.355947]  
+per_shell_linear_filter__defect_set                 mean_removed_relative_l2          21     84    0.296799   0.036377       [0.285400, 0.402708]  
+per_shell_linear_filter__supercell_strains          mean_removed_relative_l2          8      68    0.191685   0.006597       [0.189326, 0.195902]  
+per_shell_linear_filter                             mean_removed_mean_absolute_error  29     152   3.114532   0.804173       [2.988789, 4.045506]  
+per_shell_linear_filter__defect_set                 mean_removed_mean_absolute_error  21     84    3.217335   0.684972       [3.244996, 4.491904]  
+per_shell_linear_filter__supercell_strains          mean_removed_mean_absolute_error  8      68    2.520987   0.042438       [2.503691, 2.552112]  
+per_shell_linear_filter                             mean_discrepancy                  29     152   12.055770  0.150489       [12.138172, 12.477054]
+per_shell_linear_filter__defect_set                 mean_discrepancy                  21     84    12.027126  0.145562       [12.000498, 12.061120]
+per_shell_linear_filter__supercell_strains          mean_discrepancy                  8      68    13.200200  0.147737       [12.701920, 13.200465]
+training_mean_trivial_floor                         mean_removed_relative_l2          29     152   0.184317   0.158693       [0.152402, 0.233859]  
+training_mean_trivial_floor__defect_set             mean_removed_relative_l2          21     84    0.199155   0.096206       [0.188115, 0.281508]  
+training_mean_trivial_floor__supercell_strains      mean_removed_relative_l2          8      68    0.082671   0.008912       [0.081453, 0.091005]  
+training_mean_trivial_floor                         mean_removed_mean_absolute_error  29     152   1.208247   0.849732       [1.091597, 1.763224]  
+training_mean_trivial_floor__defect_set             mean_removed_mean_absolute_error  21     84    1.352306   0.621236       [1.254015, 2.108058]  
+training_mean_trivial_floor__supercell_strains      mean_removed_mean_absolute_error  8      68    0.706755   0.125754       [0.679229, 0.848718]  
+training_mean_trivial_floor                         mean_discrepancy                  29     152   12.055770  0.150489       [12.138172, 12.477054]
+training_mean_trivial_floor__defect_set             mean_discrepancy                  21     84    12.027126  0.145562       [12.000498, 12.061120]
+training_mean_trivial_floor__supercell_strains      mean_discrepancy                  8      68    13.200200  0.147737       [12.701920, 13.200465]
+nearest_run_copy_floor                              mean_removed_relative_l2          29     152   0.075957   0.097941       [0.069485, 0.158503]  
+nearest_run_copy_floor__defect_set                  mean_removed_relative_l2          21     84    0.105153   0.113429       [0.097321, 0.206297]  
+nearest_run_copy_floor__supercell_strains           mean_removed_relative_l2          8      68    0.008943   0.012088       [0.005966, 0.023495]  
+nearest_run_copy_floor                              mean_removed_mean_absolute_error  29     152   0.547114   0.831777       [0.485598, 1.199093]  
+nearest_run_copy_floor__defect_set                  mean_removed_mean_absolute_error  21     84    0.637324   0.661405       [0.650334, 1.558522]  
+nearest_run_copy_floor__supercell_strains           mean_removed_mean_absolute_error  8      68    0.096049   0.113399       [0.065197, 0.272698]  
+nearest_run_copy_floor                              mean_discrepancy                  29     152   -0.004265  1.117168       [-0.470906, 0.053722] 
+nearest_run_copy_floor__defect_set                  mean_discrepancy                  21     84    -0.004265  1.238290       [-0.564796, 0.132724] 
+nearest_run_copy_floor__supercell_strains           mean_discrepancy                  8      68    -0.024846  0.051190       [-0.474399, -0.006653]
+```
+
+### sanity check against stage zero's own committed numbers
+
+Stage zero (defect campaign only, spin-mean potential): Hartree + climatology 57.26%, Hartree + semilocal-XC ridge 56.20%. Recomputed here (defect campaign only, but per spin rather than spin-mean): Hartree + climatology 60.28%, Hartree + semilocal-XC ridge 55.16%. The difference is the per-spin-versus-spin-mean gap: a spin-mean potential already averages away the part of the exchange-correlation remainder that differs between the two spins, which a per-spin score cannot, so the two numbers are expected to differ by roughly that averaged-away spread rather than agree exactly.
+
+### the ladder for this task, neither bar invented here
+
+- **canon bar**: more than 2x better than the Hartree + semilocal-XC ridge floor (median 47.96% mean-removed relative L2) -- required absolute: **23.98%** -- or record that the physics floor suffices and keep this task as a pipeline unit test, a finding rather than a failure.
+- **added, as for ELF**: beat the training-mean template; beat the nearest-run copy.
+- **the per-shell linear filter is the linearity certificate, not a kill**: stage zero read 23.35% on the spin mean over cubic fold zero, 2.4x better than the physics floor; this recomputation's per-spin filter row (above) tests that same hypothesis on this block.
+- **the DEQ cross-entry bar**: fixed-point's error on this task within 1.5x of I.1's own error on the same split.
+

@@ -15,9 +15,11 @@ from operators.data import (
     Archive_Path,
     Fit_Per_Shell_Filter,
     Guard_Fresh_Archives,
+    Hartree_Potential,
     POOL_ROOT,
     Ridge_Apply,
     Ridge_Fit,
+    Semilocal_Xc_Ridge_Features,
     Spectral_Gradient_Magnitude_And_Laplacian,
     STORE_NAME,
 )
@@ -31,11 +33,19 @@ from operators.factorized_fourier import (
     Gram_Statistics,
     Log_Compressed_Channels,
     Reference_Density,
+    Spin_Channels,
     Standardized_Gram,
 )
 from operators.framework import Spectral_Truncation_Resample
 from operators.inspection import Render_Table
-from operators.metrics import Mean_Absolute_Error, Relative_L2, Structural_Similarity_3d
+from operators.metrics import (
+    Mean_Absolute_Error,
+    Mean_Discrepancy,
+    Mean_Removed_Mean_Absolute_Error,
+    Mean_Removed_Relative_L2,
+    Relative_L2,
+    Structural_Similarity_3d,
+)
 from operators.substrate import ParameterSet
 from operators.training import BatchSource, Train, Training_Engine, TrainingBatch
 
@@ -48,7 +58,10 @@ TRAINING_ARTIFACT_PATH = POOL_ROOT / STORE_NAME / "_training" / "factorized_four
 
 CUBIC_CAMPAIGNS = ("supercell_strains", "defect_set")
 COARSE_SHAPE = (40, 40, 40)
+FINE_SHAPE = (80, 80, 80)
 LOCALIZATION_CHANNELS = ("electron_localization_up", "electron_localization_down")
+POTENTIAL_CHANNELS = ("local_potential_up", "local_potential_down")
+POTENTIAL_METRIC_NAMES = ("mean_removed_relative_l2", "mean_removed_mean_absolute_error", "mean_discrepancy")
 
 # stage zero's own choices, kept here so the recomputed numbers reproduce them
 RIDGE_TRAIN_RUN_COUNT = 80
@@ -678,6 +691,321 @@ def Floor_Block_Lines() -> tuple[list[str], dict[str, float]]:
     return lines, bars
 
 
+# the potential task (charge_to_potential), host-only floor work: the fine-grid target changes what "coarse"
+# means, so the truncation ceiling is measured before anything else, then every floor stage zero measured on
+# the defect campaign alone and on the spin mean is remeasured here on the full cubic block, per spin
+
+
+def Mean_Removed_Field(field: NDArray[np.float64]) -> NDArray[np.float64]:
+    """the field with its own spatial mean removed"""
+    return field - field.mean()
+
+
+def Potential_Metric_Errors(predicted: NDArray[np.float64], truth: NDArray[np.float64]) -> dict[str, float]:
+    """the potential card's three metrics between one predicted and one true field"""
+    return {
+        "mean_removed_relative_l2": Mean_Removed_Relative_L2(predicted, truth),
+        "mean_removed_mean_absolute_error": Mean_Removed_Mean_Absolute_Error(predicted, truth),
+        "mean_discrepancy": Mean_Discrepancy(predicted, truth),
+    }
+
+
+def Truncation_Ceiling_Rows(block: CubicBlock) -> list[ScoredRun]:
+    """how much of the potential a 40-cubed trunk cannot carry: truncate to coarse, zero-pad back, mean-removed"""
+    scored: list[ScoredRun] = []
+    for identifier in block.evaluation:
+        campaign = block.campaign_of[identifier]
+        with np.load(Archive_Path(campaign, identifier)) as archive:
+            truths = {channel: np.asarray(archive[channel], dtype=np.float64) for channel in POTENTIAL_CHANNELS}
+        for channel, truth in truths.items():
+            coarse = Spectral_Truncation_Resample(truth[None], COARSE_SHAPE)[0]
+            back_to_fine = Spectral_Truncation_Resample(coarse[None], FINE_SHAPE)[0]
+            scored.append(
+                ScoredRun(
+                    identifier=f"{identifier}_{channel}",
+                    unit_key=block.unit_of[identifier],
+                    campaign=campaign,
+                    family=channel,
+                    errors={"mean_removed_relative_l2": Mean_Removed_Relative_L2(back_to_fine, truth)},
+                    covariate_values={"spin_channel": channel},
+                )
+            )
+    return scored
+
+
+@dataclasses.dataclass(frozen=True, slots=True)
+class PotentialRunData:
+    """one run's raw and per-spin densities beside its own Hartree potential and both spin potentials"""
+
+    identifier: str
+    campaign: str
+    unit_key: str
+    lattice: NDArray[np.float64]
+    density: NDArray[np.float64]
+    spin_up_density: NDArray[np.float64]
+    spin_down_density: NDArray[np.float64]
+    hartree: NDArray[np.float64]
+    up_truth: NDArray[np.float64]
+    down_truth: NDArray[np.float64]
+
+
+def Loaded_Potential_Run(block: CubicBlock, identifier: str) -> PotentialRunData:
+    """one run's density, per-spin split, Hartree potential and both spin potentials, loaded once"""
+    campaign = block.campaign_of[identifier]
+    density, magnetization, lattice = Loaded_Density_And_Magnetization(campaign, identifier)
+    spin_up_density, spin_down_density = Spin_Channels(density, magnetization)
+    hartree = Hartree_Potential(density, lattice)
+    with np.load(Archive_Path(campaign, identifier)) as archive:
+        up_truth = np.asarray(archive[POTENTIAL_CHANNELS[0]], dtype=np.float64)
+        down_truth = np.asarray(archive[POTENTIAL_CHANNELS[1]], dtype=np.float64)
+    return PotentialRunData(
+        identifier=identifier,
+        campaign=campaign,
+        unit_key=block.unit_of[identifier],
+        lattice=lattice,
+        density=density,
+        spin_up_density=spin_up_density,
+        spin_down_density=spin_down_density,
+        hartree=hartree,
+        up_truth=up_truth,
+        down_truth=down_truth,
+    )
+
+
+def Spin_Remainder(run: PotentialRunData, channel: str) -> NDArray[np.float64]:
+    """one spin's own potential less the (spin-independent) Hartree part, both mean-removed first"""
+    truth = run.up_truth if channel == POTENTIAL_CHANNELS[0] else run.down_truth
+    return Mean_Removed_Field(truth) - Mean_Removed_Field(run.hartree)
+
+
+def Climatology_Fields(train_runs: list[PotentialRunData]) -> dict[str, NDArray[np.float64]]:
+    """the training block's own mean remainder per spin, the positional template the ridge is judged against"""
+    sums = {channel: np.zeros(FINE_SHAPE, dtype=np.float64) for channel in POTENTIAL_CHANNELS}
+    for run in train_runs:
+        for channel in POTENTIAL_CHANNELS:
+            sums[channel] += Spin_Remainder(run, channel)
+    return {channel: total / len(train_runs) for channel, total in sums.items()}
+
+
+def Potential_Ridge(ridge_runs: list[PotentialRunData]) -> tuple[NDArray[np.float64], NDArray[np.float64]]:
+    """standardized ridge coefficients fit on both spins' own density features against their own remainder"""
+    generator = np.random.default_rng(RIDGE_SEED)
+    feature_rows: list[NDArray[np.float64]] = []
+    target_rows: list[NDArray[np.float64]] = []
+    for run in ridge_runs:
+        for channel, spin_density in (
+            (POTENTIAL_CHANNELS[0], run.spin_up_density),
+            (POTENTIAL_CHANNELS[1], run.spin_down_density),
+        ):
+            features = Semilocal_Xc_Ridge_Features(spin_density, run.lattice)
+            remainder = Spin_Remainder(run, channel).ravel()
+            chosen = generator.choice(features.shape[0], size=RIDGE_VOXELS_PER_RUN, replace=False)
+            feature_rows.append(features[chosen])
+            target_rows.append(remainder[chosen])
+    scales = np.concatenate(feature_rows).std(axis=0)
+    coefficients = Ridge_Fit(np.concatenate(feature_rows) / scales, np.concatenate(target_rows))
+    return coefficients, scales
+
+
+def Potential_Rows(
+    evaluation_runs: list[PotentialRunData],
+    predicted_by_channel: dict[str, dict[str, NDArray[np.float64]]],
+) -> list[ScoredRun]:
+    """one scored run per evaluation run and spin channel, for every named floor sharing this evaluation pass"""
+    scored: list[ScoredRun] = []
+    for run in evaluation_runs:
+        for channel, truth in ((POTENTIAL_CHANNELS[0], run.up_truth), (POTENTIAL_CHANNELS[1], run.down_truth)):
+            predicted = predicted_by_channel[channel][run.identifier]
+            scored.append(
+                ScoredRun(
+                    identifier=f"{run.identifier}_{channel}",
+                    unit_key=run.unit_key,
+                    campaign=run.campaign,
+                    family=channel,
+                    errors=Potential_Metric_Errors(predicted, truth),
+                    covariate_values={"spin_channel": channel},
+                )
+            )
+    return scored
+
+
+def Potential_Nearest_Run_Rows(block: CubicBlock, reference_density: float) -> list[ScoredRun]:
+    """the memorization floor: the nearest training run's own potential fields, copied verbatim"""
+    train_used = block.floor_train
+    train_representations = np.stack(
+        [
+            Coarse_Log_Density_Representation(block.campaign_of[identifier], identifier, reference_density)
+            for identifier in train_used
+        ]
+    )
+    scored: list[ScoredRun] = []
+    for identifier in block.evaluation:
+        campaign = block.campaign_of[identifier]
+        evaluation_representation = Coarse_Log_Density_Representation(campaign, identifier, reference_density)
+        distances = np.linalg.norm(train_representations - evaluation_representation[None, :], axis=1)
+        nearest_identifier = train_used[int(np.argmin(distances))]
+        nearest_campaign = block.campaign_of[nearest_identifier]
+        with np.load(Archive_Path(nearest_campaign, nearest_identifier)) as archive:
+            copied = {channel: np.asarray(archive[channel], dtype=np.float64) for channel in POTENTIAL_CHANNELS}
+        with np.load(Archive_Path(campaign, identifier)) as archive:
+            truths = {channel: np.asarray(archive[channel], dtype=np.float64) for channel in POTENTIAL_CHANNELS}
+        for channel, truth in truths.items():
+            scored.append(
+                ScoredRun(
+                    identifier=f"{identifier}_{channel}",
+                    unit_key=block.unit_of[identifier],
+                    campaign=campaign,
+                    family=channel,
+                    errors=Potential_Metric_Errors(copied[channel], truth),
+                    covariate_values={"spin_channel": channel},
+                )
+            )
+    return scored
+
+
+def Potential_Floor_Rows(block: CubicBlock) -> dict[str, list[ScoredRun]]:
+    """every potential floor, sharing one load and one Hartree computation per run, scored on the kill block"""
+    train_identifiers = block.floor_train[:FILTER_TRAIN_RUN_COUNT]
+    train_runs = [Loaded_Potential_Run(block, identifier) for identifier in train_identifiers]
+    ridge_runs = train_runs[:RIDGE_TRAIN_RUN_COUNT]
+    evaluation_runs = [Loaded_Potential_Run(block, identifier) for identifier in block.evaluation]
+
+    climatology = Climatology_Fields(train_runs)
+    coefficients, scales = Potential_Ridge(ridge_runs)
+    # the filter's gains are fit on the up channel alone and applied to both, matching the localization floor
+    filter_gains = Fit_Per_Shell_Filter(
+        [run.density for run in train_runs], [Mean_Removed_Field(run.up_truth) for run in train_runs]
+    )
+    training_mean = {
+        channel: np.mean([Mean_Removed_Field(run.up_truth if channel == POTENTIAL_CHANNELS[0] else run.down_truth) for run in train_runs], axis=0)
+        for channel in POTENTIAL_CHANNELS
+    }
+
+    hartree_only: dict[str, dict[str, NDArray[np.float64]]] = {channel: {} for channel in POTENTIAL_CHANNELS}
+    climatology_only: dict[str, dict[str, NDArray[np.float64]]] = {channel: {} for channel in POTENTIAL_CHANNELS}
+    hartree_plus_climatology: dict[str, dict[str, NDArray[np.float64]]] = {channel: {} for channel in POTENTIAL_CHANNELS}
+    hartree_plus_ridge: dict[str, dict[str, NDArray[np.float64]]] = {channel: {} for channel in POTENTIAL_CHANNELS}
+    shell_filter: dict[str, dict[str, NDArray[np.float64]]] = {channel: {} for channel in POTENTIAL_CHANNELS}
+    training_mean_predicted: dict[str, dict[str, NDArray[np.float64]]] = {channel: {} for channel in POTENTIAL_CHANNELS}
+    for run in evaluation_runs:
+        # the card's own metrics remove each field's mean internally, so the raw Hartree term needs no pre-removal
+        filtered = Apply_Per_Shell_Filter(filter_gains, run.density)
+        for channel, spin_density in (
+            (POTENTIAL_CHANNELS[0], run.spin_up_density),
+            (POTENTIAL_CHANNELS[1], run.spin_down_density),
+        ):
+            hartree_only[channel][run.identifier] = run.hartree
+            climatology_only[channel][run.identifier] = climatology[channel]
+            hartree_plus_climatology[channel][run.identifier] = run.hartree + climatology[channel]
+            features = Semilocal_Xc_Ridge_Features(spin_density, run.lattice) / scales
+            predicted_remainder = Ridge_Apply(coefficients, features).reshape(FINE_SHAPE)
+            hartree_plus_ridge[channel][run.identifier] = run.hartree + predicted_remainder
+            shell_filter[channel][run.identifier] = filtered
+            training_mean_predicted[channel][run.identifier] = training_mean[channel]
+
+    return {
+        "hartree_only": Potential_Rows(evaluation_runs, hartree_only),
+        "climatology_only": Potential_Rows(evaluation_runs, climatology_only),
+        "hartree_plus_climatology": Potential_Rows(evaluation_runs, hartree_plus_climatology),
+        "hartree_plus_semilocal_xc_ridge": Potential_Rows(evaluation_runs, hartree_plus_ridge),
+        "per_shell_linear_filter": Potential_Rows(evaluation_runs, shell_filter),
+        "training_mean_trivial_floor": Potential_Rows(evaluation_runs, training_mean_predicted),
+    }
+
+
+def Potential_Task_Lines() -> list[str]:
+    """the potential task's truncation ceiling and every floor, host-only, before the metric-aware member is built"""
+    block = CubicBlock()
+    ceiling_rows = Truncation_Ceiling_Rows(block)
+    ceiling_median = Summarize(ceiling_rows, "mean_removed_relative_l2", "truncation_ceiling").median
+
+    floor_rows = Potential_Floor_Rows(block)
+    sample_densities: list[NDArray[np.float64]] = []
+    sample_magnetizations: list[NDArray[np.float64]] = []
+    for identifier in block.floor_train[:RIDGE_TRAIN_RUN_COUNT]:
+        density, magnetization, _ = Loaded_Density_And_Magnetization(block.campaign_of[identifier], identifier)
+        sample_densities.append(density)
+        sample_magnetizations.append(magnetization)
+    reference_density = Reference_Density(sample_densities, sample_magnetizations)
+    floor_rows["nearest_run_copy_floor"] = Potential_Nearest_Run_Rows(block, reference_density)
+
+    summaries: list[MetricSummary] = []
+    for floor_label, rows in floor_rows.items():
+        for metric_name in POTENTIAL_METRIC_NAMES:
+            summaries.append(Summarize(rows, metric_name, floor_label))
+            for campaign_summary in Summarize_By(rows, metric_name, "campaign"):
+                summaries.append(
+                    dataclasses.replace(campaign_summary, group_name=f"{floor_label}__{campaign_summary.group_name}")
+                )
+
+    # stage zero's own numbers, defect campaign only, spin-mean potential -- the sanity check this recomputation owes
+    defect_climatology = Summarize(
+        [row for row in floor_rows["hartree_plus_climatology"] if row.campaign == "defect_set"],
+        "mean_removed_relative_l2",
+        "defect_only_check",
+    ).median
+    defect_ridge = Summarize(
+        [row for row in floor_rows["hartree_plus_semilocal_xc_ridge"] if row.campaign == "defect_set"],
+        "mean_removed_relative_l2",
+        "defect_only_check",
+    ).median
+    canon_bar_median = Summarize(
+        floor_rows["hartree_plus_semilocal_xc_ridge"], "mean_removed_relative_l2", "hartree_plus_semilocal_xc_ridge"
+    ).median
+
+    return [
+        "## The potential task (`charge_to_potential`), host-only work",
+        "",
+        "**Truncation ceiling.** The target lives on the fine grid (80³), unlike the localization field's 40³, so"
+        " truncate-early no longer matches the target as built for I.1. Measured on the evaluation block: each"
+        " spin potential truncated to 40³ and zero-padded back to 80³, against its own untouched fine-grid"
+        " original, mean-removed relative L2:"
+        f" median **{100 * ceiling_median:.2f}%**. This is the fraction of the potential a coarse trunk cannot"
+        " carry by construction, before any model is judged.",
+        "",
+        (
+            "This is well under 1%, so the design stays the coarse trunk with the readout followed by a lifted,"
+            " differentiable resample back to the fine shape."
+            if ceiling_median < 0.01
+            else "This is at or above 1%: per the pre-registered rule, this stream stops here on the potential"
+            " member and asks the integrator before building the fine-grid trunk, which is the canon's own 9 GB"
+            " super-later ablation and not built as a default response to a failed ceiling check."
+        ),
+        "",
+        "**Floors**, all three card metrics, per spin, unit-aggregated and broken out by campaign, following"
+        " stage zero's recipes (`Poisson_Lines`, `Shell_Filter_Lines`) but on the full cubic block rather than"
+        " the defect campaign alone, and per spin rather than on the spin-mean potential:",
+        "",
+        "```",
+        Render_Table(Summary_Table(tuple(summaries))),
+        "```",
+        "",
+        "### sanity check against stage zero's own committed numbers",
+        "",
+        f"Stage zero (defect campaign only, spin-mean potential): Hartree + climatology 57.26%, Hartree +"
+        f" semilocal-XC ridge 56.20%. Recomputed here (defect campaign only, but per spin rather than spin-mean):"
+        f" Hartree + climatology {100 * defect_climatology:.2f}%, Hartree + semilocal-XC ridge"
+        f" {100 * defect_ridge:.2f}%. The difference is the per-spin-versus-spin-mean gap: a spin-mean potential"
+        " already averages away the part of the exchange-correlation remainder that differs between the two"
+        " spins, which a per-spin score cannot, so the two numbers are expected to differ by roughly that"
+        " averaged-away spread rather than agree exactly.",
+        "",
+        "### the ladder for this task, neither bar invented here",
+        "",
+        f"- **canon bar**: more than 2x better than the Hartree + semilocal-XC ridge floor (median"
+        f" {100 * canon_bar_median:.2f}% mean-removed relative L2) -- required absolute:"
+        f" **{100 * canon_bar_median / 2.0:.2f}%** -- or record that the physics floor suffices and keep this"
+        " task as a pipeline unit test, a finding rather than a failure.",
+        "- **added, as for ELF**: beat the training-mean template; beat the nearest-run copy.",
+        "- **the per-shell linear filter is the linearity certificate, not a kill**: stage zero read 23.35% on the"
+        " spin mean over cubic fold zero, 2.4x better than the physics floor; this recomputation's per-spin filter"
+        f" row (above) tests that same hypothesis on this block.",
+        "- **the DEQ cross-entry bar**: fixed-point's error on this task within 1.5x of I.1's own error on the"
+        " same split.",
+        "",
+    ]
+
+
 # the deep-equilibrium ladder (canon I.3): parameter counts of all three rungs, computed now; every trained
 # number -- steps, wall-clock, peak memory, convergence rate, seed -- waits for the runs the integrator schedules
 
@@ -774,9 +1102,10 @@ def Deep_Equilibrium_Ladder_Lines() -> list[str]:
 
 
 def Main() -> int:
-    """the block, its floors, the claim ladder and the deep-equilibrium ladder, the report's first committed section"""
+    """the block, its floors, both ladders and the potential task's own floors, the report's committed sections"""
     floor_lines, bars = Floor_Block_Lines()
     deq_lines = Deep_Equilibrium_Ladder_Lines()
+    potential_lines = Potential_Task_Lines()
     header = [
         "# factorized_fourier — measured against its floors",
         "",
@@ -789,7 +1118,7 @@ def Main() -> int:
         "land in a later commit once training has run.",
         "",
     ]
-    REPORT_PATH.write_text("\n".join(header + floor_lines + deq_lines) + "\n")
+    REPORT_PATH.write_text("\n".join(header + floor_lines + deq_lines + potential_lines) + "\n")
     print(f"wrote {REPORT_PATH}")
     print(bars)
     return 0

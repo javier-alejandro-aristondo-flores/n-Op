@@ -512,6 +512,9 @@ def Localization_Loss(member: FactorizedFourier) -> Any:
 
     def Loss(lifted: dict[str, Any], lifted_batch: dict[str, Any]) -> Any:
         example_count = lifted_batch["combined_coarse_input"].shape[0]
+        # one example is drawn per training step, so this is a training solve rather than a validation
+        # one, unless a held-out unit happens to carry exactly one example itself
+        drawn_as_a_training_step = example_count == 1
         total = 0.0
         for example_index in range(example_count):
             predicted = member.Forward_From_Coarse_Input(lifted, lifted_batch["combined_coarse_input"][example_index])
@@ -519,19 +522,18 @@ def Localization_Loss(member: FactorizedFourier) -> Any:
             total = total + (residual * residual).mean()
             cap_was_hit = member.last_fixed_point_cap_was_hit
             iterations_taken = member.last_fixed_point_iterations
-            if cap_was_hit is not None and iterations_taken is not None:
+            if drawn_as_a_training_step and cap_was_hit is not None and iterations_taken is not None:
                 cap_hit_history.append(cap_was_hit)
                 iterations_history.append(iterations_taken)
-                # the fixed-point health floor, visible while the run trains rather than only at evaluation;
-                # this closure cannot tell a training solve from a validation one, so the window mixes both
+                # the fixed-point health floor, visible while the run trains rather than only at evaluation
                 if len(cap_hit_history) % VALIDATION_INTERVAL == 0:
                     recent_hits = cap_hit_history[-100:]
                     recent_iterations = iterations_history[-100:]
                     cap_hit_fraction = sum(recent_hits) / len(recent_hits)
                     mean_iterations = sum(recent_iterations) / len(recent_iterations)
                     print(
-                        f"solve {len(cap_hit_history)}: cap-hit fraction {cap_hit_fraction:.2f} over the last"
-                        f" {len(recent_hits)} solves, mean iterations {mean_iterations:.1f}",
+                        f"training step {len(cap_hit_history)}: cap-hit fraction {cap_hit_fraction:.2f} over the"
+                        f" last {len(recent_hits)} training solves, mean iterations {mean_iterations:.1f}",
                         flush=True,
                     )
         return total / example_count

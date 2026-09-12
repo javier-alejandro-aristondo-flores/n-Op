@@ -128,6 +128,7 @@ class FixedPointSolve:
 
     equilibrium: Any
     iterations_taken: int
+    # every residual is relative to the iterate's own norm, so a tolerance means the same thing on any grid
     final_residual: float
     cap_was_hit: bool
     residual_norm_history: list[float]
@@ -218,6 +219,9 @@ class FixedPoint(Composition[GridFunction]):
             # the residuals stay on their engine, and only the scalars the host decides on come across
             residual_values = applied - state
             residual_norm = float(np.sqrt(Host_Inner_Product(residual_values, residual_values)))
+            iterate_norm = float(np.sqrt(Host_Inner_Product(applied, applied)))
+            # relative to the iterate, so the tolerance does not tighten with the number of entries
+            residual_norm = residual_norm / max(iterate_norm, 1e-12)
             residual_norm_history.append(residual_norm)
             if residual_norm < self.tolerance:
                 return FixedPointSolve(applied, iteration_index + 1, residual_norm, False, residual_norm_history)
@@ -291,8 +295,9 @@ class FixedPoint(Composition[GridFunction]):
                 updated = Vector_Jacobian_Product(Applied_At_The_Equilibrium, output, adjoint) + cotangent
                 adjoint_step = Detached(updated - adjoint)
                 change = float(np.sqrt(Host_Inner_Product(adjoint_step, adjoint_step)))
+                adjoint_norm = float(np.sqrt(Host_Inner_Product(Detached(updated), Detached(updated))))
                 adjoint = updated
-                if change < self.tolerance:
+                if change / max(adjoint_norm, 1e-12) < self.tolerance:
                     break
 
             gradients: list[Any] = []

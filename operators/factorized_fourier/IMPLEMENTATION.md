@@ -139,6 +139,10 @@ the first thing timed once the accelerator is available, before a training budge
 
 Every array below is reachable through `FactorizedFourier.Inspect()`. The prefixed arrays come from
 `NeuralOperator.Inspect()` aggregating the three parts; the unprefixed ones are the member's own.
+The `composition.` prefix carries a `layer_{n}.` segment beneath it only for the explicit-stack
+configuration (twelve layers, each its own kernel and local linear map); `weight_tied` and
+`fixed_point` share one layer, so their own keys read `composition.kernel...` and
+`composition.local_linear...` with no layer index at all.
 
 | Key | Shape | Drawn by |
 |---|---|---|
@@ -146,9 +150,14 @@ Every array below is reachable through `FactorizedFourier.Inspect()`. The prefix
 | `encoder.lift_biases` | `(64,)` | `Render_Bars` |
 | `composition.layer_{n}.kernel.{axis}_mode_weights_real` / `_imaginary` | `(39, 64, 64)` per named axis | `Render_Field_Slices` |
 | `composition.layer_{n}.kernel.{axis}_mode_magnitudes` / `_phases` | `(39, 64, 64)` per named axis | `Render_Field_Slices` |
+| `composition.layer_{n}.kernel.gain_layer_0_weights` / `_biases` | `(8, 1)` / `(8,)`, metric-aware only (the potential task) | `Render_Matrix` / `Render_Bars` |
+| `composition.layer_{n}.kernel.gain_layer_1_weights` / `_biases` | `(64, 8)` / `(64,)`, metric-aware only | `Render_Matrix` / `Render_Bars` |
+| `composition.layer_{n}.kernel.last_output_values` | `(64, *output_shape)`, only once `Integrate()` is called directly on that kernel object -- the member's own forward path never does | `Render_Field_Sheet` |
+| `composition.layer_{n}.kernel.last_mode_gains` | `(39, 39, 39, 64)`, metric-aware only, same direct-`Integrate()` caveat | `Render_Field_Sheet` |
+| `composition.layer_{n}.kernel.last_mode_wavevector_features` | `(39, 39, 39)`, metric-aware only, same direct-`Integrate()` caveat | `Render_Field_Slices` |
 | `composition.layer_{n}.local_linear.lift_weights` | `(64, 64)` | `Render_Matrix` |
 | `composition.layer_{n}.local_linear.lift_biases` | `(64,)` | `Render_Bars` |
-| `composition.last_layer_norms` | `(12,)`, after a numpy call | `Render_Bars` (reference line at 1) |
+| `composition.last_layer_norms` (`weight_tied` / `fixed_point`: `last_application_norms`) | `(12,)`, only once `Apply()` is called directly on the composition -- the member's own forward path never does | `Render_Bars` (reference line at 1) |
 | `readout.projection_weights` | `(2, 64)` | `Render_Matrix` |
 | `readout.projection_biases` | `(2,)` | `Render_Bars` |
 | `reference_density` | `()` | scalar panel |
@@ -156,12 +165,20 @@ Every array below is reachable through `FactorizedFourier.Inspect()`. The prefix
 | `gram_standardization_scale` | `(6,)` | `Render_Bars` |
 | `last_gram_vector` | `(6,)`, after a numpy call | `Render_Bars` |
 | `last_predicted_values` | `(2, *processing_shape)`, after a numpy call | `Render_Field_Sheet` |
+| `target_scale` | `()`, potential task only | scalar panel |
+| `last_fixed_point_iterations_taken` | `()`, `fixed_point` configuration only, after a numpy call | scalar panel |
+| `last_fixed_point_final_residual` | `()`, `fixed_point` configuration only, after a numpy call | scalar panel |
+| `last_fixed_point_cap_was_hit` | `()`, `fixed_point` configuration only, after a numpy call | scalar panel |
+| `last_fixed_point_residual_history` | up to `(32,)`, `fixed_point` configuration only, after a numpy call | `Render_Bars` |
 
 `{axis}` ranges over `first_axis`, `second_axis`, `third_axis` (the separable kernel's own three
-per-axis weight tensors) and `{n}` over the twelve layer indices. Every key above is covered by the
-generic renderer dispatched on its rank alone (`Render_Inspection_Suite`); no key needs a bespoke
-renderer, and `Test_Inspection_Keys_Are_Covered_By_The_Generic_Renderer` checks the skipped list is
-empty on a toy member. The report's own figure suite additionally draws a per-layer mode-magnitude
-spectrum through `Render_Spectrum`, radius-ordered from the zero mode out to mode 19 — the last
-point on that plot is, by construction, the coarse grid's own Nyquist edge, which is where the
-truncation from the 80³ input stops.
+per-axis weight tensors) and `{n}` over the twelve layer indices, explicit-stack configuration only.
+Every key above is covered by the generic renderer dispatched on its rank alone
+(`Render_Inspection_Suite`); no key needs a bespoke renderer. `Test_Inspection_Keys_Are_Covered_By_The_Generic_Renderer`
+checks the skipped list is empty on a toy member reached through its own forward path, which is why
+the direct-`Integrate()`-only and direct-`Apply()`-only keys above are not exercised by that
+particular test -- they share the same rank-dispatched renderers as the keys it does cover, since
+`Render_One_Array` dispatches on rank alone, blind to the name. The report's own figure suite
+additionally draws a per-layer mode-magnitude spectrum through `Render_Spectrum`, radius-ordered
+from the zero mode out to mode 19 — the last point on that plot is, by construction, the coarse
+grid's own Nyquist edge, which is where the truncation from the 80³ input stops.

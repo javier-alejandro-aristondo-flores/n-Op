@@ -10,6 +10,7 @@ from operators.framework import Array, Coefficients, Composition, GridFunction, 
 from operators.substrate import (
     CustomGradient,
     Detached,
+    Host_Array,
     Gaussian_Error_Linear_Unit,
     Solve_Linear_System,
     Vector_Jacobian_Product,
@@ -176,7 +177,8 @@ class FixedPoint(Composition[GridFunction]):
         residual_norm_history: list[float] = []
         for iteration_index in range(self.iteration_cap):
             applied = Detached(Applied_Once(self.layer, kernel_lifted, local_linear_lifted, state))
-            residual_values = np.asarray(applied, dtype=np.float64) - np.asarray(state, dtype=np.float64)
+            # the tolerance check and the mixing history live on the host; the iterate itself never leaves its engine
+            residual_values = Host_Array(applied) - Host_Array(state)
             residual_norm = float(np.linalg.norm(residual_values))
             residual_norm_history.append(residual_norm)
             if residual_norm < self.tolerance:
@@ -248,7 +250,7 @@ class FixedPoint(Composition[GridFunction]):
             adjoint = cotangent
             for _ in range(self.iteration_cap):
                 updated = Vector_Jacobian_Product(Applied_At_The_Equilibrium, output, adjoint) + cotangent
-                change = float(np.linalg.norm(np.asarray(Detached(updated - adjoint), dtype=np.float64)))
+                change = float(np.linalg.norm(Host_Array(Detached(updated - adjoint))))
                 adjoint = updated
                 if change < self.tolerance:
                     break

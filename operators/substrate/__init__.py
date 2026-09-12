@@ -44,6 +44,7 @@ from operators.substrate.operations import (
     Detached,
     Exponential,
     Gaussian_Error_Linear_Unit,
+    Host_Array,
     Hyperbolic_Tangent,
     Maximum_Over_Last_Axis,
     Mean_Over_Last_Axis,

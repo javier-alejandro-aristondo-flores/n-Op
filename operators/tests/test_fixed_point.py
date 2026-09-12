@@ -13,6 +13,8 @@ from operators.encoders import PointwiseLift
 from operators.framework import Domain, GridFunction, Layer, UniformGridQuadrature
 from operators.kernels import SpectralKernel
 from operators.substrate import (
+    ACCELERATOR_DEVICE_NAME,
+    Accelerator_Is_Available,
     Detached,
     NumpyEngine,
     ParameterSet,
@@ -276,6 +278,31 @@ def Test_The_Lifted_Forward_Records_The_Solve_The_Health_Floor_Is_Read_From() ->
     assert composition.last_solve is not None
     assert composition.last_solve.iterations_taken >= 1
     assert "last_iterations_taken" in composition.Inspect()
+
+
+@pytest.mark.skipif(not Accelerator_Is_Available(), reason="no accelerator to hold the iterate on")
+@pytest.mark.parametrize("backward", ["phantom", "jacobian_free", "implicit"])
+def Test_Every_Backward_Rule_Solves_And_Differentiates_With_The_Iterate_On_The_Accelerator(backward: Any) -> None:
+    """the solver's host-side checks must read an iterate that lives on the card without ever moving it there"""
+    layer = Contractive_Layer(seed=21)
+    composition = FixedPoint(layer, backward=backward)
+    field_values = np.asarray(Small_Field(2, seed=22).values, dtype=np.float64)
+    target = np.random.default_rng(23).random((2, 8, 8, 8))
+    parameters = ParameterSet(values={name: value.copy() for name, value in composition.Parameter_Values().items()})
+    engine = TorchEngine(device_name=ACCELERATOR_DEVICE_NAME, working_precision="single")
+    lifted_field = engine.Lift_Constant(field_values)
+    lifted_target = engine.Lift_Constant(target)
+
+    def Loss(lifted: dict[str, Any]) -> Any:
+        difference = composition.Forward(lifted, lifted_field) - lifted_target
+        return (difference * difference).sum()
+
+    value, gradients = engine.Value_And_Gradients(parameters, Loss)
+    assert np.isfinite(value)
+    assert composition.last_solve is not None
+    assert composition.last_solve.iterations_taken >= 1
+    for name, gradient in gradients.items():
+        assert np.all(np.isfinite(gradient)), name
 
 
 def Test_Inspect_Exposes_The_Health_Signals_The_Canon_Requires() -> None:

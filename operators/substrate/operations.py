@@ -3,6 +3,7 @@
 from typing import Any
 
 import numpy as np
+from numpy.typing import NDArray
 
 from operators.substrate.torch_engine import Torch_Module
 
@@ -32,6 +33,13 @@ def Gaussian_Error_Linear_Unit(value: Any) -> Any:
     shaping = value + 0.044715 * value * value * value
     # 0.79788... is the square root of two over pi
     return 0.5 * value * (1.0 + Hyperbolic_Tangent(0.7978845608028654 * shaping))
+
+
+def Host_Array(value: Any) -> NDArray[np.float64]:
+    """the value as a double array on the host, whichever engine and device hold it"""
+    if Is_Engine_Native(value):
+        return np.asarray(value.detach().cpu().numpy(), dtype=np.float64)
+    return np.asarray(value, dtype=np.float64)
 
 
 def Sum_Over_Last_Axis(value: Any) -> Any:

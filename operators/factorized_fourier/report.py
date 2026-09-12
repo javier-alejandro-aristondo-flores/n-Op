@@ -611,6 +611,7 @@ def Train_Flagship_Member(
     run_name: str,
     configuration: FactorizedFourierConfiguration = "explicit",
     stage_fractions: tuple[float, float, float] = STAGE_FRACTIONS,
+    initial_scale: float | None = None,
 ) -> dict[str, object]:
     """the full staged run: a divergence probe with one allowed restart at a lower rate, then the staged schedule"""
     block = CubicBlock()
@@ -633,6 +634,7 @@ def Train_Flagship_Member(
         processing_shape=COARSE_SHAPE,
         seed=FLAGSHIP_SEED,
         configuration=configuration,
+        initial_scale=initial_scale,
     )
     forward_loss = Localization_Loss(member)
     parameters = ParameterSet(values=member.Parameter_Values())

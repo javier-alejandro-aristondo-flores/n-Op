@@ -1,7 +1,11 @@
 # Energy-trunk variant: the trunk runs over energy instead of position — the output is the
-# density-of-states curve as a function. Curves are rebuilt from eigenvalues with the
-# suite-wide recipe (never read DOSCAR); smearing per campaign; gaps from the occupancy
-# walk. test-suite.md §7, VI.1.
+# density-of-states curve as a function. Built; report.py measures it. Curves are rebuilt from
+# eigenvalues with the suite-wide recipe (never read DOSCAR); smearing per campaign; gaps from
+# the occupancy walk. test-suite.md §7, VI.1.
+# window_eV below predates the measurement in loader.py:32 and is wrong: the aligned window is
+# (-28.0, 8.0) eV from the valence-band maximum, 601 points at 0.06 eV, stopping at +8.0 because
+# the lowest top-band minimum across all 2,680 strain-atlas runs sits 8.357 eV above it. Follow
+# the loader; report.py's own constants are what was actually trained and measured.
 branch = { width = 256, depth = 3 }
-trunk = { domain = "energy", window_eV = [-10.0, 10.0], width = 128, depth = 4, latent = 128 }
+trunk = { domain = "energy", window_eV = [-28.0, 8.0], fourier_orders = 4, width = 128, depth = 4, latent = 128 }
 head = "softplus"

@@ -6,13 +6,19 @@ one orbit are exact copies of each other. Two fixed-basis configurations, each o
 basis: `principal_component` on the raw fields, `proper_orthogonal` on fields standardized
 voxel by voxel before the decomposition. A third, `canonical`, replaces both fixed bases with
 a learned coordinate trunk, trained point-sampled on every grid shape the campaign holds at
-once. Trained on the accelerator in single precision.
+once. A fourth, `energy_trunk`, is `canonical`'s sibling on the strain-to-states card: the
+trunk runs over energy instead of position, both functionals pooled into one member, scored
+by the card's own `curve_l1`, `wasserstein_1d` and `gap_edge_error` rather than relative L2.
+Trained on the accelerator in single precision.
 
 Each number below is one training run. A twelve-run seed sweep of the two fixed-basis
 configurations measured a seed spread of fourteen to thirty-five percent of the median, and
 a difference between configurations of under two percent, so the ordering of any two rows
 here is not a finding; the sweep is the finding, and it says they are indistinguishable.
-`canonical` is reported from a single seeded run and should be read with the same caution.
+`canonical` and `energy_trunk` are each reported from a single seeded run and should be read
+with the same caution. `energy_trunk` sets no kill margin and contributes no row to the
+floor-comparison standing below: VI.1 fixes none, and a floor winning there is a reportable
+result, not a failure.
 
 ## cheap functional, `principal_component` — strain to charge density, held-out test orbits
 
@@ -213,6 +219,81 @@ member_every_shape_full_test_set    relative_l2  30     124   0.002766  0.001392
 group        floor                  floor_median  member_median  improvement  required  verdict
 every_shape  nearest_neighbor_copy  0.009421      0.002766       70.6%        50.0%     pass   
 ```
+
+## strain to states, `energy_trunk` — density of states over energy, both functionals pooled
+
+Train 1856 runs, validation 256, test 248 over 30 orbits, cheap and accurate functionals pooled together with the functional as a seventh branch feature beside the six strain components. Branch widths (256, 256), latent 128, trunk widths (128, 128, 128), 4 Fourier orders, 151552 parameters. 22 figures under `figures/pooled/energy_trunk/`. One seeded run; a twelve-run sweep of the fixed-basis configurations measured fourteen to thirty-five percent seed spread, and this member should be read with the same caution.
+
+The aligned window runs -28.0 to 8.0 eV from the valence-band maximum over 601 points at 0.06 eV; it stops short of the conduction band's own ceiling, so the mean curve's final bins are still rising rather than falling, an intentional property of the window and not a bug in the curve. The band-edge region scored separately below is -2 to 6 eV, 133 of 601 bins, where the strain signal was measured to concentrate before this member was trained: the valence band alone is nearly strain-invariant, and dominates the full-window integral roughly fivefold over the band edges.
+
+Trained whole-curve: one fixed batch carrying every training run's full 601-point curve at once (under 5 MB), rather than sampling energies per step, because the whole block fits comfortably in memory and the energy grid is identical across every run; unlike position, there is no varying grid shape here for a point sampler to earn its cost against. The trunk's own feature map reads the energy coordinate after it is rescaled from the aligned window onto minus one to one; the branch's seven features are each standardized by their own spread across the training block. The loss trained here is the card's own `curve_l1`, made differentiable as each run's own L1 residual normalized by that run's own curve size and then averaged over runs, unweighted across the window, exactly as the card specifies.
+
+The full-window `curve_l1` below is the headline the card mandates, and it is expected to look unimpressive regardless of model quality: 467 of 601 bins are valence-band states that are nearly strain-invariant, diluting real skill roughly fivefold. The band-edge score beside it, plus `wasserstein_1d` and `gap_edge_error`, carry the information this task actually turns on. No kill margin is set for this configuration, since the canon fixes none for VI.1, and a floor winning here is an informative, reportable outcome on a coarse spectral function, not a failure.
+
+```
+stage 0 (2e-03, up to 800 steps): best unit-mean validation 0.224747 at step 800
+stage 1 (7e-04, up to 1200 steps): best unit-mean validation 0.180202 at step 1160
+stage 2 (2e-04, up to 5000 steps): best unit-mean validation 0.141546 at step 5000
+```
+
+Caveat: the final stage's validation score was still improving at its last step, so the search did not settle inside its budget. Measured directly: extending that stage from 2000 to 5000 steps (2.5x the compute) moved the member's whole-window median from 0.217 to 0.206 (5.1%) and its band-edge median from 0.270 to 0.265 (1.9%) against a ridge floor it already cleared by over 40% at the shorter budget, so the boundary is recorded rather than chased further.
+
+```
+group                metric              units  runs  median    interquartile  mean_interval       
+training_mean_floor  curve_l1_whole      30     248   0.392161  0.108072       [0.379294, 0.427156]
+training_mean_floor  curve_l1_band_edge  30     248   0.756956  0.490013       [0.769093, 0.964555]
+training_mean_floor  wasserstein_1d      30     248   1.231802  0.141469       [1.236388, 1.411393]
+training_mean_floor  gap_edge_error      30     248   0.000000  0.000000       [0.000000, 0.019500]
+ridge_floor          curve_l1_whole      30     248   0.368105  0.115723       [0.327978, 0.382238]
+ridge_floor          curve_l1_band_edge  30     248   0.517723  0.124499       [0.470968, 0.555277]
+ridge_floor          wasserstein_1d      30     248   0.408620  0.188192       [0.372466, 0.469092]
+ridge_floor          gap_edge_error      30     248   0.000000  0.000000       [0.000000, 0.019500]
+member               curve_l1_whole      30     248   0.206032  0.056304       [0.182025, 0.228441]
+member               curve_l1_band_edge  30     248   0.264763  0.115160       [0.239503, 0.307909]
+member               wasserstein_1d      30     248   0.156582  0.122827       [0.144733, 0.244455]
+member               gap_edge_error      30     248   1.912500  0.735000       [1.538962, 1.994012]
+```
+
+`gap_edge_error` reads near zero for both floors and not for the member, and that is the metric's own limit, not a physics failure. `test-suite.md` already calls the support-edge read-out a diagnostic only, next to the trusted occupancy-walk gap, and this is why: measured directly, every one of the 248 test truths crosses one percent of its own peak at exactly +0.02 eV, one grid step past the valence-band maximum, with zero variance across every strain family — because the smearing that rebuilds every curve here bridges the sharp valence edge into a shoulder that crosses the threshold long before the true conduction band starts, for any curve shaped like a real one. A floor built from real curves inherits that shoulder and reads a near-zero gap error by sharing the artifact, not by finding the gap. The member's own curve is smoother — a handful of Fourier orders and a softplus head cannot fall back to exact zero the way a sharp, smeared feature does — so it clears one percent of its own peak further out, and its larger `gap_edge_error` is a property of that smoothness, not evidence the map is worse at the physics.
+
+Ridge's skill over the training-mean floor: 6.1% on the whole window, 31.6% on the band-edge region. The member's skill over the same floor: 47.5% whole-window, 65.0% band-edge. The member against the ridge floor directly: 44.0% whole-window, 48.9% band-edge.
+
+```
+group     metric          units  runs  median    interquartile  mean_interval       
+accurate  curve_l1_whole  30     124   0.214698  0.048480       [0.188695, 0.236576]
+cheap     curve_l1_whole  30     124   0.194840  0.067638       [0.174497, 0.220788]
+```
+
+```
+group              metric          units  runs  median    interquartile  mean_interval       
+biaxial            curve_l1_whole  4      8     0.226831  0.019941       [0.211886, 0.247427]
+isotropic          curve_l1_whole  5      10    0.212864  0.040797       [0.186638, 0.285032]
+one_angle_shear    curve_l1_whole  2      24    0.085409  0.012633       [0.072776, 0.098041]
+three_angle_shear  curve_l1_whole  2      24    0.127615  0.008053       [0.119562, 0.135668]
+triaxial           curve_l1_whole  12     102   0.199236  0.033527       [0.191908, 0.237670]
+two_angle_shear    curve_l1_whole  2      72    0.070845  0.001931       [0.068913, 0.072776]
+uniaxial           curve_l1_whole  4      8     0.246609  0.034505       [0.234490, 0.302434]
+```
+
+### band-edge-weighted loss — ablation, not the card's loss and not a substitute for the row above
+
+The same architecture and schedule, trained instead on a loss that weighs the -2 to 6 eV region 5x the rest of the window in both the residual and the normalizer.
+
+```
+stage 0 (2e-03, up to 800 steps): best unit-mean validation 0.236898 at step 800
+stage 1 (7e-04, up to 1200 steps): best unit-mean validation 0.187834 at step 1160
+stage 2 (2e-04, up to 5000 steps): best unit-mean validation 0.152676 at step 5000
+```
+
+```
+group                               metric              units  runs  median    interquartile  mean_interval       
+member_band_edge_weighted_ablation  curve_l1_whole      30     248   0.208393  0.059322       [0.186312, 0.232664]
+member_band_edge_weighted_ablation  curve_l1_band_edge  30     248   0.193485  0.142184       [0.187545, 0.254465]
+member_band_edge_weighted_ablation  wasserstein_1d      30     248   0.158520  0.152554       [0.146312, 0.238249]
+member_band_edge_weighted_ablation  gap_edge_error      30     248   0.000000  0.000000       [0.081000, 0.470500]
+```
+
+The ablation's `gap_edge_error` lands back near zero, which is consistent with the mechanism above rather than against it: weighing the band-edge region five times over pushes this member to reproduce the smearing shoulder precisely enough to cross one percent of peak at the same point the floors do, at the cost of the valence band it no longer weighs as heavily.
 
 ## Standing
 

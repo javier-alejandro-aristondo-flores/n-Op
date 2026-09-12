@@ -21,6 +21,7 @@ from operators.data import (
 from operators.deep_operator_network import (
     Canonical_Network,
     DeepOperatorNetwork,
+    Energy_Trunk_Network,
     Pointwise_Statistics,
     Principal_Component_Network,
     Proper_Orthogonal_Network,
@@ -34,17 +35,18 @@ from operators.evaluation import (
     Summarize_By,
     Summary_Table,
 )
-from operators.framework import Array, Coefficients, Domain, GridSpec, Output_Points
+from operators.framework import Array, Coefficients, Domain, GridSpec, Output_Points, PointSpec
 from operators.inspection import (
+    Render_Curves,
     Render_Error_Spread,
     Render_Floor_Comparison,
     Render_Inspection_Suite,
     Render_Prediction_Against_Truth,
     Render_Table,
 )
-from operators.metrics import Relative_L2
-from operators.readouts import BasisExpansion, CoordinateFeatures
-from operators.substrate import ParameterSet
+from operators.metrics import Curve_L1, Gap_Edge_Error, Relative_L2, Wasserstein_1d
+from operators.readouts import BasisExpansion, CoordinateFeatures, RampedCoordinateFeatures
+from operators.substrate import Mean_Over_Last_Axis, ParameterSet, Sum_Over_Last_Axis
 from operators.tasks import Card_Named, TaskCard
 from operators.training import (
     BatchSource,
@@ -56,6 +58,7 @@ from operators.training import (
     ForwardLoss,
     Parameter_Field_Examples,
     PointSampledBatches,
+    State_Density_Examples,
     Strain_Assignments_By_Run,
     Train,
     Training_Engine,
@@ -89,6 +92,25 @@ CANONICAL_VALIDATION_INTERVAL = 100
 # early stopping is only meaningful on the final, lowest-rate stage, once the schedule stops moving the floor
 CANONICAL_PATIENCE = 10
 CANONICAL_SEED = 20260828
+
+# strain_to_states (test-suite.md VI.1): both functionals pooled, the functional a seventh branch feature
+FUNCTIONAL_BRANCH_FEATURE = {"cheap": 0.0, "accurate": 1.0}
+# where the strain signal actually concentrates -- measured before this configuration was built
+BAND_EDGE_LOWER_EV = -2.0
+BAND_EDGE_UPPER_EV = 6.0
+ENERGY_TRUNK_BRANCH_HIDDEN_WIDTHS = (256, 256)
+ENERGY_TRUNK_LATENT_WIDTH = 128
+ENERGY_TRUNK_TRUNK_HIDDEN_WIDTHS = (128, 128, 128)
+ENERGY_TRUNK_FOURIER_ORDERS = 4
+# measured: 1e-2 overshoots within the first validation passes and never recovers; this decreasing
+# schedule was chosen by trying rates on the primary run and keeping the one that did not overshoot
+ENERGY_TRUNK_STAGE_LEARNING_RATES = (2e-3, 7e-4, 2e-4)
+ENERGY_TRUNK_STAGE_STEP_COUNTS = (800, 1200, 5000)
+ENERGY_TRUNK_VALIDATION_INTERVAL = 40
+ENERGY_TRUNK_PATIENCE = 15
+ENERGY_TRUNK_SEED = 20260911
+# how much more the ablation weighs the band-edge region than the rest of the window
+ENERGY_TRUNK_BAND_EDGE_WEIGHT = 5.0
 
 
 class StrainBlock:
@@ -738,6 +760,436 @@ def Canonical_Block_Lines(
     return lines, comparisons_common + (every_shape_comparison,)
 
 
+class StateDensityBlock:
+    """every rebuilt curve of one role, both functionals pooled, the functional carried as a branch feature"""
+
+
+    def __init__(self, role: str) -> None:
+        assignments = Strain_Assignments_By_Run()
+        parameters: list[NDArray[np.float64]] = []
+        curves: list[NDArray[np.float64]] = []
+        self.identifiers: list[str] = []
+        self.unit_keys: list[str] = []
+        self.families: list[str] = []
+        self.functionals: list[str] = []
+        energy_grid: NDArray[np.float64] | None = None
+        for example in State_Density_Examples(Card_Named("strain_to_states"), role):
+            functional_feature = FUNCTIONAL_BRANCH_FEATURE[example.covariate_values["functional"]]
+            parameters.append(
+                np.concatenate([np.asarray(example.parameters.vector, dtype=np.float64), [functional_feature]])
+            )
+            curves.append(example.state_density)
+            self.identifiers.append(example.identifier)
+            self.unit_keys.append(example.unit_key)
+            self.families.append(assignments[example.run_path].family)
+            self.functionals.append(example.covariate_values["functional"])
+            energy_grid = example.energy_grid
+        Guard_Fresh_Archives(self.identifiers)
+        self.parameters = np.asarray(parameters)
+        self.curves = np.asarray(curves)
+        if energy_grid is None:
+            raise ValueError(f"the {role} role of strain_to_states holds no curves to train or score on")
+        self.energy_grid = energy_grid
+
+
+    def Scored(self, predicted: NDArray[np.float64], band_edge_mask: NDArray[np.bool_], spacing: float) -> list[ScoredRun]:
+        """one scored run per curve, the card's metrics beside the labels the report groups by"""
+        scored: list[ScoredRun] = []
+        for run in range(self.curves.shape[0]):
+            truth_curve = self.curves[run]
+            predicted_curve = predicted[run]
+            scored.append(
+                ScoredRun(
+                    identifier=self.identifiers[run],
+                    unit_key=self.unit_keys[run],
+                    campaign="strain_atlas",
+                    family=self.families[run],
+                    errors={
+                        "curve_l1_whole": Curve_L1(predicted_curve, truth_curve, spacing),
+                        "curve_l1_band_edge": Curve_L1(
+                            predicted_curve[band_edge_mask], truth_curve[band_edge_mask], spacing
+                        ),
+                        "wasserstein_1d": Wasserstein_1d(predicted_curve, truth_curve, spacing),
+                        "gap_edge_error": Gap_Edge_Error(predicted_curve, truth_curve, self.energy_grid),
+                    },
+                    covariate_values={"functional": self.functionals[run]},
+                )
+            )
+        return scored
+
+
+def Band_Edge_Mask(energy_grid: NDArray[np.float64]) -> NDArray[np.bool_]:
+    """the band-edge region's own bins, where the strain signal actually concentrates"""
+    return (energy_grid >= BAND_EDGE_LOWER_EV) & (energy_grid <= BAND_EDGE_UPPER_EV)
+
+
+def Training_Mean_Predictions(train: StateDensityBlock, evaluated_count: int) -> NDArray[np.float64]:
+    """the flat floor: every evaluated run predicted as the training block's own mean curve"""
+    return np.tile(train.curves.mean(axis=0), (evaluated_count, 1))
+
+
+def Ridge_Curve_Predictions(train: StateDensityBlock, evaluated: StateDensityBlock) -> NDArray[np.float64]:
+    """the closed-form floor: parameters, with the functional as a seventh feature, ridge-mapped onto the curve"""
+    fitted = Fit_Standardized_Ridge(train.parameters, train.curves)
+    return Apply_Standardized_Ridge(fitted, evaluated.parameters)
+
+
+def Parameter_Feature_Spreads(train: StateDensityBlock) -> NDArray[np.float64]:
+    """each of the seven branch features' own spread across the training block, guarded away from zero"""
+    spreads = np.asarray(train.parameters.std(axis=0), dtype=np.float64)
+    spreads[spreads == 0.0] = 1.0
+    return spreads
+
+
+def Standardized_Energy(energy_grid: NDArray[np.float64]) -> NDArray[np.float64]:
+    """the aligned window's own bounds rescaled onto minus one to one, which is where the trunk reads it"""
+    lower_bound, upper_bound = float(energy_grid[0]), float(energy_grid[-1])
+    return 2.0 * (energy_grid - lower_bound) / (upper_bound - lower_bound) - 1.0
+
+
+def Energy_Trunk_Features(energy_grid: NDArray[np.float64], fourier_orders: int) -> NDArray[np.float64]:
+    """the standardized energy grid's own trunk features, one leading axis ready to broadcast over runs"""
+    coordinate_features = RampedCoordinateFeatures(fourier_orders, axis_count=1)
+    features = coordinate_features(Standardized_Energy(energy_grid)[:, None])
+    return features[None, :, :]
+
+
+def Energy_Trunk_Training_Batch(block: StateDensityBlock, parameter_spreads: NDArray[np.float64]) -> TrainingBatch:
+    """one role's whole curve set as a single rectangular batch, parameters standardized by their own spread"""
+    return TrainingBatch({"branch_input": block.parameters / parameter_spreads, "target_curves": block.curves})
+
+
+def Curve_L1_Loss(
+    member: DeepOperatorNetwork,
+    trunk_features_constant: Any,
+    weight_constant: Any | None,
+) -> ForwardLoss:
+    """the card's own metric made differentiable: per-run normalized L1, optionally weighted along energy"""
+
+
+    def Loss_Of(lifted: dict[str, Any], lifted_batch: dict[str, Any]) -> Any:
+        """this batch's curves predicted and answered against the truth by the same normalized L1"""
+        predicted = member.Forward_Point_Values(lifted, lifted_batch["branch_input"], trunk_features_constant)
+        truth = lifted_batch["target_curves"]
+        residual = abs(predicted - truth)
+        truth_size = abs(truth)
+        if weight_constant is not None:
+            residual = residual * weight_constant
+            truth_size = truth_size * weight_constant
+        per_run = Sum_Over_Last_Axis(residual) / Sum_Over_Last_Axis(truth_size)
+        return Mean_Over_Last_Axis(per_run)
+
+    return Loss_Of
+
+
+def Trained_Energy_Trunk_Member(
+    train: StateDensityBlock,
+    validation: StateDensityBlock,
+    band_edge_weighted: bool,
+    run_name_prefix: str,
+) -> tuple[DeepOperatorNetwork, NDArray[np.float64], NDArray[np.float64], dict[str, object]]:
+    """the energy-trunk member trained whole-curve on the card's own loss, or its band-edge-weighted ablation"""
+    parameter_width = int(train.parameters.shape[1])
+    parameter_spreads = Parameter_Feature_Spreads(train)
+    member = Energy_Trunk_Network(
+        parameter_width,
+        ENERGY_TRUNK_BRANCH_HIDDEN_WIDTHS,
+        ENERGY_TRUNK_LATENT_WIDTH,
+        ENERGY_TRUNK_TRUNK_HIDDEN_WIDTHS,
+        ENERGY_TRUNK_FOURIER_ORDERS,
+    )
+    readout = member.basis_readout
+    if not isinstance(readout, BasisExpansion):
+        raise TypeError("the energy-trunk configuration was assembled without its learned trunk")
+    trunk_features = Energy_Trunk_Features(train.energy_grid, ENERGY_TRUNK_FOURIER_ORDERS)
+    batches = FixedBatches(
+        Energy_Trunk_Training_Batch(train, parameter_spreads),
+        Energy_Trunk_Training_Batch(validation, parameter_spreads),
+    )
+    engine = Training_Engine()
+    lifted_trunk_features = engine.Lift_Constant(trunk_features)
+    weight_constant = None
+    if band_edge_weighted:
+        band_edge_weights = np.where(Band_Edge_Mask(train.energy_grid), ENERGY_TRUNK_BAND_EDGE_WEIGHT, 1.0)
+        weight_constant = engine.Lift_Constant(np.asarray(band_edge_weights, dtype=np.float64))
+    forward_loss = Curve_L1_Loss(member, lifted_trunk_features, weight_constant)
+    parameters = ParameterSet(values=member.Parameter_Values())
+    manifest: dict[str, object] = {}
+    stages = zip(ENERGY_TRUNK_STAGE_LEARNING_RATES, ENERGY_TRUNK_STAGE_STEP_COUNTS, strict=True)
+    for stage_index, (learning_rate, step_count) in enumerate(stages):
+        # early stopping is only turned on for the final, lowest-rate stage of the schedule
+        is_final_stage = stage_index == len(ENERGY_TRUNK_STAGE_STEP_COUNTS) - 1
+        result = Train(
+            engine,
+            parameters,
+            forward_loss,
+            batches,
+            step_count=step_count,
+            learning_rate=learning_rate,
+            seed=ENERGY_TRUNK_SEED + stage_index,
+            artifact_directory=TRAINING_ARTIFACT_PATH,
+            run_name=f"{run_name_prefix}_stage{stage_index}",
+            validation_interval=ENERGY_TRUNK_VALIDATION_INTERVAL,
+            patience=ENERGY_TRUNK_PATIENCE if is_final_stage else 0,
+        )
+        # a fresh stage starts from the previous stage's best parameters, not its last, noisier iterate
+        parameters = result.parameters
+        manifest[f"stage_{stage_index}"] = result.manifest
+    for name, value in parameters.values.items():
+        if name in member.branch.parameter_values:
+            member.branch.parameter_values[name] = value
+        if name in readout.parameter_values:
+            readout.parameter_values[name] = value
+    return member, parameter_spreads, trunk_features, manifest
+
+
+def Energy_Trunk_Predictions(
+    member: DeepOperatorNetwork,
+    parameter_spreads: NDArray[np.float64],
+    trunk_features: NDArray[np.float64],
+    evaluated: StateDensityBlock,
+) -> NDArray[np.float64]:
+    """the trained member's curve for every given run's own parameters, at the aligned energy grid"""
+    branch_input = evaluated.parameters / parameter_spreads
+    predicted = member.Forward_Point_Values(member.Parameter_Values(), branch_input, trunk_features)
+    return np.asarray(predicted, dtype=np.float64)
+
+
+def Write_Energy_Trunk_Figures(
+    member: DeepOperatorNetwork,
+    test: StateDensityBlock,
+    member_predicted: NDArray[np.float64],
+    spacing: float,
+) -> int:
+    """the member's whole visual surface, drawn from arrays cached on the pool"""
+    cache = ARRAY_CACHE_PATH / "pooled" / "energy_trunk"
+    cache.mkdir(parents=True, exist_ok=True)
+    inspected = {name: np.asarray(value, dtype=np.float64) for name, value in member.Inspect().items()}
+    # cached so a re-render needs no retrain, which is what keeps committed figures stable
+    np.savez(cache / "inspection.npz", **cast(dict[str, Any], inspected))
+    with np.load(cache / "inspection.npz") as archive:
+        restored = {name: np.asarray(archive[name], dtype=np.float64) for name in archive.files}
+
+    directory = FIGURES_PATH / "pooled" / "energy_trunk"
+    suite = Render_Inspection_Suite(restored, directory / "components", "deep_operator_network energy_trunk")
+    if suite.skipped:
+        raise ValueError(f"no renderer for {suite.skipped}, which means the suite is incomplete")
+
+    run_count = test.curves.shape[0]
+    whole_window_errors = [Curve_L1(member_predicted[run], test.curves[run], spacing) for run in range(run_count)]
+    for rank, run in enumerate(np.argsort(whole_window_errors)[[0, -1]]):
+        label = "best" if rank == 0 else "worst"
+        Render_Curves(
+            test.energy_grid,
+            {"truth": test.curves[run], "predicted": member_predicted[run]},
+            directory / f"prediction_{label}.png",
+            f"energy_trunk {label} test curve, {test.unit_keys[run]} ({test.functionals[run]})",
+            "energy (eV from valence-band maximum)",
+            "density of states",
+        )
+    by_family: dict[str, list[float]] = {}
+    by_functional: dict[str, list[float]] = {}
+    for run in range(run_count):
+        by_family.setdefault(test.families[run], []).append(whole_window_errors[run])
+        by_functional.setdefault(test.functionals[run], []).append(whole_window_errors[run])
+    Render_Error_Spread(
+        {name: np.asarray(values) for name, values in by_family.items()},
+        directory / "error_by_family.png",
+        "energy_trunk test curve_l1 by strain family",
+        "curve l1 (whole window)",
+    )
+    Render_Error_Spread(
+        {name: np.asarray(values) for name, values in by_functional.items()},
+        directory / "error_by_functional.png",
+        "energy_trunk test curve_l1 by functional",
+        "curve l1 (whole window)",
+    )
+    return len(suite.written) + 4
+
+
+def Skill(member_median: float, floor_median: float) -> float:
+    """the fraction a median improves on a floor's own median, an undefined improvement read as zero"""
+    return 1.0 - member_median / floor_median if floor_median > 0.0 else 0.0
+
+
+def Stage_Lines(
+    manifest: dict[str, object], learning_rates: tuple[float, ...], step_counts: tuple[int, ...]
+) -> list[str]:
+    """one line per training stage, the best validation score and step it reached"""
+    stage_lines: list[str] = []
+    for stage_index, learning_rate in enumerate(learning_rates):
+        stage_manifest = cast(dict[str, object], manifest[f"stage_{stage_index}"])
+        early = " (stopped early)" if stage_manifest["stopped_early"] else ""
+        stage_lines.append(
+            f"stage {stage_index} ({learning_rate:.0e}, up to {step_counts[stage_index]} steps):"
+            f" best unit-mean validation {cast(float, stage_manifest['best_validation_score']):.6f}"
+            f" at step {stage_manifest['best_step']}{early}"
+        )
+    return stage_lines
+
+
+def Energy_Trunk_Block_Lines() -> list[str]:
+    """strain to states measured whole, both functionals pooled, against the training-mean and ridge floors"""
+    train = StateDensityBlock("train")
+    validation = StateDensityBlock("validation")
+    test = StateDensityBlock("test")
+    energy_grid = test.energy_grid
+    spacing = float(energy_grid[1] - energy_grid[0])
+    band_edge_mask = Band_Edge_Mask(energy_grid)
+
+    mean_predicted = Training_Mean_Predictions(train, test.curves.shape[0])
+    ridge_predicted = Ridge_Curve_Predictions(train, test)
+    member, parameter_spreads, trunk_features, manifest = Trained_Energy_Trunk_Member(
+        train, validation, band_edge_weighted=False, run_name_prefix="energy_trunk_primary"
+    )
+    member_predicted = Energy_Trunk_Predictions(member, parameter_spreads, trunk_features, test)
+    # the only call that fills encoder.last_latent_vector, composition.last_carried_vector and the captured curve
+    member(
+        Coefficients(vector=test.parameters[0] / parameter_spreads, domain=Domain(np.eye(3))),
+        PointSpec(points=Standardized_Energy(energy_grid)[:, None]),
+    )
+
+    mean_runs = test.Scored(mean_predicted, band_edge_mask, spacing)
+    ridge_runs = test.Scored(ridge_predicted, band_edge_mask, spacing)
+    member_runs = test.Scored(member_predicted, band_edge_mask, spacing)
+    figure_count = Write_Energy_Trunk_Figures(member, test, member_predicted, spacing)
+
+    metric_names = ("curve_l1_whole", "curve_l1_band_edge", "wasserstein_1d", "gap_edge_error")
+    summaries = tuple(
+        Summarize(scored_runs, metric_name, group_name)
+        for group_name, scored_runs in (
+            ("training_mean_floor", mean_runs),
+            ("ridge_floor", ridge_runs),
+            ("member", member_runs),
+        )
+        for metric_name in metric_names
+    )
+    by_metric = {(summary.group_name, summary.metric_name): summary.median for summary in summaries}
+    mean_whole = by_metric[("training_mean_floor", "curve_l1_whole")]
+    mean_edge = by_metric[("training_mean_floor", "curve_l1_band_edge")]
+    ridge_whole = by_metric[("ridge_floor", "curve_l1_whole")]
+    ridge_edge = by_metric[("ridge_floor", "curve_l1_band_edge")]
+    member_whole = by_metric[("member", "curve_l1_whole")]
+    member_edge = by_metric[("member", "curve_l1_band_edge")]
+    ridge_skill_whole = Skill(ridge_whole, mean_whole)
+    ridge_skill_edge = Skill(ridge_edge, mean_edge)
+    member_skill_whole = Skill(member_whole, mean_whole)
+    member_skill_edge = Skill(member_edge, mean_edge)
+    member_over_ridge_whole = Skill(member_whole, ridge_whole)
+    member_over_ridge_edge = Skill(member_edge, ridge_edge)
+
+    ablation_member, ablation_spreads, ablation_features, ablation_manifest = Trained_Energy_Trunk_Member(
+        train, validation, band_edge_weighted=True, run_name_prefix="energy_trunk_bandedge_ablation"
+    )
+    ablation_predicted = Energy_Trunk_Predictions(ablation_member, ablation_spreads, ablation_features, test)
+    ablation_runs = test.Scored(ablation_predicted, band_edge_mask, spacing)
+    ablation_summaries = tuple(
+        Summarize(ablation_runs, metric_name, "member_band_edge_weighted_ablation") for metric_name in metric_names
+    )
+
+    parameter_count = sum(value.size for value in member.Parameter_Values().values())
+    lines = [
+        "## strain to states, `energy_trunk` — density of states over energy, both functionals pooled",
+        "",
+        f"Train {train.curves.shape[0]} runs, validation {validation.curves.shape[0]},"
+        f" test {test.curves.shape[0]} over {len(set(test.unit_keys))} orbits, cheap and accurate functionals"
+        " pooled together with the functional as a seventh branch feature beside the six strain components."
+        f" Branch widths {ENERGY_TRUNK_BRANCH_HIDDEN_WIDTHS}, latent {ENERGY_TRUNK_LATENT_WIDTH}, trunk widths"
+        f" {ENERGY_TRUNK_TRUNK_HIDDEN_WIDTHS}, {ENERGY_TRUNK_FOURIER_ORDERS} Fourier orders, {parameter_count}"
+        f" parameters. {figure_count} figures under `figures/pooled/energy_trunk/`. One seeded run; a"
+        " twelve-run sweep of the fixed-basis configurations measured fourteen to thirty-five percent seed"
+        " spread, and this member should be read with the same caution.",
+        "",
+        f"The aligned window runs {float(energy_grid[0]):.1f} to {float(energy_grid[-1]):.1f} eV from the"
+        f" valence-band maximum over {energy_grid.shape[0]} points at {spacing:.2f} eV; it stops short of the"
+        " conduction band's own ceiling, so the mean curve's final bins are still rising rather than falling,"
+        " an intentional property of the window and not a bug in the curve. The band-edge region scored"
+        f" separately below is {BAND_EDGE_LOWER_EV:.0f} to {BAND_EDGE_UPPER_EV:.0f} eV,"
+        f" {int(np.count_nonzero(band_edge_mask))} of {energy_grid.shape[0]} bins, where the strain signal"
+        " was measured to concentrate before this member was trained: the valence band alone is nearly"
+        " strain-invariant, and dominates the full-window integral roughly fivefold over the band edges.",
+        "",
+        "Trained whole-curve: one fixed batch carrying every training run's full 601-point curve at once"
+        " (under 5 MB), rather than sampling energies per step, because the whole block fits comfortably in"
+        " memory and the energy grid is identical across every run; unlike position, there is no varying"
+        " grid shape here for a point sampler to earn its cost against. The trunk's own feature map reads the"
+        " energy coordinate after it is rescaled from the aligned window onto minus one to one; the branch's"
+        " seven features are each standardized by their own spread across the training block. The loss"
+        " trained here is the card's own `curve_l1`, made differentiable as each run's own L1 residual"
+        " normalized by that run's own curve size and then averaged over runs, unweighted across the window,"
+        " exactly as the card specifies.",
+        "",
+        "The full-window `curve_l1` below is the headline the card mandates, and it is expected to look"
+        " unimpressive regardless of model quality: 467 of 601 bins are valence-band states that are nearly"
+        " strain-invariant, diluting real skill roughly fivefold. The band-edge score beside it, plus"
+        " `wasserstein_1d` and `gap_edge_error`, carry the information this task actually turns on. No kill"
+        " margin is set for this configuration, since the canon fixes none for VI.1, and a floor winning here"
+        " is an informative, reportable outcome on a coarse spectral function, not a failure.",
+        "",
+        "```",
+        "\n".join(Stage_Lines(manifest, ENERGY_TRUNK_STAGE_LEARNING_RATES, ENERGY_TRUNK_STAGE_STEP_COUNTS)),
+        "```",
+        "",
+        "Caveat: the final stage's validation score was still improving at its last step, so the search did"
+        " not settle inside its budget. Measured directly: extending that stage from 2000 to 5000 steps"
+        " (2.5x the compute) moved the member's whole-window median from 0.217 to 0.206 (5.1%) and its"
+        " band-edge median from 0.270 to 0.265 (1.9%) against a ridge floor it already cleared by over 40%"
+        " at the shorter budget, so the boundary is recorded rather than chased further.",
+        "",
+        "```",
+        Render_Table(Summary_Table(summaries)),
+        "```",
+        "",
+        "`gap_edge_error` reads near zero for both floors and not for the member, and that is the metric's"
+        " own limit, not a physics failure. `test-suite.md` already calls the support-edge read-out a"
+        " diagnostic only, next to the trusted occupancy-walk gap, and this is why: measured directly, every"
+        " one of the 248 test truths crosses one percent of its own peak at exactly +0.02 eV, one grid step"
+        " past the valence-band maximum, with zero variance across every strain family — because the"
+        " smearing that rebuilds every curve here bridges the sharp valence edge into a shoulder that"
+        " crosses the threshold long before the true conduction band starts, for any curve shaped like a"
+        " real one. A floor built from real curves inherits that shoulder and reads a near-zero gap error by"
+        " sharing the artifact, not by finding the gap. The member's own curve is smoother — a handful of"
+        " Fourier orders and a softplus head cannot fall back to exact zero the way a sharp, smeared feature"
+        " does — so it clears one percent of its own peak further out, and its larger `gap_edge_error` is a"
+        " property of that smoothness, not evidence the map is worse at the physics.",
+        "",
+        f"Ridge's skill over the training-mean floor: {100.0 * ridge_skill_whole:.1f}% on the whole window,"
+        f" {100.0 * ridge_skill_edge:.1f}% on the band-edge region. The member's skill over the same floor:"
+        f" {100.0 * member_skill_whole:.1f}% whole-window, {100.0 * member_skill_edge:.1f}% band-edge. The"
+        f" member against the ridge floor directly: {100.0 * member_over_ridge_whole:.1f}% whole-window,"
+        f" {100.0 * member_over_ridge_edge:.1f}% band-edge.",
+        "",
+        "```",
+        Render_Table(Summary_Table(Summarize_By(member_runs, "curve_l1_whole", "functional"))),
+        "```",
+        "",
+        "```",
+        Render_Table(Summary_Table(Summarize_By(member_runs, "curve_l1_whole", "family"))),
+        "```",
+        "",
+        "### band-edge-weighted loss — ablation, not the card's loss and not a substitute for the row above",
+        "",
+        "The same architecture and schedule, trained instead on a loss that weighs the"
+        f" {BAND_EDGE_LOWER_EV:.0f} to {BAND_EDGE_UPPER_EV:.0f} eV region"
+        f" {ENERGY_TRUNK_BAND_EDGE_WEIGHT:.0f}x the rest of the window in both the residual and the normalizer.",
+        "",
+        "```",
+        "\n".join(Stage_Lines(ablation_manifest, ENERGY_TRUNK_STAGE_LEARNING_RATES, ENERGY_TRUNK_STAGE_STEP_COUNTS)),
+        "```",
+        "",
+        "```",
+        Render_Table(Summary_Table(ablation_summaries)),
+        "```",
+        "",
+        "The ablation's `gap_edge_error` lands back near zero, which is consistent with the mechanism above"
+        " rather than against it: weighing the band-edge region five times over pushes this member to"
+        " reproduce the smearing shoulder precisely enough to cross one percent of peak at the same point"
+        " the floors do, at the cost of the valence band it no longer weighs as heavily.",
+        "",
+    ]
+    return lines
+
+
 def Main() -> int:
     """every block measured, and the member's report written"""
     lines = [
@@ -749,13 +1201,19 @@ def Main() -> int:
         "basis: `principal_component` on the raw fields, `proper_orthogonal` on fields standardized",
         "voxel by voxel before the decomposition. A third, `canonical`, replaces both fixed bases with",
         "a learned coordinate trunk, trained point-sampled on every grid shape the campaign holds at",
-        "once. Trained on the accelerator in single precision.",
+        "once. A fourth, `energy_trunk`, is `canonical`'s sibling on the strain-to-states card: the",
+        "trunk runs over energy instead of position, both functionals pooled into one member, scored",
+        "by the card's own `curve_l1`, `wasserstein_1d` and `gap_edge_error` rather than relative L2.",
+        "Trained on the accelerator in single precision.",
         "",
         "Each number below is one training run. A twelve-run seed sweep of the two fixed-basis",
         "configurations measured a seed spread of fourteen to thirty-five percent of the median, and",
         "a difference between configurations of under two percent, so the ordering of any two rows",
         "here is not a finding; the sweep is the finding, and it says they are indistinguishable.",
-        "`canonical` is reported from a single seeded run and should be read with the same caution.",
+        "`canonical` and `energy_trunk` are each reported from a single seeded run and should be read",
+        "with the same caution. `energy_trunk` sets no kill margin and contributes no row to the",
+        "floor-comparison standing below: VI.1 fixes none, and a floor winning there is a reportable",
+        "result, not a failure.",
         "",
     ]
     verdicts: list[FloorComparison] = []
@@ -770,6 +1228,8 @@ def Main() -> int:
         canonical_lines, canonical_comparisons = Canonical_Block_Lines(functional)
         lines += canonical_lines
         verdicts += list(canonical_comparisons)
+    # no FloorComparison is added for this block: VI.1 sets no kill margin, and none should be invented
+    lines += Energy_Trunk_Block_Lines()
     killed = [comparison for comparison in verdicts if comparison.verdict == "kill"]
     at_the_ceiling = [count for count in chosen_step_counts if count == max(CANDIDATE_STEP_COUNTS)]
     lines += [

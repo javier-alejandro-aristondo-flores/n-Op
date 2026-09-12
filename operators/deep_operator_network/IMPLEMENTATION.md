@@ -11,7 +11,10 @@ Hosseini, Kovachki, Stuart, SMAI-JCM 7:121, 2021). Suite entries: `test-suite.md
 ## What it assembles
 
 Sensor encoder (the branch) → dense layers on coefficients → basis-expansion readout (the trunk),
-with integer-frequency Fourier features for exact periodicity.
+with integer-frequency Fourier features for exact periodicity. The energy-trunk configuration reads
+its one coordinate through the raw-plus-Fourier feature map instead, because energy has no far face
+to wrap onto, and closes with a softplus head because a density of states is non-negative and
+unbounded above.
 
 ## Why it is shaped this way
 
@@ -78,6 +81,39 @@ the every-shape nearest-neighbor floor too. See `report.md` for the full tables.
 every shape the fixed-basis configurations cannot read remains this configuration's justification
 regardless; the common-grid win is a bonus the untuned scratch drill did not predict.
 
+**`energy_trunk` is `canonical`'s sibling with a different coordinate**: the same branch-trunk form,
+except the trunk runs over a single energy axis instead of three fractional position axes, so the
+member is a genuine function of energy, queryable anywhere in the aligned window and between its
+601 grid points. Three choices distinguish it from `canonical`. First, the coordinate feature map
+is `RampedCoordinateFeatures`, not the periodic one — energy has no far face to identify with its
+near one, so the raw coordinate rides beside the Fourier waves rather than being replaced by a
+constant. Second, the branch takes seven features, not six: the six strain components plus the
+functional (cheap or accurate) as a numeric indicator, so one member is trained pooled across both
+functionals rather than one member per functional the way `canonical` is. Third, the readout closes
+with a softplus head, applied after the trunk's inner product and before anything else touches the
+value, because the target is a density of states and a signed field has no physical meaning here.
+`Aligned_Energy_Grid` (`operators/training/loader.py`) fixes the window at −28 to +8 eV from the
+valence-band maximum, 601 points at 0.06 eV — the ceiling was measured, not guessed: the lowest
+top-band minimum across all 2,680 strain-atlas runs sits 8.357 eV above the alignment, so +8.0 never
+reaches a region some run left uncomputed. Because that grid is identical for every run, unlike
+`canonical`'s varying grid shapes, training draws no per-step sample at all: the whole training role
+(1,856 curves, under 5 MB) is one fixed batch, and the trunk's own features are computed once on the
+window rescaled to minus one to one, then held as an engine constant for the whole run.
+
+**The card's headline metric hides most of the signal, and the report says so rather than hiding
+it in turn.** A pre-training measurement (both functionals pooled, orbit-weighted medians, ridge
+from parameters to curve) found the strain signal concentrated almost entirely at the band edges:
+ridge beats the training-mean floor by 6.1% over the whole −28…+8 eV window, by 0.7% over the
+valence band alone (−28…0 eV, 467 of 601 bins), and by 31.6% over the −2…+6 eV band-edge region
+(133 bins) — because the valence band is nearly strain-invariant and dominates the whole-window
+integral roughly fivefold, diluting real skill by about the same factor. `report.py` trains on the
+card's own loss (`curve_l1`, unweighted, over the whole window, because the card is canon-bound) and
+reports both windows beside `wasserstein_1d` and `gap_edge_error` for exactly this reason, plus a
+clearly labeled band-edge-weighted ablation. No kill margin is invented: VI.1 sets none, and its own
+honesty clause calls a floor win on a coarse spectral function an informative, reportable outcome,
+not a failure — so `report.md` states measured skill against both floors and writes neither `pass`
+nor `kill` for this configuration.
+
 ## Floors and kill thresholds
 
 Ridge from parameters to basis coefficients is the natural floor: kill any variant not at least
@@ -89,6 +125,12 @@ The projection variants are gated before training by a measured basis-decay chec
 within three percent at rank ≤ N/2, per campaign. The defect campaign is the expected failure —
 localized features that move are the classic weakness of a fixed basis — and a failing block goes
 to the grid-native members instead.
+
+**`energy_trunk` sets no numeric kill margin.** The suite's own VI.1 entry fixes none, and states
+outright that on a coarse spectral function — 172 irreducible k, both functionals pooled — a floor
+winning is an informative, reportable result rather than a failure. `report.md` therefore states the
+member's measured skill against the training-mean and ridge floors on both the whole window and the
+band-edge region, and prints neither `pass` nor `kill` for this configuration.
 
 ## Inspection
 
@@ -123,6 +165,13 @@ above: the readout's own copy is set by a whole-grid or whole-point-set query th
 the report's evaluation and figures use; the batch source's copy is set by the lifted, point-sampled
 forward the loss actually trains through, and is the only place that path's own inputs are named at all.
 
+**`energy_trunk` carries its own captured output beside the parts' arrays**, because it is the only
+configuration whose readout is a pre-activation rather than the physical quantity itself: the member
+itself (not the readout) publishes `last_predicted_curve`, the softplus head's own output at the last
+query, flattened to one row. This is what makes the non-negative head reachable by name rather than
+only re-derivable by calling the member again — the same discipline `readout.last_trunk_features`
+already gives the trunk's own feature map, applied to the one step the trunk does not itself own.
+
 **Wrapped for inference**, the conservation law publishes what it did: `last_renormalization_scale`
 under the electron-count law, `last_removed_mean` under the zero-mean law. Both are exact
 diagnostics rather than corrections — ground truth already integrates to the archived electron
@@ -141,8 +190,12 @@ which is exactly the egress the suite document permits.
 
 Measured, and in `report.md`; regenerate both it and the figures with
 `python -m operators.deep_operator_network.report`. `principal_component` and `proper_orthogonal`
-are both built and both measured there, each on its own basis. `canonical` is now built too,
-assembled by `Canonical_Network`, trained point-sampled on every grid shape the strain campaign
-holds, and measured in the same report — once on the common grid against the same floors the
-fixed-basis configurations answer to, once across every shape its own test runs hold. `energy_trunk`
-remains declared, not built.
+are both built and both measured there, each on its own basis. `canonical` is built too, assembled
+by `Canonical_Network`, trained point-sampled on every grid shape the strain campaign holds, and
+measured in the same report — once on the common grid against the same floors the fixed-basis
+configurations answer to, once across every shape its own test runs hold. `energy_trunk` is now
+built too, assembled by `Energy_Trunk_Network` and measured on `strain_to_states`
+(`test-suite.md` §7, VI.1): both functionals pooled into one member, trained whole-curve on a single
+fixed batch rather than point-sampled, against the training-mean and ridge floors, on the whole
+window and the band-edge region, with a band-edge-weighted loss reported alongside as a clearly
+labeled ablation and never as a substitute for the card's own loss.

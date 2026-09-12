@@ -13,6 +13,7 @@ from operators.deep_operator_network import (
     CONFIGURATIONS,
     Canonical_Network,
     DeepOperatorNetwork,
+    Energy_Trunk_Network,
     Pointwise_Statistics,
     Principal_Component_Network,
     Proper_Orthogonal_Network,
@@ -26,7 +27,13 @@ from operators.framework import (
     PointSet,
     PointSpec,
 )
-from operators.readouts import BasisExpansion, BiasedModeExpansion, FixedModeExpansion, PointwiseStandardizedExpansion
+from operators.readouts import (
+    BasisExpansion,
+    BiasedModeExpansion,
+    FixedModeExpansion,
+    PointwiseStandardizedExpansion,
+    RampedCoordinateFeatures,
+)
 from operators.substrate import Accelerator_Is_Available, NumpyEngine, ParameterSet
 from operators.training import Training_Engine
 
@@ -429,3 +436,145 @@ def Test_A_Grid_Query_Agrees_With_The_Same_Points_Asked_For_Explicitly() -> None
     gridded_values = np.asarray(grid_result.values).reshape(1, -1).T
     assert point_result.values is not None
     assert np.allclose(np.asarray(point_result.values), gridded_values, atol=1e-10)
+
+
+def Small_Energy_Trunk_Network(seed: int = 0) -> DeepOperatorNetwork:
+    """a tiny learned-branch, learned-trunk member over a one-dimensional energy coordinate"""
+    return Energy_Trunk_Network(
+        parameter_width=3, branch_hidden_widths=(6,), latent_width=4, trunk_hidden_widths=(6,), seed=seed
+    )
+
+
+def Test_The_Energy_Trunk_Factory_Collects_Both_Branch_And_Trunk_Arrays() -> None:
+    """the trainer is handed both the branch's and the trunk's arrays, under one namespace"""
+    member = Small_Energy_Trunk_Network()
+    collected = member.Parameter_Values()
+    assert any(name.startswith("sensor_encoder_") for name in collected)
+    assert any(name.startswith("trunk_") for name in collected)
+    assert member.configuration == "energy_trunk"
+    # the two parts draw from different seeds, so neither part's arrays are all zero or identical
+    assert not np.allclose(collected["sensor_encoder_layer_0_weights"], 0.0)
+    assert not np.allclose(collected["trunk_layer_0_weights"], 0.0)
+
+
+def Test_The_Energy_Trunk_Reads_The_Raw_Coordinate_Not_The_Periodic_One() -> None:
+    """energy has no far face to wrap onto, so the trunk's feature map carries the raw coordinate beside it"""
+    member = Small_Energy_Trunk_Network()
+    readout = member.basis_readout
+    assert isinstance(readout, BasisExpansion)
+    assert isinstance(readout.coordinate_features, RampedCoordinateFeatures)
+    assert readout.coordinate_features.axis_count == 1
+
+
+def Test_The_Energy_Trunk_Head_Is_Non_Negative_Everywhere() -> None:
+    """a density of states cannot be negative, however deep into the negative the pre-activation runs"""
+    member = Small_Energy_Trunk_Network(seed=7)
+    readout = member.basis_readout
+    assert isinstance(readout, BasisExpansion)
+    generator = np.random.default_rng(21)
+    # a wide spread, wide enough to push the raw dot product deep negative on some rows
+    branch_input = generator.normal(0.0, 50.0, size=(6, 3))
+    trunk_features = generator.normal(0.0, 50.0, size=(6, 9, readout.coordinate_features.feature_count))
+    lifted = member.Parameter_Values()
+    predicted = np.asarray(member.Forward_Point_Values(lifted, branch_input, trunk_features))
+    assert np.isfinite(predicted).all()
+    assert (predicted >= 0.0).all()
+
+
+def Test_A_Fixed_Basis_Sibling_Carries_No_Such_Guard() -> None:
+    """the non-negative head is specific to the energy trunk, not something every configuration inherited"""
+    member = Principal_Component_Network(Small_Basis(rank=4), (4, 4, 4), parameter_width=6, hidden_widths=(8,))
+    assert member.configuration != "energy_trunk"
+    with pytest.raises(TypeError):
+        member.Forward_Point_Values(member.Parameter_Values(), np.ones((2, 6)), np.ones((2, 5, 3)))
+
+
+def Test_Gradients_Reach_Every_Energy_Trunk_Array_Through_The_Point_Sampled_Forward() -> None:
+    """the card's curve loss differentiates onto both the branch and the trunk, through the non-negative head"""
+    member = Small_Energy_Trunk_Network(seed=8)
+    readout = member.basis_readout
+    assert isinstance(readout, BasisExpansion)
+    generator = np.random.default_rng(22)
+    lifted_batch = {
+        "branch_input": np.asarray(generator.normal(size=(4, 3)), dtype=np.float64),
+        "trunk_features": np.asarray(
+            generator.normal(size=(4, 5, readout.coordinate_features.feature_count)), dtype=np.float64
+        ),
+        "targets": np.asarray(generator.uniform(0.0, 1.0, size=(4, 5)), dtype=np.float64),
+    }
+
+    def Curve_Loss(lifted: dict[str, Any], batch: dict[str, Any]) -> Any:
+        predicted = member.Forward_Point_Values(lifted, batch["branch_input"], batch["trunk_features"])
+        residuals = predicted - batch["targets"]
+        return (residuals * residuals).mean()
+
+    gradients = NumpyEngine().Gradients(
+        ParameterSet(values=member.Parameter_Values()), lambda lifted: Curve_Loss(lifted, lifted_batch)
+    )
+    assert set(gradients) == set(member.Parameter_Values())
+    assert any(name.startswith("trunk_") for name in gradients)
+    assert all(np.isfinite(gradient).all() for gradient in gradients.values())
+    assert all(np.abs(gradient).max() > 0.0 for gradient in gradients.values())
+
+
+@pytest.mark.skipif(not Accelerator_Is_Available(), reason="no card on this machine answers a lift")
+def Test_Gradients_Reach_The_Energy_Trunk_Member_On_The_Card() -> None:
+    """the point-sampled curve loss differentiates onto the whole member through the accelerator in single precision"""
+    member = Small_Energy_Trunk_Network(seed=10)
+    readout = member.basis_readout
+    assert isinstance(readout, BasisExpansion)
+    generator = np.random.default_rng(23)
+    branch_input = np.asarray(generator.normal(size=(4, 3)), dtype=np.float64)
+    trunk_features = np.asarray(
+        generator.normal(size=(4, 5, readout.coordinate_features.feature_count)), dtype=np.float64
+    )
+    targets = np.asarray(generator.uniform(0.0, 1.0, size=(4, 5)), dtype=np.float64)
+    engine = Training_Engine()
+    lifted_batch = {
+        "branch_input": engine.Lift_Constant(branch_input),
+        "trunk_features": engine.Lift_Constant(trunk_features),
+        "targets": engine.Lift_Constant(targets),
+    }
+
+    def Curve_Loss(lifted: dict[str, Any], batch: dict[str, Any]) -> Any:
+        predicted = member.Forward_Point_Values(lifted, batch["branch_input"], batch["trunk_features"])
+        residuals = predicted - batch["targets"]
+        return (residuals * residuals).mean()
+
+    loss_value, gradients = engine.Value_And_Gradients(
+        ParameterSet(values=member.Parameter_Values()), lambda lifted: Curve_Loss(lifted, lifted_batch)
+    )
+    assert np.isfinite(loss_value)
+    assert set(gradients) == set(member.Parameter_Values())
+    assert all(np.isfinite(gradient).all() for gradient in gradients.values())
+    assert all(np.abs(gradient).max() > 0.0 for gradient in gradients.values())
+
+
+def Test_Querying_Between_The_Aligned_Grids_Points_Still_Returns_A_Finite_Nonnegative_Curve() -> None:
+    """the energy trunk is a genuine function of energy, not a lookup table over the training grid"""
+    member = Small_Energy_Trunk_Network(seed=9)
+    coefficients = Coefficients(vector=np.linspace(-1.0, 1.0, 3), domain=CUBE)
+    # deliberately off any round spacing, so no value here could coincide with a training grid point
+    between_the_grid_points = np.linspace(-0.97, 0.93, 37) + 0.013
+    produced = member(coefficients, PointSpec(points=between_the_grid_points[:, None]))
+    assert isinstance(produced, PointSet)
+    assert produced.values is not None
+    values = np.asarray(produced.values)
+    assert values.shape == (37, 1)
+    assert np.isfinite(values).all()
+    assert (values >= 0.0).all()
+
+
+def Test_The_Energy_Trunk_Member_Inspects_The_Captured_Curve_Beside_Its_Arrays() -> None:
+    """the non-negative head's own output is reachable by name, not only re-derivable by calling the member"""
+    member = Small_Energy_Trunk_Network(seed=11)
+    coefficients = Coefficients(vector=np.zeros(3), domain=CUBE)
+    energies = np.linspace(-1.0, 1.0, 13)[:, None]
+    produced = member(coefficients, PointSpec(points=energies))
+    assert isinstance(produced, PointSet)
+    assert produced.values is not None
+    inspected = member.Inspect()
+    assert "readout.last_trunk_features" in inspected
+    assert "last_predicted_curve" in inspected
+    assert np.allclose(np.asarray(inspected["last_predicted_curve"]), np.asarray(produced.values).reshape(-1))
+    assert (np.asarray(inspected["last_predicted_curve"]) >= 0.0).all()

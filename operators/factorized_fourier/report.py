@@ -3,10 +3,12 @@
 import dataclasses
 import json
 from pathlib import Path
+from typing import Any
 
 import numpy as np
 from numpy.typing import NDArray
 
+from operators.compositions import ExplicitStack
 from operators.data import (
     ARTIFACT_DIRECTORY,
     Apply_Per_Shell_Filter,
@@ -20,10 +22,20 @@ from operators.data import (
     STORE_NAME,
 )
 from operators.evaluation import MetricSummary, ScoredRun, Summarize, Summarize_By, Summary_Table
-from operators.factorized_fourier import Log_Compressed_Channels, Reference_Density
+from operators.factorized_fourier import (
+    Factorized_Fourier_Network,
+    FactorizedFourier,
+    Gram_Six,
+    Gram_Statistics,
+    Log_Compressed_Channels,
+    Reference_Density,
+    Standardized_Gram,
+)
 from operators.framework import Spectral_Truncation_Resample
 from operators.inspection import Render_Table
 from operators.metrics import Mean_Absolute_Error, Relative_L2, Structural_Similarity_3d
+from operators.substrate import ParameterSet
+from operators.training import BatchSource, Train, Training_Engine, TrainingBatch
 
 REPORT_PATH = Path(__file__).parent / "report.md"
 FIGURES_PATH = Path(__file__).parent / "figures"
@@ -49,6 +61,19 @@ PATTERN_RULE_MARGIN = 0.20
 
 # the flagship's own bar (IMPLEMENTATION.md): half the floor's error or the member is killed
 FLAGSHIP_KILL_MARGIN = 0.50
+
+# the assembly as built: width, depth and the full coarse Nyquist confirmed by Check_Modes_Fit
+HIDDEN_CHANNELS = 64
+LAYER_COUNT = 12
+KEPT_MODE = 19
+FLAGSHIP_SEED = 20260912
+
+# the pre-authorized schedule: a peak rate, one allowed halving of the schedule if the probe diverges
+PEAK_LEARNING_RATE = 1e-3
+DIVERGENCE_PROBE_STEPS = 200
+VALIDATION_INTERVAL = 100
+FINAL_STAGE_PATIENCE = 15
+STAGE_FRACTIONS = (0.3, 0.3, 0.4)
 
 
 def Fold_Membership() -> dict[str, tuple[int, str, str]]:
@@ -301,6 +326,252 @@ def Nearest_Run_Rows(block: CubicBlock) -> list[ScoredRun]:
                 )
             )
     return scored
+
+
+def Loaded_Density_And_Magnetization(
+    campaign: str, identifier: str
+) -> tuple[NDArray[np.float64], NDArray[np.float64], NDArray[np.float64]]:
+    """one run's charge density, magnetization (zero-filled where the run is spin-restricted) and lattice"""
+    with np.load(Archive_Path(campaign, identifier)) as archive:
+        density = np.asarray(archive["charge_density"], dtype=np.float64)
+        if "magnetization_density" in archive:
+            magnetization = np.asarray(archive["magnetization_density"], dtype=np.float64)
+        else:
+            magnetization = np.zeros_like(density)
+        lattice = np.asarray(archive["lattice"], dtype=np.float64)
+    return density, magnetization, lattice
+
+
+@dataclasses.dataclass(frozen=True, slots=True)
+class LocalizationExample:
+    """one run's fine-grid log-density channels and gram vector, cached beside its coarse localization target"""
+
+    identifier: str
+    unit_key: str
+    campaign: str
+    log_density_values: NDArray[np.float32]
+    gram_vector: NDArray[np.float32]
+    target_values: NDArray[np.float32]
+
+
+def Localization_Examples(
+    identifiers: list[str],
+    block: CubicBlock,
+    reference_density: float,
+    gram_mean: NDArray[np.float64],
+    gram_scale: NDArray[np.float64],
+) -> list[LocalizationExample]:
+    """every named run, held resident as its own log-density channels, gram vector and coarse target, in single"""
+    examples: list[LocalizationExample] = []
+    for identifier in identifiers:
+        campaign = block.campaign_of[identifier]
+        density, magnetization, lattice = Loaded_Density_And_Magnetization(campaign, identifier)
+        log_density_values = Log_Compressed_Channels(density, magnetization, reference_density)
+        gram_vector = Standardized_Gram(Gram_Six(lattice), gram_mean, gram_scale)
+        with np.load(Archive_Path(campaign, identifier)) as archive:
+            target_values = np.stack(
+                [np.asarray(archive[channel], dtype=np.float64) for channel in LOCALIZATION_CHANNELS]
+            )
+        examples.append(
+            LocalizationExample(
+                identifier=identifier,
+                unit_key=block.unit_of[identifier],
+                campaign=campaign,
+                log_density_values=np.asarray(log_density_values, dtype=np.float32),
+                gram_vector=np.asarray(gram_vector, dtype=np.float32),
+                target_values=np.asarray(target_values, dtype=np.float32),
+            )
+        )
+    return examples
+
+
+class LocalizationBatches(BatchSource):
+    """one training example drawn uniformly with replacement every step, and every validation unit held fixed"""
+
+
+    def __init__(self, training_examples: list[LocalizationExample], validation_examples: list[LocalizationExample]) -> None:
+        self.training_examples = training_examples
+        self.validation_by_unit: dict[str, list[LocalizationExample]] = {}
+        for example in validation_examples:
+            self.validation_by_unit.setdefault(example.unit_key, []).append(example)
+        self.last_drawn_identifier: str | None = None
+
+
+    def Next_Batch(self, generator: np.random.Generator) -> TrainingBatch:
+        drawn = self.training_examples[int(generator.integers(0, len(self.training_examples)))]
+        self.last_drawn_identifier = drawn.identifier
+        return TrainingBatch(
+            {
+                "log_density_values": drawn.log_density_values[None],
+                "gram_vectors": drawn.gram_vector[None],
+                "targets": drawn.target_values[None],
+            }
+        )
+
+
+    def Validation_Batches(self) -> tuple[tuple[str, TrainingBatch], ...]:
+        batches: list[tuple[str, TrainingBatch]] = []
+        for unit_key, examples in sorted(self.validation_by_unit.items()):
+            batches.append(
+                (
+                    unit_key,
+                    TrainingBatch(
+                        {
+                            "log_density_values": np.stack([example.log_density_values for example in examples]),
+                            "gram_vectors": np.stack([example.gram_vector for example in examples]),
+                            "targets": np.stack([example.target_values for example in examples]),
+                        }
+                    ),
+                )
+            )
+        return tuple(batches)
+
+
+    def Inspect(self) -> dict[str, Any]:
+        state: dict[str, Any] = {
+            "training_example_count": np.asarray([len(self.training_examples)], dtype=np.float64),
+            "validation_unit_count": np.asarray([len(self.validation_by_unit)], dtype=np.float64),
+        }
+        if self.last_drawn_identifier is not None:
+            state["last_drawn_identifier"] = np.asarray(self.last_drawn_identifier)
+        return state
+
+
+def Localization_Loss(member: FactorizedFourier) -> Any:
+    """mean squared error over every example a batch carries, looped since the lifted path takes one at a time"""
+
+    def Loss(lifted: dict[str, Any], lifted_batch: dict[str, Any]) -> Any:
+        example_count = lifted_batch["log_density_values"].shape[0]
+        total = 0.0
+        for example_index in range(example_count):
+            predicted = member.Forward_Field(
+                lifted,
+                lifted_batch["log_density_values"][example_index],
+                lifted_batch["gram_vectors"][example_index],
+                COARSE_SHAPE,
+            )
+            residual = predicted - lifted_batch["targets"][example_index]
+            total = total + (residual * residual).mean()
+        return total / example_count
+
+    return Loss
+
+
+def Staged_Step_Counts(step_count: int, fractions: tuple[float, float, float] = STAGE_FRACTIONS) -> tuple[int, int, int]:
+    """a step budget split across three stages, the last absorbing whatever rounding leaves behind"""
+    first_stage = round(fractions[0] * step_count)
+    second_stage = round(fractions[1] * step_count)
+    return first_stage, second_stage, step_count - first_stage - second_stage
+
+
+def Sane_Loss_Curve(loss_curve: NDArray[np.float64], validation_curve: NDArray[np.float64]) -> bool:
+    """every recorded loss and validation score stayed finite, and neither run away from where it started"""
+    if loss_curve.size == 0 or validation_curve.size == 0:
+        return False
+    if not (bool(np.all(np.isfinite(loss_curve))) and bool(np.all(np.isfinite(validation_curve)))):
+        return False
+    # a single-example batch is noisy, so this asks only that nothing blew up, not that every step improved
+    return bool(loss_curve[-1] < 10.0 * loss_curve[0] + 1.0) and bool(validation_curve[-1] < 10.0 * validation_curve[0] + 1.0)
+
+
+def Train_Flagship_Member(step_count: int, run_name: str) -> dict[str, object]:
+    """the full staged run: a divergence probe with one allowed restart at a lower rate, then the staged schedule"""
+    block = CubicBlock()
+    training_identifiers = block.member_train
+    validation_identifiers = block.validation
+
+    density_sample: list[NDArray[np.float64]] = []
+    magnetization_sample: list[NDArray[np.float64]] = []
+    for identifier in training_identifiers[:RIDGE_TRAIN_RUN_COUNT]:
+        density, magnetization, _ = Loaded_Density_And_Magnetization(block.campaign_of[identifier], identifier)
+        density_sample.append(density)
+        magnetization_sample.append(magnetization)
+    reference_density = Reference_Density(density_sample, magnetization_sample)
+    del density_sample, magnetization_sample
+
+    lattices = [
+        Loaded_Density_And_Magnetization(block.campaign_of[identifier], identifier)[2]
+        for identifier in training_identifiers
+    ]
+    gram_mean, gram_scale = Gram_Statistics(lattices)
+
+    training_examples = Localization_Examples(training_identifiers, block, reference_density, gram_mean, gram_scale)
+    validation_examples = Localization_Examples(validation_identifiers, block, reference_density, gram_mean, gram_scale)
+    batches = LocalizationBatches(training_examples, validation_examples)
+
+    member = Factorized_Fourier_Network(
+        hidden_channels=HIDDEN_CHANNELS,
+        kept_modes=(KEPT_MODE, KEPT_MODE, KEPT_MODE),
+        layer_count=LAYER_COUNT,
+        reference_density=reference_density,
+        gram_mean=gram_mean,
+        gram_scale=gram_scale,
+        processing_shape=COARSE_SHAPE,
+        seed=FLAGSHIP_SEED,
+    )
+    forward_loss = Localization_Loss(member)
+    parameters = ParameterSet(values=member.Parameter_Values())
+    engine = Training_Engine()
+
+    stage_step_counts = Staged_Step_Counts(step_count)
+    probe_steps = min(DIVERGENCE_PROBE_STEPS, stage_step_counts[0])
+    chosen_peak_rate = PEAK_LEARNING_RATE
+    probe_result = Train(
+        engine, parameters, forward_loss, batches, step_count=probe_steps, learning_rate=chosen_peak_rate,
+        seed=FLAGSHIP_SEED, artifact_directory=TRAINING_ARTIFACT_PATH, run_name=f"{run_name}_stage0",
+        validation_interval=probe_steps, patience=0,
+    )
+    if not Sane_Loss_Curve(probe_result.loss_curve, probe_result.validation_curve):
+        chosen_peak_rate = PEAK_LEARNING_RATE * 0.3
+        probe_result = Train(
+            engine, ParameterSet(values=member.Parameter_Values()), forward_loss, batches, step_count=probe_steps,
+            learning_rate=chosen_peak_rate, seed=FLAGSHIP_SEED, artifact_directory=TRAINING_ARTIFACT_PATH,
+            run_name=f"{run_name}_stage0", validation_interval=probe_steps, patience=0, resume=False,
+        )
+        if not Sane_Loss_Curve(probe_result.loss_curve, probe_result.validation_curve):
+            raise RuntimeError(
+                "the loss is non-finite or diverging at both the peak and the reduced rate within the probe"
+            )
+    parameters = probe_result.parameters
+    stage_rates = (chosen_peak_rate, chosen_peak_rate / 3.0, chosen_peak_rate / 9.0)
+
+    manifest: dict[str, object] = {
+        "run_name": run_name,
+        "reference_density": reference_density,
+        "probe_learning_rate": chosen_peak_rate,
+        "probe_steps": probe_steps,
+        "training_example_count": len(training_examples),
+        "validation_unit_count": len(batches.validation_by_unit),
+    }
+    for stage_index, (rate, stage_steps) in enumerate(zip(stage_rates, stage_step_counts, strict=True)):
+        is_final_stage = stage_index == len(stage_step_counts) - 1
+        result = Train(
+            engine, parameters, forward_loss, batches, step_count=stage_steps, learning_rate=rate,
+            seed=FLAGSHIP_SEED + stage_index, artifact_directory=TRAINING_ARTIFACT_PATH,
+            run_name=f"{run_name}_stage{stage_index}", validation_interval=VALIDATION_INTERVAL,
+            patience=FINAL_STAGE_PATIENCE if is_final_stage else 0, resume=(stage_index == 0),
+        )
+        parameters = result.parameters
+        manifest[f"stage_{stage_index}"] = result.manifest
+    for name, value in parameters.values.items():
+        if name in member.lift.parameter_values:
+            member.lift.parameter_values[name] = value
+        if name in member.projection.parameter_values:
+            member.projection.parameter_values[name] = value
+    if not isinstance(member.spectral_stack, ExplicitStack):
+        raise TypeError("this training driver is written for the explicit-stack configuration only")
+    for layer_index, layer in enumerate(member.spectral_stack.layers):
+        for bare_name in list(layer.kernel.parameter_values):
+            prefixed_name = f"layer_{layer_index}.kernel.{bare_name}"
+            if prefixed_name in parameters.values:
+                layer.kernel.parameter_values[bare_name] = parameters.values[prefixed_name]
+        for bare_name in list(layer.local_linear.parameter_values):
+            prefixed_name = f"layer_{layer_index}.local_linear.{bare_name}"
+            if prefixed_name in parameters.values:
+                layer.local_linear.parameter_values[bare_name] = parameters.values[prefixed_name]
+    manifest["final_parameters"] = parameters
+    manifest["member"] = member
+    return manifest
 
 
 def Recorded_Bars(

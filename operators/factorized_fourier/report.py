@@ -1690,9 +1690,10 @@ def Elf_Evaluation_Lines(
         "",
         "The block's geometries are near-identical within a campaign, which is why a verbatim copy of the nearest"
         " training run already reaches a mean absolute error of 0.0062 without learning anything (the"
-        " nearest-run-copy floor, above), and why the strain rows read roughly ten times better than the defect"
-        " rows (mean absolute error 0.000704 against 0.002329, relative L2 0.26% against 1.35%): the supercell"
-        " strains are small, smooth perturbations of one lattice, so a near neighbor is nearly the true answer,"
+        " nearest-run-copy floor, above), and why the strain rows read markedly better than the defect rows: 3.3x"
+        " lower mean absolute error (0.000704 against 0.002329) and 5.2x lower relative L2 (0.26% against 1.35%)."
+        " The supercell strains are small, smooth perturbations of one lattice, so a near neighbor is nearly the"
+        " true answer,"
         " while the defect campaign varies impurity species and site by run. The defect rows, not the pooled"
         " median, are this member's real test.",
         "",

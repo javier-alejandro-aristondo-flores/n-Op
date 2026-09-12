@@ -283,6 +283,55 @@ def Test_The_Health_Metric_Is_A_Fraction_Of_Inputs_Converged_Read_Off_Inspect() 
     assert health == 1.0
 
 
+def Test_The_Contractive_Initial_Scale_Converges_At_The_Members_Own_Channel_Width() -> None:
+    """the fixed point, at its default tenth-scale initialization, clears the cap on a random eight-cubed input"""
+    member = Factorized_Fourier_Network(
+        hidden_channels=64,
+        kept_modes=(1, 1, 1),
+        layer_count=5,
+        reference_density=0.05,
+        gram_mean=np.zeros(6),
+        gram_scale=np.ones(6),
+        processing_shape=(8, 8, 8),
+        configuration="fixed_point",
+        seed=7,
+    )
+    assert float(np.asarray(member.Inspect()["initial_scale"])) == 0.1
+    member(Toy_Input((8, 8, 8), seed=71), GridSpec((8, 8, 8)))
+    inspected = member.Inspect()
+    assert not bool(np.asarray(inspected["last_fixed_point_cap_was_hit"]))
+    assert int(np.asarray(inspected["last_fixed_point_iterations_taken"])) < 32
+
+
+def Test_The_Explicit_Configurations_Ignore_Initial_Scale() -> None:
+    """the escalation rung is scoped to the iterated and fixed-point rungs, every other configuration reads one"""
+
+    def Configured_Parameters(
+        configuration: FactorizedFourierConfiguration, initial_scale: float | None
+    ) -> dict[str, NDArray[np.float64]]:
+        """the named configuration's own trained arrays, built once at the given initial_scale request"""
+        member = Factorized_Fourier_Network(
+            hidden_channels=8,
+            kept_modes=(1, 1, 1),
+            layer_count=3,
+            reference_density=0.05,
+            gram_mean=np.zeros(6),
+            gram_scale=np.ones(6),
+            processing_shape=(4, 4, 4),
+            configuration=configuration,
+            seed=9,
+            initial_scale=initial_scale,
+        )
+        assert float(np.asarray(member.Inspect()["initial_scale"])) == 1.0
+        return member.Parameter_Values()
+
+    for configuration in ("explicit", "explicit_matched", "weight_tied"):
+        at_default = Configured_Parameters(configuration, None)
+        at_a_requested_scale = Configured_Parameters(configuration, 0.03)
+        for name in at_default:
+            assert np.array_equal(at_default[name], at_a_requested_scale[name])
+
+
 def Contractive_Member_Layer(seed: int, hidden_channels: int = 8, kept_mode: int = 1) -> Any:
     """a small instance of this member's own separable layer, scaled into a contraction with a nonzero bias"""
     layer = Shared_Member_Layer(hidden_channels, (kept_mode, kept_mode, kept_mode), seed)

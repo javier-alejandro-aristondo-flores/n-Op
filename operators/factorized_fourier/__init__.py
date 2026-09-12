@@ -165,6 +165,7 @@ class FactorizedFourier(NeuralOperator[GridFunction, GridFunction, GridFunction]
         kept_modes: tuple[int, int, int] | None = None,
         metric_aware: bool = False,
         target_scale: float = 1.0,
+        initial_scale: float = 1.0,
     ) -> None:
         super().__init__(encoder, composition, readout)
         self.lift = encoder
@@ -178,6 +179,7 @@ class FactorizedFourier(NeuralOperator[GridFunction, GridFunction, GridFunction]
         self.kept_modes = kept_modes
         self.metric_aware = metric_aware
         self.target_scale = target_scale
+        self.initial_scale = initial_scale
         # the whole-field conservation law: the potential task's own zero-mean gauge, the parametric task's own
         # electron count, neither one touching the localization task's bounded head
         if task == "potential":
@@ -365,6 +367,7 @@ class FactorizedFourier(NeuralOperator[GridFunction, GridFunction, GridFunction]
         state["gram_standardization_scale"] = self.gram_scale
         if self.task == "potential":
             state["target_scale"] = np.asarray(self.target_scale)
+        state["initial_scale"] = np.asarray(self.initial_scale)
         if self.last_gram_vector is not None:
             state["last_gram_vector"] = self.last_gram_vector
         if self.last_predicted_values is not None:
@@ -381,7 +384,11 @@ class FactorizedFourier(NeuralOperator[GridFunction, GridFunction, GridFunction]
 
 
 def Shared_Member_Layer(
-    hidden_channels: int, kept_modes: tuple[int, int, int], seed: int, metric_aware: bool = False
+    hidden_channels: int,
+    kept_modes: tuple[int, int, int],
+    seed: int,
+    metric_aware: bool = False,
+    initial_scale: float = 1.0,
 ) -> Layer[GridFunction]:
     """the one kernel-plus-local-linear layer the tied and fixed-point rungs apply repeatedly"""
     # no residual here, unlike the explicit stack's own layers: repeated or iterated application of x plus a
@@ -395,6 +402,12 @@ def Shared_Member_Layer(
         metric_aware=metric_aware,
     )
     local_linear = PointwiseLift(hidden_channels, hidden_channels, seed=seed + 1)
+    # the map an iterated or fixed-point rung applies must start contractive, which its weight arrays alone
+    # control -- the biases stay at initial_scale's own default of one, so a zero bias is untouched by it
+    for name in kernel.parameter_values:
+        if not name.endswith("_biases"):
+            kernel.parameter_values[name] = kernel.parameter_values[name] * initial_scale
+    local_linear.parameter_values["lift_weights"] = local_linear.parameter_values["lift_weights"] * initial_scale
     return Layer(kernel=kernel, local_linear=local_linear, residual=False)
 
 
@@ -432,11 +445,18 @@ def Factorized_Fourier_Network(
     fixed_point_phantom_depth: int = 3,
     task: FactorizedFourierTask = "localization",
     target_scale: float = 1.0,
+    initial_scale: float | None = None,
 ) -> FactorizedFourier:
     """the flagship configuration: pointwise lift, a composition of factorized spectral layers, a task-shaped head"""
     # localization stays metric-blind, exactly as briefed; the potential task is the metric-aware kernel's own reason
     # the parametric task never reads a density field at all, so there is no metric for it to be aware of either
     metric_aware = task == "potential"
+    # the canon's own stability escalation, its first rung: the iterated and fixed-point rungs alone start
+    # contractive at a tenth scale unless told otherwise, every other configuration untouched at one
+    if configuration in ("fixed_point", "weight_tied_injected"):
+        resolved_initial_scale = 0.1 if initial_scale is None else initial_scale
+    else:
+        resolved_initial_scale = 1.0
     input_channel_count = PARAMETRIC_INPUT_CHANNEL_COUNT if task == "parametric" else INPUT_CHANNEL_COUNT
     lift = PointwiseLift(hidden_channels, input_channel_count, seed=seed)
     stack: FourierComposition
@@ -452,13 +472,13 @@ def Factorized_Fourier_Network(
     elif configuration == "weight_tied_injected":
         # the fixed point's own iteration unrolled a fixed number of times, its exact non-iterative counterpart
         stack = WeightTied(
-            Shared_Member_Layer(hidden_channels, kept_modes, seed + 1, metric_aware),
+            Shared_Member_Layer(hidden_channels, kept_modes, seed + 1, metric_aware, resolved_initial_scale),
             depth=layer_count,
             input_injection=True,
         )
     elif configuration == "fixed_point":
         stack = FixedPoint(
-            Shared_Member_Layer(hidden_channels, kept_modes, seed + 1, metric_aware),
+            Shared_Member_Layer(hidden_channels, kept_modes, seed + 1, metric_aware, resolved_initial_scale),
             backward="phantom",
             phantom_depth=fixed_point_phantom_depth,
         )
@@ -485,4 +505,5 @@ def Factorized_Fourier_Network(
         kept_modes=kept_modes,
         metric_aware=metric_aware,
         target_scale=target_scale,
+        initial_scale=resolved_initial_scale,
     )

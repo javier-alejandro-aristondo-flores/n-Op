@@ -266,6 +266,18 @@ def Test_The_Solver_Reaches_What_A_Long_Weight_Tied_Unroll_Also_Converges_Toward
     assert np.allclose(produced, produced_unrolled, atol=1e-2)
 
 
+def Test_The_Lifted_Forward_Records_The_Solve_The_Health_Floor_Is_Read_From() -> None:
+    layer = Contractive_Layer(seed=11)
+    composition = FixedPoint(layer, backward="phantom")
+    values = np.random.default_rng(11).normal(size=(2, 8, 8, 8))
+    assert composition.last_solve is None
+    composition.Forward(composition.Parameter_Values(), values)
+    # training only ever runs the lifted path, so the convergence record must come from it too
+    assert composition.last_solve is not None
+    assert composition.last_solve.iterations_taken >= 1
+    assert "last_iterations_taken" in composition.Inspect()
+
+
 def Test_Inspect_Exposes_The_Health_Signals_The_Canon_Requires() -> None:
     """iterations, residual and the cap flag all surface as named arrays, not just as python attributes"""
     layer = Contractive_Layer(seed=51)

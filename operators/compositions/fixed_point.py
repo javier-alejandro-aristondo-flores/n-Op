@@ -279,7 +279,10 @@ class FixedPoint(Composition[GridFunction]):
 
     def Forward(self, lifted: dict[str, Any], input_values: Any) -> Any:
         """the state at or just past the fixed point, shaped by whichever backward rule was asked for"""
-        return self.Resolved(lifted, input_values)[0]
+        produced, solved = self.Resolved(lifted, input_values)
+        # the solve's counts and residuals are host numbers on either engine, and the health floor is read during training
+        self.last_solve = solved
+        return produced
 
 
     def Parameter_Values(self) -> dict[str, NDArray[np.float64]]:

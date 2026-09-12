@@ -1,7 +1,7 @@
 """charge density to electron localization, by factorized Fourier convolution"""
 
 from collections.abc import Sequence
-from typing import Any
+from typing import Any, Literal
 
 import numpy as np
 from numpy.typing import NDArray
@@ -23,6 +23,8 @@ from operators.readouts import PointwiseProjection
 from operators.substrate import Concatenate_Channels, Zeros_Beside
 
 type FourierComposition = ExplicitStack | WeightTied | FixedPoint
+
+type FactorizedFourierConfiguration = Literal["explicit", "weight_tied", "fixed_point"]
 
 GRAM_CHANNEL_COUNT = 6
 
@@ -111,6 +113,10 @@ class FactorizedFourier(NeuralOperator[GridFunction, GridFunction, GridFunction]
         self.processing_shape = processing_shape
         self.last_gram_vector: NDArray[np.float64] | None = None
         self.last_predicted_values: NDArray[np.float64] | None = None
+        self.last_fixed_point_iterations: int | None = None
+        self.last_fixed_point_residual: float | None = None
+        self.last_fixed_point_cap_was_hit: bool | None = None
+        self.last_fixed_point_residual_history: NDArray[np.float64] | None = None
 
 
     def Parameter_Values(self) -> dict[str, NDArray[np.float64]]:
@@ -137,7 +143,15 @@ class FactorizedFourier(NeuralOperator[GridFunction, GridFunction, GridFunction]
         )
         combined = Concatenate_Channels([coarse_density, gram_field])
         hidden = self.lift.Forward(lifted, combined)
-        carried = self.spectral_stack.Forward(lifted, hidden)
+        # a bare forward call would drop the solve, so resolved is used directly to capture it for inspection
+        if isinstance(self.spectral_stack, FixedPoint):
+            carried, solved = self.spectral_stack.Resolved(lifted, hidden)
+            self.last_fixed_point_iterations = solved.iterations_taken
+            self.last_fixed_point_residual = solved.final_residual
+            self.last_fixed_point_cap_was_hit = solved.cap_was_hit
+            self.last_fixed_point_residual_history = np.asarray(solved.residual_norm_history, dtype=np.float64)
+        else:
+            carried = self.spectral_stack.Forward(lifted, hidden)
         return self.projection.Forward(lifted, carried)
 
 
@@ -182,7 +196,30 @@ class FactorizedFourier(NeuralOperator[GridFunction, GridFunction, GridFunction]
             state["last_gram_vector"] = self.last_gram_vector
         if self.last_predicted_values is not None:
             state["last_predicted_values"] = self.last_predicted_values
+        if self.last_fixed_point_iterations is not None:
+            state["last_fixed_point_iterations_taken"] = np.asarray(self.last_fixed_point_iterations)
+        if self.last_fixed_point_residual is not None:
+            state["last_fixed_point_final_residual"] = np.asarray(self.last_fixed_point_residual)
+        if self.last_fixed_point_cap_was_hit is not None:
+            state["last_fixed_point_cap_was_hit"] = np.asarray(self.last_fixed_point_cap_was_hit)
+        if self.last_fixed_point_residual_history is not None:
+            state["last_fixed_point_residual_history"] = self.last_fixed_point_residual_history
         return state
+
+
+def Shared_Member_Layer(hidden_channels: int, kept_modes: tuple[int, int, int], seed: int) -> Layer[GridFunction]:
+    """the one kernel-plus-local-linear layer the tied and fixed-point rungs apply repeatedly"""
+    # no residual here, unlike the explicit stack's own layers: repeated or iterated application of x plus a
+    # correction drifts rather than contracts, since the fixed point would then need the correction itself to vanish
+    kernel = SpectralKernel(
+        kept_modes=kept_modes,
+        output_channels=hidden_channels,
+        input_channels=hidden_channels,
+        seed=seed,
+        mode_mixing="separable",
+    )
+    local_linear = PointwiseLift(hidden_channels, hidden_channels, seed=seed + 1)
+    return Layer(kernel=kernel, local_linear=local_linear, residual=False)
 
 
 def Factorized_Fourier_Network(
@@ -194,24 +231,38 @@ def Factorized_Fourier_Network(
     gram_scale: NDArray[np.float64],
     processing_shape: tuple[int, int, int] = (40, 40, 40),
     seed: int = 0,
+    configuration: FactorizedFourierConfiguration = "explicit",
+    fixed_point_phantom_depth: int = 3,
 ) -> FactorizedFourier:
-    """the flagship configuration: pointwise lift, an explicit stack of factorized spectral layers, the bounded head"""
+    """the flagship configuration: pointwise lift, a composition of factorized spectral layers, the bounded head"""
     lift = PointwiseLift(hidden_channels, INPUT_CHANNEL_COUNT, seed=seed)
-    layers = tuple(
-        Layer(
-            kernel=SpectralKernel(
-                kept_modes=kept_modes,
-                output_channels=hidden_channels,
-                input_channels=hidden_channels,
-                seed=seed + 2 * layer_index + 1,
-                mode_mixing="separable",
-            ),
-            local_linear=PointwiseLift(hidden_channels, hidden_channels, seed=seed + 2 * layer_index + 2),
-            residual=True,
+    stack: FourierComposition
+    if configuration == "explicit":
+        layers = tuple(
+            Layer(
+                kernel=SpectralKernel(
+                    kept_modes=kept_modes,
+                    output_channels=hidden_channels,
+                    input_channels=hidden_channels,
+                    seed=seed + 2 * layer_index + 1,
+                    mode_mixing="separable",
+                ),
+                local_linear=PointwiseLift(hidden_channels, hidden_channels, seed=seed + 2 * layer_index + 2),
+                residual=True,
+            )
+            for layer_index in range(layer_count)
         )
-        for layer_index in range(layer_count)
-    )
-    stack = ExplicitStack(layers)
+        stack = ExplicitStack(layers)
+    elif configuration == "weight_tied":
+        stack = WeightTied(Shared_Member_Layer(hidden_channels, kept_modes, seed + 1), depth=layer_count)
+    elif configuration == "fixed_point":
+        stack = FixedPoint(
+            Shared_Member_Layer(hidden_channels, kept_modes, seed + 1),
+            backward="phantom",
+            phantom_depth=fixed_point_phantom_depth,
+        )
+    else:
+        raise ValueError(f"{configuration} is not one of the member's configurations")
     projection = PointwiseProjection(
         len(LOCALIZATION_CHANNEL_LABELS), hidden_channels, bounded=True, seed=seed + 2 * layer_count + 1
     )

@@ -6,15 +6,18 @@ import numpy as np
 import pytest
 from numpy.typing import NDArray
 
-from operators.compositions import Spectral_Resampled
+from operators.compositions import FixedPoint, Spectral_Resampled, WeightTied
+from operators.compositions.fixed_point import Sliced_Lifted
 from operators.data import Archive_Path
 from operators.factorized_fourier import (
     Factorized_Fourier_Network,
     FactorizedFourier,
+    FactorizedFourierConfiguration,
     Gram_Six,
     Gram_Statistics,
     Log_Compressed_Channels,
     Reference_Density,
+    Shared_Member_Layer,
     Standardized_Gram,
 )
 from operators.factorized_fourier.report import (
@@ -160,6 +163,180 @@ def Test_Truncate_Early_Equals_Lift_Then_Truncate() -> None:
     lift_then_truncate = Spectral_Resampled(lifted_fine, (4, 4, 4))
 
     assert np.allclose(truncate_then_lift, lift_then_truncate, atol=1e-10)
+
+
+def Test_The_Weight_Tied_And_Fixed_Point_Configurations_Assemble() -> None:
+    """the tied and implicit rungs answer a toy grid and carry a twelfth of the explicit stack's spectral weights"""
+
+    def Toy_Network(configuration: FactorizedFourierConfiguration) -> FactorizedFourier:
+        """a toy member of the named configuration, every other choice held fixed"""
+        return Factorized_Fourier_Network(
+            hidden_channels=8,
+            kept_modes=(1, 1, 1),
+            layer_count=5,
+            reference_density=0.05,
+            gram_mean=np.zeros(6),
+            gram_scale=np.ones(6),
+            processing_shape=(4, 4, 4),
+            seed=3,
+            configuration=configuration,
+        )
+
+    explicit = Toy_Network("explicit")
+    weight_tied = Toy_Network("weight_tied")
+    fixed_point = Toy_Network("fixed_point")
+    assert isinstance(weight_tied.spectral_stack, WeightTied)
+    assert isinstance(fixed_point.spectral_stack, FixedPoint)
+    explicit_count = sum(value.size for value in explicit.Parameter_Values().values())
+    tied_count = sum(value.size for value in weight_tied.Parameter_Values().values())
+    fixed_point_count = sum(value.size for value in fixed_point.Parameter_Values().values())
+    # the lift and readout are shared by all three, so only the spectral-plus-local-linear share is exactly a fifth
+    assert tied_count == fixed_point_count
+    assert tied_count < explicit_count
+
+    for member in (weight_tied, fixed_point):
+        output = member(Toy_Input((8, 8, 8), seed=40), GridSpec((4, 4, 4)))
+        assert np.asarray(output.values).shape == (2, 4, 4, 4)
+
+
+def Test_Fixed_Point_Inspect_Exposes_The_Health_Signals_After_A_Member_Call() -> None:
+    """a bare forward call on the primitive records nothing, so the member captures the solve at its own level"""
+    member = Factorized_Fourier_Network(
+        hidden_channels=8,
+        kept_modes=(1, 1, 1),
+        layer_count=5,
+        reference_density=0.05,
+        gram_mean=np.zeros(6),
+        gram_scale=np.ones(6),
+        processing_shape=(4, 4, 4),
+        configuration="fixed_point",
+        seed=3,
+    )
+    member(Toy_Input((8, 8, 8), seed=41), GridSpec((4, 4, 4)))
+    inspected = member.Inspect()
+    for name in (
+        "last_fixed_point_iterations_taken",
+        "last_fixed_point_final_residual",
+        "last_fixed_point_cap_was_hit",
+        "last_fixed_point_residual_history",
+    ):
+        assert name in inspected
+    assert int(np.asarray(inspected["last_fixed_point_iterations_taken"])) <= 32
+    history = np.asarray(inspected["last_fixed_point_residual_history"])
+    assert history.ndim == 1
+    assert int(np.asarray(inspected["last_fixed_point_iterations_taken"])) == history.shape[0]
+
+
+def Test_The_Health_Metric_Is_A_Fraction_Of_Inputs_Converged_Read_Off_Inspect() -> None:
+    """the canon's health floor, computed the only way Inspect allows: one call per input, one read per call"""
+    member = Factorized_Fourier_Network(
+        hidden_channels=8,
+        kept_modes=(1, 1, 1),
+        layer_count=5,
+        reference_density=0.05,
+        gram_mean=np.zeros(6),
+        gram_scale=np.ones(6),
+        processing_shape=(4, 4, 4),
+        configuration="fixed_point",
+        seed=3,
+    )
+    converged_count = 0
+    validation_input_count = 6
+    for seed in range(validation_input_count):
+        member(Toy_Input((8, 8, 8), seed=100 + seed), GridSpec((4, 4, 4)))
+        inspected = member.Inspect()
+        if not bool(np.asarray(inspected["last_fixed_point_cap_was_hit"])):
+            converged_count += 1
+    health = converged_count / validation_input_count
+    assert 0.0 <= health <= 1.0
+    # a well-scaled small instance is expected to converge on every one of a handful of random toy inputs
+    assert health == 1.0
+
+
+def Contractive_Member_Layer(seed: int, hidden_channels: int = 8, kept_mode: int = 1) -> Any:
+    """a small instance of this member's own separable layer, scaled into a contraction with a nonzero bias"""
+    layer = Shared_Member_Layer(hidden_channels, (kept_mode, kept_mode, kept_mode), seed)
+    for name in layer.kernel.parameter_values:
+        layer.kernel.parameter_values[name] *= 0.05
+    for name in layer.local_linear.parameter_values:
+        layer.local_linear.parameter_values[name] *= 0.05
+    # a zero bias would leave the origin as the map's only fixed point, pinning most weights' true gradient at zero
+    generator = np.random.default_rng(seed + 1000)
+    layer.local_linear.parameter_values["lift_biases"] = generator.normal(size=hidden_channels) * 0.1
+    return layer
+
+
+def Relative_Gap(candidate: dict[str, NDArray[np.float64]], ground_truth: dict[str, NDArray[np.float64]]) -> float:
+    """how far one named gradient dict sits from another, as one fraction of the ground truth's own size"""
+    flat_candidate = np.concatenate([value.reshape(-1) for value in candidate.values()])
+    flat_truth = np.concatenate([value.reshape(-1) for value in ground_truth.values()])
+    return float(np.linalg.norm(flat_candidate - flat_truth) / (np.linalg.norm(flat_truth) + 1e-12))
+
+
+def Equilibrium_Loss(stack: FixedPoint, field_values: Any, target: Any) -> Any:
+    """the summed squared gap between the solved equilibrium and a fixed target, as a forward an engine can drive"""
+
+    def Loss(lifted: dict[str, Any]) -> Any:
+        produced, _ = stack.Resolved(lifted, field_values)
+        difference = produced - target
+        return (difference * difference).sum()
+
+    return Loss
+
+
+def Tied_Loss(stack: WeightTied, field_values: Any, target: Any) -> Any:
+    """the summed squared gap between the depth-matched unroll's output and a fixed target"""
+
+    def Loss(lifted: dict[str, Any]) -> Any:
+        difference = stack.Forward(lifted, field_values) - target
+        return (difference * difference).sum()
+
+    return Loss
+
+
+def Test_The_Mandatory_Gradient_Audit_On_This_Members_Own_Layer() -> None:
+    """the canon's mandatory audit (I.3), run on the separable layer this member actually uses, not a generic one"""
+    layer = Contractive_Member_Layer(seed=201, hidden_channels=2, kept_mode=1)
+    generator = np.random.default_rng(202)
+    field_values = generator.random((2, 8, 8, 8)) * 0.1
+    target = generator.random((2, 8, 8, 8))
+
+    probe = FixedPoint(layer)
+    parameters = ParameterSet(values={name: value.copy() for name, value in probe.Parameter_Values().items()})
+    finite_difference_gradients = NumpyEngine().Gradients(parameters, Equilibrium_Loss(probe, field_values, target))
+
+    kernel_lifted = Sliced_Lifted(probe.Parameter_Values(), "kernel.")
+    local_linear_lifted = Sliced_Lifted(probe.Parameter_Values(), "local_linear.")
+    depth = probe.Solved(kernel_lifted, local_linear_lifted, field_values).iterations_taken
+    tied = WeightTied(layer, depth=depth)
+    engine = TorchEngine()
+    lifted_field_values = engine.Lift_Constant(field_values)
+    lifted_target = engine.Lift_Constant(target)
+    _, full_unroll_gradients = engine.Value_And_Gradients(parameters, Tied_Loss(tied, lifted_field_values, lifted_target))
+
+    natural_disagreement = Relative_Gap(full_unroll_gradients, finite_difference_gradients)
+
+    implicit = FixedPoint(layer, backward="implicit")
+    _, implicit_gradients = engine.Value_And_Gradients(
+        parameters, Equilibrium_Loss(implicit, lifted_field_values, lifted_target)
+    )
+    implicit_gap_to_finite_difference = Relative_Gap(implicit_gradients, finite_difference_gradients)
+    implicit_gap_to_full_unroll = Relative_Gap(implicit_gradients, full_unroll_gradients)
+    # the exact adjoint sits at the two ground truths' own mutual distance, not at a percent-scale bias of its own
+    assert implicit_gap_to_finite_difference < max(natural_disagreement, 1e-3)
+    assert implicit_gap_to_full_unroll < max(natural_disagreement, 1e-3)
+
+    for phantom_depth, label in ((1, "phantom_s1"), (3, "phantom_s3")):
+        phantom = FixedPoint(layer, backward="phantom", phantom_depth=phantom_depth)
+        _, phantom_gradients = engine.Value_And_Gradients(
+            parameters, Equilibrium_Loss(phantom, lifted_field_values, lifted_target)
+        )
+        gap_to_finite_difference = Relative_Gap(phantom_gradients, finite_difference_gradients)
+        gap_to_full_unroll = Relative_Gap(phantom_gradients, full_unroll_gradients)
+        if phantom_depth == 3:
+            # within an order of magnitude of the ground truths' own mutual disagreement
+            assert gap_to_finite_difference < 10.0 * max(natural_disagreement, 1e-3), label
+            assert gap_to_full_unroll < 10.0 * max(natural_disagreement, 1e-3), label
 
 
 def Test_Inspection_Keys_Are_Covered_By_The_Generic_Renderer(tmp_path: Any) -> None:

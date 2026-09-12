@@ -8,7 +8,7 @@ import numpy as np
 import pytest
 
 from operators.compositions import WithoutIntegralLayers
-from operators.data import Gram_Pod, Project
+from operators.data import Gram_Pod, Project, Reconstruct
 from operators.deep_operator_network import (
     CONFIGURATIONS,
     Canonical_Network,
@@ -608,6 +608,26 @@ def Test_The_Perovskite_Strata_Match_What_The_Angle_Block_Claims() -> None:
     assert all(field.grid_shape == PEROVSKITE_ANGLE_GRID_SHAPE for field in angle_fields)
     assert len(length_fields) == 124
     assert len({field.grid_shape for field in length_fields}) == 124
+
+
+def Test_The_Proper_Orthogonal_Basis_Must_Be_Fit_On_Standardized_Fields_To_Round_Trip() -> None:
+    """pins the mechanism a real defect once had: the basis and the standardization it decodes must match"""
+    generator = np.random.default_rng(40)
+    # a wide per-voxel spread, so a basis-space mismatch shows up as more than round-off noise
+    training_fields = np.asarray(generator.normal(0.0, 1.0, size=(12, 64)) * generator.uniform(1.0, 50.0, size=64))
+    voxel_mean, voxel_scale = Pointwise_Statistics(training_fields)
+    standardized = (training_fields - voxel_mean) / voxel_scale
+
+    matching_basis = Gram_Pod(standardized, rank=12)
+    matched_rebuilt = Reconstruct(matching_basis, Project(matching_basis, standardized)) * voxel_scale + voxel_mean
+    assert np.allclose(matched_rebuilt, training_fields, atol=1e-8)
+
+    # the defect this guards against: projecting the standardized fields onto a basis fit on the raw ones
+    mismatched_basis = Gram_Pod(training_fields, rank=12)
+    mismatched_rebuilt = (
+        Reconstruct(mismatched_basis, Project(mismatched_basis, standardized)) * voxel_scale + voxel_mean
+    )
+    assert not np.allclose(mismatched_rebuilt, training_fields, atol=1e-3)
 
 
 def Test_The_Reference_Density_Standardization_Round_Trips_Exactly() -> None:

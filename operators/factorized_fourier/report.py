@@ -507,6 +507,8 @@ class LocalizationBatches(BatchSource):
 
 def Localization_Loss(member: FactorizedFourier) -> Any:
     """mean squared error over every example a batch carries, looped since the lifted path takes one at a time"""
+    cap_hit_history: list[bool] = []
+    iterations_history: list[int] = []
 
     def Loss(lifted: dict[str, Any], lifted_batch: dict[str, Any]) -> Any:
         example_count = lifted_batch["combined_coarse_input"].shape[0]
@@ -515,6 +517,23 @@ def Localization_Loss(member: FactorizedFourier) -> Any:
             predicted = member.Forward_From_Coarse_Input(lifted, lifted_batch["combined_coarse_input"][example_index])
             residual = predicted - lifted_batch["targets"][example_index]
             total = total + (residual * residual).mean()
+            cap_was_hit = member.last_fixed_point_cap_was_hit
+            iterations_taken = member.last_fixed_point_iterations
+            if cap_was_hit is not None and iterations_taken is not None:
+                cap_hit_history.append(cap_was_hit)
+                iterations_history.append(iterations_taken)
+                # the fixed-point health floor, visible while the run trains rather than only at evaluation;
+                # this closure cannot tell a training solve from a validation one, so the window mixes both
+                if len(cap_hit_history) % VALIDATION_INTERVAL == 0:
+                    recent_hits = cap_hit_history[-100:]
+                    recent_iterations = iterations_history[-100:]
+                    cap_hit_fraction = sum(recent_hits) / len(recent_hits)
+                    mean_iterations = sum(recent_iterations) / len(recent_iterations)
+                    print(
+                        f"solve {len(cap_hit_history)}: cap-hit fraction {cap_hit_fraction:.2f} over the last"
+                        f" {len(recent_hits)} solves, mean iterations {mean_iterations:.1f}",
+                        flush=True,
+                    )
         return total / example_count
 
     return Loss
@@ -586,7 +605,10 @@ def Write_Back_Parameters(member: FactorizedFourier, parameters: ParameterSet) -
 
 
 def Train_Flagship_Member(
-    step_count: int, run_name: str, configuration: FactorizedFourierConfiguration = "explicit"
+    step_count: int,
+    run_name: str,
+    configuration: FactorizedFourierConfiguration = "explicit",
+    stage_fractions: tuple[float, float, float] = STAGE_FRACTIONS,
 ) -> dict[str, object]:
     """the full staged run: a divergence probe with one allowed restart at a lower rate, then the staged schedule"""
     block = CubicBlock()
@@ -614,7 +636,7 @@ def Train_Flagship_Member(
     parameters = ParameterSet(values=member.Parameter_Values())
     engine = Training_Engine()
 
-    stage_step_counts = Staged_Step_Counts(step_count)
+    stage_step_counts = Staged_Step_Counts(step_count, stage_fractions)
     probe_steps = min(DIVERGENCE_PROBE_STEPS, stage_step_counts[0])
     chosen_peak_rate = PEAK_LEARNING_RATE
     probe_result = Train(
@@ -1380,14 +1402,17 @@ def Deep_Equilibrium_Ladder_Lines() -> list[str]:
         "```",
         "rung                       | steps | wall_clock_s | peak_memory_MiB | convergence_rate     | seed",
         "explicit (same width)      | 24404 |    14183     |     ~3600       | n/a (not iterative)  | 20260912 (1 of 3)",
-        "explicit (matched params)  |   --  |     --       |       --        | n/a (not iterative)  |  --",
+        "explicit (matched params)  | 35505 |     1872     |      ~700       | n/a (not iterative)  | 20260912 (1 of 3)",
         "weight_tied                | 23804 |     9670     |     ~3185       | n/a (not iterative)  | 20260912 (1 of 3)",
         "fixed_point                |   --  |     --       |       --        |          --           |  --",
         "```",
         "",
         "**Steps** are the sum actually completed across all three stages (the final stage's own patience can stop"
-        " it short of the stage plan, as it did for both rungs above: explicit at 24,404 of 35,505, weight-tied at"
-        " 23,804). **Wall-clock** and **peak memory** are one seed's own measured run, the first of the three the"
+        " it short of the stage plan, as it did for the same-width explicit rung at 24,404 of 35,505 and"
+        " weight-tied at 23,804; the matched-params explicit rung instead ran its full budget without stopping"
+        " early at any of the three stages -- 10,652 / 10,652 / 14,201, all 35,505 requested -- so its number"
+        " reflects the training budget rather than a convergence plateau, and a longer budget might read lower"
+        " still). **Wall-clock** and **peak memory** are one seed's own measured run, the first of the three the"
         " kill bar needs -- peak memory is read from periodic `nvidia-smi` checks during the run, not a"
         " continuously logged maximum, so it is reported to the nearest hundred MiB rather than claimed exact.",
         "",
@@ -1407,6 +1432,7 @@ CONFIGURATION_LABELS: dict[FactorizedFourierConfiguration, str] = {
     "explicit": "explicit stack",
     "explicit_matched": "explicit stack, matched params",
     "weight_tied": "weight-tied",
+    "weight_tied_injected": "weight-tied, input-injected",
     "fixed_point": "fixed-point",
 }
 

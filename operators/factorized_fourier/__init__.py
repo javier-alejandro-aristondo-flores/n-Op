@@ -27,7 +27,9 @@ from operators.wrappers import Conserving
 
 type FourierComposition = ExplicitStack | WeightTied | FixedPoint
 
-type FactorizedFourierConfiguration = Literal["explicit", "explicit_matched", "weight_tied", "fixed_point"]
+type FactorizedFourierConfiguration = Literal[
+    "explicit", "explicit_matched", "weight_tied", "weight_tied_injected", "fixed_point"
+]
 
 type FactorizedFourierTask = Literal["localization", "potential", "parametric"]
 
@@ -446,6 +448,13 @@ def Factorized_Fourier_Network(
     elif configuration == "weight_tied":
         stack = WeightTied(
             Shared_Member_Layer(hidden_channels, kept_modes, seed + 1, metric_aware), depth=layer_count
+        )
+    elif configuration == "weight_tied_injected":
+        # the fixed point's own iteration unrolled a fixed number of times, its exact non-iterative counterpart
+        stack = WeightTied(
+            Shared_Member_Layer(hidden_channels, kept_modes, seed + 1, metric_aware),
+            depth=layer_count,
+            input_injection=True,
         )
     elif configuration == "fixed_point":
         stack = FixedPoint(

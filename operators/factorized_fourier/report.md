@@ -159,12 +159,12 @@ Every trained number below is the integrator's to schedule and this stream's to 
 ```
 rung                       | steps | wall_clock_s | peak_memory_MiB | convergence_rate     | seed
 explicit (same width)      | 24404 |    14183     |     ~3600       | n/a (not iterative)  | 20260912 (1 of 3)
-explicit (matched params)  |   --  |     --       |       --        | n/a (not iterative)  |  --
+explicit (matched params)  | 35505 |     1872     |      ~700       | n/a (not iterative)  | 20260912 (1 of 3)
 weight_tied                | 23804 |     9670     |     ~3185       | n/a (not iterative)  | 20260912 (1 of 3)
 fixed_point                |   --  |     --       |       --        |          --           |  --
 ```
 
-**Steps** are the sum actually completed across all three stages (the final stage's own patience can stop it short of the stage plan, as it did for both rungs above: explicit at 24,404 of 35,505, weight-tied at 23,804). **Wall-clock** and **peak memory** are one seed's own measured run, the first of the three the kill bar needs -- peak memory is read from periodic `nvidia-smi` checks during the run, not a continuously logged maximum, so it is reported to the nearest hundred MiB rather than claimed exact.
+**Steps** are the sum actually completed across all three stages (the final stage's own patience can stop it short of the stage plan, as it did for the same-width explicit rung at 24,404 of 35,505 and weight-tied at 23,804; the matched-params explicit rung instead ran its full budget without stopping early at any of the three stages -- 10,652 / 10,652 / 14,201, all 35,505 requested -- so its number reflects the training budget rather than a convergence plateau, and a longer budget might read lower still). **Wall-clock** and **peak memory** are one seed's own measured run, the first of the three the kill bar needs -- peak memory is read from periodic `nvidia-smi` checks during the run, not a continuously logged maximum, so it is reported to the nearest hundred MiB rather than claimed exact.
 
 ## The potential task (`charge_to_potential`), host-only work
 

@@ -25,6 +25,7 @@ from operators.data import (
 )
 from operators.evaluation import MetricSummary, ScoredRun, Summarize, Summarize_By, Summary_Table
 from operators.factorized_fourier import (
+    Combined_Coarse_Input,
     Factorized_Fourier_Network,
     FactorizedFourier,
     FactorizedFourierConfiguration,
@@ -359,13 +360,12 @@ def Loaded_Density_And_Magnetization(
 
 @dataclasses.dataclass(frozen=True, slots=True)
 class LocalizationExample:
-    """one run's fine-grid log-density channels and gram vector, cached beside its coarse localization target"""
+    """one run's eight-channel coarse input, precomputed once, cached beside its coarse localization target"""
 
     identifier: str
     unit_key: str
     campaign: str
-    log_density_values: NDArray[np.float32]
-    gram_vector: NDArray[np.float32]
+    combined_coarse_input: NDArray[np.float32]
     target_values: NDArray[np.float32]
 
 
@@ -376,13 +376,15 @@ def Localization_Examples(
     gram_mean: NDArray[np.float64],
     gram_scale: NDArray[np.float64],
 ) -> list[LocalizationExample]:
-    """every named run, held resident as its own log-density channels, gram vector and coarse target, in single"""
+    """every named run, held resident as its own precomputed coarse input and coarse target, in single precision"""
     examples: list[LocalizationExample] = []
     for identifier in identifiers:
         campaign = block.campaign_of[identifier]
         density, magnetization, lattice = Loaded_Density_And_Magnetization(campaign, identifier)
         log_density_values = Log_Compressed_Channels(density, magnetization, reference_density)
         gram_vector = Standardized_Gram(Gram_Six(lattice), gram_mean, gram_scale)
+        # the truncation this call pays happens once here, not once per step the cached example is drawn
+        combined_coarse_input = Combined_Coarse_Input(log_density_values, gram_vector, COARSE_SHAPE)
         with np.load(Archive_Path(campaign, identifier)) as archive:
             target_values = np.stack(
                 [np.asarray(archive[channel], dtype=np.float64) for channel in LOCALIZATION_CHANNELS]
@@ -392,8 +394,7 @@ def Localization_Examples(
                 identifier=identifier,
                 unit_key=block.unit_of[identifier],
                 campaign=campaign,
-                log_density_values=np.asarray(log_density_values, dtype=np.float32),
-                gram_vector=np.asarray(gram_vector, dtype=np.float32),
+                combined_coarse_input=np.asarray(combined_coarse_input, dtype=np.float32),
                 target_values=np.asarray(target_values, dtype=np.float32),
             )
         )
@@ -417,8 +418,7 @@ class LocalizationBatches(BatchSource):
         self.last_drawn_identifier = drawn.identifier
         return TrainingBatch(
             {
-                "log_density_values": drawn.log_density_values[None],
-                "gram_vectors": drawn.gram_vector[None],
+                "combined_coarse_input": drawn.combined_coarse_input[None],
                 "targets": drawn.target_values[None],
             }
         )
@@ -432,8 +432,9 @@ class LocalizationBatches(BatchSource):
                     unit_key,
                     TrainingBatch(
                         {
-                            "log_density_values": np.stack([example.log_density_values for example in examples]),
-                            "gram_vectors": np.stack([example.gram_vector for example in examples]),
+                            "combined_coarse_input": np.stack(
+                                [example.combined_coarse_input for example in examples]
+                            ),
                             "targets": np.stack([example.target_values for example in examples]),
                         }
                     ),
@@ -456,15 +457,10 @@ def Localization_Loss(member: FactorizedFourier) -> Any:
     """mean squared error over every example a batch carries, looped since the lifted path takes one at a time"""
 
     def Loss(lifted: dict[str, Any], lifted_batch: dict[str, Any]) -> Any:
-        example_count = lifted_batch["log_density_values"].shape[0]
+        example_count = lifted_batch["combined_coarse_input"].shape[0]
         total = 0.0
         for example_index in range(example_count):
-            predicted = member.Forward_Field(
-                lifted,
-                lifted_batch["log_density_values"][example_index],
-                lifted_batch["gram_vectors"][example_index],
-                COARSE_SHAPE,
-            )
+            predicted = member.Forward_From_Coarse_Input(lifted, lifted_batch["combined_coarse_input"][example_index])
             residual = predicted - lifted_batch["targets"][example_index]
             total = total + (residual * residual).mean()
         return total / example_count

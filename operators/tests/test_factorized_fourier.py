@@ -10,6 +10,7 @@ from operators.compositions import FixedPoint, Spectral_Resampled, WeightTied
 from operators.compositions.fixed_point import Sliced_Lifted
 from operators.data import Archive_Path
 from operators.factorized_fourier import (
+    Combined_Coarse_Input,
     Factorized_Fourier_Network,
     FactorizedFourier,
     FactorizedFourierConfiguration,
@@ -163,6 +164,20 @@ def Test_Truncate_Early_Equals_Lift_Then_Truncate() -> None:
     lift_then_truncate = Spectral_Resampled(lifted_fine, (4, 4, 4))
 
     assert np.allclose(truncate_then_lift, lift_then_truncate, atol=1e-10)
+
+
+def Test_The_Cached_Coarse_Input_Path_Equals_The_On_The_Fly_Path() -> None:
+    """precomputing the eight-channel coarse input once and skipping straight to the lift changes nothing"""
+    member = Toy_Member(hidden_channels=5, seed=13)
+    input_function = Toy_Input((8, 8, 8), seed=14)
+    log_density_values, gram_vector = member.Input_Channels(input_function)
+    parameters = member.Parameter_Values()
+
+    on_the_fly = np.asarray(member.Forward_Field(parameters, log_density_values, gram_vector, (4, 4, 4)))
+    combined_coarse_input = Combined_Coarse_Input(log_density_values, gram_vector, (4, 4, 4))
+    from_the_cache = np.asarray(member.Forward_From_Coarse_Input(parameters, combined_coarse_input))
+
+    assert np.allclose(on_the_fly, from_the_cache, atol=1e-12)
 
 
 def Test_The_Weight_Tied_And_Fixed_Point_Configurations_Assemble() -> None:

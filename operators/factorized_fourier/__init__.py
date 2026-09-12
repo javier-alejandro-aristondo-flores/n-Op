@@ -89,6 +89,16 @@ def Reference_Density(
     return max(total / counted_entries, REFERENCE_DENSITY_FLOOR)
 
 
+def Combined_Coarse_Input(log_density_values: Any, gram_vector: Any, target_shape: tuple[int, int, int]) -> Any:
+    """the eight-channel coarse input the lift reads, built once from the fine-grid channels and the gram vector"""
+    # a pointwise affine lift commutes exactly with spectral truncation, so truncating first costs an eighth as much
+    coarse_density = Spectral_Resampled(log_density_values, target_shape)
+    gram_field = gram_vector.reshape(GRAM_CHANNEL_COUNT, 1, 1, 1) + Zeros_Beside(
+        coarse_density, (GRAM_CHANNEL_COUNT, *target_shape)
+    )
+    return Concatenate_Channels([coarse_density, gram_field])
+
+
 class FactorizedFourier(NeuralOperator[GridFunction, GridFunction, GridFunction]):
     """pointwise lift, factorized spectral layers, bounded head"""
 
@@ -127,22 +137,9 @@ class FactorizedFourier(NeuralOperator[GridFunction, GridFunction, GridFunction]
         return collected
 
 
-    def Forward_Field(
-        self,
-        lifted: dict[str, Any],
-        log_density_values: Any,
-        gram_vector: Any,
-        target_shape: tuple[int, int, int] | None = None,
-    ) -> Any:
-        """the whole lifted path, from fine-grid log-compressed channels to the bounded localization field"""
-        resolved_shape = self.processing_shape if target_shape is None else target_shape
-        # a pointwise affine lift commutes exactly with spectral truncation, so truncating first costs an eighth as much
-        coarse_density = Spectral_Resampled(log_density_values, resolved_shape)
-        gram_field = gram_vector.reshape(GRAM_CHANNEL_COUNT, 1, 1, 1) + Zeros_Beside(
-            coarse_density, (GRAM_CHANNEL_COUNT, *resolved_shape)
-        )
-        combined = Concatenate_Channels([coarse_density, gram_field])
-        hidden = self.lift.Forward(lifted, combined)
+    def Forward_From_Coarse_Input(self, lifted: dict[str, Any], combined_coarse_input: Any) -> Any:
+        """the lifted path onward from the eight-channel coarse input, for a caller that has already built it"""
+        hidden = self.lift.Forward(lifted, combined_coarse_input)
         # a bare forward call would drop the solve, so resolved is used directly to capture it for inspection
         if isinstance(self.spectral_stack, FixedPoint):
             carried, solved = self.spectral_stack.Resolved(lifted, hidden)
@@ -153,6 +150,19 @@ class FactorizedFourier(NeuralOperator[GridFunction, GridFunction, GridFunction]
         else:
             carried = self.spectral_stack.Forward(lifted, hidden)
         return self.projection.Forward(lifted, carried)
+
+
+    def Forward_Field(
+        self,
+        lifted: dict[str, Any],
+        log_density_values: Any,
+        gram_vector: Any,
+        target_shape: tuple[int, int, int] | None = None,
+    ) -> Any:
+        """the whole lifted path, from fine-grid log-compressed channels to the bounded localization field"""
+        resolved_shape = self.processing_shape if target_shape is None else target_shape
+        combined = Combined_Coarse_Input(log_density_values, gram_vector, resolved_shape)
+        return self.Forward_From_Coarse_Input(lifted, combined)
 
 
     def Input_Channels(self, input_function: GridFunction) -> tuple[NDArray[np.float64], NDArray[np.float64]]:

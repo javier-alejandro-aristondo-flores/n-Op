@@ -16,7 +16,7 @@ from operators.framework import (
 )
 from operators.kernels.codomain_attention.layer_norm import FunctionSpaceLayerNorm
 from operators.kernels.codomain_attention.tokens import Token_Count
-from operators.kernels.spectral import SpectralKernel
+from operators.kernels.spectral import ModeMixing, SpectralKernel
 from operators.substrate import Einstein_Summation, Exponential, Mean_Over_Last_Axis, Precision, Sum_Over_Last_Axis
 
 
@@ -38,6 +38,7 @@ class CodomainAttentionKernel(Kernel[GridFunction, GridFunction]):
         head_count: int = 1,
         seed: int = 0,
         working_precision: Precision = "double",
+        mode_mixing: ModeMixing = "full",
     ) -> None:
         if hidden_channels % head_count != 0:
             raise ValueError(f"{hidden_channels} hidden channels do not split evenly into {head_count} heads")
@@ -46,19 +47,40 @@ class CodomainAttentionKernel(Kernel[GridFunction, GridFunction]):
         self.head_count = head_count
         self.head_width = hidden_channels // head_count
         self.working_precision: Precision = working_precision
+        self.mode_mixing: ModeMixing = mode_mixing
         self.pre_norm = FunctionSpaceLayerNorm(hidden_channels)
         # each inner kernel takes the base seed offset by its position, so all four differ
         self.query_kernel = SpectralKernel(
-            kept_modes, hidden_channels, hidden_channels, seed=seed, working_precision=working_precision
+            kept_modes,
+            hidden_channels,
+            hidden_channels,
+            seed=seed,
+            mode_mixing=mode_mixing,
+            working_precision=working_precision,
         )
         self.key_kernel = SpectralKernel(
-            kept_modes, hidden_channels, hidden_channels, seed=seed + 1, working_precision=working_precision
+            kept_modes,
+            hidden_channels,
+            hidden_channels,
+            seed=seed + 1,
+            mode_mixing=mode_mixing,
+            working_precision=working_precision,
         )
         self.value_kernel = SpectralKernel(
-            kept_modes, hidden_channels, hidden_channels, seed=seed + 2, working_precision=working_precision
+            kept_modes,
+            hidden_channels,
+            hidden_channels,
+            seed=seed + 2,
+            mode_mixing=mode_mixing,
+            working_precision=working_precision,
         )
         self.output_kernel = SpectralKernel(
-            kept_modes, hidden_channels, hidden_channels, seed=seed + 3, working_precision=working_precision
+            kept_modes,
+            hidden_channels,
+            hidden_channels,
+            seed=seed + 3,
+            mode_mixing=mode_mixing,
+            working_precision=working_precision,
         )
         self.spectral_parts: tuple[tuple[str, SpectralKernel], ...] = (
             ("query.", self.query_kernel),
@@ -73,6 +95,20 @@ class CodomainAttentionKernel(Kernel[GridFunction, GridFunction]):
             for name, value in spectral_part.parameter_values.items():
                 self.parameter_values[f"{prefix}{name}"] = value
         self.last_attention_scores: NDArray[np.float64] | None = None
+
+
+    def Parameter_Count(self) -> int:
+        """how many real numbers this kernel stores, the same at every token count it is ever asked to answer for"""
+        return sum(int(value.size) for value in self.parameter_values.values())
+
+
+    @staticmethod
+    def Parameter_Count_For(
+        hidden_channels: int, kept_modes: tuple[int, int, int], head_count: int, mode_mixing: ModeMixing
+    ) -> int:
+        """the same count without building the weights, so a configuration can be priced before it is paid"""
+        spectral_count = SpectralKernel.Parameter_Count_For(kept_modes, hidden_channels, hidden_channels, mode_mixing)
+        return 4 * spectral_count + 2 * hidden_channels + head_count
 
 
     def Head_Split(self, values: Any, token_count: int) -> Any:

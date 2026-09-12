@@ -73,6 +73,33 @@ def Test_Parameter_Count_Is_Independent_Of_Token_Count() -> None:
         assert np.array_equal(value, parameter_arrays_before[name])
 
 
+def Test_Parameter_Count_Formula_Covers_Full_And_Separable_Mixing() -> None:
+    """the built kernel's own count matches what the pricing function predicts, for both mixing modes"""
+    full_kernel = CodomainAttentionKernel(
+        hidden_channels=3, kept_modes=(1, 1, 2), head_count=1, seed=130, mode_mixing="full"
+    )
+    separable_kernel = CodomainAttentionKernel(
+        hidden_channels=3, kept_modes=(1, 1, 2), head_count=1, seed=131, mode_mixing="separable"
+    )
+    full_priced = CodomainAttentionKernel.Parameter_Count_For(
+        hidden_channels=3, kept_modes=(1, 1, 2), head_count=1, mode_mixing="full"
+    )
+    separable_priced = CodomainAttentionKernel.Parameter_Count_For(
+        hidden_channels=3, kept_modes=(1, 1, 2), head_count=1, mode_mixing="separable"
+    )
+    assert full_kernel.Parameter_Count() == full_priced
+    assert separable_kernel.Parameter_Count() == separable_priced
+    assert separable_priced < full_priced
+
+    generator = np.random.default_rng(132)
+    # the third axis keeps modes minus two to plus two, so it needs at least five points
+    grid_shape = (4, 4, 5)
+    values = generator.random((2 * 3, *grid_shape))
+    produced = np.asarray(separable_kernel.Forward(separable_kernel.parameter_values, values, grid_shape))
+    assert produced.shape == (2 * 3, *grid_shape)
+    assert np.all(np.isfinite(produced))
+
+
 def Test_Permuting_Tokens_Permutes_The_Output_The_Same_Way() -> None:
     """attention over tokens is equivariant to their order, the encodings break the symmetry elsewhere"""
     kernel = CodomainAttentionKernel(hidden_channels=3, kept_modes=(1, 1, 2), head_count=1, seed=10)

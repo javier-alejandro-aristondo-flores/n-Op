@@ -7,7 +7,7 @@ Verdicts use the canon's own bars; levels added before a member trained are labe
 
 | as of | trunk | tests | figures |
 |---|---|---|---|
-| 2026-09-12, 15:15 | `db9d764` | 422 | 536 committed |
+| 2026-09-12, 16:00 | `63ff0d4` | 424 | 536 committed |
 
 Words used throughout, defined once: the *electron localization function* is a field on [0, 1]
 saying how strongly electrons are pinned at a point; the *density of states* is the curve of how
@@ -103,8 +103,8 @@ much under grid shift) is not built.
 
 ## I.3 — Deep-equilibrium Fourier operator, with the weight-tied ladder · charge density → electron localization, computed as a fixed point
 
-**Status: three of four rungs trained and judged; the fixed-point rung's first valid run is being
-launched.** Lives in `operators/factorized_fourier/` as configurations of one factory, the
+**Status: three of four rungs trained and judged; the fixed-point rung is blocked on a build (see
+below), not on a knob.** Lives in `operators/factorized_fourier/` as configurations of one factory, the
 canon's own design. The experiment is the decomposition curve explicit → weight-tied → fixed point,
 isolating what weight sharing buys from what implicit depth buys; "weight-tying yes, deep
 equilibrium no" is a legitimate verdict.
@@ -128,11 +128,16 @@ Four latent defects in the shared fixed-point primitive surfaced on its first ca
 fixed on the trunk: numpy asked to read a card tensor; a host-bound Anderson step; no input
 injection, so the equilibrium was identical for every input and the model could only emit a
 constant; an absolute residual tolerance that on a four-million-entry iterate meant parts per
-million. A fifth item is in hand: the shared layer does not contract at its default initialization,
-so the canon's first stability rung, a contractive initialization (weight scale 0.1), is applied
-before the run and recorded as the tuning used. The honest counterpart of the fixed point is a
-weight-tied rung *with* input injection, queued after it; the injection-free weight-tied row above
-stays as an extra rung.
+million. A fifth item is measured and open: the shared layer does not contract at its default
+initialization, and the canon's first stability rung, a contractive initialization, holds only at
+the start — with the shared layer's weights scaled by 0.1 or 0.03 the solves converge at step 100
+(cap-hit 0.34, mean 22 iterations) and training drives the map back out of contractivity by step
+200–300 (cap-hit 0.98 → 1.00) at both scales. The next rungs the canon names are builds: per-mode
+spectral clipping, a Jacobian penalty, a monotone parametrization; one of them is built before the
+rung trains. Even at the cap the injected model learns (validation loss 3.4e-3 at step 200, better
+than the explicit stack there); what it lacks is a converged equilibrium, which the health floor
+exists to say. The honest counterpart of the fixed point is a weight-tied rung *with* input
+injection, queued after it; the injection-free weight-tied row above stays as an extra rung.
 
 ---
 

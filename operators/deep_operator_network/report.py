@@ -25,11 +25,16 @@ from operators.deep_operator_network import (
     Pointwise_Statistics,
     Principal_Component_Network,
     Proper_Orthogonal_Network,
+    Reference_Density,
+    Reference_Density_Restored,
+    Reference_Density_Standardized,
 )
 from operators.evaluation import (
     Compare_To_Floor,
     Comparison_Table,
+    EXTRAPOLATION,
     FloorComparison,
+    INTERPOLATION,
     ScoredRun,
     Summarize,
     Summarize_By,
@@ -44,7 +49,7 @@ from operators.inspection import (
     Render_Prediction_Against_Truth,
     Render_Table,
 )
-from operators.metrics import Curve_L1, Gap_Edge_Error, Relative_L2, Wasserstein_1d
+from operators.metrics import Curve_L1, Frequency_Split_Relative_L2, Gap_Edge_Error, Relative_L2, Wasserstein_1d
 from operators.readouts import BasisExpansion, CoordinateFeatures, RampedCoordinateFeatures
 from operators.substrate import Mean_Over_Last_Axis, ParameterSet, Sum_Over_Last_Axis
 from operators.tasks import Card_Named, TaskCard
@@ -57,6 +62,7 @@ from operators.training import (
     FixedBatches,
     ForwardLoss,
     Parameter_Field_Examples,
+    ParameterExample,
     PointSampledBatches,
     State_Density_Examples,
     Strain_Assignments_By_Run,
@@ -64,6 +70,7 @@ from operators.training import (
     Training_Engine,
     TrainingBatch,
 )
+from operators.wrappers import Renormalization_Scale
 
 REPORT_PATH = Path(__file__).parent / "report.md"
 FIGURES_PATH = Path(__file__).parent / "figures"
@@ -111,6 +118,22 @@ ENERGY_TRUNK_PATIENCE = 15
 ENERGY_TRUNK_SEED = 20260911
 # how much more the ablation weighs the band-edge region than the rest of the window
 ENERGY_TRUNK_BAND_EDGE_WEIGHT = 5.0
+
+# lattice_to_charge (test-suite.md II.1b): the angle stratum's one shared shape, measured on all 125 of its runs
+PEROVSKITE_ANGLE_GRID_SHAPE = (64, 64, 64)
+# measured: every one of the 249 perovskite runs integrates to exactly this, 0 exceptions
+PEROVSKITE_ELECTRON_COUNT = 48.0
+PEROVSKITE_DEVELOP_FOLD = 0
+# fold and holdout label, extrapolation label -- fold 0 is where the budget is chosen, both holdouts reuse it
+PEROVSKITE_SPLITS = (
+    ("fold_0", None, INTERPOLATION),
+    ("holdout_factor_0p8", "holdout_factor_0p8", EXTRAPOLATION),
+    ("holdout_factor_1p2", "holdout_factor_1p2", EXTRAPOLATION),
+)
+# an eighth of a grid's own smallest extent, this report's low/high mode boundary
+LATTICE_FREQUENCY_CUTOFF_DIVISOR = 8.0
+LATTICE_SEED = 20260911
+LATTICE_CANONICAL_LEARNING_RATE = 3e-3
 
 
 class StrainBlock:
@@ -1190,6 +1213,798 @@ def Energy_Trunk_Block_Lines() -> list[str]:
     return lines
 
 
+def Lattice_Frequency_Cutoff(grid_shape: tuple[int, ...]) -> float:
+    """an eighth of this grid's own smallest extent, the low/high mode boundary this block uses"""
+    return float(min(grid_shape)) / LATTICE_FREQUENCY_CUTOFF_DIVISOR
+
+
+def Perovskite_Angle_Examples(
+    role: str, evaluation_fold: int, extrapolation_holdout: str | None
+) -> list[ParameterExample]:
+    """every angle-stratum example of one loader role, still on the shape the whole stratum shares"""
+    card = Card_Named("lattice_to_charge")
+    selected: list[ParameterExample] = []
+    for example in Parameter_Field_Examples(card, role, evaluation_fold, extrapolation_holdout):
+        if not example.unit_key.endswith("_angle"):
+            continue
+        if np.asarray(example.target_function.values).shape[1:] != PEROVSKITE_ANGLE_GRID_SHAPE:
+            continue
+        selected.append(example)
+    return selected
+
+
+def Perovskite_Train_Validation_Split(
+    examples: list[ParameterExample],
+) -> tuple[list[ParameterExample], list[ParameterExample]]:
+    """every fifth example, by sorted unit key, held out as this split's own validation slice"""
+    ordered = sorted(range(len(examples)), key=lambda position: examples[position].unit_key)
+    validation_positions = {position for count, position in enumerate(ordered) if count % 5 == 4}
+    train_examples = [example for position, example in enumerate(examples) if position not in validation_positions]
+    validation_examples = [example for position, example in enumerate(examples) if position in validation_positions]
+    return train_examples, validation_examples
+
+
+def Perovskite_Cache_Validation_Mask(cache: FieldCache) -> list[bool]:
+    """every fifth field, by sorted unit key, held out as this cache's own validation slice"""
+    ordered = sorted(range(len(cache.fields)), key=lambda position: cache.fields[position].unit_key)
+    validation_positions = {position for count, position in enumerate(ordered) if count % 5 == 4}
+    return [position in validation_positions for position in range(len(cache.fields))]
+
+
+class PerovskiteAngleBlock:
+    """the perovskite angle stratum's own runs, every one on the shared 64-cubed grid"""
+
+
+    def __init__(self, examples: list[ParameterExample], extrapolation: str = INTERPOLATION) -> None:
+        parameters: list[NDArray[np.float64]] = []
+        fields: list[NDArray[np.float64]] = []
+        cell_volumes: list[float] = []
+        self.unit_keys: list[str] = []
+        self.identifiers: list[str] = []
+        for example in examples:
+            values = np.asarray(example.target_function.values, dtype=np.float64)
+            parameters.append(np.asarray(example.parameters.vector, dtype=np.float64))
+            fields.append(values.reshape(-1))
+            cell_volumes.append(float(example.target_function.quadrature.cell_volume))
+            self.unit_keys.append(example.unit_key)
+            self.identifiers.append(example.identifier)
+        Guard_Fresh_Archives(self.identifiers)
+        self.parameters = np.asarray(parameters)
+        self.fields = np.asarray(fields)
+        self.cell_volumes = np.asarray(cell_volumes, dtype=np.float64)
+        self.extrapolation = extrapolation
+
+
+    def Scored(self, rebuilt: NDArray[np.float64]) -> list[ScoredRun]:
+        """one scored run per field, the card's two metrics, labeled by this block's own extrapolation status"""
+        cutoff = Lattice_Frequency_Cutoff(PEROVSKITE_ANGLE_GRID_SHAPE)
+        scored: list[ScoredRun] = []
+        for run in range(self.fields.shape[0]):
+            low, high = Frequency_Split_Relative_L2(
+                rebuilt[run].reshape(PEROVSKITE_ANGLE_GRID_SHAPE),
+                self.fields[run].reshape(PEROVSKITE_ANGLE_GRID_SHAPE),
+                cutoff_modes=cutoff,
+            )
+            scored.append(
+                ScoredRun(
+                    identifier=self.identifiers[run],
+                    unit_key=self.unit_keys[run],
+                    campaign="perovskite_grid",
+                    family="angle",
+                    errors={
+                        "relative_l2": Relative_L2(rebuilt[run], self.fields[run]),
+                        "frequency_split_relative_l2_low": low,
+                        "frequency_split_relative_l2_high": high,
+                    },
+                    extrapolation=self.extrapolation,
+                )
+            )
+        return scored
+
+
+def Perovskite_Standardized_Fields(
+    block: PerovskiteAngleBlock, voxel_mean: NDArray[np.float64], voxel_scale: NDArray[np.float64]
+) -> NDArray[np.float64]:
+    """a block's fields on the per-voxel scale of the training block"""
+    return (block.fields - voxel_mean) / voxel_scale
+
+
+def Perovskite_Ridge_Predictions(
+    basis: PodBasis, train: PerovskiteAngleBlock, evaluated: PerovskiteAngleBlock
+) -> NDArray[np.float64]:
+    """the closed-form floor: lattice parameters onto mode coefficients, decoded through the basis"""
+    fitted = Fit_Standardized_Ridge(train.parameters, Project(basis, train.fields))
+    return Reconstruct(basis, Apply_Standardized_Ridge(fitted, evaluated.parameters))
+
+
+def Perovskite_Nearest_Neighbor_Predictions(
+    train: PerovskiteAngleBlock, evaluated: PerovskiteAngleBlock
+) -> NDArray[np.float64]:
+    """the memorization floor: the field of the closest training run in lattice-parameter space"""
+    nearest = Nearest_Training_Run(train.parameters, evaluated.parameters)
+    return train.fields[nearest]
+
+
+def Perovskite_Training_Mean_Predictions(
+    train: PerovskiteAngleBlock, evaluated: PerovskiteAngleBlock
+) -> NDArray[np.float64]:
+    """the flat floor: every evaluated run predicted as the training block's own mean field, parameters ignored"""
+    return np.tile(train.fields.mean(axis=0), (evaluated.fields.shape[0], 1))
+
+
+def Perovskite_Renormalization_Scales(
+    rebuilt: NDArray[np.float64], cell_volumes: NDArray[np.float64]
+) -> NDArray[np.float64]:
+    """the exact factor the card's renormalize_to_electron_count law takes on each evaluated run's field"""
+    point_count = rebuilt.shape[1]
+    return np.asarray(
+        [
+            float(
+                Renormalization_Scale(
+                    rebuilt[run], float(cell_volumes[run]) / point_count, np.asarray(PEROVSKITE_ELECTRON_COUNT)
+                )
+            )
+            for run in range(rebuilt.shape[0])
+        ],
+        dtype=np.float64,
+    )
+
+
+def Perovskite_Conservation_Applied(
+    rebuilt: NDArray[np.float64], cell_volumes: NDArray[np.float64]
+) -> tuple[NDArray[np.float64], NDArray[np.float64]]:
+    """every evaluated run's field renormalized exactly onto the known electron count, with the scale each took"""
+    scales = Perovskite_Renormalization_Scales(rebuilt, cell_volumes)
+    return rebuilt * scales[:, None], scales
+
+
+def Perovskite_Fixed_Basis_Member(
+    configuration: str,
+    basis: PodBasis,
+    train: PerovskiteAngleBlock,
+    validation: PerovskiteAngleBlock,
+    evaluated: PerovskiteAngleBlock,
+    run_name_prefix: str,
+    fixed_step_count: int | None,
+) -> tuple[NDArray[np.float64], int, DeepOperatorNetwork]:
+    """the fixed-basis member trained at the given budget, or at the one validation prefers among the card's five"""
+    voxel_mean, voxel_scale = Pointwise_Statistics(train.fields)
+    if configuration == "proper_orthogonal":
+        coefficients = Project(basis, (train.fields - voxel_mean) / voxel_scale)
+    else:
+        coefficients = Project(basis, train.fields)
+    parameter_spreads = train.parameters.std(axis=0)
+    parameter_spreads[parameter_spreads == 0.0] = 1.0
+    coefficient_mean = coefficients.mean(axis=0)
+    coefficient_scale = coefficients.std(axis=0)
+    coefficient_scale[coefficient_scale == 0.0] = 1.0
+    batch = np.concatenate(
+        [train.parameters / parameter_spreads, (coefficients - coefficient_mean) / coefficient_scale],
+        axis=1,
+    )
+    parameter_width = train.parameters.shape[1]
+    whole_batch = FixedBatches(TrainingBatch({"rows": batch}))
+    if configuration == "proper_orthogonal":
+        member = Proper_Orthogonal_Network(
+            basis, PEROVSKITE_ANGLE_GRID_SHAPE, voxel_mean, voxel_scale, parameter_width, HIDDEN_WIDTHS
+        )
+    else:
+        member = Principal_Component_Network(basis, PEROVSKITE_ANGLE_GRID_SHAPE, parameter_width, HIDDEN_WIDTHS)
+
+    def Coefficient_Loss(lifted: dict[str, Any], lifted_batch: dict[str, Any]) -> Any:
+        """mean squared error between the branch's coefficients and the projected truth"""
+        rows = lifted_batch["rows"]
+        predicted = member.Forward_Coefficients(lifted, rows[:, :parameter_width])
+        residuals = predicted - rows[:, parameter_width:]
+        return (residuals * residuals).mean()
+
+    def Rebuild(values: dict[str, NDArray[np.float64]], block: PerovskiteAngleBlock) -> NDArray[np.float64]:
+        """this block's parameters carried through the trained branch and decoded back onto the field"""
+        predicted = np.asarray(
+            member.Forward_Coefficients(values, block.parameters / parameter_spreads), dtype=np.float64
+        )
+        rebuilt = Reconstruct(basis, predicted * coefficient_scale + coefficient_mean)
+        if configuration == "proper_orthogonal":
+            return rebuilt * voxel_scale + voxel_mean
+        return rebuilt
+
+    candidates = CANDIDATE_STEP_COUNTS if fixed_step_count is None else (fixed_step_count,)
+    best_score = float("inf")
+    best_values: dict[str, NDArray[np.float64]] = {}
+    best_step_count = candidates[0]
+    for step_count in candidates:
+        # the budget is the one hyperparameter chosen here, and fold_0's validation is what chooses it
+        result = Train(
+            Training_Engine(),
+            ParameterSet(values=member.Parameter_Values()),
+            Coefficient_Loss,
+            whole_batch,
+            step_count=step_count,
+            learning_rate=3e-3,
+            seed=LATTICE_SEED,
+            artifact_directory=TRAINING_ARTIFACT_PATH,
+            run_name=f"{run_name_prefix}_{step_count}",
+        )
+        rebuilt = Rebuild(result.parameters.values, validation)
+        score = float(
+            np.median([Relative_L2(rebuilt[run], validation.fields[run]) for run in range(rebuilt.shape[0])])
+        )
+        if score < best_score:
+            best_score, best_values, best_step_count = score, result.parameters.values, step_count
+    for name, value in best_values.items():
+        if name in member.branch.parameter_values:
+            member.branch.parameter_values[name] = value
+    member(
+        Coefficients(vector=evaluated.parameters[0] / parameter_spreads, domain=Domain(np.eye(3))),
+        GridSpec(PEROVSKITE_ANGLE_GRID_SHAPE),
+    )
+    return Rebuild(best_values, evaluated), best_step_count, member
+
+
+def Perovskite_Write_Figures(
+    split_name: str,
+    configuration: str,
+    member: DeepOperatorNetwork,
+    test: PerovskiteAngleBlock,
+    member_rebuilt: NDArray[np.float64],
+    floor_medians: dict[str, float],
+    member_median: float,
+) -> int:
+    """the member's whole visual surface, drawn from arrays cached on the pool"""
+    cache = ARRAY_CACHE_PATH / "perovskite" / split_name / configuration
+    cache.mkdir(parents=True, exist_ok=True)
+    inspected = {name: np.asarray(value, dtype=np.float64) for name, value in member.Inspect().items()}
+    np.savez(cache / "inspection.npz", **cast(dict[str, Any], inspected))
+    with np.load(cache / "inspection.npz") as archive:
+        restored = {name: np.asarray(archive[name], dtype=np.float64) for name in archive.files}
+
+    directory = FIGURES_PATH / "perovskite" / split_name / configuration
+    suite = Render_Inspection_Suite(
+        restored, directory / "components", f"deep_operator_network lattice {split_name} {configuration}"
+    )
+    if suite.skipped:
+        raise ValueError(f"no renderer for {suite.skipped}, which means the suite is incomplete")
+
+    scored = [Relative_L2(member_rebuilt[run], test.fields[run]) for run in range(test.fields.shape[0])]
+    for rank, run in enumerate(np.argsort(scored)[[0, -1]]):
+        Render_Prediction_Against_Truth(
+            member_rebuilt[run].reshape(PEROVSKITE_ANGLE_GRID_SHAPE),
+            test.fields[run].reshape(PEROVSKITE_ANGLE_GRID_SHAPE),
+            directory / f"prediction_{'best' if rank == 0 else 'worst'}.png",
+            f"lattice {split_name} {configuration} {'best' if rank == 0 else 'worst'} test run,"
+            f" {test.unit_keys[run]}",
+        )
+    Render_Floor_Comparison(
+        floor_medians,
+        member_median,
+        {"ridge_to_coefficients": RIDGE_MARGIN, "nearest_neighbor_copy": NEAREST_NEIGHBOR_MARGIN},
+        directory / "floors.png",
+        f"lattice {split_name} {configuration} against its floors",
+    )
+    return len(suite.written) + 3
+
+
+def Perovskite_Fixed_Basis_Block_Lines(
+    split_name: str,
+    configuration: str,
+    evaluation_fold: int,
+    extrapolation_holdout: str | None,
+    extrapolation: str,
+    fixed_step_count: int | None,
+) -> tuple[list[str], tuple[FloorComparison, ...], int]:
+    """one split and fixed-basis configuration measured end to end, on the angle stratum's shared grid"""
+    train_examples, validation_examples = Perovskite_Train_Validation_Split(
+        Perovskite_Angle_Examples("train", evaluation_fold, extrapolation_holdout)
+    )
+    train = PerovskiteAngleBlock(train_examples)
+    validation = PerovskiteAngleBlock(validation_examples)
+    test = PerovskiteAngleBlock(
+        Perovskite_Angle_Examples("evaluation", evaluation_fold, extrapolation_holdout), extrapolation
+    )
+    raw_basis = Gram_Pod(train.fields, rank=BASIS_RANK)
+    voxel_mean, voxel_scale = Pointwise_Statistics(train.fields)
+    if configuration == "proper_orthogonal":
+        basis = Gram_Pod(Perovskite_Standardized_Fields(train, voxel_mean, voxel_scale), rank=BASIS_RANK)
+        # the ceiling of a standardized basis is read back on the raw scale, where the metric lives
+        ceiling_rebuilt = (
+            Reconstruct(basis, Project(basis, Perovskite_Standardized_Fields(test, voxel_mean, voxel_scale)))
+            * voxel_scale
+            + voxel_mean
+        )
+    else:
+        basis = raw_basis
+        ceiling_rebuilt = Reconstruct(basis, Project(basis, test.fields))
+
+    # the floors are the same floors whichever configuration is being judged against them
+    ridge_runs = test.Scored(Perovskite_Ridge_Predictions(raw_basis, train, test))
+    copy_runs = test.Scored(Perovskite_Nearest_Neighbor_Predictions(train, test))
+    mean_runs = test.Scored(Perovskite_Training_Mean_Predictions(train, test))
+    member_rebuilt_raw, step_count, member = Perovskite_Fixed_Basis_Member(
+        configuration, basis, train, validation, test, f"lattice_{split_name}_{configuration}", fixed_step_count
+    )
+    member_rebuilt, conservation_scales = Perovskite_Conservation_Applied(member_rebuilt_raw, test.cell_volumes)
+    member_runs = test.Scored(member_rebuilt)
+    ceiling_runs = test.Scored(ceiling_rebuilt)
+
+    comparisons = (
+        Compare_To_Floor(member_runs, ridge_runs, "relative_l2", "ridge_to_coefficients", RIDGE_MARGIN, split_name),
+        Compare_To_Floor(
+            member_runs, copy_runs, "relative_l2", "nearest_neighbor_copy", NEAREST_NEIGHBOR_MARGIN, split_name
+        ),
+    )
+    summaries = (
+        Summarize(ceiling_runs, "relative_l2", "rank_32_projection_ceiling"),
+        Summarize(mean_runs, "relative_l2", "training_mean_floor"),
+        Summarize(ridge_runs, "relative_l2", "ridge_floor"),
+        Summarize(copy_runs, "relative_l2", "nearest_neighbor_floor"),
+        Summarize(member_runs, "relative_l2", "member"),
+        Summarize(member_runs, "frequency_split_relative_l2_low", "member"),
+        Summarize(member_runs, "frequency_split_relative_l2_high", "member"),
+    )
+    floor_medians = {
+        "ridge_to_coefficients": comparisons[0].floor_median,
+        "nearest_neighbor_copy": comparisons[1].floor_median,
+    }
+    figure_count = Perovskite_Write_Figures(
+        split_name, configuration, member, test, member_rebuilt, floor_medians, comparisons[0].member_median
+    )
+    label = "extrapolation" if extrapolation == EXTRAPOLATION else "interpolation"
+    budget_note = "chosen on validation" if fixed_step_count is None else "reused from fold_0's own search"
+    lines = [
+        f"## lattice_to_charge, `{split_name}`, `{configuration}` — perovskite angle stratum, {label}",
+        "",
+        f"Train {train.fields.shape[0]} runs, validation {validation.fields.shape[0]},"
+        f" test {test.fields.shape[0]}, all on the shared {PEROVSKITE_ANGLE_GRID_SHAPE} grid."
+        f" Basis rank {BASIS_RANK}; branch widths {HIDDEN_WIDTHS}; {step_count} steps ({budget_note})."
+        f" Conservation scale (`renormalize_to_electron_count`), median:"
+        f" {float(np.median(conservation_scales)):.6f}."
+        f" {figure_count} figures under `figures/perovskite/{split_name}/{configuration}/`.",
+        "",
+        "```",
+        Render_Table(Summary_Table(summaries)),
+        "```",
+        "",
+        "```",
+        Render_Table(Comparison_Table(comparisons)),
+        "```",
+        "",
+    ]
+    return lines, comparisons, step_count
+
+
+def Perovskite_Point_Value_Loss(member: DeepOperatorNetwork, parameter_spreads: Any) -> ForwardLoss:
+    """mean squared error on each run's own reference-density-standardized density, at its own sampled points"""
+
+
+    def Loss_Of(lifted: dict[str, Any], lifted_batch: dict[str, Any]) -> Any:
+        """the point-sampled forward answered against this batch's own reference-density-standardized targets"""
+        branch_input = lifted_batch["parameter_vectors"] / parameter_spreads
+        predicted = member.Forward_Point_Values(lifted, branch_input, lifted_batch["trunk_features"])
+        reference_density = Reference_Density(PEROVSKITE_ELECTRON_COUNT, lifted_batch["cell_volumes"])
+        target = Reference_Density_Standardized(lifted_batch["target_values"][:, :, 0], reference_density[:, None])
+        residuals = predicted - target
+        return (residuals * residuals).mean()
+
+    return Loss_Of
+
+
+def Perovskite_Canonical_Member(
+    training_cache: FieldCache,
+    validation_cache: FieldCache,
+    run_name_prefix: str,
+    fixed_step_count: int | None,
+) -> tuple[DeepOperatorNetwork, NDArray[np.float64], dict[str, object], int]:
+    """the canonical member trained point-sampled across every grid shape the cache holds"""
+    parameter_width = int(training_cache.fields[0].parameters.shape[0])
+    parameter_spreads = Parameter_Spreads(training_cache)
+    member = Canonical_Network(
+        parameter_width, CANONICAL_BRANCH_HIDDEN_WIDTHS, CANONICAL_LATENT_WIDTH, CANONICAL_TRUNK_HIDDEN_WIDTHS
+    )
+    readout = member.basis_readout
+    if not isinstance(readout, BasisExpansion):
+        raise TypeError("the canonical configuration was assembled without its learned trunk")
+    sampler = PointSampledBatches(training_cache, validation_cache, CANONICAL_RUNS_PER_BATCH, CANONICAL_POINTS_PER_RUN)
+    batches = CoordinateFeaturizedBatches(sampler, readout.coordinate_features)
+    engine = Training_Engine()
+    lifted_parameter_spreads = engine.Lift_Constant(parameter_spreads)
+    forward_loss = Perovskite_Point_Value_Loss(member, lifted_parameter_spreads)
+    parameters = ParameterSet(values=member.Parameter_Values())
+
+    candidates = CANDIDATE_STEP_COUNTS if fixed_step_count is None else (fixed_step_count,)
+    best_score = float("inf")
+    best_values: dict[str, NDArray[np.float64]] = dict(parameters.values)
+    best_step_count = candidates[0]
+    best_manifest: dict[str, object] = {}
+    for step_count in candidates:
+        # every candidate restarts from the member's own initial weights, exactly as the fixed-basis search does
+        result = Train(
+            engine,
+            parameters,
+            forward_loss,
+            batches,
+            step_count=step_count,
+            learning_rate=LATTICE_CANONICAL_LEARNING_RATE,
+            seed=LATTICE_SEED,
+            artifact_directory=TRAINING_ARTIFACT_PATH,
+            run_name=f"{run_name_prefix}_{step_count}",
+            validation_interval=CANONICAL_VALIDATION_INTERVAL,
+        )
+        score = float(cast(float, result.manifest["best_validation_score"]))
+        if score < best_score:
+            best_score, best_values, best_step_count, best_manifest = score, result.parameters.values, step_count, result.manifest
+    for name, value in best_values.items():
+        if name in member.branch.parameter_values:
+            member.branch.parameter_values[name] = value
+        if name in readout.parameter_values:
+            readout.parameter_values[name] = value
+    return member, parameter_spreads, best_manifest, best_step_count
+
+
+def Perovskite_Canonical_Angle_Predictions(
+    member: DeepOperatorNetwork, parameter_spreads: NDArray[np.float64], evaluated: PerovskiteAngleBlock
+) -> NDArray[np.float64]:
+    """the trained member's field on the angle stratum's shared grid, for every given run's own parameters"""
+    readout = member.basis_readout
+    if not isinstance(readout, BasisExpansion):
+        raise TypeError("a grid prediction needs the learned coordinate trunk")
+    points = Output_Points(GridSpec(PEROVSKITE_ANGLE_GRID_SHAPE))
+    trunk_features = readout.Coordinate_Features(points)
+    coefficients = member.Forward_Coefficients(
+        member.branch.parameter_values, evaluated.parameters / parameter_spreads
+    )
+    standardized = np.asarray(
+        readout.Forward(readout.parameter_values, coefficients, trunk_features), dtype=np.float64
+    )
+    reference_density = Reference_Density(PEROVSKITE_ELECTRON_COUNT, evaluated.cell_volumes)
+    return Reference_Density_Restored(standardized.T, reference_density[:, None])
+
+
+def Perovskite_Canonical_Every_Shape_Runs(
+    member: DeepOperatorNetwork,
+    parameter_spreads: NDArray[np.float64],
+    test_cache: FieldCache,
+    extrapolation: str,
+) -> tuple[list[ScoredRun], NDArray[np.float64]]:
+    """the trained member's own field on every test run's own grid shape, conservation applied per run"""
+    readout = member.basis_readout
+    if not isinstance(readout, BasisExpansion):
+        raise TypeError("a grid prediction needs the learned coordinate trunk")
+    grouped: dict[tuple[int, ...], list[CachedField]] = {}
+    for cached_field in test_cache.fields:
+        grouped.setdefault(cached_field.grid_shape, []).append(cached_field)
+    scored: list[ScoredRun] = []
+    scales: list[float] = []
+    for grid_shape, cached_fields in grouped.items():
+        points = Output_Points(GridSpec((grid_shape[0], grid_shape[1], grid_shape[2])))
+        trunk_features = readout.Coordinate_Features(points)
+        parameters = np.stack([field.parameters for field in cached_fields])
+        cell_volumes = np.asarray([field.cell_volume for field in cached_fields], dtype=np.float64)
+        coefficients = member.Forward_Coefficients(member.branch.parameter_values, parameters / parameter_spreads)
+        standardized = np.asarray(
+            readout.Forward(readout.parameter_values, coefficients, trunk_features), dtype=np.float64
+        )
+        reference_density = Reference_Density(PEROVSKITE_ELECTRON_COUNT, cell_volumes)
+        physical = Reference_Density_Restored(standardized.T, reference_density[:, None])
+        conserved, run_scales = Perovskite_Conservation_Applied(physical, cell_volumes)
+        cutoff = Lattice_Frequency_Cutoff(grid_shape)
+        for position, cached_field in enumerate(cached_fields):
+            truth = cached_field.Flattened_Values()[0].astype(np.float64)
+            predicted = conserved[position]
+            low, high = Frequency_Split_Relative_L2(
+                predicted.reshape(grid_shape), truth.reshape(grid_shape), cutoff_modes=cutoff
+            )
+            scored.append(
+                ScoredRun(
+                    identifier=cached_field.identifier,
+                    unit_key=cached_field.unit_key,
+                    campaign="perovskite_grid",
+                    family="length" if cached_field.unit_key.endswith("_length") else "angle",
+                    errors={
+                        "relative_l2": Relative_L2(predicted, truth),
+                        "frequency_split_relative_l2_low": low,
+                        "frequency_split_relative_l2_high": high,
+                    },
+                    extrapolation=extrapolation,
+                )
+            )
+            scales.append(float(run_scales[position]))
+    return scored, np.asarray(scales, dtype=np.float64)
+
+
+def Perovskite_Every_Shape_Nearest_Neighbor_Runs(
+    training_cache: FieldCache, test_cache: FieldCache, extrapolation: str
+) -> list[ScoredRun]:
+    """the memorization floor computed within each grid shape, since a copy needs a shape to match its truth"""
+    training_groups: dict[tuple[int, ...], list[CachedField]] = {}
+    for cached_field in training_cache.fields:
+        training_groups.setdefault(cached_field.grid_shape, []).append(cached_field)
+    test_groups: dict[tuple[int, ...], list[CachedField]] = {}
+    for cached_field in test_cache.fields:
+        test_groups.setdefault(cached_field.grid_shape, []).append(cached_field)
+    scored: list[ScoredRun] = []
+    for grid_shape, test_fields in test_groups.items():
+        training_fields = training_groups.get(grid_shape)
+        # a shape the training role never produced has no candidate this floor could copy
+        if not training_fields:
+            continue
+        training_parameters = np.stack([field.parameters for field in training_fields])
+        test_parameters = np.stack([field.parameters for field in test_fields])
+        nearest = Nearest_Training_Run(training_parameters, test_parameters)
+        cutoff = Lattice_Frequency_Cutoff(grid_shape)
+        for position, cached_field in enumerate(test_fields):
+            copied = training_fields[int(nearest[position])].Flattened_Values()[0].astype(np.float64)
+            truth = cached_field.Flattened_Values()[0].astype(np.float64)
+            low, high = Frequency_Split_Relative_L2(
+                copied.reshape(grid_shape), truth.reshape(grid_shape), cutoff_modes=cutoff
+            )
+            scored.append(
+                ScoredRun(
+                    identifier=cached_field.identifier,
+                    unit_key=cached_field.unit_key,
+                    campaign="perovskite_grid",
+                    family="length" if cached_field.unit_key.endswith("_length") else "angle",
+                    errors={
+                        "relative_l2": Relative_L2(copied, truth),
+                        "frequency_split_relative_l2_low": low,
+                        "frequency_split_relative_l2_high": high,
+                    },
+                    extrapolation=extrapolation,
+                )
+            )
+    return scored
+
+
+def Perovskite_Write_Every_Shape_Figure(split_name: str, member_runs_every: list[ScoredRun]) -> Path:
+    """error spread across both strata the test set holds, canonical's own extra reach"""
+    directory = FIGURES_PATH / "perovskite" / split_name / "canonical"
+    by_stratum: dict[str, list[float]] = {}
+    for scored_run in member_runs_every:
+        by_stratum.setdefault(scored_run.family, []).append(scored_run.errors["relative_l2"])
+    return Render_Error_Spread(
+        {name: np.asarray(values) for name, values in by_stratum.items()},
+        directory / "error_by_stratum.png",
+        f"lattice {split_name} canonical test error by stratum, the shapes no fixed basis can reach",
+    )
+
+
+def Perovskite_Canonical_Block_Lines(
+    split_name: str,
+    evaluation_fold: int,
+    extrapolation_holdout: str | None,
+    extrapolation: str,
+    fixed_step_count: int | None,
+) -> tuple[list[str], tuple[FloorComparison, ...], int]:
+    """one split's canonical member: on the angle stratum beside the fixed-basis floors, and on every shape"""
+    train_examples, _ = Perovskite_Train_Validation_Split(
+        Perovskite_Angle_Examples("train", evaluation_fold, extrapolation_holdout)
+    )
+    train_common = PerovskiteAngleBlock(train_examples)
+    test_common = PerovskiteAngleBlock(
+        Perovskite_Angle_Examples("evaluation", evaluation_fold, extrapolation_holdout), extrapolation
+    )
+    raw_basis = Gram_Pod(train_common.fields, rank=BASIS_RANK)
+    ridge_runs = test_common.Scored(Perovskite_Ridge_Predictions(raw_basis, train_common, test_common))
+    copy_runs = test_common.Scored(Perovskite_Nearest_Neighbor_Predictions(train_common, test_common))
+    mean_runs = test_common.Scored(Perovskite_Training_Mean_Predictions(train_common, test_common))
+
+    card = Card_Named("lattice_to_charge")
+    pool_cache = Build_Field_Cache(card, "train", evaluation_fold, extrapolation_holdout)
+    Guard_Fresh_Archives([cached_field.identifier for cached_field in pool_cache.fields])
+    cache_is_validation = Perovskite_Cache_Validation_Mask(pool_cache)
+    training_cache = FieldCache(
+        pool_cache.card_name,
+        "train",
+        tuple(field for field, held in zip(pool_cache.fields, cache_is_validation) if not held),
+    )
+    validation_cache = FieldCache(
+        pool_cache.card_name,
+        "validation",
+        tuple(field for field, held in zip(pool_cache.fields, cache_is_validation) if held),
+    )
+    test_cache = Build_Field_Cache(card, "evaluation", evaluation_fold, extrapolation_holdout)
+    Guard_Fresh_Archives([cached_field.identifier for cached_field in test_cache.fields])
+
+    member, parameter_spreads, _, step_count = Perovskite_Canonical_Member(
+        training_cache, validation_cache, f"lattice_{split_name}_canonical", fixed_step_count
+    )
+    readout = member.basis_readout
+    if not isinstance(readout, BasisExpansion):
+        raise TypeError("the canonical configuration was assembled without its learned trunk")
+
+    member_rebuilt_common_raw = Perovskite_Canonical_Angle_Predictions(member, parameter_spreads, test_common)
+    member_rebuilt_common, common_scales = Perovskite_Conservation_Applied(
+        member_rebuilt_common_raw, test_common.cell_volumes
+    )
+    member_runs_common = test_common.Scored(member_rebuilt_common)
+    # the only call that fills encoder.last_latent_vector, composition.last_carried_vector and last_trunk_features
+    member(
+        Coefficients(vector=test_common.parameters[0] / parameter_spreads, domain=Domain(np.eye(3))),
+        GridSpec(PEROVSKITE_ANGLE_GRID_SHAPE),
+    )
+
+    comparisons_common = (
+        Compare_To_Floor(
+            member_runs_common, ridge_runs, "relative_l2", "ridge_to_coefficients", RIDGE_MARGIN, split_name
+        ),
+        Compare_To_Floor(
+            member_runs_common, copy_runs, "relative_l2", "nearest_neighbor_copy", NEAREST_NEIGHBOR_MARGIN, split_name
+        ),
+    )
+    figure_count = Perovskite_Write_Figures(
+        split_name,
+        "canonical",
+        member,
+        test_common,
+        member_rebuilt_common,
+        {
+            "ridge_to_coefficients": comparisons_common[0].floor_median,
+            "nearest_neighbor_copy": comparisons_common[1].floor_median,
+        },
+        comparisons_common[0].member_median,
+    )
+
+    copy_runs_every = Perovskite_Every_Shape_Nearest_Neighbor_Runs(training_cache, test_cache, extrapolation)
+    member_runs_every, every_scales = Perovskite_Canonical_Every_Shape_Runs(
+        member, parameter_spreads, test_cache, extrapolation
+    )
+    covered_identifiers = {scored_run.identifier for scored_run in copy_runs_every}
+    member_runs_every_covered = [run for run in member_runs_every if run.identifier in covered_identifiers]
+    every_shape_comparison = Compare_To_Floor(
+        member_runs_every_covered,
+        copy_runs_every,
+        "relative_l2",
+        "nearest_neighbor_copy",
+        NEAREST_NEIGHBOR_MARGIN,
+        group_name=f"{split_name}_every_shape",
+    )
+    Perovskite_Write_Every_Shape_Figure(split_name, member_runs_every)
+
+    length_count = sum(1 for run in member_runs_every if run.family == "length")
+    shape_count = len({cached_field.grid_shape for cached_field in test_cache.fields})
+    label = "extrapolation" if extrapolation == EXTRAPOLATION else "interpolation"
+    budget_note = "chosen on its own held-out training loss" if fixed_step_count is None else "reused from fold_0"
+    lines = [
+        f"## lattice_to_charge, `{split_name}`, `canonical` — perovskite grid, {label}, learned coordinate trunk",
+        "",
+        f"Trained point-sampled on {len(training_cache.fields)} runs across both strata"
+        f" ({len(validation_cache.fields)} held for validation); test on the angle stratum's"
+        f" {test_common.fields.shape[0]} runs on the shared {PEROVSKITE_ANGLE_GRID_SHAPE} grid, scored"
+        f" exactly as the fixed-basis configurations are. Branch widths {CANONICAL_BRANCH_HIDDEN_WIDTHS},"
+        f" latent {CANONICAL_LATENT_WIDTH}, trunk widths {CANONICAL_TRUNK_HIDDEN_WIDTHS}."
+        f" {step_count} steps ({budget_note})."
+        f" Conservation scale on the angle stratum, median: {float(np.median(common_scales)):.6f}."
+        f" {figure_count} figures under `figures/perovskite/{split_name}/canonical/`.",
+        "",
+        "```",
+        Render_Table(
+            Summary_Table(
+                (
+                    Summarize(mean_runs, "relative_l2", "training_mean_floor"),
+                    Summarize(ridge_runs, "relative_l2", "ridge_floor"),
+                    Summarize(copy_runs, "relative_l2", "nearest_neighbor_floor"),
+                    Summarize(member_runs_common, "relative_l2", "member_on_angle_stratum"),
+                    Summarize(member_runs_common, "frequency_split_relative_l2_low", "member_on_angle_stratum"),
+                    Summarize(member_runs_common, "frequency_split_relative_l2_high", "member_on_angle_stratum"),
+                )
+            )
+        ),
+        "```",
+        "",
+        "```",
+        Render_Table(Comparison_Table(comparisons_common)),
+        "```",
+        "",
+        f"### every shape this split's test set holds, {shape_count} of them, {len(member_runs_every)} test runs"
+        f" ({length_count} on the length stratum's own unique grid,"
+        f" {len(member_runs_every) - length_count} on the angle stratum's shared one;"
+        f" {len(member_runs_every_covered)} had a same-shape training neighbor to copy)",
+        "",
+        "The table above restricts training and test to the angle stratum's one shared grid, because the",
+        "fixed-basis configurations cannot read any other. This same member trained on every shape the",
+        f"training role holds at once ({training_cache.Resident_Bytes() / 1e6:.0f} MB resident), including the",
+        "length stratum's own distinct grid per run, and is scored below across every shape its own test runs",
+        "hold — the capability the fixed-basis pair does not have. Every length-stratum run sits on a grid",
+        "shape unique to that one run, so it carries no same-shape training neighbor for the copy floor to",
+        f"read; the conservation scale across every shape, median: {float(np.median(every_scales)):.6f}.",
+        "",
+        "```",
+        Render_Table(
+            Summary_Table(
+                (
+                    Summarize(copy_runs_every, "relative_l2", "nearest_neighbor_floor_every_shape"),
+                    Summarize(member_runs_every, "relative_l2", "member_every_shape_full_test_set"),
+                    *Summarize_By(member_runs_every, "relative_l2", "family"),
+                )
+            )
+        ),
+        "```",
+        "",
+        "```",
+        Render_Table(Comparison_Table((every_shape_comparison,))),
+        "```",
+        "",
+    ]
+    return lines, comparisons_common + (every_shape_comparison,), step_count
+
+
+def Perovskite_Report_Lines() -> tuple[list[str], list[FloorComparison]]:
+    """every split of lattice_to_charge, fixed-basis on the angle stratum and canonical on everything"""
+    lines: list[str] = [
+        "## lattice_to_charge — perovskite grid, `test-suite.md` §3, II.1b",
+        "",
+        "The same member as strain_to_charge, on a different campaign: the branch reads the six lattice",
+        "factors `(a, b, c, alpha, beta, gamma)` (`Lattice_Factors_Of`) instead of a strain tensor, split",
+        "`perovskite_folds` instead of the strain holdout, conservation `renormalize_to_electron_count`",
+        "mandated on the density output. `energy_trunk` does not apply: this card has no eigenvalue target.",
+        "",
+        "The campaign splits into two strata by grid shape, measured directly: the angle stratum is 125",
+        "runs, every one on the shared 64-cubed grid; the length stratum is 124 runs on 124 distinct grid",
+        "shapes. The fixed-basis configurations (`principal_component`, `proper_orthogonal`) need one",
+        "common shape to stack fields into a basis, so they train and are scored on the angle stratum",
+        "alone — roughly 100 training runs per fold. `canonical` trains point-sampled across both strata",
+        "at once and is the only configuration that can read the length stratum's 124 distinct shapes at",
+        "all; that row is the number no fixed basis can produce.",
+        "",
+        "The target's dynamic range is far wider than the strain atlas's: measured directly, the peak",
+        "density sits at 15.47 to 15.68 e/A^3 at the heavy-atom cores across the whole campaign, and the",
+        "angle stratum's own cell volume varies only 1.24x while the length stratum's varies 3.375x, even",
+        "though the electron count is fixed at 48.0 for every run. A plain mean-squared error in raw voxel",
+        "units would let the length stratum's smallest cells dominate canonical's point-sampled loss.",
+        "`canonical` therefore standardizes each sampled run's own target by that run's own reference",
+        "density — electron count over its own cell volume, the field's exact spatial mean, known from the",
+        "branch's own input and never from the truth — before the loss compares it to the branch's raw",
+        "output, and restores it by the same factor before any figure or metric sees it. The fixed-basis",
+        "pair keeps its existing coefficient-space loss unchanged: the angle stratum's 1.24x volume range",
+        "is mild, and its per-coefficient standardization already conditions that loss; `relative_l2` and",
+        "`frequency_split_relative_l2` are themselves invariant to a positive per-run rescaling applied",
+        "identically to a prediction and its truth, so this choice changes no reported number, only what",
+        "the loss optimizes toward.",
+        "",
+        "`renormalize_to_electron_count` (`operators.wrappers.Conserving`) is applied to every reported",
+        "prediction on the whole-field path, never to a point batch, which carries no quadrature weight.",
+        "Ground truth integrates to 48.0 electrons to within a few parts in 10^8 on every run measured, so",
+        "the scale this law applies at inference is pure model error, reported as a free diagnostic beside",
+        "each block's own numbers.",
+        "",
+        "Fold 0 is where the training budget is chosen, among the same five candidate step counts the",
+        "fixed-basis pair otherwise searches, for every configuration including `canonical`. Both",
+        "extrapolation holdouts reuse whichever budget fold 0 chose for that configuration rather than",
+        "re-searching, so nine trainings become three searches plus six fixed-budget runs. The two holdout",
+        "splits hold out every factor-0.8 run, separately every factor-1.2 run, and are labeled",
+        "`extrapolation` throughout; fold 0 is `interpolation`. One seeded run per block, as elsewhere in",
+        "this report.",
+        "",
+    ]
+    verdicts: list[FloorComparison] = []
+    fixed_basis_step_counts: dict[str, int] = {}
+    canonical_step_count: int | None = None
+    for split_name, extrapolation_holdout, extrapolation in PEROVSKITE_SPLITS:
+        is_develop = extrapolation_holdout is None
+        for configuration in ("principal_component", "proper_orthogonal"):
+            fixed_step = None if is_develop else fixed_basis_step_counts[configuration]
+            block_lines, comparisons, chosen_step_count = Perovskite_Fixed_Basis_Block_Lines(
+                split_name, configuration, PEROVSKITE_DEVELOP_FOLD, extrapolation_holdout, extrapolation, fixed_step
+            )
+            lines += block_lines
+            verdicts += list(comparisons)
+            if is_develop:
+                fixed_basis_step_counts[configuration] = chosen_step_count
+        canonical_fixed_step = None if is_develop else canonical_step_count
+        canonical_lines, canonical_comparisons, chosen_canonical_step_count = Perovskite_Canonical_Block_Lines(
+            split_name, PEROVSKITE_DEVELOP_FOLD, extrapolation_holdout, extrapolation, canonical_fixed_step
+        )
+        lines += canonical_lines
+        verdicts += list(canonical_comparisons)
+        if is_develop:
+            canonical_step_count = chosen_canonical_step_count
+    lines += [
+        "`energy_trunk` does not apply to `lattice_to_charge`: the card has no eigenvalue target, so no",
+        "block for it appears in this section.",
+        "",
+    ]
+    return lines, verdicts
+
+
 def Main() -> int:
     """every block measured, and the member's report written"""
     lines = [
@@ -1230,6 +2045,9 @@ def Main() -> int:
         verdicts += list(canonical_comparisons)
     # no FloorComparison is added for this block: VI.1 sets no kill margin, and none should be invented
     lines += Energy_Trunk_Block_Lines()
+    perovskite_lines, perovskite_verdicts = Perovskite_Report_Lines()
+    lines += perovskite_lines
+    verdicts += perovskite_verdicts
     killed = [comparison for comparison in verdicts if comparison.verdict == "kill"]
     at_the_ceiling = [count for count in chosen_step_counts if count == max(CANDIDATE_STEP_COUNTS)]
     lines += [

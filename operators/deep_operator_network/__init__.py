@@ -137,6 +137,25 @@ def Pointwise_Statistics(training_fields: NDArray[np.float64]) -> tuple[NDArray[
     return voxel_mean, voxel_scale
 
 
+def Reference_Density(electron_count: float, cell_volume: NDArray[np.float64]) -> NDArray[np.float64]:
+    """the flat density one run's own electron count would give its own cell, its exact spatial mean"""
+    return electron_count / cell_volume
+
+
+def Reference_Density_Standardized(
+    field: NDArray[np.float64], reference_density: NDArray[np.float64]
+) -> NDArray[np.float64]:
+    """a field divided by its own run's reference density, so every run's own spatial mean lands near one"""
+    return field / reference_density
+
+
+def Reference_Density_Restored(
+    standardized: NDArray[np.float64], reference_density: NDArray[np.float64]
+) -> NDArray[np.float64]:
+    """a standardized field carried back onto physical density units by the same run's reference density"""
+    return standardized * reference_density
+
+
 def Proper_Orthogonal_Network(
     basis: PodBasis,
     grid_shape: tuple[int, int, int],

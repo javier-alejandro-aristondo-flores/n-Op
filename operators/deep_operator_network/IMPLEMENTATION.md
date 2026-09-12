@@ -177,6 +177,30 @@ under the electron-count law, `last_removed_mean` under the zero-mean law. Both 
 diagnostics rather than corrections — ground truth already integrates to the archived electron
 count within 2e-7, so any scale away from one is the model's own error.
 
+**`lattice_to_charge` runs the same assembly on the perovskite campaign, and needs no new
+inspection surface.** The branch reads six lattice factors (`Lattice_Factors_Of`) instead of a
+strain tensor; the fixed-basis pair and `canonical` publish the identical `Inspect()` dicts
+described above, only keyed under `figures/perovskite/{split}/{configuration}/` instead of
+`figures/{functional}/{configuration}/`. What differs is upstream of the member, in how the two
+campaign strata are fed to it. The angle stratum's 125 runs share one 64-cubed grid and can feed
+the fixed-basis pair's stacked-field basis; the length stratum's 124 runs each carry a distinct
+grid shape only `canonical`'s point-sampled trunk can read at all — the division of labor this
+member exists to demonstrate, measured directly rather than assumed. `canonical`'s point-sampled
+loss standardizes each sampled run's own target by that run's own reference density — its
+electron count over its own cell volume, exact and known from the branch's own input, never from
+the truth — because the length stratum's cell volume varies 3.375-fold at a fixed electron count
+of 48.0, and a raw-voxel loss would let its largest cells dominate. `Reference_Density`,
+`Reference_Density_Standardized` and `Reference_Density_Restored` (`__init__.py`) carry the round
+trip; it never touches `relative_l2` or `frequency_split_relative_l2`, both invariant to a
+positive per-run rescaling applied identically to a prediction and its truth, so the fixed-basis
+pair's existing coefficient-space loss is left unchanged rather than given a standardization its
+own milder 1.24x volume range does not need. `renormalize_to_electron_count`
+(`operators.wrappers.Conserving`) is applied to every reported whole-field prediction, never to a
+point batch, which carries no quadrature weight to renormalize against; since ground truth already
+integrates to the campaign's fixed electron count to a few parts in 10^8, the scale this law
+applies is reported as each block's own median, a free diagnostic of the model's error rather than
+a correction the report depends on.
+
 **Beyond the parts**, training emits its loss curve, and the report emits the per-run errors it
 tabulates. The suite renders the components, the best and worst test predictions against truth
 with their signed difference, the error spread by strain family, and the member against its

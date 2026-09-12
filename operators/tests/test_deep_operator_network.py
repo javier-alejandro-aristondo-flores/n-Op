@@ -17,7 +17,17 @@ from operators.deep_operator_network import (
     Pointwise_Statistics,
     Principal_Component_Network,
     Proper_Orthogonal_Network,
+    Reference_Density,
+    Reference_Density_Restored,
+    Reference_Density_Standardized,
 )
+from operators.deep_operator_network.report import (
+    PEROVSKITE_ANGLE_GRID_SHAPE,
+    PEROVSKITE_ELECTRON_COUNT,
+    Perovskite_Angle_Examples,
+    PerovskiteAngleBlock,
+)
+from operators.evaluation import EXTRAPOLATION, INTERPOLATION
 from operators.framework import (
     Coefficients,
     Domain,
@@ -35,7 +45,9 @@ from operators.readouts import (
     RampedCoordinateFeatures,
 )
 from operators.substrate import Accelerator_Is_Available, NumpyEngine, ParameterSet
-from operators.training import Training_Engine
+from operators.tasks import Card_Named
+from operators.training import Build_Field_Cache, Training_Engine
+from operators.wrappers import Renormalization_Scale
 
 CUBE = Domain(lattice=np.eye(3) * 3.57)
 
@@ -578,3 +590,61 @@ def Test_The_Energy_Trunk_Member_Inspects_The_Captured_Curve_Beside_Its_Arrays()
     assert "last_predicted_curve" in inspected
     assert np.allclose(np.asarray(inspected["last_predicted_curve"]), np.asarray(produced.values).reshape(-1))
     assert (np.asarray(inspected["last_predicted_curve"]) >= 0.0).all()
+
+
+@pytest.mark.pool
+def Test_The_Perovskite_Strata_Match_What_The_Angle_Block_Claims() -> None:
+    """the angle stratum is 125 runs all on the shared grid, the length stratum is 124 runs on distinct grids"""
+    angle_train = Perovskite_Angle_Examples("train", 0, None)
+    angle_test = Perovskite_Angle_Examples("evaluation", 0, None)
+    assert len(angle_train) + len(angle_test) == 125
+    card = Card_Named("lattice_to_charge")
+    pool_cache = Build_Field_Cache(card, "train", 0, None)
+    test_cache = Build_Field_Cache(card, "evaluation", 0, None)
+    all_fields = pool_cache.fields + test_cache.fields
+    angle_fields = [field for field in all_fields if field.unit_key.endswith("_angle")]
+    length_fields = [field for field in all_fields if field.unit_key.endswith("_length")]
+    assert len(angle_fields) == 125
+    assert all(field.grid_shape == PEROVSKITE_ANGLE_GRID_SHAPE for field in angle_fields)
+    assert len(length_fields) == 124
+    assert len({field.grid_shape for field in length_fields}) == 124
+
+
+def Test_The_Reference_Density_Standardization_Round_Trips_Exactly() -> None:
+    """dividing a field by its own run's reference density and multiplying back recovers it exactly"""
+    generator = np.random.default_rng(30)
+    field = generator.normal(size=(5, 64))
+    reference_density = generator.uniform(1.0, 10.0, size=(5, 1))
+    standardized = Reference_Density_Standardized(field, reference_density)
+    restored = Reference_Density_Restored(standardized, reference_density)
+    assert np.allclose(restored, field, atol=1e-12)
+    # a run's own electron count over its own cell volume is exactly its reference density
+    assert np.allclose(Reference_Density(48.0, np.asarray([2.0, 4.0])), [24.0, 12.0])
+
+
+def Test_The_Renormalization_Scale_Puts_The_Integral_On_The_Electron_Count_Exactly() -> None:
+    """the factor Conserving's electron-count law computes rescales a field to integrate to the target exactly"""
+    generator = np.random.default_rng(31)
+    values = generator.uniform(0.1, 5.0, size=(8, 8, 8))
+    point_count = values.size
+    cell_volume = 40.0
+    weight_each = cell_volume / point_count
+    scale = Renormalization_Scale(values, weight_each, np.asarray(PEROVSKITE_ELECTRON_COUNT))
+    rescaled = values * scale
+    integral = float(rescaled.sum()) * weight_each
+    assert abs(integral - PEROVSKITE_ELECTRON_COUNT) < 1e-9
+
+
+@pytest.mark.pool
+def Test_The_Holdout_Block_Is_Labeled_Extrapolation_And_Fold_Zero_Is_Not() -> None:
+    """the holdout blocks carry the extrapolation label, fold zero's own blocks carry the interpolation one"""
+    fold_zero_test = PerovskiteAngleBlock(Perovskite_Angle_Examples("evaluation", 0, None))
+    holdout_test = PerovskiteAngleBlock(
+        Perovskite_Angle_Examples("evaluation", 0, "holdout_factor_0p8"), EXTRAPOLATION
+    )
+    assert fold_zero_test.extrapolation == INTERPOLATION
+    assert holdout_test.extrapolation == EXTRAPOLATION
+    fold_zero_scored = fold_zero_test.Scored(fold_zero_test.fields.copy())
+    holdout_scored = holdout_test.Scored(holdout_test.fields.copy())
+    assert fold_zero_scored and all(scored.extrapolation == INTERPOLATION for scored in fold_zero_scored)
+    assert holdout_scored and all(scored.extrapolation == EXTRAPOLATION for scored in holdout_scored)

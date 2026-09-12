@@ -10,6 +10,7 @@ from operators.data.exclusions import (
     Resolve_Exclusion,
 )
 from operators.data.floors import (
+    Apply_Per_Shell_Filter,
     Apply_Standardized_Ridge,
     Fit_Per_Shell_Filter,
     Fit_Standardized_Ridge,
@@ -22,6 +23,7 @@ from operators.data.floors import (
     Ridge_Fit,
     Scissor_Floor,
     Semilocal_Xc_Ridge_Features,
+    Spectral_Gradient_Magnitude_And_Laplacian,
     StandardizedRidge,
     Strain_Pairs,
     Superposed_Atomic_Density_Errors,

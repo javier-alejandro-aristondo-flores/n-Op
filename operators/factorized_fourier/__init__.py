@@ -1,13 +1,12 @@
 """charge density to electron localization, by factorized Fourier convolution"""
 
 from collections.abc import Sequence
-from math import prod
 from typing import Any
 
 import numpy as np
 from numpy.typing import NDArray
 
-from operators.compositions import ExplicitStack, FixedPoint, WeightTied
+from operators.compositions import ExplicitStack, FixedPoint, Spectral_Resampled, WeightTied
 from operators.encoders import PointwiseLift
 from operators.framework import (
     Array,
@@ -21,17 +20,7 @@ from operators.framework import (
 )
 from operators.kernels import SpectralKernel
 from operators.readouts import PointwiseProjection
-from operators.substrate import (
-    Concatenate_Channels,
-    GRID_AXES,
-    Half_Spectrum_Extent,
-    Inverse_Real_Fourier_Transform_3d,
-    Join_Along_Axis,
-    Real_Fourier_Transform_3d,
-    Sliced_Along_Axis,
-    Split_Batch_From_Grid,
-    Zeros_Beside,
-)
+from operators.substrate import Concatenate_Channels, Zeros_Beside
 
 type FourierComposition = ExplicitStack | WeightTied | FixedPoint
 
@@ -43,47 +32,6 @@ LOCALIZATION_CHANNEL_LABELS = ("electron_localization_up", "electron_localizatio
 
 # a positive floor under a training-block mean that would otherwise divide by zero
 REFERENCE_DENSITY_FLOOR = 1e-12
-
-
-def Full_Axis_Resampled(spectrum: Any, axis: int, source_extent: int, target_extent: int) -> Any:
-    """one full complex spectral axis truncated or zero-padded to a new length, its low modes kept exactly"""
-    largest_kept_mode = (min(source_extent, target_extent) - 1) // 2
-    non_negative = Sliced_Along_Axis(spectrum, axis, 0, largest_kept_mode + 1)
-    negative = Sliced_Along_Axis(spectrum, axis, source_extent - largest_kept_mode, source_extent)
-    pieces = [non_negative]
-    middle_extent = target_extent - (2 * largest_kept_mode + 1)
-    if middle_extent > 0:
-        middle_shape = list(non_negative.shape)
-        middle_shape[axis] = middle_extent
-        pieces.append(Zeros_Beside(non_negative, tuple(middle_shape)))
-    pieces.append(negative)
-    return Join_Along_Axis(pieces, axis)
-
-
-def Half_Axis_Resampled(half_spectrum: Any, source_extent: int, target_extent: int) -> Any:
-    """the last, half-stored spectral axis truncated or zero-padded to a new length, its low modes kept exactly"""
-    largest_kept_mode = (min(source_extent, target_extent) - 1) // 2
-    kept = Sliced_Along_Axis(half_spectrum, -1, 0, largest_kept_mode + 1)
-    target_half_extent = Half_Spectrum_Extent(target_extent)
-    filler_extent = target_half_extent - (largest_kept_mode + 1)
-    if filler_extent > 0:
-        filler_shape = list(kept.shape)
-        filler_shape[-1] = filler_extent
-        kept = Join_Along_Axis([kept, Zeros_Beside(kept, tuple(filler_shape))], -1)
-    return kept
-
-
-def Resampled_To_Shape(values: Any, target_shape: tuple[int, int, int]) -> Any:
-    """the field moved to a new grid shape by exact spectral truncation or zero-padding, lifted and differentiable"""
-    # a local twin of operators.compositions.multi_scale.Spectral_Resampled, not yet exported from that root
-    _, source_shape = Split_Batch_From_Grid(values)
-    half_spectrum = Real_Fourier_Transform_3d(values)
-    for axis, source_extent, target_extent in zip(GRID_AXES[:2], source_shape[:2], target_shape[:2]):
-        half_spectrum = Full_Axis_Resampled(half_spectrum, axis, source_extent, target_extent)
-    half_spectrum = Half_Axis_Resampled(half_spectrum, source_shape[2], target_shape[2])
-    resampled = Inverse_Real_Fourier_Transform_3d(half_spectrum, target_shape)
-    scale = prod(target_shape) / prod(source_shape)
-    return resampled * scale
 
 
 def Gram_Six(lattice: NDArray[np.float64]) -> NDArray[np.float64]:
@@ -181,7 +129,7 @@ class FactorizedFourier(NeuralOperator[GridFunction, GridFunction, GridFunction]
         """the whole lifted path, from fine-grid log-compressed channels to the bounded localization field"""
         resolved_shape = self.processing_shape if target_shape is None else target_shape
         # a pointwise affine lift commutes exactly with spectral truncation, so truncating first costs an eighth as much
-        coarse_density = Resampled_To_Shape(log_density_values, resolved_shape)
+        coarse_density = Spectral_Resampled(log_density_values, resolved_shape)
         gram_field = gram_vector.reshape(GRAM_CHANNEL_COUNT, 1, 1, 1) + Zeros_Beside(
             coarse_density, (GRAM_CHANNEL_COUNT, *resolved_shape)
         )

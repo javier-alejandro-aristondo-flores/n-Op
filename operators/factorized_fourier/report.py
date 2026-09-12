@@ -2,8 +2,9 @@
 
 import dataclasses
 import json
+import re
 from pathlib import Path
-from typing import Any
+from typing import Any, cast
 
 import numpy as np
 from numpy.typing import NDArray
@@ -23,12 +24,22 @@ from operators.data import (
     Spectral_Gradient_Magnitude_And_Laplacian,
     STORE_NAME,
 )
-from operators.evaluation import MetricSummary, ScoredRun, Summarize, Summarize_By, Summary_Table
+from operators.evaluation import (
+    Compare_To_Floor,
+    Comparison_Table,
+    FloorComparison,
+    MetricSummary,
+    ScoredRun,
+    Summarize,
+    Summarize_By,
+    Summary_Table,
+)
 from operators.factorized_fourier import (
     Combined_Coarse_Input,
     Factorized_Fourier_Network,
     FactorizedFourier,
     FactorizedFourierConfiguration,
+    FactorizedFourierTask,
     GRAM_CHANNEL_COUNT,
     Gram_Six,
     Gram_Statistics,
@@ -37,9 +48,15 @@ from operators.factorized_fourier import (
     Spin_Channels,
     Standardized_Gram,
 )
-from operators.framework import Spectral_Truncation_Resample
+from operators.framework import GridFunction, GridSpec, Layer, Spectral_Truncation_Resample
 from operators.kernels.spectral import Mode_Wavevector_Features
-from operators.inspection import Render_Table
+from operators.inspection import (
+    Render_Error_Spread,
+    Render_Floor_Comparison,
+    Render_Inspection_Suite,
+    Render_Prediction_Against_Truth,
+    Render_Table,
+)
 from operators.metrics import (
     Mean_Absolute_Error,
     Mean_Discrepancy,
@@ -49,7 +66,15 @@ from operators.metrics import (
     Structural_Similarity_3d,
 )
 from operators.substrate import ParameterSet
-from operators.training import BatchSource, Train, Training_Engine, TrainingBatch
+from operators.training import (
+    BatchSource,
+    Field_From_Archive,
+    Read_Checkpoint,
+    Train,
+    Training_Engine,
+    TrainingBatch,
+    TrainingProgress,
+)
 
 REPORT_PATH = Path(__file__).parent / "report.md"
 FIGURES_PATH = Path(__file__).parent / "figures"
@@ -93,16 +118,22 @@ FINAL_STAGE_PATIENCE = 15
 STAGE_FRACTIONS = (0.3, 0.3, 0.4)
 
 
-def Fold_Membership() -> dict[str, tuple[int, str, str]]:
-    """every cubic-campaign run identifier with its fold, campaign and owning split unit"""
+def Fold_Membership() -> dict[str, tuple[int, str, str, str]]:
+    """every cubic-campaign run identifier with its fold, campaign, owning split unit and own run path"""
     payload = json.loads((ARTIFACT_DIRECTORY / "paired_fields_fivefold.json").read_text())
-    membership: dict[str, tuple[int, str, str]] = {}
+    membership: dict[str, tuple[int, str, str, str]] = {}
     for unit_key, unit in payload.items():
         if unit["campaign"] not in CUBIC_CAMPAIGNS:
             continue
-        for identifier in unit["run_identifiers"]:
-            membership[identifier] = (int(unit["fold"]), str(unit["campaign"]), unit_key)
+        for identifier, run_path in zip(unit["run_identifiers"], unit["run_paths"], strict=True):
+            membership[identifier] = (int(unit["fold"]), str(unit["campaign"]), unit_key, str(run_path))
     return membership
+
+
+def Functional_Of_Run_Path(run_path: str) -> str:
+    """the exchange-correlation functional a cubic-block run's own path names, cheap or accurate"""
+    lowered = run_path.lower()
+    return "accurate" if "hse06" in lowered or "hse" in lowered else "cheap"
 
 
 class CubicBlock:
@@ -114,7 +145,8 @@ class CubicBlock:
         by_fold: dict[int, list[str]] = {fold: [] for fold in range(5)}
         campaign_of: dict[str, str] = {}
         unit_of: dict[str, str] = {}
-        for identifier, (fold, campaign, unit_key) in membership.items():
+        run_path_of: dict[str, str] = {}
+        for identifier, (fold, campaign, unit_key, run_path) in membership.items():
             archive_path = Archive_Path(campaign, identifier)
             if not archive_path.exists():
                 continue
@@ -127,10 +159,17 @@ class CubicBlock:
             by_fold[fold].append(identifier)
             campaign_of[identifier] = campaign
             unit_of[identifier] = unit_key
+            run_path_of[identifier] = run_path
         Guard_Fresh_Archives(identifier for fold_identifiers in by_fold.values() for identifier in fold_identifiers)
         self.by_fold = {fold: sorted(identifiers) for fold, identifiers in by_fold.items()}
         self.campaign_of = campaign_of
         self.unit_of = unit_of
+        self.run_path_of = run_path_of
+
+
+    def Functional_Of(self, identifier: str) -> str:
+        """the identifier's own run path read for its exchange-correlation functional"""
+        return Functional_Of_Run_Path(self.run_path_of[identifier])
 
 
     @property
@@ -486,12 +525,10 @@ def Sane_Loss_Curve(loss_curve: NDArray[np.float64], validation_curve: NDArray[n
     return bool(loss_curve[-1] < 10.0 * loss_curve[0] + 1.0) and bool(validation_curve[-1] < 10.0 * validation_curve[0] + 1.0)
 
 
-def Train_Flagship_Member(step_count: int, run_name: str) -> dict[str, object]:
-    """the full staged run: a divergence probe with one allowed restart at a lower rate, then the staged schedule"""
-    block = CubicBlock()
-    training_identifiers = block.member_train
-    validation_identifiers = block.validation
-
+def Input_Statistics(
+    block: CubicBlock, training_identifiers: list[str]
+) -> tuple[float, NDArray[np.float64], NDArray[np.float64]]:
+    """the reference density and gram standardization one training population fixes, reused unchanged at evaluation"""
     density_sample: list[NDArray[np.float64]] = []
     magnetization_sample: list[NDArray[np.float64]] = []
     for identifier in training_identifiers[:RIDGE_TRAIN_RUN_COUNT]:
@@ -506,6 +543,43 @@ def Train_Flagship_Member(step_count: int, run_name: str) -> dict[str, object]:
         for identifier in training_identifiers
     ]
     gram_mean, gram_scale = Gram_Statistics(lattices)
+    return reference_density, gram_mean, gram_scale
+
+
+def Write_Back_Layer(layer: Layer[GridFunction], parameters: ParameterSet, prefix: str) -> None:
+    """one layer's own kernel and local-linear arrays, read off their prefixed names in a flat parameter set"""
+    for bare_name in list(layer.kernel.parameter_values):
+        prefixed_name = f"{prefix}kernel.{bare_name}"
+        if prefixed_name in parameters.values:
+            layer.kernel.parameter_values[bare_name] = parameters.values[prefixed_name]
+    for bare_name in list(layer.local_linear.parameter_values):
+        prefixed_name = f"{prefix}local_linear.{bare_name}"
+        if prefixed_name in parameters.values:
+            layer.local_linear.parameter_values[bare_name] = parameters.values[prefixed_name]
+
+
+def Write_Back_Parameters(member: FactorizedFourier, parameters: ParameterSet) -> None:
+    """a flat trained parameter set folded back onto the member's own part-shaped storage, any composition kind"""
+    for name, value in parameters.values.items():
+        if name in member.lift.parameter_values:
+            member.lift.parameter_values[name] = value
+        if name in member.projection.parameter_values:
+            member.projection.parameter_values[name] = value
+    composition = member.spectral_stack
+    if isinstance(composition, ExplicitStack):
+        for layer_index, layer in enumerate(composition.layers):
+            Write_Back_Layer(layer, parameters, f"layer_{layer_index}.")
+    else:
+        Write_Back_Layer(composition.layer, parameters, "")
+
+
+def Train_Flagship_Member(step_count: int, run_name: str) -> dict[str, object]:
+    """the full staged run: a divergence probe with one allowed restart at a lower rate, then the staged schedule"""
+    block = CubicBlock()
+    training_identifiers = block.member_train
+    validation_identifiers = block.validation
+
+    reference_density, gram_mean, gram_scale = Input_Statistics(block, training_identifiers)
 
     training_examples = Localization_Examples(training_identifiers, block, reference_density, gram_mean, gram_scale)
     validation_examples = Localization_Examples(validation_identifiers, block, reference_density, gram_mean, gram_scale)
@@ -565,22 +639,7 @@ def Train_Flagship_Member(step_count: int, run_name: str) -> dict[str, object]:
         )
         parameters = result.parameters
         manifest[f"stage_{stage_index}"] = result.manifest
-    for name, value in parameters.values.items():
-        if name in member.lift.parameter_values:
-            member.lift.parameter_values[name] = value
-        if name in member.projection.parameter_values:
-            member.projection.parameter_values[name] = value
-    if not isinstance(member.spectral_stack, ExplicitStack):
-        raise TypeError("this training driver is written for the explicit-stack configuration only")
-    for layer_index, layer in enumerate(member.spectral_stack.layers):
-        for bare_name in list(layer.kernel.parameter_values):
-            prefixed_name = f"layer_{layer_index}.kernel.{bare_name}"
-            if prefixed_name in parameters.values:
-                layer.kernel.parameter_values[bare_name] = parameters.values[prefixed_name]
-        for bare_name in list(layer.local_linear.parameter_values):
-            prefixed_name = f"layer_{layer_index}.local_linear.{bare_name}"
-            if prefixed_name in parameters.values:
-                layer.local_linear.parameter_values[bare_name] = parameters.values[prefixed_name]
+    Write_Back_Parameters(member, parameters)
     manifest["final_parameters"] = parameters
     manifest["member"] = member
     return manifest
@@ -1046,20 +1105,7 @@ def Train_Potential_Member(step_count: int, run_name: str) -> dict[str, object]:
     training_identifiers = block.member_train
     validation_identifiers = block.validation
 
-    density_sample: list[NDArray[np.float64]] = []
-    magnetization_sample: list[NDArray[np.float64]] = []
-    for identifier in training_identifiers[:RIDGE_TRAIN_RUN_COUNT]:
-        density, magnetization, _ = Loaded_Density_And_Magnetization(block.campaign_of[identifier], identifier)
-        density_sample.append(density)
-        magnetization_sample.append(magnetization)
-    reference_density = Reference_Density(density_sample, magnetization_sample)
-    del density_sample, magnetization_sample
-
-    lattices = [
-        Loaded_Density_And_Magnetization(block.campaign_of[identifier], identifier)[2]
-        for identifier in training_identifiers
-    ]
-    gram_mean, gram_scale = Gram_Statistics(lattices)
+    reference_density, gram_mean, gram_scale = Input_Statistics(block, training_identifiers)
 
     scale_runs = [
         Loaded_Potential_Run(block, identifier) for identifier in training_identifiers[:RIDGE_TRAIN_RUN_COUNT]
@@ -1133,22 +1179,7 @@ def Train_Potential_Member(step_count: int, run_name: str) -> dict[str, object]:
         )
         parameters = result.parameters
         manifest[f"stage_{stage_index}"] = result.manifest
-    for name, value in parameters.values.items():
-        if name in member.lift.parameter_values:
-            member.lift.parameter_values[name] = value
-        if name in member.projection.parameter_values:
-            member.projection.parameter_values[name] = value
-    if not isinstance(member.spectral_stack, ExplicitStack):
-        raise TypeError("this training driver is written for the explicit-stack configuration only")
-    for layer_index, layer in enumerate(member.spectral_stack.layers):
-        for bare_name in list(layer.kernel.parameter_values):
-            prefixed_name = f"layer_{layer_index}.kernel.{bare_name}"
-            if prefixed_name in parameters.values:
-                layer.kernel.parameter_values[bare_name] = parameters.values[prefixed_name]
-        for bare_name in list(layer.local_linear.parameter_values):
-            prefixed_name = f"layer_{layer_index}.local_linear.{bare_name}"
-            if prefixed_name in parameters.values:
-                layer.local_linear.parameter_values[bare_name] = parameters.values[prefixed_name]
+    Write_Back_Parameters(member, parameters)
     manifest["final_parameters"] = parameters
     manifest["member"] = member
     return manifest
@@ -1342,9 +1373,355 @@ def Deep_Equilibrium_Ladder_Lines() -> list[str]:
     ]
 
 
+# the member's own result on the localization task: loaded from whichever checkpoint the training driver above
+# has written, scored against every floor above, on the exact evaluation block the floors themselves were fit
+# and measured against -- host-only, the numpy inference path, no engine and no accelerator needed to read it
+
+ELF_EXPLICIT_RUN_NAME = "elf_fold0_explicit_35505"
+SUPER_RESOLUTION_SAMPLE_STRIDE = 12
+COMPARABLE_CARD_METRIC_NAMES = ("mean_absolute_error", "relative_l2")
+_STAGE_CHECKPOINT_PATTERN = re.compile(r"_stage(\d+)_checkpoint\.npz$")
+
+
+def Latest_Stage_Checkpoint(artifact_directory: Path, run_name: str) -> Path:
+    """the furthest-along stage checkpoint a run has written to disk, its own closest thing to a final answer"""
+    candidates: list[tuple[int, Path]] = []
+    for path in artifact_directory.glob(f"{run_name}_stage*_checkpoint.npz"):
+        match = _STAGE_CHECKPOINT_PATTERN.search(path.name)
+        if match is not None:
+            candidates.append((int(match.group(1)), path))
+    if not candidates:
+        raise FileNotFoundError(f"no stage checkpoint found for {run_name!r} under {artifact_directory}")
+    return max(candidates, key=lambda pair: pair[0])[1]
+
+
+def Fresh_Flagship_Member(
+    block: CubicBlock,
+    task: FactorizedFourierTask = "localization",
+    configuration: FactorizedFourierConfiguration = "explicit",
+    hidden_channels: int = HIDDEN_CHANNELS,
+    layer_count: int = LAYER_COUNT,
+    kept_mode: int = KEPT_MODE,
+) -> tuple[FactorizedFourier, ParameterSet]:
+    """an untrained member built exactly as its own training driver builds it, and the flat set its checkpoint names"""
+    training_identifiers = block.member_train
+    reference_density, gram_mean, gram_scale = Input_Statistics(block, training_identifiers)
+    target_scale = 1.0
+    if task == "potential":
+        scale_runs = [
+            Loaded_Potential_Run(block, identifier) for identifier in training_identifiers[:RIDGE_TRAIN_RUN_COUNT]
+        ]
+        target_scale = Potential_Target_Scale(scale_runs)
+    member = Factorized_Fourier_Network(
+        hidden_channels=hidden_channels,
+        kept_modes=(kept_mode, kept_mode, kept_mode),
+        layer_count=layer_count,
+        reference_density=reference_density,
+        gram_mean=gram_mean,
+        gram_scale=gram_scale,
+        processing_shape=COARSE_SHAPE,
+        seed=FLAGSHIP_SEED,
+        configuration=configuration,
+        task=task,
+        target_scale=target_scale,
+    )
+    return member, ParameterSet(values=member.Parameter_Values())
+
+
+def Load_Trained_Member(
+    checkpoint_path: Path,
+    block: CubicBlock,
+    task: FactorizedFourierTask = "localization",
+    configuration: FactorizedFourierConfiguration = "explicit",
+    hidden_channels: int = HIDDEN_CHANNELS,
+    layer_count: int = LAYER_COUNT,
+    kept_mode: int = KEPT_MODE,
+) -> tuple[FactorizedFourier, TrainingProgress]:
+    """the member a finished or in-progress run produced, its best checkpoint parameters written back onto it"""
+    member, parameters = Fresh_Flagship_Member(block, task, configuration, hidden_channels, layer_count, kept_mode)
+    progress = Read_Checkpoint(checkpoint_path, parameters)
+    Write_Back_Parameters(member, progress.best_parameters)
+    return member, progress
+
+
+def Elf_Evaluation_Rows(member: FactorizedFourier, block: CubicBlock) -> list[ScoredRun]:
+    """the trained member's own predictions on the kill block, scored per spin in every card metric"""
+    scored: list[ScoredRun] = []
+    for identifier in block.evaluation:
+        campaign = block.campaign_of[identifier]
+        with np.load(Archive_Path(campaign, identifier)) as archive:
+            input_function = Field_From_Archive(archive, ("charge_density", "magnetization_density"))
+            if input_function is None:
+                raise ValueError(f"{identifier} carries neither a charge density nor a magnetization")
+            truths = {channel: np.asarray(archive[channel], dtype=np.float64) for channel in LOCALIZATION_CHANNELS}
+        predicted = np.asarray(member(input_function, GridSpec(COARSE_SHAPE)).values, dtype=np.float64)
+        functional = block.Functional_Of(identifier)
+        for channel_index, channel in enumerate(LOCALIZATION_CHANNELS):
+            scored.append(
+                ScoredRun(
+                    identifier=f"{identifier}_{channel}",
+                    unit_key=block.unit_of[identifier],
+                    campaign=campaign,
+                    family=channel,
+                    errors=Card_Metric_Errors(predicted[channel_index], truths[channel]),
+                    covariate_values={"spin_channel": channel, "functional": functional},
+                )
+            )
+    return scored
+
+
+def Evaluation_Summaries(rows: list[ScoredRun], label: str) -> list[MetricSummary]:
+    """one evaluation's pooled summary beside its per-campaign and per-functional breakdowns, every card metric"""
+    summaries: list[MetricSummary] = []
+    for metric_name in CARD_METRIC_NAMES:
+        summaries.append(Summarize(rows, metric_name, label))
+        for campaign_summary in Summarize_By(rows, metric_name, "campaign"):
+            summaries.append(
+                dataclasses.replace(campaign_summary, group_name=f"{label}__{campaign_summary.group_name}")
+            )
+        for functional_summary in Summarize_By(rows, metric_name, "functional"):
+            summaries.append(
+                dataclasses.replace(
+                    functional_summary, group_name=f"{label}__functional_{functional_summary.group_name}"
+                )
+            )
+    return summaries
+
+
+def Elf_Ladder_Verdicts(
+    member_rows: list[ScoredRun], ridge_rows: list[ScoredRun], mean_rows: list[ScoredRun], copy_rows: list[ScoredRun]
+) -> tuple[FloorComparison, ...]:
+    """the five pre-registered ladder levels, the floor block's own margins, measured against the member's rows"""
+    return (
+        Compare_To_Floor(
+            member_rows, ridge_rows, "mean_absolute_error", "semilocal_ridge_floor", FLAGSHIP_KILL_MARGIN,
+            "1_canon_kill",
+        ),
+        Compare_To_Floor(
+            member_rows, ridge_rows, "mean_absolute_error", "semilocal_ridge_floor", PATTERN_RULE_MARGIN,
+            "2_canon_pattern_rule",
+        ),
+        Compare_To_Floor(
+            member_rows, mean_rows, "mean_absolute_error", "training_mean_trivial_floor", 0.0,
+            "3_added_beat_training_mean_template",
+        ),
+        Compare_To_Floor(
+            member_rows, copy_rows, "mean_absolute_error", "nearest_run_copy_floor", 0.0,
+            "4_added_beat_nearest_run_copy",
+        ),
+        Compare_To_Floor(
+            member_rows, mean_rows, "mean_absolute_error", "training_mean_trivial_floor", 0.5,
+            "5_added_stretch_half_the_template",
+        ),
+    )
+
+
+def Elf_Floor_Comparisons(
+    member_rows: list[ScoredRun], floors: dict[str, list[ScoredRun]]
+) -> tuple[FloorComparison, ...]:
+    """the member against every floor, on the two lower-is-better card metrics, at zero required improvement"""
+    return tuple(
+        Compare_To_Floor(member_rows, floor_rows, metric_name, floor_name, 0.0)
+        for floor_name, floor_rows in floors.items()
+        for metric_name in COMPARABLE_CARD_METRIC_NAMES
+    )
+
+
+def Super_Resolution_Self_Consistency_Rows(member: FactorizedFourier, block: CubicBlock) -> list[ScoredRun]:
+    """the same weights answering an 80-cubed grid directly, spectrally truncated to 40, against the plain answer"""
+    scored: list[ScoredRun] = []
+    for identifier in block.evaluation[::SUPER_RESOLUTION_SAMPLE_STRIDE]:
+        campaign = block.campaign_of[identifier]
+        with np.load(Archive_Path(campaign, identifier)) as archive:
+            input_function = Field_From_Archive(archive, ("charge_density", "magnetization_density"))
+        if input_function is None:
+            raise ValueError(f"{identifier} carries neither a charge density nor a magnetization")
+        coarse_predicted = np.asarray(member(input_function, GridSpec(COARSE_SHAPE)).values, dtype=np.float64)
+        fine_predicted = np.asarray(member(input_function, GridSpec(FINE_SHAPE)).values, dtype=np.float64)
+        fine_truncated = Spectral_Truncation_Resample(fine_predicted, COARSE_SHAPE)
+        for channel_index, channel in enumerate(LOCALIZATION_CHANNELS):
+            scored.append(
+                ScoredRun(
+                    identifier=f"{identifier}_{channel}",
+                    unit_key=block.unit_of[identifier],
+                    campaign=campaign,
+                    family=channel,
+                    errors=Card_Metric_Errors(fine_truncated[channel_index], coarse_predicted[channel_index]),
+                    covariate_values={"spin_channel": channel},
+                )
+            )
+    return scored
+
+
+def Write_Elf_Figures(
+    member: FactorizedFourier,
+    member_rows: list[ScoredRun],
+    floor_medians: dict[str, float],
+    member_median: float,
+    cache_root: Path = ARRAY_CACHE_PATH,
+    figures_root: Path = FIGURES_PATH,
+) -> int:
+    """the localization evaluation's whole visual surface, drawn from arrays cached under the given roots"""
+    cache = cache_root / "fold_0" / "explicit"
+    cache.mkdir(parents=True, exist_ok=True)
+    inspected = {name: np.asarray(value, dtype=np.float64) for name, value in member.Inspect().items()}
+    np.savez(cache / "inspection.npz", **cast(dict[str, Any], inspected))
+    with np.load(cache / "inspection.npz") as archive:
+        restored = {name: np.asarray(archive[name], dtype=np.float64) for name in archive.files}
+
+    directory = figures_root / "fold_0" / "explicit"
+    suite = Render_Inspection_Suite(
+        restored, directory / "components", "factorized_fourier electron localization fold 0 explicit"
+    )
+    if suite.skipped:
+        raise ValueError(f"no renderer for {suite.skipped}, which means the suite is incomplete")
+
+    ranked_rows = sorted(member_rows, key=lambda scored_row: scored_row.errors["relative_l2"])
+    for rank, row in ((0, ranked_rows[0]), (-1, ranked_rows[-1])):
+        base_identifier = row.identifier.removesuffix(f"_{row.family}")
+        with np.load(Archive_Path(row.campaign, base_identifier)) as archive:
+            truth = np.asarray(archive[row.family], dtype=np.float64)
+            input_function = Field_From_Archive(archive, ("charge_density", "magnetization_density"))
+        if input_function is None:
+            raise ValueError(f"{base_identifier} carries neither a charge density nor a magnetization")
+        predicted_channels = np.asarray(member(input_function, GridSpec(COARSE_SHAPE)).values, dtype=np.float64)
+        channel_index = LOCALIZATION_CHANNELS.index(row.family)
+        Render_Prediction_Against_Truth(
+            predicted_channels[channel_index],
+            truth,
+            directory / f"prediction_{'best' if rank == 0 else 'worst'}.png",
+            f"electron localization fold 0 explicit {'best' if rank == 0 else 'worst'} evaluation run,"
+            f" {row.identifier}",
+        )
+    by_campaign: dict[str, list[float]] = {}
+    for row in member_rows:
+        by_campaign.setdefault(row.campaign, []).append(row.errors["relative_l2"])
+    Render_Error_Spread(
+        {name: np.asarray(values) for name, values in by_campaign.items()},
+        directory / "error_by_campaign.png",
+        "electron localization fold 0 explicit evaluation error by campaign",
+    )
+    Render_Floor_Comparison(
+        floor_medians,
+        member_median,
+        {name: 0.0 for name in floor_medians},
+        directory / "floors.png",
+        "electron localization fold 0 explicit against its floors (relative L2; the ladder itself is absolute"
+        " mean absolute error, tabulated separately)",
+    )
+    return len(suite.written) + 3
+
+
+def Elf_Evaluation_Lines(
+    run_name: str = ELF_EXPLICIT_RUN_NAME,
+    artifact_directory: Path = TRAINING_ARTIFACT_PATH,
+    configuration: FactorizedFourierConfiguration = "explicit",
+    hidden_channels: int = HIDDEN_CHANNELS,
+    layer_count: int = LAYER_COUNT,
+    kept_mode: int = KEPT_MODE,
+    cache_root: Path = ARRAY_CACHE_PATH,
+    figures_root: Path = FIGURES_PATH,
+) -> list[str]:
+    """the member's own result once a checkpoint exists, floors through the alloy row, or a placeholder before one"""
+    try:
+        checkpoint_path = Latest_Stage_Checkpoint(artifact_directory, run_name)
+    except FileNotFoundError:
+        return [
+            "## The member's own result (electron localization, fold 0, explicit stack)",
+            "",
+            f"Training is not yet run (no checkpoint for `{run_name}` under `{artifact_directory}` yet); this"
+            " section fills in from `Elf_Evaluation_Lines` alone once one exists, no other change to this report"
+            " needed.",
+            "",
+        ]
+
+    block = CubicBlock()
+    member, progress = Load_Trained_Member(
+        checkpoint_path, block, "localization", configuration, hidden_channels, layer_count, kept_mode
+    )
+    member_rows = Elf_Evaluation_Rows(member, block)
+
+    ridge_rows = Elf_Ridge_Rows(block)
+    filter_rows = Shell_Filter_Rows(block)
+    mean_rows = Training_Mean_Rows(block)
+    copy_rows = Nearest_Run_Rows(block)
+    floors = {
+        "training_mean_trivial_floor": mean_rows,
+        "nearest_run_copy_floor": copy_rows,
+        "per_shell_linear_filter": filter_rows,
+        "semilocal_ridge_floor": ridge_rows,
+    }
+
+    summaries = Evaluation_Summaries(member_rows, "member")
+    ladder = Elf_Ladder_Verdicts(member_rows, ridge_rows, mean_rows, copy_rows)
+    floor_comparisons = Elf_Floor_Comparisons(member_rows, floors)
+
+    super_resolution_rows = Super_Resolution_Self_Consistency_Rows(member, block)
+    super_resolution_summary = Summarize(super_resolution_rows, "relative_l2", "super_resolution_self_consistency")
+
+    relative_l2_floor_medians = {name: Summarize(rows, "relative_l2", name).median for name, rows in floors.items()}
+    relative_l2_member_median = Summarize(member_rows, "relative_l2", "member").median
+    figures_written = Write_Elf_Figures(
+        member, member_rows, relative_l2_floor_medians, relative_l2_member_median, cache_root, figures_root
+    )
+
+    sampled_run_count = len(super_resolution_rows) // len(LOCALIZATION_CHANNELS)
+    figures_directory = figures_root / "fold_0" / "explicit"
+    cache_directory = cache_root / "fold_0" / "explicit"
+    return [
+        "## The member's own result (electron localization, fold 0, explicit stack)",
+        "",
+        f"Loaded from `{checkpoint_path.name}`: {progress.completed_steps} completed steps, best validation score"
+        f" {progress.best_score:.6f} at step {progress.best_step}.",
+        "",
+        "### scored on the kill block (fold zero, both spins, every card metric, by campaign and by functional)",
+        "",
+        "```",
+        Render_Table(Summary_Table(tuple(summaries))),
+        "```",
+        "",
+        "### the pre-registered claim ladder, measured",
+        "",
+        "```",
+        Render_Table(Comparison_Table(ladder)),
+        "```",
+        "",
+        "### every floor, on the two lower-is-better card metrics, beaten or not",
+        "",
+        "Structural similarity is higher-is-better and is reported only as a summary above (median per group), not"
+        " as a floor-comparison ratio: `Compare_To_Floor`'s improvement formula assumes a lower-is-better error,"
+        " which mean absolute error and relative L2 are and structural similarity is not.",
+        "",
+        "```",
+        Render_Table(Comparison_Table(floor_comparisons)),
+        "```",
+        "",
+        "### super-resolution self-consistency",
+        "",
+        "The same trained weights, asked to answer directly on an 80³ grid rather than the 40³ grid they trained"
+        " on, then spectrally truncated back to 40³, against the direct 40³ answer, on every"
+        f" {SUPER_RESOLUTION_SAMPLE_STRIDE}th evaluation run ({sampled_run_count} runs, both spins): median"
+        f" relative L2 **{100 * super_resolution_summary.median:.3f}%**. A small number here means the learned"
+        " Fourier modes carry the same answer at a resolution the member never trained at, which is what makes"
+        " the coarse-trunk design's answer at the fine grid (the potential task's own finish) trustworthy rather"
+        " than a coincidence of the training resolution.",
+        "",
+        "### the alloy every-shape row",
+        "",
+        "Not applicable: the `alloy_ensemble` fold-zero archives checked all carry `has_localization: False` and"
+        " non-cubic shapes (for example `(48, 96, 216)`); this campaign has no localization target for the member"
+        " to be scored against, on any shape.",
+        "",
+        f"Figures: {figures_written} files written under `{figures_directory}`, arrays cached at"
+        f" `{cache_directory}`.",
+        "",
+    ]
+
+
 def Main() -> int:
-    """the block, its floors, both ladders and the potential task's own floors, the report's committed sections"""
+    """the block, its floors, both ladders, the potential task's own floors and the member's own result, written"""
     floor_lines, bars = Floor_Block_Lines()
+    evaluation_lines = Elf_Evaluation_Lines()
     deq_lines = Deep_Equilibrium_Ladder_Lines()
     potential_lines = Potential_Task_Lines()
     header = [
@@ -1352,14 +1729,16 @@ def Main() -> int:
         "",
         "Regenerate with `python3 -m operators.factorized_fourier.report`.",
         "",
-        "Training is not yet run (the accelerator was held by another stream while this section was written);",
-        "this first commit records the block, all four floors and the pre-registered claim ladder the member will",
-        "be judged against, exactly as the doctrine asks for before a single training step is taken. The member's",
-        "own result, the per-functional rows, the super-resolution self-consistency check and the figure suite",
-        "land in a later commit once training has run.",
+        "The block, all four floors and the pre-registered claim ladder below were measured before a single"
+        " training step was taken, exactly as the doctrine asks. The member's own result, per-campaign and"
+        " per-functional rows, the super-resolution self-consistency check and the figure suite follow once a"
+        " checkpoint exists for it; until then that section says so plainly and nothing else about this command"
+        " changes.",
         "",
     ]
-    REPORT_PATH.write_text("\n".join(header + floor_lines + deq_lines + potential_lines) + "\n")
+    REPORT_PATH.write_text(
+        "\n".join(header + floor_lines + evaluation_lines + deq_lines + potential_lines) + "\n"
+    )
     print(f"wrote {REPORT_PATH}")
     print(bars)
     return 0

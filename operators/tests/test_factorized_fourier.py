@@ -1,5 +1,6 @@
 """the flagship member: its assembly, the discretization and commutation claims, and its recomputed floors"""
 
+from pathlib import Path
 from typing import Any
 
 import numpy as np
@@ -9,6 +10,7 @@ from numpy.typing import NDArray
 from operators.compositions import ExplicitStack, FixedPoint, Spectral_Resampled, WeightTied
 from operators.compositions.fixed_point import Sliced_Lifted
 from operators.data import Archive_Path
+from operators.evaluation import ScoredRun
 from operators.factorized_fourier import (
     Combined_Coarse_Input,
     Factorized_Fourier_Network,
@@ -23,15 +25,28 @@ from operators.factorized_fourier import (
 )
 from operators.factorized_fourier.report import (
     CARD_METRIC_NAMES,
+    COARSE_SHAPE,
     CubicBlock,
+    Elf_Evaluation_Lines,
+    Elf_Evaluation_Rows,
+    Elf_Floor_Comparisons,
+    Elf_Ladder_Verdicts,
     Elf_Ridge_Rows,
+    Fresh_Flagship_Member,
+    Functional_Of_Run_Path,
+    Input_Statistics,
+    Latest_Stage_Checkpoint,
+    Localization_Examples,
+    LocalizationBatches,
+    Localization_Loss,
     Nearest_Run_Rows,
     Shell_Filter_Rows,
+    Write_Back_Parameters,
 )
 from operators.framework import Domain, GridFunction, GridSpec, UniformGridQuadrature
 from operators.inspection import Render_Inspection_Suite
 from operators.substrate import Concatenate_Channels, NumpyEngine, ParameterSet, TorchEngine, Zeros_Beside
-from operators.training import BatchSource, Train, TrainingBatch
+from operators.training import BatchSource, Read_Checkpoint, Train, TrainingBatch
 
 CUBE = Domain(lattice=np.eye(3) * 3.57)
 
@@ -656,3 +671,160 @@ def Test_Gram_Statistics_Come_Off_The_Trained_Blocks_Own_Lattices() -> None:
     assert bool(np.all(scale > 0.0))
     reference_density = Reference_Density(densities, magnetizations)
     assert reference_density > 0.0
+
+
+def Test_The_Checkpoint_Round_Trip_Rebuilds_The_Trained_Member_Exactly(tmp_path: Path) -> None:
+    """a checkpoint written during training reloads to a member whose parameters and predictions exactly match"""
+    batches = TwoExampleBatches(Toy_Training_Batch(seed=31))
+    original_member = Toy_Member(hidden_channels=4, seed=32)
+    parameters = ParameterSet(
+        values={name: value.copy() for name, value in original_member.Parameter_Values().items()}
+    )
+    result = Train(
+        TorchEngine(device_name="cpu"),
+        parameters,
+        Batch_Loss(original_member),
+        batches,
+        step_count=4,
+        learning_rate=1e-2,
+        seed=33,
+        artifact_directory=tmp_path,
+        run_name="toy_stage0",
+        validation_interval=2,
+    )
+    checkpoint_path = Latest_Stage_Checkpoint(tmp_path, "toy")
+    assert checkpoint_path.name == "toy_stage0_checkpoint.npz"
+
+    reloaded_member = Toy_Member(hidden_channels=4, seed=32)
+    progress = Read_Checkpoint(checkpoint_path, ParameterSet(values=reloaded_member.Parameter_Values()))
+    for name, value in result.parameters.values.items():
+        assert np.array_equal(value, progress.best_parameters.values[name]), name
+    Write_Back_Parameters(reloaded_member, progress.best_parameters)
+    Write_Back_Parameters(original_member, result.parameters)
+
+    probe = Toy_Input((4, 4, 4), seed=40)
+    trained_prediction = np.asarray(original_member(probe, GridSpec((4, 4, 4))).values)
+    reloaded_prediction = np.asarray(reloaded_member(probe, GridSpec((4, 4, 4))).values)
+    assert np.array_equal(trained_prediction, reloaded_prediction)
+
+
+def Test_Latest_Stage_Checkpoint_Picks_The_Furthest_Along_Stage(tmp_path: Path) -> None:
+    """three stage checkpoints on disk, out of write order, resolve to the highest-numbered one"""
+    for stage_index in (0, 2, 1):
+        (tmp_path / f"a_run_stage{stage_index}_checkpoint.npz").write_bytes(b"")
+    assert Latest_Stage_Checkpoint(tmp_path, "a_run").name == "a_run_stage2_checkpoint.npz"
+
+
+def Synthetic_Row(identifier: str, unit_key: str, mean_absolute_error: float, relative_l2: float) -> ScoredRun:
+    """one hand-built scored row, for exercising the ladder and floor-comparison arithmetic without any archive"""
+    return ScoredRun(
+        identifier=identifier,
+        unit_key=unit_key,
+        campaign="toy_campaign",
+        family="toy_channel",
+        errors={
+            "mean_absolute_error": mean_absolute_error,
+            "relative_l2": relative_l2,
+            "structural_similarity_3d": 0.9,
+        },
+        covariate_values={"spin_channel": "up", "functional": "cheap"},
+    )
+
+
+def Test_The_Ladder_Verdicts_Match_Hand_Computed_Margins() -> None:
+    """five synthetic floors and a synthetic member reproduce exactly the pass or kill each margin predicts"""
+    member_rows = [Synthetic_Row(f"m{count}", f"unit{count}", 0.04, 0.04) for count in range(4)]
+    ridge_rows = [Synthetic_Row(f"r{count}", f"unit{count}", 0.10, 0.10) for count in range(4)]
+    mean_rows = [Synthetic_Row(f"n{count}", f"unit{count}", 0.05, 0.05) for count in range(4)]
+    copy_rows = [Synthetic_Row(f"c{count}", f"unit{count}", 0.03, 0.03) for count in range(4)]
+
+    ladder = Elf_Ladder_Verdicts(member_rows, ridge_rows, mean_rows, copy_rows)
+    verdicts = {comparison.group_name: comparison.verdict for comparison in ladder}
+    # member 0.04 against ridge 0.10 is a 60% improvement, clearing both the 50% kill and the 20% pattern rule
+    assert verdicts["1_canon_kill"] == "pass"
+    assert verdicts["2_canon_pattern_rule"] == "pass"
+    # member 0.04 against the mean template 0.05 is a 20% improvement: beats it outright, short of half
+    assert verdicts["3_added_beat_training_mean_template"] == "pass"
+    assert verdicts["5_added_stretch_half_the_template"] == "kill"
+    # member 0.04 is worse than the copy floor's own 0.03: the memorization null is not cleared
+    assert verdicts["4_added_beat_nearest_run_copy"] == "kill"
+
+    floors = {
+        "training_mean_trivial_floor": mean_rows,
+        "nearest_run_copy_floor": copy_rows,
+        "semilocal_ridge_floor": ridge_rows,
+    }
+    comparisons = Elf_Floor_Comparisons(member_rows, floors)
+    metrics_seen = {comparison.metric_name for comparison in comparisons}
+    # structural similarity is higher-is-better, so Compare_To_Floor's lower-is-better ratio excludes it here
+    assert metrics_seen == {"mean_absolute_error", "relative_l2"}
+
+
+def Test_Functional_Of_Run_Path_Reads_Hse_As_Accurate_And_Everything_Else_As_Cheap() -> None:
+    """the exchange-correlation functional token a run path carries decides cheap versus accurate"""
+    assert Functional_Of_Run_Path("diamond/single_defects_new-only-HSE06/IA-impurity/Cs/hse06") == "accurate"
+    assert Functional_Of_Run_Path("diamond/single_defects_new-only-GGA-PBE/IA-impurity/Cs/GGA-PBE") == "cheap"
+
+
+@pytest.mark.pool
+def Test_The_Evaluation_Rows_Score_Every_Kill_Block_Run_On_Real_Archives() -> None:
+    """a toy-width member answers the whole kill block through Elf_Evaluation_Rows, every metric finite and named"""
+    block = CubicBlock()
+    reference_density, gram_mean, gram_scale = Input_Statistics(block, block.member_train)
+    member = Factorized_Fourier_Network(
+        hidden_channels=4,
+        kept_modes=(1, 1, 1),
+        layer_count=2,
+        reference_density=reference_density,
+        gram_mean=gram_mean,
+        gram_scale=gram_scale,
+        processing_shape=COARSE_SHAPE,
+        seed=44,
+    )
+    rows = Elf_Evaluation_Rows(member, block)
+    assert len(rows) == 2 * len(block.evaluation)
+    for row in rows:
+        assert set(row.errors) == set(CARD_METRIC_NAMES)
+        assert row.covariate_values["functional"] in ("cheap", "accurate")
+        assert all(np.isfinite(value) for value in row.errors.values())
+
+
+@pytest.mark.pool
+def Test_The_Evaluation_Entry_Point_Runs_End_To_End_On_A_Toy_Trained_Member(tmp_path: Path) -> None:
+    """a briefly-trained toy-width member, checkpointed to a scratch directory, produces the real result section"""
+    block = CubicBlock()
+    hidden_channels, layer_count, kept_mode = 4, 2, 1
+    member, parameters = Fresh_Flagship_Member(block, "localization", "explicit", hidden_channels, layer_count, kept_mode)
+    training_examples = Localization_Examples(
+        block.member_train[:6], block, member.reference_density, member.gram_mean, member.gram_scale
+    )
+    validation_examples = Localization_Examples(
+        block.validation[:3], block, member.reference_density, member.gram_mean, member.gram_scale
+    )
+    batches = LocalizationBatches(training_examples, validation_examples)
+    Train(
+        TorchEngine(device_name="cpu"),
+        parameters,
+        Localization_Loss(member),
+        batches,
+        step_count=3,
+        learning_rate=1e-2,
+        seed=55,
+        artifact_directory=tmp_path,
+        run_name="toy_elf_stage0",
+        validation_interval=2,
+    )
+    lines = Elf_Evaluation_Lines(
+        run_name="toy_elf",
+        artifact_directory=tmp_path,
+        hidden_channels=hidden_channels,
+        layer_count=layer_count,
+        kept_mode=kept_mode,
+        cache_root=tmp_path / "cache",
+        figures_root=tmp_path / "figures",
+    )
+    assert any("The member's own result" in line for line in lines)
+    assert not any("Training is not yet run" in line for line in lines)
+    assert any("super-resolution" in line for line in lines)
+    assert (tmp_path / "figures" / "fold_0" / "explicit" / "floors.png").is_file()
+    assert (tmp_path / "cache" / "fold_0" / "explicit" / "inspection.npz").is_file()

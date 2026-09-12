@@ -15,6 +15,7 @@ from operators.readouts import (
     FixedModeExpansion,
     PointwiseStandardizedExpansion,
 )
+from operators.substrate import Sum_Over_Last_Axis
 
 CONFIGURATIONS = ("canonical", "proper_orthogonal", "principal_component", "energy_trunk")
 
@@ -60,6 +61,17 @@ class DeepOperatorNetwork(NeuralOperator[Coefficients, Coefficients, Representat
         return self.branch.network.Forward(lifted, branch_input)
 
 
+    def Forward_Point_Values(self, lifted: dict[str, Any], branch_input: Any, trunk_features: Any) -> Any:
+        """predicted values at sampled points, each run's own trunk features read against its own coefficients"""
+        readout = self.basis_readout
+        if not isinstance(readout, BasisExpansion):
+            raise TypeError("a point-sampled forward needs the learned coordinate trunk")
+        coefficients = self.Forward_Coefficients(lifted, branch_input)
+        trunk_values = readout.trunk.Forward(lifted, trunk_features)
+        # each run reads only its own points against its own coefficients, never another run's
+        return Sum_Over_Last_Axis(trunk_values * coefficients[:, None, :])
+
+
 def Principal_Component_Network(
     basis: PodBasis,
     grid_shape: tuple[int, int, int],
@@ -96,3 +108,17 @@ def Proper_Orthogonal_Network(
     branch = SensorEncoder((parameter_width, *hidden_widths, rank), seed=seed)
     readout = PointwiseStandardizedExpansion(basis, grid_shape, voxel_mean, voxel_scale)
     return DeepOperatorNetwork(branch, readout, "proper_orthogonal")
+
+
+def Canonical_Network(
+    parameter_width: int,
+    branch_hidden_widths: tuple[int, ...],
+    latent_width: int,
+    trunk_hidden_widths: tuple[int, ...],
+    seed: int = 0,
+) -> DeepOperatorNetwork:
+    """the learned-trunk member: a branch latent read against a coordinate trunk at any query point"""
+    branch = SensorEncoder((parameter_width, *branch_hidden_widths, latent_width), seed=seed)
+    # the trunk is seeded one past the branch, so the two draws never share a stream
+    readout = BasisExpansion(latent_width, trunk_hidden_widths, seed=seed + 1)
+    return DeepOperatorNetwork(branch, readout, "canonical")

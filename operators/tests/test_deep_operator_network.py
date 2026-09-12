@@ -11,14 +11,24 @@ from operators.compositions import WithoutIntegralLayers
 from operators.data import Gram_Pod, Project
 from operators.deep_operator_network import (
     CONFIGURATIONS,
+    Canonical_Network,
     DeepOperatorNetwork,
     Pointwise_Statistics,
     Principal_Component_Network,
     Proper_Orthogonal_Network,
 )
-from operators.framework import Coefficients, Domain, GridFunction, GridSpec
-from operators.readouts import BiasedModeExpansion, FixedModeExpansion, PointwiseStandardizedExpansion
-from operators.substrate import NumpyEngine, ParameterSet
+from operators.framework import (
+    Coefficients,
+    Domain,
+    Fractional_Grid_Coordinates,
+    GridFunction,
+    GridSpec,
+    PointSet,
+    PointSpec,
+)
+from operators.readouts import BasisExpansion, BiasedModeExpansion, FixedModeExpansion, PointwiseStandardizedExpansion
+from operators.substrate import Accelerator_Is_Available, NumpyEngine, ParameterSet
+from operators.training import Training_Engine
 
 CUBE = Domain(lattice=np.eye(3) * 3.57)
 
@@ -264,3 +274,158 @@ def Test_Gradients_Reach_The_Proper_Orthogonal_Offset_Too() -> None:
     assert "output_bias" in gradients
     assert all(np.isfinite(gradient).all() for gradient in gradients.values())
     assert all(np.abs(gradient).max() > 0.0 for gradient in gradients.values())
+
+
+def Small_Canonical_Network(seed: int = 0) -> DeepOperatorNetwork:
+    """a tiny learned-branch, learned-trunk member, enough to assemble and differentiate"""
+    return Canonical_Network(
+        parameter_width=3, branch_hidden_widths=(6,), latent_width=4, trunk_hidden_widths=(6,), seed=seed
+    )
+
+
+def Test_The_Canonical_Factory_Collects_Both_Branch_And_Trunk_Arrays() -> None:
+    """the trainer is handed both the branch's and the trunk's arrays, under one namespace"""
+    member = Small_Canonical_Network()
+    collected = member.Parameter_Values()
+    assert any(name.startswith("sensor_encoder_") for name in collected)
+    assert any(name.startswith("trunk_") for name in collected)
+    assert member.configuration == "canonical"
+    # the two parts draw from different seeds, so neither part's arrays are all zero or identical
+    assert not np.allclose(collected["sensor_encoder_layer_0_weights"], 0.0)
+    assert not np.allclose(collected["trunk_layer_0_weights"], 0.0)
+
+
+def Test_The_Canonical_Member_Inspects_Under_Part_Prefixes_Including_Trunk_Features() -> None:
+    """an assembled canonical member is one flat browsable namespace, the trunk features among them"""
+    member = Small_Canonical_Network()
+    member(Coefficients(vector=np.zeros(3), domain=CUBE), GridSpec((4, 4, 4)))
+    inspected = member.Inspect()
+    assert any(name.startswith("encoder.") for name in inspected)
+    assert "readout.last_trunk_features" in inspected
+    assert "readout.trunk_layer_0_weights" in inspected
+    # a grid query shapes the cached features as a field, one column per trunk feature
+    assert np.asarray(inspected["readout.last_trunk_features"]).shape[:3] == (4, 4, 4)
+
+
+def Test_The_Canonical_Member_Reads_Out_A_Field_On_The_Requested_Grid() -> None:
+    """parameters in, a field of the asked-for shape out, exactly as the fixed-basis members do"""
+    member = Small_Canonical_Network()
+    produced = member(Coefficients(vector=np.ones(3), domain=CUBE), GridSpec((4, 4, 4)))
+    assert isinstance(produced, GridFunction)
+    assert np.asarray(produced.values).shape == (1, 4, 4, 4)
+
+
+def Test_The_Canonical_Member_Refuses_A_Point_Sampled_Forward_Without_A_Learned_Trunk() -> None:
+    """a fixed-basis readout has no trunk to read a point batch against, and says so plainly"""
+    member = Principal_Component_Network(Small_Basis(), (4, 4, 4), parameter_width=6, hidden_widths=(8,))
+    with pytest.raises(TypeError):
+        member.Forward_Point_Values(member.Parameter_Values(), np.ones((2, 6)), np.ones((2, 5, 3)))
+
+
+def Test_Forward_Point_Values_Matches_A_Manual_Per_Run_Dot_Product() -> None:
+    """the sampled prediction is the trunk answered at this batch's points, dotted with this batch's coefficients"""
+    member = Small_Canonical_Network(seed=2)
+    readout = member.basis_readout
+    assert isinstance(readout, BasisExpansion)
+    generator = np.random.default_rng(12)
+    branch_input = generator.normal(size=(5, 3))
+    trunk_features = generator.normal(size=(5, 7, readout.coordinate_features.feature_count))
+    lifted = member.Parameter_Values()
+    produced = np.asarray(member.Forward_Point_Values(lifted, branch_input, trunk_features))
+    coefficients = np.asarray(member.Forward_Coefficients(lifted, branch_input))
+    trunk_values = np.asarray(readout.trunk.Forward(lifted, trunk_features))
+    expected = np.stack([trunk_values[run] @ coefficients[run] for run in range(branch_input.shape[0])])
+    assert produced.shape == (5, 7)
+    assert np.allclose(produced, expected, atol=1e-10)
+
+
+def Test_Forward_Point_Values_Keeps_Each_Runs_Points_And_Coefficients_Together() -> None:
+    """moving one run's branch input moves only that run's own predicted points, never another run's"""
+    member = Small_Canonical_Network(seed=3)
+    readout = member.basis_readout
+    assert isinstance(readout, BasisExpansion)
+    generator = np.random.default_rng(13)
+    branch_input = generator.normal(size=(4, 3))
+    trunk_features = generator.normal(size=(4, 5, readout.coordinate_features.feature_count))
+    lifted = member.Parameter_Values()
+    original = np.asarray(member.Forward_Point_Values(lifted, branch_input, trunk_features))
+    perturbed_input = branch_input.copy()
+    perturbed_input[2] += 10.0
+    perturbed = np.asarray(member.Forward_Point_Values(lifted, perturbed_input, trunk_features))
+    assert np.allclose(perturbed[[0, 1, 3]], original[[0, 1, 3]])
+    assert not np.allclose(perturbed[2], original[2])
+
+
+def Test_Gradients_Reach_Every_Canonical_Array_Through_The_Point_Sampled_Forward() -> None:
+    """the point-sampled loss the trainer will use differentiates onto both the branch and the trunk"""
+    member = Small_Canonical_Network(seed=4)
+    readout = member.basis_readout
+    assert isinstance(readout, BasisExpansion)
+    generator = np.random.default_rng(14)
+    lifted_batch = {
+        "branch_input": np.asarray(generator.normal(size=(4, 3)), dtype=np.float64),
+        "trunk_features": np.asarray(
+            generator.normal(size=(4, 5, readout.coordinate_features.feature_count)), dtype=np.float64
+        ),
+        "targets": np.asarray(generator.normal(size=(4, 5)), dtype=np.float64),
+    }
+
+    def Point_Loss(lifted: dict[str, Any], batch: dict[str, Any]) -> Any:
+        predicted = member.Forward_Point_Values(lifted, batch["branch_input"], batch["trunk_features"])
+        residuals = predicted - batch["targets"]
+        return (residuals * residuals).mean()
+
+    gradients = NumpyEngine().Gradients(
+        ParameterSet(values=member.Parameter_Values()), lambda lifted: Point_Loss(lifted, lifted_batch)
+    )
+    assert set(gradients) == set(member.Parameter_Values())
+    assert any(name.startswith("trunk_") for name in gradients)
+    assert all(np.isfinite(gradient).all() for gradient in gradients.values())
+    assert all(np.abs(gradient).max() > 0.0 for gradient in gradients.values())
+
+
+@pytest.mark.skipif(not Accelerator_Is_Available(), reason="no card on this machine answers a lift")
+def Test_Gradients_Reach_The_Canonical_Member_On_The_Card() -> None:
+    """the point-sampled loss differentiates onto the whole member through the accelerator, in single precision"""
+    member = Small_Canonical_Network(seed=5)
+    readout = member.basis_readout
+    assert isinstance(readout, BasisExpansion)
+    generator = np.random.default_rng(15)
+    branch_input = np.asarray(generator.normal(size=(4, 3)), dtype=np.float64)
+    trunk_features = np.asarray(
+        generator.normal(size=(4, 5, readout.coordinate_features.feature_count)), dtype=np.float64
+    )
+    targets = np.asarray(generator.normal(size=(4, 5)), dtype=np.float64)
+    engine = Training_Engine()
+    lifted_batch = {
+        "branch_input": engine.Lift_Constant(branch_input),
+        "trunk_features": engine.Lift_Constant(trunk_features),
+        "targets": engine.Lift_Constant(targets),
+    }
+
+    def Point_Loss(lifted: dict[str, Any], batch: dict[str, Any]) -> Any:
+        predicted = member.Forward_Point_Values(lifted, batch["branch_input"], batch["trunk_features"])
+        residuals = predicted - batch["targets"]
+        return (residuals * residuals).mean()
+
+    loss_value, gradients = engine.Value_And_Gradients(
+        ParameterSet(values=member.Parameter_Values()), lambda lifted: Point_Loss(lifted, lifted_batch)
+    )
+    assert np.isfinite(loss_value)
+    assert set(gradients) == set(member.Parameter_Values())
+    assert all(np.isfinite(gradient).all() for gradient in gradients.values())
+    assert all(np.abs(gradient).max() > 0.0 for gradient in gradients.values())
+
+
+def Test_A_Grid_Query_Agrees_With_The_Same_Points_Asked_For_Explicitly() -> None:
+    """the trunk answers a grid and the same points asked for explicitly with the identical values"""
+    member = Small_Canonical_Network(seed=6)
+    coefficients = Coefficients(vector=np.linspace(-1.0, 1.0, 3), domain=CUBE)
+    shape = (3, 4, 5)
+    grid_result = member(coefficients, GridSpec(shape))
+    point_result = member(coefficients, PointSpec(points=Fractional_Grid_Coordinates(shape)))
+    assert isinstance(grid_result, GridFunction)
+    assert isinstance(point_result, PointSet)
+    gridded_values = np.asarray(grid_result.values).reshape(1, -1).T
+    assert point_result.values is not None
+    assert np.allclose(np.asarray(point_result.values), gridded_values, atol=1e-10)

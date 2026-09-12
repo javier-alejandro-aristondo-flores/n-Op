@@ -1,4 +1,5 @@
-# Canonical Deep Operator Network: learned branch, learned trunk.
-# Numbers below are the drill's starting point (test-suite.md II.1), not final.
+# Canonical Deep Operator Network: learned branch, learned trunk. Built; report.py measures it.
+# Numbers below are the recorded starting point (test-suite.md II.1); report.py's own constants
+# are what was actually trained and measured, same as the other three configs in this directory.
 branch = { width = 256, depth = 4 }
-trunk = { fourier_features = 48, width = 256, depth = 4, latent = 256 }
+trunk = { fourier_orders = 4, width = 256, depth = 4, latent = 256 }

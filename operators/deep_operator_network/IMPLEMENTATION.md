@@ -56,6 +56,28 @@ D5 chose global standardization there instead) — the fields are standardized v
 `Gram_Pod` ever runs, so the modes themselves are fit in a different space, not merely rescaled
 after the fact.
 
+**`canonical` replaces both fixed bases with a learned coordinate trunk, and that is what buys it a**
+**reach the other two structurally cannot have.** `BasisExpansion` turns a fractional coordinate into
+a feature vector and reads it against the branch's latent vector by inner product, so the member is a
+genuine function, queryable at any point on any grid, not only the voxel centers a fixed basis was fit
+on. Training is point-sampled — each step draws a handful of runs and a handful of points inside each,
+so memory is a function of batch size and not of grid size — and that is exactly why this configuration
+trains on every one of the strain campaign's fifteen grid shapes at once (`Functional_Field_Cache` and
+`Canonical_Every_Shape_Predictions` in `report.py`), where the fixed-basis configurations are limited to
+the single most common shape by construction. `report.py` scores it twice for exactly this reason: once
+on the common grid, directly against the same ridge and nearest-neighbor floors the fixed-basis
+configurations answer to, and once across every shape its own test runs hold, against a nearest-neighbor
+floor computed within each shape (a fixed-rank basis has no such per-shape reading; a field copy does).
+Decision D5 follows from this reach: per-voxel statistics like `proper_orthogonal`'s do not exist across
+varying grids, so standardization here is one global mean and deviation for the whole campaign instead.
+**A rank-32 linear projection was expected to be a very tight floor on a fixed shape, one a learned
+trunk would likely pay for its generality against.** Measured, with a real budget, a three-stage
+decreasing schedule and early stopping on the final stage, it was not: `canonical` beats the ridge
+floor on the common grid by 54.2% (cheap) and 41.3% (accurate) against a 25% requirement, and clears
+the every-shape nearest-neighbor floor too. See `report.md` for the full tables. The reach across
+every shape the fixed-basis configurations cannot read remains this configuration's justification
+regardless; the common-grid win is a bonus the untuned scratch drill did not predict.
+
 ## Floors and kill thresholds
 
 Ridge from parameters to basis coefficients is the natural floor: kill any variant not at least
@@ -92,6 +114,15 @@ publish the trunk's weights and biases instead, plus the features it last read
 (`readout.last_trunk_features`), shaped as fields when the query was a grid and as a plain
 points-by-features table when it was not.
 
+**`canonical` carries a second inspection surface beside the member's**, because it is the only
+configuration whose training path itself computes something worth naming: `CoordinateFeaturizedBatches`
+(`report.py`) wraps the point sampler and publishes its own `last_trunk_features` — the feature array the
+most recently drawn training step actually multiplied against the branch's coefficients, shaped
+`(runs per batch, points per run, feature count)`. This is distinct from `readout.last_trunk_features`
+above: the readout's own copy is set by a whole-grid or whole-point-set query through `__call__`, the kind
+the report's evaluation and figures use; the batch source's copy is set by the lifted, point-sampled
+forward the loss actually trains through, and is the only place that path's own inputs are named at all.
+
 **Wrapped for inference**, the conservation law publishes what it did: `last_renormalization_scale`
 under the electron-count law, `last_removed_mean` under the zero-mean law. Both are exact
 diagnostics rather than corrections — ground truth already integrates to the archived electron
@@ -109,8 +140,9 @@ which is exactly the egress the suite document permits.
 ## Implementation specification
 
 Measured, and in `report.md`; regenerate both it and the figures with
-`python -m operators.deep_operator_network.report`. The `principal_component` configuration is
-built and judged there. `proper_orthogonal` is now built too, assembled by
-`Proper_Orthogonal_Network` on the same split and basis rank, but its measured numbers are not yet
-folded into the committed report or figures — those are regenerated separately, as one deliberate
-step. `canonical` and `energy_trunk` remain declared, not built.
+`python -m operators.deep_operator_network.report`. `principal_component` and `proper_orthogonal`
+are both built and both measured there, each on its own basis. `canonical` is now built too,
+assembled by `Canonical_Network`, trained point-sampled on every grid shape the strain campaign
+holds, and measured in the same report — once on the common grid against the same floors the
+fixed-basis configurations answer to, once across every shape its own test runs hold. `energy_trunk`
+remains declared, not built.

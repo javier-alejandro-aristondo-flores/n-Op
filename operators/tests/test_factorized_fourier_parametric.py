@@ -16,6 +16,7 @@ from operators.factorized_fourier.parametric import (
     PEROVSKITE_ARM_NAMES,
     STRAIN_ARM_NAMES,
 )
+from operators.factorized_fourier.report import Card_Metric_Errors, Multilinear_Interpolated_Field, Strain_Bracketing_Floor_Rows
 from operators.framework import Fractional_Grid_Coordinates, Layer
 from operators.kernels import SpectralKernel
 from operators.readouts import PeriodicCoordinateFeatures, PointwiseProjection
@@ -184,3 +185,36 @@ def Test_Coordinate_Features_Break_The_Constant_Output_Degeneracy_And_Answer_Any
     other_output = np.asarray(Run_Backbone(lift, composition, projection, other_channels))
     assert other_output.shape == (1, *other_shape)
     assert float(np.ptp(other_output)) > 1e-6
+
+
+def Test_Multilinear_Interpolated_Field_Matches_Hand_Computed_Weights() -> None:
+    """one dimension linearly interpolates and two dimensions bilinearly interpolate, against known arithmetic"""
+    one_dimensional = {(0.0,): np.zeros((2, 2)), (2.0,): np.full((2, 2), 4.0)}
+    corners_1d = ((0.0,), (2.0,))
+    assert np.allclose(Multilinear_Interpolated_Field((1.0,), corners_1d, one_dimensional), 2.0)
+    assert np.allclose(Multilinear_Interpolated_Field((0.5,), corners_1d, one_dimensional), 1.0)
+
+    two_dimensional = {
+        (0.0, 0.0): np.full((1,), 0.0),
+        (0.0, 2.0): np.full((1,), 10.0),
+        (2.0, 0.0): np.full((1,), 20.0),
+        (2.0, 2.0): np.full((1,), 30.0),
+    }
+    corners_2d = tuple(two_dimensional)
+    assert np.allclose(Multilinear_Interpolated_Field((1.0, 1.0), corners_2d, two_dimensional), 15.0)
+    assert np.allclose(Multilinear_Interpolated_Field((0.0, 0.0), corners_2d, two_dimensional), 0.0)
+    assert np.allclose(Multilinear_Interpolated_Field((0.5, 0.0), corners_2d, two_dimensional), 5.0)
+
+
+@pytest.mark.pool
+def Test_The_Bracketing_Floor_Scores_Every_Interior_Level_Against_Its_Own_Corners() -> None:
+    """the decisive floor's multilinear interpolation reads as a strong, physically sane floor on real strain data"""
+    arms = All_Strain_Arms()
+    rows = Strain_Bracketing_Floor_Rows(arms)
+    assert len(rows) == sum(len(Interior_Levels(arm)) for arm in arms)
+    assert {row.family for row in rows} == set(STRAIN_ARM_NAMES)
+    for row in rows:
+        assert set(row.errors) == set(Card_Metric_Errors(np.zeros((2, 2, 2)), np.ones((2, 2, 2))))
+        # a smooth strain sweep interpolates far better than one percent relative error, on every family
+        assert 0.0 <= row.errors["relative_l2"] < 0.01
+        assert row.errors["structural_similarity_3d"] > 0.999

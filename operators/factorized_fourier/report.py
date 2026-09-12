@@ -20,6 +20,7 @@ from operators.data import (
     POOL_ROOT,
     Ridge_Apply,
     Ridge_Fit,
+    Run_Identifier,
     Semilocal_Xc_Ridge_Features,
     Spectral_Gradient_Magnitude_And_Laplacian,
     STORE_NAME,
@@ -48,6 +49,7 @@ from operators.factorized_fourier import (
     Spin_Channels,
     Standardized_Gram,
 )
+from operators.factorized_fourier.parametric import Arm, Interior_Levels, Level
 from operators.framework import GridFunction, GridSpec, Layer, Spectral_Truncation_Resample
 from operators.kernels.spectral import Mode_Wavevector_Features
 from operators.inspection import (
@@ -1744,6 +1746,76 @@ def Elf_Evaluation_Lines(
         f" `{cache_directory}`.",
         "",
     ]
+
+
+# the parametric variant (canon II.4): strain or lattice parameters broadcast into the same backbone, floors
+# measured host-only against real charge-density fields before any member is built; the decisive one interpolates
+# multilinearly between an interior level's own bracket corners, on the leave-one-level-out block Bracket_Corners
+# and Interior_Levels (operators.factorized_fourier.parametric) name
+
+STRAIN_ATLAS_CAMPAIGN = "strain_atlas"
+STRAIN_ATLAS_COMMON_SHAPE = (40, 40, 40)
+
+
+def Loaded_Strain_Charge_Density(
+    run_path: str, shape: tuple[int, int, int] = STRAIN_ATLAS_COMMON_SHAPE
+) -> NDArray[np.float64]:
+    """one strain-atlas run's own charge density, resampled to the block's common shape (native shapes vary)"""
+    identifier = Run_Identifier(run_path)
+    with np.load(Archive_Path(STRAIN_ATLAS_CAMPAIGN, identifier)) as archive:
+        density = np.asarray(archive["charge_density"], dtype=np.float64)
+    return Spectral_Truncation_Resample(density[None], shape)[0]
+
+
+def Cached_Level_Field(
+    arm: Arm, level: Level, shape: tuple[int, int, int], cache: dict[tuple[str, Level], NDArray[np.float64]]
+) -> NDArray[np.float64]:
+    """one level's own mean charge density over every run sharing it, memoized since brackets share corners"""
+    key = (arm.name, level)
+    if key not in cache:
+        fields = [Loaded_Strain_Charge_Density(run_path, shape) for run_path in arm.runs_by_level[level]]
+        cache[key] = np.mean(np.stack(fields), axis=0)
+    return cache[key]
+
+
+def Multilinear_Interpolated_Field(
+    level: Level, corners: tuple[Level, ...], field_of_corner: dict[Level, NDArray[np.float64]]
+) -> NDArray[np.float64]:
+    """the level's own field, multilinearly interpolated from its bracket corners' true fields"""
+    dimension = len(level)
+    bounds = [tuple(sorted({corner[axis] for corner in corners})) for axis in range(dimension)]
+    total = np.zeros_like(next(iter(field_of_corner.values())))
+    for corner in corners:
+        weight = 1.0
+        for axis in range(dimension):
+            low, high = bounds[axis]
+            fraction = (level[axis] - low) / (high - low)
+            weight *= fraction if corner[axis] == high else (1.0 - fraction)
+        total = total + weight * field_of_corner[corner]
+    return total
+
+
+def Strain_Bracketing_Floor_Rows(
+    arms: tuple[Arm, ...], shape: tuple[int, int, int] = STRAIN_ATLAS_COMMON_SHAPE
+) -> list[ScoredRun]:
+    """the decisive floor: every interior level's own field against its bracket corners' multilinear interpolation"""
+    cache: dict[tuple[str, Level], NDArray[np.float64]] = {}
+    scored: list[ScoredRun] = []
+    for arm in arms:
+        for level, corners in Interior_Levels(arm).items():
+            truth = Cached_Level_Field(arm, level, shape, cache)
+            field_of_corner = {corner: Cached_Level_Field(arm, corner, shape, cache) for corner in corners}
+            predicted = Multilinear_Interpolated_Field(level, corners, field_of_corner)
+            scored.append(
+                ScoredRun(
+                    identifier=f"{arm.name}_{level}",
+                    unit_key=f"{arm.name}_{level}",
+                    campaign="strain_atlas",
+                    family=arm.name,
+                    errors=Card_Metric_Errors(predicted, truth),
+                )
+            )
+    return scored
 
 
 def Main() -> int:

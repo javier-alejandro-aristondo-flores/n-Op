@@ -1381,9 +1381,14 @@ def Deep_Equilibrium_Ladder_Lines() -> list[str]:
         " tuning step rather than a post-hoc one: the fixed-point and weight-tied-injected configurations alone"
         " start their shared layer's kernel and local-linear weight arrays -- never the biases -- at a tenth scale"
         " by default, every other configuration reading exactly one and untouched by the parameter's existence."
-        " Per-mode spectral clipping, a Hutchinson Jacobian penalty and a monotone parametrization remain unbuilt,"
-        " the canon's own further escalation, reached for only if a contractive initialization alone does not"
-        " clear the cap.",
+        " Both scales this member was probed at failed the same way: a tenth scale read a cap-hit fraction of"
+        " 0.34, 0.98, 1.00, 1.00 and 1.00 at training steps 100 through 500 (mean iterations 22.3 climbing to"
+        " 32.0), and a thirtieth scale read 0.34, 0.75, 0.96, 0.98 and 0.99 over the same five intervals (mean"
+        " iterations 21.9 to 32.0) -- the map contracts at initialization either way, and training alone drives it"
+        " back out of contractivity within the first two hundred steps regardless of how small the starting scale"
+        " is. Per-mode spectral clipping, a Hutchinson Jacobian penalty and a monotone parametrization -- the"
+        " canon's own further escalation -- are what the ladder needs next, and those are builds rather than"
+        " knobs, the integrator's own to schedule.",
         "",
         "**The mandatory 8³ gradient audit** ran on this member's own separable layer (width 2, one kept mode,"
         " nonzero local bias so the origin is not the map's only fixed point), not a generic one, in"

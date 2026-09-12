@@ -496,10 +496,9 @@ def Test_The_Cached_Coarse_Input_Path_Equals_The_On_The_Fly_Path_For_Potential()
         member.Forward_Field(parameters, log_density_values, gram_vector, (4, 4, 4), mode_wavevector_features, (8, 8, 8))
     )
     combined_coarse_input = Combined_Coarse_Input(log_density_values, gram_vector, (4, 4, 4))
-    hidden_carried = member.Forward_From_Coarse_Input(parameters, combined_coarse_input, mode_wavevector_features)
-    resampled = Spectral_Resampled(hidden_carried, (8, 8, 8))
-    assert member.conservation is not None
-    from_the_cache = np.asarray(member.conservation.Forward(resampled, 1.0))
+    from_the_cache = np.asarray(
+        member.Forward_From_Coarse_Input(parameters, combined_coarse_input, mode_wavevector_features, (8, 8, 8))
+    )
 
     assert np.allclose(on_the_fly, from_the_cache, atol=1e-12)
 

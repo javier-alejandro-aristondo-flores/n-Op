@@ -165,9 +165,13 @@ class FactorizedFourier(NeuralOperator[GridFunction, GridFunction, GridFunction]
 
 
     def Forward_From_Coarse_Input(
-        self, lifted: dict[str, Any], combined_coarse_input: Any, mode_wavevector_features: Any | None = None
+        self,
+        lifted: dict[str, Any],
+        combined_coarse_input: Any,
+        mode_wavevector_features: Any | None = None,
+        output_shape: tuple[int, int, int] | None = None,
     ) -> Any:
-        """the lifted path onward from the eight-channel coarse input, for a caller that has already built it"""
+        """the lifted path onward from the eight-channel coarse input, including the potential task's own finish"""
         layer_lifted = lifted
         if mode_wavevector_features is not None:
             layer_lifted = dict(lifted)
@@ -183,7 +187,14 @@ class FactorizedFourier(NeuralOperator[GridFunction, GridFunction, GridFunction]
             self.last_fixed_point_residual_history = np.asarray(solved.residual_norm_history, dtype=np.float64)
         else:
             carried = self.spectral_stack.Forward(layer_lifted, hidden)
-        return self.projection.Forward(lifted, carried)
+        produced = self.projection.Forward(lifted, carried)
+        if self.task == "potential":
+            resolved_output_shape = FINE_SHAPE if output_shape is None else output_shape
+            produced = Spectral_Resampled(produced, resolved_output_shape)
+            if self.conservation is None:
+                raise ValueError("the potential task always carries its own conservation wrapper")
+            produced = self.conservation.Forward(produced, weight_each=1.0)
+        return produced
 
 
     def Forward_Field(
@@ -195,17 +206,10 @@ class FactorizedFourier(NeuralOperator[GridFunction, GridFunction, GridFunction]
         mode_wavevector_features: Any | None = None,
         output_shape: tuple[int, int, int] | None = None,
     ) -> Any:
-        """the whole lifted path, coarse throughout; the potential task resamples to the fine shape and pins the mean"""
+        """the whole lifted path, from fine-grid log-compressed channels through whatever Forward_From_Coarse_Input does"""
         resolved_shape = self.processing_shape if target_shape is None else target_shape
         combined = Combined_Coarse_Input(log_density_values, gram_vector, resolved_shape)
-        produced = self.Forward_From_Coarse_Input(lifted, combined, mode_wavevector_features)
-        if self.task == "potential":
-            resolved_output_shape = FINE_SHAPE if output_shape is None else output_shape
-            produced = Spectral_Resampled(produced, resolved_output_shape)
-            if self.conservation is None:
-                raise ValueError("the potential task always carries its own conservation wrapper")
-            produced = self.conservation.Forward(produced, weight_each=1.0)
-        return produced
+        return self.Forward_From_Coarse_Input(lifted, combined, mode_wavevector_features, output_shape)
 
 
     def Input_Channels(self, input_function: GridFunction) -> tuple[NDArray[np.float64], NDArray[np.float64]]:

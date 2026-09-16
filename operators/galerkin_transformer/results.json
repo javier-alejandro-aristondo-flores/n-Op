@@ -1,0 +1,70 @@
+{
+ "member": "galerkin_transformer",
+ "regenerate": "python -m operators.galerkin_transformer.report",
+ "rows": [
+  {
+   "block_signature": "37c6af0a8392",
+   "key": {
+    "block": "fold_0",
+    "configuration": "gate",
+    "group": "nearest_angle_copy_floor",
+    "member": "galerkin_transformer",
+    "split": "perovskite_folds",
+    "task": "lattice_to_charge"
+   },
+   "summary": {
+    "confidence_high": 0.089932,
+    "confidence_low": 0.084757,
+    "group_name": "nearest_angle_copy_floor",
+    "interquartile": 0.006871,
+    "median": 0.085278,
+    "metric_name": "relative_l2",
+    "run_count": 25,
+    "unit_count": 25
+   }
+  },
+  {
+   "block_signature": "41b450449c83",
+   "key": {
+    "block": "angle_arm_interior_levels",
+    "configuration": "gate",
+    "group": "linear_in_angle_interpolation_floor",
+    "member": "galerkin_transformer",
+    "split": "perovskite_arms",
+    "task": "lattice_to_charge"
+   },
+   "summary": {
+    "confidence_high": 0.027168,
+    "confidence_low": 0.025932,
+    "group_name": "linear_in_angle_interpolation_floor",
+    "interquartile": 0.000821,
+    "median": 0.026421,
+    "metric_name": "relative_l2",
+    "run_count": 27,
+    "unit_count": 27
+   }
+  },
+  {
+   "block_signature": "ced810c611f4",
+   "key": {
+    "block": "fold_0",
+    "configuration": "gate",
+    "group": "semilocal_ridge_floor",
+    "member": "galerkin_transformer",
+    "split": "paired_fields_fivefold",
+    "task": "charge_to_localization"
+   },
+   "summary": {
+    "confidence_high": 0.098625,
+    "confidence_low": 0.097382,
+    "group_name": "semilocal_ridge_floor",
+    "interquartile": 0.002436,
+    "median": 0.097618,
+    "metric_name": "mean_absolute_error",
+    "run_count": 152,
+    "unit_count": 29
+   }
+  }
+ ],
+ "verdicts": []
+}

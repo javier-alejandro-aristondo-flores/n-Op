@@ -31,7 +31,15 @@ from operators.galerkin_transformer import (
     Sliced_Lifted,
     Token_Axis_Normalized,
 )
-from operators.galerkin_transformer.report import Nearest_Angle_Copy_Rows
+from operators.evaluation import Read_Member_Results, ScoredRun, Write_Member_Results
+from operators.factorized_fourier import Interior_Levels
+from operators.galerkin_transformer.report import (
+    Angle_Arm,
+    FloorData,
+    Linear_In_Angle_Interpolation_Rows,
+    Nearest_Angle_Copy_Rows,
+    Results_Artifact,
+)
 from operators.inspection.plots import Render_Inspection_Suite
 from operators.metrics import Median_Per_Unit
 from operators.substrate import NumpyEngine, ParameterSet, Torch_Is_Available, TorchEngine
@@ -342,3 +350,66 @@ def Test_The_Nearest_Angle_Copy_Floor_Reproduces_The_Built_Members_Own_Number() 
     unit_keys = [row.unit_key for row in copy_rows]
     median_error = float(np.median(Median_Per_Unit(errors, unit_keys)))
     assert abs(median_error - 0.0853) < 0.002
+
+
+@pytest.mark.pool
+def Test_The_Linear_In_Angle_Interpolation_Floor_Scores_Exactly_The_Interior_Levels() -> None:
+    """one row per bracketed level, none for the edge levels a bracket cannot be built for, every error finite"""
+    arm = Angle_Arm()
+    interior_level_count = len(Interior_Levels(arm))
+    rows = Linear_In_Angle_Interpolation_Rows()
+    assert len(rows) == interior_level_count
+    assert interior_level_count < len(arm.runs_by_level)
+    errors = np.asarray([row.errors["relative_l2"] for row in rows], dtype=np.float64)
+    assert np.all(np.isfinite(errors))
+    assert np.all(errors >= 0.0)
+    assert len({row.unit_key for row in rows}) == len(rows)
+
+
+@pytest.mark.pool
+def Test_The_Linear_In_Angle_Interpolation_Floor_Beats_The_Copy_Floor_On_This_Corpus() -> None:
+    """the canon's own expectation for an interpolation split: the multilinear floor is the harder bar here"""
+    copy_rows = Nearest_Angle_Copy_Rows(evaluation_fold=0)
+    interpolation_rows = Linear_In_Angle_Interpolation_Rows()
+    copy_median = float(np.median([row.errors["relative_l2"] for row in copy_rows]))
+    interpolation_median = float(np.median([row.errors["relative_l2"] for row in interpolation_rows]))
+    assert interpolation_median < copy_median
+
+
+def Test_The_Results_Artifact_Round_Trips_Through_Json(tmp_path: Path) -> None:
+    """a hand-built floor data set writes through Write_Member_Results and reads back byte-for-byte equal"""
+    data = FloorData(
+        copy_rows=[
+            ScoredRun(
+                identifier="run_a",
+                unit_key="unit_a",
+                campaign="perovskite_grid",
+                family="angle",
+                errors={"relative_l2": 0.08},
+            )
+        ],
+        interpolation_rows=[
+            ScoredRun(
+                identifier="angle_(0.1,)",
+                unit_key="angle_(0.1,)",
+                campaign="perovskite_grid",
+                family="angle",
+                errors={"relative_l2": 0.02},
+            )
+        ],
+        ridge_rows=[
+            ScoredRun(
+                identifier="run_b_electron_localization_up",
+                unit_key="unit_b",
+                campaign="defect_set",
+                family="electron_localization_up",
+                errors={"mean_absolute_error": 0.1, "structural_similarity_3d": 0.9, "relative_l2": 0.2},
+            )
+        ],
+    )
+    results = Results_Artifact(data)
+    assert results.verdicts == ()
+    assert len(results.rows) == 3
+    path = tmp_path / "results.json"
+    Write_Member_Results(path, results)
+    assert Read_Member_Results(path) == results

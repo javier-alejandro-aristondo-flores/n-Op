@@ -2,7 +2,9 @@
 
 import time
 from pathlib import Path
+from typing import Any
 
+from operators.data import POOL_ROOT, STORE_NAME
 from operators.evaluation import (
     Block_Signature,
     CubicBlock,
@@ -19,8 +21,16 @@ from operators.evaluation import (
     Training_Mean_Rows,
     Write_Member_Results,
 )
-from operators.multiple_input_operator_network import Density_Alone_Twin, Two_Branch_Member
-from operators.multiple_input_operator_network.cache import BASIS_RANK, Fitted_Bases
+from operators.multiple_input_operator_network import Density_Alone_Twin, MultipleInputOperatorNetwork, Two_Branch_Member
+from operators.multiple_input_operator_network.cache import (
+    BASIS_RANK,
+    Fitted_Bases,
+    Localization_Cache,
+    MEMBER_TRAIN_FOLDS,
+    VALIDATION_FOLDS,
+)
+from operators.substrate import ParameterSet
+from operators.training import CoordinateFeaturizedBatches, ForwardLoss, PointSampledBatches, Train, Training_Engine
 
 REPORT_PATH = Path(__file__).resolve().parent / "report.md"
 
@@ -35,6 +45,24 @@ TASK_NAME = "charge_and_potential_to_localization"
 DECISIVE_TWIN_MARGIN = 0.05
 
 PATTERN_RULE_MARGIN = 0.20
+
+# the training driver below, the flagship's own staged protocol (factorized_fourier/report.py Train_Flagship_Member)
+
+TRAINING_ARTIFACT_PATH = POOL_ROOT / STORE_NAME / "_training" / MEMBER_NAME
+
+MEMBER_SEED = 20260916
+
+RUNS_PER_BATCH = 8
+
+POINTS_PER_RUN = 4096
+
+STAGE_FRACTIONS = (0.3, 0.3, 0.4)
+
+STAGE_LEARNING_RATES = (1e-3, 3.3e-4, 1.1e-4)
+
+VALIDATION_INTERVAL = 100
+
+FINAL_STAGE_PATIENCE = 15
 
 
 def Block_Lines(block: CubicBlock) -> list[str]:
@@ -165,6 +193,84 @@ def Result_Rows(block: CubicBlock, floor_summaries: tuple[MetricSummary, ...]) -
         )
         for summary in floor_summaries
     )
+
+
+def Staged_Step_Counts(step_count: int) -> tuple[int, int, int]:
+    """the flagship's own three-stage split of a total step budget, by the pre-registered fractions"""
+    first_stage = round(STAGE_FRACTIONS[0] * step_count)
+    second_stage = round(STAGE_FRACTIONS[1] * step_count)
+    return first_stage, second_stage, step_count - first_stage - second_stage
+
+
+def Point_Value_Loss(member: MultipleInputOperatorNetwork) -> ForwardLoss:
+    """mean squared error against the sampled localization targets, no standardization needed since the bounded head already answers their own zero-to-one range"""
+
+
+    def Loss_Of(lifted: dict[str, Any], lifted_batch: dict[str, Any]) -> Any:
+        """the point-sampled forward answered against this batch's own targets"""
+        predicted = member.Forward_Point_Values(
+            lifted, lifted_batch["parameter_vectors"], lifted_batch["trunk_features"]
+        )
+        residuals = predicted - lifted_batch["target_values"]
+        return (residuals * residuals).mean()
+
+    return Loss_Of
+
+
+def Batches_For(
+    member: MultipleInputOperatorNetwork,
+    density_basis: Any,
+    potential_basis: Any,
+    reference_density: float,
+) -> tuple[CoordinateFeaturizedBatches, int]:
+    """the training and validation caches drawn point-sampled, their points already answered by the trunk's own map, beside the training run count -- one cache serves the member and its twin alike, since the twin simply ignores the potential columns"""
+    training_cache = Localization_Cache(
+        MEMBER_TRAIN_FOLDS, density_basis, potential_basis, reference_density, "training"
+    )
+    validation_cache = Localization_Cache(
+        VALIDATION_FOLDS, density_basis, potential_basis, reference_density, "validation"
+    )
+    sampler = PointSampledBatches(training_cache, validation_cache, RUNS_PER_BATCH, POINTS_PER_RUN)
+    batches = CoordinateFeaturizedBatches(sampler, member.trunk_readout.coordinate_features)
+    return batches, len(training_cache.fields)
+
+
+def Train_Configuration(step_count: int, run_name: str, twin: bool) -> dict[str, object]:
+    """the staged run for either configuration, one code path so the twin cannot drift from the member: stages 0.3/0.3/0.4 of the given step count at 1e-3, 3.3e-4, 1.1e-4, validated every hundred steps on the validation fold, patience fifteen in the final stage, seed 20260916, single precision -- the card holder's own driver, not invoked by this module; the card is scheduled by the integrator and this function trains nothing until it is called"""
+    density_basis, potential_basis, reference_density, _ = Fitted_Bases()
+    member = (
+        Density_Alone_Twin(density_basis, reference_density, seed=0)
+        if twin
+        else Two_Branch_Member(density_basis, potential_basis, reference_density, seed=0)
+    )
+    batches, training_run_count = Batches_For(member, density_basis, potential_basis, reference_density)
+    forward_loss = Point_Value_Loss(member)
+    parameters = ParameterSet(values=member.Parameter_Values())
+    engine = Training_Engine()
+    stage_step_counts = Staged_Step_Counts(step_count)
+    manifest: dict[str, object] = {"run_name": run_name, "twin": twin, "training_run_count": training_run_count}
+    for stage_index, (rate, stage_steps) in enumerate(zip(STAGE_LEARNING_RATES, stage_step_counts, strict=True)):
+        is_final_stage = stage_index == len(stage_step_counts) - 1
+        result = Train(
+            engine,
+            parameters,
+            forward_loss,
+            batches,
+            step_count=stage_steps,
+            learning_rate=rate,
+            seed=MEMBER_SEED + stage_index,
+            artifact_directory=TRAINING_ARTIFACT_PATH,
+            run_name=f"{run_name}_stage{stage_index}",
+            validation_interval=VALIDATION_INTERVAL,
+            patience=FINAL_STAGE_PATIENCE if is_final_stage else 0,
+            resume=(stage_index == 0),
+        )
+        # a fresh stage starts from the previous stage's best parameters, not its last, noisier iterate
+        parameters = result.parameters
+        manifest[f"stage_{stage_index}"] = result.manifest
+    manifest["final_parameters"] = parameters
+    manifest["member"] = member
+    return manifest
 
 
 def Main() -> int:

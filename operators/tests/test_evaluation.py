@@ -36,6 +36,8 @@ from operators.evaluation import (
     VerdictRow,
     Write_Member_Results,
 )
+from operators.compositions import Spectral_Resampled
+from operators.framework import Spectral_Truncation_Resample
 from operators.inspection import Render_Table
 
 
@@ -308,3 +310,13 @@ def Test_The_Rendering_Is_Byte_Deterministic() -> None:
     forward_render = Cross_Member_Table((first, second))
     reversed_render = Cross_Member_Table((second, first))
     assert forward_render == reversed_render
+
+
+def Test_The_Host_Harness_Resample_Agrees_With_The_Lifted_Resample() -> None:
+    """the invariance harness's numpy truncation and the composition's lifted resample land on the same field"""
+    generator = np.random.default_rng(20260916)
+    field = generator.normal(size=(3, 8, 8, 8))
+    for target_shape in ((4, 4, 4), (16, 16, 16)):
+        harness = Spectral_Truncation_Resample(field, target_shape)
+        lifted = np.asarray(Spectral_Resampled(field, target_shape))
+        assert np.max(np.abs(harness - lifted)) < 1e-10

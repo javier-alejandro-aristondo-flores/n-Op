@@ -23,7 +23,7 @@ TRAINING_SHAPE = (40, 40, 40)
 def Spectral_Truncation_Resample(
     values: NDArray[np.float64], target_shape: tuple[int, int, int]
 ) -> NDArray[np.float64]:
-    """grid to grid by exact Fourier truncation or zero-padding"""
+    """grid to grid by exact Fourier truncation or zero-padding, the host numpy twin of Spectral_Resampled"""
     stacked = np.asarray(values, dtype=np.float64)
     spectrum = np.fft.fftn(stacked, axes=(1, 2, 3))
     result = np.zeros((stacked.shape[0], *target_shape), dtype=np.complex128)

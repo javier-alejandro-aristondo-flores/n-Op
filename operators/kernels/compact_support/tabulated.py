@@ -62,6 +62,7 @@ class TabulatedStencilKernel(Kernel[GridFunction, GridFunction]):
 
 
     def Forward(self, lifted: dict[str, Any], input_values: Any, output_shape: tuple[int, int, int]) -> Any:
+        """the fused convolution at the grid it was tabulated for, output_shape must equal the input's own"""
         spatial_shape = tuple(int(extent) for extent in input_values.shape[1:])
         if output_shape != spatial_shape:
             raise ValueError("a tabulated stencil evaluates on the grid it was tabulated for, not another one")

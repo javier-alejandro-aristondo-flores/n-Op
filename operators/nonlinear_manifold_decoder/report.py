@@ -49,8 +49,8 @@ from operators.training import (
     Parameter_Field_Examples,
     Parameter_Spreads,
     PointSampledBatches,
+    Staged_Training,
     Strain_Assignments_By_Run,
-    Train,
     Training_Engine,
 )
 
@@ -79,9 +79,10 @@ FOURIER_ORDERS = 4
 RUNS_PER_BATCH = 8
 POINTS_PER_RUN = 2048
 VALIDATION_POINTS_PER_RUN = 512
-# a decreasing schedule across three restarts, sized against the entry's 1.5-hour card cap
-STAGE_LEARNING_RATES = (3e-3, 1e-3, 3e-4)
-STAGE_STEP_COUNTS = (3000, 3000, 4000)
+# the staged protocol's own thirds (peak, peak/3, peak/9), sized against the entry's 1.5-hour card cap
+PEAK_LEARNING_RATE = 3e-3
+STEP_COUNT = 10000
+DIVERGENCE_PROBE_STEPS = 200
 VALIDATION_INTERVAL = 100
 # early stopping is only meaningful on the final, lowest-rate stage, once the schedule stops moving the floor
 FINAL_STAGE_PATIENCE = 15
@@ -462,28 +463,21 @@ def Trained_Manifold_Member() -> tuple[NonlinearManifoldDecoder, NDArray[np.floa
     lifted_channel_deviation = engine.Lift_Constant(np.asarray(channel_deviation, dtype=np.float64))
     forward_loss = Point_Value_Loss(member, lifted_parameter_spreads, lifted_channel_mean, lifted_channel_deviation)
     parameters = ParameterSet(values=member.Parameter_Values())
-    manifest: dict[str, object] = {}
-    stages = zip(STAGE_LEARNING_RATES, STAGE_STEP_COUNTS, strict=True)
-    for stage_index, (learning_rate, step_count) in enumerate(stages):
-        # early stopping is only turned on for the final, lowest-rate stage of the schedule
-        is_final_stage = stage_index == len(STAGE_STEP_COUNTS) - 1
-        result = Train(
-            engine,
-            parameters,
-            forward_loss,
-            batches,
-            step_count=step_count,
-            learning_rate=learning_rate,
-            seed=SEED + stage_index,
-            artifact_directory=TRAINING_ARTIFACT_PATH,
-            run_name=f"manifold_stage{stage_index}",
-            validation_interval=VALIDATION_INTERVAL,
-            patience=FINAL_STAGE_PATIENCE if is_final_stage else 0,
-            resume=(stage_index == 0),
-        )
-        # a fresh stage starts from the previous stage's best parameters, not its last, noisier iterate
-        parameters = result.parameters
-        manifest[f"stage_{stage_index}"] = result.manifest
+    parameters, manifest = Staged_Training(
+        engine,
+        parameters,
+        lambda: ParameterSet(values=member.Parameter_Values()),
+        forward_loss,
+        batches,
+        STEP_COUNT,
+        "manifold",
+        SEED,
+        TRAINING_ARTIFACT_PATH,
+        peak_learning_rate=PEAK_LEARNING_RATE,
+        probe_steps=DIVERGENCE_PROBE_STEPS,
+        validation_interval=VALIDATION_INTERVAL,
+        final_stage_patience=FINAL_STAGE_PATIENCE,
+    )
     for name, value in parameters.values.items():
         if name in member.branch.parameter_values:
             member.branch.parameter_values[name] = value

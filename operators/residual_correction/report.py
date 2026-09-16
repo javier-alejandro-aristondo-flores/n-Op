@@ -23,13 +23,20 @@ from operators.data import (
 )
 from operators.deep_operator_network import Pointwise_Statistics
 from operators.evaluation import (
+    Block_Signature,
     Compare_To_Floor,
     Comparison_Table,
     FloorComparison,
+    MemberResults,
+    MetricSummary,
+    ResultKey,
+    ResultRow,
     ScoredRun,
     Summarize,
     Summarize_By,
     Summary_Table,
+    VerdictRow,
+    Write_Member_Results,
 )
 from operators.framework import GridSpec
 from operators.inspection import (
@@ -39,7 +46,7 @@ from operators.inspection import (
     Render_Prediction_Against_Truth,
     Render_Table,
 )
-from operators.metrics import Delta_R_Squared, Median_Per_Unit, Relative_L2
+from operators.metrics import Delta_R_Squared, Median_And_Interquartile, Median_Per_Unit, Relative_L2
 from operators.residual_correction import BASIS_RANK, Guarded_Spread, ProjectionBackbone, ResidualCorrection
 from operators.substrate import ParameterSet
 from operators.training import (
@@ -54,6 +61,7 @@ from operators.training import (
 from operators.wrappers import ConformalCalibrator
 
 REPORT_PATH = Path(__file__).parent / "report.md"
+RESULTS_PATH = Path(__file__).parent / "results.json"
 FIGURES_PATH = Path(__file__).parent / "figures"
 CONFIGURATION_DIRECTORY = Path(__file__).parent / "configs"
 # the inspection arrays are fields, and a field never leaves the pool -- only the drawing does
@@ -63,9 +71,21 @@ TRAINING_ARTIFACT_PATH = POOL_ROOT / STORE_NAME / "_training" / "residual_correc
 COMMON_GRID_SHAPE = (40, 40, 40)
 # canon kill (test-suite.md IV.1): the corrected density must reach half the identity floor
 REQUIRED_IMPROVEMENT = 0.5
-CANDIDATE_STEP_COUNTS = (2000, 4000, 8000, 16000, 32000)
+MEMBER_NAME = "residual_correction"
+CONFIGURATION_NAME = "projection_backbone"
+TASK_NAME = "cheap_to_accurate_charge"
+SPLIT_NAME = "strain_atlas_holdout"
+EVALUATION_BLOCK = "test"
+# the flagship's own staged schedule (operators/factorized_fourier/report.py:Train_Flagship_Member),
+# carried over at its fixed peak rate rather than a probed one -- this backbone starts zero-initialized
+STAGE_FRACTIONS = (0.3, 0.3, 0.4)
+PEAK_LEARNING_RATE = 1e-3
+STAGE_LEARNING_RATES = (PEAK_LEARNING_RATE, PEAK_LEARNING_RATE / 3.0, PEAK_LEARNING_RATE / 9.0)
+VALIDATION_INTERVAL = 100
+FINAL_STAGE_PATIENCE = 15
+# a full-batch run of a small projection backbone against the plan's ~0.5 h card estimate; not yet measured
+STEP_COUNT = 20000
 SEED = 20260916
-LEARNING_RATE = 3e-3
 RUN_NAME_PREFIX = "correction_projection"
 
 
@@ -163,7 +183,7 @@ def Ridge_From_Strain_Predictions(
 
 def Floor_Lines(
     train: CorrectionBlock, validation: CorrectionBlock, test: CorrectionBlock
-) -> tuple[list[str], tuple[FloorComparison, ...], PodBasis, PodBasis, float]:
+) -> tuple[list[str], tuple[FloorComparison, ...], tuple[MetricSummary, ...], PodBasis, PodBasis, float]:
     """the pre-registered floors on the held-out test orbits, with the bases they were measured against"""
     correction_basis = Gram_Pod(train.correction, rank=BASIS_RANK)
     cheap_basis = Gram_Pod(train.cheap, rank=BASIS_RANK)
@@ -239,7 +259,16 @@ def Floor_Lines(
         " head, never this member, and must beat this scissor on orbit-held-out data.",
         "",
     ]
-    return lines, comparisons, correction_basis, cheap_basis, kill_bar
+    return lines, comparisons, summaries, correction_basis, cheap_basis, kill_bar
+
+
+def Staged_Step_Counts(
+    step_count: int, fractions: tuple[float, float, float] = STAGE_FRACTIONS
+) -> tuple[int, int, int]:
+    """a step budget split across three stages, the last absorbing whatever rounding leaves behind"""
+    first_stage = round(fractions[0] * step_count)
+    second_stage = round(fractions[1] * step_count)
+    return first_stage, second_stage, step_count - first_stage - second_stage
 
 
 def Trained_Member_Predictions(
@@ -248,20 +277,25 @@ def Trained_Member_Predictions(
     test: CorrectionBlock,
     correction_basis: PodBasis,
     cheap_basis: PodBasis,
-) -> tuple[NDArray[np.float64], NDArray[np.float64], int, ResidualCorrection]:
-    """the member trained at the step count validation prefers, read on both validation and test"""
+) -> tuple[NDArray[np.float64], NDArray[np.float64], dict[str, object], ResidualCorrection]:
+    """the member trained on the flagship's staged schedule, one seeded run, read on validation and test"""
     # the bases are the floors' own fit, reused rather than refit so the two sections agree exactly
     _, voxel_scale = Pointwise_Statistics(train.correction)
     input_scale = Guarded_Spread(Project(cheap_basis, train.cheap))
     backbone = ProjectionBackbone(cheap_basis, correction_basis, COMMON_GRID_SHAPE, voxel_scale, input_scale, SEED)
     member = ResidualCorrection(backbone)
-    train_cheap_coefficients = Project(cheap_basis, train.cheap)
-    batch_arrays: dict[str, BatchArray] = {
-        "cheap_coefficients": train_cheap_coefficients,
-        "true_correction": train.correction,
-    }
-    batch_arrays.update(member.Constant_Values())
-    whole_batch = FixedBatches(TrainingBatch(batch_arrays))
+    constants = member.Constant_Values()
+
+    def Batch_Of(block: CorrectionBlock) -> TrainingBatch:
+        """one block's whole set of pairs as a single rectangular training batch, constants included"""
+        arrays: dict[str, BatchArray] = {
+            "cheap_coefficients": Project(cheap_basis, block.cheap),
+            "true_correction": block.correction,
+        }
+        arrays.update(constants)
+        return TrainingBatch(arrays)
+
+    batches = FixedBatches(Batch_Of(train), Batch_Of(validation))
 
     def Correction_Loss(lifted: dict[str, Any], lifted_batch: dict[str, Any]) -> Any:
         """squared error between the predicted and the true correction, mean over pairs and voxels"""
@@ -272,49 +306,43 @@ def Trained_Member_Predictions(
 
     def Rebuild(values: dict[str, NDArray[np.float64]], block: CorrectionBlock) -> NDArray[np.float64]:
         """the whole block's corrected density from a candidate parameter set, member state left untouched"""
-        full_values = {**values, **member.Constant_Values()}
+        full_values = {**values, **constants}
         cheap_coefficients = Project(cheap_basis, block.cheap)
         correction = np.asarray(member.Forward_Correction(full_values, cheap_coefficients), dtype=np.float64)
         return block.cheap + correction
 
-    best_score = float("inf")
-    best_values: dict[str, NDArray[np.float64]] = dict(member.Parameter_Values())
-    best_step_count = CANDIDATE_STEP_COUNTS[0]
-    # every candidate restarts from member's own untouched, zero-initialized parameters, since
-    # rebuilding a block never writes into member, so no candidate warm-starts off the last one
-    initial_values = {name: value.copy() for name, value in member.Parameter_Values().items()}
-    for step_count in CANDIDATE_STEP_COUNTS:
-        # the budget is the one hyperparameter chosen here, and validation is what chooses it
+    engine = Training_Engine(precision="single")
+    parameters = ParameterSet(values=member.Parameter_Values())
+    stage_step_counts = Staged_Step_Counts(STEP_COUNT)
+    manifest: dict[str, object] = {"run_name": RUN_NAME_PREFIX, "stage_step_counts": stage_step_counts}
+    for stage_index, (rate, stage_steps) in enumerate(zip(STAGE_LEARNING_RATES, stage_step_counts, strict=True)):
+        is_final_stage = stage_index == len(stage_step_counts) - 1
         result = Train(
-            Training_Engine(),
-            ParameterSet(values={name: value.copy() for name, value in initial_values.items()}),
+            engine,
+            parameters,
             Correction_Loss,
-            whole_batch,
-            step_count=step_count,
-            learning_rate=LEARNING_RATE,
+            batches,
+            step_count=stage_steps,
+            learning_rate=rate,
             seed=SEED,
             artifact_directory=TRAINING_ARTIFACT_PATH,
-            run_name=f"{RUN_NAME_PREFIX}_{step_count}",
+            run_name=f"{RUN_NAME_PREFIX}_stage{stage_index}",
+            validation_interval=VALIDATION_INTERVAL,
+            patience=FINAL_STAGE_PATIENCE if is_final_stage else 0,
         )
-        rebuilt_validation = Rebuild(result.parameters.values, validation)
-        score = float(
-            np.median(
-                [Relative_L2(rebuilt_validation[run], validation.accurate[run]) for run in range(len(validation.points))]
-            )
-        )
-        if score < best_score:
-            best_score, best_values, best_step_count = score, result.parameters.values, step_count
+        parameters = result.parameters
+        manifest[f"stage_{stage_index}"] = result.manifest
 
-    rebuilt_validation = Rebuild(best_values, validation)
-    rebuilt_test = Rebuild(best_values, test)
-    # the report's own figures and inspection arrays read the chosen run's state off member itself
-    for name, value in best_values.items():
+    rebuilt_validation = Rebuild(parameters.values, validation)
+    rebuilt_test = Rebuild(parameters.values, test)
+    # the report's own figures and inspection arrays read the trained run's state off member itself
+    for name, value in parameters.values.items():
         if name in member.backbone.branch.parameter_values:
             member.backbone.branch.parameter_values[name] = value
         elif name in member.backbone.readout.parameter_values:
             member.backbone.readout.parameter_values[name] = value
     member(test.cheap_functions[0], GridSpec(COMMON_GRID_SHAPE))
-    return rebuilt_validation, rebuilt_test, best_step_count, member
+    return rebuilt_validation, rebuilt_test, manifest, member
 
 
 def Write_Figures(
@@ -373,7 +401,7 @@ def Conformal_Lines(
     validation_rebuilt: NDArray[np.float64],
     test: CorrectionBlock,
     test_rebuilt: NDArray[np.float64],
-) -> list[str]:
+) -> tuple[list[str], MetricSummary]:
     """the iv.3 conformal band: a point prediction widened by a calibrated offset, coverage per orbit"""
     settings = tomllib.loads((CONFIGURATION_DIRECTORY / "projection_backbone.toml").read_text())
     calibrator = ConformalCalibrator(**settings["conformal"])
@@ -384,18 +412,65 @@ def Conformal_Lines(
     )
     orbit_coverage = Median_Per_Unit(covered_everywhere.astype(np.float64), test.unit_keys)
     orbit_level_coverage = float(orbit_coverage.mean())
+    coverage_median, coverage_interquartile = Median_And_Interquartile(orbit_coverage)
     inspected = calibrator.Inspect()
-    return [
+    guarantee_low = float(np.asarray(inspected["coverage_guarantee_low"]))
+    guarantee_high = float(np.asarray(inspected["coverage_guarantee_high"]))
+    lines = [
         "## Conformal band (IV.3)",
         "",
         f"Level {settings['conformal']['level']}, unit `{settings['conformal']['unit']}`, calibrated on"
         f" {int(np.asarray(inspected['calibration_unit_count']))} validation orbits, offset"
         f" `{float(np.asarray(inspected['conformal_offset'])):.6f}`. Test-orbit coverage (every voxel of the"
         f" whole field inside the band, medianed per orbit then averaged): `{orbit_level_coverage:.3f}`"
-        f" against a guarantee of `[{float(np.asarray(inspected['coverage_guarantee_low'])):.3f}, "
-        f"{float(np.asarray(inspected['coverage_guarantee_high'])):.3f}]`.",
+        f" against a guarantee of `[{guarantee_low:.3f}, {guarantee_high:.3f}]`.",
         "",
     ]
+    summary = MetricSummary(
+        metric_name="orbit_field_coverage",
+        group_name="conformal_calibration_0.90",
+        unit_count=int(orbit_coverage.shape[0]),
+        run_count=int(test.accurate.shape[0]),
+        median=coverage_median,
+        interquartile=coverage_interquartile,
+        confidence_low=guarantee_low,
+        confidence_high=guarantee_high,
+    )
+    return lines, summary
+
+
+def Result_Key(group: str) -> ResultKey:
+    """this member's own key, fixed in every field but the group one row or verdict covers"""
+    return ResultKey(
+        member=MEMBER_NAME,
+        configuration=CONFIGURATION_NAME,
+        task=TASK_NAME,
+        split=SPLIT_NAME,
+        block=EVALUATION_BLOCK,
+        group=group,
+    )
+
+
+def Write_Results(
+    summaries: tuple[MetricSummary, ...], comparisons: tuple[FloorComparison, ...], block_signature: str
+) -> None:
+    """every summary and verdict measured so far, written as the one committed cross-member artifact"""
+    rows = tuple(
+        ResultRow(key=Result_Key(summary.group_name), summary=summary, block_signature=block_signature)
+        for summary in summaries
+    )
+    verdicts = tuple(
+        VerdictRow(key=Result_Key(comparison.group_name), comparison=comparison) for comparison in comparisons
+    )
+    Write_Member_Results(
+        RESULTS_PATH,
+        MemberResults(
+            member=MEMBER_NAME,
+            regenerate="python -m operators.residual_correction.report",
+            rows=rows,
+            verdicts=verdicts,
+        ),
+    )
 
 
 def Main(argv: list[str] | None = None) -> int:
@@ -407,8 +482,11 @@ def Main(argv: list[str] | None = None) -> int:
     train = CorrectionBlock("train")
     validation = CorrectionBlock("validation")
     test = CorrectionBlock("test")
+    block_signature = Block_Signature(test.unit_keys)
 
-    floor_lines, floor_comparisons, correction_basis, cheap_basis, kill_bar = Floor_Lines(train, validation, test)
+    floor_lines, floor_comparisons, floor_summaries, correction_basis, cheap_basis, kill_bar = Floor_Lines(
+        train, validation, test
+    )
     lines = [
         "# residual_correction — measured report",
         "",
@@ -426,10 +504,11 @@ def Main(argv: list[str] | None = None) -> int:
             "",
         ]
         REPORT_PATH.write_text("\n".join(lines) + "\n")
+        Write_Results(floor_summaries, floor_comparisons, block_signature)
         print(f"wrote {REPORT_PATH} (floors only)")
         return 0
 
-    validation_rebuilt, test_rebuilt, step_count, member = Trained_Member_Predictions(
+    validation_rebuilt, test_rebuilt, training_manifest, member = Trained_Member_Predictions(
         train, validation, test, correction_basis, cheap_basis
     )
     member_runs = test.Scored(test_rebuilt)
@@ -441,14 +520,22 @@ def Main(argv: list[str] | None = None) -> int:
     floor_medians["identity"] = member_comparison.floor_median
     figure_count = Write_Figures(member, test, test_rebuilt, floor_medians, member_comparison.member_median)
 
+    stage_step_counts = cast(tuple[int, int, int], training_manifest["stage_step_counts"])
+    stage_summary = ", ".join(
+        f"stage {stage_index} at {rate:.2e} for {steps} steps"
+        for stage_index, (rate, steps) in enumerate(zip(STAGE_LEARNING_RATES, stage_step_counts, strict=True))
+    )
+    member_relative_l2 = Summarize(member_runs, "relative_l2", "member")
+    member_delta_r_squared = Summarize(member_runs, "delta_r_squared", "member")
+
     lines += [
         "## Result (one seed, 20260916)",
         "",
-        f"{step_count} steps chosen on validation out of {CANDIDATE_STEP_COUNTS}."
-        f" {figure_count} figures under `figures/projection_backbone/`.",
+        f"Staged schedule ({stage_summary}), validated every {VALIDATION_INTERVAL} steps, final-stage"
+        f" patience {FINAL_STAGE_PATIENCE}. {figure_count} figures under `figures/projection_backbone/`.",
         "",
         "```",
-        Render_Table(Summary_Table((Summarize(member_runs, "relative_l2", "member"),))),
+        Render_Table(Summary_Table((member_relative_l2,))),
         "```",
         "",
         "```",
@@ -460,18 +547,19 @@ def Main(argv: list[str] | None = None) -> int:
         "```",
         "",
         "```",
-        Render_Table(Summary_Table((Summarize(member_runs, "delta_r_squared", "member"),))),
+        Render_Table(Summary_Table((member_delta_r_squared,))),
         "```",
         "",
     ]
-    lines += Conformal_Lines(member, validation, validation_rebuilt, test, test_rebuilt)
+    conformal_lines, conformal_summary = Conformal_Lines(member, validation, validation_rebuilt, test, test_rebuilt)
+    lines += conformal_lines
     lines += [
         "## Standing",
         "",
         f"Verdict: **{member_comparison.verdict}** against the canon kill (`{kill_bar:.6f}` relative L2,"
-        f" delta-R-squared >= 0.75), one seeded run (20260916). The built member's own seed sweep measured"
-        " a fourteen to thirty-five percent spread on its task, so this single run cannot resolve a"
-        " few-percent difference from the bar; it is read at face value.",
+        f" delta-R-squared >= 0.75), one seeded run (20260916). Per the sweep's own policy (seed sweeps"
+        " deferred), no seed-spread is measured for this member, so a close result cannot be resolved"
+        " further on this run alone; it is read at face value.",
         "",
         "Caveats: one seed; the FiLM conditioning on campaign and exact-exchange fraction named in the"
         " canon entry is dropped here because the strain atlas is one campaign at one exact-exchange"
@@ -480,6 +568,11 @@ def Main(argv: list[str] | None = None) -> int:
         "",
     ]
     REPORT_PATH.write_text("\n".join(lines) + "\n")
+    Write_Results(
+        floor_summaries + (member_relative_l2, member_delta_r_squared, conformal_summary),
+        floor_comparisons + (member_comparison,),
+        block_signature,
+    )
     print(f"wrote {REPORT_PATH}")
     return 0
 

@@ -1,0 +1,193 @@
+{
+ "member": "residual_correction",
+ "regenerate": "python -m operators.residual_correction.report",
+ "rows": [
+  {
+   "block_signature": "9b086b9ef5f1",
+   "key": {
+    "block": "test",
+    "configuration": "projection_backbone",
+    "group": "identity",
+    "member": "residual_correction",
+    "split": "strain_atlas_holdout",
+    "task": "cheap_to_accurate_charge"
+   },
+   "summary": {
+    "confidence_high": 0.011303,
+    "confidence_low": 0.010826,
+    "group_name": "identity",
+    "interquartile": 0.000611,
+    "median": 0.011131,
+    "metric_name": "relative_l2",
+    "run_count": 88,
+    "unit_count": 22
+   }
+  },
+  {
+   "block_signature": "9b086b9ef5f1",
+   "key": {
+    "block": "test",
+    "configuration": "projection_backbone",
+    "group": "global_affine",
+    "member": "residual_correction",
+    "split": "strain_atlas_holdout",
+    "task": "cheap_to_accurate_charge"
+   },
+   "summary": {
+    "confidence_high": 0.010593,
+    "confidence_low": 0.010224,
+    "group_name": "global_affine",
+    "interquartile": 0.000482,
+    "median": 0.010466,
+    "metric_name": "relative_l2",
+    "run_count": 88,
+    "unit_count": 22
+   }
+  },
+  {
+   "block_signature": "9b086b9ef5f1",
+   "key": {
+    "block": "test",
+    "configuration": "projection_backbone",
+    "group": "ridge_cheap_coefficients",
+    "member": "residual_correction",
+    "split": "strain_atlas_holdout",
+    "task": "cheap_to_accurate_charge"
+   },
+   "summary": {
+    "confidence_high": 6e-06,
+    "confidence_low": 5e-06,
+    "group_name": "ridge_cheap_coefficients",
+    "interquartile": 2e-06,
+    "median": 5e-06,
+    "metric_name": "relative_l2",
+    "run_count": 88,
+    "unit_count": 22
+   }
+  },
+  {
+   "block_signature": "9b086b9ef5f1",
+   "key": {
+    "block": "test",
+    "configuration": "projection_backbone",
+    "group": "ridge_strain_components",
+    "member": "residual_correction",
+    "split": "strain_atlas_holdout",
+    "task": "cheap_to_accurate_charge"
+   },
+   "summary": {
+    "confidence_high": 9.8e-05,
+    "confidence_low": 5.1e-05,
+    "group_name": "ridge_strain_components",
+    "interquartile": 2.5e-05,
+    "median": 4.9e-05,
+    "metric_name": "relative_l2",
+    "run_count": 88,
+    "unit_count": 22
+   }
+  },
+  {
+   "block_signature": "9b086b9ef5f1",
+   "key": {
+    "block": "test",
+    "configuration": "projection_backbone",
+    "group": "rank_32_ceiling",
+    "member": "residual_correction",
+    "split": "strain_atlas_holdout",
+    "task": "cheap_to_accurate_charge"
+   },
+   "summary": {
+    "confidence_high": 3e-06,
+    "confidence_low": 2e-06,
+    "group_name": "rank_32_ceiling",
+    "interquartile": 1e-06,
+    "median": 2e-06,
+    "metric_name": "relative_l2",
+    "run_count": 88,
+    "unit_count": 22
+   }
+  }
+ ],
+ "verdicts": [
+  {
+   "comparison": {
+    "floor_median": 0.011131,
+    "floor_name": "identity",
+    "group_name": "global_affine",
+    "improvement": 0.059694,
+    "member_median": 0.010466,
+    "metric_name": "relative_l2",
+    "required_improvement": 0.0,
+    "verdict": "pass"
+   },
+   "key": {
+    "block": "test",
+    "configuration": "projection_backbone",
+    "group": "global_affine",
+    "member": "residual_correction",
+    "split": "strain_atlas_holdout",
+    "task": "cheap_to_accurate_charge"
+   }
+  },
+  {
+   "comparison": {
+    "floor_median": 0.011131,
+    "floor_name": "identity",
+    "group_name": "ridge_cheap_coefficients",
+    "improvement": 0.99954,
+    "member_median": 5e-06,
+    "metric_name": "relative_l2",
+    "required_improvement": 0.0,
+    "verdict": "pass"
+   },
+   "key": {
+    "block": "test",
+    "configuration": "projection_backbone",
+    "group": "ridge_cheap_coefficients",
+    "member": "residual_correction",
+    "split": "strain_atlas_holdout",
+    "task": "cheap_to_accurate_charge"
+   }
+  },
+  {
+   "comparison": {
+    "floor_median": 0.011131,
+    "floor_name": "identity",
+    "group_name": "ridge_strain_components",
+    "improvement": 0.995637,
+    "member_median": 4.9e-05,
+    "metric_name": "relative_l2",
+    "required_improvement": 0.0,
+    "verdict": "pass"
+   },
+   "key": {
+    "block": "test",
+    "configuration": "projection_backbone",
+    "group": "ridge_strain_components",
+    "member": "residual_correction",
+    "split": "strain_atlas_holdout",
+    "task": "cheap_to_accurate_charge"
+   }
+  },
+  {
+   "comparison": {
+    "floor_median": 0.011131,
+    "floor_name": "identity",
+    "group_name": "rank_32_ceiling",
+    "improvement": 0.999849,
+    "member_median": 2e-06,
+    "metric_name": "relative_l2",
+    "required_improvement": 0.0,
+    "verdict": "pass"
+   },
+   "key": {
+    "block": "test",
+    "configuration": "projection_backbone",
+    "group": "rank_32_ceiling",
+    "member": "residual_correction",
+    "split": "strain_atlas_holdout",
+    "task": "cheap_to_accurate_charge"
+   }
+  }
+ ]
+}

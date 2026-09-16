@@ -48,6 +48,8 @@ from operators.substrate.operations import (
     Concatenate_Channels,
     Contract_Channel_Axis,
     Detached,
+    Peak_Accelerator_Bytes,
+    Reset_Peak_Accelerator_Bytes,
     Exponential,
     Gaussian_Error_Linear_Unit,
     Gaussian_Error_Linear_Unit_Derivative,

@@ -6,6 +6,7 @@ import numpy as np
 from numpy.typing import NDArray
 
 from operators.substrate.linear_algebra import Largest_Singular_Values_Of_Stack
+from operators.substrate.devices import Accelerator_Is_Available
 from operators.substrate.torch_engine import Torch_Module
 
 
@@ -149,3 +150,16 @@ def Clipped_Above(value: Any, ceiling: float) -> Any:
     if Is_Engine_Native(value):
         return Torch_Module().clamp(value, max=ceiling)
     return np.minimum(value, ceiling)
+
+
+def Reset_Peak_Accelerator_Bytes() -> None:
+    """the accelerator's peak-allocation counter set back to what is held right now, a no-op without one"""
+    if Accelerator_Is_Available():
+        Torch_Module().cuda.reset_peak_memory_stats()
+
+
+def Peak_Accelerator_Bytes() -> int:
+    """the most bytes the foreign engine has held on the accelerator since the last reset, zero without one"""
+    if not Accelerator_Is_Available():
+        return 0
+    return int(Torch_Module().cuda.max_memory_allocated())

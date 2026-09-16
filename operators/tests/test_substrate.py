@@ -12,6 +12,8 @@ from operators.substrate import (
     ACCELERATOR_DEVICE_NAME,
     Accelerator_Is_Available,
     Adam_Step,
+    Peak_Accelerator_Bytes,
+    Reset_Peak_Accelerator_Bytes,
     Clipped_Above,
     Contract_Channel_Axis,
     CustomGradient,
@@ -523,3 +525,16 @@ def Test_The_Torch_Seam_Holds() -> None:
         if ".pytest_cache" in parts or "substrate" in parts or "tests" in parts:
             continue
         assert "torch" not in source_path.read_text(), f"{source_path} mentions the foreign engine"
+
+
+def Test_The_Peak_Accelerator_Bytes_Read_Zero_Without_A_Card_And_Grow_With_One() -> None:
+    """the peak counter is an honest zero on a host alone and rises after an allocation on a card"""
+    Reset_Peak_Accelerator_Bytes()
+    before = Peak_Accelerator_Bytes()
+    assert before >= 0
+    if not Accelerator_Is_Available():
+        assert before == 0
+        return
+    held = TorchEngine(device_name=ACCELERATOR_DEVICE_NAME).Lift_Constant(np.ones((256, 256), dtype=np.float64))
+    after = Peak_Accelerator_Bytes()
+    assert after >= before + held.numel() * held.element_size()

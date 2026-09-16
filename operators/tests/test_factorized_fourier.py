@@ -1,5 +1,6 @@
 """the flagship member: its assembly, the discretization and commutation claims, and its recomputed floors"""
 
+import json
 from pathlib import Path
 from typing import Any, cast
 
@@ -46,6 +47,7 @@ from operators.factorized_fourier.report import (
     Nearest_Run_Rows,
     Probe_Curve_At,
     Probe_Passes,
+    Staged_Training,
     Shell_Filter_Rows,
     Write_Back_Parameters,
 )
@@ -1059,3 +1061,30 @@ def Test_Deep_Equilibrium_Verdict_Lines_Reads_Outcome_A_Before_Any_Rung_Has_Trai
     """with nothing trained, the verdict section still writes the one pre-registered outcome that already holds"""
     lines = Deep_Equilibrium_Verdict_Lines()
     assert any("Outcome A" in line for line in lines)
+
+
+def Test_A_Staged_Run_Resumes_Every_Stage_From_Its_Own_Checkpoint(tmp_path: Path) -> None:
+    """after a power loss the probe is not rerun, a finished stage is skipped, and the end state is unchanged"""
+    batches = TwoExampleBatches(Toy_Training_Batch(seed=21))
+    engine = TorchEngine(device_name="cpu")
+
+    def Launch() -> dict[str, NDArray[np.float64]]:
+        member = Toy_Member(hidden_channels=4, seed=22)
+        parameters = ParameterSet(values={name: value.copy() for name, value in member.Parameter_Values().items()})
+        trained, _ = Staged_Training(
+            engine, parameters, lambda: ParameterSet(values=member.Parameter_Values()), Batch_Loss(member),
+            batches, step_count=6, run_name="toy", artifact_directory=tmp_path,
+        )
+        return trained.values
+
+    first = Launch()
+    probe_written = (tmp_path / "toy_probe_manifest.json").stat().st_mtime_ns
+    # the unlinking simulates the power loss: stages one and two are gone, stage zero and the probe survive
+    for stage in (1, 2):
+        (tmp_path / f"toy_stage{stage}_checkpoint.npz").unlink()
+    second = Launch()
+    assert (tmp_path / "toy_probe_manifest.json").stat().st_mtime_ns == probe_written
+    stage_zero = json.loads((tmp_path / "toy_stage0_manifest.json").read_text())
+    assert stage_zero["resumed_from_step"] == stage_zero["step_count"]
+    for name in first:
+        assert np.allclose(first[name], second[name], atol=1e-12), name

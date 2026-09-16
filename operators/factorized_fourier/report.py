@@ -1,8 +1,10 @@
 """the member measured against its floors, written as one committed markdown artifact"""
 
 import dataclasses
+import json
 import re
 from pathlib import Path
+from collections.abc import Callable
 from typing import Any, Literal, cast
 
 import numpy as np
@@ -87,7 +89,7 @@ from operators.inspection import (
     Render_Prediction_Against_Truth,
     Render_Table,
 )
-from operators.substrate import Detached, Host_Array, ParameterSet
+from operators.substrate import Detached, Engine, Host_Array, ParameterSet
 from operators.tasks import Card_Named
 from operators.training import (
     BatchArray,
@@ -354,6 +356,65 @@ def Write_Back_Parameters(member: FactorizedFourier, parameters: ParameterSet) -
         Write_Back_Layer(composition.layer, parameters, "")
 
 
+def Staged_Training(
+    engine: Engine,
+    parameters: ParameterSet,
+    fresh_parameters: Callable[[], ParameterSet],
+    forward_loss: Any,
+    batches: BatchSource,
+    step_count: int,
+    run_name: str,
+    hook: TrainingHook | None = None,
+    stage_fractions: tuple[float, float, float] = STAGE_FRACTIONS,
+    seed: int = FLAGSHIP_SEED,
+    artifact_directory: Path = TRAINING_ARTIFACT_PATH,
+) -> tuple[ParameterSet, dict[str, object]]:
+    """the divergence probe then three stages at decaying rates, every piece resuming from its own checkpoint"""
+    stage_step_counts = Staged_Step_Counts(step_count, stage_fractions)
+    probe_steps = min(DIVERGENCE_PROBE_STEPS, stage_step_counts[0])
+    probe_name = f"{run_name}_probe"
+    probe_manifest_path = artifact_directory / f"{probe_name}_manifest.json"
+    if probe_manifest_path.is_file():
+        # a probe that already ran is not run again after a power loss, its verdict and rate are read back instead
+        chosen_peak_rate = float(json.loads(probe_manifest_path.read_text())["learning_rate"])
+        probe_checkpoint = artifact_directory / f"{probe_name}_checkpoint.npz"
+        if probe_checkpoint.is_file():
+            parameters = Read_Checkpoint(probe_checkpoint, parameters).parameters
+    else:
+        chosen_peak_rate = PEAK_LEARNING_RATE
+        probe_result = Train(
+            engine, parameters, forward_loss, batches, step_count=probe_steps, learning_rate=chosen_peak_rate,
+            seed=seed, artifact_directory=artifact_directory, run_name=probe_name,
+            validation_interval=probe_steps, patience=0, hook=hook,
+        )
+        if not Sane_Loss_Curve(probe_result.loss_curve, probe_result.validation_curve):
+            chosen_peak_rate = PEAK_LEARNING_RATE * 0.3
+            probe_result = Train(
+                engine, fresh_parameters(), forward_loss, batches, step_count=probe_steps,
+                learning_rate=chosen_peak_rate, seed=seed, artifact_directory=artifact_directory,
+                run_name=probe_name, validation_interval=probe_steps, patience=0, resume=False, hook=hook,
+            )
+            if not Sane_Loss_Curve(probe_result.loss_curve, probe_result.validation_curve):
+                raise RuntimeError(
+                    "the loss is non-finite or diverging at both the peak and the reduced rate within the probe"
+                )
+        parameters = probe_result.parameters
+    stage_rates = (chosen_peak_rate, chosen_peak_rate / 3.0, chosen_peak_rate / 9.0)
+    manifest: dict[str, object] = {"probe_learning_rate": chosen_peak_rate, "probe_steps": probe_steps}
+    for stage_index, (rate, stage_steps) in enumerate(zip(stage_rates, stage_step_counts, strict=True)):
+        is_final_stage = stage_index == len(stage_step_counts) - 1
+        # every stage resumes its own checkpoint, so a relaunch skips finished stages and continues a partial one
+        result = Train(
+            engine, parameters, forward_loss, batches, step_count=stage_steps, learning_rate=rate,
+            seed=seed + stage_index, artifact_directory=artifact_directory,
+            run_name=f"{run_name}_stage{stage_index}", validation_interval=VALIDATION_INTERVAL,
+            patience=FINAL_STAGE_PATIENCE if is_final_stage else 0, resume=True, hook=hook,
+        )
+        parameters = result.parameters
+        manifest[f"stage_{stage_index}"] = result.manifest
+    return parameters, manifest
+
+
 def Train_Flagship_Member(
     step_count: int,
     run_name: str,
@@ -405,47 +466,18 @@ def Train_Flagship_Member(
         # the solver's own cap-hit fraction and mean iterations, windowed for the probe protocol's own launch rule
         hook = HealthTrackingHook(member, hook)
 
-    stage_step_counts = Staged_Step_Counts(step_count, stage_fractions)
-    probe_steps = min(DIVERGENCE_PROBE_STEPS, stage_step_counts[0])
-    chosen_peak_rate = PEAK_LEARNING_RATE
-    probe_result = Train(
-        engine, parameters, forward_loss, batches, step_count=probe_steps, learning_rate=chosen_peak_rate,
-        seed=FLAGSHIP_SEED, artifact_directory=TRAINING_ARTIFACT_PATH, run_name=f"{run_name}_stage0",
-        validation_interval=probe_steps, patience=0, hook=hook,
+    parameters, staged = Staged_Training(
+        engine, parameters, lambda: ParameterSet(values=member.Parameter_Values()), forward_loss, batches,
+        step_count, run_name, hook=hook, stage_fractions=stage_fractions,
     )
-    if not Sane_Loss_Curve(probe_result.loss_curve, probe_result.validation_curve):
-        chosen_peak_rate = PEAK_LEARNING_RATE * 0.3
-        probe_result = Train(
-            engine, ParameterSet(values=member.Parameter_Values()), forward_loss, batches, step_count=probe_steps,
-            learning_rate=chosen_peak_rate, seed=FLAGSHIP_SEED, artifact_directory=TRAINING_ARTIFACT_PATH,
-            run_name=f"{run_name}_stage0", validation_interval=probe_steps, patience=0, resume=False, hook=hook,
-        )
-        if not Sane_Loss_Curve(probe_result.loss_curve, probe_result.validation_curve):
-            raise RuntimeError(
-                "the loss is non-finite or diverging at both the peak and the reduced rate within the probe"
-            )
-    parameters = probe_result.parameters
-    stage_rates = (chosen_peak_rate, chosen_peak_rate / 3.0, chosen_peak_rate / 9.0)
-
     manifest: dict[str, object] = {
         "run_name": run_name,
         "reference_density": reference_density,
-        "probe_learning_rate": chosen_peak_rate,
-        "probe_steps": probe_steps,
         "training_example_count": len(training_examples),
         "validation_unit_count": len(batches.validation_by_unit),
         "stabilization": stabilization,
     }
-    for stage_index, (rate, stage_steps) in enumerate(zip(stage_rates, stage_step_counts, strict=True)):
-        is_final_stage = stage_index == len(stage_step_counts) - 1
-        result = Train(
-            engine, parameters, forward_loss, batches, step_count=stage_steps, learning_rate=rate,
-            seed=FLAGSHIP_SEED + stage_index, artifact_directory=TRAINING_ARTIFACT_PATH,
-            run_name=f"{run_name}_stage{stage_index}", validation_interval=VALIDATION_INTERVAL,
-            patience=FINAL_STAGE_PATIENCE if is_final_stage else 0, resume=(stage_index == 0), hook=hook,
-        )
-        parameters = result.parameters
-        manifest[f"stage_{stage_index}"] = result.manifest
+    manifest.update(staged)
     Write_Back_Parameters(member, parameters)
     manifest["final_parameters"] = parameters
     manifest["member"] = member

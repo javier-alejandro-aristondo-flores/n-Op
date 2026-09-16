@@ -36,19 +36,29 @@ from operators.substrate.fourier import (
     Split_Batch_From_Grid,
     Zeros_Beside,
 )
-from operators.substrate.linear_algebra import Least_Squares_Solution, Solve_Linear_System
+from operators.substrate.linear_algebra import (
+    Largest_Singular_Values_Of_Stack,
+    Least_Squares_Solution,
+    Singular_Values_Clipped,
+    Solve_Linear_System,
+)
 from operators.substrate.network import MultilayerPerceptron
 from operators.substrate.operations import (
+    Clipped_Above,
     Concatenate_Channels,
     Contract_Channel_Axis,
     Detached,
     Exponential,
     Gaussian_Error_Linear_Unit,
+    Gaussian_Error_Linear_Unit_Derivative,
     Host_Array,
     Hyperbolic_Tangent,
+    Largest_Singular_Values,
     Maximum_Over_Last_Axis,
     Mean_Over_Last_Axis,
+    Periodic_Convolution_3d,
     Roll_Along_Axes,
+    Scatter_Add,
     Softplus,
     Sum_Over_Last_Axis,
 )

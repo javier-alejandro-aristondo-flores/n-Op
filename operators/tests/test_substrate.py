@@ -6,25 +6,33 @@ from typing import Any
 
 import numpy as np
 import pytest
+from numpy.typing import NDArray
 
 from operators.substrate import (
     ACCELERATOR_DEVICE_NAME,
     Accelerator_Is_Available,
     Adam_Step,
+    Clipped_Above,
     Contract_Channel_Axis,
     CustomGradient,
     Device_Name_Of,
     Engine,
-    HOST_DEVICE_NAME,
-    Preferred_Device_Name,
-    Fresh_Adam_State,
     Fourier_Transform_3d,
+    Fresh_Adam_State,
     Gaussian_Error_Linear_Unit,
+    Gaussian_Error_Linear_Unit_Derivative,
+    HOST_DEVICE_NAME,
     Inverse_Fourier_Transform_3d,
+    Largest_Singular_Values,
+    Largest_Singular_Values_Of_Stack,
     MultilayerPerceptron,
     NumpyEngine,
     ParameterSet,
+    Periodic_Convolution_3d,
+    Preferred_Device_Name,
     Roll_Along_Axes,
+    Scatter_Add,
+    Singular_Values_Clipped,
     Softplus,
     Torch_Is_Available,
     TorchEngine,
@@ -247,6 +255,26 @@ def Test_The_Nonlinearities_Have_Their_Known_Values() -> None:
     assert abs(float(Gaussian_Error_Linear_Unit(np.asarray(3.0))) - 3.0) < 2e-2
 
 
+def Test_Gaussian_Error_Linear_Unit_Derivative_Matches_Central_Differences() -> None:
+    """the analytic derivative lands beside a central-difference estimate at a spread of points"""
+    points = np.asarray([-2.5, -0.75, 0.0, 0.4, 1.3, 3.0])
+    step_size = 1e-5
+    numeric = (
+        Gaussian_Error_Linear_Unit(points + step_size) - Gaussian_Error_Linear_Unit(points - step_size)
+    ) / (2.0 * step_size)
+    assert np.allclose(Gaussian_Error_Linear_Unit_Derivative(points), numeric, atol=1e-6)
+
+
+@pytest.mark.skipif(not Torch_Is_Available(), reason="torch is not installed yet")
+def Test_Gaussian_Error_Linear_Unit_Derivative_Agrees_Between_Engines() -> None:
+    """the derivative lands on the same numbers whether numpy or the foreign engine carries the array"""
+    points = np.asarray([-2.5, -0.75, 0.0, 0.4, 1.3, 3.0])
+    reference = Gaussian_Error_Linear_Unit_Derivative(points)
+    lifted = TorchEngine().Lift_Constant(points)
+    produced = Gaussian_Error_Linear_Unit_Derivative(lifted)
+    assert np.allclose(np.asarray(produced, dtype=np.float64), reference, atol=1e-12)
+
+
 def Test_Roll_Along_Axes_Matches_Plain_Numpy() -> None:
     """the dispatched roll lands on exactly what a plain numpy roll returns"""
     generator = np.random.default_rng(40)
@@ -287,6 +315,110 @@ def Test_Contract_Channel_Axis_Agrees_Between_Engines() -> None:
     assert np.allclose(np.asarray(produced, dtype=np.float64), reference)
 
 
+def Test_Scatter_Add_Matches_Plain_Numpy_Add_At() -> None:
+    """the dispatched scatter lands on exactly what a plain numpy add-at returns"""
+    generator = np.random.default_rng(50)
+    per_edge = generator.random((6, 3))
+    receiving_points = np.asarray([0, 2, 1, 2, 0, 3], dtype=np.int64)
+    reference = np.zeros((4, 3))
+    np.add.at(reference, receiving_points, per_edge)
+    assert np.allclose(Scatter_Add(4, receiving_points, per_edge), reference)
+
+
+@pytest.mark.skipif(not Torch_Is_Available(), reason="torch is not installed yet")
+def Test_Scatter_Add_Gradient_Is_The_Gather_Of_The_Cotangent() -> None:
+    """the torch gradient with respect to per_edge matches both the reference engine and its own closed form"""
+    receiving_points = np.asarray([0, 2, 1, 2, 0, 3], dtype=np.int64)
+    row_count = 4
+
+    def Loss(lifted: dict[str, Any]) -> Any:
+        accumulated = Scatter_Add(row_count, receiving_points, lifted["per_edge"])
+        return (accumulated * accumulated).sum()
+
+    generator = np.random.default_rng(51)
+    parameters = ParameterSet(values={"per_edge": generator.random((6, 3))})
+    numeric_gradient = NumpyEngine().Gradients(parameters, Loss)["per_edge"]
+    foreign_gradient = TorchEngine().Gradients(parameters, Loss)["per_edge"]
+    assert np.allclose(foreign_gradient, numeric_gradient, atol=1e-4)
+    # the closed form the finite-difference check confirms: a gather of the accumulated output's own cotangent
+    accumulated = Scatter_Add(row_count, receiving_points, parameters.values["per_edge"])
+    expected = (2.0 * accumulated)[receiving_points]
+    assert np.allclose(foreign_gradient, expected, atol=1e-8)
+
+
+def Independent_Roll_And_Accumulate(values: NDArray[np.float64], stencil_weights: NDArray[np.float64]) -> Any:
+    """the stencil sum written out with plain numpy roll and tensordot, independent of the dispatched facet"""
+    offset_extents = stencil_weights.shape[:3]
+    half_widths = tuple((extent - 1) // 2 for extent in offset_extents)
+    produced = np.zeros((stencil_weights.shape[3], *values.shape[1:]))
+    for offset_index in np.ndindex(offset_extents):
+        shift = (
+            offset_index[0] - half_widths[0],
+            offset_index[1] - half_widths[1],
+            offset_index[2] - half_widths[2],
+        )
+        shifted = np.roll(values, shift=shift, axis=(1, 2, 3))
+        produced += np.tensordot(stencil_weights[offset_index], shifted, axes=([1], [0]))
+    return produced
+
+
+def Test_Periodic_Convolution_3d_Matches_An_Independent_Roll_And_Accumulate() -> None:
+    """the numpy path lands on exactly what a hand-written roll-and-tensordot loop returns"""
+    generator = np.random.default_rng(60)
+    values = generator.random((2, 6, 6, 6))
+    weights = generator.random((3, 3, 3, 4, 2))
+    reference = Independent_Roll_And_Accumulate(values, weights)
+    assert np.allclose(Periodic_Convolution_3d(values, weights), reference, atol=1e-12)
+
+
+@pytest.mark.skipif(not Torch_Is_Available(), reason="torch is not installed yet")
+@pytest.mark.parametrize(
+    "grid_extent,half_widths",
+    [
+        pytest.param(6, (1, 1, 1), id="six_cubed_symmetric"),
+        pytest.param(8, (1, 1, 1), id="eight_cubed_symmetric"),
+        pytest.param(8, (1, 2, 1), id="eight_cubed_asymmetric"),
+    ],
+)
+def Test_Periodic_Convolution_3d_Agrees_Between_Engines(grid_extent: int, half_widths: tuple[int, int, int]) -> None:
+    """the circular convolution lands on the same numbers as the roll-and-accumulate loop on the foreign engine"""
+    offset_extents = tuple(2 * half_width + 1 for half_width in half_widths)
+    generator = np.random.default_rng(61)
+    values = generator.random((2, grid_extent, grid_extent, grid_extent))
+    weights = generator.random((*offset_extents, 3, 2))
+    reference = Periodic_Convolution_3d(values, weights)
+    engine = TorchEngine()
+    produced = Periodic_Convolution_3d(engine.Lift_Constant(values), engine.Lift_Constant(weights))
+    assert np.allclose(np.asarray(produced, dtype=np.float64), reference, atol=1e-10)
+
+
+def Loss_Through_The_Convolution_Facet(values: Any, target: Any) -> Callable[[dict[str, Any]], Any]:
+    """the summed squared gap between the convolution facet's output and a fixed target"""
+
+    def Loss(lifted: dict[str, Any]) -> Any:
+        difference = Periodic_Convolution_3d(values, lifted["stencil_weights"]) - target
+        return (difference * difference).sum()
+
+    return Loss
+
+
+@pytest.mark.skipif(not Torch_Is_Available(), reason="torch is not installed yet")
+def Test_Periodic_Convolution_3d_Gradient_Agrees_With_The_Reference_Engine() -> None:
+    """the convolution facet's gradient with respect to the stencil weights matches the finite-difference oracle"""
+    generator = np.random.default_rng(62)
+    values = generator.random((2, 6, 6, 6))
+    target = generator.random((3, 6, 6, 6))
+    parameters = ParameterSet(values={"stencil_weights": generator.random((3, 3, 3, 3, 2))})
+    engine = TorchEngine()
+    numeric_gradient = NumpyEngine().Gradients(parameters, Loss_Through_The_Convolution_Facet(values, target))[
+        "stencil_weights"
+    ]
+    foreign_gradient = engine.Gradients(
+        parameters, Loss_Through_The_Convolution_Facet(engine.Lift_Constant(values), engine.Lift_Constant(target))
+    )["stencil_weights"]
+    assert np.allclose(foreign_gradient, numeric_gradient, atol=1e-4)
+
+
 def Test_The_Transform_Round_Trips() -> None:
     """the three-dimensional transform inverts on the reference arrays"""
     generator = np.random.default_rng(4)
@@ -294,6 +426,94 @@ def Test_The_Transform_Round_Trips() -> None:
     spectrum = Fourier_Transform_3d(field)
     returned = np.real(Inverse_Fourier_Transform_3d(spectrum))
     assert np.allclose(returned, field, atol=1e-12)
+
+
+def Test_Singular_Values_Clipped_Caps_The_Largest_Singular_Value() -> None:
+    """no matrix in the stack carries a singular value past the ceiling once clipped"""
+    generator = np.random.default_rng(70)
+    stack = generator.normal(0.0, 3.0, size=(5, 4, 3))
+    ceiling = 1.0
+    clipped = Singular_Values_Clipped(stack, ceiling)
+    assert float(Largest_Singular_Values_Of_Stack(clipped).max()) <= ceiling + 1e-8
+
+
+def Test_Singular_Values_Clipped_Leaves_A_Narrow_Stack_Unchanged() -> None:
+    """a stack already under the ceiling is reassembled to the numbers it started with"""
+    generator = np.random.default_rng(71)
+    stack = generator.normal(0.0, 0.01, size=(4, 3, 3))
+    clipped = Singular_Values_Clipped(stack, ceiling=10.0)
+    assert np.allclose(clipped, stack, atol=1e-12)
+
+
+def Test_Singular_Values_Clipped_Is_Idempotent() -> None:
+    """clipping an already-clipped stack a second time changes nothing further"""
+    generator = np.random.default_rng(72)
+    stack = generator.normal(0.0, 3.0, size=(5, 4, 3))
+    ceiling = 1.0
+    once = Singular_Values_Clipped(stack, ceiling)
+    twice = Singular_Values_Clipped(once, ceiling)
+    assert np.allclose(once, twice, atol=1e-8)
+
+
+def Test_Singular_Values_Clipped_Preserves_A_Complex_Dtype() -> None:
+    """a complex stack comes back at its own width, not promoted or demoted"""
+    generator = np.random.default_rng(73)
+    real_part = generator.normal(0.0, 3.0, size=(3, 3, 3))
+    imaginary_part = generator.normal(0.0, 3.0, size=(3, 3, 3))
+    stack = (real_part + 1j * imaginary_part).astype(np.complex64)
+    clipped = Singular_Values_Clipped(stack, ceiling=1.0)
+    assert clipped.dtype == np.complex64
+    assert float(Largest_Singular_Values_Of_Stack(clipped).max()) <= 1.0 + 1e-4
+
+
+def Test_Largest_Singular_Values_Matches_The_Reference_Helper() -> None:
+    """the dispatched primitive lands on exactly what the batched numpy helper returns"""
+    generator = np.random.default_rng(74)
+    stack = generator.normal(0.0, 2.0, size=(4, 3, 3))
+    assert np.allclose(Largest_Singular_Values(stack), Largest_Singular_Values_Of_Stack(stack))
+
+
+@pytest.mark.skipif(not Torch_Is_Available(), reason="torch is not installed yet")
+def Test_Largest_Singular_Values_Agrees_Between_Engines() -> None:
+    """the largest singular value lands on the same number whether numpy or the foreign engine carries the stack"""
+    generator = np.random.default_rng(75)
+    stack = generator.normal(0.0, 2.0, size=(4, 3, 3))
+    reference = Largest_Singular_Values(stack)
+    lifted = TorchEngine().Lift_Constant(stack)
+    produced = Largest_Singular_Values(lifted)
+    assert np.allclose(np.asarray(produced, dtype=np.float64), reference, atol=1e-8)
+
+
+@pytest.mark.skipif(not Torch_Is_Available(), reason="torch is not installed yet")
+def Test_Largest_Singular_Values_Gradient_Agrees_With_The_Reference_Engine() -> None:
+    """the torch gradient of the largest singular value matches the finite-difference oracle on one 3x3 matrix"""
+
+    def Loss(lifted: dict[str, Any]) -> Any:
+        return (Largest_Singular_Values(lifted["matrix"]) ** 2).sum()
+
+    generator = np.random.default_rng(78)
+    parameters = ParameterSet(values={"matrix": generator.normal(0.0, 1.0, size=(3, 3))})
+    numeric_gradient = NumpyEngine().Gradients(parameters, Loss)["matrix"]
+    foreign_gradient = TorchEngine().Gradients(parameters, Loss)["matrix"]
+    assert np.allclose(foreign_gradient, numeric_gradient, atol=1e-4)
+
+
+def Test_Clipped_Above_Matches_Plain_Numpy_Minimum() -> None:
+    """the dispatched ceiling lands on exactly what a plain numpy minimum returns"""
+    generator = np.random.default_rng(76)
+    values = generator.normal(0.0, 2.0, size=(5, 5))
+    assert np.allclose(Clipped_Above(values, 1.0), np.minimum(values, 1.0))
+
+
+@pytest.mark.skipif(not Torch_Is_Available(), reason="torch is not installed yet")
+def Test_Clipped_Above_Agrees_Between_Engines() -> None:
+    """the ceiling lands on the same numbers whether numpy or the foreign engine carries the array"""
+    generator = np.random.default_rng(77)
+    values = generator.normal(0.0, 2.0, size=(5, 5))
+    reference = Clipped_Above(values, 1.0)
+    lifted = TorchEngine().Lift_Constant(values)
+    produced = Clipped_Above(lifted, 1.0)
+    assert np.allclose(np.asarray(produced, dtype=np.float64), reference, atol=1e-12)
 
 
 def Test_The_Torch_Seam_Holds() -> None:

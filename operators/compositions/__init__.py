@@ -13,7 +13,14 @@ from operators.compositions.activation import (
     Activation_Table,
     ActivationTable,
 )
-from operators.compositions.contraction import ContractionBudget, ContractionProjection, Nominal_Lipschitz
+from operators.compositions.contraction import (
+    ContractionBudget,
+    ContractionProjection,
+    Nominal_Lipschitz,
+    Normalized_Kernel_Lifted,
+    Normalized_Local_Linear_Lifted,
+    Spectral_Norm_Scale,
+)
 from operators.compositions.fixed_point import (
     FixedPoint,
     Finite_Difference_Jacobian_Vector_Product,

@@ -1,4 +1,4 @@
-"""a per-mode Lipschitz budget and the post-step projection that keeps the shared layer inside it"""
+"""a per-mode Lipschitz budget, its post-step clip and its differentiable normalized counterpart"""
 
 from dataclasses import dataclass
 from typing import Any
@@ -8,7 +8,13 @@ from numpy.typing import NDArray
 
 from operators.framework import Array
 from operators.kernels.spectral import AXIS_NAMES
-from operators.substrate import Largest_Singular_Values_Of_Stack, Singular_Values_Clipped
+from operators.substrate import (
+    Clipped_Above,
+    Complex_From_Parts,
+    Largest_Singular_Values,
+    Largest_Singular_Values_Of_Stack,
+    Singular_Values_Clipped,
+)
 from operators.training import TrainingProgress
 
 # the smooth activation's own slope supremum (GELU), the constant the per-mode lipschitz bound is stated in terms of
@@ -141,3 +147,32 @@ class ContractionProjection:
         if self.last_nominal_lipschitz is not None:
             state["last_nominal_lipschitz"] = np.asarray(self.last_nominal_lipschitz)
         return state
+
+
+def Spectral_Norm_Scale(value: Any, ceiling: float) -> Any:
+    """the per-slice scale bringing value's own largest singular value under the ceiling, differentiable, one or less"""
+    sigma = Largest_Singular_Values(value)
+    # a near-zero slice has nothing to normalize, and the floor keeps the divide finite rather than undefined
+    return Clipped_Above(sigma, ceiling) / (sigma + 1e-12)
+
+
+def Normalized_Local_Linear_Lifted(local_linear_lifted: dict[str, Any], budget: ContractionBudget) -> dict[str, Any]:
+    """the local matrix rescaled toward the budget's own share inside the forward pass, its bias left untouched"""
+    scale = Spectral_Norm_Scale(local_linear_lifted["lift_weights"], budget.Local_Bound())
+    normalized = dict(local_linear_lifted)
+    normalized["lift_weights"] = local_linear_lifted["lift_weights"] * scale[..., None, None]
+    return normalized
+
+
+def Normalized_Kernel_Lifted(kernel_lifted: dict[str, Any], budget: ContractionBudget) -> dict[str, Any]:
+    """every separable factor's own slices rescaled toward the budget's own per-factor share, once per forward"""
+    mode_bound = budget.Mode_Bound(len(STEM_NAMES))
+    normalized = dict(kernel_lifted)
+    for stem in STEM_NAMES:
+        real_name, imaginary_name = f"{stem}_real", f"{stem}_imaginary"
+        complex_stem = Complex_From_Parts(kernel_lifted[real_name], kernel_lifted[imaginary_name])
+        scale = Spectral_Norm_Scale(complex_stem, mode_bound)
+        broadcast_scale = scale[..., None, None]
+        normalized[real_name] = kernel_lifted[real_name] * broadcast_scale
+        normalized[imaginary_name] = kernel_lifted[imaginary_name] * broadcast_scale
+    return normalized

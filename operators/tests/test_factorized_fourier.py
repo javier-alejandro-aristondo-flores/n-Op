@@ -7,7 +7,7 @@ import numpy as np
 import pytest
 from numpy.typing import NDArray
 
-from operators.compositions import ExplicitStack, FixedPoint, Spectral_Resampled, WeightTied
+from operators.compositions import ContractionBudget, ExplicitStack, FixedPoint, Spectral_Resampled, WeightTied
 from operators.compositions.fixed_point import Sliced_Lifted
 from operators.data import Archive_Path
 from operators.evaluation import ScoredRun
@@ -779,6 +779,58 @@ def Test_The_Checkpoint_Round_Trip_Rebuilds_The_Trained_Member_Exactly(tmp_path:
     Write_Back_Parameters(original_member, result.parameters)
 
     probe = Toy_Input((4, 4, 4), seed=40)
+    trained_prediction = np.asarray(original_member(probe, GridSpec((4, 4, 4))).values)
+    reloaded_prediction = np.asarray(reloaded_member(probe, GridSpec((4, 4, 4))).values)
+    assert np.array_equal(trained_prediction, reloaded_prediction)
+
+
+def Test_A_Normalized_Checkpoint_Round_Trips_Through_The_Same_Machinery_Load_Trained_Member_Uses(tmp_path: Path) -> None:
+    """a budgeted fixed-point member trains, checkpoints and reloads to exactly the predictions its own weights give"""
+    budget = ContractionBudget(target_lipschitz=0.9, local_share=0.2)
+
+    def Budgeted_Member(seed: int) -> FactorizedFourier:
+        """a toy fixed-point member carrying rung three's own budget, every other choice held fixed"""
+        return Factorized_Fourier_Network(
+            hidden_channels=4,
+            kept_modes=(1, 1, 1),
+            layer_count=3,
+            reference_density=0.05,
+            gram_mean=np.zeros(6),
+            gram_scale=np.ones(6),
+            processing_shape=(4, 4, 4),
+            seed=seed,
+            configuration="fixed_point",
+            contraction_budget=budget,
+        )
+
+    batches = TwoExampleBatches(Toy_Training_Batch(seed=51))
+    original_member = Budgeted_Member(52)
+    assert isinstance(original_member.spectral_stack, FixedPoint)
+    assert original_member.spectral_stack.budget is budget
+    parameters = ParameterSet(
+        values={name: value.copy() for name, value in original_member.Parameter_Values().items()}
+    )
+    result = Train(
+        TorchEngine(device_name="cpu"),
+        parameters,
+        Batch_Loss(original_member),
+        batches,
+        step_count=4,
+        learning_rate=1e-2,
+        seed=53,
+        artifact_directory=tmp_path,
+        run_name="normalized_toy_stage0",
+        validation_interval=2,
+    )
+    checkpoint_path = Latest_Stage_Checkpoint(tmp_path, "normalized_toy")
+    reloaded_member = Budgeted_Member(52)
+    progress = Read_Checkpoint(checkpoint_path, ParameterSet(values=reloaded_member.Parameter_Values()))
+    for name, value in result.parameters.values.items():
+        assert np.array_equal(value, progress.best_parameters.values[name]), name
+    Write_Back_Parameters(reloaded_member, progress.best_parameters)
+    Write_Back_Parameters(original_member, result.parameters)
+
+    probe = Toy_Input((4, 4, 4), seed=54)
     trained_prediction = np.asarray(original_member(probe, GridSpec((4, 4, 4))).values)
     reloaded_prediction = np.asarray(reloaded_member(probe, GridSpec((4, 4, 4))).values)
     assert np.array_equal(trained_prediction, reloaded_prediction)

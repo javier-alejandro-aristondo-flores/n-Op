@@ -12,6 +12,12 @@ from operators.compositions.activation import (
     Activation_Table,
     ActivationTable,
 )
+from operators.compositions.contraction import (
+    ContractionBudget,
+    Nominal_Lipschitz,
+    Normalized_Kernel_Lifted,
+    Normalized_Local_Linear_Lifted,
+)
 from operators.framework import Array, Coefficients, Composition, GridFunction, Layer
 from operators.substrate import (
     CustomGradient,
@@ -164,12 +170,15 @@ class WeightTied(Composition[GridFunction]):
         depth: int,
         input_injection: bool = False,
         activations: ActivationTable | None = None,
+        budget: ContractionBudget | None = None,
     ) -> None:
         self.layer = layer
         self.depth = depth
         self.activations = Activation_Table(activations)
         # with the injection on, this is exactly the fixed point's own iteration unrolled a fixed number of times
         self.input_injection = input_injection
+        # rung three: the lifted dicts are renormalized once per forward, never the stored parameters themselves
+        self.budget = budget
         self.last_application_norms: NDArray[np.float64] | None = None
 
 
@@ -177,6 +186,9 @@ class WeightTied(Composition[GridFunction]):
         """the value after each application of the shared layer in turn, tape on throughout"""
         kernel_lifted = Sliced_Lifted(lifted, "kernel.")
         local_linear_lifted = Sliced_Lifted(lifted, "local_linear.")
+        if self.budget is not None:
+            kernel_lifted = Normalized_Kernel_Lifted(kernel_lifted, self.budget)
+            local_linear_lifted = Normalized_Local_Linear_Lifted(local_linear_lifted, self.budget)
         injection = input_values if self.input_injection else None
         current = input_values
         outputs: list[Any] = []
@@ -213,6 +225,8 @@ class WeightTied(Composition[GridFunction]):
         state = Single_Layer_Inspection(self.layer)
         if self.last_application_norms is not None:
             state["last_application_norms"] = self.last_application_norms
+        if self.budget is not None:
+            state["nominal_lipschitz_before_normalization"] = np.asarray(Nominal_Lipschitz(self.Parameter_Values()))
         return state
 
 
@@ -285,6 +299,7 @@ class FixedPoint(Composition[GridFunction]):
         tolerance: float = 1e-3,
         iteration_cap: int = 32,
         activations: ActivationTable | None = None,
+        budget: ContractionBudget | None = None,
     ) -> None:
         self.layer = layer
         self.activations = Activation_Table(activations)
@@ -296,6 +311,8 @@ class FixedPoint(Composition[GridFunction]):
         self.condition_ceiling = condition_ceiling
         self.tolerance = tolerance
         self.iteration_cap = iteration_cap
+        # rung three: a ρ-contraction with ρ ≤ target_lipschitz for every parameter value, applied once per forward
+        self.budget = budget
         self.last_solve: FixedPointSolve | None = None
 
 
@@ -353,6 +370,9 @@ class FixedPoint(Composition[GridFunction]):
             return self.Implicit_Resolved(lifted, input_values)
         kernel_lifted = Sliced_Lifted(lifted, "kernel.")
         local_linear_lifted = Sliced_Lifted(lifted, "local_linear.")
+        if self.budget is not None:
+            kernel_lifted = Normalized_Kernel_Lifted(kernel_lifted, self.budget)
+            local_linear_lifted = Normalized_Local_Linear_Lifted(local_linear_lifted, self.budget)
         solved = self.Solved(kernel_lifted, local_linear_lifted, input_values)
         depth = 1 if self.backward == "jacobian_free" else self.phantom_depth
         # detached again here, at the equilibrium itself, even though solved already leaves nothing tape-connected
@@ -370,9 +390,14 @@ class FixedPoint(Composition[GridFunction]):
         solve_holder: list[FixedPointSolve] = []
 
         def Split(arguments: tuple[Any, ...]) -> tuple[dict[str, Any], dict[str, Any]]:
-            """the flat positional arguments read back as the two named dicts applied once expects"""
+            """the flat positional arguments read back as the two named dicts applied once expects, budget renormalized"""
             by_name = dict(zip(parameter_names, arguments))
-            return Sliced_Lifted(by_name, "kernel."), Sliced_Lifted(by_name, "local_linear.")
+            kernel_lifted = Sliced_Lifted(by_name, "kernel.")
+            local_linear_lifted = Sliced_Lifted(by_name, "local_linear.")
+            if self.budget is not None:
+                kernel_lifted = Normalized_Kernel_Lifted(kernel_lifted, self.budget)
+                local_linear_lifted = Normalized_Local_Linear_Lifted(local_linear_lifted, self.budget)
+            return kernel_lifted, local_linear_lifted
 
         def Implicit_Forward(arguments: tuple[Any, ...]) -> Any:
             """the equilibrium alone, the solve itself never asked to carry a declared gradient"""
@@ -474,4 +499,6 @@ class FixedPoint(Composition[GridFunction]):
             state["last_final_residual"] = np.asarray(self.last_solve.final_residual)
             state["last_cap_was_hit"] = np.asarray(self.last_solve.cap_was_hit)
             state["last_residual_norm_history"] = np.asarray(self.last_solve.residual_norm_history, dtype=np.float64)
+        if self.budget is not None:
+            state["nominal_lipschitz_before_normalization"] = np.asarray(Nominal_Lipschitz(self.Parameter_Values()))
         return state

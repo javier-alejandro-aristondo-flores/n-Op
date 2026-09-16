@@ -8,7 +8,7 @@ from typing import Any, cast
 import numpy as np
 from numpy.typing import NDArray
 
-from operators.compositions import ExplicitStack, Hinge_Excess, JacobianPenalty
+from operators.compositions import ContractionBudget, ExplicitStack, Hinge_Excess, JacobianPenalty
 from operators.data import (
     Apply_Standardized_Ridge,
     Archive_Path,
@@ -970,6 +970,7 @@ def Fresh_Flagship_Member(
     hidden_channels: int = HIDDEN_CHANNELS,
     layer_count: int = LAYER_COUNT,
     kept_mode: int = KEPT_MODE,
+    contraction_budget: ContractionBudget | None = None,
 ) -> tuple[FactorizedFourier, ParameterSet]:
     """an untrained member built exactly as its own training driver builds it, and the flat set its checkpoint names"""
     training_identifiers = block.member_train
@@ -992,6 +993,7 @@ def Fresh_Flagship_Member(
         configuration=configuration,
         task=task,
         target_scale=target_scale,
+        contraction_budget=contraction_budget,
     )
     return member, ParameterSet(values=member.Parameter_Values())
 
@@ -1004,9 +1006,12 @@ def Load_Trained_Member(
     hidden_channels: int = HIDDEN_CHANNELS,
     layer_count: int = LAYER_COUNT,
     kept_mode: int = KEPT_MODE,
+    contraction_budget: ContractionBudget | None = None,
 ) -> tuple[FactorizedFourier, TrainingProgress]:
     """the member a finished or in-progress run produced, its best checkpoint parameters written back onto it"""
-    member, parameters = Fresh_Flagship_Member(block, task, configuration, hidden_channels, layer_count, kept_mode)
+    member, parameters = Fresh_Flagship_Member(
+        block, task, configuration, hidden_channels, layer_count, kept_mode, contraction_budget
+    )
     progress = Read_Checkpoint(checkpoint_path, parameters)
     Write_Back_Parameters(member, progress.best_parameters)
     return member, progress

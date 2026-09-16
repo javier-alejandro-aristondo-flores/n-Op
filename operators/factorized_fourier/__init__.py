@@ -9,6 +9,7 @@ import numpy as np
 from numpy.typing import NDArray
 
 from operators.compositions import (
+    ContractionBudget,
     ExplicitStack,
     FixedPoint,
     Jacobian_Probe_Estimate,
@@ -493,6 +494,7 @@ def Factorized_Fourier_Network(
     task: FactorizedFourierTask = "localization",
     target_scale: float = 1.0,
     initial_scale: float | None = None,
+    contraction_budget: ContractionBudget | None = None,
 ) -> FactorizedFourier:
     """the flagship configuration: pointwise lift, a composition of factorized spectral layers, a task-shaped head"""
     # localization stays metric-blind, exactly as briefed; the potential task is the metric-aware kernel's own reason
@@ -514,7 +516,9 @@ def Factorized_Fourier_Network(
         stack = ExplicitStack(Explicit_Layers(hidden_channels, kept_modes, 1, seed, metric_aware))
     elif configuration == "weight_tied":
         stack = WeightTied(
-            Shared_Member_Layer(hidden_channels, kept_modes, seed + 1, metric_aware), depth=layer_count
+            Shared_Member_Layer(hidden_channels, kept_modes, seed + 1, metric_aware),
+            depth=layer_count,
+            budget=contraction_budget,
         )
     elif configuration == "weight_tied_injected":
         # the fixed point's own iteration unrolled a fixed number of times, its exact non-iterative counterpart
@@ -522,12 +526,14 @@ def Factorized_Fourier_Network(
             Shared_Member_Layer(hidden_channels, kept_modes, seed + 1, metric_aware, resolved_initial_scale),
             depth=layer_count,
             input_injection=True,
+            budget=contraction_budget,
         )
     elif configuration == "fixed_point":
         stack = FixedPoint(
             Shared_Member_Layer(hidden_channels, kept_modes, seed + 1, metric_aware, resolved_initial_scale),
             backward="phantom",
             phantom_depth=fixed_point_phantom_depth,
+            budget=contraction_budget,
         )
     else:
         raise ValueError(f"{configuration} is not one of the member's configurations")

@@ -7,8 +7,9 @@ import numpy as np
 import pytest
 from numpy.typing import NDArray
 
-from operators.compositions import FixedPoint, WeightTied
+from operators.compositions import ContractionBudget, FixedPoint, WeightTied
 from operators.compositions.activation import POINTWISE_ACTIVATIONS
+from operators.compositions.contraction import STEM_NAMES, Normalized_Kernel_Lifted, Normalized_Local_Linear_Lifted
 from operators.compositions.fixed_point import (
     Anderson_Gram,
     Anderson_Mixing_Weights,
@@ -62,6 +63,19 @@ def Contractive_Layer(seed: int, channels: int = 2) -> Layer[GridFunction]:
     kernel = Scaled(kernel, 0.05)
     local_linear = Scaled(PointwiseLift(hidden_channels=channels, input_channels=channels, seed=seed + 1), 0.05)
     # a zero bias would leave the origin as the map's only fixed point, pinning most weights' true gradient at zero
+    generator = np.random.default_rng(seed + 2)
+    local_linear.parameter_values["lift_biases"] = generator.normal(size=channels) * 0.1
+    return Layer(kernel=kernel, local_linear=local_linear)
+
+
+def Separable_Layer(seed: int, channels: int = 2, scale: float = 0.05) -> Layer[GridFunction]:
+    """a kernel-plus-local-linear layer built with the flagship's own separable mixing, the ladder's real form"""
+    kernel = SpectralKernel(
+        kept_modes=(1, 1, 1), output_channels=channels, input_channels=channels, seed=seed, mode_mixing="separable"
+    )
+    kernel.Hermitian_Symmetrize()
+    kernel = Scaled(kernel, scale)
+    local_linear = Scaled(PointwiseLift(hidden_channels=channels, input_channels=channels, seed=seed + 1), scale)
     generator = np.random.default_rng(seed + 2)
     local_linear.parameter_values["lift_biases"] = generator.normal(size=channels) * 0.1
     return Layer(kernel=kernel, local_linear=local_linear)
@@ -696,3 +710,119 @@ def Test_The_Jacobian_Penalty_Alone_Drives_A_Divergent_Toy_Layer_Back_To_Contrac
     assert after.last_solve.cap_was_hit is False
 
 
+# the ladder's third stability rung: a differentiable per-forward normalization toward the budget rung one clips to
+
+
+def Test_A_Hundred_Times_Scaled_Layer_Normalizes_Into_The_Budget() -> None:
+    """the differentiable per-forward rescale brings every factor's own spectral norm under its own share, exactly"""
+    layer = Separable_Layer(seed=101, channels=2, scale=100.0)
+    budget = ContractionBudget(target_lipschitz=0.9, local_share=0.2)
+    parameter_values = Single_Layer_Parameter_Values(layer)
+    kernel_lifted = Sliced_Lifted(parameter_values, "kernel.")
+    local_linear_lifted = Sliced_Lifted(parameter_values, "local_linear.")
+    normalized_kernel = Normalized_Kernel_Lifted(kernel_lifted, budget)
+    normalized_local = Normalized_Local_Linear_Lifted(local_linear_lifted, budget)
+    local_norm = float(np.linalg.svd(normalized_local["lift_weights"], compute_uv=False)[0])
+    assert local_norm <= budget.Local_Bound() + 1e-8
+    for stem in STEM_NAMES:
+        complex_stem = normalized_kernel[f"{stem}_real"] + 1j * normalized_kernel[f"{stem}_imaginary"]
+        stem_norm = float(np.max(np.linalg.svd(complex_stem, compute_uv=False)[..., 0]))
+        assert stem_norm <= budget.Mode_Bound(len(STEM_NAMES)) + 1e-8
+
+
+def Test_The_Budgeted_Forward_And_Apply_Agree_On_Weight_Tied() -> None:
+    """the lifted path and the numpy wrapper around it read the same numbers once normalization is engaged"""
+    layer = Separable_Layer(seed=102, channels=2, scale=20.0)
+    budget = ContractionBudget(target_lipschitz=0.9, local_share=0.2)
+    stack = WeightTied(layer, depth=4, budget=budget)
+    field = Small_Field(2, seed=103)
+    through_apply = np.asarray(stack.Apply(field).values, dtype=np.float64)
+    through_forward = np.asarray(
+        stack.Forward(stack.Parameter_Values(), np.asarray(field.values, dtype=np.float64)), dtype=np.float64
+    )
+    assert np.allclose(through_apply, through_forward, atol=1e-10)
+
+
+@pytest.mark.skipif(not Torch_Is_Available(), reason="the foreign engine is not installed yet")
+def Test_Gradients_Reach_Both_Weight_Groups_Through_The_Normalized_Forward() -> None:
+    """the rescale is differentiable, so a tape running through it still reaches the kernel and the local matrix"""
+    layer = Separable_Layer(seed=104, channels=2, scale=20.0)
+    budget = ContractionBudget(target_lipschitz=0.9, local_share=0.2)
+    stack = WeightTied(layer, depth=3, budget=budget)
+    field_values = np.asarray(Small_Field(2, seed=105).values, dtype=np.float64)
+    target = np.random.default_rng(106).random((2, 8, 8, 8))
+    parameters = ParameterSet(values={name: value.copy() for name, value in stack.Parameter_Values().items()})
+    engine = TorchEngine()
+    value, gradients = engine.Value_And_Gradients(
+        parameters, Weight_Tied_Loss(stack, engine.Lift_Constant(field_values), engine.Lift_Constant(target))
+    )
+    reference = NumpyEngine()
+    reference_loss = Weight_Tied_Loss(stack, field_values, target)
+    assert abs(value - reference.Evaluate(parameters, reference_loss)) < 1e-6
+    reference_gradients = reference.Gradients(parameters, reference_loss)
+    assert set(gradients) == set(reference_gradients)
+    for name, gradient in gradients.items():
+        assert np.allclose(gradient, reference_gradients[name], rtol=1e-3, atol=1e-5), name
+        assert float(np.abs(gradient).max()) > 1e-8, name
+
+
+def Test_The_Injected_Unroll_Matches_The_Fixed_Point_Under_The_Budget() -> None:
+    """the same budget applied to both rungs keeps the unrolled and the solved equilibria in agreement"""
+    layer = Separable_Layer(seed=107, channels=2, scale=20.0)
+    budget = ContractionBudget(target_lipschitz=0.9, local_share=0.2)
+    field = Small_Field(2, seed=108)
+    solved = FixedPoint(layer, budget=budget)
+    produced = np.asarray(solved.Apply(field).values, dtype=np.float64)
+    assert solved.last_solve is not None
+    assert solved.last_solve.cap_was_hit is False
+    unrolled = WeightTied(layer, depth=solved.last_solve.iterations_taken + 10, input_injection=True, budget=budget)
+    produced_unrolled = np.asarray(unrolled.Apply(field).values, dtype=np.float64)
+    assert np.allclose(produced, produced_unrolled, atol=1e-2)
+
+
+def Budgeted_Audit_Ground_Truths(
+    layer: Layer[GridFunction], budget: ContractionBudget, field_values: NDArray[np.float64], target: NDArray[np.float64]
+) -> tuple[ParameterSet, dict[str, NDArray[np.float64]], dict[str, NDArray[np.float64]]]:
+    """the budgeted audit's parameters beside its two ground truths: finite differences, and the depth-matched unroll"""
+    probe = FixedPoint(layer, budget=budget)
+    parameters = ParameterSet(values={name: value.copy() for name, value in probe.Parameter_Values().items()})
+    reference_loss = Fixed_Point_Equilibrium_Loss(probe, field_values, target)
+    finite_difference_gradients = NumpyEngine().Gradients(parameters, reference_loss)
+    kernel_lifted = Normalized_Kernel_Lifted(Sliced_Lifted(probe.Parameter_Values(), "kernel."), budget)
+    local_linear_lifted = Normalized_Local_Linear_Lifted(Sliced_Lifted(probe.Parameter_Values(), "local_linear."), budget)
+    depth = probe.Solved(kernel_lifted, local_linear_lifted, field_values).iterations_taken
+    tied = WeightTied(layer, depth=depth, input_injection=True, budget=budget)
+    engine = TorchEngine()
+    _, full_unroll_gradients = engine.Value_And_Gradients(
+        parameters, Weight_Tied_Loss(tied, engine.Lift_Constant(field_values), engine.Lift_Constant(target))
+    )
+    return parameters, finite_difference_gradients, full_unroll_gradients
+
+
+@pytest.mark.skipif(not Torch_Is_Available(), reason="the foreign engine is not installed yet")
+def Test_The_Mandatory_Audits_Phantom_Three_And_Implicit_Columns_Hold_Under_The_Budget() -> None:
+    """the audit's tightest two columns still agree with both ground truths once the forward carries a budget"""
+    layer = Separable_Layer(seed=111, channels=2, scale=20.0)
+    budget = ContractionBudget(target_lipschitz=0.9, local_share=0.2)
+    field_values = np.asarray(Small_Field(2, seed=112).values, dtype=np.float64)
+    target = np.random.default_rng(113).random((2, 8, 8, 8))
+    parameters, finite_difference_gradients, full_unroll_gradients = Budgeted_Audit_Ground_Truths(
+        layer, budget, field_values, target
+    )
+    engine = TorchEngine()
+
+    phantom_three = FixedPoint(layer, backward="phantom", phantom_depth=3, budget=budget)
+    lifted_phantom_loss = Fixed_Point_Equilibrium_Loss(
+        phantom_three, engine.Lift_Constant(field_values), engine.Lift_Constant(target)
+    )
+    _, phantom_gradients = engine.Value_And_Gradients(parameters, lifted_phantom_loss)
+    assert Relative_Gap(phantom_gradients, finite_difference_gradients) < 0.02
+    assert Relative_Gap(phantom_gradients, full_unroll_gradients) < 0.02
+
+    implicit = FixedPoint(layer, backward="implicit", budget=budget)
+    lifted_implicit_loss = Fixed_Point_Equilibrium_Loss(
+        implicit, engine.Lift_Constant(field_values), engine.Lift_Constant(target)
+    )
+    _, implicit_gradients = engine.Value_And_Gradients(parameters, lifted_implicit_loss)
+    assert Relative_Gap(implicit_gradients, finite_difference_gradients) < 0.005
+    assert Relative_Gap(implicit_gradients, full_unroll_gradients) < 0.005

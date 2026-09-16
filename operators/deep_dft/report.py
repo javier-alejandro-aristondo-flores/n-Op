@@ -329,6 +329,16 @@ def Floor_Block_Lines(block: LoadedBlock, measurements: FloorMeasurements) -> li
         Render_Table(Summary_Table((sad_summary_all, sad_summary_held_out, salted_summary, copy_summary))),
         "```",
         "",
+        f"The reduced-salted floor's own spread is the one to read carefully: its interquartile"
+        f" ({salted_summary.interquartile:.6f}) and its 95% interval ({salted_summary.confidence_low:.6f} to"
+        f" {salted_summary.confidence_high:.6f}) both run roughly a hundred times its median"
+        f" ({salted_summary.median:.6f}), unlike the other three floors' comparably tight spreads. That"
+        " pattern means the ridge is badly conditioned on a handful of the 21 fold-zero units, most plausibly"
+        " a rare-element shell fit, not that every unit scores near the reported number. Gate b is read"
+        " against the median alone for exactly this reason; which units are the hard ones is left to the"
+        " trained member's own per-unit evaluation, where the same units showing up as hard again would say"
+        " something the floor alone cannot.",
+        "",
         "### the pre-registered ladder, absolute normalized mean absolute error",
         "",
         f"- **gate a** (>= 10x better than the superposed-atomic-density floor, `required_improvement=0.9`):"

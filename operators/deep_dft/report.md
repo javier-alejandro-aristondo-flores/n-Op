@@ -20,6 +20,8 @@ reduced_salted_floor_all_42                  normalized_mean_absolute_error  21 
 nearest_structure_copy_context_all_42        normalized_mean_absolute_error  21     42    0.067496  0.029246       [0.054986, 0.093563]
 ```
 
+The reduced-salted floor's own spread is the one to read carefully: its interquartile (11.583332) and its 95% interval (2.832035 to 7.337816) both run roughly a hundred times its median (0.111713), unlike the other three floors' comparably tight spreads. That pattern means the ridge is badly conditioned on a handful of the 21 fold-zero units, most plausibly a rare-element shell fit, not that every unit scores near the reported number. Gate b is read against the median alone for exactly this reason; which units are the hard ones is left to the trained member's own per-unit evaluation, where the same units showing up as hard again would say something the floor alone cannot.
+
 ### the pre-registered ladder, absolute normalized mean absolute error
 
 - **gate a** (>= 10x better than the superposed-atomic-density floor, `required_improvement=0.9`): pooled bar 0.015415, held-out-chemistry bar 0.016144
@@ -28,7 +30,7 @@ nearest_structure_copy_context_all_42        normalized_mean_absolute_error  21 
 
 Trilinear interpolation error, measured on a smooth synthetic field at the campaign's own 80-cubed grid resolution, 20,000 random query points: root-mean-square 0.001742.
 
-**Not yet measured**: the member has not trained (floors are measured and pre-registered before training by policy, and the card is not this stream's yet), so no row above compares the member to these bars. The compact-support kernel and this composition's own caller-side seam both already differentiate on the foreign engine (`Test_Foreign_Engine_Forward_And_Gradient_Agree_On_A_Tiny_Structure`), so training itself is the only thing waiting. This section will carry that comparison, the gate c pass fraction, and the figure suite once a checkpoint exists.
+**Not yet measured**: the member has not trained (floors are measured and pre-registered before training by policy, and the card is not this stream's yet), so no row above compares the member to these bars. The compact-support kernel and this composition's own caller-side seam both already differentiate on the foreign engine (`Test_Foreign_Engine_Forward_And_Gradient_Agree_On_A_Tiny_Structure`), so training itself is the only thing waiting. The figure suite below is the built, untrained architecture; this section will carry the member's own comparison against these bars and the gate c pass fraction once a checkpoint exists.
 
 ## Architecture, as built
 

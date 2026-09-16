@@ -1,63 +1,49 @@
 {
- "bars": {
-  "k1_localization_fine_tuned": {
-   "absolute_bar": 0.0027125,
-   "floor_name": "factorized_fourier_dedicated_localization",
-   "floor_value": 0.00217,
-   "metric": "mean_absolute_error",
-   "reads": "reject only if still worse than this after the pairwise fine-tune",
-   "required_improvement": -0.25
+ "member": "codomain_attention",
+ "regenerate": "python -m operators.codomain_attention.report",
+ "rows": [
+  {
+   "block_signature": "55fd01d57fa5",
+   "key": {
+    "block": "55fd01d57fa5",
+    "configuration": "hidden32_modes19_heads2_layers4",
+    "group": "semilocal_ridge_floor",
+    "member": "codomain_attention",
+    "split": "fold_0_evaluation",
+    "task": "localization"
+   },
+   "summary": {
+    "confidence_high": 0.098625,
+    "confidence_low": 0.097382,
+    "group_name": "semilocal_ridge_floor",
+    "interquartile": 0.002436,
+    "median": 0.097618,
+    "metric_name": "mean_absolute_error",
+    "run_count": 152,
+    "unit_count": 29
+   }
   },
-  "k1_localization_zero_shot": {
-   "absolute_bar": 0.00434,
-   "floor_name": "factorized_fourier_dedicated_localization",
-   "floor_value": 0.00217,
-   "metric": "mean_absolute_error",
-   "reads": "reject if the zero-shot completion error exceeds this on two or more pairwise tasks",
-   "required_improvement": -1.0
-  },
-  "k1_potential_zero_shot": {
-   "absolute_bar": null,
-   "floor_name": "factorized_fourier_dedicated_potential",
-   "floor_value": null,
-   "metric": "mean_removed_relative_l2",
-   "reads": "pending: the dedicated potential run is queued on the card ahead of this member's",
-   "required_improvement": -1.0
-  },
-  "k2_localization_semilocal_floor": {
-   "absolute_bar": 0.07809440000000001,
-   "floor_name": "semilocal_ridge_floor",
-   "floor_value": 0.097618,
-   "metric": "mean_absolute_error",
-   "reads": "the completion flagship deflates if zero-shot elf lands within twenty percent of this",
-   "required_improvement": 0.2
-  },
-  "k2_potential_spectral_poisson_semilocal_xc": {
-   "absolute_bar": 0.3357522,
-   "floor_name": "hartree_plus_semilocal_xc_ridge",
-   "floor_value": 0.479646,
-   "metric": "mean_removed_relative_l2",
-   "reads": "the v-read adds nothing over textbook physics if it does not clear this",
-   "required_improvement": 0.3
+  {
+   "block_signature": "55fd01d57fa5",
+   "key": {
+    "block": "55fd01d57fa5",
+    "configuration": "hidden32_modes19_heads2_layers4",
+    "group": "hartree_plus_semilocal_xc_ridge_floor",
+    "member": "codomain_attention",
+    "split": "fold_0_evaluation",
+    "task": "potential"
+   },
+   "summary": {
+    "confidence_high": 0.669886,
+    "confidence_low": 0.459739,
+    "group_name": "hartree_plus_semilocal_xc_ridge",
+    "interquartile": 0.237299,
+    "median": 0.479646,
+    "metric_name": "mean_removed_relative_l2",
+    "run_count": 152,
+    "unit_count": 29
+   }
   }
- },
- "configuration": {
-  "head_count": 2,
-  "hidden_channels": 32,
-  "kept_modes": [
-   19,
-   19,
-   19
-  ],
-  "layer_count": 4,
-  "master_weight_megabytes_double": 30.710096,
-  "master_weight_megabytes_single": 15.355048,
-  "parameter_count": 3838762,
-  "processing_shape": [
-   40,
-   40,
-   40
-  ]
- },
- "standing": "pre_training"
+ ],
+ "verdicts": []
 }

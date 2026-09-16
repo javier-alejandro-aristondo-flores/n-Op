@@ -1,6 +1,5 @@
 """the member measured against its pre-registered floors, and the staged training driver the card runs it through"""
 
-import json
 import time
 from pathlib import Path
 from typing import Any, cast
@@ -19,6 +18,18 @@ from operators.codomain_attention.masking import MaskPatternName
 from operators.codomain_attention.splits import CompletionBlock
 from operators.compositions import ExplicitStack
 from operators.data import POOL_ROOT, STORE_NAME
+from operators.evaluation import (
+    Block_Signature,
+    CubicBlock,
+    Elf_Ridge_Rows,
+    MemberResults,
+    MetricSummary,
+    Potential_Floor_Rows,
+    ResultKey,
+    ResultRow,
+    Summarize,
+    Write_Member_Results,
+)
 from operators.inspection.plots import Render_Inspection_Suite, Render_Matrix, RenderedSuite
 from operators.substrate import ParameterSet
 from operators.training import Train, Training_Engine
@@ -39,12 +50,10 @@ FINAL_STAGE_PATIENCE = 15
 STEP_COST_PROBE_STEPS = 300
 PRETRAIN_HOUR_CAP = 6.0
 
-# the dedicated competitor's own measured numbers (factorized_fourier/report.md, fold 0 of the cubic block), cited
-# rather than recomputed here since the promoted evaluation floor builders have not landed in operators.evaluation yet
+# the dedicated competitor's own measured number (factorized_fourier/report.md, fold 0 of the cubic block), a
+# recorded reference cited by its source rather than recomputed here -- this member never trains that member
 FLAGSHIP_LOCALIZATION_MAE_FOLD0 = 0.002170
 FLAGSHIP_LOCALIZATION_HOURS = 3.94
-SEMILOCAL_ELF_RIDGE_FLOOR_MAE_FOLD0 = 0.097618
-HARTREE_SEMILOCAL_XC_RIDGE_FLOOR_MEAN_REMOVED_RELATIVE_L2_FOLD0 = 0.479646
 # the flagship's own dedicated potential run is queued on the card ahead of this member's; its number is pending
 FLAGSHIP_POTENTIAL_MEAN_REMOVED_RELATIVE_L2_FOLD0: float | None = None
 
@@ -52,6 +61,11 @@ K1_ZERO_SHOT_REQUIRED_IMPROVEMENT = -1.0
 K1_FINE_TUNE_REQUIRED_IMPROVEMENT = -0.25
 K2_ELF_REQUIRED_IMPROVEMENT = 0.20
 K2_POTENTIAL_REQUIRED_IMPROVEMENT = 0.30
+
+# the card's own measured usable budget and the flagship's own measured peak at batch one (execution log, both
+# recorded references), pre-registered here as the ceiling the probe stops at rather than measured by this member
+CARD_USABLE_MEMORY_GIGABYTES = 5.61
+FLAGSHIP_PEAK_MEMORY_GIGABYTES_AT_BATCH_ONE = 3.6
 
 
 def Staged_Step_Counts(step_count: int, fractions: tuple[float, float, float] = STAGE_FRACTIONS) -> tuple[int, int, int]:
@@ -82,7 +96,20 @@ def Completion_Loss(member: CodomainAttention) -> Any:
     return Loss
 
 
-def Pre_Registered_Bars() -> dict[str, dict[str, float | str | None]]:
+def Elf_Semilocal_Floor_Summary(block: CubicBlock) -> MetricSummary:
+    """the pointwise semilocal ridge floor's own summary on the cubic block's kill fold, from the promoted rows"""
+    return Summarize(Elf_Ridge_Rows(block), "mean_absolute_error", "semilocal_ridge_floor")
+
+
+def Potential_Semilocal_Floor_Summary(block: CubicBlock) -> MetricSummary:
+    """the hartree-plus-semilocal-xc ridge floor's own summary on the cubic block's kill fold, from the promoted rows"""
+    rows = Potential_Floor_Rows(block)["hartree_plus_semilocal_xc_ridge"]
+    return Summarize(rows, "mean_removed_relative_l2", "hartree_plus_semilocal_xc_ridge")
+
+
+def Pre_Registered_Bars(
+    elf_floor: MetricSummary, potential_floor: MetricSummary
+) -> dict[str, dict[str, float | str | None]]:
     """every kill and pattern-rule bar this policy names, in absolute numbers, before any step of training runs"""
     return {
         "k1_localization_zero_shot": {
@@ -111,19 +138,18 @@ def Pre_Registered_Bars() -> dict[str, dict[str, float | str | None]]:
         },
         "k2_localization_semilocal_floor": {
             "floor_name": "semilocal_ridge_floor",
-            "floor_value": SEMILOCAL_ELF_RIDGE_FLOOR_MAE_FOLD0,
+            "floor_value": elf_floor.median,
             "metric": "mean_absolute_error",
             "required_improvement": K2_ELF_REQUIRED_IMPROVEMENT,
-            "absolute_bar": SEMILOCAL_ELF_RIDGE_FLOOR_MAE_FOLD0 * (1.0 - K2_ELF_REQUIRED_IMPROVEMENT),
+            "absolute_bar": elf_floor.median * (1.0 - K2_ELF_REQUIRED_IMPROVEMENT),
             "reads": "the completion flagship deflates if zero-shot elf lands within twenty percent of this",
         },
         "k2_potential_spectral_poisson_semilocal_xc": {
             "floor_name": "hartree_plus_semilocal_xc_ridge",
-            "floor_value": HARTREE_SEMILOCAL_XC_RIDGE_FLOOR_MEAN_REMOVED_RELATIVE_L2_FOLD0,
+            "floor_value": potential_floor.median,
             "metric": "mean_removed_relative_l2",
             "required_improvement": K2_POTENTIAL_REQUIRED_IMPROVEMENT,
-            "absolute_bar": HARTREE_SEMILOCAL_XC_RIDGE_FLOOR_MEAN_REMOVED_RELATIVE_L2_FOLD0
-            * (1.0 - K2_POTENTIAL_REQUIRED_IMPROVEMENT),
+            "absolute_bar": potential_floor.median * (1.0 - K2_POTENTIAL_REQUIRED_IMPROVEMENT),
             "reads": "the v-read adds nothing over textbook physics if it does not clear this",
         },
     }
@@ -273,7 +299,9 @@ def Write_Inspection_Suite(member: CodomainAttention, directory: Path) -> Render
     return Render_Inspection_Suite(restored, directory / "components", "codomain attention completion")
 
 
-def Pre_Training_Report_Lines(parameter_count: int, master_weight_megabytes: float) -> list[str]:
+def Pre_Training_Report_Lines(
+    parameter_count: int, master_weight_megabytes: float, bars: dict[str, dict[str, float | str | None]]
+) -> list[str]:
     """the report's own pre-registration section: architecture, floors and every bar, before a step of training runs"""
     lines = [
         "# codomain_attention -- results",
@@ -296,16 +324,21 @@ def Pre_Training_Report_Lines(parameter_count: int, master_weight_megabytes: flo
         f"- channel vocabulary: {', '.join(CHANNEL_VOCABULARY)}",
         f"- parameters: {parameter_count:,} ({master_weight_megabytes:.1f} MB at double precision,"
         f" {master_weight_megabytes / 2.0:.1f} MB at the single-precision working width)",
-        "- peak memory: not yet measured (deferred to the scaled forward-and-backward pass under \"card is yours\")",
+        f"- peak memory: not yet measured; pre-registered ceiling for the 300-step probe is"
+        f" {CARD_USABLE_MEMORY_GIGABYTES:.2f} GB (the card's own measured usable budget), the probe stopping",
+        f"  on exceedance -- for reference the flagship's explicit configuration held"
+        f" {FLAGSHIP_PEAK_MEMORY_GIGABYTES_AT_BATCH_ONE:.1f} GB at batch 1",
         "",
-        "## Floors and bars (fold 0 of the cubic block, cited from the promoted numbers already measured)",
+        "## Floors and bars (fold 0 of the cubic block, freshly read through the promoted evaluation rows)",
         "",
     ]
-    for name, bar in Pre_Registered_Bars().items():
+    for name, bar in bars.items():
         absolute_bar = bar["absolute_bar"]
+        floor_value = bar["floor_value"]
         bar_text = f"{absolute_bar:.6f}" if isinstance(absolute_bar, float) else "pending"
+        floor_text = f"{floor_value:.6f}" if isinstance(floor_value, float) else "pending"
         lines.append(
-            f"- **{name}**: floor `{bar['floor_name']}` = {bar['floor_value']}, metric `{bar['metric']}`,"
+            f"- **{name}**: floor `{bar['floor_name']}` = {floor_text}, metric `{bar['metric']}`,"
             f" required improvement {bar['required_improvement']}, absolute bar **{bar_text}** -- {bar['reads']}"
         )
     lines.append("")
@@ -317,32 +350,64 @@ def Placeholder_Sized_Member() -> CodomainAttention:
     return Fresh_Completion_Member(ChannelStatistics(reference_density=1.0, magnetization_scale=1.0, potential_scale=1.0))
 
 
-def Write_Results_Json(path: Path, parameter_count: int, master_weight_megabytes: float) -> None:
-    """the pre-registration payload, so a later training pass has something to diff its own numbers against"""
-    payload = {
-        "standing": "pre_training",
-        "configuration": {
-            "hidden_channels": HIDDEN_CHANNELS,
-            "kept_modes": [KEPT_MODE, KEPT_MODE, KEPT_MODE],
-            "head_count": HEAD_COUNT,
-            "layer_count": LAYER_COUNT,
-            "processing_shape": list(COARSE_SHAPE),
-            "parameter_count": parameter_count,
-            "master_weight_megabytes_double": master_weight_megabytes,
-            "master_weight_megabytes_single": master_weight_megabytes / 2.0,
-        },
-        "bars": Pre_Registered_Bars(),
-    }
-    path.write_text(json.dumps(payload, indent=1, sort_keys=True) + "\n")
+CONFIGURATION_NAME = f"hidden{HIDDEN_CHANNELS}_modes{KEPT_MODE}_heads{HEAD_COUNT}_layers{LAYER_COUNT}"
+
+
+def Floor_Result_Rows(
+    block: CubicBlock, elf_floor: MetricSummary, potential_floor: MetricSummary
+) -> tuple[ResultRow, ResultRow]:
+    """the two pre-registered floor summaries as result rows, keyed to the cubic block's own evaluation fold"""
+    block_signature = Block_Signature(block.unit_of[identifier] for identifier in block.evaluation)
+    return (
+        ResultRow(
+            key=ResultKey(
+                member="codomain_attention",
+                configuration=CONFIGURATION_NAME,
+                task="localization",
+                split="fold_0_evaluation",
+                block=block_signature,
+                group="semilocal_ridge_floor",
+            ),
+            summary=elf_floor,
+            block_signature=block_signature,
+        ),
+        ResultRow(
+            key=ResultKey(
+                member="codomain_attention",
+                configuration=CONFIGURATION_NAME,
+                task="potential",
+                split="fold_0_evaluation",
+                block=block_signature,
+                group="hartree_plus_semilocal_xc_ridge_floor",
+            ),
+            summary=potential_floor,
+            block_signature=block_signature,
+        ),
+    )
+
+
+def Write_Results(path: Path, block: CubicBlock, elf_floor: MetricSummary, potential_floor: MetricSummary) -> None:
+    """the promoted cross-member schema: the pre-registered floor rows now, no verdicts until a trained member exists"""
+    results = MemberResults(
+        member="codomain_attention",
+        regenerate="python -m operators.codomain_attention.report",
+        rows=Floor_Result_Rows(block, elf_floor, potential_floor),
+        verdicts=(),
+    )
+    Write_Member_Results(path, results)
 
 
 def Main() -> int:
     """the pre-training report: architecture, split counts and every bar, written before a step of training runs"""
     block = CompletionBlock()
+    cubic_block = CubicBlock()
+    elf_floor = Elf_Semilocal_Floor_Summary(cubic_block)
+    potential_floor = Potential_Semilocal_Floor_Summary(cubic_block)
+    bars = Pre_Registered_Bars(elf_floor, potential_floor)
     sized_member = Placeholder_Sized_Member()
     parameter_count = sized_member.Parameter_Count()
     master_weight_megabytes = sum(value.nbytes for value in sized_member.Parameter_Values().values()) / 1e6
-    lines = Pre_Training_Report_Lines(parameter_count, master_weight_megabytes)
+    lines = Pre_Training_Report_Lines(parameter_count, master_weight_megabytes, bars)
     lines += [
         "## Split counts (measured against the committed paired-fields fold map)",
         "",
@@ -355,7 +420,7 @@ def Main() -> int:
         "",
     ]
     REPORT_PATH.write_text("\n".join(lines) + "\n")
-    Write_Results_Json(REPORT_PATH.parent / "results.json", parameter_count, master_weight_megabytes)
+    Write_Results(REPORT_PATH.parent / "results.json", cubic_block, elf_floor, potential_floor)
     return 0
 
 

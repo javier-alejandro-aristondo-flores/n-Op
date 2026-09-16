@@ -22,7 +22,31 @@ difference between two single runs is resolvable anywhere on this page.
 Status words: **not started** (a stub), **parts built** (its shared parts exist, no member),
 **built** (the member exists and tests pass), **floors measured**, **trained** (one seeded run),
 **judged** (trained and scored against its floors), **finished** (every configuration and task the
-canon names, judged).
+canon names, judged), **killed** (a canon bar was missed and the entry or task is removed),
+**not built: cost** (a canon-named build is skipped and recorded as a cost decision, not a miss).
+
+## Summary, one row per canon entry
+
+Copied from the sections below; no number here is computed fresh. Entries without a member number
+yet read **pending**.
+
+| entry | member | configuration | status | task / split / block | headline vs bar | verdict |
+|---|---|---|---|---|---|---|
+| I.1 | `factorized_fourier` | explicit | judged (localization); potential and parametric floors measured, training queued | charge_to_localization / fold 0, cubic block | MAE 0.00217 vs kill ≤ 0.0488 | pass, 97.8% better |
+| I.2 | `alias_free_convolutional` | — | parts built, member not started | charge_to_localization (planned) | pending | pending |
+| I.3 | `factorized_fourier` | weight_tied | three of four rungs trained and judged; fixed point blocked on a build | charge_to_localization / fold 0 | MAE 0.00297, copy margin 52% | pass; fixed_point pending |
+| I.4 | `galerkin_transformer` | — | not started; no package exists yet | charge_to_localization / charge_to_potential (planned) | pending | pending |
+| II.1 | `deep_operator_network` | principal_component | finished | strain_to_charge / 40³ block, cheap functional | 0.000821 vs ridge kill ≤ 0.003105 (25% better) | pass, 14 of 14 |
+| II.2 | `multiple_input_operator_network` | — | not started | charge_and_potential_to_localization (planned) | pending | pending |
+| II.3 | `nonlinear_manifold_decoder` | — | parts built, member not started | strain/lattice → charge (planned) | pending | pending |
+| II.4 | `factorized_fourier` | parametric | built with floors measured, training queued | strain_to_charge, parametric / interior levels | floor 0.091% vs kill ≤ 0.064% | pending, not yet trained |
+| III.1 | `deep_dft` | — | parts built, member not started | structure_to_charge_defects (planned) | pending | pending |
+| III.3 | `gaussian_plane_wave` | — | not started; no package exists yet | structure → charge (planned) | pending | pending |
+| IV.1 | `residual_correction` | — | not started; central assumption measured | cheap_to_accurate_charge (planned) | ceiling 0.024% vs identity 1.118% | pending |
+| IV.2 | — | — | not started | cheap_to_accurate_states (planned) | pending | pending |
+| IV.3 | `wrappers` (`ConformalCalibrator`) | — | built, not yet applied to a member | any prediction → interval (planned) | pending | pending |
+| V.1 | `codomain_attention` | — | parts built, member not started | field_completion (planned) | pending | pending |
+| VI.1 | `deep_operator_network` | energy_trunk | finished | strain_to_states / 248 test runs, 30 orbits | curve L1 0.206 vs ridge 0.368 | pass, 44% better |
 
 ---
 

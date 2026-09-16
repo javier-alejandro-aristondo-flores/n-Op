@@ -1,5 +1,6 @@
 """the result rows a member reports, and the floor verdicts they carry"""
 
+import re
 from pathlib import Path
 
 import numpy as np
@@ -16,6 +17,7 @@ from operators.evaluation import (
     FloorComparison,
     Label_Of,
     MemberResults,
+    Member_Results_Path,
     MetricSummary,
     PEROVSKITE_DEVELOP_FOLD,
     Perovskite_Angle_Examples,
@@ -320,3 +322,53 @@ def Test_The_Host_Harness_Resample_Agrees_With_The_Lifted_Resample() -> None:
         harness = Spectral_Truncation_Resample(field, target_shape)
         lifted = np.asarray(Spectral_Resampled(field, target_shape))
         assert np.max(np.abs(harness - lifted)) < 1e-10
+
+
+RESULTS_PAGE_PATH = Path(__file__).resolve().parent.parent.parent / "operator-results.md"
+SUMMARY_TABLE_HEADING = "## Summary, one row per canon entry"
+HEADLINE_NUMBER = re.compile(r"\d+(?:\.\d+)?%?")
+MEMBER_CELL = re.compile(r"`([a-z_]+)`")
+
+
+def Summary_Table_Rows(document_text: str) -> list[dict[str, str]]:
+    """the results page's own summary table, one dict per entry, keyed by its header cells"""
+    start = document_text.index(SUMMARY_TABLE_HEADING)
+    table_lines = [line for line in document_text[start:].splitlines() if line.startswith("|")]
+    header = [cell.strip() for cell in table_lines[0].strip("|").split("|")]
+    return [dict(zip(header, (cell.strip() for cell in line.strip("|").split("|")))) for line in table_lines[2:]]
+
+
+def Headline_Value_And_Precision(headline: str) -> tuple[float, int] | None:
+    """the first decimal number a headline cell prints, as a plain fraction, with its own printed precision"""
+    found = HEADLINE_NUMBER.search(headline)
+    if found is None:
+        return None
+    digits = found.group().rstrip("%")
+    precision = len(digits.split(".")[1]) if "." in digits else 0
+    value = float(digits) / 100.0 if found.group().endswith("%") else float(digits)
+    return value, precision
+
+
+def Test_The_Results_Page_Headlines_Match_The_Member_Artifacts() -> None:
+    """every summary-table headline with a results.json source reproduces that artifact at the page's precision"""
+    rows = Summary_Table_Rows(RESULTS_PAGE_PATH.read_text())
+    assert rows, "the summary table parsed no rows at all"
+    skipped: list[str] = []
+    mismatches: list[str] = []
+    for row in rows:
+        member_match = MEMBER_CELL.search(row["member"])
+        results_path = Member_Results_Path(member_match.group(1)) if member_match else None
+        if results_path is None or not results_path.is_file():
+            skipped.append(row["entry"])
+            continue
+        parsed = Headline_Value_And_Precision(row["headline vs bar"])
+        if parsed is None:
+            skipped.append(row["entry"])
+            continue
+        value, precision = parsed
+        artifact = Read_Member_Results(results_path)
+        printed = {f"{result_row.summary.median:.{precision}f}" for result_row in artifact.rows}
+        if f"{value:.{precision}f}" not in printed:
+            mismatches.append(f"{row['entry']}: {value:.{precision}f} not among {sorted(printed)}")
+    assert mismatches == [], mismatches
+    assert skipped, "no row was ever checked or skipped, so the parser likely found nothing"

@@ -1,0 +1,19 @@
+name = "gaussian_plane_wave"
+literature_name = "GPWNO (Gaussian Plane-Wave Neural Operator)"
+citation = "Kim & Ahn — ICML 2024 (PMLR 235:23805; arXiv:2402.04278)"
+mapping = "atomic structure → charge density field, via plane waves plus gaussians"
+suite_card = "test-suite.md §4, III.3 — IN-LOCAL, provisional; expected to land redundant"
+role = "the global-plus-local basis split; judged against the structure anchor at matched budget"
+
+[parts]
+encoder = "encoders.AtomEmbedding (keyed by element and pseudopotential title)"
+kernel = "kernels.compact_support.ContinuousDisplacementKernel (atoms to the probe lattice) and kernels.spectral.SpectralKernel (over the probe lattice)"
+composition = "compositions.ExplicitStack"
+readout = "an analytic plane-wave readout at query points plus a gaussian-orbital readout per atom (this package's own)"
+wrappers = "Conserving (renormalize to electron count) per task card"
+
+[depends_on]
+framework = true
+kernels = ["compact_support", "spectral"]
+packages = ["deep_dft"]
+shared_note = "first build is the fixed-frame variant: coefficients from an invariant stack and a perceptron; the rotation claim is forfeited, the operator claim is not"

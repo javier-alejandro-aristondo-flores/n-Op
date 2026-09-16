@@ -41,6 +41,8 @@ PACKAGES = [
     "operators.deep_dft",
     "operators.residual_correction",
     "operators.codomain_attention",
+    "operators.galerkin_transformer",
+    "operators.gaussian_plane_wave",
 ]
 
 ASSEMBLIES = {
@@ -52,6 +54,8 @@ ASSEMBLIES = {
     "operators.deep_dft": "DeepDft",
     "operators.residual_correction": "ResidualCorrection",
     "operators.codomain_attention": "CodomainAttention",
+    "operators.galerkin_transformer": "GalerkinTransformer",
+    "operators.gaussian_plane_wave": "GaussianPlaneWave",
 }
 
 

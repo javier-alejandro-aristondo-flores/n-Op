@@ -89,8 +89,8 @@ class LowRankKernel(Kernel[Representation, Coefficients]):
 
     def Forward(self, lifted: dict[str, Any], target_features: Any, source_features: Any, weighted_values: Any) -> Any:
         """branch coefficients, the fixed feature matrices contracted against the learned core between them"""
-        kernel_values = target_features @ lifted["core"] @ source_features.T
-        return kernel_values @ weighted_values
+        # associated from the right so the dense targets-by-sources matrix is never formed
+        return target_features @ (lifted["core"] @ (source_features.T @ weighted_values))
 
 
     def Lifted_Constants(

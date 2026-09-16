@@ -218,8 +218,9 @@ the final table; the projection variants of the field-to-field tasks (II.1c) are
 
 ## II.2 — Multiple-input operator network · (charge density, local potential) → electron localization
 
-**Status: not started.** Its low-rank kernel exists but has no lifted forward, and its
-composition needs its own container; the encoders and readouts it needs exist.
+**Status: not started.** Its low-rank kernel has a lifted forward (a Nyström integral, not the
+multiplicative latent combination this member needs, which is member work), its composition is
+the layerless one the branch–trunk member uses, and the encoders and readouts it needs exist.
 
 ---
 

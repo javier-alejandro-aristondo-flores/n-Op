@@ -1,0 +1,18 @@
+name = "galerkin_transformer"
+literature_name = "Galerkin Transformer with query-point decoding (merged GT + OFormer)"
+citation = "Cao — NeurIPS 2021; Li, Meidani, Farimani — TMLR 2023"
+mapping = "charge density → electron localization field / local potential, by attention over grid points"
+suite_card = "test-suite.md §2, I.4 — IN-LOCAL"
+role = "the attention entry: linear attention over grid tokens with an output-coordinate decoder"
+
+[parts]
+encoder = "encoders.PointwiseLift over input channels plus periodic coordinate features"
+kernel = "softmax-free attention over grid tokens (this package's own), two matrix products per head"
+composition = "compositions.ExplicitStack"
+readout = "cross-attention decoder over output-coordinate queries, then readouts.PointwiseProjection"
+wrappers = "per task card"
+
+[depends_on]
+framework = true
+kernels = []
+shared_note = "attention lives on the coarse Nyquist grid; the 80-cubed native trunk is the canon's own super-later clause"

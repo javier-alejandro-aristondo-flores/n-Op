@@ -8,7 +8,15 @@ import numpy as np
 from numpy.typing import NDArray
 
 from operators.compositions.fixed_point import FixedPoint, WeightTied
-from operators.compositions.multi_scale import MultiScale, Spectral_Resampled
+from operators.compositions.multi_scale import (
+    Doubled_Shape,
+    Downsampled_By_Two,
+    Halved_Shape,
+    Layer_Applied,
+    MultiScale,
+    Spectral_Resampled,
+    Upsampled_By_Two,
+)
 from operators.framework import Array, Coefficients, Composition, GridFunction, Layer
 from operators.substrate import Gaussian_Error_Linear_Unit
 

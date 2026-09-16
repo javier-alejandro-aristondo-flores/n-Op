@@ -290,8 +290,8 @@ code runs plain for inference and lifted for gradients. Adam is in-house from da
 twenty lines above the gradient dictionary and owing an engine for it would be borrowing what
 we already have.
 
-One deliberate seam residue is left, recorded: the low-rank kernel's learned core trains through
-the dense path first. The spectral kernel's forward was the other one and is no longer — it runs
+No seam residue is left on the kernels: the low-rank kernel's lifted forward contracts the feature
+matrices from the right and never forms the dense pairwise matrix. The spectral kernel's forward runs
 through the transform facet and carries gradients in both the full and separable mode mixings. The
 dense, low-rank and spectral kernels, the compact-support kernels, the perceptron, and every
 encoder, readout and wrapper are engine-lifted.

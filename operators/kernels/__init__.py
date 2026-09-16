@@ -2,6 +2,12 @@
 
 # pyright: reportUnusedImport=false
 
+from operators.kernels.codomain_attention import (
+    CodomainAttentionKernel,
+    FunctionSpaceLayerNorm,
+    Token_Count,
+    TokenSharedLocalLinear,
+)
 from operators.kernels.compact_support import (
     Cell_Heights,
     ContinuousDisplacementKernel,

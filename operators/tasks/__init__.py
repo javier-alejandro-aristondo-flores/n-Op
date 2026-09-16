@@ -114,7 +114,7 @@ CARDS: tuple[TaskCard, ...] = (
         targets=("charge_density",),
         loss="delta_mean_squared_error",
         metrics=("delta_r_squared", "relative_l2"),
-        conservation="zero_mean_correction",
+        conservation="zero_mean",
         covariates=("campaign", "exact_exchange_fraction"),
         split="strain_atlas_holdout",
     ),

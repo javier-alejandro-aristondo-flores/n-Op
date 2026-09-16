@@ -1,10 +1,11 @@
 """the member measured against its pre-registered floors, written as one committed markdown artifact"""
 
 import dataclasses
+import json
 import sys
 from collections.abc import Sequence
 from pathlib import Path
-from typing import Any
+from typing import Any, cast
 
 import numpy as np
 from numpy.typing import NDArray
@@ -36,14 +37,16 @@ from operators.galerkin_transformer import (
     Galerkin_Transformer_Network,
 )
 from operators.metrics import Relative_L2
-from operators.substrate import ParameterSet
+from operators.substrate import Engine, ParameterSet, Peak_Accelerator_Bytes, Reset_Peak_Accelerator_Bytes
 from operators.tasks import Card_Named
 from operators.training import (
     BatchSource,
+    DEFAULT_PROBE_STEPS,
     ForwardLoss,
     ParameterExample,
     Parameter_Field_Examples,
     Read_Checkpoint,
+    Staged_Training,
     Train,
     TrainingBatch,
     Training_Engine,
@@ -71,7 +74,8 @@ GATE_SEED = 20260916
 
 GATE_STAGE_FRACTIONS = (0.3, 0.3, 0.4)
 
-GATE_STAGE_LEARNING_RATES = (1e-3, 3.3e-4, 1.1e-4)
+# the shared staged protocol decays this to a third and a ninth for its own second and third stage
+GATE_PEAK_LEARNING_RATE = 1e-3
 
 GATE_VALIDATION_INTERVAL = 100
 
@@ -81,6 +85,10 @@ GATE_TRAINING_ARTIFACT_PATH = POOL_ROOT / STORE_NAME / "_training" / "galerkin_t
 
 # matches operators.training.loop's own private CHECKPOINT_SUFFIX, not exported at that package's root
 GATE_CHECKPOINT_SUFFIX = "_checkpoint.npz"
+
+COST_PROBE_STEP_COUNT = 100
+
+COST_PROBE_RESULT_PATH = GATE_TRAINING_ARTIFACT_PATH / "cost_probe.json"
 
 
 def Angle_Stratum_Examples(role: str, evaluation_fold: int) -> list[ParameterExample]:
@@ -616,13 +624,6 @@ def Perovskite_Gate_Loss(member: GalerkinTransformer, lifted_query_features: Any
     return Loss
 
 
-def Staged_Gate_Step_Counts(step_count: int) -> tuple[int, int, int]:
-    """the gate's own step budget split 0.3/0.3/0.4, the last stage absorbing whatever rounding leaves behind"""
-    first_stage = round(GATE_STAGE_FRACTIONS[0] * step_count)
-    second_stage = round(GATE_STAGE_FRACTIONS[1] * step_count)
-    return first_stage, second_stage, step_count - first_stage - second_stage
-
-
 def Write_Back_Gate_Layer(layer: Layer[GridFunction], parameters: ParameterSet, prefix: str) -> None:
     """one attention layer's own kernel and local-linear arrays, read off their prefixed names in a flat parameter set"""
     for bare_name in list(layer.kernel.parameter_values):
@@ -646,8 +647,8 @@ def Write_Back_Gate_Parameters(member: GalerkinTransformer, parameters: Paramete
         Write_Back_Gate_Layer(layer, parameters, f"layer_{layer_index}.")
 
 
-def Train_Perovskite_Gate_Member(step_count: int, run_name: str) -> dict[str, object]:
-    """the staged schedule for the two-hour perovskite gate -- written and gated, never called by this module's own Main"""
+def Perovskite_Gate_Rig() -> tuple[GalerkinTransformer, Engine, ForwardLoss, PerovskiteGateBatches]:
+    """a freshly seeded gate member beside the engine, loss and batches its staged training and cost probe both share"""
     raw_train_examples, raw_validation_examples = Perovskite_Gate_Training_Examples()
     training_examples = [Perovskite_Gate_Example(example) for example in raw_train_examples]
     validation_examples = [Perovskite_Gate_Example(example) for example in raw_validation_examples]
@@ -659,36 +660,53 @@ def Train_Perovskite_Gate_Member(step_count: int, run_name: str) -> dict[str, ob
     query_features = np.asarray(member.decoder.Coordinate_Features(query_points), dtype=np.float64)
     lifted_query_features = engine.Lift_Constant(query_features)
     forward_loss = Perovskite_Gate_Loss(member, lifted_query_features)
+    return member, engine, forward_loss, batches
+
+
+def Train_Perovskite_Gate_Member(step_count: int, run_name: str) -> dict[str, object]:
+    """the staged schedule for the two-hour perovskite gate -- written and gated, never called by this module's own Main"""
+    member, engine, forward_loss, batches = Perovskite_Gate_Rig()
     parameters = ParameterSet(values=member.Parameter_Values())
 
-    stage_step_counts = Staged_Gate_Step_Counts(step_count)
+    parameters, staged = Staged_Training(
+        engine, parameters, lambda: ParameterSet(values=member.Parameter_Values()), forward_loss, batches,
+        step_count, run_name, GATE_SEED, GATE_TRAINING_ARTIFACT_PATH, stage_fractions=GATE_STAGE_FRACTIONS,
+        peak_learning_rate=GATE_PEAK_LEARNING_RATE, probe_steps=DEFAULT_PROBE_STEPS,
+        validation_interval=GATE_VALIDATION_INTERVAL, final_stage_patience=GATE_FINAL_STAGE_PATIENCE,
+    )
     manifest: dict[str, object] = {
         "run_name": run_name,
-        "training_example_count": len(training_examples),
+        "training_example_count": len(batches.training_examples),
         "validation_unit_count": len(batches.validation_by_unit),
     }
-    for stage_index, (rate, stage_steps) in enumerate(zip(GATE_STAGE_LEARNING_RATES, stage_step_counts, strict=True)):
-        is_final_stage = stage_index == len(stage_step_counts) - 1
-        result = Train(
-            engine,
-            parameters,
-            forward_loss,
-            batches,
-            step_count=stage_steps,
-            learning_rate=rate,
-            seed=GATE_SEED + stage_index,
-            artifact_directory=GATE_TRAINING_ARTIFACT_PATH,
-            run_name=f"{run_name}_stage{stage_index}",
-            validation_interval=GATE_VALIDATION_INTERVAL,
-            patience=GATE_FINAL_STAGE_PATIENCE if is_final_stage else 0,
-            resume=(stage_index == 0),
-        )
-        parameters = result.parameters
-        manifest[f"stage_{stage_index}"] = result.manifest
+    manifest.update(staged)
     Write_Back_Gate_Parameters(member, parameters)
     manifest["final_parameters"] = parameters
     manifest["member"] = member
     return manifest
+
+
+def Cost_Probe(step_count: int = COST_PROBE_STEP_COUNT) -> dict[str, object]:
+    """a short warm-up run's own seconds per step and peak accelerator bytes, written to a small json beside the checkpoints"""
+    member, engine, forward_loss, batches = Perovskite_Gate_Rig()
+    parameters = ParameterSet(values=member.Parameter_Values())
+
+    Reset_Peak_Accelerator_Bytes()
+    result = Train(
+        engine, parameters, forward_loss, batches, step_count=step_count, learning_rate=GATE_PEAK_LEARNING_RATE,
+        seed=GATE_SEED, validation_interval=step_count, patience=0,
+    )
+    peak_accelerator_bytes = Peak_Accelerator_Bytes()
+    wall_clock_seconds = float(cast(float, result.manifest["wall_clock_seconds"]))
+    probe: dict[str, object] = {
+        "step_count": step_count,
+        "wall_clock_seconds": wall_clock_seconds,
+        "seconds_per_step": wall_clock_seconds / step_count,
+        "peak_accelerator_bytes": peak_accelerator_bytes,
+    }
+    GATE_TRAINING_ARTIFACT_PATH.mkdir(parents=True, exist_ok=True)
+    COST_PROBE_RESULT_PATH.write_text(json.dumps(probe, indent=1, sort_keys=True) + "\n")
+    return probe
 
 
 def Loaded_Gate_Member(run_name: str) -> GalerkinTransformer:

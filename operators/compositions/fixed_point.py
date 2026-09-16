@@ -53,6 +53,87 @@ def Applied_Once(
     return activated
 
 
+def Finite_Difference_Jacobian_Vector_Product(
+    layer: Layer[GridFunction],
+    kernel_lifted: dict[str, Any],
+    local_linear_lifted: dict[str, Any],
+    state: Any,
+    injection: Any | None,
+    probe: Any,
+    activations: ActivationTable,
+    relative_step: float = 1e-2,
+) -> Any:
+    """the layer's own jacobian at a detached state applied to a probe direction, by two ordinary forward passes"""
+    # no double backward exists on the foreign engine, so the state-jacobian is never asked to differentiate itself:
+    # the two applied-once calls below are each ordinary and differentiable in the weights, as the ambient tape sees
+    detached_state = Detached(state)
+    state_norm = float(np.sqrt(Host_Inner_Product(detached_state, detached_state)))
+    probe_norm = float(np.sqrt(Host_Inner_Product(probe, probe)))
+    step = relative_step * max(state_norm, 1e-12) / max(probe_norm, 1e-12)
+    perturbed = Applied_Once(
+        layer, kernel_lifted, local_linear_lifted, detached_state + step * probe, injection, activations
+    )
+    base = Applied_Once(layer, kernel_lifted, local_linear_lifted, detached_state, injection, activations)
+    return (perturbed - base) / step
+
+
+def Jacobian_Probe_Estimate(
+    layer: Layer[GridFunction],
+    kernel_lifted: dict[str, Any],
+    local_linear_lifted: dict[str, Any],
+    state: Any,
+    injection: Any | None,
+    probe: Any,
+    activations: ActivationTable = POINTWISE_ACTIVATIONS,
+    relative_step: float = 1e-2,
+) -> Any:
+    """the hutchinson estimate of the layer's own mean squared jacobian gain at a detached state, one probe's worth"""
+    directional = Finite_Difference_Jacobian_Vector_Product(
+        layer, kernel_lifted, local_linear_lifted, state, injection, probe, activations, relative_step
+    )
+    dimension = float(Host_Array(Detached(state)).size)
+    return (directional * directional).sum() / dimension
+
+
+def Hinge_Excess(estimate: Any, hinge: float) -> Any:
+    """however far the estimate sits above the hinge's own square, zero when it does not, gradient intact either way"""
+    excess = estimate - hinge * hinge
+    return excess * (excess > 0)
+
+
+@dataclass(frozen=True, slots=True)
+class JacobianPenalty:
+    """a hinge over the hutchinson jacobian-gain estimate, its gradient pulling the shared layer back to contraction"""
+
+    weight: float = 0.1
+    hinge: float = 0.9
+    relative_step: float = 1e-2
+    probe_count: int = 1
+
+
+    def Loss(
+        self,
+        layer: Layer[GridFunction],
+        kernel_lifted: dict[str, Any],
+        local_linear_lifted: dict[str, Any],
+        state: Any,
+        injection: Any | None,
+        probes: tuple[Any, ...],
+        activations: ActivationTable = POINTWISE_ACTIVATIONS,
+    ) -> Any:
+        """the weighted hinge over the mean of every probe's own estimate, one term ready to add into a training loss"""
+        if len(probes) != self.probe_count:
+            raise ValueError(f"this penalty was configured for {self.probe_count} probes, not {len(probes)}")
+        estimates = [
+            Jacobian_Probe_Estimate(
+                layer, kernel_lifted, local_linear_lifted, state, injection, probe, activations, self.relative_step
+            )
+            for probe in probes
+        ]
+        mean_estimate = sum(estimates) / len(estimates)
+        return self.weight * Hinge_Excess(mean_estimate, self.hinge)
+
+
 def Single_Layer_Parameter_Values(layer: Layer[GridFunction]) -> dict[str, NDArray[np.float64]]:
     """one shared layer's kernel and local linear arrays, prefixed once and not per application"""
     collected: dict[str, NDArray[np.float64]] = {}

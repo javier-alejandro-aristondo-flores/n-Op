@@ -229,6 +229,33 @@ def Test_The_Weight_Tied_And_Fixed_Point_Configurations_Assemble() -> None:
         assert np.asarray(output.values).shape == (2, 4, 4, 4)
 
 
+def Test_The_Member_Records_The_Jacobian_Gain_Estimate_Only_When_Handed_A_Probe() -> None:
+    """the lifted forward leaves the ladder's own jacobian diagnostic alone unless a probe was actually passed in"""
+    member = Factorized_Fourier_Network(
+        hidden_channels=4,
+        kept_modes=(1, 1, 1),
+        layer_count=3,
+        reference_density=0.05,
+        gram_mean=np.zeros(6),
+        gram_scale=np.ones(6),
+        processing_shape=(4, 4, 4),
+        seed=17,
+        configuration="fixed_point",
+    )
+    input_function = Toy_Input((8, 8, 8), seed=18)
+    log_density_values, gram_vector = member.Input_Channels(input_function)
+    combined_coarse_input = Combined_Coarse_Input(log_density_values, gram_vector, (4, 4, 4))
+    parameters = member.Parameter_Values()
+    assert member.last_fixed_point_jacobian_gain_estimate is None
+
+    member.Forward_From_Coarse_Input(parameters, combined_coarse_input)
+    assert member.last_fixed_point_jacobian_gain_estimate is None
+
+    probe = np.random.default_rng(19).normal(size=(4, 4, 4, 4))
+    member.Forward_From_Coarse_Input(parameters, combined_coarse_input, jacobian_probe=probe)
+    assert member.last_fixed_point_jacobian_gain_estimate is not None
+
+
 def Test_Fixed_Point_Inspect_Exposes_The_Health_Signals_After_A_Member_Call() -> None:
     """a bare forward call on the primitive records nothing, so the member captures the solve at its own level"""
     member = Factorized_Fourier_Network(

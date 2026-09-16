@@ -14,7 +14,14 @@ from operators.compositions.activation import (
     ActivationTable,
 )
 from operators.compositions.contraction import ContractionBudget, ContractionProjection, Nominal_Lipschitz
-from operators.compositions.fixed_point import FixedPoint, WeightTied
+from operators.compositions.fixed_point import (
+    FixedPoint,
+    Finite_Difference_Jacobian_Vector_Product,
+    Hinge_Excess,
+    JacobianPenalty,
+    Jacobian_Probe_Estimate,
+    WeightTied,
+)
 from operators.compositions.multi_scale import (
     Doubled_Shape,
     Downsampled_By_Two,

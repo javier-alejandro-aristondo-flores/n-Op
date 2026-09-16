@@ -8,7 +8,14 @@ from typing import Any, Literal
 import numpy as np
 from numpy.typing import NDArray
 
-from operators.compositions import ExplicitStack, FixedPoint, Spectral_Resampled, WeightTied
+from operators.compositions import (
+    ExplicitStack,
+    FixedPoint,
+    Jacobian_Probe_Estimate,
+    Sliced_Lifted,
+    Spectral_Resampled,
+    WeightTied,
+)
 from operators.encoders import PointwiseLift
 from operators.factorized_fourier.parametric import (
     All_Perovskite_Arms,
@@ -33,7 +40,7 @@ from operators.framework import (
 from operators.kernels import SpectralKernel
 from operators.kernels.spectral import MODE_WAVEVECTOR_FEATURES_KEY, Mode_Wavevector_Features
 from operators.readouts import PeriodicCoordinateFeatures, PointwiseProjection
-from operators.substrate import Concatenate_Channels, Zeros_Beside
+from operators.substrate import Concatenate_Channels, Detached, Host_Array, Zeros_Beside
 from operators.wrappers import Conserving
 
 type FourierComposition = ExplicitStack | WeightTied | FixedPoint
@@ -152,6 +159,16 @@ def Parametric_Input(parameters: Coefficients, shape: tuple[int, int, int]) -> G
     return GridFunction(values, labels, parameters.domain, quadrature)
 
 
+def Ladder_Injection(composition: FourierComposition, hidden: Any) -> Any | None:
+    """the state a shared layer's own iteration injects at every application, matching each rung's own rule"""
+    if isinstance(composition, FixedPoint):
+        # the solver, the phantom reentries and the implicit rule all inject the input at every iteration
+        return hidden
+    if isinstance(composition, WeightTied):
+        return hidden if composition.input_injection else None
+    return None
+
+
 def Layer_Prefixes(composition: FourierComposition) -> tuple[str, ...]:
     """every layer-scoped prefix a composition's own kernels answer to, for injecting a shared lifted constant"""
     if isinstance(composition, ExplicitStack):
@@ -205,6 +222,7 @@ class FactorizedFourier(NeuralOperator[GridFunction, GridFunction, GridFunction]
         self.last_fixed_point_residual: float | None = None
         self.last_fixed_point_cap_was_hit: bool | None = None
         self.last_fixed_point_residual_history: NDArray[np.float64] | None = None
+        self.last_fixed_point_jacobian_gain_estimate: Any | None = None
 
 
     def Parameter_Values(self) -> dict[str, NDArray[np.float64]]:
@@ -223,6 +241,7 @@ class FactorizedFourier(NeuralOperator[GridFunction, GridFunction, GridFunction]
         output_shape: tuple[int, int, int] | None = None,
         weight_each: float | None = None,
         condition_vector: Any | None = None,
+        jacobian_probe: Any | None = None,
     ) -> Any:
         """the lifted path onward from the coarse input, including the potential and parametric tasks' own finish"""
         if self.task == "parametric":
@@ -245,6 +264,18 @@ class FactorizedFourier(NeuralOperator[GridFunction, GridFunction, GridFunction]
             self.last_fixed_point_residual_history = np.asarray(solved.residual_norm_history, dtype=np.float64)
         else:
             carried = self.spectral_stack.Forward(layer_lifted, hidden)
+        if jacobian_probe is not None and isinstance(self.spectral_stack, (WeightTied, FixedPoint)):
+            kernel_lifted = Sliced_Lifted(layer_lifted, "kernel.")
+            local_linear_lifted = Sliced_Lifted(layer_lifted, "local_linear.")
+            self.last_fixed_point_jacobian_gain_estimate = Jacobian_Probe_Estimate(
+                self.spectral_stack.layer,
+                kernel_lifted,
+                local_linear_lifted,
+                carried,
+                Ladder_Injection(self.spectral_stack, hidden),
+                jacobian_probe,
+                self.spectral_stack.activations,
+            )
         produced = self.projection.Forward(lifted, carried)
         if self.task == "potential":
             resolved_output_shape = FINE_SHAPE if output_shape is None else output_shape
@@ -391,6 +422,11 @@ class FactorizedFourier(NeuralOperator[GridFunction, GridFunction, GridFunction]
             state["last_fixed_point_cap_was_hit"] = np.asarray(self.last_fixed_point_cap_was_hit)
         if self.last_fixed_point_residual_history is not None:
             state["last_fixed_point_residual_history"] = self.last_fixed_point_residual_history
+        if self.last_fixed_point_jacobian_gain_estimate is not None:
+            # brought to the host and detached, since a training step may have left this one on a live tape
+            state["last_fixed_point_jacobian_gain_estimate"] = Host_Array(
+                Detached(self.last_fixed_point_jacobian_gain_estimate)
+            )
         return state
 
 

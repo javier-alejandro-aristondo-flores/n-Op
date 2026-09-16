@@ -8,7 +8,7 @@ from typing import Any, cast
 import numpy as np
 from numpy.typing import NDArray
 
-from operators.compositions import ExplicitStack
+from operators.compositions import ExplicitStack, Hinge_Excess, JacobianPenalty
 from operators.data import (
     Apply_Standardized_Ridge,
     Archive_Path,
@@ -79,9 +79,10 @@ from operators.inspection import (
     Render_Prediction_Against_Truth,
     Render_Table,
 )
-from operators.substrate import ParameterSet
+from operators.substrate import Detached, Host_Array, ParameterSet
 from operators.tasks import Card_Named
 from operators.training import (
+    BatchArray,
     BatchSource,
     Field_From_Archive,
     Parameter_Field_Examples,
@@ -166,23 +167,31 @@ class LocalizationBatches(BatchSource):
     """one training example drawn uniformly with replacement every step, and every validation unit held fixed"""
 
 
-    def __init__(self, training_examples: list[LocalizationExample], validation_examples: list[LocalizationExample]) -> None:
+    def __init__(
+        self,
+        training_examples: list[LocalizationExample],
+        validation_examples: list[LocalizationExample],
+        jacobian_probe_shape: tuple[int, ...] | None = None,
+    ) -> None:
         self.training_examples = training_examples
         self.validation_by_unit: dict[str, list[LocalizationExample]] = {}
         for example in validation_examples:
             self.validation_by_unit.setdefault(example.unit_key, []).append(example)
+        # rung two's own probe, one per training step, drawn from the same generator the step itself is drawn from
+        self.jacobian_probe_shape = jacobian_probe_shape
         self.last_drawn_identifier: str | None = None
 
 
     def Next_Batch(self, generator: np.random.Generator) -> TrainingBatch:
         drawn = self.training_examples[int(generator.integers(0, len(self.training_examples)))]
         self.last_drawn_identifier = drawn.identifier
-        return TrainingBatch(
-            {
-                "combined_coarse_input": drawn.combined_coarse_input[None],
-                "targets": drawn.target_values[None],
-            }
-        )
+        arrays: dict[str, BatchArray] = {
+            "combined_coarse_input": drawn.combined_coarse_input[None],
+            "targets": drawn.target_values[None],
+        }
+        if self.jacobian_probe_shape is not None:
+            arrays["jacobian_probe"] = generator.standard_normal(size=self.jacobian_probe_shape).astype(np.float32)
+        return TrainingBatch(arrays)
 
 
     def Validation_Batches(self) -> tuple[tuple[str, TrainingBatch], ...]:
@@ -214,19 +223,23 @@ class LocalizationBatches(BatchSource):
         return state
 
 
-def Localization_Loss(member: FactorizedFourier) -> Any:
-    """mean squared error over every example a batch carries, looped since the lifted path takes one at a time"""
+def Localization_Loss(member: FactorizedFourier, jacobian_penalty: JacobianPenalty | None = None) -> Any:
+    """mean squared error over every example a batch carries, plus rung two's own hinge on a training step alone"""
     cap_hit_history: list[bool] = []
     iterations_history: list[int] = []
+    jacobian_gain_history: list[float] = []
 
     def Loss(lifted: dict[str, Any], lifted_batch: dict[str, Any]) -> Any:
         example_count = lifted_batch["combined_coarse_input"].shape[0]
         # one example is drawn per training step, so this is a training solve rather than a validation
         # one, unless a held-out unit happens to carry exactly one example itself
         drawn_as_a_training_step = example_count == 1
+        jacobian_probe = lifted_batch.get("jacobian_probe") if drawn_as_a_training_step else None
         total = 0.0
         for example_index in range(example_count):
-            predicted = member.Forward_From_Coarse_Input(lifted, lifted_batch["combined_coarse_input"][example_index])
+            predicted = member.Forward_From_Coarse_Input(
+                lifted, lifted_batch["combined_coarse_input"][example_index], jacobian_probe=jacobian_probe
+            )
             residual = predicted - lifted_batch["targets"][example_index]
             total = total + (residual * residual).mean()
             cap_was_hit = member.last_fixed_point_cap_was_hit
@@ -243,6 +256,18 @@ def Localization_Loss(member: FactorizedFourier) -> Any:
                     print(
                         f"training step {len(cap_hit_history)}: cap-hit fraction {cap_hit_fraction:.2f} over the"
                         f" last {len(recent_hits)} training solves, mean iterations {mean_iterations:.1f}",
+                        flush=True,
+                    )
+            gain_estimate = member.last_fixed_point_jacobian_gain_estimate
+            if jacobian_penalty is not None and drawn_as_a_training_step and gain_estimate is not None:
+                total = total + jacobian_penalty.weight * Hinge_Excess(gain_estimate, jacobian_penalty.hinge)
+                jacobian_gain_history.append(float(Host_Array(Detached(gain_estimate))))
+                # the rung's own diagnostic, visible while the run trains rather than only at evaluation
+                if len(jacobian_gain_history) % VALIDATION_INTERVAL == 0:
+                    recent_gains = jacobian_gain_history[-100:]
+                    print(
+                        f"training step {len(jacobian_gain_history)}: mean jacobian-gain estimate"
+                        f" {sum(recent_gains) / len(recent_gains):.4f} over the last {len(recent_gains)} steps",
                         flush=True,
                     )
         return total / example_count

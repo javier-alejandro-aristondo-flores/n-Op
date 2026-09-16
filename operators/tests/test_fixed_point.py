@@ -8,14 +8,28 @@ import pytest
 from numpy.typing import NDArray
 
 from operators.compositions import FixedPoint, WeightTied
-from operators.compositions.fixed_point import Anderson_Gram, Anderson_Mixing_Weights, Sliced_Lifted
+from operators.compositions.activation import POINTWISE_ACTIVATIONS
+from operators.compositions.fixed_point import (
+    Anderson_Gram,
+    Anderson_Mixing_Weights,
+    Applied_Once,
+    Finite_Difference_Jacobian_Vector_Product,
+    Hinge_Excess,
+    Host_Inner_Product,
+    JacobianPenalty,
+    Jacobian_Probe_Estimate,
+    Single_Layer_Parameter_Values,
+    Sliced_Lifted,
+)
 from operators.encoders import PointwiseLift
 from operators.framework import Domain, GridFunction, Layer, UniformGridQuadrature
 from operators.kernels import SpectralKernel
 from operators.substrate import (
     ACCELERATOR_DEVICE_NAME,
     Accelerator_Is_Available,
+    Adam_Step,
     Detached,
+    Fresh_Adam_State,
     NumpyEngine,
     ParameterSet,
     Torch_Is_Available,
@@ -527,3 +541,158 @@ def Test_Implicit_Gradient_Closes_The_Audit_Tighter_Than_Phantom_Against_Both_Gr
     assert gap_to_finite_difference < 0.0005
     assert gap_to_full_unroll < 0.0005
     assert gap_to_finite_difference < Relative_Gap(full_unroll_gradients, finite_difference_gradients) * 10.0
+
+
+# the ladder's second stability rung: a hutchinson jacobian-gain estimate by a finite-difference jvp, penalized
+# by a hinge in the training loss, grounded on the same contractive and divergent toy layers as the rungs above
+
+
+def Test_Hinge_Excess_Is_Zero_At_Or_Below_The_Hinge_And_Linear_Above_It() -> None:
+    """the exact shape of the penalty's own floor, checked directly against the arithmetic it stands for"""
+    assert float(Hinge_Excess(np.asarray(0.5), 1.0)) == 0.0
+    assert float(Hinge_Excess(np.asarray(2.0), 1.0)) == 1.0
+
+
+def Test_Jacobian_Probe_Estimate_Is_The_Mean_Squared_Directional_Output_Over_The_States_Own_Size() -> None:
+    """the reduction the estimate performs, checked against the same finite-difference jv computed independently"""
+    layer = Contractive_Layer(seed=95, channels=2)
+    parameter_values = Single_Layer_Parameter_Values(layer)
+    kernel_lifted = Sliced_Lifted(parameter_values, "kernel.")
+    local_linear_lifted = Sliced_Lifted(parameter_values, "local_linear.")
+    state = np.asarray(Small_Field(2, seed=96).values, dtype=np.float64)
+    probe = np.random.default_rng(97).normal(size=state.shape)
+    estimate = Jacobian_Probe_Estimate(
+        layer, kernel_lifted, local_linear_lifted, state, state, probe, POINTWISE_ACTIVATIONS, relative_step=1e-2
+    )
+    directional = Finite_Difference_Jacobian_Vector_Product(
+        layer, kernel_lifted, local_linear_lifted, state, state, probe, POINTWISE_ACTIVATIONS, relative_step=1e-2
+    )
+    expected = float(np.sum(np.asarray(directional) ** 2)) / float(state.size)
+    assert abs(float(estimate) - expected) < 1e-10
+
+
+@pytest.mark.skipif(not Torch_Is_Available(), reason="the foreign engine is not installed yet")
+def Test_The_Finite_Difference_Jacobian_Vector_Product_Satisfies_The_Adjoint_Identity() -> None:
+    """a forward-difference jv at a small step and the exact vjp must agree on the one number both sides can form"""
+    layer = Contractive_Layer(seed=61)
+    engine = TorchEngine()
+    parameter_values = Single_Layer_Parameter_Values(layer)
+    lifted = {name: engine.Lift_Constant(value) for name, value in parameter_values.items()}
+    kernel_lifted = Sliced_Lifted(lifted, "kernel.")
+    local_linear_lifted = Sliced_Lifted(lifted, "local_linear.")
+    state = engine.Lift_Constant(np.asarray(Small_Field(2, seed=62).values, dtype=np.float64))
+    injection = state
+    probe = engine.Lift_Constant(np.random.default_rng(63).normal(size=(2, 8, 8, 8)))
+    cotangent = engine.Lift_Constant(np.random.default_rng(64).normal(size=(2, 8, 8, 8)))
+
+    directional = Finite_Difference_Jacobian_Vector_Product(
+        layer, kernel_lifted, local_linear_lifted, state, injection, probe, POINTWISE_ACTIVATIONS, relative_step=1e-5
+    )
+    left_hand_side = Host_Inner_Product(cotangent, directional)
+
+    def Applied_At_The_State(value: Any) -> Any:
+        return Applied_Once(layer, kernel_lifted, local_linear_lifted, value, injection, POINTWISE_ACTIVATIONS)
+
+    pulled_back = Vector_Jacobian_Product(Applied_At_The_State, state, cotangent)
+    right_hand_side = Host_Inner_Product(pulled_back, probe)
+    assert abs(left_hand_side - right_hand_side) < 1e-3 * (abs(right_hand_side) + 1.0)
+
+
+@pytest.mark.skipif(not Torch_Is_Available(), reason="the foreign engine is not installed yet")
+def Test_The_Jacobian_Penaltys_Gradient_Reaches_Both_Weight_Groups_And_Matches_Finite_Differences() -> None:
+    """the hinge's own gradient, taken through the probe estimate, must move both the kernel and the local matrix"""
+    layer = Contractive_Layer(seed=81, channels=2)
+    state_values = np.asarray(Small_Field(2, seed=82).values, dtype=np.float64)
+    injection_values = np.asarray(Small_Field(2, seed=83).values, dtype=np.float64)
+    probe_values = np.random.default_rng(84).normal(size=(2, 8, 8, 8))
+    # a hinge of zero keeps the excess robustly positive, away from the hinge's own kink, for a stable comparison
+    penalty = JacobianPenalty(weight=1.0, hinge=0.0, relative_step=1e-2, probe_count=1)
+    parameters = ParameterSet(values={name: value.copy() for name, value in Single_Layer_Parameter_Values(layer).items()})
+
+    def Loss(lifted: dict[str, Any], state: Any, injection: Any, probe: Any) -> Any:
+        kernel_lifted = Sliced_Lifted(lifted, "kernel.")
+        local_linear_lifted = Sliced_Lifted(lifted, "local_linear.")
+        return penalty.Loss(layer, kernel_lifted, local_linear_lifted, state, injection, (probe,))
+
+    engine = TorchEngine()
+    lifted_state = engine.Lift_Constant(state_values)
+    lifted_injection = engine.Lift_Constant(injection_values)
+    lifted_probe = engine.Lift_Constant(probe_values)
+
+    def Torch_Loss(lifted: dict[str, Any]) -> Any:
+        return Loss(lifted, lifted_state, lifted_injection, lifted_probe)
+
+    def Reference_Loss(lifted: dict[str, Any]) -> Any:
+        return Loss(lifted, state_values, injection_values, probe_values)
+
+    value, gradients = engine.Value_And_Gradients(parameters, Torch_Loss)
+    reference = NumpyEngine()
+    reference_value = reference.Evaluate(parameters, Reference_Loss)
+    reference_gradients = reference.Gradients(parameters, Reference_Loss)
+
+    assert abs(value - reference_value) < 1e-6
+    kernel_names = [name for name in gradients if name.startswith("kernel.")]
+    local_linear_names = [name for name in gradients if name.startswith("local_linear.")]
+    for name, gradient in gradients.items():
+        assert np.allclose(gradient, reference_gradients[name], rtol=1e-3, atol=1e-6), name
+    assert max(float(np.abs(gradients[name]).max()) for name in kernel_names) > 1e-8
+    assert max(float(np.abs(gradients[name]).max()) for name in local_linear_names) > 1e-8
+
+
+def Test_The_Jacobian_Penalty_Refuses_A_Probe_Count_Mismatch() -> None:
+    """the configured probe count is not a suggestion; a mismatched batch of probes is refused rather than truncated"""
+    layer = Contractive_Layer(seed=85, channels=2)
+    penalty = JacobianPenalty(probe_count=2)
+    kernel_lifted = Sliced_Lifted(Single_Layer_Parameter_Values(layer), "kernel.")
+    local_linear_lifted = Sliced_Lifted(Single_Layer_Parameter_Values(layer), "local_linear.")
+    state = np.asarray(Small_Field(2, seed=86).values, dtype=np.float64)
+    probe = np.random.default_rng(87).normal(size=(2, 8, 8, 8))
+    with pytest.raises(ValueError):
+        penalty.Loss(layer, kernel_lifted, local_linear_lifted, state, state, (probe,))
+
+
+@pytest.mark.skipif(not Torch_Is_Available(), reason="the foreign engine is not installed yet")
+def Test_The_Jacobian_Penalty_Alone_Drives_A_Divergent_Toy_Layer_Back_To_Contractive() -> None:
+    """thirty adam steps against nothing but the hinge turn a layer the solver cannot solve into one it can"""
+    layer = Divergent_Layer(seed=91, channels=2)
+    for name in layer.kernel.parameter_values:
+        # a gentler-than-Divergent_Layer scale, chosen so the penalty alone has room to win within a short budget
+        layer.kernel.parameter_values[name] = layer.kernel.parameter_values[name] / 50.0 * 3.0
+    layer.local_linear.parameter_values["lift_weights"] = layer.local_linear.parameter_values["lift_weights"] / 50.0 * 3.0
+    field = Small_Field(2, seed=92)
+
+    baseline = FixedPoint(layer, iteration_cap=32)
+    baseline.Apply(field)
+    assert baseline.last_solve is not None
+    assert baseline.last_solve.cap_was_hit is True
+
+    penalty = JacobianPenalty(weight=2.0, hinge=0.1, relative_step=1e-2, probe_count=2)
+    parameters = ParameterSet(values={name: value.copy() for name, value in Single_Layer_Parameter_Values(layer).items()})
+    engine = TorchEngine()
+    state_values = np.asarray(field.values, dtype=np.float64)
+    generator = np.random.default_rng(93)
+    adam_state = Fresh_Adam_State(parameters)
+    for _ in range(80):
+        lifted_state = engine.Lift_Constant(state_values)
+        probes = tuple(engine.Lift_Constant(generator.normal(size=state_values.shape)) for _ in range(2))
+
+        def Step_Loss(lifted: dict[str, Any], lifted_state: Any = lifted_state, probes: Any = probes) -> Any:
+            kernel_lifted = Sliced_Lifted(lifted, "kernel.")
+            local_linear_lifted = Sliced_Lifted(lifted, "local_linear.")
+            return penalty.Loss(layer, kernel_lifted, local_linear_lifted, lifted_state, lifted_state, probes)
+
+        _, gradients = engine.Value_And_Gradients(parameters, Step_Loss)
+        parameters = Adam_Step(parameters, gradients, adam_state, learning_rate=0.1)
+
+    for bare_name, value in parameters.values.items():
+        if bare_name.startswith("kernel."):
+            layer.kernel.parameter_values[bare_name[len("kernel."):]] = value
+        elif bare_name.startswith("local_linear."):
+            layer.local_linear.parameter_values[bare_name[len("local_linear."):]] = value
+
+    after = FixedPoint(layer, iteration_cap=32)
+    after.Apply(field)
+    assert after.last_solve is not None
+    assert after.last_solve.cap_was_hit is False
+
+

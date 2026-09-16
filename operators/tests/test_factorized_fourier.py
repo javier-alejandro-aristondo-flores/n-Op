@@ -1,7 +1,7 @@
 """the flagship member: its assembly, the discretization and commutation claims, and its recomputed floors"""
 
 from pathlib import Path
-from typing import Any
+from typing import Any, cast
 
 import numpy as np
 import pytest
@@ -27,19 +27,25 @@ from operators.factorized_fourier.report import (
     CARD_METRIC_NAMES,
     COARSE_SHAPE,
     CubicBlock,
+    Deep_Equilibrium_Verdict_Lines,
     Elf_Evaluation_Lines,
     Elf_Evaluation_Rows,
     Elf_Floor_Comparisons,
     Elf_Ladder_Verdicts,
     Elf_Ridge_Rows,
+    Fixed_Point_Health_Lines,
+    Fixed_Point_Health_Verdict,
     Fresh_Flagship_Member,
     Functional_Of_Run_Path,
+    HealthTrackingHook,
     Input_Statistics,
     Latest_Stage_Checkpoint,
     Localization_Examples,
     LocalizationBatches,
     Localization_Loss,
     Nearest_Run_Rows,
+    Probe_Curve_At,
+    Probe_Passes,
     Shell_Filter_Rows,
     Write_Back_Parameters,
 )
@@ -47,6 +53,7 @@ from operators.framework import Domain, GridFunction, GridSpec, UniformGridQuadr
 from operators.inspection import Render_Inspection_Suite
 from operators.substrate import Concatenate_Channels, NumpyEngine, ParameterSet, TorchEngine, Zeros_Beside
 from operators.training import BatchSource, Read_Checkpoint, Train, TrainingBatch
+from operators.training.loop import Fresh_Progress, TrainingProgress
 
 CUBE = Domain(lattice=np.eye(3) * 3.57)
 
@@ -956,3 +963,99 @@ def Test_The_Evaluation_Entry_Point_Runs_End_To_End_On_A_Toy_Trained_Member(tmp_
     assert any("super-resolution" in line for line in lines)
     assert (tmp_path / "figures" / "fold_0" / "explicit" / "floors.png").is_file()
     assert (tmp_path / "cache" / "fold_0" / "explicit" / "inspection.npz").is_file()
+
+
+# the deep-equilibrium ladder's escalation protocol: the probe's own launch rule, the health-tracking hook every
+# fixed-point run carries, and the report sections' graceful fall-through before any rung has trained
+
+
+class StubFixedPointMember:
+    """a minimal stand-in carrying just the two attributes HealthTrackingHook reads off a real member"""
+
+
+    def __init__(self) -> None:
+        self.last_fixed_point_cap_was_hit: bool | None = None
+        self.last_fixed_point_iterations: int | None = None
+
+
+def Test_Health_Tracking_Hook_Windows_Cap_Hit_Fraction_And_Mean_Iterations_Between_Validation_Passes() -> None:
+    """the hook's own rolling window reports the fraction and mean since the last validation pass, then clears"""
+    stub = StubFixedPointMember()
+    hook = HealthTrackingHook(cast(FactorizedFourier, stub))
+    parameters = ParameterSet(values={"weight": np.zeros(2)})
+    progress = Fresh_Progress(parameters, np.random.default_rng(0))
+    for cap_was_hit, iterations_taken in [(False, 4), (False, 6), (True, 32)]:
+        stub.last_fixed_point_cap_was_hit = cap_was_hit
+        stub.last_fixed_point_iterations = iterations_taken
+        hook.After_Step(progress)
+    reported = hook.After_Validation(progress)
+    assert abs(reported["cap_hit_fraction"] - (1.0 / 3.0)) < 1e-12
+    assert abs(reported["mean_iterations"] - (4 + 6 + 32) / 3.0) < 1e-12
+    # the window clears once read, so an empty pass right after a report carries nothing forward
+    assert hook.After_Validation(progress) == {}
+
+
+def Test_Health_Tracking_Hook_Composes_With_An_Inner_Hooks_Own_Diagnostics() -> None:
+    """an inner hook's own reported names ride alongside the cap-hit and iteration diagnostics, not replaced by them"""
+
+    class InnerHook:
+        """a stand-in for a rung-one contraction projection, reporting one named diagnostic of its own"""
+
+
+        def After_Step(self, progress: TrainingProgress) -> None:
+            return None
+
+
+        def After_Validation(self, progress: TrainingProgress) -> dict[str, float]:
+            return {"inner_value": 7.0}
+
+    stub = StubFixedPointMember()
+    hook = HealthTrackingHook(cast(FactorizedFourier, stub), InnerHook())
+    parameters = ParameterSet(values={"weight": np.zeros(2)})
+    progress = Fresh_Progress(parameters, np.random.default_rng(0))
+    stub.last_fixed_point_cap_was_hit = False
+    stub.last_fixed_point_iterations = 5
+    hook.After_Step(progress)
+    reported = hook.After_Validation(progress)
+    assert reported["inner_value"] == 7.0
+    assert reported["cap_hit_fraction"] == 0.0
+    assert reported["mean_iterations"] == 5.0
+
+
+def Test_Probe_Passes_Applies_The_Launch_Rule() -> None:
+    """under one half and not climbing from the pass before it, in one direction or the other"""
+    assert Probe_Passes(cap_hit_fraction_at_400=0.4, cap_hit_fraction_at_500=0.3) is True
+    assert Probe_Passes(cap_hit_fraction_at_400=0.4, cap_hit_fraction_at_500=0.6) is False
+    assert Probe_Passes(cap_hit_fraction_at_400=0.4, cap_hit_fraction_at_500=0.5) is False
+
+
+def Test_Fixed_Point_Health_Verdict_Applies_The_Three_Way_Read() -> None:
+    """pass at or above ninety percent, caution between eighty and ninety, kill below eighty"""
+    assert Fixed_Point_Health_Verdict(0.95) == "pass"
+    assert Fixed_Point_Health_Verdict(0.90) == "pass"
+    assert Fixed_Point_Health_Verdict(0.85) == "caution"
+    assert Fixed_Point_Health_Verdict(0.79) == "kill"
+
+
+def Test_Probe_Curve_At_Reads_The_Nearest_Validation_Pass() -> None:
+    """a synthetic probe manifest's own curve, read back at the step nearest what was asked for"""
+    manifest: dict[str, object] = {
+        "stage_0_validation_steps": np.asarray([100.0, 200.0, 300.0, 400.0, 500.0]),
+        "stage_0_auxiliary_curves": {"cap_hit_fraction": np.asarray([0.9, 0.7, 0.5, 0.3, 0.2])},
+    }
+    assert abs(Probe_Curve_At(manifest, "cap_hit_fraction", 400) - 0.3) < 1e-12
+    assert abs(Probe_Curve_At(manifest, "cap_hit_fraction", 500) - 0.2) < 1e-12
+    with pytest.raises(ValueError):
+        Probe_Curve_At(manifest, "missing_curve", 400)
+
+
+def Test_Fixed_Point_Health_Lines_Reports_Not_Yet_Run_Before_Any_Checkpoint_Exists() -> None:
+    """the health section degrades gracefully, matching the same pattern Elf_Evaluation_Lines already follows"""
+    lines = Fixed_Point_Health_Lines("spectral_clipping", "a_run_name_no_checkpoint_could_ever_carry")
+    assert any("Not yet run" in line for line in lines)
+
+
+def Test_Deep_Equilibrium_Verdict_Lines_Reads_Outcome_A_Before_Any_Rung_Has_Trained() -> None:
+    """with nothing trained, the verdict section still writes the one pre-registered outcome that already holds"""
+    lines = Deep_Equilibrium_Verdict_Lines()
+    assert any("Outcome A" in line for line in lines)

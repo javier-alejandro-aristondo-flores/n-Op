@@ -92,6 +92,46 @@ and deep-equilibrium rungs are the same member with a different composition obje
 codebase; both already satisfy the same lifted `Forward(lifted, input_values)` shape `ExplicitStack`
 does.
 
+**The deep-equilibrium ladder's three stability rungs (canon C.2).** The shared layer's default
+initialization is not contractive at this member's own channel width, and training drives it further
+out regardless of starting scale (`initial_scale`, the canon's own first escalation, is not enough on
+its own — see `Deep_Equilibrium_Ladder_Lines`). The next three rungs, in canon order, all live in
+`operators.compositions.contraction` and `operators.compositions.fixed_point`, selected on
+`Train_Flagship_Member(..., stabilization=...)`:
+
+- **`"spectral_clipping"`** — `ContractionBudget(target_lipschitz, local_share)` splits a Lipschitz
+  target between the local matrix and the separable kernel's three factors (`Local_Bound()`,
+  `Mode_Bound(factor_count)`, from `Lip ≤ 1.129·(‖W‖₂ + Σ_factors max_slice ‖slice‖₂)`, GELU's own
+  slope supremum); `ContractionProjection`, a `TrainingHook.After_Step`, clips the local matrix and
+  every kernel factor slice with the exact Euclidean `U·min(Σ,c)·Vᴴ` — never a whole-matrix rescale —
+  right after every Adam step, on the host, in plain numpy (the master weights `Train`'s loop carries
+  are always host doubles regardless of which engine trained the step, so this needs no accelerator
+  round trip of its own).
+- **`"jacobian_penalty"`** — `Jacobian_Probe_Estimate` is a Hutchinson estimate of the shared layer's
+  own mean squared Jacobian gain at a detached state, taken by a forward-difference Jacobian-vector
+  product (`Finite_Difference_Jacobian_Vector_Product`, two ordinary `Applied_Once` calls the ambient
+  tape differentiates — no double backward exists on the foreign engine); `member
+  .Forward_From_Coarse_Input(..., jacobian_probe=...)` records the raw estimate as
+  `last_fixed_point_jacobian_gain_estimate` only when handed a probe (`LocalizationBatches` draws one
+  fresh probe per training step when this rung is selected); `JacobianPenalty(weight, hinge)` and the
+  free function `Hinge_Excess` turn that estimate into `weight · max(0, estimate − hinge²)`, added
+  into the training loss (never the validation one) by `Localization_Loss`.
+- **`"normalized"`** — the same budget, applied differentiably inside the forward instead of clipped
+  after the step: `Spectral_Norm_Scale` computes `min(1, c/σ_max(value))` through the substrate's own
+  dispatched, differentiable `Largest_Singular_Values` and `Clipped_Above`; `Normalized_Kernel_Lifted`
+  / `Normalized_Local_Linear_Lifted` apply it once per forward to the lifted dicts, inside
+  `WeightTied.Application_Outputs`, `FixedPoint.Resolved` and the implicit rule's own `Split` alike,
+  so the solve, every phantom reentry and the exact adjoint all differentiate the identical
+  ρ-contractive map (ρ ≤ `target_lipschitz`). Stored checkpoints are unchanged — normalization never
+  touches `parameter_values`, only the lifted copy a forward pass builds from them — so a normalized
+  run round-trips through `Load_Trained_Member` exactly as any other configuration does.
+
+`HealthTrackingHook` (in `report.py`) is attached whenever `configuration == "fixed_point"`,
+independent of `stabilization`: it windows the solver's own cap-hit fraction and mean iterations
+between validation passes (composing with whichever stabilization hook is also active, never
+replacing it) so every rung's probe and six-hour run carry the same health curves regardless of which
+mechanism is stabilizing it.
+
 **The operator claim.** `Forward_Field(lifted, log_density_values, gram_vector, target_shape)` takes
 `target_shape` as an explicit, optional argument (falling back to the member's own configured
 processing shape when omitted); `__call__` always passes the requested `GridSpec`'s own shape, so
@@ -170,6 +210,7 @@ configuration (twelve layers, each its own kernel and local linear map); `weight
 | `last_fixed_point_final_residual` | `()`, `fixed_point` configuration only, after a numpy call | scalar panel |
 | `last_fixed_point_cap_was_hit` | `()`, `fixed_point` configuration only, after a numpy call | scalar panel |
 | `last_fixed_point_residual_history` | up to `(32,)`, `fixed_point` configuration only, after a numpy call | `Render_Bars` |
+| `last_fixed_point_jacobian_gain_estimate` | `()`, `weight_tied` / `fixed_point` only, and only once `Forward_From_Coarse_Input` is called with a `jacobian_probe` (the `"jacobian_penalty"` rung's own training step) | scalar panel |
 
 `{axis}` ranges over `first_axis`, `second_axis`, `third_axis` (the separable kernel's own three
 per-axis weight tensors) and `{n}` over the twelve layer indices, explicit-stack configuration only.
@@ -182,3 +223,16 @@ particular test -- they share the same rank-dispatched renderers as the keys it 
 additionally draws a per-layer mode-magnitude spectrum through `Render_Spectrum`, radius-ordered
 from the zero mode out to mode 19 — the last point on that plot is, by construction, the coarse
 grid's own Nyquist edge, which is where the truncation from the 80³ input stops.
+
+**The stability rungs' own diagnostics live beside the member's, not inside it.**
+`ContractionProjection.Inspect()` (`"spectral_clipping"` only) exposes `local_bound`, `mode_bound`,
+`last_local_pre_clip_norm`, `last_{axis}_mode_weights_pre_clip_norms` and `last_clipped_fraction` /
+`last_nominal_lipschitz`, each a plain array under its own name; `WeightTied.Inspect()` and
+`FixedPoint.Inspect()` add `nominal_lipschitz_before_normalization` whenever a `budget` is set
+(`"normalized"`). None of these are reachable through `FactorizedFourier.Inspect()` — they belong to
+the hook or the composition, not the member — but every one of them, plus `HealthTrackingHook`'s own
+`cap_hit_fraction` and `mean_iterations`, is folded into the training run's own curves through the
+`TrainingHook.After_Validation` contract (`training/loop.py`), persisted as `auxiliary_<name>` in the
+checkpoint and `<name>_curve` in `TrainingResult.Inspect()` and `<run>_curves.npz` — reachable through
+the run's own artifacts rather than the member's, exactly like the loss and validation curves already
+are.

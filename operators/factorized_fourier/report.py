@@ -3,12 +3,21 @@
 import dataclasses
 import re
 from pathlib import Path
-from typing import Any, cast
+from typing import Any, Literal, cast
 
 import numpy as np
 from numpy.typing import NDArray
 
-from operators.compositions import ContractionBudget, ExplicitStack, Hinge_Excess, JacobianPenalty
+from operators.compositions import (
+    ContractionBudget,
+    ContractionProjection,
+    ExplicitStack,
+    FixedPoint,
+    Hinge_Excess,
+    JacobianPenalty,
+    Nominal_Lipschitz,
+    WeightTied,
+)
 from operators.data import (
     Apply_Standardized_Ridge,
     Archive_Path,
@@ -92,6 +101,7 @@ from operators.training import (
     Train,
     Training_Engine,
     TrainingBatch,
+    TrainingHook,
     TrainingProgress,
 )
 
@@ -118,6 +128,11 @@ DIVERGENCE_PROBE_STEPS = 200
 VALIDATION_INTERVAL = 100
 FINAL_STAGE_PATIENCE = 15
 STAGE_FRACTIONS = (0.3, 0.3, 0.4)
+
+# the deep-equilibrium ladder's three canon rungs (C.2), plus the unescalated fixed-point rung they each close on
+type Stabilization = Literal["none", "spectral_clipping", "jacobian_penalty", "normalized"]
+
+STABILIZED_CONFIGURATIONS = ("weight_tied", "weight_tied_injected", "fixed_point")
 
 
 @dataclasses.dataclass(frozen=True, slots=True)
@@ -346,8 +361,13 @@ def Train_Flagship_Member(
     configuration: FactorizedFourierConfiguration = "explicit",
     stage_fractions: tuple[float, float, float] = STAGE_FRACTIONS,
     initial_scale: float | None = None,
+    stabilization: Stabilization = "none",
+    contraction_budget: ContractionBudget | None = None,
+    jacobian_penalty: JacobianPenalty | None = None,
 ) -> dict[str, object]:
     """the full staged run: a divergence probe with one allowed restart at a lower rate, then the staged schedule"""
+    if stabilization != "none" and configuration not in STABILIZED_CONFIGURATIONS:
+        raise ValueError(f"{stabilization!r} projects or penalizes the ladder's shared layer, not {configuration!r}")
     block = CubicBlock()
     training_identifiers = block.member_train
     validation_identifiers = block.validation
@@ -356,8 +376,11 @@ def Train_Flagship_Member(
 
     training_examples = Localization_Examples(training_identifiers, block, reference_density, gram_mean, gram_scale)
     validation_examples = Localization_Examples(validation_identifiers, block, reference_density, gram_mean, gram_scale)
-    batches = LocalizationBatches(training_examples, validation_examples)
+    resolved_jacobian_penalty = jacobian_penalty if stabilization == "jacobian_penalty" else None
+    jacobian_probe_shape = (HIDDEN_CHANNELS, *COARSE_SHAPE) if resolved_jacobian_penalty is not None else None
+    batches = LocalizationBatches(training_examples, validation_examples, jacobian_probe_shape)
 
+    resolved_budget = contraction_budget if stabilization == "normalized" else None
     member = Factorized_Fourier_Network(
         hidden_channels=HIDDEN_CHANNELS,
         kept_modes=(KEPT_MODE, KEPT_MODE, KEPT_MODE),
@@ -369,10 +392,19 @@ def Train_Flagship_Member(
         seed=FLAGSHIP_SEED,
         configuration=configuration,
         initial_scale=initial_scale,
+        contraction_budget=resolved_budget,
     )
-    forward_loss = Localization_Loss(member)
+    forward_loss = Localization_Loss(member, resolved_jacobian_penalty)
     parameters = ParameterSet(values=member.Parameter_Values())
     engine = Training_Engine()
+
+    hook: TrainingHook | None = None
+    if stabilization == "spectral_clipping":
+        assert isinstance(member.spectral_stack, (WeightTied, FixedPoint))
+        hook = ContractionProjection(member.spectral_stack.layer, contraction_budget or ContractionBudget())
+    if configuration == "fixed_point":
+        # the solver's own cap-hit fraction and mean iterations, windowed for the probe protocol's own launch rule
+        hook = HealthTrackingHook(member, hook)
 
     stage_step_counts = Staged_Step_Counts(step_count, stage_fractions)
     probe_steps = min(DIVERGENCE_PROBE_STEPS, stage_step_counts[0])
@@ -380,14 +412,14 @@ def Train_Flagship_Member(
     probe_result = Train(
         engine, parameters, forward_loss, batches, step_count=probe_steps, learning_rate=chosen_peak_rate,
         seed=FLAGSHIP_SEED, artifact_directory=TRAINING_ARTIFACT_PATH, run_name=f"{run_name}_stage0",
-        validation_interval=probe_steps, patience=0,
+        validation_interval=probe_steps, patience=0, hook=hook,
     )
     if not Sane_Loss_Curve(probe_result.loss_curve, probe_result.validation_curve):
         chosen_peak_rate = PEAK_LEARNING_RATE * 0.3
         probe_result = Train(
             engine, ParameterSet(values=member.Parameter_Values()), forward_loss, batches, step_count=probe_steps,
             learning_rate=chosen_peak_rate, seed=FLAGSHIP_SEED, artifact_directory=TRAINING_ARTIFACT_PATH,
-            run_name=f"{run_name}_stage0", validation_interval=probe_steps, patience=0, resume=False,
+            run_name=f"{run_name}_stage0", validation_interval=probe_steps, patience=0, resume=False, hook=hook,
         )
         if not Sane_Loss_Curve(probe_result.loss_curve, probe_result.validation_curve):
             raise RuntimeError(
@@ -403,6 +435,7 @@ def Train_Flagship_Member(
         "probe_steps": probe_steps,
         "training_example_count": len(training_examples),
         "validation_unit_count": len(batches.validation_by_unit),
+        "stabilization": stabilization,
     }
     for stage_index, (rate, stage_steps) in enumerate(zip(stage_rates, stage_step_counts, strict=True)):
         is_final_stage = stage_index == len(stage_step_counts) - 1
@@ -410,7 +443,7 @@ def Train_Flagship_Member(
             engine, parameters, forward_loss, batches, step_count=stage_steps, learning_rate=rate,
             seed=FLAGSHIP_SEED + stage_index, artifact_directory=TRAINING_ARTIFACT_PATH,
             run_name=f"{run_name}_stage{stage_index}", validation_interval=VALIDATION_INTERVAL,
-            patience=FINAL_STAGE_PATIENCE if is_final_stage else 0, resume=(stage_index == 0),
+            patience=FINAL_STAGE_PATIENCE if is_final_stage else 0, resume=(stage_index == 0), hook=hook,
         )
         parameters = result.parameters
         manifest[f"stage_{stage_index}"] = result.manifest
@@ -1335,6 +1368,267 @@ def Elf_Evaluation_Lines(
     ]
 
 
+# the deep-equilibrium ladder's escalation protocol (canon C.2): a five-hundred-step probe per rung, the six-hour
+# run's own convergence health floor, and the verdict logic that reads every trained rung so the page's outcome
+# always has a source -- none of the three rungs has trained yet, so every function below is exercised through its
+# own "not yet run" branch until the integrator launches a probe and names a run
+
+PROBE_STEP_COUNT = 500
+PROBE_LAUNCH_STEP = 400
+
+HEALTH_PASS_THRESHOLD = 0.90
+HEALTH_CAUTION_THRESHOLD = 0.80
+
+KILL_WALL_CLOCK_MULTIPLE = 3.0
+
+RUNG_LABELS: dict[Stabilization, str] = {
+    "spectral_clipping": "rung 1: per-mode spectral clipping",
+    "jacobian_penalty": "rung 2: hutchinson jacobian penalty",
+    "normalized": "rung 3: spectral-norm-normalized parametrization",
+}
+
+EXPLICIT_MATCHED_RUN_NAME = "elf_fold0_explicit_matched_35505"
+
+# updated by hand once each rung's six-hour run is launched and its step count known, the same convention
+# ELF_EXPLICIT_RUN_NAME already follows; a name with no checkpoint yet is exactly how "not yet run" is read
+FIXED_POINT_RUN_NAME_BY_RUNG: dict[Stabilization, str] = {
+    "spectral_clipping": "elf_fold0_fixed_point_spectral_clipping_pending",
+    "jacobian_penalty": "elf_fold0_fixed_point_jacobian_penalty_pending",
+    "normalized": "elf_fold0_fixed_point_normalized_pending",
+}
+
+
+class HealthTrackingHook:
+    """the fixed-point solver's own cap-hit fraction and mean iterations, windowed between validation passes"""
+
+
+    def __init__(self, member: FactorizedFourier, inner: TrainingHook | None = None) -> None:
+        self.member = member
+        self.inner = inner
+        self.window: list[tuple[bool, int]] = []
+
+
+    def After_Step(self, progress: TrainingProgress) -> None:
+        if self.inner is not None:
+            self.inner.After_Step(progress)
+        cap_was_hit = self.member.last_fixed_point_cap_was_hit
+        iterations_taken = self.member.last_fixed_point_iterations
+        if cap_was_hit is not None and iterations_taken is not None:
+            self.window.append((cap_was_hit, iterations_taken))
+
+
+    def After_Validation(self, progress: TrainingProgress) -> dict[str, float]:
+        reported: dict[str, float] = dict(self.inner.After_Validation(progress)) if self.inner is not None else {}
+        if self.window:
+            reported["cap_hit_fraction"] = sum(1.0 for hit, _ in self.window if hit) / len(self.window)
+            reported["mean_iterations"] = sum(count for _, count in self.window) / len(self.window)
+        self.window = []
+        return reported
+
+
+def Probe_Fixed_Point_Rung(
+    rung: Stabilization,
+    run_name: str,
+    contraction_budget: ContractionBudget | None = None,
+    jacobian_penalty: JacobianPenalty | None = None,
+) -> dict[str, object]:
+    """the five-hundred-step probe every rung is launched under before its six-hour run, one stage, no early stop"""
+    return Train_Flagship_Member(
+        PROBE_STEP_COUNT, run_name, "fixed_point", stage_fractions=(1.0, 0.0, 0.0), stabilization=rung,
+        contraction_budget=contraction_budget, jacobian_penalty=jacobian_penalty,
+    )
+
+
+def Probe_Curve_At(manifest: dict[str, object], curve_name: str, step: int) -> float:
+    """one probe's own auxiliary curve, read back at the validation pass nearest the named step"""
+    validation_steps = np.asarray(cast(NDArray[np.float64], manifest["stage_0_validation_steps"]))
+    curves = cast(dict[str, NDArray[np.float64]], manifest["stage_0_auxiliary_curves"])
+    if curve_name not in curves or validation_steps.size == 0:
+        raise ValueError(f"this probe carries no {curve_name!r} curve to read a rate from")
+    position = int(np.argmin(np.abs(validation_steps - step)))
+    return float(curves[curve_name][position])
+
+
+def Probe_Passes(cap_hit_fraction_at_400: float, cap_hit_fraction_at_500: float) -> bool:
+    """the launch rule: under one half at five hundred steps, and not still climbing from the pass at four hundred"""
+    return cap_hit_fraction_at_500 < 0.5 and cap_hit_fraction_at_500 <= cap_hit_fraction_at_400
+
+
+def Fixed_Point_Health_Verdict(convergence_rate: float) -> str:
+    """the canon's own three-way health read: pass at or above ninety percent, caution above eighty, kill below"""
+    if convergence_rate >= HEALTH_PASS_THRESHOLD:
+        return "pass"
+    if convergence_rate >= HEALTH_CAUTION_THRESHOLD:
+        return "caution"
+    return "kill"
+
+
+def Fixed_Point_Convergence_And_Correlation(
+    member: FactorizedFourier, block: CubicBlock, identifiers: list[str]
+) -> tuple[float, float, float]:
+    """convergence rate, mean iterations, and the correlation of the solve's own residual with the member's own error"""
+    if not isinstance(member.spectral_stack, FixedPoint):
+        raise TypeError("the fixed-point health floor reads a solve that only the fixed-point configuration records")
+    converged = 0
+    iterations_total = 0
+    residuals: list[float] = []
+    errors: list[float] = []
+    for identifier in identifiers:
+        campaign = block.campaign_of[identifier]
+        with np.load(Archive_Path(campaign, identifier)) as archive:
+            input_function = Field_From_Archive(archive, ("charge_density", "magnetization_density"))
+            if input_function is None:
+                raise ValueError(f"{identifier} carries neither a charge density nor a magnetization")
+            truths = np.stack([np.asarray(archive[channel], dtype=np.float64) for channel in LOCALIZATION_CHANNELS])
+        predicted = np.asarray(member(input_function, GridSpec(COARSE_SHAPE)).values, dtype=np.float64)
+        cap_was_hit = member.last_fixed_point_cap_was_hit
+        iterations_taken = member.last_fixed_point_iterations
+        residual = member.last_fixed_point_residual
+        if cap_was_hit is None or iterations_taken is None or residual is None:
+            raise ValueError(f"{identifier} produced no recorded solve to read the health floor from")
+        if not cap_was_hit:
+            converged += 1
+        iterations_total += iterations_taken
+        residuals.append(residual)
+        errors.append(float(np.mean(np.abs(predicted - truths))))
+    count = len(identifiers)
+    correlation = float(np.corrcoef(residuals, errors)[0, 1]) if count > 1 else float("nan")
+    return converged / count, iterations_total / count, correlation
+
+
+def Fixed_Point_Health_Lines(rung: Stabilization, run_name: str) -> list[str]:
+    """the six-hour run's own health floor: convergence rate on fold 1 and fold 0, mean iterations, the correlation"""
+    label = RUNG_LABELS.get(rung, rung)
+    try:
+        checkpoint_path = Latest_Stage_Checkpoint(TRAINING_ARTIFACT_PATH, run_name)
+    except FileNotFoundError:
+        return [
+            f"### {label}: health floor",
+            "",
+            f"Not yet run (no checkpoint for `{run_name}` under `{TRAINING_ARTIFACT_PATH}` yet); this section fills"
+            " in from `Fixed_Point_Health_Lines` alone once the six-hour run exists, no other change to this report"
+            " needed.",
+            "",
+        ]
+    block = CubicBlock()
+    member, progress = Load_Trained_Member(
+        checkpoint_path, block, "localization", "fixed_point", HIDDEN_CHANNELS, LAYER_COUNT, KEPT_MODE
+    )
+    validation_rate, validation_iterations, validation_correlation = Fixed_Point_Convergence_And_Correlation(
+        member, block, block.validation
+    )
+    evaluation_rate, evaluation_iterations, evaluation_correlation = Fixed_Point_Convergence_And_Correlation(
+        member, block, block.evaluation
+    )
+    verdict = Fixed_Point_Health_Verdict(min(validation_rate, evaluation_rate))
+    return [
+        f"### {label}: health floor",
+        "",
+        f"Loaded from `{checkpoint_path.name}`: {progress.completed_steps} completed steps, best validation score"
+        f" {progress.best_score:.6f} at step {progress.best_step}.",
+        "",
+        "```",
+        f"fold 1 (validation): convergence rate {100 * validation_rate:.2f}%, mean iterations"
+        f" {validation_iterations:.1f}, residual-vs-error correlation {validation_correlation:.3f}",
+        f"fold 0 (kill block): convergence rate {100 * evaluation_rate:.2f}%, mean iterations"
+        f" {evaluation_iterations:.1f}, residual-vs-error correlation {evaluation_correlation:.3f}",
+        "```",
+        "",
+        f"**Health verdict: {verdict}** (pass at or above 90%, caution 80-90%, kill below 80%, read off the"
+        " stricter of the two folds above).",
+        "",
+    ]
+
+
+def Trained_Configuration_Median_Mae(run_name: str, configuration: FactorizedFourierConfiguration) -> float | None:
+    """a comparator's own pooled MAE on the kill block, or nothing when it has not trained yet"""
+    try:
+        checkpoint_path = Latest_Stage_Checkpoint(TRAINING_ARTIFACT_PATH, run_name)
+    except FileNotFoundError:
+        return None
+    block = CubicBlock()
+    member, _ = Load_Trained_Member(
+        checkpoint_path, block, "localization", configuration, HIDDEN_CHANNELS, LAYER_COUNT, KEPT_MODE
+    )
+    return Summarize(Elf_Evaluation_Rows(member, block), "mean_absolute_error", configuration).median
+
+
+def Comparator_Line(rung_mae: float, comparator_name: str, comparator_mae: float | None) -> str:
+    """one rung's own reading against one comparator, or an honest placeholder while that comparator is untrained"""
+    if comparator_mae is None:
+        return f"{comparator_name} not yet run"
+    verb = "beats" if rung_mae < comparator_mae else "does not beat"
+    return f"{verb} {comparator_name} (MAE {comparator_mae:.6f})"
+
+
+def Deep_Equilibrium_Verdict_Lines() -> list[str]:
+    """outcomes A-D, pre-written, chosen by whichever rungs have trained; Main() reads this so the page has a source"""
+    lines = [
+        "## The deep-equilibrium ladder's verdict (canon C.2), read from whichever rungs have trained",
+        "",
+        "Health beside accuracy against both comparators (the same-width explicit stack and the matched-params"
+        " one) and the canon's own literal kill (\"not better while >= 3x wall-clock\"); outcomes A (no rung"
+        " survives) through D (health 80-90%, qualified) are pre-written below and chosen by what the numbers say,"
+        " never invented after the fact.",
+        "",
+    ]
+    per_rung_mae: dict[Stabilization, float] = {}
+    for rung, run_name in FIXED_POINT_RUN_NAME_BY_RUNG.items():
+        lines.extend(Fixed_Point_Health_Lines(rung, run_name))
+        mae = Trained_Configuration_Median_Mae(run_name, "fixed_point")
+        if mae is not None:
+            per_rung_mae[rung] = mae
+
+    if not per_rung_mae:
+        lines += [
+            "### verdict",
+            "",
+            "No rung has trained yet. The one pre-registered outcome that already holds on zero trained rungs is"
+            " **Outcome A, provisionally**: \"weight-tying yes, DEQ no (unconverged under all three canon rungs)\","
+            " standing only until at least one rung's own six-hour run and evaluation exist to overturn it.",
+            "",
+        ]
+        return lines
+
+    same_width_mae = Trained_Configuration_Median_Mae(ELF_EXPLICIT_RUN_NAME, "explicit")
+    matched_mae = Trained_Configuration_Median_Mae(EXPLICIT_MATCHED_RUN_NAME, "explicit_matched")
+
+    lines += ["### each trained rung against both comparators", "", "```"]
+    any_rung_beats_both = False
+    any_rung_beats_matched_only = False
+    for rung, mae in per_rung_mae.items():
+        beats_matched = matched_mae is not None and mae < matched_mae
+        beats_same_width = same_width_mae is not None and mae < same_width_mae
+        if beats_matched and beats_same_width:
+            any_rung_beats_both = True
+        elif beats_matched:
+            any_rung_beats_matched_only = True
+        lines.append(
+            f"{RUNG_LABELS[rung]}: MAE {mae:.6f}, "
+            + Comparator_Line(mae, "matched-params", matched_mae)
+            + ", "
+            + Comparator_Line(mae, "same-width", same_width_mae)
+        )
+    lines += ["```", "", "### verdict", ""]
+    if any_rung_beats_both:
+        lines.append(
+            "**Outcome C**: at least one trained rung beats both the matched-params and the same-width comparator"
+            " -- \"DEQ yes on one seed\", the gap against the one-seed spread still unresolved."
+        )
+    elif any_rung_beats_matched_only:
+        lines.append(
+            "**Outcome B**: at least one trained rung's health passes and it beats the matched-params comparator"
+            " but not the same-width one -- \"DEQ no (no gain)\"."
+        )
+    else:
+        lines.append(
+            "**Outcome A**: no trained rung beats the matched-params comparator -- \"weight-tying yes, DEQ no"
+            " (unconverged under all three canon rungs)\"."
+        )
+    lines.append("")
+    return lines
+
+
 # the parametric variant (canon II.4): strain or lattice parameters broadcast into the same backbone, floors
 # measured host-only against real charge-density fields before any member is built; the decisive one interpolates
 # multilinearly between an interior level's own bracket corners, on the leave-one-level-out block Bracket_Corners
@@ -1666,6 +1960,7 @@ def Main() -> int:
     floor_lines, bars = Floor_Block_Lines()
     evaluation_lines = Elf_Evaluation_Lines()
     deq_lines = Deep_Equilibrium_Ladder_Lines()
+    deq_verdict_lines = Deep_Equilibrium_Verdict_Lines()
     potential_lines = Potential_Task_Lines()
     parametric_lines = Parametric_Task_Lines()
     header = [
@@ -1681,7 +1976,11 @@ def Main() -> int:
         "",
     ]
     REPORT_PATH.write_text(
-        "\n".join(header + floor_lines + evaluation_lines + deq_lines + potential_lines + parametric_lines) + "\n"
+        "\n".join(
+            header + floor_lines + evaluation_lines + deq_lines + deq_verdict_lines + potential_lines
+            + parametric_lines
+        )
+        + "\n"
     )
     print(f"wrote {REPORT_PATH}")
     print(bars)

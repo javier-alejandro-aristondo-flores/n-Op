@@ -1,6 +1,8 @@
 """the member measured against its pre-registered floors, written as one committed markdown artifact"""
 
 import dataclasses
+import sys
+from collections.abc import Sequence
 from pathlib import Path
 from typing import Any
 
@@ -10,8 +12,10 @@ from numpy.typing import NDArray
 from operators.data import Archive_Path, Guard_Fresh_Archives, Nearest_Training_Run, POOL_ROOT, Run_Identifier, STORE_NAME
 from operators.evaluation import (
     Block_Signature,
+    Compare_To_Floor,
     CubicBlock,
     Elf_Ridge_Rows,
+    FloorComparison,
     MemberResults,
     MetricSummary,
     PATTERN_RULE_MARGIN,
@@ -20,10 +24,11 @@ from operators.evaluation import (
     ScoredRun,
     Summarize,
     Summary_Table,
+    VerdictRow,
     Write_Member_Results,
 )
 from operators.factorized_fourier import All_Perovskite_Arms, Arm, Interior_Levels
-from operators.framework import GridFunction, GridSpec, Layer, Output_Points
+from operators.framework import Coefficients, GridFunction, GridSpec, Layer, Output_Points, UniformGridQuadrature
 from operators.galerkin_transformer import (
     Constant_Channel_Field,
     Coordinate_Feature_Channels,
@@ -38,6 +43,7 @@ from operators.training import (
     ForwardLoss,
     ParameterExample,
     Parameter_Field_Examples,
+    Read_Checkpoint,
     Train,
     TrainingBatch,
     Training_Engine,
@@ -73,25 +79,41 @@ GATE_FINAL_STAGE_PATIENCE = 15
 
 GATE_TRAINING_ARTIFACT_PATH = POOL_ROOT / STORE_NAME / "_training" / "galerkin_transformer"
 
+# matches operators.training.loop's own private CHECKPOINT_SUFFIX, not exported at that package's root
+GATE_CHECKPOINT_SUFFIX = "_checkpoint.npz"
 
-def Angle_Stratum_Parameters_And_Fields(
-    role: str, evaluation_fold: int
-) -> tuple[NDArray[np.float64], NDArray[np.float64], list[str], list[str]]:
-    """the angle stratum's own lattice vectors and flattened truths for one loader role of one fold"""
+
+def Angle_Stratum_Examples(role: str, evaluation_fold: int) -> list[ParameterExample]:
+    """every angle-stratum example of one loader role, still on the grid shape the whole stratum shares"""
     card = Card_Named("lattice_to_charge")
-    parameters: list[NDArray[np.float64]] = []
-    fields: list[NDArray[np.float64]] = []
-    unit_keys: list[str] = []
-    identifiers: list[str] = []
+    selected: list[ParameterExample] = []
     for example in Parameter_Field_Examples(card, role, evaluation_fold, None):
         if not example.unit_key.endswith(PEROVSKITE_ANGLE_UNIT_SUFFIX):
             continue
         if np.asarray(example.target_function.values).shape[1:] != PEROVSKITE_ANGLE_GRID_SHAPE:
             continue
-        parameters.append(np.asarray(example.parameters.vector, dtype=np.float64))
-        fields.append(np.asarray(example.target_function.values, dtype=np.float64).reshape(-1))
-        unit_keys.append(example.unit_key)
-        identifiers.append(example.identifier)
+        selected.append(example)
+    return selected
+
+
+def Angle_Stratum_Example_By_Run_Path() -> dict[str, ParameterExample]:
+    """every angle-stratum example, train and evaluation roles pooled, keyed by its own run path"""
+    pooled: dict[str, ParameterExample] = {}
+    for role in ("train", "evaluation"):
+        for example in Angle_Stratum_Examples(role, 0):
+            pooled[example.run_path] = example
+    return pooled
+
+
+def Angle_Stratum_Parameters_And_Fields(
+    role: str, evaluation_fold: int
+) -> tuple[NDArray[np.float64], NDArray[np.float64], list[str], list[str]]:
+    """the angle stratum's own lattice vectors and flattened truths for one loader role of one fold"""
+    examples = Angle_Stratum_Examples(role, evaluation_fold)
+    parameters = [np.asarray(example.parameters.vector, dtype=np.float64) for example in examples]
+    fields = [np.asarray(example.target_function.values, dtype=np.float64).reshape(-1) for example in examples]
+    unit_keys = [example.unit_key for example in examples]
+    identifiers = [example.identifier for example in examples]
     return np.asarray(parameters), np.asarray(fields), unit_keys, identifiers
 
 
@@ -209,12 +231,12 @@ def Measured_Floors() -> FloorData:
     )
 
 
-def Results_Artifact(data: FloorData) -> MemberResults:
-    """the floors measured so far, as one member results artifact -- no verdicts yet, since nothing has trained"""
+def Results_Artifact(data: FloorData, evaluation: GateEvaluation | None = None) -> MemberResults:
+    """the floors measured so far, plus a trained gate run's own rows and verdicts once one has been evaluated"""
     copy_summary = Summarize(data.copy_rows, "relative_l2", "nearest_angle_copy_floor")
     interpolation_summary = Summarize(data.interpolation_rows, "relative_l2", "linear_in_angle_interpolation_floor")
     ridge_summary = Summarize(data.ridge_rows, "mean_absolute_error", "semilocal_ridge_floor")
-    rows = (
+    rows: list[ResultRow] = [
         ResultRow(
             key=ResultKey(
                 member="galerkin_transformer",
@@ -251,16 +273,72 @@ def Results_Artifact(data: FloorData) -> MemberResults:
             summary=ridge_summary,
             block_signature=Block_Signature(row.unit_key for row in data.ridge_rows),
         ),
-    )
+    ]
+    verdicts: tuple[VerdictRow, ...] = ()
+    if evaluation is not None:
+        copy_verdict_key = ResultKey(
+            member="galerkin_transformer",
+            configuration="gate",
+            task="lattice_to_charge",
+            split="perovskite_folds",
+            block="fold_0",
+            group="member_vs_nearest_angle_copy",
+        )
+        interpolation_verdict_key = ResultKey(
+            member="galerkin_transformer",
+            configuration="gate",
+            task="lattice_to_charge",
+            split="perovskite_arms",
+            block="angle_arm_interior_levels",
+            group="member_vs_linear_in_angle_interpolation",
+        )
+        rows.append(
+            ResultRow(
+                key=copy_verdict_key,
+                summary=Summarize(evaluation.copy_comparison_rows, "relative_l2", "member"),
+                block_signature=Block_Signature(row.unit_key for row in evaluation.copy_comparison_rows),
+            )
+        )
+        rows.append(
+            ResultRow(
+                key=interpolation_verdict_key,
+                summary=Summarize(evaluation.interpolation_comparison_rows, "relative_l2", "member"),
+                block_signature=Block_Signature(row.unit_key for row in evaluation.interpolation_comparison_rows),
+            )
+        )
+        verdicts = (
+            VerdictRow(key=copy_verdict_key, comparison=evaluation.copy_verdict),
+            VerdictRow(key=interpolation_verdict_key, comparison=evaluation.interpolation_verdict),
+        )
     return MemberResults(
         member="galerkin_transformer",
         regenerate="python -m operators.galerkin_transformer.report",
-        rows=rows,
-        verdicts=(),
+        rows=tuple(rows),
+        verdicts=verdicts,
     )
 
 
-def Report_Lines(data: FloorData) -> list[str]:
+def Gate_Run_Lines(evaluation: GateEvaluation) -> list[str]:
+    """one trained gate run's own numbers against both stage-1 bars, both verdicts stamped by Compare_To_Floor"""
+    return [
+        "## Stage-1 gate run",
+        "",
+        f"`{evaluation.run_name}`, folded back from its own final-stage checkpoint under"
+        f" `{GATE_TRAINING_ARTIFACT_PATH}`, scored on the exact populations each floor above was measured on.",
+        "",
+        f"1. vs nearest-angle copy: member median {evaluation.copy_verdict.member_median:.4f} against floor"
+        f" {evaluation.copy_verdict.floor_median:.4f}, improvement {100 * evaluation.copy_verdict.improvement:.1f}%"
+        f" (required {100 * GATE_IMPROVEMENT_MARGIN:.0f}%) -- **{evaluation.copy_verdict.verdict}**",
+        "2. vs linear-in-angle interpolation: member median"
+        f" {evaluation.interpolation_verdict.member_median:.4f} against floor"
+        f" {evaluation.interpolation_verdict.floor_median:.4f}, improvement"
+        f" {100 * evaluation.interpolation_verdict.improvement:.1f}% (required"
+        f" {100 * GATE_IMPROVEMENT_MARGIN:.0f}%) -- **{evaluation.interpolation_verdict.verdict}**",
+        "",
+    ]
+
+
+def Report_Lines(data: FloorData, evaluation: GateEvaluation | None = None) -> list[str]:
     """the pre-registered ladder: both stage-one floors and their bars, the stage-two ridge floor and its bar"""
     copy_summary = Summarize(data.copy_rows, "relative_l2", "nearest_angle_copy_floor")
     interpolation_summary = Summarize(data.interpolation_rows, "relative_l2", "linear_in_angle_interpolation_floor")
@@ -309,6 +387,16 @@ def Report_Lines(data: FloorData) -> list[str]:
         "2. vs linear-in-angle interpolation (50% improvement):"
         f" **{gate_bars['gate_vs_linear_in_angle_interpolation']:.4f}**",
         "",
+    ]
+    lines += Gate_Run_Lines(evaluation) if evaluation is not None else [
+        "## Stage-1 gate run",
+        "",
+        "Not yet run. Pass a run name as this module's own command-line argument"
+        " (`python -m operators.galerkin_transformer.report <run_name>`) once the card has trained it, to fold"
+        " its checkpoint back in and score both bars in one host command.",
+        "",
+    ]
+    lines += [
         "## Stage 2 — the cubic block, fold 0 (pre-registration, before training)",
         "",
         f"`charge_to_localization`, `paired_fields_fivefold` fold 0: the semilocal-ridge floor, recomputed on"
@@ -338,22 +426,45 @@ def Report_Lines(data: FloorData) -> list[str]:
         " 0.3/0.3/0.4 schedule at learning rates 1e-3, 3.3e-4, 1.1e-4, validating every 100 steps with a"
         " final-stage patience of 15, seed 20260916, single precision, checkpoints under"
         " `_training/galerkin_transformer/` -- the same staged idiom"
-        " `factorized_fourier.report.Train_Flagship_Member` uses. **It has not been run.** The card is"
-        " scheduled by the integrator; the step count for the two-hour cap is chosen from a short timing probe"
-        " once the card is granted, the same way the deep-equilibrium ladder's own rungs choose theirs.",
+        " `factorized_fourier.report.Train_Flagship_Member` uses."
+        + (
+            f" **It has run as `{evaluation.run_name}`**, scored above."
+            if evaluation is not None
+            else " **It has not been run.** The card is scheduled by the integrator; the step count for the"
+            " two-hour cap is chosen from a short timing probe once the card is granted, the same way the"
+            " deep-equilibrium ladder's own rungs choose theirs."
+        ),
         "",
         "## Results artifact",
         "",
-        f"`{RESULTS_PATH.name}` carries the three floor rows above, written through"
-        " `operators.evaluation.Write_Member_Results`. It carries no verdicts yet: a verdict compares the"
-        " member against a floor, and no configuration has trained.",
+        f"`{RESULTS_PATH.name}` carries the three floor rows above"
+        + (
+            ", the trained gate run's own two rows and its two verdicts against the stage-1 bars, all"
+            if evaluation is not None
+            else ""
+        )
+        + " written through `operators.evaluation.Write_Member_Results`."
+        + (
+            ""
+            if evaluation is not None
+            else " It carries no verdicts yet: a verdict compares the member against a floor, and no"
+            " configuration has trained."
+        ),
         "",
         "## Standing",
         "",
-        "No training has run. The gate class, the attention kernel, the query-point decoder and the member are"
+        (
+            f"The stage-1 gate run `{evaluation.run_name}` is scored above against both bars"
+            if evaluation is not None
+            else "No training has run."
+        )
+        + " The gate class, the attention kernel, the query-point decoder and the member are"
         " built and pass every test (`operators/tests/test_galerkin_transformer.py`). Both stage-1 floors and"
         " the stage-2 semilocal-ridge floor are measured and pre-registered above; the training driver for the"
-        " stage-1 gate is written but not run. What remains: the card.",
+        " stage-1 gate is written"
+        + (
+            " and has been run once." if evaluation is not None else " but not run. What remains: the card."
+        ),
     ]
     return lines
 
@@ -378,14 +489,7 @@ def Member_Memory_Line(member: GalerkinTransformer, label: str) -> str:
 
 def Perovskite_Gate_Training_Examples() -> tuple[list[ParameterExample], list[ParameterExample]]:
     """the angle stratum's own fold-0 training runs, split into this driver's own train and validation slices"""
-    card = Card_Named("lattice_to_charge")
-    population: list[ParameterExample] = []
-    for example in Parameter_Field_Examples(card, "train", evaluation_fold=0):
-        if not example.unit_key.endswith(PEROVSKITE_ANGLE_UNIT_SUFFIX):
-            continue
-        if np.asarray(example.target_function.values).shape[1:] != PEROVSKITE_ANGLE_GRID_SHAPE:
-            continue
-        population.append(example)
+    population = Angle_Stratum_Examples("train", 0)
     ordered = sorted(range(len(population)), key=lambda position: population[position].unit_key)
     validation_positions = {position for count, position in enumerate(ordered) if count % 5 == 4}
     train_examples = [example for position, example in enumerate(population) if position not in validation_positions]
@@ -587,12 +691,113 @@ def Train_Perovskite_Gate_Member(step_count: int, run_name: str) -> dict[str, ob
     return manifest
 
 
-def Main() -> int:
-    """writes the pre-registration report and its results artifact, honest about what is and is not measured yet"""
+def Loaded_Gate_Member(run_name: str) -> GalerkinTransformer:
+    """a fresh gate-configuration member, its final training stage's best checkpoint folded back in"""
+    member = Galerkin_Transformer_Network("parametric", processing_shape=GATE_PROCESSING_SHAPE, seed=GATE_SEED)
+    parameters = ParameterSet(values=member.Parameter_Values())
+    final_stage_index = len(GATE_STAGE_FRACTIONS) - 1
+    checkpoint_path = GATE_TRAINING_ARTIFACT_PATH / f"{run_name}_stage{final_stage_index}{GATE_CHECKPOINT_SUFFIX}"
+    progress = Read_Checkpoint(checkpoint_path, parameters)
+    Write_Back_Gate_Parameters(member, progress.best_parameters)
+    return member
+
+
+def Member_Predicted_Field(
+    member: GalerkinTransformer, parameters: Coefficients, truth: NDArray[np.float64], quadrature: UniformGridQuadrature
+) -> NDArray[np.float64]:
+    """the trained member's own prediction at one example's exact lattice, renormalized to that truth's own electron count"""
+    electron_count = float(truth.sum() * quadrature.cell_volume / quadrature.point_count)
+    output = member.Predict_Density(parameters, GridSpec(PEROVSKITE_ANGLE_GRID_SHAPE), electron_count)
+    return np.asarray(output.values, dtype=np.float64)
+
+
+def Member_Angle_Stratum_Rows(member: GalerkinTransformer, examples: list[ParameterExample]) -> list[ScoredRun]:
+    """the trained member's own relative L2 against each angle-stratum example's own true field, one row each"""
+    scored: list[ScoredRun] = []
+    for example in examples:
+        truth = np.asarray(example.target_function.values, dtype=np.float64)
+        predicted = Member_Predicted_Field(member, example.parameters, truth, example.target_function.quadrature)
+        scored.append(
+            ScoredRun(
+                identifier=example.identifier,
+                unit_key=example.unit_key,
+                campaign=PEROVSKITE_CAMPAIGN,
+                family="angle",
+                errors={"relative_l2": Relative_L2(predicted, truth)},
+            )
+        )
+    return scored
+
+
+def Member_Angle_Level_Rows(
+    member: GalerkinTransformer,
+    arm: Arm,
+    interior_levels: dict[Level, tuple[Level, ...]],
+    example_by_run_path: dict[str, ParameterExample],
+) -> list[ScoredRun]:
+    """the trained member's own relative L2 against each interior level's own mean truth, matching the floor exactly"""
+    scored: list[ScoredRun] = []
+    for level in interior_levels:
+        representative_run_path = arm.runs_by_level[level][0]
+        example = example_by_run_path[representative_run_path]
+        level_fields = [Loaded_Perovskite_Charge_Density(run_path) for run_path in arm.runs_by_level[level]]
+        truth = np.mean(np.stack(level_fields), axis=0)
+        predicted = Member_Predicted_Field(member, example.parameters, truth, example.target_function.quadrature)
+        scored.append(
+            ScoredRun(
+                identifier=f"angle_{level}",
+                unit_key=f"angle_{level}",
+                campaign=PEROVSKITE_CAMPAIGN,
+                family="angle",
+                errors={"relative_l2": Relative_L2(predicted, truth)},
+            )
+        )
+    return scored
+
+
+@dataclasses.dataclass(frozen=True, slots=True)
+class GateEvaluation:
+    """one trained gate run's own scored rows and its verdict against each stage-1 floor"""
+
+    run_name: str
+    copy_comparison_rows: list[ScoredRun]
+    interpolation_comparison_rows: list[ScoredRun]
+    copy_verdict: FloorComparison
+    interpolation_verdict: FloorComparison
+
+
+def Evaluated_Gate_Run(run_name: str, data: FloorData) -> GateEvaluation:
+    """the trained member folded back from its own checkpoint, scored on the exact populations each floor used"""
+    member = Loaded_Gate_Member(run_name)
+    copy_rows = Member_Angle_Stratum_Rows(member, Angle_Stratum_Examples("evaluation", 0))
+    arm = Angle_Arm()
+    interpolation_rows = Member_Angle_Level_Rows(
+        member, arm, Interior_Levels(arm), Angle_Stratum_Example_By_Run_Path()
+    )
+    return GateEvaluation(
+        run_name=run_name,
+        copy_comparison_rows=copy_rows,
+        interpolation_comparison_rows=interpolation_rows,
+        copy_verdict=Compare_To_Floor(
+            copy_rows, data.copy_rows, "relative_l2", "nearest_angle_copy_floor",
+            GATE_IMPROVEMENT_MARGIN, "angle_stratum_fold_0",
+        ),
+        interpolation_verdict=Compare_To_Floor(
+            interpolation_rows, data.interpolation_rows, "relative_l2", "linear_in_angle_interpolation_floor",
+            GATE_IMPROVEMENT_MARGIN, "angle_arm_interior_levels",
+        ),
+    )
+
+
+def Main(argv: Sequence[str] | None = None) -> int:
+    """writes the pre-registration report and its results artifact; a run name argument also evaluates that run"""
+    arguments = sys.argv[1:] if argv is None else argv
+    run_name = arguments[0] if arguments else None
     data = Measured_Floors()
-    lines = Report_Lines(data)
+    evaluation = Evaluated_Gate_Run(run_name, data) if run_name is not None else None
+    lines = Report_Lines(data, evaluation)
     REPORT_PATH.write_text("\n".join(lines) + "\n")
-    Write_Member_Results(RESULTS_PATH, Results_Artifact(data))
+    Write_Member_Results(RESULTS_PATH, Results_Artifact(data, evaluation))
     print(f"wrote {REPORT_PATH}")
     print(f"wrote {RESULTS_PATH}")
     return 0

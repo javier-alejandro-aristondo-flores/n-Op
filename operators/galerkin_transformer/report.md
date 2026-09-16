@@ -18,6 +18,10 @@
 1. vs nearest-angle copy (50% improvement): **0.0426**
 2. vs linear-in-angle interpolation (50% improvement): **0.0132**
 
+## Stage-1 gate run
+
+Not yet run. Pass a run name as this module's own command-line argument (`python -m operators.galerkin_transformer.report <run_name>`) once the card has trained it, to fold its checkpoint back in and score both bars in one host command.
+
 ## Stage 2 — the cubic block, fold 0 (pre-registration, before training)
 
 `charge_to_localization`, `paired_fields_fivefold` fold 0: the semilocal-ridge floor, recomputed on this member's own kill block through `operators.evaluation.Elf_Ridge_Rows`, over 152 evaluation run-channels across 29 units.
@@ -39,7 +43,7 @@
 
 ## Results artifact
 
-`results.json` carries the three floor rows above, written through `operators.evaluation.Write_Member_Results`. It carries no verdicts yet: a verdict compares the member against a floor, and no configuration has trained.
+`results.json` carries the three floor rows above written through `operators.evaluation.Write_Member_Results`. It carries no verdicts yet: a verdict compares the member against a floor, and no configuration has trained.
 
 ## Standing
 

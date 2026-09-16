@@ -37,7 +37,7 @@ from operators.evaluation import (
 from operators.factorized_fourier import Gram_Six, Gram_Statistics, Log_Compressed_Channels, Reference_Density, Standardized_Gram
 from operators.framework import GridFunction, Layer
 from operators.inspection import Render_Inspection_Suite, Render_Table
-from operators.substrate import ParameterSet
+from operators.substrate import ParameterSet, Peak_Accelerator_Bytes, Reset_Peak_Accelerator_Bytes
 from operators.training import BatchSource, Train, Training_Engine, TrainingBatch
 
 REPORT_PATH = Path(__file__).parent / "report.md"
@@ -331,7 +331,7 @@ def Train_Convolutional_Member(
 
 
 def Cost_Probe(activation: StencilActivation, step_count: int = COST_PROBE_STEP_COUNT) -> dict[str, object]:
-    """seconds per step for one activation, measured on the real batch source; the wall-clock half of the cost probe"""
+    """seconds per step and peak accelerator bytes for one activation, measured on the real batch source"""
     block = CubicBlock()
     training_identifiers = block.member_train
     reference_density, gram_mean, gram_scale = Input_Statistics(block, training_identifiers)
@@ -346,10 +346,12 @@ def Cost_Probe(activation: StencilActivation, step_count: int = COST_PROBE_STEP_
         seed=MEMBER_SEED,
     )
     parameters = ParameterSet(values=member.Parameter_Values())
+    Reset_Peak_Accelerator_Bytes()
     result = Train(
         Training_Engine(), parameters, Member_Loss(member), batches, step_count=step_count,
         learning_rate=PEAK_LEARNING_RATE, seed=MEMBER_SEED, validation_interval=step_count, patience=0,
     )
+    peak_accelerator_bytes = Peak_Accelerator_Bytes()
     wall_clock_seconds = float(cast(float, result.manifest["wall_clock_seconds"]))
     seconds_per_step = wall_clock_seconds / step_count
     wall_clock_cap = TWIN_WALL_CLOCK_CAP_SECONDS if activation == "pointwise" else CNO_WALL_CLOCK_CAP_SECONDS
@@ -358,6 +360,7 @@ def Cost_Probe(activation: StencilActivation, step_count: int = COST_PROBE_STEP_
         "step_count": step_count,
         "wall_clock_seconds": wall_clock_seconds,
         "seconds_per_step": seconds_per_step,
+        "peak_accelerator_bytes": peak_accelerator_bytes,
         "wall_clock_cap_seconds": wall_clock_cap,
         "capped_step_budget": int(wall_clock_cap / seconds_per_step),
     }

@@ -6,13 +6,18 @@ from typing import Any, Literal
 import numpy as np
 from numpy.typing import NDArray
 
+from operators.compositions.activation import (
+    POINTWISE_ACTIVATIONS,
+    Activated,
+    Activation_Table,
+    ActivationTable,
+)
 from operators.framework import Array, Coefficients, Composition, GridFunction, Layer
 from operators.substrate import (
     CustomGradient,
     Detached,
     Host_Array,
     Sum_Over_Last_Axis,
-    Gaussian_Error_Linear_Unit,
     Solve_Linear_System,
     Vector_Jacobian_Product,
 )
@@ -31,6 +36,7 @@ def Applied_Once(
     local_linear_lifted: dict[str, Any],
     state: Any,
     injection: Any | None = None,
+    activations: ActivationTable = POINTWISE_ACTIVATIONS,
 ) -> Any:
     """one activated pass of a layer over the current value, differentiable through whichever engine holds it"""
     spatial_shape = state.shape[1:]
@@ -41,9 +47,7 @@ def Applied_Once(
     # the input injected before the activation is what makes an iterated map's fixed point depend on the input
     if injection is not None:
         summed = summed + injection
-    if layer.activation == "alias_free":
-        raise NotImplementedError("the alias-free activation is the convolutional entry's own build")
-    activated = Gaussian_Error_Linear_Unit(summed)
+    activated = Activated(activations, layer.activation, summed)
     if layer.residual and activated.shape == state.shape:
         activated = activated + state
     return activated
@@ -73,9 +77,16 @@ class WeightTied(Composition[GridFunction]):
     """one layer applied a fixed number of times with the same weights, gradients accumulating across every use"""
 
 
-    def __init__(self, layer: Layer[GridFunction], depth: int, input_injection: bool = False) -> None:
+    def __init__(
+        self,
+        layer: Layer[GridFunction],
+        depth: int,
+        input_injection: bool = False,
+        activations: ActivationTable | None = None,
+    ) -> None:
         self.layer = layer
         self.depth = depth
+        self.activations = Activation_Table(activations)
         # with the injection on, this is exactly the fixed point's own iteration unrolled a fixed number of times
         self.input_injection = input_injection
         self.last_application_norms: NDArray[np.float64] | None = None
@@ -89,7 +100,9 @@ class WeightTied(Composition[GridFunction]):
         current = input_values
         outputs: list[Any] = []
         for _ in range(self.depth):
-            current = Applied_Once(self.layer, kernel_lifted, local_linear_lifted, current, injection)
+            current = Applied_Once(
+                self.layer, kernel_lifted, local_linear_lifted, current, injection, self.activations
+            )
             outputs.append(current)
         return outputs
 
@@ -190,8 +203,10 @@ class FixedPoint(Composition[GridFunction]):
         condition_ceiling: float = 1e8,
         tolerance: float = 1e-3,
         iteration_cap: int = 32,
+        activations: ActivationTable | None = None,
     ) -> None:
         self.layer = layer
+        self.activations = Activation_Table(activations)
         self.backward: FixedPointBackward = backward
         self.phantom_depth = phantom_depth
         self.damping = damping
@@ -215,7 +230,9 @@ class FixedPoint(Composition[GridFunction]):
         applied_history: list[Any] = []
         residual_norm_history: list[float] = []
         for iteration_index in range(self.iteration_cap):
-            applied = Detached(Applied_Once(self.layer, kernel_lifted, local_linear_lifted, state, injection))
+            applied = Detached(
+                Applied_Once(self.layer, kernel_lifted, local_linear_lifted, state, injection, self.activations)
+            )
             # the residuals stay on their engine, and only the scalars the host decides on come across
             residual_values = applied - state
             residual_norm = float(np.sqrt(Host_Inner_Product(residual_values, residual_values)))
@@ -260,7 +277,9 @@ class FixedPoint(Composition[GridFunction]):
         # detached again here, at the equilibrium itself, even though solved already leaves nothing tape-connected
         state = Detached(solved.equilibrium)
         for _ in range(depth):
-            state = Applied_Once(self.layer, kernel_lifted, local_linear_lifted, state, input_values)
+            state = Applied_Once(
+                self.layer, kernel_lifted, local_linear_lifted, state, input_values, self.activations
+            )
         return state, solved
 
 
@@ -288,7 +307,9 @@ class FixedPoint(Composition[GridFunction]):
 
             def Applied_At_The_Equilibrium(state: Any) -> Any:
                 """applied once at the fixed state, differentiable only through the state itself"""
-                return Applied_Once(self.layer, kernel_lifted, local_linear_lifted, state, saved_injection)
+                return Applied_Once(
+                    self.layer, kernel_lifted, local_linear_lifted, state, saved_injection, self.activations
+                )
 
             adjoint = cotangent
             for _ in range(self.iteration_cap):
@@ -313,7 +334,12 @@ class FixedPoint(Composition[GridFunction]):
                     )
                     varied_kernel_lifted, varied_local_linear_lifted = Split(varied_arguments)
                     return Applied_Once(
-                        self.layer, varied_kernel_lifted, varied_local_linear_lifted, output, saved_injection
+                        self.layer,
+                        varied_kernel_lifted,
+                        varied_local_linear_lifted,
+                        output,
+                        saved_injection,
+                        self.activations,
                     )
 
                 gradients.append(
@@ -322,7 +348,9 @@ class FixedPoint(Composition[GridFunction]):
 
             def Applied_Varying_The_Injection(injection: Any) -> Any:
                 """applied once at the fixed equilibrium with every parameter held, so only the input moves"""
-                return Applied_Once(self.layer, kernel_lifted, local_linear_lifted, output, injection)
+                return Applied_Once(
+                    self.layer, kernel_lifted, local_linear_lifted, output, injection, self.activations
+                )
 
             # the input is the last saved argument, and its gradient is what lets the parts upstream train
             gradients.append(Vector_Jacobian_Product(Applied_Varying_The_Injection, saved_injection, adjoint))

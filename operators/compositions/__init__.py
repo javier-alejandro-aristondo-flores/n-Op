@@ -7,6 +7,12 @@ from typing import Any
 import numpy as np
 from numpy.typing import NDArray
 
+from operators.compositions.activation import (
+    POINTWISE_ACTIVATIONS,
+    Activated,
+    Activation_Table,
+    ActivationTable,
+)
 from operators.compositions.fixed_point import FixedPoint, WeightTied
 from operators.compositions.multi_scale import (
     Doubled_Shape,
@@ -18,7 +24,6 @@ from operators.compositions.multi_scale import (
     Upsampled_By_Two,
 )
 from operators.framework import Array, Coefficients, Composition, GridFunction, Layer
-from operators.substrate import Gaussian_Error_Linear_Unit
 
 
 def Sliced_Lifted(lifted: dict[str, Any], prefix: str) -> dict[str, Any]:
@@ -30,8 +35,9 @@ class ExplicitStack(Composition[GridFunction]):
     """layers one after another, each an activated kernel-plus-local sum"""
 
 
-    def __init__(self, layers: tuple[Layer[GridFunction], ...]) -> None:
+    def __init__(self, layers: tuple[Layer[GridFunction], ...], activations: ActivationTable | None = None) -> None:
         self.layers = layers
+        self.activations = Activation_Table(activations)
         self.last_layer_norms: NDArray[np.float64] | None = None
 
 
@@ -48,9 +54,7 @@ class ExplicitStack(Composition[GridFunction]):
             kernel_output = layer.kernel.Forward(kernel_lifted, current, output_shape)
             local_output = layer.local_linear.Forward(local_linear_lifted, current)
             summed = local_output + kernel_output
-            if layer.activation == "alias_free":
-                raise NotImplementedError("the alias-free activation is the convolutional entry's own build")
-            activated = Gaussian_Error_Linear_Unit(summed)
+            activated = Activated(self.activations, layer.activation, summed)
             # a residual layer can only add its input back when the channel count survived
             if layer.residual and activated.shape == current.shape:
                 activated = activated + current

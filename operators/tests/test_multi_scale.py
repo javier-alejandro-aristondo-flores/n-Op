@@ -7,7 +7,7 @@ import numpy as np
 import pytest
 from numpy.typing import NDArray
 
-from operators.compositions import MultiScale
+from operators.compositions import ExplicitStack, MultiScale, WeightTied
 from operators.compositions.multi_scale import Downsampled_By_Two, Layer_Applied, Sliced_Lifted, Upsampled_By_Two
 from operators.encoders import PointwiseLift
 from operators.framework import Domain, GridFunction, Layer, UniformGridQuadrature
@@ -180,11 +180,43 @@ def Test_Gradients_Reach_Every_Layers_Kernel_And_Local_Linear_Weights() -> None:
         assert float(np.abs(gradient).max()) > 1e-6, name
 
 
-def Test_The_Alias_Free_Activation_Raises_Where_The_Explicit_Stack_Does() -> None:
-    """the fused kernel is the convolutional entry's own build, not a topology default"""
+def Test_An_Activation_Name_The_Composition_Was_Never_Handed_Raises() -> None:
+    """the fused kernel is the convolutional entry's own build, so no composition carries it by default"""
     descending = (Small_Layer(2, 2, seed=61, activation="alias_free"),)
     bottom = Small_Layer(2, 2, seed=63)
     composition = MultiScale(descending, bottom, (), output_scale=1)
     field = Small_Field(2, (8, 8, 8), seed=65)
-    with pytest.raises(NotImplementedError, match="the alias-free activation is the convolutional entry's own build"):
+    with pytest.raises(NotImplementedError, match="no activation named 'alias_free' was handed"):
         composition.Apply(field)
+    stack = ExplicitStack((Small_Layer(2, 2, seed=61, activation="alias_free"),))
+    with pytest.raises(NotImplementedError, match="no activation named 'alias_free' was handed"):
+        stack.Apply(field)
+    tied = WeightTied(Small_Layer(2, 2, seed=61, activation="alias_free"), depth=2)
+    with pytest.raises(NotImplementedError, match="no activation named 'alias_free' was handed"):
+        tied.Apply(field)
+
+
+def Test_A_Handed_Activation_Runs_Through_Every_Composition() -> None:
+    """a member hands its own activation in under the name its layers carry, and each composition applies it"""
+
+    def Doubled(summed: Any) -> Any:
+        """a stand-in for the fused activation, recognizable in the output"""
+        return summed * 2.0
+
+    handed = {"alias_free": Doubled}
+    field = Small_Field(2, (8, 8, 8), seed=65)
+    descending = (Small_Layer(2, 2, seed=61, activation="alias_free"),)
+    bottom = Small_Layer(2, 2, seed=63)
+    composition = MultiScale(descending, bottom, (), output_scale=1, activations=handed)
+    produced = np.asarray(composition.Apply(field).values, dtype=np.float64)
+    assert produced.shape == (2, 4, 4, 4)
+    stack = ExplicitStack((Small_Layer(2, 2, seed=61, activation="alias_free"),), activations=handed)
+    pointwise_stack = ExplicitStack((Small_Layer(2, 2, seed=61),))
+    lifted = stack.Parameter_Values()
+    values = np.asarray(field.values, dtype=np.float64)
+    handed_output = np.asarray(stack.Forward(lifted, values), dtype=np.float64)
+    pointwise_output = np.asarray(pointwise_stack.Forward(lifted, values), dtype=np.float64)
+    # the same weights under the handed activation give a different answer from the pointwise default
+    assert not np.allclose(handed_output, pointwise_output)
+    tied = WeightTied(Small_Layer(2, 2, seed=61, activation="alias_free"), depth=2, activations=handed)
+    assert np.asarray(tied.Apply(field).values, dtype=np.float64).shape == (2, 8, 8, 8)

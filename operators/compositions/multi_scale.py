@@ -6,10 +6,15 @@ from typing import Any
 import numpy as np
 from numpy.typing import NDArray
 
+from operators.compositions.activation import (
+    POINTWISE_ACTIVATIONS,
+    Activated,
+    Activation_Table,
+    ActivationTable,
+)
 from operators.framework import Array, Coefficients, Composition, GridFunction, Layer, UniformGridQuadrature
 from operators.substrate import (
     Concatenate_Channels,
-    Gaussian_Error_Linear_Unit,
     GRID_AXES,
     Half_Spectrum_Extent,
     Inverse_Real_Fourier_Transform_3d,
@@ -26,15 +31,18 @@ def Sliced_Lifted(lifted: dict[str, Any], prefix: str) -> dict[str, Any]:
     return {name[len(prefix):]: value for name, value in lifted.items() if name.startswith(prefix)}
 
 
-def Layer_Applied(layer: Layer[GridFunction], lifted: dict[str, Any], input_values: Any) -> Any:
+def Layer_Applied(
+    layer: Layer[GridFunction],
+    lifted: dict[str, Any],
+    input_values: Any,
+    activations: ActivationTable = POINTWISE_ACTIVATIONS,
+) -> Any:
     """one layer's activation over its kernel-plus-local sum, run at the shape its input already carries"""
     _, spatial_shape = Split_Batch_From_Grid(input_values)
     kernel_output = layer.kernel.Forward(Sliced_Lifted(lifted, "kernel."), input_values, spatial_shape)
     local_output = layer.local_linear.Forward(Sliced_Lifted(lifted, "local_linear."), input_values)
     summed = local_output + kernel_output
-    if layer.activation == "alias_free":
-        raise NotImplementedError("the alias-free activation is the convolutional entry's own build")
-    activated = Gaussian_Error_Linear_Unit(summed)
+    activated = Activated(activations, layer.activation, summed)
     # a residual layer can only add its input back when the channel count survived
     if layer.residual and activated.shape == input_values.shape:
         activated = activated + input_values
@@ -136,6 +144,7 @@ class MultiScale(Composition[GridFunction]):
         bottom_layer: Layer[GridFunction],
         ascending_layers: tuple[Layer[GridFunction], ...],
         output_scale: int,
+        activations: ActivationTable | None = None,
     ) -> None:
         scale_count = len(descending_layers) + 1
         if not 0 <= output_scale < scale_count:
@@ -150,6 +159,8 @@ class MultiScale(Composition[GridFunction]):
         self.bottom_layer = bottom_layer
         self.ascending_layers = ascending_layers
         self.output_scale = output_scale
+        # the alias-free activation reaches the composition here, handed in by the member that builds it
+        self.activations = Activation_Table(activations)
         self.last_scale_norms: dict[str, float] | None = None
         self.last_scale_shapes: dict[str, tuple[int, int, int]] | None = None
 
@@ -160,17 +171,21 @@ class MultiScale(Composition[GridFunction]):
         descending_outputs: list[Any] = []
         current = input_values
         for descending_index, layer in enumerate(self.descending_layers):
-            current = Layer_Applied(layer, Sliced_Lifted(lifted, f"descending_{descending_index}."), current)
+            current = Layer_Applied(
+                layer, Sliced_Lifted(lifted, f"descending_{descending_index}."), current, self.activations
+            )
             descending_outputs.append(current)
             named_outputs.append((f"descending_{descending_index}", current))
             current = Downsampled_By_Two(current)
-        current = Layer_Applied(self.bottom_layer, Sliced_Lifted(lifted, "bottom."), current)
+        current = Layer_Applied(self.bottom_layer, Sliced_Lifted(lifted, "bottom."), current, self.activations)
         named_outputs.append(("bottom", current))
         for ascending_index, layer in enumerate(self.ascending_layers):
             # the skip reads the newest descending scale first, mirroring the order the bottom was reached in
             skip_position = len(self.descending_layers) - 1 - ascending_index
             joined = Concatenate_Channels([Upsampled_By_Two(current), descending_outputs[skip_position]])
-            current = Layer_Applied(layer, Sliced_Lifted(lifted, f"ascending_{ascending_index}."), joined)
+            current = Layer_Applied(
+                layer, Sliced_Lifted(lifted, f"ascending_{ascending_index}."), joined, self.activations
+            )
             named_outputs.append((f"ascending_{ascending_index}", current))
         return named_outputs
 

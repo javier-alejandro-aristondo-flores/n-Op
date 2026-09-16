@@ -48,9 +48,9 @@ rather than Q and K is what makes the map softmax-free. The score is never forme
 `key_value = Einstein_Summation("hdn,hen->hde", key_heads, value_heads)` contracts over the
 source-token axis first, producing a `(head_count, head_width, head_width)` block independent of
 `N`; `attended = Einstein_Summation("hde,hdm->hem", key_value, query_heads) / N` is the second
-matrix product. Both are linear in `N`; no `(N, N)` tensor is ever allocated. Four layers, two
-heads, width 32, each wrapped by the framework's own local-linear-plus-GELU-plus-residual assembly
-(`ExplicitStack.Layer_Outputs`) with a `PointwiseLift(32, 32)` as the local term, exactly the
+matrix product. Both are linear in `N`; no `(N, N)` tensor is ever allocated. Four layers, four
+heads, width 128, each wrapped by the framework's own local-linear-plus-GELU-plus-residual assembly
+(`ExplicitStack.Layer_Outputs`) with a `PointwiseLift(128, 128)` as the local term, exactly the
 flagship's `Explicit_Layers` idiom.
 
 **Decoder — `QueryPointDecoder`.** An `Operator[GridFunction, GridFunction]` (not
@@ -91,10 +91,12 @@ Both tasks answer queries at any grid shape the caller requests (64³ for the pe
 for the cubic block, and whatever an invariance probe asks), independent of `processing_shape`,
 because the decoder is the operator claim.
 
-**Parameter count.** ≈ 26,000 at width 32 / 2 heads / 4 layers (`GalerkinTransformer.Parameter_Count()`),
-short of the canon's own ≈1M full-scale estimate; this build is the minimal gate configuration the
-card names explicitly (width, head count and layer count are all pinned), not a width search, so the
-gap is reported rather than closed by widening past the given spec.
+**Parameter count.** 373,377 (parametric task) / 373,762 (localization task) at width 128 / 4 heads /
+4 layers (`GalerkinTransformer.Parameter_Count()`), inside the 0.3-0.5M pre-registration band the
+integrator set before any card spend. The first build, at width 32 / 2 heads / 4 layers, reached only
+25,761 parameters -- short of the canon's own ≈1M full-scale estimate -- and is kept here as a note:
+the width was raised before pre-registration once that gap was seen, not discovered by a width search.
+Head count and layer count are unchanged from the first build; only the hidden width moved.
 
 ## Compute
 
@@ -111,22 +113,22 @@ own. `{n}` ranges over the four attention-layer indices.
 
 | Key | Shape | Drawn by |
 |---|---|---|
-| `encoder.lift_weights` | `(32, input_channels)` | `Render_Matrix` |
-| `encoder.lift_biases` | `(32,)` | `Render_Bars` |
-| `composition.layer_{n}.kernel.key_norm_scale` / `_bias` | `(32,)` | `Render_Bars` |
-| `composition.layer_{n}.kernel.value_norm_scale` / `_bias` | `(32,)` | `Render_Bars` |
-| `composition.layer_{n}.kernel.query.lift_weights` / `key.lift_weights` / `value.lift_weights` / `output.lift_weights` | `(32, 32)` | `Render_Matrix` |
-| `composition.layer_{n}.kernel.query.lift_biases` / `key.lift_biases` / `value.lift_biases` / `output.lift_biases` | `(32,)` | `Render_Bars` |
+| `encoder.lift_weights` | `(128, input_channels)` | `Render_Matrix` |
+| `encoder.lift_biases` | `(128,)` | `Render_Bars` |
+| `composition.layer_{n}.kernel.key_norm_scale` / `_bias` | `(128,)` | `Render_Bars` |
+| `composition.layer_{n}.kernel.value_norm_scale` / `_bias` | `(128,)` | `Render_Bars` |
+| `composition.layer_{n}.kernel.query.lift_weights` / `key.lift_weights` / `value.lift_weights` / `output.lift_weights` | `(128, 128)` | `Render_Matrix` |
+| `composition.layer_{n}.kernel.query.lift_biases` / `key.lift_biases` / `value.lift_biases` / `output.lift_biases` | `(128,)` | `Render_Bars` |
 | `composition.layer_{n}.kernel.last_attended_norm` | `()`, only once `Integrate()` is called directly on that kernel object -- the member's own forward path never does | scalar panel |
-| `composition.layer_{n}.local_linear.lift_weights` | `(32, 32)` | `Render_Matrix` |
-| `composition.layer_{n}.local_linear.lift_biases` | `(32,)` | `Render_Bars` |
+| `composition.layer_{n}.local_linear.lift_weights` | `(128, 128)` | `Render_Matrix` |
+| `composition.layer_{n}.local_linear.lift_biases` | `(128,)` | `Render_Bars` |
 | `composition.last_layer_norms` | `(4,)`, only once `Apply()` is called directly on the composition -- the member's own forward path never does | `Render_Bars` (reference line at 1) |
-| `readout.key_norm_scale` / `_bias`, `value_norm_scale` / `_bias` | `(32,)` | `Render_Bars` |
-| `readout.query.lift_weights` | `(32, 25)` | `Render_Matrix` |
-| `readout.query.lift_biases` | `(32,)` | `Render_Bars` |
-| `readout.key.lift_weights` / `value.lift_weights` | `(32, 32)` | `Render_Matrix` |
-| `readout.key.lift_biases` / `value.lift_biases` | `(32,)` | `Render_Bars` |
-| `readout.final.projection_weights` | `(output_channels, 32)` | `Render_Matrix` |
+| `readout.key_norm_scale` / `_bias`, `value_norm_scale` / `_bias` | `(128,)` | `Render_Bars` |
+| `readout.query.lift_weights` | `(128, 25)` | `Render_Matrix` |
+| `readout.query.lift_biases` | `(128,)` | `Render_Bars` |
+| `readout.key.lift_weights` / `value.lift_weights` | `(128, 128)` | `Render_Matrix` |
+| `readout.key.lift_biases` / `value.lift_biases` | `(128,)` | `Render_Bars` |
+| `readout.final.projection_weights` | `(output_channels, 128)` | `Render_Matrix` |
 | `readout.final.projection_biases` | `(output_channels,)` | `Render_Bars` |
 | `readout.last_answered_query_count` | `()`, after a numpy call | scalar panel |
 | `processing_shape` | `(3,)` | `Render_Bars` |

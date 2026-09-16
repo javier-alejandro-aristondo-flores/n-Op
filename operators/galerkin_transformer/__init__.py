@@ -27,9 +27,9 @@ from operators.wrappers import Conserving
 
 type GalerkinTransformerTask = Literal["parametric", "localization"]
 
-HIDDEN_CHANNELS = 32
+HIDDEN_CHANNELS = 128
 
-HEAD_COUNT = 2
+HEAD_COUNT = 4
 
 ENCODER_LAYER_COUNT = 4
 

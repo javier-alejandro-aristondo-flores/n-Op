@@ -554,7 +554,7 @@ def Test_The_Tabulated_Stencil_Forward_Matches_The_Dense_Oracle() -> None:
 
 @pytest.mark.skipif(not Torch_Is_Available(), reason="torch is not installed yet")
 def Test_The_Tabulated_Stencil_Forward_Matches_The_Dense_Oracle_On_The_Foreign_Engine() -> None:
-    """the roll and the channel contraction dispatch correctly, landing on the oracle on the foreign engine too"""
+    """the convolution facet dispatches correctly, landing on the oracle on the foreign engine too"""
     kernel = TabulatedStencilKernel(half_widths=(1, 1, 1), output_channels=2, input_channels=2, seed=28)
     generator = np.random.default_rng(29)
     field = GridFunction(
@@ -570,6 +570,44 @@ def Test_The_Tabulated_Stencil_Forward_Matches_The_Dense_Oracle_On_The_Foreign_E
     lifted_values = engine.Lift_Constant(np.asarray(field.values, dtype=np.float64))
     produced = kernel.Forward(lifted, lifted_values, (6, 6, 6))
     assert np.allclose(np.asarray(produced, dtype=np.float64), reference, atol=1e-10)
+
+
+def Saved_Tensor_Count_Of_The_Tabulated_Stencil_Forward(half_widths: tuple[int, int, int]) -> int:
+    """how many tensors the foreign engine saves for backward during one lifted forward at this stencil size"""
+    import torch
+
+    kernel = TabulatedStencilKernel(half_widths=half_widths, output_channels=4, input_channels=4, seed=44)
+    generator = np.random.default_rng(45)
+    field_values = generator.random((4, 8, 8, 8))
+    engine = TorchEngine()
+    lifted = engine.Lift(kernel.parameter_values, requires_gradient=True)
+    lifted_values = engine.Lift_Constant(field_values)
+    saved_tensor_count = 0
+
+    def Count_Pack(saved_tensor: Any) -> Any:
+        nonlocal saved_tensor_count
+        saved_tensor_count += 1
+        return saved_tensor
+
+    def Unpack(saved_tensor: Any) -> Any:
+        return saved_tensor
+
+    with torch.autograd.graph.saved_tensors_hooks(Count_Pack, Unpack):
+        produced = kernel.Forward(lifted, lifted_values, (8, 8, 8))
+        produced.sum().backward()
+    return saved_tensor_count
+
+
+@pytest.mark.skipif(not Torch_Is_Available(), reason="torch is not installed yet")
+def Test_The_Tabulated_Stencil_Forward_Holds_No_Per_Offset_Intermediates() -> None:
+    """the saved-tensor count of one lifted forward does not grow with the offset count behind it"""
+    # a per-offset roll would have saved one shifted copy of the field for each of 27, then 125 offsets
+    # the convolution facet instead saves the padded field and the assembled kernel once, whatever the offset count
+    # so a hook counting every tensor the autograd graph actually saves is a size measure, not a proportional one
+    twenty_seven_offsets = Saved_Tensor_Count_Of_The_Tabulated_Stencil_Forward((1, 1, 1))
+    one_hundred_twenty_five_offsets = Saved_Tensor_Count_Of_The_Tabulated_Stencil_Forward((2, 2, 2))
+    assert twenty_seven_offsets >= 1
+    assert one_hundred_twenty_five_offsets < 2 * twenty_seven_offsets
 
 
 def Tabulated_Stencil_Loss(

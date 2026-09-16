@@ -15,11 +15,11 @@ from operators.framework import (
     Kernel,
 )
 from operators.kernels.compact_support.geometry import Grid_Offsets, Voxel_Indices
-from operators.substrate import Contract_Channel_Axis, Roll_Along_Axes
+from operators.substrate import Periodic_Convolution_3d
 
 
 class TabulatedStencilKernel(Kernel[GridFunction, GridFunction]):
-    """a learned channel-mixing block at every whole-voxel offset of a small box"""
+    """a learned channel-mixing block at every whole-voxel offset of a small box, output shape equal to input"""
 
     supported_representations = (GridFunction,)
 
@@ -65,15 +65,7 @@ class TabulatedStencilKernel(Kernel[GridFunction, GridFunction]):
         spatial_shape = tuple(int(extent) for extent in input_values.shape[1:])
         if output_shape != spatial_shape:
             raise ValueError("a tabulated stencil evaluates on the grid it was tabulated for, not another one")
-        weights = lifted["stencil_weights"]
-        produced: Any = None
-        for offset in self.Offsets():
-            shift = (int(offset[0]), int(offset[1]), int(offset[2]))
-            # rolling forward by the offset brings the source voxel that offset names onto the target
-            shifted = Roll_Along_Axes(input_values, shift, (1, 2, 3))
-            contribution = Contract_Channel_Axis(self.Block_At(weights, offset), shifted)
-            produced = contribution if produced is None else produced + contribution
-        return produced
+        return Periodic_Convolution_3d(input_values, lifted["stencil_weights"])
 
 
     def Integrate(

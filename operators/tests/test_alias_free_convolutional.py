@@ -1,6 +1,8 @@
 """the convolutional member: its fused activation, its assembly, and the pointwise twin the identity check needs"""
 
+import os
 from collections.abc import Callable
+from pathlib import Path
 from typing import Any
 
 import numpy as np
@@ -14,8 +16,17 @@ from operators.alias_free_convolutional import (
     StencilActivation,
 )
 from operators.alias_free_convolutional.activation import Alias_Free_Activation
+from operators.alias_free_convolutional.report import (
+    AugmentedMemberBatches,
+    Grid_Shift_Probe_Set,
+    Latest_Stage_Checkpoint_For_Prefix,
+    MemberExample,
+    Member_Loss,
+    Write_Back_Parameters,
+)
 from operators.compositions import Downsampled_By_Two, Halved_Shape, Upsampled_By_Two
 from operators.encoders import PointwiseLift
+from operators.evaluation import CubicBlock, Elf_Ridge_Rows, Nearest_Run_Rows, Shell_Filter_Rows, Summarize, Training_Mean_Rows
 from operators.framework import (
     Apply_Grid_Operation,
     Diamond_Grid_Operations,
@@ -37,6 +48,7 @@ from operators.substrate import (
     Torch_Is_Available,
     TorchEngine,
 )
+from operators.training import Train
 
 CUBE = Domain(lattice=np.eye(3) * 3.57)
 
@@ -361,3 +373,95 @@ def Test_A_Two_Step_Toy_Training_Is_Deterministic() -> None:
     assert losses_one == losses_two
     for name in parameters_one.values:
         assert np.array_equal(parameters_one.values[name], parameters_two.values[name])
+
+
+@pytest.mark.pool
+def Test_The_Four_Floors_Land_Near_The_Flagships_Recorded_Numbers() -> None:
+    """the same four floor recipes on the same block, checked against the flagship's own committed numbers"""
+    block = CubicBlock()
+    ridge_rows = Elf_Ridge_Rows(block)
+    filter_rows = Shell_Filter_Rows(block)
+    mean_rows = Training_Mean_Rows(block)
+    copy_rows = Nearest_Run_Rows(block)
+    recorded_by_floor = {
+        "semilocal_ridge_floor": (ridge_rows, 0.0976),
+        "per_shell_linear_filter": (filter_rows, 0.0830),
+        "training_mean_trivial_floor": (mean_rows, 0.0160),
+        "nearest_run_copy_floor": (copy_rows, 0.0062),
+    }
+    for floor_label, (rows, flagship_value) in recorded_by_floor.items():
+        measured = Summarize(rows, "mean_absolute_error", floor_label).median
+        assert abs(measured - flagship_value) < 0.002, floor_label
+
+
+@pytest.mark.pool
+def Test_The_Grid_Shift_Probe_Set_Is_Twenty_One_Valid_Cells_Spanning_Both_Campaigns() -> None:
+    """21 distinct evaluation-block identifiers, both campaigns represented, every axis a multiple of four"""
+    block = CubicBlock()
+    probes = Grid_Shift_Probe_Set(block)
+    assert len(probes) == 21
+    assert len({probe.identifier for probe in probes}) == 21
+    assert {probe.campaign for probe in probes} == {"supercell_strains", "defect_set"}
+    for probe in probes:
+        assert probe.identifier in block.evaluation
+        assert all(axis % 4 == 0 for axis in probe.stretched_shape)
+        assert all(72 <= axis <= 84 for axis in probe.stretched_shape)
+    # the seed is fixed, so the same block reproduces the same probe set bit for bit
+    assert Grid_Shift_Probe_Set(block) == probes
+
+
+def Test_Latest_Stage_Checkpoint_For_Prefix_Finds_The_Newest_Runs_Furthest_Stage(tmp_path: Path) -> None:
+    """among an older two-stage run and a newer one-stage run sharing a prefix, the newer run's own stage wins"""
+    older_run_stage0 = tmp_path / "elf_fold0_cno_100_stage0_checkpoint.npz"
+    older_run_stage1 = tmp_path / "elf_fold0_cno_100_stage1_checkpoint.npz"
+    newer_run_stage0 = tmp_path / "elf_fold0_cno_200_stage0_checkpoint.npz"
+    for path, mtime in ((older_run_stage0, 100.0), (older_run_stage1, 100.0), (newer_run_stage0, 200.0)):
+        path.write_bytes(b"")
+        os.utime(path, (mtime, mtime))
+    found = Latest_Stage_Checkpoint_For_Prefix(tmp_path, "elf_fold0_cno")
+    assert found == newer_run_stage0
+
+
+def Test_Latest_Stage_Checkpoint_For_Prefix_Raises_When_Nothing_Matches(tmp_path: Path) -> None:
+    """an empty directory, or one carrying only an unrelated prefix, fails clearly rather than answering nothing"""
+    with pytest.raises(FileNotFoundError):
+        Latest_Stage_Checkpoint_For_Prefix(tmp_path, "elf_fold0_cno")
+
+
+def Test_The_Augmented_Batch_Source_And_Loss_Train_A_Toy_Member_And_Write_Back_Cleanly() -> None:
+    """the driver's own batch source and loss, wired through Train(), and its write-back restores every part"""
+    member = Toy_Member(hidden_channel_widths=(2, 3, 4), activation="pointwise", seed=11)
+    generator = np.random.default_rng(13)
+    training_examples = [
+        MemberExample(
+            identifier=f"toy_{draw}",
+            unit_key=f"unit_{draw}",
+            campaign="toy",
+            log_density_values=(generator.normal(size=(2, 8, 8, 8)) * 0.1).astype(np.float32),
+            gram_vector=(generator.normal(size=(6,)) * 0.1).astype(np.float32),
+            target_values=generator.uniform(0.1, 0.9, size=(2, 4, 4, 4)).astype(np.float32),
+        )
+        for draw in range(3)
+    ]
+    batches = AugmentedMemberBatches(training_examples, training_examples[:1])
+    initial_parameters = ParameterSet(
+        values={name: value.copy() for name, value in member.Parameter_Values().items()}
+    )
+    result = Train(
+        TorchEngine(device_name="cpu"), initial_parameters, Member_Loss(member, fine_shape=(8, 8, 8)), batches,
+        step_count=3, learning_rate=0.01, seed=17,
+    )
+    assert any(
+        not np.array_equal(initial_parameters.values[name], result.parameters.values[name])
+        for name in initial_parameters.values
+    )
+    Write_Back_Parameters(member, result.parameters)
+    for name, value in result.parameters.values.items():
+        if name in member.lift.parameter_values:
+            assert np.array_equal(member.lift.parameter_values[name], value)
+        if name in member.projection.parameter_values:
+            assert np.array_equal(member.projection.parameter_values[name], value)
+    for descending_index, layer in enumerate(member.multi_scale.descending_layers):
+        for bare_name, value in layer.kernel.parameter_values.items():
+            prefixed_name = f"descending_{descending_index}.kernel.{bare_name}"
+            assert np.array_equal(value, result.parameters.values[prefixed_name])

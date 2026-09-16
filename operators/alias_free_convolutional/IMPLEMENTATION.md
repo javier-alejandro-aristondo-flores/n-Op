@@ -117,22 +117,23 @@ deleted in favor of a dispatched substrate version the day one lands. Measured o
 machine: peak accelerator memory for a fused forward-and-backward at 32³ with 16 channels is about
 26% of the unfused (naive-autodiff) path's peak — comfortably "far under."
 
-**The registration seam.** `operators/compositions/{multi_scale.py, __init__.py, fixed_point.py}`
-each raise `NotImplementedError` on `activation == "alias_free"` — that seam is not owned by this
-package and is not patched here. `Alias_Free_Activation` is built, tested and re-exported at this
-package's root, ready for `operators.compositions` to reach for the moment it exports a lookup the
-member can register into; see the stream's report to the team lead for the exact proposed patch.
-Every test that needs the real composed seam (as opposed to the activation function alone, which is
-fully tested on its own) is written now and gated on a runtime probe of the live seam, so it starts
-passing the moment the patch lands with no test-file changes needed.
+**The registration seam.** Landed: `MultiScale.__init__` takes an `activations` table
+(`compositions/activation.py`) rather than a fixed lookup, and this package's own
+`Alias_Free_Convolutional_Network` hands it one entry, `{"alias_free": Alias_Free_Activation}`, at
+construction — no patch to `operators.compositions` owned by another package was needed in the end.
+Every test that exercises the real composed seam runs the live path directly, not a runtime probe of
+an unpatched one.
 
-**Training and floors.** Not built yet: `operators.evaluation` does not yet export `CubicBlock`,
-the localization floor builders, or `Write_Member_Results`, and `operators.substrate` does not yet
-export `Periodic_Convolution_3d` (needed before an 80³ training run, not before anything this build
-tests at 8³–16³). Once those land, the training protocol here follows the flagship's own
-`Train_Flagship_Member` shape verbatim — staged 0.3/0.3/0.4 learning-rate schedule, validation every
-100 steps, checkpoints, the coarse-input cache — with the CNO and the pointwise twin as two separate
-card jobs, run names `elf_fold0_cno_<steps>` and `elf_fold0_pointwise_twin_<steps>`.
+**Training and floors.** Landed: `operators.evaluation` exports `CubicBlock`, the four localization
+floor builders and `Write_Member_Results`; `operators.substrate` exports `Periodic_Convolution_3d`,
+so `TabulatedStencilKernel.Forward` no longer saves 27 rolled copies at 80³. `report.py` (this
+package) measures the block and all four floors, the pre-registered claim ladder, and the identity
+check's 21-cell grid-shift probe set, none of which needed a trained member. The training protocol,
+`Train_Convolutional_Member`, follows the flagship's own `Train_Flagship_Member` shape — staged
+0.3/0.3/0.4 learning-rate schedule, seed 20260916, batch one, validation every 100 steps on fold one,
+final-stage patience 15, augmentation on — with a `Cost_Probe` (300 steps) to convert the twin's 8 h
+and the CNO's 12 h wall-clock caps into step budgets. Both are written and neither has run; run names
+`elf_fold0_cno_<steps>` and `elf_fold0_pointwise_twin_<steps>`.
 
 ## Inspection
 

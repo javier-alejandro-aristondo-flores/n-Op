@@ -1,0 +1,6 @@
+{
+ "member": "alias_free_convolutional",
+ "regenerate": "python -m operators.alias_free_convolutional.report",
+ "rows": [],
+ "verdicts": []
+}

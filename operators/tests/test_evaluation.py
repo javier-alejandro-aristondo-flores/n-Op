@@ -10,6 +10,7 @@ from operators.evaluation import (
     Card_Metric_Errors,
     Compare_To_Floor,
     Comparison_Table,
+    Cross_Member_Table,
     CubicBlock,
     EXTRAPOLATION,
     FloorComparison,
@@ -228,3 +229,82 @@ def Test_Block_Signatures_Agree_Only_When_The_Unit_Keys_Agree(tmp_path: Path) ->
     different_signature = Read_Member_Results(different_path).rows[0].block_signature
     assert same_order_signature == reordered_signature
     assert same_order_signature != different_signature
+
+
+def Synthetic_Cross_Member_Results(member: str, task: str, split: str, signature: str, median: float) -> MemberResults:
+    """one small, hand-built artifact for one member on one task, its own summary and verdict clean decimals"""
+    key = ResultKey(member=member, configuration="explicit", task=task, split=split, block="fold_0", group="all")
+    summary = MetricSummary(
+        metric_name="relative_l2",
+        group_name="all",
+        unit_count=2,
+        run_count=4,
+        median=median,
+        interquartile=0.01,
+        confidence_low=median - 0.01,
+        confidence_high=median + 0.01,
+    )
+    comparison = FloorComparison(
+        floor_name="ridge_floor",
+        metric_name="relative_l2",
+        group_name="all",
+        floor_median=0.5,
+        member_median=median,
+        required_improvement=0.25,
+        improvement=0.5,
+        verdict="pass",
+    )
+    return MemberResults(
+        member=member,
+        regenerate=f"python -m operators.{member}.report",
+        rows=(ResultRow(key=key, summary=summary, block_signature=signature),),
+        verdicts=(VerdictRow(key=key, comparison=comparison),),
+    )
+
+
+def Test_Agreeing_Artifacts_Render_One_Table_Per_Task() -> None:
+    """two members that agree on split and unit signature render side by side under their shared task"""
+    first = Synthetic_Cross_Member_Results(
+        "factorized_fourier", "charge_to_localization", "paired_fields_fivefold", "sig_a", 0.1
+    )
+    second = Synthetic_Cross_Member_Results(
+        "alias_free_convolutional", "charge_to_localization", "paired_fields_fivefold", "sig_a", 0.2
+    )
+    rendered = Cross_Member_Table((first, second))
+    assert "charge_to_localization" in rendered
+    assert "factorized_fourier" in rendered
+    assert "alias_free_convolutional" in rendered
+
+
+def Test_A_Split_Mismatch_Refuses() -> None:
+    """a row whose split differs from its own task card's split is refused, never silently rendered"""
+    wrong_split = Synthetic_Cross_Member_Results(
+        "factorized_fourier", "charge_to_localization", "not_the_cards_split", "sig_a", 0.1
+    )
+    with pytest.raises(ValueError):
+        Cross_Member_Table((wrong_split,))
+
+
+def Test_A_Signature_Mismatch_Refuses() -> None:
+    """two members scored on different unit sets for the same task are refused, never averaged together"""
+    first = Synthetic_Cross_Member_Results(
+        "factorized_fourier", "charge_to_localization", "paired_fields_fivefold", "sig_a", 0.1
+    )
+    second = Synthetic_Cross_Member_Results(
+        "alias_free_convolutional", "charge_to_localization", "paired_fields_fivefold", "sig_b", 0.2
+    )
+    with pytest.raises(ValueError):
+        Cross_Member_Table((first, second))
+
+
+def Test_The_Rendering_Is_Byte_Deterministic() -> None:
+    """the same artifacts, pooled in either order, render to the identical bytes"""
+    first = Synthetic_Cross_Member_Results(
+        "factorized_fourier", "charge_to_localization", "paired_fields_fivefold", "sig_a", 0.1
+    )
+    second = Synthetic_Cross_Member_Results(
+        "alias_free_convolutional", "charge_to_localization", "paired_fields_fivefold", "sig_a", 0.2
+    )
+    forward_render = Cross_Member_Table((first, second))
+    reversed_render = Cross_Member_Table((second, first))
+    assert forward_render == reversed_render

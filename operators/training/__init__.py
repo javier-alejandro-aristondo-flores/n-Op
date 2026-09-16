@@ -7,6 +7,10 @@ from operators.training.cache import (
     CachedField,
     Cached_Field_Statistics,
     FieldCache,
+    Functional_Field_Cache,
+    Global_Statistics,
+    Parameter_Spreads,
+    Shape_Groups,
 )
 from operators.training.hardware import DeviceChoice, Resolved_Device_Name, Training_Engine
 from operators.training.loader import (
@@ -42,6 +46,7 @@ from operators.training.sampling import (
     Batch_Of_Fields,
     BatchArray,
     BatchSource,
+    CoordinateFeaturizedBatches,
     Evenly_Spaced_Flat_Indices,
     FixedBatches,
     PointSampledBatches,

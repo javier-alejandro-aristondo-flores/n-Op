@@ -33,6 +33,7 @@ from operators.evaluation import (
     Compare_To_Floor,
     Comparison_Table,
     EXTRAPOLATION,
+    Every_Shape_Nearest_Neighbor_Runs,
     FloorComparison,
     INTERPOLATION,
     ScoredRun,
@@ -40,7 +41,7 @@ from operators.evaluation import (
     Summarize_By,
     Summary_Table,
 )
-from operators.framework import Array, Coefficients, Domain, GridSpec, Output_Points, PointSpec
+from operators.framework import Coefficients, Domain, GridSpec, Output_Points, PointSpec
 from operators.inspection import (
     Render_Curves,
     Render_Error_Spread,
@@ -50,20 +51,23 @@ from operators.inspection import (
     Render_Table,
 )
 from operators.metrics import Curve_L1, Frequency_Split_Relative_L2, Gap_Edge_Error, Relative_L2, Wasserstein_1d
-from operators.readouts import BasisExpansion, CoordinateFeatures, RampedCoordinateFeatures
+from operators.readouts import BasisExpansion, RampedCoordinateFeatures
 from operators.substrate import Mean_Over_Last_Axis, ParameterSet, Sum_Over_Last_Axis
-from operators.tasks import Card_Named, TaskCard
+from operators.tasks import Card_Named
 from operators.training import (
-    BatchSource,
     Build_Field_Cache,
-    Cached_Field_Statistics,
     CachedField,
+    CoordinateFeaturizedBatches,
     FieldCache,
     FixedBatches,
     ForwardLoss,
+    Functional_Field_Cache,
+    Global_Statistics,
     Parameter_Field_Examples,
     ParameterExample,
+    Parameter_Spreads,
     PointSampledBatches,
+    Shape_Groups,
     State_Density_Examples,
     Strain_Assignments_By_Run,
     Train,
@@ -392,77 +396,6 @@ def Block_Lines(functional: str, configuration: str) -> tuple[list[str], tuple[F
     return lines, comparisons, step_count
 
 
-def Functional_Field_Cache(card: TaskCard, role: str, functional: str) -> FieldCache:
-    """one functional's slice of a role's field cache, every grid shape kept as the sampler found it"""
-    whole = Build_Field_Cache(card, role)
-    selected = tuple(field for field in whole.fields if field.covariate_values.get("functional") == functional)
-    return FieldCache(whole.card_name, whole.role, selected)
-
-
-def Shape_Groups(cache: FieldCache) -> dict[tuple[int, ...], list[CachedField]]:
-    """this cache's fields bucketed by the one thing a rectangle needs to agree on"""
-    grouped: dict[tuple[int, ...], list[CachedField]] = {}
-    for cached_field in cache.fields:
-        grouped.setdefault(cached_field.grid_shape, []).append(cached_field)
-    return grouped
-
-
-def Global_Statistics(cache: FieldCache) -> tuple[float, float]:
-    """one mean and one deviation for the campaign's single channel, decision D5's global standardization"""
-    means, deviations = Cached_Field_Statistics(cache)
-    return float(means[0]), float(deviations[0])
-
-
-def Parameter_Spreads(cache: FieldCache) -> NDArray[np.float64]:
-    """each branch input's own spread across the cache's runs, guarded away from zero"""
-    stacked = np.stack([cached_field.parameters for cached_field in cache.fields])
-    spreads = np.asarray(stacked.std(axis=0), dtype=np.float64)
-    # a parameter that never varies across the whole campaign would divide the branch input by zero
-    spreads[spreads == 0.0] = 1.0
-    return spreads
-
-
-class CoordinateFeaturizedBatches(BatchSource):
-    """a point-sampled source with each batch's trunk features precomputed alongside its own points"""
-
-
-    def __init__(self, inner: BatchSource, coordinate_features: CoordinateFeatures) -> None:
-        self.inner = inner
-        self.coordinate_features = coordinate_features
-        self.last_batch: TrainingBatch | None = None
-
-
-    def Featurized(self, batch: TrainingBatch) -> TrainingBatch:
-        """the batch's own arrays, with this trunk's coordinate features added beside them"""
-        points = np.asarray(batch.arrays["point_coordinates"], dtype=np.float64)
-        run_count = points.shape[0]
-        point_count = points.shape[1]
-        axis_count = points.shape[2]
-        flattened = self.coordinate_features(points.reshape(-1, axis_count))
-        features = flattened.reshape(run_count, point_count, flattened.shape[1])
-        return TrainingBatch({**batch.arrays, "trunk_features": features})
-
-
-    def Next_Batch(self, generator: np.random.Generator) -> TrainingBatch:
-        """one step's batch, its points already answered by the trunk's own feature map"""
-        featurized = self.Featurized(self.inner.Next_Batch(generator))
-        self.last_batch = featurized
-        return featurized
-
-
-    def Validation_Batches(self) -> tuple[tuple[str, TrainingBatch], ...]:
-        """the wrapped source's held units, each one's points answered the identical way"""
-        return tuple((unit_key, self.Featurized(batch)) for unit_key, batch in self.inner.Validation_Batches())
-
-
-    def Inspect(self) -> dict[str, Array]:
-        """the wrapped source's own arrays, plus the trunk features that answered the last drawn batch"""
-        state = dict(self.inner.Inspect())
-        if self.last_batch is not None:
-            state["last_trunk_features"] = self.last_batch.arrays["trunk_features"]
-        return state
-
-
 def Point_Value_Loss(
     member: DeepOperatorNetwork, parameter_spreads: Any, channel_mean: Any, channel_deviation: Any
 ) -> ForwardLoss:
@@ -551,40 +484,6 @@ def Canonical_Common_Grid_Predictions(
     coefficients = member.Forward_Coefficients(member.branch.parameter_values, evaluated.parameters / parameter_spreads)
     standardized = np.asarray(readout.Forward(readout.parameter_values, coefficients, trunk_features), dtype=np.float64)
     return standardized.T * channel_deviation + channel_mean
-
-
-def Every_Shape_Nearest_Neighbor_Runs(
-    training_cache: FieldCache, test_cache: FieldCache, functional: str
-) -> list[ScoredRun]:
-    """the memorization floor computed within each grid shape, since a copy needs a shape to match its truth"""
-    assignments = Strain_Assignments_By_Run()
-    training_groups = Shape_Groups(training_cache)
-    scored: list[ScoredRun] = []
-    for grid_shape, test_fields in Shape_Groups(test_cache).items():
-        training_fields = training_groups.get(grid_shape)
-        # a shape the training role never produced has no candidate this floor could copy
-        if not training_fields:
-            continue
-        training_parameters = np.stack([field.parameters for field in training_fields])
-        test_parameters = np.stack([field.parameters for field in test_fields])
-        nearest = Nearest_Training_Run(training_parameters, test_parameters)
-        for position, cached_field in enumerate(test_fields):
-            copied = training_fields[int(nearest[position])].Flattened_Values()[0]
-            truth = cached_field.Flattened_Values()[0]
-            scored.append(
-                ScoredRun(
-                    identifier=cached_field.identifier,
-                    unit_key=cached_field.unit_key,
-                    campaign="strain_atlas",
-                    family=assignments[cached_field.run_path].family,
-                    errors={"relative_l2": Relative_L2(copied, truth)},
-                    covariate_values={
-                        "functional": functional,
-                        "grid_shape": "x".join(str(extent) for extent in grid_shape),
-                    },
-                )
-            )
-    return scored
 
 
 def Canonical_Every_Shape_Predictions(

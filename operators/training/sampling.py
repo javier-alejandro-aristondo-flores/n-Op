@@ -9,6 +9,7 @@ import numpy as np
 from numpy.typing import NDArray
 
 from operators.framework import Array, Fractional_Coordinates_Of_Flat_Indices, Inspectable
+from operators.readouts import CoordinateFeatures
 from operators.training.cache import CachedField, FieldCache
 
 type BatchArray = NDArray[np.float32] | NDArray[np.float64]
@@ -166,4 +167,45 @@ class PointSampledBatches(BatchSource):
         if self.last_batch is not None:
             for name, drawn_array in self.last_batch.Inspect().items():
                 state[f"last_{name}"] = drawn_array
+        return state
+
+
+class CoordinateFeaturizedBatches(BatchSource):
+    """a point-sampled source with each batch's trunk features precomputed alongside its own points"""
+
+
+    def __init__(self, inner: BatchSource, coordinate_features: CoordinateFeatures) -> None:
+        self.inner = inner
+        self.coordinate_features = coordinate_features
+        self.last_batch: TrainingBatch | None = None
+
+
+    def Featurized(self, batch: TrainingBatch) -> TrainingBatch:
+        """the batch's own arrays, with this trunk's coordinate features added beside them"""
+        points = np.asarray(batch.arrays["point_coordinates"], dtype=np.float64)
+        run_count = points.shape[0]
+        point_count = points.shape[1]
+        axis_count = points.shape[2]
+        flattened = self.coordinate_features(points.reshape(-1, axis_count))
+        features = flattened.reshape(run_count, point_count, flattened.shape[1])
+        return TrainingBatch({**batch.arrays, "trunk_features": features})
+
+
+    def Next_Batch(self, generator: np.random.Generator) -> TrainingBatch:
+        """one step's batch, its points already answered by the trunk's own feature map"""
+        featurized = self.Featurized(self.inner.Next_Batch(generator))
+        self.last_batch = featurized
+        return featurized
+
+
+    def Validation_Batches(self) -> tuple[tuple[str, TrainingBatch], ...]:
+        """the wrapped source's held units, each one's points answered the identical way"""
+        return tuple((unit_key, self.Featurized(batch)) for unit_key, batch in self.inner.Validation_Batches())
+
+
+    def Inspect(self) -> dict[str, Array]:
+        """the wrapped source's own arrays, plus the trunk features that answered the last drawn batch"""
+        state = dict(self.inner.Inspect())
+        if self.last_batch is not None:
+            state["last_trunk_features"] = self.last_batch.arrays["trunk_features"]
         return state

@@ -163,3 +163,33 @@ def Cached_Field_Statistics(cache: FieldCache) -> tuple[NDArray[np.float64], NDA
         widened: NDArray[np.float64] = cached_field.Flattened_Values().astype(np.float64)
         squared_deviations += np.square(widened - means[:, None]).sum(axis=1)
     return means, np.maximum(np.sqrt(squared_deviations / float(counted_points)), 1e-12)
+
+
+def Functional_Field_Cache(card: TaskCard, role: str, functional: str) -> FieldCache:
+    """one functional's slice of a role's field cache, every grid shape kept as the sampler found it"""
+    whole = Build_Field_Cache(card, role)
+    selected = tuple(field for field in whole.fields if field.covariate_values.get("functional") == functional)
+    return FieldCache(whole.card_name, whole.role, selected)
+
+
+def Shape_Groups(cache: FieldCache) -> dict[tuple[int, ...], list[CachedField]]:
+    """this cache's fields bucketed by the one thing a rectangle needs to agree on"""
+    grouped: dict[tuple[int, ...], list[CachedField]] = {}
+    for cached_field in cache.fields:
+        grouped.setdefault(cached_field.grid_shape, []).append(cached_field)
+    return grouped
+
+
+def Global_Statistics(cache: FieldCache) -> tuple[float, float]:
+    """one mean and one deviation for the campaign's single channel, decision D5's global standardization"""
+    means, deviations = Cached_Field_Statistics(cache)
+    return float(means[0]), float(deviations[0])
+
+
+def Parameter_Spreads(cache: FieldCache) -> NDArray[np.float64]:
+    """each branch input's own spread across the cache's runs, guarded away from zero"""
+    stacked = np.stack([cached_field.parameters for cached_field in cache.fields])
+    spreads = np.asarray(stacked.std(axis=0), dtype=np.float64)
+    # a parameter that never varies across the whole campaign would divide the branch input by zero
+    spreads[spreads == 0.0] = 1.0
+    return spreads

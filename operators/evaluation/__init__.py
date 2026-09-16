@@ -2,6 +2,7 @@
 
 # pyright: reportUnusedImport=false
 
+from operators.evaluation.every_shape import Every_Shape_Nearest_Neighbor_Runs
 from operators.evaluation.localization_block import (
     COARSE_SHAPE,
     CUBIC_CAMPAIGNS,

@@ -1,5 +1,7 @@
 """charge density to electron localization or local potential, by factorized Fourier convolution"""
 
+# pyright: reportUnusedImport=false
+
 from collections.abc import Sequence
 from typing import Any, Literal
 
@@ -8,6 +10,15 @@ from numpy.typing import NDArray
 
 from operators.compositions import ExplicitStack, FixedPoint, Spectral_Resampled, WeightTied
 from operators.encoders import PointwiseLift
+from operators.factorized_fourier.parametric import (
+    All_Perovskite_Arms,
+    All_Strain_Arms,
+    Arm,
+    Bracket_Corners,
+    Interior_Levels,
+    Perovskite_Level,
+    Strain_Level,
+)
 from operators.framework import (
     Array,
     Coefficients,

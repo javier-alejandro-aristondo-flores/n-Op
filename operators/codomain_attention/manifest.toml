@@ -9,11 +9,11 @@ role = "the multi-field completion experiment; strongest transfer headline (allo
 encoder = "encoders.VariableEncoding (per-field learned encodings; functional covariate in the encoding slot)"
 kernel = "kernels.codomain_attention.CodomainAttentionKernel over kernels.spectral.SpectralKernel (token-shared weights)"
 composition = "compositions.ExplicitStack"
-readout = "readouts.PointwiseProjection"
-wrappers = "per task card"
+readout = "codomain_attention.readout.TokenSharedReadout (member-local; readouts.PointwiseProjection is not token-count invariant)"
+wrappers = "per-token heads realized member-side (codomain_attention.readout.Per_Token_Heads), reusing wrappers.Channel_Means and wrappers.Renormalization_Scale"
 
 [depends_on]
 framework = true
 kernels = ["codomain_attention", "spectral"]
-packages = ["factorized_fourier"]
-shared_note = "competitor for every kill gate: dedicated per-pair Fourier operators trained on the same 365-run block at equal total compute"
+packages = []
+shared_note = "competitor for every kill gate: the dedicated per-pair factorized_fourier operator, trained on the same cubic block at equal total compute; its measured numbers are cited in report.py, not imported in code"

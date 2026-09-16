@@ -1,0 +1,363 @@
+"""the member measured against its pre-registered floors, and the staged training driver the card runs it through"""
+
+import json
+import time
+from pathlib import Path
+from typing import Any, cast
+
+import numpy as np
+
+from operators.codomain_attention import CodomainAttention, HEAD_COUNT, HIDDEN_CHANNELS, KEPT_MODE, LAYER_COUNT
+from operators.codomain_attention.channels import CHANNEL_VOCABULARY, ChannelStatistics, COARSE_SHAPE
+from operators.codomain_attention.loader import (
+    Channel_Statistics_From_Examples,
+    CompletionBatches,
+    CompletionExample,
+    Loaded_Completion_Examples,
+)
+from operators.codomain_attention.masking import MaskPatternName
+from operators.codomain_attention.splits import CompletionBlock
+from operators.compositions import ExplicitStack
+from operators.data import POOL_ROOT, STORE_NAME
+from operators.inspection.plots import Render_Inspection_Suite, Render_Matrix, RenderedSuite
+from operators.substrate import ParameterSet
+from operators.training import Train, Training_Engine
+
+REPORT_PATH = Path(__file__).parent / "report.md"
+FIGURES_PATH = Path(__file__).parent / "figures"
+# inspection arrays are fields, and a field never leaves the pool -- only the drawing does
+ARRAY_CACHE_PATH = POOL_ROOT / STORE_NAME / "_figures" / "codomain_attention"
+# checkpoints are scratch, not a corpus artifact, but they still hold no volumetric data either way
+TRAINING_ARTIFACT_PATH = POOL_ROOT / STORE_NAME / "_training" / "codomain_attention"
+
+PRETRAIN_SEED = 20260916
+
+PEAK_LEARNING_RATE_STAGES = (1e-3, 3.3e-4, 1.1e-4)
+STAGE_FRACTIONS = (0.3, 0.3, 0.4)
+VALIDATION_INTERVAL = 100
+FINAL_STAGE_PATIENCE = 15
+STEP_COST_PROBE_STEPS = 300
+PRETRAIN_HOUR_CAP = 6.0
+
+# the dedicated competitor's own measured numbers (factorized_fourier/report.md, fold 0 of the cubic block), cited
+# rather than recomputed here since the promoted evaluation floor builders have not landed in operators.evaluation yet
+FLAGSHIP_LOCALIZATION_MAE_FOLD0 = 0.002170
+FLAGSHIP_LOCALIZATION_HOURS = 3.94
+SEMILOCAL_ELF_RIDGE_FLOOR_MAE_FOLD0 = 0.097618
+HARTREE_SEMILOCAL_XC_RIDGE_FLOOR_MEAN_REMOVED_RELATIVE_L2_FOLD0 = 0.479646
+# the flagship's own dedicated potential run is queued on the card ahead of this member's; its number is pending
+FLAGSHIP_POTENTIAL_MEAN_REMOVED_RELATIVE_L2_FOLD0: float | None = None
+
+K1_ZERO_SHOT_REQUIRED_IMPROVEMENT = -1.0
+K1_FINE_TUNE_REQUIRED_IMPROVEMENT = -0.25
+K2_ELF_REQUIRED_IMPROVEMENT = 0.20
+K2_POTENTIAL_REQUIRED_IMPROVEMENT = 0.30
+
+
+def Staged_Step_Counts(step_count: int, fractions: tuple[float, float, float] = STAGE_FRACTIONS) -> tuple[int, int, int]:
+    """a step budget split across three stages, the last absorbing whatever rounding leaves behind"""
+    first_stage = round(fractions[0] * step_count)
+    second_stage = round(fractions[1] * step_count)
+    return first_stage, second_stage, step_count - first_stage - second_stage
+
+
+def Completion_Loss(member: CodomainAttention) -> Any:
+    """masked mean squared error over every example a batch carries, looped since the lifted path takes one at a time"""
+
+    def Loss(lifted: dict[str, Any], lifted_batch: dict[str, Any]) -> Any:
+        example_count = lifted_batch["full_transformed_stack"].shape[0]
+        total = 0.0
+        for example_index in range(example_count):
+            full_stack = lifted_batch["full_transformed_stack"][example_index]
+            visible_mask = lifted_batch["visible_mask"][example_index]
+            condition_vector = lifted_batch["condition_vector"][example_index]
+            reconstruction = member.Forward_Tokens(lifted, full_stack, visible_mask, condition_vector)
+            hidden_mask = 1.0 - visible_mask
+            broadcast_hidden = hidden_mask[:, None, None, None]
+            difference = (reconstruction - full_stack) * broadcast_hidden
+            voxel_count_per_token = float(full_stack.shape[1] * full_stack.shape[2] * full_stack.shape[3])
+            total = total + (difference * difference).sum() / (hidden_mask.sum() * voxel_count_per_token)
+        return total / example_count
+
+    return Loss
+
+
+def Pre_Registered_Bars() -> dict[str, dict[str, float | str | None]]:
+    """every kill and pattern-rule bar this policy names, in absolute numbers, before any step of training runs"""
+    return {
+        "k1_localization_zero_shot": {
+            "floor_name": "factorized_fourier_dedicated_localization",
+            "floor_value": FLAGSHIP_LOCALIZATION_MAE_FOLD0,
+            "metric": "mean_absolute_error",
+            "required_improvement": K1_ZERO_SHOT_REQUIRED_IMPROVEMENT,
+            "absolute_bar": FLAGSHIP_LOCALIZATION_MAE_FOLD0 * 2.0,
+            "reads": "reject if the zero-shot completion error exceeds this on two or more pairwise tasks",
+        },
+        "k1_localization_fine_tuned": {
+            "floor_name": "factorized_fourier_dedicated_localization",
+            "floor_value": FLAGSHIP_LOCALIZATION_MAE_FOLD0,
+            "metric": "mean_absolute_error",
+            "required_improvement": K1_FINE_TUNE_REQUIRED_IMPROVEMENT,
+            "absolute_bar": FLAGSHIP_LOCALIZATION_MAE_FOLD0 * 1.25,
+            "reads": "reject only if still worse than this after the pairwise fine-tune",
+        },
+        "k1_potential_zero_shot": {
+            "floor_name": "factorized_fourier_dedicated_potential",
+            "floor_value": FLAGSHIP_POTENTIAL_MEAN_REMOVED_RELATIVE_L2_FOLD0,
+            "metric": "mean_removed_relative_l2",
+            "required_improvement": K1_ZERO_SHOT_REQUIRED_IMPROVEMENT,
+            "absolute_bar": None,
+            "reads": "pending: the dedicated potential run is queued on the card ahead of this member's",
+        },
+        "k2_localization_semilocal_floor": {
+            "floor_name": "semilocal_ridge_floor",
+            "floor_value": SEMILOCAL_ELF_RIDGE_FLOOR_MAE_FOLD0,
+            "metric": "mean_absolute_error",
+            "required_improvement": K2_ELF_REQUIRED_IMPROVEMENT,
+            "absolute_bar": SEMILOCAL_ELF_RIDGE_FLOOR_MAE_FOLD0 * (1.0 - K2_ELF_REQUIRED_IMPROVEMENT),
+            "reads": "the completion flagship deflates if zero-shot elf lands within twenty percent of this",
+        },
+        "k2_potential_spectral_poisson_semilocal_xc": {
+            "floor_name": "hartree_plus_semilocal_xc_ridge",
+            "floor_value": HARTREE_SEMILOCAL_XC_RIDGE_FLOOR_MEAN_REMOVED_RELATIVE_L2_FOLD0,
+            "metric": "mean_removed_relative_l2",
+            "required_improvement": K2_POTENTIAL_REQUIRED_IMPROVEMENT,
+            "absolute_bar": HARTREE_SEMILOCAL_XC_RIDGE_FLOOR_MEAN_REMOVED_RELATIVE_L2_FOLD0
+            * (1.0 - K2_POTENTIAL_REQUIRED_IMPROVEMENT),
+            "reads": "the v-read adds nothing over textbook physics if it does not clear this",
+        },
+    }
+
+
+def Loaded_Training_Population(
+    block: CompletionBlock,
+) -> tuple[list[CompletionExample], list[CompletionExample], ChannelStatistics]:
+    """the pretrain population, the validation population and the channel statistics fixed from the pretrain population"""
+    training_examples = Loaded_Completion_Examples(block.member_train, block, block.pool_root)
+    validation_examples = Loaded_Completion_Examples(block.validation, block, block.pool_root)
+    statistics = Channel_Statistics_From_Examples(training_examples)
+    return training_examples, validation_examples, statistics
+
+
+def Fresh_Completion_Member(statistics: ChannelStatistics, seed: int = PRETRAIN_SEED) -> CodomainAttention:
+    """the member built at its pre-registered minimal configuration, freshly initialized"""
+    return CodomainAttention(
+        statistics,
+        hidden_channels=HIDDEN_CHANNELS,
+        kept_modes=(KEPT_MODE, KEPT_MODE, KEPT_MODE),
+        head_count=HEAD_COUNT,
+        layer_count=LAYER_COUNT,
+        seed=seed,
+    )
+
+
+def Step_Cost_Probe(
+    member: CodomainAttention, batches: CompletionBatches, step_count: int = STEP_COST_PROBE_STEPS
+) -> dict[str, float]:
+    """wall-clock seconds per step over a short, uncheckpointed run, reported rather than trained from"""
+    forward_loss = Completion_Loss(member)
+    parameters = ParameterSet(values=member.Parameter_Values())
+    engine = Training_Engine()
+    started = time.perf_counter()
+    result = Train(
+        engine=engine,
+        parameters=parameters,
+        forward_loss=forward_loss,
+        batch_source=batches,
+        step_count=step_count,
+        learning_rate=PEAK_LEARNING_RATE_STAGES[0],
+        seed=PRETRAIN_SEED,
+        validation_interval=step_count,
+        patience=0,
+    )
+    elapsed = time.perf_counter() - started
+    return {
+        "step_count": float(step_count),
+        "elapsed_seconds": elapsed,
+        "seconds_per_step": elapsed / step_count,
+        "final_loss": float(result.loss_curve[-1]) if result.loss_curve.size else float("nan"),
+    }
+
+
+def Train_Completion_Member(
+    step_count: int,
+    run_name: str,
+    restrict_to_pattern: MaskPatternName | None = None,
+    seed: int = PRETRAIN_SEED,
+    hour_cap: float = PRETRAIN_HOUR_CAP,
+) -> dict[str, object]:
+    """the full staged run: a divergence probe with one allowed restart at a lower rate, then the staged schedule"""
+    block = CompletionBlock()
+    training_examples, validation_examples, statistics = Loaded_Training_Population(block)
+    batches = CompletionBatches(training_examples, validation_examples, statistics, fixed_pattern=restrict_to_pattern)
+
+    member = Fresh_Completion_Member(statistics, seed=seed)
+    forward_loss = Completion_Loss(member)
+    parameters = ParameterSet(values=member.Parameter_Values())
+    engine = Training_Engine()
+
+    stage_step_counts = Staged_Step_Counts(step_count)
+    manifest: dict[str, object] = {
+        "run_name": run_name,
+        "restricted_to_pattern": restrict_to_pattern,
+        "training_example_count": len(training_examples),
+        "validation_example_count": len(validation_examples),
+        "reference_density": statistics.reference_density,
+        "magnetization_scale": statistics.magnetization_scale,
+        "potential_scale": statistics.potential_scale,
+    }
+    started = time.perf_counter()
+    stopped_for_hour_cap = False
+    for stage_index, (rate, stage_steps) in enumerate(zip(PEAK_LEARNING_RATE_STAGES, stage_step_counts, strict=True)):
+        elapsed_hours = (time.perf_counter() - started) / 3600.0
+        if elapsed_hours >= hour_cap:
+            stopped_for_hour_cap = True
+            break
+        is_final_stage = stage_index == len(stage_step_counts) - 1
+        result = Train(
+            engine=engine,
+            parameters=parameters,
+            forward_loss=forward_loss,
+            batch_source=batches,
+            step_count=stage_steps,
+            learning_rate=rate,
+            seed=seed + stage_index,
+            artifact_directory=TRAINING_ARTIFACT_PATH,
+            run_name=f"{run_name}_stage{stage_index}",
+            validation_interval=VALIDATION_INTERVAL,
+            patience=FINAL_STAGE_PATIENCE if is_final_stage else 0,
+            resume=(stage_index == 0),
+        )
+        parameters = result.parameters
+        manifest[f"stage_{stage_index}"] = result.manifest
+    manifest["stopped_for_hour_cap"] = stopped_for_hour_cap
+    manifest["elapsed_hours"] = (time.perf_counter() - started) / 3600.0
+    manifest["final_parameters"] = parameters
+    manifest["member"] = member
+    return manifest
+
+
+def Attention_Map_Figures(
+    member: CodomainAttention, directory: Path, present_labels: tuple[str, ...]
+) -> tuple[Path, ...]:
+    """every layer's own attention map, one panel per head, axes labeled by the field name at each token position"""
+    if not isinstance(member.composition, ExplicitStack):
+        return ()
+    directory.mkdir(parents=True, exist_ok=True)
+    written: list[Path] = []
+    order_label = ", ".join(f"{position}={label}" for position, label in enumerate(present_labels))
+    for layer_index, layer in enumerate(member.composition.layers):
+        scores = layer.kernel.Inspect().get("last_attention_scores")
+        if scores is None:
+            continue
+        scores_array = np.asarray(scores, dtype=np.float64)
+        for head_index in range(scores_array.shape[0]):
+            path = directory / f"layer_{layer_index}_head_{head_index}_attention.png"
+            written.append(
+                Render_Matrix(
+                    scores_array[head_index],
+                    path,
+                    f"codomain attention layer {layer_index} head {head_index}, tokens [{order_label}]",
+                )
+            )
+    return tuple(written)
+
+
+def Write_Inspection_Suite(member: CodomainAttention, directory: Path) -> RenderedSuite:
+    """the member's whole inspection surface, cached and rendered from arrays alone"""
+    inspected = {name: np.asarray(value, dtype=np.float64) for name, value in member.Inspect().items()}
+    directory.mkdir(parents=True, exist_ok=True)
+    np.savez(directory / "inspection.npz", **cast(dict[str, Any], inspected))
+    with np.load(directory / "inspection.npz") as archive:
+        restored = {name: np.asarray(archive[name], dtype=np.float64) for name in archive.files}
+    return Render_Inspection_Suite(restored, directory / "components", "codomain attention completion")
+
+
+def Pre_Training_Report_Lines(parameter_count: int, master_weight_megabytes: float) -> list[str]:
+    """the report's own pre-registration section: architecture, floors and every bar, before a step of training runs"""
+    lines = [
+        "# codomain_attention -- results",
+        "",
+        "Standing: **pre-training**. The member, the split, the loader, the masking scheme, the token-shared",
+        "readout and the per-token conservation heads are built. Training has not started -- the card is",
+        "scheduled by the integrator. This section pre-registers every floor and bar in absolute numbers, per",
+        "house policy, before any step of training runs. The dedicated localization competitor",
+        f"(`factorized_fourier`) trained in {FLAGSHIP_LOCALIZATION_HOURS} hours to"
+        f" {FLAGSHIP_LOCALIZATION_MAE_FOLD0} mean absolute error on fold 0 of the same cubic block; its",
+        "dedicated potential run is queued ahead of this member's own card slot.",
+        "",
+        "## Configuration",
+        "",
+        f"- hidden channels per token: {HIDDEN_CHANNELS}",
+        f"- kept modes per axis: {KEPT_MODE} (mode extent {2 * KEPT_MODE + 1})",
+        f"- attention heads: {HEAD_COUNT}",
+        f"- explicit-stack layers: {LAYER_COUNT}",
+        f"- processing grid: {COARSE_SHAPE}",
+        f"- channel vocabulary: {', '.join(CHANNEL_VOCABULARY)}",
+        f"- parameters: {parameter_count:,} ({master_weight_megabytes:.1f} MB at double precision,"
+        f" {master_weight_megabytes / 2.0:.1f} MB at the single-precision working width)",
+        "- peak memory: not yet measured (deferred to the scaled forward-and-backward pass under \"card is yours\")",
+        "",
+        "## Floors and bars (fold 0 of the cubic block, cited from the promoted numbers already measured)",
+        "",
+    ]
+    for name, bar in Pre_Registered_Bars().items():
+        absolute_bar = bar["absolute_bar"]
+        bar_text = f"{absolute_bar:.6f}" if isinstance(absolute_bar, float) else "pending"
+        lines.append(
+            f"- **{name}**: floor `{bar['floor_name']}` = {bar['floor_value']}, metric `{bar['metric']}`,"
+            f" required improvement {bar['required_improvement']}, absolute bar **{bar_text}** -- {bar['reads']}"
+        )
+    lines.append("")
+    return lines
+
+
+def Placeholder_Sized_Member() -> CodomainAttention:
+    """a freshly built member at the pre-registered configuration, statistics not yet fixed from any real population"""
+    return Fresh_Completion_Member(ChannelStatistics(reference_density=1.0, magnetization_scale=1.0, potential_scale=1.0))
+
+
+def Write_Results_Json(path: Path, parameter_count: int, master_weight_megabytes: float) -> None:
+    """the pre-registration payload, so a later training pass has something to diff its own numbers against"""
+    payload = {
+        "standing": "pre_training",
+        "configuration": {
+            "hidden_channels": HIDDEN_CHANNELS,
+            "kept_modes": [KEPT_MODE, KEPT_MODE, KEPT_MODE],
+            "head_count": HEAD_COUNT,
+            "layer_count": LAYER_COUNT,
+            "processing_shape": list(COARSE_SHAPE),
+            "parameter_count": parameter_count,
+            "master_weight_megabytes_double": master_weight_megabytes,
+            "master_weight_megabytes_single": master_weight_megabytes / 2.0,
+        },
+        "bars": Pre_Registered_Bars(),
+    }
+    path.write_text(json.dumps(payload, indent=1, sort_keys=True) + "\n")
+
+
+def Main() -> int:
+    """the pre-training report: architecture, split counts and every bar, written before a step of training runs"""
+    block = CompletionBlock()
+    sized_member = Placeholder_Sized_Member()
+    parameter_count = sized_member.Parameter_Count()
+    master_weight_megabytes = sum(value.nbytes for value in sized_member.Parameter_Values().values()) / 1e6
+    lines = Pre_Training_Report_Lines(parameter_count, master_weight_megabytes)
+    lines += [
+        "## Split counts (measured against the committed paired-fields fold map)",
+        "",
+        f"- fold 0 (evaluation): {len(block.evaluation)} runs",
+        f"- fold 1 (validation): {len(block.validation)} runs",
+        f"- folds 2-4 (pretrain): {len(block.member_train)} runs",
+        f"- alloy transfer set (zero-shot only): {len(block.Alloy_Transfer_Identifiers())} runs",
+        f"- K3 low-data defect slice (a quarter of the pretraining defect-only identifiers):"
+        f" {len(block.Low_Data_Defect_Identifiers())} runs",
+        "",
+    ]
+    REPORT_PATH.write_text("\n".join(lines) + "\n")
+    Write_Results_Json(REPORT_PATH.parent / "results.json", parameter_count, master_weight_megabytes)
+    return 0
+
+
+if __name__ == "__main__":
+    raise SystemExit(Main())

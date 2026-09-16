@@ -1,4 +1,4 @@
-"""scored runs, the floors they are measured against, and the cubic block's own kill and potential floors"""
+"""scored runs, the floors measured against them, the cubic block's own floors, and the results each member writes"""
 
 # pyright: reportUnusedImport=false
 
@@ -37,6 +37,15 @@ from operators.evaluation.localization_block import (
     Spin_Remainder,
     Training_Mean_Rows,
     Truncation_Ceiling_Rows,
+)
+from operators.evaluation.results import (
+    Block_Signature,
+    MemberResults,
+    Read_Member_Results,
+    ResultKey,
+    ResultRow,
+    VerdictRow,
+    Write_Member_Results,
 )
 from operators.evaluation.scoring import (
     Compare_To_Floor,

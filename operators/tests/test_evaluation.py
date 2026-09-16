@@ -1,24 +1,35 @@
 """the result rows a member reports, and the floor verdicts they carry"""
 
+from pathlib import Path
+
 import numpy as np
 import pytest
 
 from operators.evaluation import (
+    Block_Signature,
     Card_Metric_Errors,
     Compare_To_Floor,
     Comparison_Table,
     CubicBlock,
     EXTRAPOLATION,
+    FloorComparison,
     Label_Of,
+    MemberResults,
+    MetricSummary,
     Potential_Floor_Rows,
     Potential_Metric_Errors,
+    Read_Member_Results,
     Recorded_Bars,
+    ResultKey,
+    ResultRow,
     ScoredRun,
     Summarize,
     Summarize_By,
     Summary_Table,
     Truncation_Ceiling_Rows,
     Unit_Medians,
+    VerdictRow,
+    Write_Member_Results,
 )
 from operators.inspection import Render_Table
 
@@ -135,3 +146,69 @@ def Test_The_Promoted_Localization_Block_Names_Answer_From_The_Root_And_Partitio
     # fold zero is the kill block by definition, not by coincidence of construction order
     assert evaluation_identifiers == set(block.by_fold[0])
     assert evaluation_identifiers
+
+
+def Synthetic_Member_Results(unit_keys: tuple[str, ...]) -> MemberResults:
+    """one small, hand-built results artifact, its own summary and comparison both clean decimal numbers"""
+    key = ResultKey(
+        member="factorized_fourier",
+        configuration="explicit",
+        task="charge_to_localization",
+        split="paired_fields_fivefold",
+        block="fold_0",
+        group="all",
+    )
+    summary = MetricSummary(
+        metric_name="relative_l2",
+        group_name="all",
+        unit_count=2,
+        run_count=4,
+        median=0.125,
+        interquartile=0.05,
+        confidence_low=0.1,
+        confidence_high=0.15,
+    )
+    comparison = FloorComparison(
+        floor_name="semilocal_ridge_floor",
+        metric_name="relative_l2",
+        group_name="all",
+        floor_median=0.25,
+        member_median=0.125,
+        required_improvement=0.5,
+        improvement=0.5,
+        verdict="pass",
+    )
+    return MemberResults(
+        member="factorized_fourier",
+        regenerate="python -m operators.factorized_fourier.report",
+        rows=(ResultRow(key=key, summary=summary, block_signature=Block_Signature(unit_keys)),),
+        verdicts=(VerdictRow(key=key, comparison=comparison),),
+    )
+
+
+def Test_Member_Results_Round_Trip_Through_Json(tmp_path: Path) -> None:
+    """a written artifact reads back with every row, verdict and key exactly reproduced"""
+    results = Synthetic_Member_Results(("orbit_a", "orbit_b"))
+    path = tmp_path / "results.json"
+    Write_Member_Results(path, results)
+    assert Read_Member_Results(path) == results
+
+
+def Test_Block_Signatures_Agree_Only_When_The_Unit_Keys_Agree(tmp_path: Path) -> None:
+    """two artifacts share a signature exactly when their own unit keys are the same set, order aside"""
+    same_order = Synthetic_Member_Results(("orbit_a", "orbit_b"))
+    reordered = Synthetic_Member_Results(("orbit_b", "orbit_a"))
+    different = Synthetic_Member_Results(("orbit_a", "orbit_c"))
+
+    same_order_path = tmp_path / "same_order.json"
+    reordered_path = tmp_path / "reordered.json"
+    different_path = tmp_path / "different.json"
+    Write_Member_Results(same_order_path, same_order)
+    Write_Member_Results(reordered_path, reordered)
+    Write_Member_Results(different_path, different)
+
+    same_order_signature = Read_Member_Results(same_order_path).rows[0].block_signature
+    reordered_signature = Read_Member_Results(reordered_path).rows[0].block_signature
+    different_signature = Read_Member_Results(different_path).rows[0].block_signature
+    assert same_order_signature == reordered_signature
+    assert same_order_signature != different_signature

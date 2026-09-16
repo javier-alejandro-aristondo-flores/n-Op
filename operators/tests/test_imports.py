@@ -106,6 +106,39 @@ def Test_Every_Assembly_Carries_The_Inspection_Contract() -> None:
         assert callable(getattr(assembly, "Inspect"))
 
 
+def Inspection_Section(document_text: str) -> str | None:
+    """the prose between an Inspection heading and the next heading, or none when there is no such heading"""
+    marker = "\n## Inspection"
+    start = document_text.find(marker)
+    if start == -1:
+        return None
+    body_start = start + len(marker)
+    next_heading = document_text.find("\n## ", body_start)
+    return document_text[body_start:] if next_heading == -1 else document_text[body_start:next_heading]
+
+
+def Test_Every_Built_Assembly_Specifies_Its_Inspection_Surface() -> None:
+    """a package whose assembly no longer raises NotImplementedError on construction documents its inspection"""
+    package_root = Path(__file__).resolve().parent.parent
+    offenses: list[str] = []
+    for package_name, class_name in ASSEMBLIES.items():
+        module = importlib.import_module(package_name)
+        assembly = getattr(module, class_name)
+        try:
+            assembly()
+        except NotImplementedError:
+            continue
+        except Exception:
+            pass
+        doc_path = package_root / package_name.split(".")[-1] / "IMPLEMENTATION.md"
+        section = Inspection_Section(doc_path.read_text()) if doc_path.is_file() else None
+        if section is None:
+            offenses.append(f"{package_name}: no Inspection heading in {doc_path.name}")
+        elif len(section.strip()) < 200 or "TODO" in section or "to be written" in section:
+            offenses.append(f"{package_name}: Inspection section in {doc_path.name} reads as a placeholder")
+    assert offenses == [], offenses
+
+
 def Test_The_Names_Are_Prosaic() -> None:
     """no cryptic identifiers and no placeholder counters, package-wide"""
     allowed_short_names = {"_", "In"}

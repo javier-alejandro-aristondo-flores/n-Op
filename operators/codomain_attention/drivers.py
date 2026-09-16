@@ -2,8 +2,6 @@
 
 import argparse
 import json
-import subprocess
-import threading
 import time
 
 from operators.codomain_attention.masking import MaskPatternName, NAMED_MASK_PATTERNS
@@ -22,6 +20,7 @@ from operators.codomain_attention.report import (
 )
 from operators.codomain_attention.loader import CompletionBatches
 from operators.codomain_attention.splits import CompletionBlock
+from operators.substrate import Peak_Accelerator_Bytes, Reset_Peak_Accelerator_Bytes
 
 # the pretrain's own fixed run name, so the fine-tune and k3 drivers know which checkpoint to resume from
 PRETRAIN_RUN_NAME = "completion_fold0_pretrain_20260916"
@@ -33,26 +32,7 @@ K3_HOUR_CAP = 4.0
 K3_LOW_DATA_RUN_NAME = "completion_fold0_k3_pretrained_lowdata_20260916"
 K3_DEDICATED_RUN_NAME = "completion_fold0_k3_dedicated_lowdata_20260916"
 
-MEBIBYTES_PER_GIGABYTE = 1024.0
-MEMORY_POLL_INTERVAL_SECONDS = 0.5
-
-
-def Peak_Accelerator_Memory_Mebibytes(stop: threading.Event, peak: list[float]) -> None:
-    """the largest accelerator memory reading nvidia-smi reports while a driver trains, polled on its own thread"""
-    while not stop.is_set():
-        try:
-            output = subprocess.run(
-                ["nvidia-smi", "--query-gpu=memory.used", "--format=csv,noheader,nounits"],
-                capture_output=True,
-                text=True,
-                timeout=5,
-                check=True,
-            )
-            reading = float(output.stdout.strip().splitlines()[0])
-            peak[0] = max(peak[0], reading)
-        except (subprocess.SubprocessError, ValueError, OSError):
-            pass
-        stop.wait(MEMORY_POLL_INTERVAL_SECONDS)
+BYTES_PER_GIGABYTE = 1024.0**3
 
 
 def Run_Probe() -> dict[str, object]:
@@ -62,17 +42,13 @@ def Run_Probe() -> dict[str, object]:
     batches = CompletionBatches(training_examples, validation_examples, statistics)
     member = Fresh_Completion_Member(statistics, seed=PRETRAIN_SEED)
 
-    peak_mebibytes = [0.0]
-    stop = threading.Event()
-    watcher = threading.Thread(target=Peak_Accelerator_Memory_Mebibytes, args=(stop, peak_mebibytes), daemon=True)
-    watcher.start()
+    Reset_Peak_Accelerator_Bytes()
     probe = Step_Cost_Probe(member, batches, step_count=STEP_COST_PROBE_STEPS)
-    stop.set()
-    watcher.join(timeout=5.0)
+    peak_bytes = Peak_Accelerator_Bytes()
 
-    peak_gigabytes = peak_mebibytes[0] / MEBIBYTES_PER_GIGABYTE
+    peak_gigabytes = peak_bytes / BYTES_PER_GIGABYTE
     result: dict[str, object] = dict(probe)
-    result["peak_accelerator_memory_mebibytes"] = peak_mebibytes[0]
+    result["peak_accelerator_bytes"] = peak_bytes
     result["peak_accelerator_memory_gigabytes"] = peak_gigabytes
     result["ceiling_gigabytes"] = CARD_USABLE_MEMORY_GIGABYTES
     result["within_ceiling"] = peak_gigabytes <= CARD_USABLE_MEMORY_GIGABYTES
@@ -97,9 +73,7 @@ def Manifest_Summary(manifest: dict[str, object]) -> dict[str, object]:
 def Run_Pretrain() -> dict[str, object]:
     """the staged six-hour pretrain over every mask pattern, checkpointed under this member's own training path"""
     step_count = Pretrain_Step_Count(PRETRAIN_HOUR_CAP)
-    manifest = Train_Completion_Member(
-        step_count, PRETRAIN_RUN_NAME, restrict_to_pattern=None, seed=PRETRAIN_SEED, hour_cap=PRETRAIN_HOUR_CAP
-    )
+    manifest = Train_Completion_Member(step_count, PRETRAIN_RUN_NAME, restrict_to_pattern=None, seed=PRETRAIN_SEED)
     summary = Manifest_Summary(manifest)
     (TRAINING_ARTIFACT_PATH / f"{PRETRAIN_RUN_NAME}_summary.json").write_text(
         json.dumps(summary, indent=1, sort_keys=True, default=str) + "\n"
@@ -120,7 +94,6 @@ def Run_Fine_Tune(pattern: MaskPatternName, hour_cap: float = FINE_TUNE_HOUR_CAP
         run_name,
         restrict_to_pattern=pattern,
         seed=PRETRAIN_SEED,
-        hour_cap=hour_cap,
         starting_parameters=progress.best_parameters,
     )
     summary = Manifest_Summary(manifest)
@@ -146,7 +119,6 @@ def Run_K3_Comparison(hour_cap: float = K3_HOUR_CAP) -> dict[str, dict[str, obje
         K3_LOW_DATA_RUN_NAME,
         restrict_to_pattern=None,
         seed=PRETRAIN_SEED,
-        hour_cap=half_hour_cap,
         starting_parameters=progress.best_parameters,
         training_identifiers=low_data_identifiers,
         statistics_override=pretrain_statistics,
@@ -156,7 +128,6 @@ def Run_K3_Comparison(hour_cap: float = K3_HOUR_CAP) -> dict[str, dict[str, obje
         K3_DEDICATED_RUN_NAME,
         restrict_to_pattern=None,
         seed=PRETRAIN_SEED,
-        hour_cap=half_hour_cap,
         training_identifiers=low_data_identifiers,
     )
     combined = {"pretrained_continued": pretrained_manifest, "dedicated_from_scratch": dedicated_manifest}

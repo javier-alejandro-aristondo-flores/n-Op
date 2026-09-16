@@ -33,7 +33,7 @@ from operators.evaluation import (
 )
 from operators.inspection.plots import Render_Inspection_Suite, Render_Matrix, RenderedSuite
 from operators.substrate import ParameterSet
-from operators.training import Read_Checkpoint, Train, Training_Engine, TrainingProgress
+from operators.training import Read_Checkpoint, Staged_Training, Train, Training_Engine, TrainingProgress
 
 REPORT_PATH = Path(__file__).parent / "report.md"
 FIGURES_PATH = Path(__file__).parent / "figures"
@@ -44,7 +44,7 @@ TRAINING_ARTIFACT_PATH = POOL_ROOT / STORE_NAME / "_training" / "codomain_attent
 
 PRETRAIN_SEED = 20260916
 
-PEAK_LEARNING_RATE_STAGES = (1e-3, 3.3e-4, 1.1e-4)
+PEAK_LEARNING_RATE = 1e-3
 STAGE_FRACTIONS = (0.3, 0.3, 0.4)
 VALIDATION_INTERVAL = 100
 FINAL_STAGE_PATIENCE = 15
@@ -67,13 +67,6 @@ K2_POTENTIAL_REQUIRED_IMPROVEMENT = 0.30
 # recorded references), pre-registered here as the ceiling the probe stops at rather than measured by this member
 CARD_USABLE_MEMORY_GIGABYTES = 5.61
 FLAGSHIP_PEAK_MEMORY_GIGABYTES_AT_BATCH_ONE = 3.6
-
-
-def Staged_Step_Counts(step_count: int, fractions: tuple[float, float, float] = STAGE_FRACTIONS) -> tuple[int, int, int]:
-    """a step budget split across three stages, the last absorbing whatever rounding leaves behind"""
-    first_stage = round(fractions[0] * step_count)
-    second_stage = round(fractions[1] * step_count)
-    return first_stage, second_stage, step_count - first_stage - second_stage
 
 
 def Completion_Loss(member: CodomainAttention) -> Any:
@@ -199,7 +192,7 @@ def Step_Cost_Probe(
         forward_loss=forward_loss,
         batch_source=batches,
         step_count=step_count,
-        learning_rate=PEAK_LEARNING_RATE_STAGES[0],
+        learning_rate=PEAK_LEARNING_RATE,
         seed=PRETRAIN_SEED,
         validation_interval=step_count,
         patience=0,
@@ -218,7 +211,6 @@ def Train_Completion_Member(
     run_name: str,
     restrict_to_pattern: MaskPatternName | None = None,
     seed: int = PRETRAIN_SEED,
-    hour_cap: float = PRETRAIN_HOUR_CAP,
     starting_parameters: ParameterSet | None = None,
     training_identifiers: list[str] | None = None,
     statistics_override: ChannelStatistics | None = None,
@@ -234,7 +226,12 @@ def Train_Completion_Member(
     parameters = starting_parameters if starting_parameters is not None else ParameterSet(values=member.Parameter_Values())
     engine = Training_Engine()
 
-    stage_step_counts = Staged_Step_Counts(step_count)
+    parameters, staged = Staged_Training(
+        engine, parameters, lambda: ParameterSet(values=member.Parameter_Values()), forward_loss, batches,
+        step_count, run_name, seed, TRAINING_ARTIFACT_PATH, stage_fractions=STAGE_FRACTIONS,
+        peak_learning_rate=PEAK_LEARNING_RATE, validation_interval=VALIDATION_INTERVAL,
+        final_stage_patience=FINAL_STAGE_PATIENCE,
+    )
     manifest: dict[str, object] = {
         "run_name": run_name,
         "restricted_to_pattern": restrict_to_pattern,
@@ -244,32 +241,7 @@ def Train_Completion_Member(
         "magnetization_scale": statistics.magnetization_scale,
         "potential_scale": statistics.potential_scale,
     }
-    started = time.perf_counter()
-    stopped_for_hour_cap = False
-    for stage_index, (rate, stage_steps) in enumerate(zip(PEAK_LEARNING_RATE_STAGES, stage_step_counts, strict=True)):
-        elapsed_hours = (time.perf_counter() - started) / 3600.0
-        if elapsed_hours >= hour_cap:
-            stopped_for_hour_cap = True
-            break
-        is_final_stage = stage_index == len(stage_step_counts) - 1
-        result = Train(
-            engine=engine,
-            parameters=parameters,
-            forward_loss=forward_loss,
-            batch_source=batches,
-            step_count=stage_steps,
-            learning_rate=rate,
-            seed=seed + stage_index,
-            artifact_directory=TRAINING_ARTIFACT_PATH,
-            run_name=f"{run_name}_stage{stage_index}",
-            validation_interval=VALIDATION_INTERVAL,
-            patience=FINAL_STAGE_PATIENCE if is_final_stage else 0,
-            resume=(stage_index == 0),
-        )
-        parameters = result.parameters
-        manifest[f"stage_{stage_index}"] = result.manifest
-    manifest["stopped_for_hour_cap"] = stopped_for_hour_cap
-    manifest["elapsed_hours"] = (time.perf_counter() - started) / 3600.0
+    manifest.update(staged)
     Write_Back_Parameters(member, parameters)
     manifest["final_parameters"] = parameters
     manifest["member"] = member

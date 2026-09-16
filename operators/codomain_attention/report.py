@@ -1,5 +1,6 @@
 """the member measured against its pre-registered floors, and the staged training driver the card runs it through"""
 
+import re
 import time
 from pathlib import Path
 from typing import Any, cast
@@ -32,7 +33,7 @@ from operators.evaluation import (
 )
 from operators.inspection.plots import Render_Inspection_Suite, Render_Matrix, RenderedSuite
 from operators.substrate import ParameterSet
-from operators.training import Train, Training_Engine
+from operators.training import Read_Checkpoint, Train, Training_Engine, TrainingProgress
 
 REPORT_PATH = Path(__file__).parent / "report.md"
 FIGURES_PATH = Path(__file__).parent / "figures"
@@ -155,14 +156,21 @@ def Pre_Registered_Bars(
     }
 
 
+def Loaded_Population(
+    block: CompletionBlock, training_identifiers: list[str], statistics: ChannelStatistics | None = None
+) -> tuple[list[CompletionExample], list[CompletionExample], ChannelStatistics]:
+    """one named training population against the fixed validation fold, statistics fixed from it unless handed one"""
+    training_examples = Loaded_Completion_Examples(training_identifiers, block, block.pool_root)
+    validation_examples = Loaded_Completion_Examples(block.validation, block, block.pool_root)
+    resolved_statistics = statistics if statistics is not None else Channel_Statistics_From_Examples(training_examples)
+    return training_examples, validation_examples, resolved_statistics
+
+
 def Loaded_Training_Population(
     block: CompletionBlock,
 ) -> tuple[list[CompletionExample], list[CompletionExample], ChannelStatistics]:
-    """the pretrain population, the validation population and the channel statistics fixed from the pretrain population"""
-    training_examples = Loaded_Completion_Examples(block.member_train, block, block.pool_root)
-    validation_examples = Loaded_Completion_Examples(block.validation, block, block.pool_root)
-    statistics = Channel_Statistics_From_Examples(training_examples)
-    return training_examples, validation_examples, statistics
+    """the whole pretrain population, the validation population and the channel statistics fixed from the pretrain population"""
+    return Loaded_Population(block, block.member_train)
 
 
 def Fresh_Completion_Member(statistics: ChannelStatistics, seed: int = PRETRAIN_SEED) -> CodomainAttention:
@@ -211,15 +219,19 @@ def Train_Completion_Member(
     restrict_to_pattern: MaskPatternName | None = None,
     seed: int = PRETRAIN_SEED,
     hour_cap: float = PRETRAIN_HOUR_CAP,
+    starting_parameters: ParameterSet | None = None,
+    training_identifiers: list[str] | None = None,
+    statistics_override: ChannelStatistics | None = None,
 ) -> dict[str, object]:
-    """the full staged run: a divergence probe with one allowed restart at a lower rate, then the staged schedule"""
+    """the staged schedule over a fresh member, or over a fine-tune's own starting weights and population when handed one"""
     block = CompletionBlock()
-    training_examples, validation_examples, statistics = Loaded_Training_Population(block)
+    chosen_identifiers = training_identifiers if training_identifiers is not None else block.member_train
+    training_examples, validation_examples, statistics = Loaded_Population(block, chosen_identifiers, statistics_override)
     batches = CompletionBatches(training_examples, validation_examples, statistics, fixed_pattern=restrict_to_pattern)
 
     member = Fresh_Completion_Member(statistics, seed=seed)
     forward_loss = Completion_Loss(member)
-    parameters = ParameterSet(values=member.Parameter_Values())
+    parameters = starting_parameters if starting_parameters is not None else ParameterSet(values=member.Parameter_Values())
     engine = Training_Engine()
 
     stage_step_counts = Staged_Step_Counts(step_count)
@@ -258,9 +270,54 @@ def Train_Completion_Member(
         manifest[f"stage_{stage_index}"] = result.manifest
     manifest["stopped_for_hour_cap"] = stopped_for_hour_cap
     manifest["elapsed_hours"] = (time.perf_counter() - started) / 3600.0
+    Write_Back_Parameters(member, parameters)
     manifest["final_parameters"] = parameters
     manifest["member"] = member
     return manifest
+
+
+def Write_Back_Parameters(member: CodomainAttention, parameters: ParameterSet) -> None:
+    """a flat trained parameter set folded back onto the member's own part-shaped storage, any layer count"""
+    for name, value in parameters.values.items():
+        if name.startswith("layer_"):
+            layer_token, part_name, bare_name = name.split(".", 2)
+            layer = member.attention_stack.layers[int(layer_token.removeprefix("layer_"))]
+            part = layer.kernel if part_name == "kernel" else layer.local_linear
+            part.parameter_values[bare_name] = value
+        elif name in member.channel_encoder.parameter_values:
+            member.channel_encoder.parameter_values[name] = value
+        elif name in member.token_readout.parameter_values:
+            member.token_readout.parameter_values[name] = value
+        elif name in member.parameter_values:
+            member.parameter_values[name] = value
+        else:
+            raise KeyError(f"{name} matches no part of this member's own parameter storage")
+
+
+_STAGE_CHECKPOINT_PATTERN = re.compile(r"_stage(\d+)_checkpoint\.npz$")
+
+
+def Latest_Stage_Checkpoint(artifact_directory: Path, run_name: str) -> Path:
+    """the furthest-along stage checkpoint a run has written to disk, its own closest thing to a final answer"""
+    candidates: list[tuple[int, Path]] = []
+    for path in artifact_directory.glob(f"{run_name}_stage*_checkpoint.npz"):
+        match = _STAGE_CHECKPOINT_PATTERN.search(path.name)
+        if match is not None:
+            candidates.append((int(match.group(1)), path))
+    if not candidates:
+        raise FileNotFoundError(f"no stage checkpoint found for {run_name!r} under {artifact_directory}")
+    return max(candidates, key=lambda pair: pair[0])[1]
+
+
+def Load_Trained_Completion_Member(
+    checkpoint_path: Path, statistics: ChannelStatistics, seed: int = PRETRAIN_SEED
+) -> tuple[CodomainAttention, TrainingProgress]:
+    """the member a finished or in-progress run produced, its best checkpoint parameters written back onto it"""
+    member = Fresh_Completion_Member(statistics, seed=seed)
+    template = ParameterSet(values=member.Parameter_Values())
+    progress = Read_Checkpoint(checkpoint_path, template)
+    Write_Back_Parameters(member, progress.best_parameters)
+    return member, progress
 
 
 def Attention_Map_Figures(

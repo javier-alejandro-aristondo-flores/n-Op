@@ -4,15 +4,16 @@ citation = "Jin, Meng, Lu — SIAM J. Sci. Comput. 44(6):A3490 (2022)"
 mapping = "(charge density, local potential) → electron localization field"
 suite_card = "test-suite.md §3, II.2 — IN-LOCAL, add-on"
 role = "tests whether the potential adds information beyond the density; kill if ≤5% better than density alone"
+assembled = "the two_branch member and its density_alone_twin, the same seeded configuration and trunk"
 
 [parts]
-encoder = "two encoders.SensorEncoder, one per labeled input channel group"
-kernel = "kernels.low_rank.LowRankKernel (multiplicative latent combination)"
-composition = "compositions.ExplicitStack"
+encoder = "two encoders.BasisProjectionEncoder + encoders.SensorEncoder pairs, one per labeled input channel group"
+kernel = "none; the multiplicative latent combination is member-owned, no framework kernel does it"
+composition = "compositions.WithoutIntegralLayers"
 readout = "readouts.BasisExpansion"
-wrappers = "per task card"
+wrappers = "none; the card carries no conservation law"
 
 [depends_on]
 framework = true
-kernels = ["low_rank"]
-packages = ["deep_operator_network"]
+kernels = []
+packages = ["deep_operator_network", "factorized_fourier"]

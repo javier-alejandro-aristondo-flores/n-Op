@@ -2,6 +2,7 @@
 
 import dataclasses
 from pathlib import Path
+from typing import Any, cast
 
 import numpy as np
 from numpy.typing import NDArray
@@ -10,16 +11,48 @@ from operators.data import (
     Apply_Standardized_Ridge,
     Archive_Path,
     Fit_Standardized_Ridge,
+    Guard_Fresh_Archives,
     Nearest_Training_Run,
     POOL_ROOT,
     Run_Identifier,
     STORE_NAME,
 )
-from operators.evaluation import MetricSummary, ScoredRun, Summarize, Summarize_By
+from operators.evaluation import (
+    Block_Signature,
+    Compare_To_Floor,
+    Comparison_Table,
+    FloorComparison,
+    MemberResults,
+    MetricSummary,
+    ResultKey,
+    ResultRow,
+    ScoredRun,
+    Summarize,
+    Summarize_By,
+    Summary_Table,
+    VerdictRow,
+    Write_Member_Results,
+)
 from operators.factorized_fourier import All_Strain_Arms, Arm, Interior_Levels
-from operators.framework import Spectral_Truncation_Resample
+from operators.framework import Coefficients, Domain, GridSpec, Spectral_Truncation_Resample
+from operators.inspection import Render_Error_Spread, Render_Floor_Comparison, Render_Inspection_Suite, Render_Table
 from operators.metrics import Relative_L2
-from operators.training import Strain_Assignments_By_Run
+from operators.nonlinear_manifold_decoder import Manifold_Network, NonlinearManifoldDecoder
+from operators.substrate import ParameterSet
+from operators.tasks import Card_Named
+from operators.training import (
+    Build_Field_Cache,
+    CoordinateFeaturizedBatches,
+    FieldCache,
+    ForwardLoss,
+    Global_Statistics,
+    Parameter_Field_Examples,
+    Parameter_Spreads,
+    PointSampledBatches,
+    Strain_Assignments_By_Run,
+    Train,
+    Training_Engine,
+)
 
 REPORT_PATH = Path(__file__).parent / "report.md"
 RESULTS_PATH = Path(__file__).parent / "results.json"
@@ -35,6 +68,24 @@ STRAIN_ATLAS_CAMPAIGN = "strain_atlas"
 COMMON_GRID_SHAPE = (40, 40, 40)
 COMMON_GRID_SHAPE_LABEL = "40x40x40"
 CHARGE_DENSITY_FIELD_NAME = "charge_density"
+
+# the branch's seventh feature, beside the six standardized strain components
+FUNCTIONAL_BRANCH_FEATURE = {"cheap": 0.0, "accurate": 1.0}
+
+BRANCH_HIDDEN_WIDTHS = (256, 256)
+LATENT_WIDTH = 128
+DECODER_HIDDEN_WIDTHS = (256, 256, 256)
+FOURIER_ORDERS = 4
+RUNS_PER_BATCH = 8
+POINTS_PER_RUN = 2048
+VALIDATION_POINTS_PER_RUN = 512
+# a decreasing schedule across three restarts, sized against the entry's 1.5-hour card cap
+STAGE_LEARNING_RATES = (3e-3, 1e-3, 3e-4)
+STAGE_STEP_COUNTS = (3000, 3000, 4000)
+VALIDATION_INTERVAL = 100
+# early stopping is only meaningful on the final, lowest-rate stage, once the schedule stops moving the floor
+FINAL_STAGE_PATIENCE = 15
+SEED = 20260916
 
 # the canon's 1.5x kill margin restated as a fractional improvement: beat a floor's median by a third
 IMPROVEMENT_MARGIN = 1.0 / 3.0
@@ -248,3 +299,402 @@ def Host_Floors() -> tuple[ArmFloorPopulation, dict[str, list[ScoredRun]]]:
         **Arm_Host_Floors(population, tensor_of_run),
     }
     return population, host_floors
+
+
+def Field_Cache_With_Functional_Feature(cache: FieldCache) -> FieldCache:
+    """every cached field's own parameters, the run's functional appended as a seventh branch feature"""
+    augmented = tuple(
+        dataclasses.replace(
+            cached_field,
+            parameters=np.concatenate(
+                [
+                    cached_field.parameters,
+                    [FUNCTIONAL_BRANCH_FEATURE[cached_field.covariate_values["functional"]]],
+                ]
+            ),
+        )
+        for cached_field in cache.fields
+    )
+    return FieldCache(cache.card_name, cache.role, augmented)
+
+
+class ManifoldBlock:
+    """one committed-split role's own runs on the campaign's common grid, both functionals pooled"""
+
+
+    def __init__(self, role: str) -> None:
+        assignments = Strain_Assignments_By_Run()
+        parameters: list[NDArray[np.float64]] = []
+        fields: list[NDArray[np.float64]] = []
+        self.unit_keys: list[str] = []
+        self.families: list[str] = []
+        self.identifiers: list[str] = []
+        self.functionals: list[str] = []
+        for example in Parameter_Field_Examples(Card_Named("strain_to_charge"), role):
+            values = np.asarray(example.target_function.values, dtype=np.float64)
+            if values.shape[1:] != COMMON_GRID_SHAPE:
+                continue
+            functional = example.covariate_values["functional"]
+            branch_vector = np.concatenate(
+                [np.asarray(example.parameters.vector, dtype=np.float64), [FUNCTIONAL_BRANCH_FEATURE[functional]]]
+            )
+            parameters.append(branch_vector)
+            fields.append(values.reshape(-1))
+            self.unit_keys.append(example.unit_key)
+            self.families.append(assignments[example.run_path].family)
+            self.identifiers.append(example.identifier)
+            self.functionals.append(functional)
+        Guard_Fresh_Archives(self.identifiers)
+        self.parameters = np.asarray(parameters)
+        self.fields = np.asarray(fields)
+
+
+    def Scored(self, rebuilt: NDArray[np.float64]) -> list[ScoredRun]:
+        """one scored run per field, carrying the labels the report groups by"""
+        return [
+            ScoredRun(
+                identifier=self.identifiers[run],
+                unit_key=self.unit_keys[run],
+                campaign=STRAIN_ATLAS_CAMPAIGN,
+                family=self.families[run],
+                errors={"relative_l2": Relative_L2(rebuilt[run], self.fields[run])},
+                covariate_values={"functional": self.functionals[run]},
+            )
+            for run in range(self.fields.shape[0])
+        ]
+
+
+def Manifold_Grid_Predictions(
+    member: NonlinearManifoldDecoder,
+    parameter_spreads: NDArray[np.float64],
+    channel_mean: float,
+    channel_deviation: float,
+    block: ManifoldBlock,
+    shape: tuple[int, int, int] = COMMON_GRID_SHAPE,
+) -> NDArray[np.float64]:
+    """the trained member's field on the campaign's common grid, for every given run's own branch vector"""
+    predictions: list[NDArray[np.float64]] = []
+    for run in range(block.parameters.shape[0]):
+        branch_vector = block.parameters[run] / parameter_spreads
+        produced = member(Coefficients(vector=branch_vector, domain=Domain(np.eye(3))), GridSpec(shape))
+        standardized = np.asarray(produced.values, dtype=np.float64).reshape(-1)
+        predictions.append(standardized * channel_deviation + channel_mean)
+    return np.asarray(predictions)
+
+
+def Manifold_Every_Shape_Predictions(
+    member: NonlinearManifoldDecoder,
+    parameter_spreads: NDArray[np.float64],
+    channel_mean: float,
+    channel_deviation: float,
+    test_cache: FieldCache,
+) -> list[ScoredRun]:
+    """the trained member's own field on every test run's own grid shape, whatever shape each one is"""
+    assignments = Strain_Assignments_By_Run()
+    scored: list[ScoredRun] = []
+    for cached_field in test_cache.fields:
+        branch_vector = cached_field.parameters / parameter_spreads
+        grid_shape = cast(tuple[int, int, int], cached_field.grid_shape)
+        produced = member(Coefficients(vector=branch_vector, domain=Domain(np.eye(3))), GridSpec(grid_shape))
+        standardized = np.asarray(produced.values, dtype=np.float64).reshape(-1)
+        predicted = standardized * channel_deviation + channel_mean
+        truth = cached_field.Flattened_Values()[0].astype(np.float64)
+        scored.append(
+            ScoredRun(
+                identifier=cached_field.identifier,
+                unit_key=cached_field.unit_key,
+                campaign=STRAIN_ATLAS_CAMPAIGN,
+                family=assignments[cached_field.run_path].family,
+                errors={"relative_l2": Relative_L2(predicted, truth)},
+                covariate_values={
+                    "functional": cached_field.covariate_values["functional"],
+                    "grid_shape": "x".join(str(extent) for extent in grid_shape),
+                },
+            )
+        )
+    return scored
+
+
+def Transfer_Comparison(every_shape_runs: list[ScoredRun]) -> FloorComparison:
+    """the member's own error off the dominant shape, against its own error on the dominant shape"""
+    on_common = [run for run in every_shape_runs if run.covariate_values["grid_shape"] == COMMON_GRID_SHAPE_LABEL]
+    off_dominant = [
+        run for run in every_shape_runs if run.covariate_values["grid_shape"] != COMMON_GRID_SHAPE_LABEL
+    ]
+    return Compare_To_Floor(off_dominant, on_common, "relative_l2", "own_40_cubed_error", TRANSFER_MARGIN)
+
+
+def Point_Value_Loss(
+    member: NonlinearManifoldDecoder, parameter_spreads: Any, channel_mean: Any, channel_deviation: Any
+) -> ForwardLoss:
+    """mean squared error on globally standardized density values at the sampled points"""
+
+
+    def Loss_Of(lifted: dict[str, Any], lifted_batch: dict[str, Any]) -> Any:
+        """the point-sampled forward answered against this batch's own standardized targets"""
+        branch_input = lifted_batch["parameter_vectors"] / parameter_spreads
+        predicted = member.Forward_Point_Values(lifted, branch_input, lifted_batch["trunk_features"])
+        target = (lifted_batch["target_values"][:, :, 0] - channel_mean) / channel_deviation
+        residuals = predicted - target
+        return (residuals * residuals).mean()
+
+    return Loss_Of
+
+
+def Trained_Manifold_Member() -> tuple[NonlinearManifoldDecoder, NDArray[np.float64], float, float, dict[str, object]]:
+    """the member trained point-sampled on every grid shape at once, both functionals pooled as a branch feature"""
+    card = Card_Named("strain_to_charge")
+    training_cache = Field_Cache_With_Functional_Feature(Build_Field_Cache(card, "train"))
+    validation_cache = Field_Cache_With_Functional_Feature(Build_Field_Cache(card, "validation"))
+    parameter_width = int(training_cache.fields[0].parameters.shape[0])
+    parameter_spreads = Parameter_Spreads(training_cache)
+    channel_mean, channel_deviation = Global_Statistics(training_cache)
+    member = Manifold_Network(
+        parameter_width, BRANCH_HIDDEN_WIDTHS, LATENT_WIDTH, DECODER_HIDDEN_WIDTHS, FOURIER_ORDERS, seed=SEED
+    )
+    sampler = PointSampledBatches(
+        training_cache, validation_cache, RUNS_PER_BATCH, POINTS_PER_RUN, VALIDATION_POINTS_PER_RUN
+    )
+    batches = CoordinateFeaturizedBatches(sampler, member.decoder.coordinate_features)
+    engine = Training_Engine()
+    lifted_parameter_spreads = engine.Lift_Constant(parameter_spreads)
+    lifted_channel_mean = engine.Lift_Constant(np.asarray(channel_mean, dtype=np.float64))
+    lifted_channel_deviation = engine.Lift_Constant(np.asarray(channel_deviation, dtype=np.float64))
+    forward_loss = Point_Value_Loss(member, lifted_parameter_spreads, lifted_channel_mean, lifted_channel_deviation)
+    parameters = ParameterSet(values=member.Parameter_Values())
+    manifest: dict[str, object] = {}
+    stages = zip(STAGE_LEARNING_RATES, STAGE_STEP_COUNTS, strict=True)
+    for stage_index, (learning_rate, step_count) in enumerate(stages):
+        # early stopping is only turned on for the final, lowest-rate stage of the schedule
+        is_final_stage = stage_index == len(STAGE_STEP_COUNTS) - 1
+        result = Train(
+            engine,
+            parameters,
+            forward_loss,
+            batches,
+            step_count=step_count,
+            learning_rate=learning_rate,
+            seed=SEED + stage_index,
+            artifact_directory=TRAINING_ARTIFACT_PATH,
+            run_name=f"manifold_stage{stage_index}",
+            validation_interval=VALIDATION_INTERVAL,
+            patience=FINAL_STAGE_PATIENCE if is_final_stage else 0,
+            resume=(stage_index == 0),
+        )
+        # a fresh stage starts from the previous stage's best parameters, not its last, noisier iterate
+        parameters = result.parameters
+        manifest[f"stage_{stage_index}"] = result.manifest
+    for name, value in parameters.values.items():
+        if name in member.branch.parameter_values:
+            member.branch.parameter_values[name] = value
+        if name in member.decoder.parameter_values:
+            member.decoder.parameter_values[name] = value
+    return member, parameter_spreads, channel_mean, channel_deviation, manifest
+
+
+def Manifold_Member_Arm_Predictions(
+    member: NonlinearManifoldDecoder,
+    parameter_spreads: NDArray[np.float64],
+    channel_mean: float,
+    channel_deviation: float,
+    population: ArmFloorPopulation,
+    tensor_of_run: dict[str, NDArray[np.float64]],
+) -> list[ScoredRun]:
+    """the trained member's own prediction at every interior level, averaged over the functionals it carries"""
+    scored: list[ScoredRun] = []
+    for arm_name, level in population.eval_keys:
+        tensor = Representative_Tensor(population, tensor_of_run, arm_name, level)
+        predictions: list[NDArray[np.float64]] = []
+        for functional_feature in FUNCTIONAL_BRANCH_FEATURE.values():
+            branch_vector = np.concatenate([tensor, [functional_feature]]) / parameter_spreads
+            produced = member(Coefficients(vector=branch_vector, domain=Domain(np.eye(3))), GridSpec(COMMON_GRID_SHAPE))
+            standardized = np.asarray(produced.values, dtype=np.float64).reshape(COMMON_GRID_SHAPE)
+            predictions.append(standardized * channel_deviation + channel_mean)
+        predicted = np.mean(predictions, axis=0)
+        truth = population.field_of[(arm_name, level)]
+        identifier = f"{arm_name}_{level}"
+        scored.append(
+            ScoredRun(
+                identifier=identifier, unit_key=identifier, campaign=STRAIN_ATLAS_CAMPAIGN, family=arm_name,
+                errors={"relative_l2": Relative_L2(predicted, truth)},
+            )
+        )
+    return scored
+
+
+def Write_Figures(
+    member: NonlinearManifoldDecoder,
+    test: ManifoldBlock,
+    member_rebuilt: NDArray[np.float64],
+    floor_medians: dict[str, float],
+    member_median: float,
+) -> int:
+    """the member's whole visual surface, drawn from arrays cached on the pool"""
+    cache = ARRAY_CACHE_PATH / "pooled"
+    cache.mkdir(parents=True, exist_ok=True)
+    inspected = {name: np.asarray(value, dtype=np.float64) for name, value in member.Inspect().items()}
+    # cached so a re-render needs no retrain, which is what keeps committed figures stable
+    np.savez(cache / "inspection.npz", **cast(dict[str, Any], inspected))
+    with np.load(cache / "inspection.npz") as archive:
+        restored = {name: np.asarray(archive[name], dtype=np.float64) for name in archive.files}
+
+    directory = FIGURES_PATH / "pooled"
+    suite = Render_Inspection_Suite(restored, directory / "components", "nonlinear_manifold_decoder pooled")
+    if suite.skipped:
+        raise ValueError(f"no renderer for {suite.skipped}, which means the suite is incomplete")
+
+    scored = [Relative_L2(member_rebuilt[run], test.fields[run]) for run in range(test.fields.shape[0])]
+    by_family: dict[str, list[float]] = {}
+    for run in range(test.fields.shape[0]):
+        by_family.setdefault(test.families[run], []).append(scored[run])
+    Render_Error_Spread(
+        {name: np.asarray(values) for name, values in by_family.items()},
+        directory / "error_by_family.png",
+        "nonlinear_manifold_decoder test error by strain family",
+    )
+    Render_Floor_Comparison(
+        floor_medians,
+        member_median,
+        {name: IMPROVEMENT_MARGIN for name in floor_medians},
+        directory / "floors.png",
+        "nonlinear_manifold_decoder against its host floors",
+    )
+    return len(suite.written) + 2
+
+
+def Report_Lines() -> tuple[list[str], MemberResults]:
+    """the whole report: floors pre-registered, the member trained once, every bar checked against it"""
+    population, host_floors = Host_Floors()
+    tensor_of_run = Strain_Tensor_By_Run_Path()
+
+    member, parameter_spreads, channel_mean, channel_deviation, training_manifest = Trained_Manifold_Member()
+
+    member_arm_runs = Manifold_Member_Arm_Predictions(
+        member, parameter_spreads, channel_mean, channel_deviation, population, tensor_of_run
+    )
+    interpolation_comparison = Compare_To_Floor(
+        member_arm_runs, host_floors["bracketing_interpolation_floor"], "relative_l2",
+        "bracketing_interpolation", IMPROVEMENT_MARGIN,
+    )
+    radial_basis_comparison = Compare_To_Floor(
+        member_arm_runs, host_floors["gaussian_radial_basis_floor"], "relative_l2",
+        "gaussian_radial_basis", IMPROVEMENT_MARGIN,
+    )
+
+    test_block = ManifoldBlock("test")
+    member_rebuilt = Manifold_Grid_Predictions(member, parameter_spreads, channel_mean, channel_deviation, test_block)
+    member_runs = test_block.Scored(member_rebuilt)
+
+    card = Card_Named("strain_to_charge")
+    every_shape_cache = Field_Cache_With_Functional_Feature(Build_Field_Cache(card, "test"))
+    every_shape_runs = Manifold_Every_Shape_Predictions(
+        member, parameter_spreads, channel_mean, channel_deviation, every_shape_cache
+    )
+    transfer_comparison = Transfer_Comparison(every_shape_runs)
+
+    dead_end = interpolation_comparison.verdict == "kill"
+    parameter_count = sum(value.size for value in member.Parameter_Values().values())
+
+    floor_medians = {
+        "bracketing_interpolation": interpolation_comparison.floor_median,
+        "gaussian_radial_basis": radial_basis_comparison.floor_median,
+    }
+    figure_count = Write_Figures(
+        member, test_block, member_rebuilt, floor_medians, interpolation_comparison.member_median
+    )
+
+    host_summaries = Floor_Summaries(host_floors)
+    headline_summary = Summarize(member_runs, "relative_l2", "member_headline_committed_split")
+    arm_member_summary = Summarize(member_arm_runs, "relative_l2", "member_arm_population")
+    every_shape_summary = Summarize(every_shape_runs, "relative_l2", "member_every_shape")
+
+    arm_signature = Block_Signature(f"{arm_name}_{level}" for arm_name, level in population.eval_keys)
+    headline_signature = Block_Signature(test_block.unit_keys)
+    every_shape_signature = Block_Signature(run.unit_key for run in every_shape_runs)
+
+    def Result_Key(block: str, group: str) -> ResultKey:
+        """this report's own member, configuration, task and split, beside the block and group asked for"""
+        return ResultKey(
+            member="nonlinear_manifold_decoder", configuration="canonical", task="strain_to_charge",
+            split="strain_atlas_holdout", block=block, group=group,
+        )
+
+    rows = tuple(
+        ResultRow(
+            key=Result_Key("arm_leave_one_level_out", summary.group_name), summary=summary,
+            block_signature=arm_signature,
+        )
+        for summary in (*host_summaries, arm_member_summary)
+    ) + (
+        ResultRow(
+            key=Result_Key("committed_test_split", headline_summary.group_name), summary=headline_summary,
+            block_signature=headline_signature,
+        ),
+        ResultRow(
+            key=Result_Key("every_shape_test_split", every_shape_summary.group_name), summary=every_shape_summary,
+            block_signature=every_shape_signature,
+        ),
+    )
+    verdicts = (
+        VerdictRow(
+            key=Result_Key("arm_leave_one_level_out", "bracketing_interpolation"), comparison=interpolation_comparison
+        ),
+        VerdictRow(
+            key=Result_Key("arm_leave_one_level_out", "gaussian_radial_basis"), comparison=radial_basis_comparison
+        ),
+        VerdictRow(key=Result_Key("every_shape_test_split", "own_40_cubed_error"), comparison=transfer_comparison),
+    )
+    results = MemberResults(
+        member="nonlinear_manifold_decoder", regenerate="python -m operators.nonlinear_manifold_decoder.report",
+        rows=rows, verdicts=verdicts,
+    )
+
+    verdict_line = (
+        "**dead end**: the interpolation bar killed the entry (the canon's terminal clause for this member)"
+        if dead_end else "**alive**: the interpolation bar passed"
+    )
+    lines = [
+        "# nonlinear_manifold_decoder -- strain or lattice parameters to charge density, decoded point by point",
+        "",
+        f"`{card.name}` on the strain atlas holdout, one seeded run (seed {SEED}), {parameter_count} parameters.",
+        "",
+        "## floors, pre-registered on the arm leave-one-level-out population",
+        "",
+        "```",
+        Render_Table(Summary_Table(tuple(host_summaries))),
+        "```",
+        "",
+        "## the member against its floors and bars",
+        "",
+        "```",
+        Render_Table(
+            Comparison_Table((interpolation_comparison, radial_basis_comparison, transfer_comparison))
+        ),
+        "```",
+        "",
+        f"{verdict_line}. Grid transfer is reported regardless of the interpolation verdict, per the canon's own"
+        " instruction for this entry.",
+        "",
+        "## the member's own headline, committed strain_atlas_holdout split",
+        "",
+        "```",
+        Render_Table(Summary_Table((headline_summary, arm_member_summary, every_shape_summary))),
+        "```",
+        "",
+        f"Training manifest: {list(training_manifest)}.",
+        "",
+        f"Figures: {figure_count} files written under `figures/pooled/`, arrays cached at `{ARRAY_CACHE_PATH}`.",
+        "",
+    ]
+    return lines, results
+
+
+def Main() -> None:
+    """regenerate report.md, results.json and the figure suite from a fresh training run"""
+    lines, results = Report_Lines()
+    REPORT_PATH.write_text("\n".join(lines) + "\n")
+    Write_Member_Results(RESULTS_PATH, results)
+
+
+if __name__ == "__main__":
+    Main()

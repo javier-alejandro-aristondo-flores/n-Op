@@ -4,14 +4,20 @@ import numpy as np
 import pytest
 
 from operators.evaluation import (
+    Card_Metric_Errors,
     Compare_To_Floor,
     Comparison_Table,
+    CubicBlock,
     EXTRAPOLATION,
     Label_Of,
+    Potential_Floor_Rows,
+    Potential_Metric_Errors,
+    Recorded_Bars,
     ScoredRun,
     Summarize,
     Summarize_By,
     Summary_Table,
+    Truncation_Ceiling_Rows,
     Unit_Medians,
 )
 from operators.inspection import Render_Table
@@ -106,3 +112,26 @@ def Test_The_Tables_Render_Without_Losing_A_Column() -> None:
         rendered = Render_Table(rows)
         assert expected in rendered
         assert len(rendered.splitlines()) >= 2
+
+
+@pytest.mark.pool
+def Test_The_Promoted_Localization_Block_Names_Answer_From_The_Root_And_Partition_The_Folds() -> None:
+    """the flagship's kill block and its floors now live here, reachable from the package root, folds intact"""
+    assert isinstance(CubicBlock, type)
+    for promoted_scorer in (Card_Metric_Errors, Potential_Metric_Errors, Recorded_Bars, Truncation_Ceiling_Rows):
+        assert callable(promoted_scorer)
+    assert callable(Potential_Floor_Rows)
+
+    block = CubicBlock()
+    evaluation_identifiers = set(block.evaluation)
+    validation_identifiers = set(block.validation)
+    member_train_identifiers = set(block.member_train)
+    # the kill block, the member's own early-stopping fold and its three training folds never share a run
+    assert evaluation_identifiers.isdisjoint(validation_identifiers)
+    assert evaluation_identifiers.isdisjoint(member_train_identifiers)
+    assert validation_identifiers.isdisjoint(member_train_identifiers)
+    every_identifier = {identifier for fold_identifiers in block.by_fold.values() for identifier in fold_identifiers}
+    assert evaluation_identifiers | validation_identifiers | member_train_identifiers == every_identifier
+    # fold zero is the kill block by definition, not by coincidence of construction order
+    assert evaluation_identifiers == set(block.by_fold[0])
+    assert evaluation_identifiers

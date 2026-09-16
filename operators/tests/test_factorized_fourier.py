@@ -47,14 +47,13 @@ from operators.factorized_fourier.report import (
     Nearest_Run_Rows,
     Probe_Curve_At,
     Probe_Passes,
-    Staged_Training,
     Shell_Filter_Rows,
     Write_Back_Parameters,
 )
 from operators.framework import Domain, GridFunction, GridSpec, UniformGridQuadrature
 from operators.inspection import Render_Inspection_Suite
 from operators.substrate import Concatenate_Channels, NumpyEngine, ParameterSet, TorchEngine, Zeros_Beside
-from operators.training import BatchSource, Read_Checkpoint, Train, TrainingBatch
+from operators.training import BatchSource, Read_Checkpoint, Staged_Training, Train, TrainingBatch
 from operators.training.loop import Fresh_Progress, TrainingProgress
 
 CUBE = Domain(lattice=np.eye(3) * 3.57)
@@ -1073,7 +1072,7 @@ def Test_A_Staged_Run_Resumes_Every_Stage_From_Its_Own_Checkpoint(tmp_path: Path
         parameters = ParameterSet(values={name: value.copy() for name, value in member.Parameter_Values().items()})
         trained, _ = Staged_Training(
             engine, parameters, lambda: ParameterSet(values=member.Parameter_Values()), Batch_Loss(member),
-            batches, step_count=6, run_name="toy", artifact_directory=tmp_path,
+            batches, step_count=6, run_name="toy", seed=5, artifact_directory=tmp_path,
         )
         return trained.values
 

@@ -64,8 +64,8 @@ def Species_Shell_Features(
         normalizer = (2.0 * np.pi * width * width) ** 1.5
         per_atom_density = np.zeros((fractional_points.shape[0], kept_positions.shape[0]), dtype=np.float64)
         for image in images:
-            displacement = (gaps + image) @ lattice
-            squared_lengths = np.sum(displacement * displacement, axis=-1)
+            displacement: NDArray[np.float64] = (gaps + image) @ lattice
+            squared_lengths: NDArray[np.float64] = np.sum(displacement * displacement, axis=-1)
             per_atom_density += np.exp(-0.5 * squared_lengths / (width * width)) / normalizer
         for element_position in range(len(element_vocabulary)):
             atoms_of_element = kept_columns == element_position
@@ -223,6 +223,23 @@ def Nearest_Copy_Errors(
     return errors
 
 
+def Magnetic_Identifiers(
+    structures: tuple[Structure, ...], pool_root: Path = POOL_ROOT, epsilon: float = 1e-3
+) -> frozenset[str]:
+    """identifiers whose stored final magnetization is definitively nonzero, gate c's own scoring subset"""
+    identifiers: set[str] = set()
+    for structure in structures:
+        archive_path = Archive_Path(structure.campaign, structure.identifier, pool_root)
+        if not archive_path.exists():
+            continue
+        with np.load(archive_path) as archive:
+            if "final_magnetization" not in archive:
+                continue
+            if abs(float(archive["final_magnetization"])) > epsilon:
+                identifiers.add(structure.identifier)
+    return frozenset(identifiers)
+
+
 def Total_Moment(magnetization_grid: NDArray[np.float64], cell_volume: float) -> float:
     """the signed integral of a magnetization field over the cell"""
     return float(np.mean(magnetization_grid)) * cell_volume
@@ -234,7 +251,7 @@ def Moment_Gate_Row(
     """gate c: the fraction of runs whose predicted total moment sits within tolerance and carries the true sign"""
     relative_error = np.abs(predicted_totals - true_totals) / np.abs(true_totals)
     correct_sign = np.sign(predicted_totals) == np.sign(true_totals)
-    passed = (relative_error <= tolerance) & correct_sign
+    passed: NDArray[np.bool_] = (relative_error <= tolerance) & correct_sign
     return {
         "pass_fraction": float(np.mean(passed)),
         "run_count": float(true_totals.shape[0]),

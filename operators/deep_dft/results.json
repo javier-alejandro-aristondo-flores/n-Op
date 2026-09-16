@@ -1,0 +1,91 @@
+{
+ "member": "deep_dft",
+ "regenerate": "python3 -m operators.deep_dft.report",
+ "rows": [
+  {
+   "block_signature": "243ee5a82a76",
+   "key": {
+    "block": "fold_0",
+    "configuration": "minimal",
+    "group": "superposed_atomic_density_floor_all_42",
+    "member": "deep_dft",
+    "split": "paired_fields_fivefold",
+    "task": "structure_to_density_and_magnetization"
+   },
+   "summary": {
+    "confidence_high": 0.173254,
+    "confidence_low": 0.152565,
+    "group_name": "superposed_atomic_density_floor_all_42",
+    "interquartile": 0.012129,
+    "median": 0.154149,
+    "metric_name": "normalized_mean_absolute_error",
+    "run_count": 42,
+    "unit_count": 21
+   }
+  },
+  {
+   "block_signature": "72586cc7652e",
+   "key": {
+    "block": "fold_0",
+    "configuration": "minimal",
+    "group": "superposed_atomic_density_floor_held_out_18",
+    "member": "deep_dft",
+    "split": "paired_fields_fivefold",
+    "task": "structure_to_density_and_magnetization"
+   },
+   "summary": {
+    "confidence_high": 0.200479,
+    "confidence_low": 0.156676,
+    "group_name": "superposed_atomic_density_floor_held_out_18",
+    "interquartile": 0.015705,
+    "median": 0.161438,
+    "metric_name": "normalized_mean_absolute_error",
+    "run_count": 18,
+    "unit_count": 9
+   }
+  },
+  {
+   "block_signature": "243ee5a82a76",
+   "key": {
+    "block": "fold_0",
+    "configuration": "minimal",
+    "group": "reduced_salted_floor_all_42",
+    "member": "deep_dft",
+    "split": "paired_fields_fivefold",
+    "task": "structure_to_density_and_magnetization"
+   },
+   "summary": {
+    "confidence_high": 7.337816,
+    "confidence_low": 2.832035,
+    "group_name": "reduced_salted_floor_all_42",
+    "interquartile": 11.583332,
+    "median": 0.111713,
+    "metric_name": "normalized_mean_absolute_error",
+    "run_count": 42,
+    "unit_count": 21
+   }
+  },
+  {
+   "block_signature": "243ee5a82a76",
+   "key": {
+    "block": "fold_0",
+    "configuration": "minimal",
+    "group": "nearest_structure_copy_context_all_42",
+    "member": "deep_dft",
+    "split": "paired_fields_fivefold",
+    "task": "structure_to_density_and_magnetization"
+   },
+   "summary": {
+    "confidence_high": 0.093563,
+    "confidence_low": 0.054986,
+    "group_name": "nearest_structure_copy_context_all_42",
+    "interquartile": 0.029246,
+    "median": 0.067496,
+    "metric_name": "normalized_mean_absolute_error",
+    "run_count": 42,
+    "unit_count": 21
+   }
+  }
+ ],
+ "verdicts": []
+}

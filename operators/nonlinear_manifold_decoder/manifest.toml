@@ -4,15 +4,16 @@ citation = "Seidman, Kissas, Perdikaris, Pappas — NeurIPS 2022 (arXiv:2206.035
 mapping = "strain or lattice parameters → charge density field, decoded point by point"
 suite_card = "test-suite.md §3, II.3 — IN-LOCAL"
 role = "breaks the linear-reconstruction ceiling of basis readouts; restricted to parametric tasks"
+assembled = "the one configuration report.md measures: a sensor-encoder branch read by a nonlinear decoder"
 
 [parts]
 encoder = "encoders.SensorEncoder"
-kernel = "kernels.low_rank.DenseKernel"
-composition = "compositions.ExplicitStack"
+kernel = "none: zero integral layers is the honest description, so no kernel is assembled at all"
+composition = "compositions.WithoutIntegralLayers"
 readout = "readouts.NonlinearDecoder"
 wrappers = "per task card"
 
 [depends_on]
 framework = true
-kernels = ["low_rank"]
-packages = ["deep_operator_network"]
+kernels = []
+shared_note = "readouts.NonlinearDecoder and compositions.WithoutIntegralLayers are the branch-trunk family's own parts, reused rather than forked"

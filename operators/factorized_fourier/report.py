@@ -15,7 +15,6 @@ from operators.compositions import (
     FixedPoint,
     Hinge_Excess,
     JacobianPenalty,
-    Nominal_Lipschitz,
     WeightTied,
 )
 from operators.data import (
@@ -1390,7 +1389,7 @@ RUNG_LABELS: dict[Stabilization, str] = {
 EXPLICIT_MATCHED_RUN_NAME = "elf_fold0_explicit_matched_35505"
 
 # updated by hand once each rung's six-hour run is launched and its step count known, the same convention
-# ELF_EXPLICIT_RUN_NAME already follows; a name with no checkpoint yet is exactly how "not yet run" is read
+# the explicit run's own name already follows; a name with no checkpoint yet is exactly how "not yet run" is read
 FIXED_POINT_RUN_NAME_BY_RUNG: dict[Stabilization, str] = {
     "spectral_clipping": "elf_fold0_fixed_point_spectral_clipping_pending",
     "jacobian_penalty": "elf_fold0_fixed_point_jacobian_penalty_pending",

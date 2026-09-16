@@ -1,8 +1,9 @@
 """the two-branch member measured against its pre-registered floors, before a step of training runs"""
 
+import json
 import time
 from pathlib import Path
-from typing import Any
+from typing import Any, cast
 
 from operators.data import POOL_ROOT, STORE_NAME
 from operators.evaluation import (
@@ -29,8 +30,16 @@ from operators.multiple_input_operator_network.cache import (
     MEMBER_TRAIN_FOLDS,
     VALIDATION_FOLDS,
 )
-from operators.substrate import ParameterSet
-from operators.training import CoordinateFeaturizedBatches, ForwardLoss, PointSampledBatches, Train, Training_Engine
+from operators.substrate import ParameterSet, Peak_Accelerator_Bytes, Reset_Peak_Accelerator_Bytes
+from operators.training import (
+    CoordinateFeaturizedBatches,
+    DEFAULT_PEAK_LEARNING_RATE,
+    ForwardLoss,
+    PointSampledBatches,
+    Staged_Training,
+    Train,
+    Training_Engine,
+)
 
 REPORT_PATH = Path(__file__).resolve().parent / "report.md"
 
@@ -46,7 +55,7 @@ DECISIVE_TWIN_MARGIN = 0.05
 
 PATTERN_RULE_MARGIN = 0.20
 
-# the training driver below, the flagship's own staged protocol (factorized_fourier/report.py Train_Flagship_Member)
+# the training driver below, operators.training.Staged_Training, the shared protocol every member runs
 
 TRAINING_ARTIFACT_PATH = POOL_ROOT / STORE_NAME / "_training" / MEMBER_NAME
 
@@ -56,13 +65,7 @@ RUNS_PER_BATCH = 8
 
 POINTS_PER_RUN = 4096
 
-STAGE_FRACTIONS = (0.3, 0.3, 0.4)
-
-STAGE_LEARNING_RATES = (1e-3, 3.3e-4, 1.1e-4)
-
-VALIDATION_INTERVAL = 100
-
-FINAL_STAGE_PATIENCE = 15
+COST_PROBE_STEP_COUNT = 100
 
 
 def Block_Lines(block: CubicBlock) -> list[str]:
@@ -195,13 +198,6 @@ def Result_Rows(block: CubicBlock, floor_summaries: tuple[MetricSummary, ...]) -
     )
 
 
-def Staged_Step_Counts(step_count: int) -> tuple[int, int, int]:
-    """the flagship's own three-stage split of a total step budget, by the pre-registered fractions"""
-    first_stage = round(STAGE_FRACTIONS[0] * step_count)
-    second_stage = round(STAGE_FRACTIONS[1] * step_count)
-    return first_stage, second_stage, step_count - first_stage - second_stage
-
-
 def Point_Value_Loss(member: MultipleInputOperatorNetwork) -> ForwardLoss:
     """mean squared error against the sampled localization targets, no standardization needed since the bounded head already answers their own zero-to-one range"""
 
@@ -236,7 +232,7 @@ def Batches_For(
 
 
 def Train_Configuration(step_count: int, run_name: str, twin: bool) -> dict[str, object]:
-    """the staged run for either configuration, one code path so the twin cannot drift from the member: stages 0.3/0.3/0.4 of the given step count at 1e-3, 3.3e-4, 1.1e-4, validated every hundred steps on the validation fold, patience fifteen in the final stage, seed 20260916, single precision -- the card holder's own driver, not invoked by this module; the card is scheduled by the integrator and this function trains nothing until it is called"""
+    """the staged run for either configuration through operators.training.Staged_Training, one code path so the twin cannot drift from the member, every stage resuming its own checkpoint -- the card holder's own driver, not invoked by this module; the card is scheduled by the integrator and this function trains nothing until it is called"""
     density_basis, potential_basis, reference_density, _ = Fitted_Bases()
     member = (
         Density_Alone_Twin(density_basis, reference_density, seed=0)
@@ -247,30 +243,63 @@ def Train_Configuration(step_count: int, run_name: str, twin: bool) -> dict[str,
     forward_loss = Point_Value_Loss(member)
     parameters = ParameterSet(values=member.Parameter_Values())
     engine = Training_Engine()
-    stage_step_counts = Staged_Step_Counts(step_count)
+    parameters, staged = Staged_Training(
+        engine,
+        parameters,
+        lambda: ParameterSet(values=member.Parameter_Values()),
+        forward_loss,
+        batches,
+        step_count,
+        run_name,
+        MEMBER_SEED,
+        TRAINING_ARTIFACT_PATH,
+    )
     manifest: dict[str, object] = {"run_name": run_name, "twin": twin, "training_run_count": training_run_count}
-    for stage_index, (rate, stage_steps) in enumerate(zip(STAGE_LEARNING_RATES, stage_step_counts, strict=True)):
-        is_final_stage = stage_index == len(stage_step_counts) - 1
-        result = Train(
-            engine,
-            parameters,
-            forward_loss,
-            batches,
-            step_count=stage_steps,
-            learning_rate=rate,
-            seed=MEMBER_SEED + stage_index,
-            artifact_directory=TRAINING_ARTIFACT_PATH,
-            run_name=f"{run_name}_stage{stage_index}",
-            validation_interval=VALIDATION_INTERVAL,
-            patience=FINAL_STAGE_PATIENCE if is_final_stage else 0,
-            resume=(stage_index == 0),
-        )
-        # a fresh stage starts from the previous stage's best parameters, not its last, noisier iterate
-        parameters = result.parameters
-        manifest[f"stage_{stage_index}"] = result.manifest
+    manifest.update(staged)
     manifest["final_parameters"] = parameters
     manifest["member"] = member
     return manifest
+
+
+def Cost_Probe(twin: bool) -> dict[str, object]:
+    """a hundred steps on the real batch source for either configuration, seconds per step and peak accelerator bytes through operators.substrate's own dispatched facet, written to a small json beside the checkpoints"""
+    density_basis, potential_basis, reference_density, _ = Fitted_Bases()
+    member = (
+        Density_Alone_Twin(density_basis, reference_density, seed=0)
+        if twin
+        else Two_Branch_Member(density_basis, potential_basis, reference_density, seed=0)
+    )
+    batches, training_run_count = Batches_For(member, density_basis, potential_basis, reference_density)
+    forward_loss = Point_Value_Loss(member)
+    parameters = ParameterSet(values=member.Parameter_Values())
+    Reset_Peak_Accelerator_Bytes()
+    result = Train(
+        Training_Engine(),
+        parameters,
+        forward_loss,
+        batches,
+        step_count=COST_PROBE_STEP_COUNT,
+        learning_rate=DEFAULT_PEAK_LEARNING_RATE,
+        seed=MEMBER_SEED,
+        validation_interval=COST_PROBE_STEP_COUNT,
+        patience=0,
+    )
+    peak_accelerator_bytes = Peak_Accelerator_Bytes()
+    wall_clock_seconds = float(cast(float, result.manifest["wall_clock_seconds"]))
+    seconds_per_step = wall_clock_seconds / COST_PROBE_STEP_COUNT
+    probe: dict[str, object] = {
+        "twin": twin,
+        "step_count": COST_PROBE_STEP_COUNT,
+        "training_run_count": training_run_count,
+        "wall_clock_seconds": wall_clock_seconds,
+        "seconds_per_step": seconds_per_step,
+        "peak_accelerator_bytes": peak_accelerator_bytes,
+        "one_hour_step_budget": int(3600.0 / seconds_per_step),
+    }
+    TRAINING_ARTIFACT_PATH.mkdir(parents=True, exist_ok=True)
+    probe_path = TRAINING_ARTIFACT_PATH / f"cost_probe_{'twin' if twin else 'member'}.json"
+    probe_path.write_text(json.dumps(probe, indent=1, sort_keys=True) + "\n")
+    return probe
 
 
 def Main() -> int:

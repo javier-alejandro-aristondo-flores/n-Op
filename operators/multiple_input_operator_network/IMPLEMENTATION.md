@@ -187,11 +187,16 @@ member nor its twin has trained. Regenerating is a clean, byte-identical rerun
 (`python -m operators.multiple_input_operator_network.report`).
 
 **The staged training driver is written and gated, not run.** `Train_Configuration(step_count,
-run_name, twin)` builds either configuration from one code path and trains it under the flagship's
-own three-stage schedule (0.3/0.3/0.4 of the given step count at 1e-3, 3.3e-4, 1.1e-4), point-sampled
-batches through `PointSampledBatches` and `CoordinateFeaturizedBatches`, validation every hundred
-steps on the validation fold, patience fifteen in the final stage, seed 20260916, checkpoints under
-`_training/multiple_input_operator_network/`. Its own `step_count` is left to the card holder, who
-sizes it from a short step-cost probe once the card is free, per house policy (a probe is itself
-training). **Not yet run**: the twin's and the member's own training, and therefore the decisive gate
-and every bar that needs a trained model — scheduled on the card.
+run_name, twin)` builds either configuration from one code path and trains it through
+`operators.training.Staged_Training`, the shared probe-then-three-stage schedule every member now
+runs (0.3/0.3/0.4 of the given step count at 1e-3, 3.3e-4, 1.1e-4, validation every hundred steps on
+the validation fold, patience fifteen in the final stage, seed 20260916), point-sampled batches
+through `PointSampledBatches` and `CoordinateFeaturizedBatches`, checkpoints under
+`_training/multiple_input_operator_network/`, every stage resuming its own checkpoint so a power
+loss costs the running stage its steps since its last validation pass rather than the whole run.
+`Cost_Probe(twin)` (`report.py`, this package) runs a hundred steps on the real batch source and
+writes seconds per step and peak accelerator bytes — measured through `operators.substrate`'s own
+`Reset_Peak_Accelerator_Bytes`/`Peak_Accelerator_Bytes` facet, never by naming the foreign engine —
+to a small json beside the checkpoints, the figure the card holder sizes each one-hour run's
+`step_count` from. **Not yet run**: the twin's and the member's own training, and therefore the
+decisive gate and every bar that needs a trained model — scheduled on the card.

@@ -1,4 +1,4 @@
-"""the convolutional member: its fused activation, its assembly, and the seam its own activation waits on"""
+"""the convolutional member: its fused activation, its assembly, and the pointwise twin the identity check needs"""
 
 from collections.abc import Callable
 from typing import Any
@@ -14,7 +14,7 @@ from operators.alias_free_convolutional import (
     StencilActivation,
 )
 from operators.alias_free_convolutional.activation import Alias_Free_Activation
-from operators.compositions import Downsampled_By_Two, Halved_Shape, MultiScale, Upsampled_By_Two
+from operators.compositions import Downsampled_By_Two, Halved_Shape, Upsampled_By_Two
 from operators.encoders import PointwiseLift
 from operators.framework import (
     Apply_Grid_Operation,
@@ -23,11 +23,9 @@ from operators.framework import (
     GridFunction,
     GridSpec,
     Inspectable,
-    Layer,
     Operator,
     UniformGridQuadrature,
 )
-from operators.kernels import TabulatedStencilKernel
 from operators.substrate import (
     ACCELERATOR_DEVICE_NAME,
     Accelerator_Is_Available,
@@ -70,28 +68,6 @@ def Toy_Field(shape: tuple[int, int, int], seed: int) -> GridFunction:
     quadrature = UniformGridQuadrature(cell_volume=8.0, point_count=int(np.prod(shape)))
     values = np.stack([density, magnetization])
     return GridFunction(values, ("charge_density", "magnetization"), CUBE, quadrature)
-
-
-def Composition_Seam_Is_Wired() -> bool:
-    """whether operators.compositions now runs the alias-free activation instead of raising the placeholder"""
-    kernel = TabulatedStencilKernel((0, 0, 0), 1, 1, seed=0)
-    local_linear = PointwiseLift(1, 1, seed=1)
-    layer = Layer(kernel=kernel, local_linear=local_linear, activation="alias_free")
-    composition = MultiScale((layer,), layer, (), output_scale=1)
-    probe = GridFunction(np.ones((1, 2, 2, 2)), ("channel_0",), CUBE, UniformGridQuadrature(1.0, 8))
-    try:
-        composition.Apply(probe)
-    except NotImplementedError:
-        return False
-    return True
-
-
-SEAM_WIRED = Composition_Seam_Is_Wired()
-
-BLOCKED_ON_SEAM = pytest.mark.skipif(
-    not SEAM_WIRED,
-    reason="operators.compositions still raises on activation='alias_free' until the seam patch lands",
-)
 
 
 def Band_Limited_Field(
@@ -255,22 +231,36 @@ def Test_The_Assembly_Runs_From_Sixteen_Cubed_To_Eight_Cubed_With_Gradients_On_E
         assert float(np.abs(gradient).max()) > 1e-8, name
 
 
-@BLOCKED_ON_SEAM
 def Test_The_Alias_Free_Assembly_Runs_From_Sixteen_Cubed_To_Eight_Cubed_With_Gradients_On_Every_Parameter() -> None:
-    """the member's own configured activation, once the composition seam runs it instead of raising"""
+    """the member's own configured activation, through the composition's own activation table"""
     member = Toy_Member(hidden_channel_widths=(2, 3, 4), activation="alias_free", seed=3)
     field = Toy_Field((16, 16, 16), seed=253)
     output = member(field, GridSpec((8, 8, 8)))
-    parameters = ParameterSet(values={name: value.copy() for name, value in member.Parameter_Values().items()})
-
-    def Loss(lifted: dict[str, Any]) -> Any:
-        log_density_values, gram_vector = member.Input_Channels(field)
-        produced = member.Forward_Field(lifted, log_density_values, gram_vector, (16, 16, 16))
-        return (produced * produced).sum()
-
-    gradients = TorchEngine().Gradients(parameters, Loss)
     assert output.values.shape == (2, 8, 8, 8)
+    log_density_values, gram_vector = member.Input_Channels(field)
+    target = np.random.default_rng(255).uniform(0.1, 0.9, size=(2, 8, 8, 8))
+
+    def Loss_Of(density_input: Any, gram_input: Any, target_input: Any) -> Callable[[dict[str, Any]], Any]:
+        def Loss(lifted: dict[str, Any]) -> Any:
+            produced = member.Forward_Field(lifted, density_input, gram_input, (16, 16, 16))
+            difference = produced - target_input
+            return (difference * difference).sum()
+
+        return Loss
+
+    parameters = ParameterSet(values={name: value.copy() for name, value in member.Parameter_Values().items()})
+    engine = TorchEngine()
+    lifted_loss = Loss_Of(
+        engine.Lift_Constant(log_density_values), engine.Lift_Constant(gram_vector), engine.Lift_Constant(target)
+    )
+    reference_loss = Loss_Of(log_density_values, gram_vector, target)
+    value, gradients = engine.Value_And_Gradients(parameters, lifted_loss)
+    reference = NumpyEngine()
+    assert abs(value - reference.Evaluate(parameters, reference_loss)) < 1e-8
+    reference_gradients = reference.Gradients(parameters, reference_loss)
+    assert set(gradients) == set(parameters.values)
     for name, gradient in gradients.items():
+        assert np.allclose(gradient, reference_gradients[name], rtol=1e-4, atol=1e-5), name
         assert float(np.abs(gradient).max()) > 1e-8, name
 
 
@@ -286,7 +276,6 @@ def Test_The_Three_Scale_Composition_Runs_On_Evenly_And_Oddly_Bottomed_Axis_Shap
     assert output.values.shape == (2, *expected_shape)
 
 
-@BLOCKED_ON_SEAM
 @pytest.mark.parametrize("shape", [(16, 16, 16), (16, 12, 16), (16, 20, 16)])
 def Test_The_Alias_Free_Composition_Runs_On_Evenly_And_Oddly_Bottomed_Axis_Shapes(shape: tuple[int, int, int]) -> None:
     """the member's own configured activation on the same axis-stretched shapes the grid-shift probe exercises"""

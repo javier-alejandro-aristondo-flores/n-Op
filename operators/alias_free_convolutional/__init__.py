@@ -166,7 +166,13 @@ def Alias_Free_Convolutional_Network(
     ascending_layers = (
         Stencil_Layer(lift_width, bottom_width + middle_width, activation, residual=False, seed=seed + 7),
     )
-    composition = MultiScale(descending_layers, bottom_layer, ascending_layers, output_scale=1)
+    composition = MultiScale(
+        descending_layers,
+        bottom_layer,
+        ascending_layers,
+        output_scale=1,
+        activations={"alias_free": Alias_Free_Activation},
+    )
     projection = PointwiseProjection(
         len(LOCALIZATION_CHANNEL_LABELS), lift_width, bounded=True, seed=seed + 9
     )

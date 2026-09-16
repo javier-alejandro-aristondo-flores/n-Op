@@ -1,10 +1,12 @@
 """the training loop on the engine facet, scored over exchangeable units and resumable from its own archive"""
 
 import json
+import time
+from abc import abstractmethod
 from collections.abc import Callable
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from pathlib import Path
-from typing import Any, cast
+from typing import Any, Protocol, cast
 
 import numpy as np
 from numpy.typing import NDArray
@@ -32,13 +34,14 @@ CHECKPOINT_SUFFIX = "_checkpoint.npz"
 
 @dataclass(frozen=True, slots=True)
 class TrainingResult:
-    """the best parameters the run reached, the two curves it drew and the manifest that replays it"""
+    """the best parameters the run reached, the curves it drew and the manifest that replays it"""
 
     parameters: ParameterSet
     loss_curve: NDArray[np.float64]
     validation_curve: NDArray[np.float64]
     validation_steps: NDArray[np.float64]
     manifest: dict[str, object]
+    auxiliary_curves: dict[str, NDArray[np.float64]] = field(default_factory=dict[str, NDArray[np.float64]])
 
 
     def Inspect(self) -> dict[str, Array]:
@@ -50,6 +53,8 @@ class TrainingResult:
         }
         for name, value in self.parameters.values.items():
             reported[f"parameter_{name}"] = value
+        for name, curve in self.auxiliary_curves.items():
+            reported[f"{name}_curve"] = curve
         return reported
 
 
@@ -68,6 +73,19 @@ class TrainingProgress:
     validation_scores: list[float]
     validation_steps: list[int]
     generator_state: str
+    auxiliary_curves: dict[str, list[float]] = field(default_factory=dict[str, list[float]])
+
+
+class TrainingHook(Protocol):
+    """a per-step parameter projection and a per-validation named report, both folded into the run it hooks"""
+
+
+    @abstractmethod
+    def After_Step(self, progress: TrainingProgress) -> None: ...
+
+
+    @abstractmethod
+    def After_Validation(self, progress: TrainingProgress) -> dict[str, float]: ...
 
 
 def Copied_Parameters(parameters: ParameterSet) -> ParameterSet:
@@ -89,6 +107,7 @@ def Fresh_Progress(parameters: ParameterSet, generator: np.random.Generator) -> 
         validation_scores=[],
         validation_steps=[],
         generator_state=json.dumps(generator.bit_generator.state),
+        auxiliary_curves={},
     )
 
 
@@ -148,6 +167,14 @@ def Record_Validation_Pass(
     return score
 
 
+def After_Validation_Curves(hook: TrainingHook | None, progress: TrainingProgress) -> None:
+    """the hook's own named scalars for this pass, folded onto the curves they belong to"""
+    if hook is None:
+        return
+    for name, value in hook.After_Validation(progress).items():
+        progress.auxiliary_curves.setdefault(name, []).append(value)
+
+
 def Write_Checkpoint(path: Path, progress: TrainingProgress) -> None:
     """the whole run to one archive, renamed into place so a death mid-write leaves the pass before it"""
     stored: dict[str, Any] = {
@@ -167,6 +194,8 @@ def Write_Checkpoint(path: Path, progress: TrainingProgress) -> None:
         stored[f"best_parameter_{name}"] = progress.best_parameters.values[name]
         stored[f"first_moment_{name}"] = progress.adam_state.first_moments[name]
         stored[f"second_moment_{name}"] = progress.adam_state.second_moments[name]
+    for name, curve in progress.auxiliary_curves.items():
+        stored[f"auxiliary_{name}"] = np.asarray(curve, dtype=np.float64)
     beside = path.parent / f"{path.name}.partial.npz"
     np.savez(beside, **stored)
     beside.replace(path)
@@ -184,6 +213,12 @@ def Read_Checkpoint(path: Path, parameters: ParameterSet) -> TrainingProgress:
             if name not in ("parameter_names", "generator_state")
         }
         generator_state = str(archive["generator_state"])
+    # optional: a checkpoint written before a hook carried one names no auxiliary_ keys at all
+    auxiliary_curves = {
+        name.removeprefix("auxiliary_"): [float(recorded) for recorded in held[name]]
+        for name in held
+        if name.startswith("auxiliary_")
+    }
     return TrainingProgress(
         parameters=ParameterSet(values={name: held[f"live_parameter_{name}"] for name in stored_names}),
         adam_state=AdamState(
@@ -200,6 +235,7 @@ def Read_Checkpoint(path: Path, parameters: ParameterSet) -> TrainingProgress:
         validation_scores=[float(recorded) for recorded in held["validation_curve"]],
         validation_steps=[int(recorded) for recorded in held["validation_steps"]],
         generator_state=generator_state,
+        auxiliary_curves=auxiliary_curves,
     )
 
 
@@ -218,6 +254,7 @@ def Train(
     device: DeviceChoice = "automatic",
     precision: Precision = "single",
     resume: bool = False,
+    hook: TrainingHook | None = None,
 ) -> TrainingResult:
     """the Adam loop over drawn batches, keeping the parameters that scored best over the held-out units"""
     if validation_interval < 1:
@@ -240,6 +277,7 @@ def Train(
     generator.bit_generator.state = json.loads(progress.generator_state)
 
     stopped_early = False
+    loop_started_at = time.perf_counter()
     while progress.completed_steps < step_count:
         lifted_batch = Lifted_Batch(chosen_engine, batch_source.Next_Batch(generator))
         # the fused call spends one forward where a value and a gradient asked for apart spend two
@@ -249,6 +287,8 @@ def Train(
         progress.parameters = Adam_Step(
             progress.parameters, gradients, progress.adam_state, learning_rate=learning_rate
         )
+        if hook is not None:
+            hook.After_Step(progress)
         # the loss on the curve is the one the gradient was taken at, which is the one the fused call hands back
         progress.losses.append(loss_value)
         progress.completed_steps += 1
@@ -256,6 +296,7 @@ def Train(
             continue
         progress.generator_state = json.dumps(generator.bit_generator.state)
         Record_Validation_Pass(chosen_engine, forward_loss, held_units, progress)
+        After_Validation_Curves(hook, progress)
         if checkpoint_path is not None:
             Write_Checkpoint(checkpoint_path, progress)
         if patience > 0 and progress.passes_without_gain >= patience:
@@ -263,6 +304,8 @@ def Train(
             break
     if not progress.validation_scores:
         Record_Validation_Pass(chosen_engine, forward_loss, held_units, progress)
+        After_Validation_Curves(hook, progress)
+    wall_clock_seconds = time.perf_counter() - loop_started_at
 
     loss_curve = np.asarray(progress.losses, dtype=np.float64)
     validation_curve = np.asarray(progress.validation_scores, dtype=np.float64)
@@ -285,14 +328,22 @@ def Train(
         "best_step": progress.best_step,
         "final_loss": float(loss_curve[-1]) if loss_curve.size else None,
         "parameter_names": sorted(progress.best_parameters.values),
+        "wall_clock_seconds": wall_clock_seconds,
+        "hook_present": hook is not None,
+    }
+    auxiliary_curves = {
+        name: np.asarray(curve, dtype=np.float64) for name, curve in progress.auxiliary_curves.items()
     }
     if artifact_directory is not None:
-        np.savez(
-            artifact_directory / f"{run_name}_curves.npz",
-            loss_curve=loss_curve,
-            validation_curve=validation_curve,
-            validation_steps=validation_steps,
-        )
+        # a plain dict, typed loosely, so an arbitrary hook-chosen name never collides with a keyword savez owns
+        curve_arrays: dict[str, Any] = {
+            "loss_curve": loss_curve,
+            "validation_curve": validation_curve,
+            "validation_steps": validation_steps,
+        }
+        for name, curve in auxiliary_curves.items():
+            curve_arrays[f"{name}_curve"] = curve
+        np.savez(artifact_directory / f"{run_name}_curves.npz", **curve_arrays)
         (artifact_directory / f"{run_name}_manifest.json").write_text(json.dumps(manifest, indent=1))
         Render_Curves(
             np.arange(loss_curve.shape[0], dtype=np.float64),
@@ -316,4 +367,5 @@ def Train(
         validation_curve=validation_curve,
         validation_steps=validation_steps,
         manifest=manifest,
+        auxiliary_curves=auxiliary_curves,
     )

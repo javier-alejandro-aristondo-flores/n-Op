@@ -36,6 +36,8 @@ from operators.training import (
     Strain_Charge_Pairs,
     Train,
     TrainingBatch,
+    TrainingHook,
+    TrainingProgress,
 )
 
 ENGINE_CASES = [
@@ -345,6 +347,113 @@ def Test_A_Checkpoint_Is_Refused_By_A_Run_It_Was_Not_Written_For(tmp_path: Path)
             validation_interval=20,
             resume=True,
         )
+
+
+class ClippingHook(TrainingHook):
+    """clips every named parameter into a symmetric box after each Adam step, and counts its own calls"""
+
+
+    def __init__(self, bound: float) -> None:
+        self.bound = bound
+        self.step_calls = 0
+
+
+    def After_Step(self, progress: TrainingProgress) -> None:
+        self.step_calls += 1
+        progress.parameters = ParameterSet(
+            values={
+                name: np.clip(value, -self.bound, self.bound)
+                for name, value in progress.parameters.values.items()
+            }
+        )
+
+
+    def After_Validation(self, progress: TrainingProgress) -> dict[str, float]:
+        return {}
+
+
+class ProbeHook(TrainingHook):
+    """no per-step projection, and a validation-scored probe naming the step it was taken at"""
+
+
+    def After_Step(self, progress: TrainingProgress) -> None:
+        return None
+
+
+    def After_Validation(self, progress: TrainingProgress) -> dict[str, float]:
+        return {"probe": float(progress.completed_steps)}
+
+
+def Test_A_Hook_Clips_Every_Step_And_The_Manifest_Records_Its_Presence() -> None:
+    """a hook projecting the parameters into a box every step leaves the trained result sitting on that box"""
+    rows, parameters = Linear_Regression_Setup()
+    hook = ClippingHook(bound=0.3)
+    result = Train(
+        NumpyEngine(),
+        parameters,
+        Regression_Loss,
+        FixedBatches(Rows_Batch(rows)),
+        step_count=200,
+        learning_rate=0.05,
+        validation_interval=50,
+        hook=hook,
+    )
+    assert hook.step_calls == 200
+    for value in result.parameters.values.values():
+        assert bool(np.all(value >= -0.3 - 1e-9))
+        assert bool(np.all(value <= 0.3 + 1e-9))
+    # the unconstrained closed form wants coefficients near [2.0, -1.0], well outside this box
+    assert float(np.max(np.abs(result.parameters.values["coefficients"]))) > 0.29
+    assert result.manifest["hook_present"] is True
+
+
+def Test_A_Hook_With_No_Hook_Leaves_The_Manifest_Unflagged() -> None:
+    """asserts the manifest's own flag answers false, not merely absent, when no hook was passed"""
+    rows, parameters = Linear_Regression_Setup()
+    result = Train(
+        NumpyEngine(), parameters, Regression_Loss, FixedBatches(Rows_Batch(rows)), step_count=5, learning_rate=0.05
+    )
+    assert result.manifest["hook_present"] is False
+    assert cast(float, result.manifest["wall_clock_seconds"]) >= 0.0
+
+
+def Test_A_Hooks_Validation_Curve_Survives_A_Checkpoint_And_A_Resume(tmp_path: Path) -> None:
+    """a hook's own named curve rebuilds exactly across an interrupted-and-resumed run, and Inspect carries it"""
+    rows, parameters = Linear_Regression_Setup()
+    interrupted = tmp_path / "interrupted"
+    Train(
+        NumpyEngine(),
+        parameters,
+        Regression_Loss,
+        FixedBatches(Rows_Batch(rows)),
+        step_count=40,
+        learning_rate=0.05,
+        artifact_directory=interrupted,
+        run_name="probed",
+        validation_interval=20,
+        hook=ProbeHook(),
+    )
+    carried = Train(
+        NumpyEngine(),
+        parameters,
+        Regression_Loss,
+        FixedBatches(Rows_Batch(rows)),
+        step_count=100,
+        learning_rate=0.05,
+        artifact_directory=interrupted,
+        run_name="probed",
+        validation_interval=20,
+        hook=ProbeHook(),
+        resume=True,
+    )
+    assert len(carried.validation_curve) == 5
+    assert carried.auxiliary_curves["probe"].tolist() == [20.0, 40.0, 60.0, 80.0, 100.0]
+    inspected = carried.Inspect()
+    assert "probe_curve" in inspected
+    assert np.array_equal(inspected["probe_curve"], carried.auxiliary_curves["probe"])
+    with np.load(interrupted / "probed_curves.npz") as archive:
+        assert "probe_curve" in archive.files
+        assert np.asarray(archive["probe_curve"]).tolist() == [20.0, 40.0, 60.0, 80.0, 100.0]
 
 
 def Test_The_Loop_Makes_One_Fused_Call_A_Step_And_No_Bare_Gradient_Call() -> None:

@@ -16,6 +16,10 @@ from operators.evaluation import (
     Label_Of,
     MemberResults,
     MetricSummary,
+    PEROVSKITE_DEVELOP_FOLD,
+    Perovskite_Angle_Examples,
+    PerovskiteAngleBlock,
+    Perovskite_Nearest_Neighbor_Predictions,
     Potential_Floor_Rows,
     Potential_Metric_Errors,
     Read_Member_Results,
@@ -146,6 +150,18 @@ def Test_The_Promoted_Localization_Block_Names_Answer_From_The_Root_And_Partitio
     # fold zero is the kill block by definition, not by coincidence of construction order
     assert evaluation_identifiers == set(block.by_fold[0])
     assert evaluation_identifiers
+
+
+@pytest.mark.pool
+def Test_The_Promoted_Perovskite_Block_Reproduces_Its_Own_Copy_Floor() -> None:
+    """the angle stratum's memorization floor, computed through the promoted names, lands on the page's own number"""
+    train = PerovskiteAngleBlock(Perovskite_Angle_Examples("train", PEROVSKITE_DEVELOP_FOLD, None))
+    evaluated = PerovskiteAngleBlock(Perovskite_Angle_Examples("evaluation", PEROVSKITE_DEVELOP_FOLD, None))
+    assert train.fields.shape[0] == 100
+    assert evaluated.fields.shape[0] == 25
+    copy_runs = evaluated.Scored(Perovskite_Nearest_Neighbor_Predictions(train, evaluated))
+    summary = Summarize(copy_runs, "relative_l2")
+    assert f"{summary.median:.4f}" == "0.0853"
 
 
 def Synthetic_Member_Results(unit_keys: tuple[str, ...]) -> MemberResults:

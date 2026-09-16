@@ -3,6 +3,24 @@
 # pyright: reportUnusedImport=false
 
 from operators.evaluation.every_shape import Every_Shape_Nearest_Neighbor_Runs
+from operators.evaluation.perovskite_block import (
+    Lattice_Frequency_Cutoff,
+    LATTICE_FREQUENCY_CUTOFF_DIVISOR,
+    NEAREST_NEIGHBOR_MARGIN,
+    PEROVSKITE_ANGLE_GRID_SHAPE,
+    PEROVSKITE_DEVELOP_FOLD,
+    PEROVSKITE_ELECTRON_COUNT,
+    PEROVSKITE_SPLITS,
+    Perovskite_Angle_Examples,
+    PerovskiteAngleBlock,
+    Perovskite_Cache_Validation_Mask,
+    Perovskite_Conservation_Applied,
+    Perovskite_Nearest_Neighbor_Predictions,
+    Perovskite_Renormalization_Scales,
+    Perovskite_Ridge_Predictions,
+    Perovskite_Train_Validation_Split,
+    Perovskite_Training_Mean_Predictions,
+)
 from operators.evaluation.localization_block import (
     COARSE_SHAPE,
     CUBIC_CAMPAIGNS,

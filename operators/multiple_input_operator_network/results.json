@@ -1,0 +1,91 @@
+{
+ "member": "multiple_input_operator_network",
+ "regenerate": "python -m operators.multiple_input_operator_network.report",
+ "rows": [
+  {
+   "block_signature": "55fd01d57fa5",
+   "key": {
+    "block": "55fd01d57fa5",
+    "configuration": "rank32_latent128_trunk3x256",
+    "group": "semilocal_ridge_floor",
+    "member": "multiple_input_operator_network",
+    "split": "fold_0_evaluation",
+    "task": "localization"
+   },
+   "summary": {
+    "confidence_high": 0.098625,
+    "confidence_low": 0.097382,
+    "group_name": "semilocal_ridge_floor",
+    "interquartile": 0.002436,
+    "median": 0.097618,
+    "metric_name": "mean_absolute_error",
+    "run_count": 152,
+    "unit_count": 29
+   }
+  },
+  {
+   "block_signature": "55fd01d57fa5",
+   "key": {
+    "block": "55fd01d57fa5",
+    "configuration": "rank32_latent128_trunk3x256",
+    "group": "per_shell_filter_floor",
+    "member": "multiple_input_operator_network",
+    "split": "fold_0_evaluation",
+    "task": "localization"
+   },
+   "summary": {
+    "confidence_high": 0.100953,
+    "confidence_low": 0.082713,
+    "group_name": "per_shell_filter_floor",
+    "interquartile": 0.008,
+    "median": 0.083022,
+    "metric_name": "mean_absolute_error",
+    "run_count": 152,
+    "unit_count": 29
+   }
+  },
+  {
+   "block_signature": "55fd01d57fa5",
+   "key": {
+    "block": "55fd01d57fa5",
+    "configuration": "rank32_latent128_trunk3x256",
+    "group": "training_mean_trivial_floor",
+    "member": "multiple_input_operator_network",
+    "split": "fold_0_evaluation",
+    "task": "localization"
+   },
+   "summary": {
+    "confidence_high": 0.024347,
+    "confidence_low": 0.014533,
+    "group_name": "training_mean_trivial_floor",
+    "interquartile": 0.009715,
+    "median": 0.015957,
+    "metric_name": "mean_absolute_error",
+    "run_count": 152,
+    "unit_count": 29
+   }
+  },
+  {
+   "block_signature": "55fd01d57fa5",
+   "key": {
+    "block": "55fd01d57fa5",
+    "configuration": "rank32_latent128_trunk3x256",
+    "group": "nearest_run_copy_floor",
+    "member": "multiple_input_operator_network",
+    "split": "fold_0_evaluation",
+    "task": "localization"
+   },
+   "summary": {
+    "confidence_high": 0.016482,
+    "confidence_low": 0.005945,
+    "group_name": "nearest_run_copy_floor",
+    "interquartile": 0.00875,
+    "median": 0.006164,
+    "metric_name": "mean_absolute_error",
+    "run_count": 152,
+    "unit_count": 29
+   }
+  }
+ ],
+ "verdicts": []
+}

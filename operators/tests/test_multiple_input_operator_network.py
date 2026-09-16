@@ -10,7 +10,7 @@ from numpy.typing import NDArray
 
 from operators.data import Gram_Pod, Project
 from operators.encoders import BasisProjectionEncoder, SensorEncoder
-from operators.evaluation import Compare_To_Floor, ScoredRun
+from operators.evaluation import Compare_To_Floor, CubicBlock, ScoredRun
 from operators.framework import (
     Domain,
     Fractional_Grid_Coordinates,
@@ -42,6 +42,7 @@ from operators.multiple_input_operator_network.cache import (
     MEMBER_TRAIN_FOLDS,
     VALIDATION_FOLDS,
 )
+from operators.multiple_input_operator_network.report import Floor_Summaries
 from operators.readouts import BasisExpansion, PeriodicCoordinateFeatures
 from operators.substrate import Accelerator_Is_Available, Adam_Step, Fresh_Adam_State, NumpyEngine, ParameterSet
 from operators.tasks import Card_Named
@@ -420,6 +421,17 @@ def Test_The_Built_Configurations_Match_Their_Own_Parameter_Counts() -> None:
     twin_parameter_count = sum(value.size for value in twin.Parameter_Values().values())
     assert member_parameter_count == 245_632
     assert twin_parameter_count == 224_896
+
+
+@pytest.mark.pool
+def Test_The_Reports_Own_Floors_Reproduce_The_Recorded_Ladder() -> None:
+    """report.py's floor rows, read live through operators.evaluation, land near IMPLEMENTATION.md's own table"""
+    block = CubicBlock()
+    ridge_summary, filter_summary, mean_summary, copy_summary, _ = Floor_Summaries(block)
+    assert ridge_summary.median == pytest.approx(0.0976, rel=0.02)
+    assert filter_summary.median == pytest.approx(0.0830, rel=0.02)
+    assert mean_summary.median == pytest.approx(0.0160, rel=0.05)
+    assert copy_summary.median == pytest.approx(0.0062, rel=0.05)
 
 
 @pytest.mark.pool

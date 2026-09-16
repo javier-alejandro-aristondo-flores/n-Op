@@ -17,8 +17,11 @@ from operators.framework import (
     GridSpec,
     Layer,
     LiftedKernel,
+    Output_Points,
     PointSet,
     PointSpec,
+    Quadrature_Weights,
+    Source_Points_And_Values,
     UniformGridQuadrature,
 )
 from operators.kernels import (
@@ -329,6 +332,99 @@ def Test_Probe_Points_Receive_And_Never_Send() -> None:
     assert isinstance(undirected, PointSet)
     # the control: if the roles were ignored the two probes would have changed every answer
     assert not np.allclose(np.asarray(produced.values), np.asarray(undirected.values))
+
+
+def Continuous_Kernel_Graph_And_Reference(
+    kernel: ContinuousDisplacementKernel, lattice: NDArray[np.float64], cloud: PointSet, query: PointSpec
+) -> tuple[NDArray[np.float64], NDArray[np.float64], NDArray[np.int64], int, NDArray[np.float64]]:
+    """the profile features, weighted sent values, receiving points, row count and dense oracle Integrate builds from"""
+    source_points, source_values = Source_Points_And_Values(cloud)
+    quadrature_weights = Quadrature_Weights(cloud)
+    target_points = Output_Points(query)
+    graph = Periodic_Radius_Graph(target_points, source_points, lattice, kernel.cutoff_radius)
+    features = Radial_Profile_Features(graph.distances, kernel.cutoff_radius, kernel.basis_count)
+    weighted = np.asarray(source_values, dtype=np.float64) * quadrature_weights[:, None]
+    reference = Dense_Reference_Integral(kernel.Dense_Kernel_Function(lattice), cloud, query)
+    return features, weighted[graph.sending_points], graph.receiving_points, int(target_points.shape[0]), reference
+
+
+@pytest.mark.skipif(not Torch_Is_Available(), reason="torch is not installed yet")
+def Test_The_Continuous_Kernel_Forward_Matches_The_Dense_Oracle_On_The_Foreign_Engine() -> None:
+    """the scatter and the Einstein summation dispatch correctly, landing on the oracle on the foreign engine too"""
+    kernel = ContinuousDisplacementKernel(
+        cutoff_radius=2.5, basis_count=4, output_channels=3, input_channels=2, seed=8
+    )
+    lattice = np.asarray(SHEARED_SLAB.lattice, dtype=np.float64)
+    generator = np.random.default_rng(9)
+    cloud = PointSet(
+        positions=generator.random((7, 3)),
+        domain=SHEARED_SLAB,
+        values=generator.random((7, 2)),
+        quadrature=CountingQuadrature(),
+    )
+    query = PointSpec(generator.random((5, 3)))
+    features, weighted, receiving_points, receiving_count, reference = Continuous_Kernel_Graph_And_Reference(
+        kernel, lattice, cloud, query
+    )
+    engine = TorchEngine()
+    lifted = engine.Lift(kernel.parameter_values, requires_gradient=False)
+    lifted_features = engine.Lift_Constant(features)
+    lifted_weighted = engine.Lift_Constant(weighted)
+    produced = kernel.Forward(lifted, lifted_features, lifted_weighted, receiving_points, receiving_count)
+    assert np.allclose(np.asarray(produced, dtype=np.float64), reference, atol=1e-10)
+
+
+def Continuous_Kernel_Loss(
+    kernel: ContinuousDisplacementKernel,
+    profile_features: Any,
+    sent_values: Any,
+    receiving_points: NDArray[np.int64],
+    receiving_count: int,
+    target: Any,
+) -> Callable[[dict[str, Any]], Any]:
+    """the summed squared gap between the continuous kernel's lifted forward and a fixed target"""
+
+    def Loss(lifted: dict[str, Any]) -> Any:
+        difference = kernel.Forward(lifted, profile_features, sent_values, receiving_points, receiving_count) - target
+        return (difference * difference).sum()
+
+    return Loss
+
+
+@pytest.mark.skipif(not Torch_Is_Available(), reason="torch is not installed yet")
+def Test_Gradients_Reach_The_Continuous_Kernel_Radial_Weights() -> None:
+    """a tape severed at the scatter or the final contraction would leave the radial weights untrainable"""
+    kernel = ContinuousDisplacementKernel(
+        cutoff_radius=2.5, basis_count=4, output_channels=3, input_channels=2, seed=42
+    )
+    lattice = np.asarray(SHEARED_SLAB.lattice, dtype=np.float64)
+    generator = np.random.default_rng(43)
+    cloud = PointSet(
+        positions=generator.random((7, 3)),
+        domain=SHEARED_SLAB,
+        values=generator.random((7, 2)),
+        quadrature=CountingQuadrature(),
+    )
+    query = PointSpec(generator.random((5, 3)))
+    features, weighted, receiving_points, receiving_count, _ = Continuous_Kernel_Graph_And_Reference(
+        kernel, lattice, cloud, query
+    )
+    target = generator.random((receiving_count, kernel.output_channels))
+    parameters = ParameterSet(values={name: value.copy() for name, value in kernel.parameter_values.items()})
+    engine = TorchEngine()
+    gradients = Agreeing_Gradients(
+        parameters,
+        Continuous_Kernel_Loss(
+            kernel,
+            engine.Lift_Constant(features),
+            engine.Lift_Constant(weighted),
+            receiving_points,
+            receiving_count,
+            engine.Lift_Constant(target),
+        ),
+        Continuous_Kernel_Loss(kernel, features, weighted, receiving_points, receiving_count, target),
+    )
+    assert float(np.abs(gradients["radial_weights"]).max()) > 1e-6
 
 
 def Test_Image_Enumeration_Follows_Cell_Heights() -> None:

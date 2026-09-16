@@ -32,6 +32,7 @@ from operators.kernels.compact_support.geometry import (
     Vector_Lengths,
 )
 from operators.kernels.compact_support.tabulated import Stencil_From_Weights, TabulatedStencilKernel
+from operators.substrate import Einstein_Summation, Scatter_Add
 
 PROFILE_SAMPLE_COUNT = 64
 
@@ -91,7 +92,7 @@ class ContinuousDisplacementKernel(Kernel[Representation, Representation]):
     def Profile_Matrices(self, lifted: dict[str, Any], distances: NDArray[np.float64]) -> Any:
         """the channel-mixing block this profile carries at each separation"""
         features = Radial_Profile_Features(distances, self.cutoff_radius, self.basis_count)
-        return np.einsum("eb,boc->eoc", features, lifted["radial_weights"])
+        return Einstein_Summation("eb,boc->eoc", features, lifted["radial_weights"])
 
 
     def Forward(
@@ -102,13 +103,10 @@ class ContinuousDisplacementKernel(Kernel[Representation, Representation]):
         receiving_points: NDArray[np.int64],
         receiving_count: int,
     ) -> Any:
-        features = np.asarray(profile_features, dtype=np.float64)
-        values = np.asarray(sent_values, dtype=np.float64)
         # a message is held in basis space so the learned weights are contracted once, after the sum
-        per_edge = features[:, :, None] * values[:, None, :]
-        accumulated = np.zeros((receiving_count, self.basis_count, self.input_channels))
-        np.add.at(accumulated, receiving_points, per_edge)
-        return np.einsum("tbc,boc->to", accumulated, lifted["radial_weights"])
+        per_edge = profile_features[:, :, None] * sent_values[:, None, :]
+        accumulated = Scatter_Add(receiving_count, receiving_points, per_edge)
+        return Einstein_Summation("tbc,boc->to", accumulated, lifted["radial_weights"])
 
 
     def Integrate(

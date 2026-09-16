@@ -6,11 +6,11 @@ suite_card = "test-suite.md §4, III.1 — IN-LOCAL, anchor"
 role = "the skip-DFT-entirely direction; independent machinery, buildable in parallel with the Fourier lineage"
 
 [parts]
-encoder = "encoders.AtomEmbedding (keyed by element AND pseudopotential title)"
+encoder = "encoders.AtomEmbedding (keyed by element AND pseudopotential title, plus a member-local trained unknown row)"
 kernel = "kernels.compact_support.ContinuousDisplacementKernel (continuous-per-pair; directed edges; probes receive-only)"
-composition = "compositions.ExplicitStack"
-readout = "readouts.PointwiseProjection"
-wrappers = "Conserving (renormalize to electron count) per task card"
+composition = "deep_dft.MessagePassingStack (member-local: the framework's ExplicitStack is grid-typed and cannot host point-set message passing; three atom-atom layers then three atom-probe layers over one PointSet with roles)"
+readout = "deep_dft.ProbeHead (member-local two-layer perceptron; readouts.PointwiseProjection is grid-typed and assumes a channel-first layout, not the point-first PointSet.values convention)"
+wrappers = "deep_dft.Renormalized_To_Electron_Count (member-local: the shared Conserving wrapper flattens every channel before renormalizing, which is correct for one output channel but wrong once magnetization rides beside density; this scales density alone onto the electron count)"
 
 [depends_on]
 framework = true

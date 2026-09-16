@@ -34,7 +34,7 @@ from operators.framework import (
 )
 from operators.inspection import Render_Inspection_Suite
 from operators.kernels.compact_support import Periodic_Radius_Graph
-from operators.substrate import NumpyEngine, ParameterSet
+from operators.substrate import NumpyEngine, ParameterSet, Torch_Is_Available, TorchEngine
 
 CARBON_KEY = ("C", "PAW_PBE C 08Apr2002")
 
@@ -242,6 +242,45 @@ def Test_Two_Path_Agreement_And_A_Gradient_On_Every_Parameter() -> None:
     for name, gradient in gradients.items():
         assert bool(np.all(np.isfinite(gradient))), name
         assert bool(np.any(gradient != 0.0)), name
+
+
+@pytest.mark.skipif(not Torch_Is_Available(), reason="torch is not installed yet")
+def Test_Foreign_Engine_Forward_And_Gradient_Agree_On_A_Tiny_Structure() -> None:
+    """the whole member differentiates through the lifted kernel on the foreign engine, matching every other path"""
+    member = Deep_Dft_Network(TINY_VOCABULARY, seed=9, hidden_channels=3, basis_count=2, cutoff_radius=3.0)
+    generator = np.random.default_rng(11)
+    lattice = np.eye(3) * 3.0
+    positions = generator.random((3, 3))
+    species = np.asarray([list(CARBON_KEY), list(NITROGEN_KEY), list(CARBON_KEY)])
+    domain = Domain(lattice=lattice)
+    structure = PointSet(positions=positions, domain=domain, species=species)
+    probe_points = generator.random((5, 3))
+    vocabulary_indices = member.atom_embedding.Vocabulary_Indices(species)
+    parameters = member.Parameter_Values()
+
+    from_call = np.asarray(member(structure, PointSpec(probe_points)).values)
+
+    def Squared_Sum_Loss(lifted: dict[str, object]) -> object:
+        """the summed squared prediction, written only with dunders so either engine can carry it"""
+        predicted = member.Forward(lifted, lattice, positions, vocabulary_indices, probe_points)
+        return (predicted * predicted).sum()
+
+    parameter_set = ParameterSet(values=parameters)
+    torch_engine = TorchEngine()
+    torch_lifted = torch_engine.Lift(parameter_set.values, requires_gradient=False)
+    foreign_forward = member.Forward(torch_lifted, lattice, positions, vocabulary_indices, probe_points)
+    from_foreign_forward = np.asarray(foreign_forward)
+    assert np.allclose(from_call, from_foreign_forward, atol=1e-8)
+
+    reference_engine = NumpyEngine(step_size=1e-4)
+    reference_value = reference_engine.Evaluate(parameter_set, Squared_Sum_Loss)
+    reference_gradients = reference_engine.Gradients(parameter_set, Squared_Sum_Loss)
+    torch_value, torch_gradients = torch_engine.Value_And_Gradients(parameter_set, Squared_Sum_Loss)
+    assert abs(reference_value - torch_value) < 1e-8
+    assert set(torch_gradients) == set(parameters)
+    for name, gradient in torch_gradients.items():
+        assert bool(np.all(np.isfinite(gradient))), name
+        assert np.allclose(gradient, reference_gradients[name], rtol=1e-4, atol=1e-5), name
 
 
 def Test_The_Moment_Row_On_A_Synthetic_Magnetic_Field() -> None:

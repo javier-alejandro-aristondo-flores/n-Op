@@ -47,6 +47,14 @@ def Layer_Parameter_Values(layer: MessagePassingLayer, prefix: str) -> dict[str,
     return collected
 
 
+def Matched_To_Values(features: NDArray[np.float64], values: Any) -> Any:
+    """the host-computed radial-profile features cast onto whichever engine already carries the point values"""
+    # the profile is geometry alone, computed once per phase in plain numpy, then joined to a lifted graph here
+    if hasattr(values, "new_tensor"):
+        return values.new_tensor(features)
+    return features
+
+
 def Layer_Step(
     layer: MessagePassingLayer,
     lifted: dict[str, Any],
@@ -111,7 +119,9 @@ class MessagePassingStack(Composition[PointSet]):
         """the final atom and probe features, differentiable through whichever engine lifted the dict"""
         atom_count = atom_positions.shape[0]
         atom_graph = Periodic_Radius_Graph(atom_positions, atom_positions, lattice, self.cutoff_radius)
-        atom_features = Radial_Profile_Features(atom_graph.distances, self.cutoff_radius, self.basis_count)
+        atom_features = Matched_To_Values(
+            Radial_Profile_Features(atom_graph.distances, self.cutoff_radius, self.basis_count), atom_values
+        )
         atom_only_values = atom_values
         for layer_index, layer in enumerate(self.atom_atom_layers):
             atom_only_values = Layer_Step(
@@ -135,11 +145,12 @@ class MessagePassingStack(Composition[PointSet]):
         kept_edges = sending_mask[combined_graph.sending_points]
         receiving_points = combined_graph.receiving_points[kept_edges]
         sending_points = combined_graph.sending_points[kept_edges]
-        combined_features = Radial_Profile_Features(
-            combined_graph.distances[kept_edges], self.cutoff_radius, self.basis_count
-        )
         probe_initial_values = Zeros_Beside(atom_values, (probe_count, atom_only_values.shape[1]))
         combined_values = Concatenate_Channels([atom_only_values, probe_initial_values])
+        combined_features = Matched_To_Values(
+            Radial_Profile_Features(combined_graph.distances[kept_edges], self.cutoff_radius, self.basis_count),
+            combined_values,
+        )
         for layer_index, layer in enumerate(self.atom_probe_layers):
             combined_values = Layer_Step(
                 layer,

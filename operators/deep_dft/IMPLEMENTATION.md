@@ -81,7 +81,13 @@ features are then concatenated with zero-initialized probe features into one joi
 from other atoms, a probe only ever receives. The two phases share one radius graph and one
 `Radial_Profile_Features` evaluation per phase (not per layer), since positions are fixed for the
 whole forward pass and only the carried values change layer to layer. Each phase's graph is
-`Periodic_Radius_Graph`, cell-height image enumeration, never the minimum-image shortcut.
+`Periodic_Radius_Graph`, cell-height image enumeration, never the minimum-image shortcut. The
+profile is pure geometry, computed once per phase on the host in plain numpy; the kernel's own
+`Forward` combines it with the carried point values through a bare multiplication, which assumes
+both operands already share one engine, so `MessagePassingStack.Forward` casts the profile onto
+whichever engine the carried values already belong to (`Matched_To_Values`, a member-local seam
+using a lifted tensor's own `new_tensor` construction rather than a second dispatch primitive)
+before either phase's layers run.
 
 **Readout — `ProbeHead`.** `MultilayerPerceptron((64, 64, 2), "probe_head")`, applied to every
 point's final features (called only on the probe rows in the assembled operator, since only probes
@@ -144,14 +150,21 @@ scheduled by the team lead). `ContinuousDisplacementKernel.Forward` and `Profile
 carry messages through `Scatter_Add` and `Einstein_Summation` on the dispatched substrate rather
 than `np.add.at`/`np.einsum`, so the kernel differentiates on the foreign engine; this landed on
 trunk after this member's own layers were written and reached this stream through the standard
-rebase, alongside `Write_Member_Results`. Everything in this package is already written against
-the kernel's existing `Forward` signature and is engine-dispatch-clean on the composition's own
-side (`Gaussian_Error_Linear_Unit`, `Concatenate_Channels`, `Zeros_Beside` from
-`operators.substrate`, never a bare reference to the foreign engine or an engine-specific branch),
-so no rework to this package's own forward path was needed once the lift arrived. Gradient
-correctness is verified on the reference `NumpyEngine` (central differences,
-`Test_Two_Path_Agreement_And_A_Gradient_On_Every_Parameter`); foreign-engine agreement on a tiny
-structure is verified next, in this stream, now that the lift is present.
+rebase, alongside `Write_Member_Results`. One seam did need rework once the lift arrived: the
+kernel's own `Forward` combines the caller's profile features with the caller's point values
+through a bare multiplication, which silently assumes the two already share an engine, and this
+composition was computing that profile on the host in plain numpy regardless of which engine
+carried the point values — correct under `NumpyEngine`, a `TypeError` under `TorchEngine`. The fix
+is `Matched_To_Values` in `message_passing.py`, applied once per phase; see the composition
+section above. Everywhere else the package was already engine-dispatch-clean
+(`Gaussian_Error_Linear_Unit`, `Concatenate_Channels`, `Zeros_Beside` from `operators.substrate`,
+never a bare reference to the foreign engine or an engine-specific branch). Gradient correctness is
+verified on the reference `NumpyEngine` (central differences,
+`Test_Two_Path_Agreement_And_A_Gradient_On_Every_Parameter`) and, now that the lift is present, on
+the foreign engine directly against that same central-difference reference
+(`Test_Foreign_Engine_Forward_And_Gradient_Agree_On_A_Tiny_Structure`, skipped when the foreign
+engine is unavailable) — every one of the tiny configuration's 23 named parameters carries a
+finite, nonzero gradient there, matching the reference to `1e-4` relative.
 
 ## Inspection
 

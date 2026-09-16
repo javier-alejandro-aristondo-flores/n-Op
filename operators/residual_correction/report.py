@@ -52,9 +52,9 @@ from operators.substrate import ParameterSet
 from operators.training import (
     BatchArray,
     FixedBatches,
+    Staged_Training,
     Strain_Assignments_By_Run,
     Strain_Charge_Pairs,
-    Train,
     Training_Engine,
     TrainingBatch,
 )
@@ -76,11 +76,11 @@ CONFIGURATION_NAME = "projection_backbone"
 TASK_NAME = "cheap_to_accurate_charge"
 SPLIT_NAME = "strain_atlas_holdout"
 EVALUATION_BLOCK = "test"
-# the flagship's own staged schedule (operators/factorized_fourier/report.py:Train_Flagship_Member),
-# carried over at its fixed peak rate rather than a probed one -- this backbone starts zero-initialized
+# the shared resumable protocol (operators/training/staged.py:Staged_Training), a divergence probe
+# then three stages at decaying rates, every piece resuming from its own checkpoint after a power loss
 STAGE_FRACTIONS = (0.3, 0.3, 0.4)
 PEAK_LEARNING_RATE = 1e-3
-STAGE_LEARNING_RATES = (PEAK_LEARNING_RATE, PEAK_LEARNING_RATE / 3.0, PEAK_LEARNING_RATE / 9.0)
+PROBE_STEPS = 200
 VALIDATION_INTERVAL = 100
 FINAL_STAGE_PATIENCE = 15
 # a full-batch run of a small projection backbone against the plan's ~0.5 h card estimate; not yet measured
@@ -262,15 +262,6 @@ def Floor_Lines(
     return lines, comparisons, summaries, correction_basis, cheap_basis, kill_bar
 
 
-def Staged_Step_Counts(
-    step_count: int, fractions: tuple[float, float, float] = STAGE_FRACTIONS
-) -> tuple[int, int, int]:
-    """a step budget split across three stages, the last absorbing whatever rounding leaves behind"""
-    first_stage = round(fractions[0] * step_count)
-    second_stage = round(fractions[1] * step_count)
-    return first_stage, second_stage, step_count - first_stage - second_stage
-
-
 def Trained_Member_Predictions(
     train: CorrectionBlock,
     validation: CorrectionBlock,
@@ -278,7 +269,7 @@ def Trained_Member_Predictions(
     correction_basis: PodBasis,
     cheap_basis: PodBasis,
 ) -> tuple[NDArray[np.float64], NDArray[np.float64], dict[str, object], ResidualCorrection]:
-    """the member trained on the flagship's staged schedule, one seeded run, read on validation and test"""
+    """the member trained on the shared staged protocol, one seeded run, read on validation and test"""
     # the bases are the floors' own fit, reused rather than refit so the two sections agree exactly
     _, voxel_scale = Pointwise_Statistics(train.correction)
     input_scale = Guarded_Spread(Project(cheap_basis, train.cheap))
@@ -313,25 +304,23 @@ def Trained_Member_Predictions(
 
     engine = Training_Engine(precision="single")
     parameters = ParameterSet(values=member.Parameter_Values())
-    stage_step_counts = Staged_Step_Counts(STEP_COUNT)
-    manifest: dict[str, object] = {"run_name": RUN_NAME_PREFIX, "stage_step_counts": stage_step_counts}
-    for stage_index, (rate, stage_steps) in enumerate(zip(STAGE_LEARNING_RATES, stage_step_counts, strict=True)):
-        is_final_stage = stage_index == len(stage_step_counts) - 1
-        result = Train(
-            engine,
-            parameters,
-            Correction_Loss,
-            batches,
-            step_count=stage_steps,
-            learning_rate=rate,
-            seed=SEED,
-            artifact_directory=TRAINING_ARTIFACT_PATH,
-            run_name=f"{RUN_NAME_PREFIX}_stage{stage_index}",
-            validation_interval=VALIDATION_INTERVAL,
-            patience=FINAL_STAGE_PATIENCE if is_final_stage else 0,
-        )
-        parameters = result.parameters
-        manifest[f"stage_{stage_index}"] = result.manifest
+    parameters, manifest = Staged_Training(
+        engine,
+        parameters,
+        lambda: ParameterSet(values=member.Parameter_Values()),
+        Correction_Loss,
+        batches,
+        STEP_COUNT,
+        RUN_NAME_PREFIX,
+        SEED,
+        TRAINING_ARTIFACT_PATH,
+        stage_fractions=STAGE_FRACTIONS,
+        peak_learning_rate=PEAK_LEARNING_RATE,
+        probe_steps=PROBE_STEPS,
+        validation_interval=VALIDATION_INTERVAL,
+        final_stage_patience=FINAL_STAGE_PATIENCE,
+    )
+    manifest["run_name"] = RUN_NAME_PREFIX
 
     rebuilt_validation = Rebuild(parameters.values, validation)
     rebuilt_test = Rebuild(parameters.values, test)
@@ -520,10 +509,12 @@ def Main(argv: list[str] | None = None) -> int:
     floor_medians["identity"] = member_comparison.floor_median
     figure_count = Write_Figures(member, test, test_rebuilt, floor_medians, member_comparison.member_median)
 
-    stage_step_counts = cast(tuple[int, int, int], training_manifest["stage_step_counts"])
+    stage_manifests = [cast(dict[str, object], training_manifest[f"stage_{stage_index}"]) for stage_index in range(3)]
+    probe_rate = cast(float, training_manifest["probe_learning_rate"])
     stage_summary = ", ".join(
-        f"stage {stage_index} at {rate:.2e} for {steps} steps"
-        for stage_index, (rate, steps) in enumerate(zip(STAGE_LEARNING_RATES, stage_step_counts, strict=True))
+        f"stage {stage_index} at {cast(float, stage['learning_rate']):.2e} for"
+        f" {cast(int, stage['completed_steps'])} of {cast(int, stage['step_count'])} steps"
+        for stage_index, stage in enumerate(stage_manifests)
     )
     member_relative_l2 = Summarize(member_runs, "relative_l2", "member")
     member_delta_r_squared = Summarize(member_runs, "delta_r_squared", "member")
@@ -531,8 +522,9 @@ def Main(argv: list[str] | None = None) -> int:
     lines += [
         "## Result (one seed, 20260916)",
         "",
-        f"Staged schedule ({stage_summary}), validated every {VALIDATION_INTERVAL} steps, final-stage"
-        f" patience {FINAL_STAGE_PATIENCE}. {figure_count} figures under `figures/projection_backbone/`.",
+        f"Divergence probe at `{probe_rate:.2e}`, staged schedule ({stage_summary}), validated every"
+        f" {VALIDATION_INTERVAL} steps, final-stage patience {FINAL_STAGE_PATIENCE}. {figure_count} figures"
+        f" under `figures/projection_backbone/`.",
         "",
         "```",
         Render_Table(Summary_Table((member_relative_l2,))),

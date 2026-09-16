@@ -171,12 +171,27 @@ basis fitting and the member-local cache (`cache.py`), and the full test suite i
 to-branch-trunk identity, the label-driven channel refusal, the POD round trip, two-path agreement,
 gradients on both branches and the trunk on both engines, the twin/member shared-name property, a
 deterministic two-step toy training run, the full inspection surface, and the exact 76/65/196 cubic-
-block fold counts.
+block fold counts. The parameter count of the built configuration, measured directly: 245,632 for the
+two-branch member, 224,896 for the density-alone twin — both below the canon's own rough estimate of
+≈0.6M, the difference in the channel-head addition's own favor (128 → 256 is small next to the
+trunk's 171,136).
 
-**Not yet built**, pending `operators.evaluation`'s promotion of `CubicBlock`, `Card_Metric_Errors`,
-the four localization floor row builders and `Write_Member_Results` (landing separately): `report.py`,
-`results.json`, and the test that the promoted floor builders still reproduce the numbers tabulated
-above. **Not yet run**: training itself, which the card holder schedules. The parameter count of the
-built configuration, measured directly: 245,632 for the two-branch member, 224,896 for the
-density-alone twin — both below the canon's own rough estimate of ≈0.6M, the difference in the
-channel-head addition's own favor (128 → 256 is small next to the trunk's 171,136).
+**`report.py` and `results.json` are built**, now that `operators.evaluation` carries `CubicBlock`,
+the four localization floor row builders and `Write_Member_Results`. The four floors are read live
+through the promoted package on the cubic block's own evaluation fold — not copied from the table
+above — and land within the stated precision (`Test_The_Reports_Own_Floors_Reproduce_The_Recorded_Ladder`,
+`pool`); the pattern-rule and context bars are computed from them and written to `report.md` beside
+the built configuration's own parameter counts; the four floor summaries are written to
+`results.json` through `ResultRow`/`Write_Member_Results`, with no verdicts yet since neither the
+member nor its twin has trained. Regenerating is a clean, byte-identical rerun
+(`python -m operators.multiple_input_operator_network.report`).
+
+**The staged training driver is written and gated, not run.** `Train_Configuration(step_count,
+run_name, twin)` builds either configuration from one code path and trains it under the flagship's
+own three-stage schedule (0.3/0.3/0.4 of the given step count at 1e-3, 3.3e-4, 1.1e-4), point-sampled
+batches through `PointSampledBatches` and `CoordinateFeaturizedBatches`, validation every hundred
+steps on the validation fold, patience fifteen in the final stage, seed 20260916, checkpoints under
+`_training/multiple_input_operator_network/`. Its own `step_count` is left to the card holder, who
+sizes it from a short step-cost probe once the card is free, per house policy (a probe is itself
+training). **Not yet run**: the twin's and the member's own training, and therefore the decisive gate
+and every bar that needs a trained model — scheduled on the card.

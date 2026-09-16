@@ -33,4 +33,117 @@ and a half times the flagship's error, is recorded when that task is run.
 
 ## Implementation specification
 
-To be written.
+**Attention core — `GalerkinAttentionKernel`, in `operators/galerkin_transformer/__init__.py`.** A
+`Kernel[GridFunction, GridFunction]` whose `Forward(lifted, input_values, output_shape)` also
+satisfies the framework's `LiftedKernel` shape structurally, exactly as `SpectralKernel` and
+`CodomainAttentionKernel` already do, so `ExplicitStack` hosts it directly as a `Layer.kernel`. The
+grid is flattened to `N = nx·ny·nz` tokens internally; query, key, value and output are each one
+token-shared linear map (`encoders.PointwiseLift` reused at a square `hidden_channels →
+hidden_channels` width, the same reuse the flagship already makes of `PointwiseLift` as a `Layer`'s
+own local linear term). Key and value are standardized over the *token axis*, per channel
+(`Token_Axis_Normalized`, a from-scratch normalizer — the codomain-attention package's
+`FunctionSpaceLayerNorm` standardizes a token's own function over its channels and grid instead, the
+wrong axis for a spatial-token attention). This is the Galerkin-type projection: normalizing K and V
+rather than Q and K is what makes the map softmax-free. The score is never formed: per head,
+`key_value = Einstein_Summation("hdn,hen->hde", key_heads, value_heads)` contracts over the
+source-token axis first, producing a `(head_count, head_width, head_width)` block independent of
+`N`; `attended = Einstein_Summation("hde,hdm->hem", key_value, query_heads) / N` is the second
+matrix product. Both are linear in `N`; no `(N, N)` tensor is ever allocated. Four layers, two
+heads, width 32, each wrapped by the framework's own local-linear-plus-GELU-plus-residual assembly
+(`ExplicitStack.Layer_Outputs`) with a `PointwiseLift(32, 32)` as the local term, exactly the
+flagship's `Explicit_Layers` idiom.
+
+**Decoder — `QueryPointDecoder`.** An `Operator[GridFunction, GridFunction]` (not
+`GridFunction | PointSet`: the gate class pins `Out = GridFunction`, so the decoder's own `__call__`
+raises `TypeError` off a `PointSpec`, matching `FactorizedFourier.__call__`'s and
+`CodomainAttentionKernel.Integrate`'s own precedent for a grid-pinned contract). Its `Forward(lifted,
+token_values, query_features)` is discretization-blind: `query_features` is precomputed and passed
+in, exactly as `NonlinearDecoder`/`BasisExpansion` externalize their own coordinate features, which
+is what lets one `Forward` answer a grid and an explicit point list identically and is also what
+keeps coordinate-feature construction (always plain numpy — coordinates are never trained) out of
+any engine-lifted path where it could be handed to a foreign engine's tensor ops unconverted. Key and
+value come from the encoder's own final tokens and are built once; queries are read in chunks of
+`DECODER_QUERY_CHUNK_SIZE` rows, each chunk reusing the same `key_value` block, so decoder-side
+memory never scales with the query count. `PointwiseProjection` finishes the head: bounded for
+localization, unbounded for the perovskite density.
+
+**Member — `GalerkinTransformer`.** Assembles `PointwiseLift` (encoder) → `ExplicitStack` of four
+`GalerkinAttentionKernel` layers (composition) → `QueryPointDecoder` (readout), and owns the
+task-specific input convention in `__call__` rather than in the parts, mirroring
+`FactorizedFourier`'s own split between framework parts and a member-level `Forward_From_Coarse_Input`.
+Two tasks:
+- `"parametric"` (stage 1, `lattice_to_charge`): the six lattice factors broadcast as constant
+  channels at `processing_shape` (`Constant_Channel_Field`, plain-numpy broadcast — there is no field
+  input to truncate), concatenated with `Coordinate_Feature_Channels(processing_shape)`. Output is
+  renormalized to the electron count via `wrappers.Conserving.Forward` (the lifted-array method, used
+  directly rather than through `Conserving.__call__`, matching the flagship's own parametric task).
+- `"localization"` (stage 2, `charge_to_localization`): a local from-scratch reimplementation of the
+  flagship's own input convention (`Spin_Channels`, `Log_Compressed_Input_Channels`,
+  `Lattice_Gram_Six`, `Standardized_Lattice_Gram`, `Lattice_Gram_Statistics`, `Reference_Density`) —
+  not imported from `operators.factorized_fourier`,
+  since this package's manifest declares no dependency on it and no other operator package imports a
+  sibling operator package's root; the formulas are kept numerically identical to the flagship's by
+  construction, for the cross-entry comparison the canon asks for. The fine input field is truncated
+  to `processing_shape` by `compositions.Spectral_Resampled`, concatenated with the six standardized
+  Gram channels and the coordinate features.
+
+Both tasks answer queries at any grid shape the caller requests (64³ for the perovskite stage, 40³
+for the cubic block, and whatever an invariance probe asks), independent of `processing_shape`,
+because the decoder is the operator claim.
+
+**Parameter count.** ≈ 26,000 at width 32 / 2 heads / 4 layers (`GalerkinTransformer.Parameter_Count()`),
+short of the canon's own ≈1M full-scale estimate; this build is the minimal gate configuration the
+card names explicitly (width, head count and layer count are all pinned), not a width search, so the
+gap is reported rather than closed by widening past the given spec.
+
+## Compute
+
+Attention is two GEMMs per head, `O(N · head_width²)`, never `O(N²)`. At 32³ tokens (stage 1) and
+40³ tokens (stage 2) this stays well under the canon's own 64³-native ≈ 3.8 GB envelope; no
+checkpointing is needed at this scale. The decoder's query chunking bounds cross-attention memory
+independent of the query grid (64³ or 40³ queries, same per-chunk cost).
+
+## Inspection
+
+Every array below is reachable through `GalerkinTransformer.Inspect()`. The prefixed arrays come
+from `NeuralOperator.Inspect()` aggregating the three parts; the unprefixed ones are the member's
+own. `{n}` ranges over the four attention-layer indices.
+
+| Key | Shape | Drawn by |
+|---|---|---|
+| `encoder.lift_weights` | `(32, input_channels)` | `Render_Matrix` |
+| `encoder.lift_biases` | `(32,)` | `Render_Bars` |
+| `composition.layer_{n}.kernel.key_norm_scale` / `_bias` | `(32,)` | `Render_Bars` |
+| `composition.layer_{n}.kernel.value_norm_scale` / `_bias` | `(32,)` | `Render_Bars` |
+| `composition.layer_{n}.kernel.query.lift_weights` / `key.lift_weights` / `value.lift_weights` / `output.lift_weights` | `(32, 32)` | `Render_Matrix` |
+| `composition.layer_{n}.kernel.query.lift_biases` / `key.lift_biases` / `value.lift_biases` / `output.lift_biases` | `(32,)` | `Render_Bars` |
+| `composition.layer_{n}.kernel.last_attended_norm` | `()`, only once `Integrate()` is called directly on that kernel object -- the member's own forward path never does | scalar panel |
+| `composition.layer_{n}.local_linear.lift_weights` | `(32, 32)` | `Render_Matrix` |
+| `composition.layer_{n}.local_linear.lift_biases` | `(32,)` | `Render_Bars` |
+| `composition.last_layer_norms` | `(4,)`, only once `Apply()` is called directly on the composition -- the member's own forward path never does | `Render_Bars` (reference line at 1) |
+| `readout.key_norm_scale` / `_bias`, `value_norm_scale` / `_bias` | `(32,)` | `Render_Bars` |
+| `readout.query.lift_weights` | `(32, 25)` | `Render_Matrix` |
+| `readout.query.lift_biases` | `(32,)` | `Render_Bars` |
+| `readout.key.lift_weights` / `value.lift_weights` | `(32, 32)` | `Render_Matrix` |
+| `readout.key.lift_biases` / `value.lift_biases` | `(32,)` | `Render_Bars` |
+| `readout.final.projection_weights` | `(output_channels, 32)` | `Render_Matrix` |
+| `readout.final.projection_biases` | `(output_channels,)` | `Render_Bars` |
+| `readout.last_answered_query_count` | `()`, after a numpy call | scalar panel |
+| `processing_shape` | `(3,)` | `Render_Bars` |
+| `reference_density` | `()`, localization task only | scalar panel |
+| `gram_standardization_mean` / `_scale` | `(6,)`, localization task only | `Render_Bars` |
+| `last_predicted_values` | `(output_channels, *query_shape)`, after a numpy call | `Render_Field_Sheet` |
+
+Every key above is covered by the generic renderer dispatched on its rank alone
+(`Render_Inspection_Suite`); no key needs a bespoke renderer.
+`Test_Inspection_Keys_Are_Covered_By_The_Generic_Renderer` checks the skipped list is empty on a
+toy member reached through its own forward path, which is why the direct-`Integrate()`-only and
+direct-`Apply()`-only keys above are not exercised by that particular test.
+
+**What is not inspectable.** Attention is over grid points, so an attention "map" here would
+naturally want to be an `(N, N)` object — exactly the tensor this kernel is built never to form.
+What is exposed instead is per-head *projected* K/V/Q features (reachable by calling the kernel's
+own parts directly) and the `(head_width, head_width)` `key_value` block, neither of which is stored
+as a `last_*` array on the member's own forward path since it never leaves the lifted computation;
+a caller wanting it calls `GalerkinAttentionKernel.Forward` directly, the same way the mandatory
+dense-reference check in the test suite does.

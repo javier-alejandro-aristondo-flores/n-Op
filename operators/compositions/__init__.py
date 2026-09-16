@@ -13,6 +13,7 @@ from operators.compositions.activation import (
     Activation_Table,
     ActivationTable,
 )
+from operators.compositions.contraction import ContractionBudget, ContractionProjection, Nominal_Lipschitz
 from operators.compositions.fixed_point import FixedPoint, WeightTied
 from operators.compositions.multi_scale import (
     Doubled_Shape,

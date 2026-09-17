@@ -39,6 +39,7 @@ from operators.compositions.multi_scale import (
     Upsampled_By_Two,
 )
 from operators.framework import Array, Coefficients, Composition, GridFunction, Layer
+from operators.substrate import Recomputed_In_Backward
 
 
 def Sliced_Lifted(lifted: dict[str, Any], prefix: str) -> dict[str, Any]:
@@ -50,9 +51,16 @@ class ExplicitStack(Composition[GridFunction]):
     """layers one after another, each an activated kernel-plus-local sum"""
 
 
-    def __init__(self, layers: tuple[Layer[GridFunction], ...], activations: ActivationTable | None = None) -> None:
+    def __init__(
+        self,
+        layers: tuple[Layer[GridFunction], ...],
+        activations: ActivationTable | None = None,
+        recompute_layers: bool = False,
+    ) -> None:
         self.layers = layers
         self.activations = Activation_Table(activations)
+        # a stack whose saved intermediates outgrow the accelerator trades a second forward per layer for the room
+        self.recompute_layers = recompute_layers
         self.last_layer_norms: NDArray[np.float64] | None = None
 
 
@@ -63,18 +71,26 @@ class ExplicitStack(Composition[GridFunction]):
         for layer_index, layer in enumerate(self.layers):
             kernel_lifted = Sliced_Lifted(lifted, f"layer_{layer_index}.kernel.")
             local_linear_lifted = Sliced_Lifted(lifted, f"layer_{layer_index}.local_linear.")
-            # every layer answers on the grid it was handed
-            spatial_shape = current.shape[1:]
-            output_shape = (int(spatial_shape[0]), int(spatial_shape[1]), int(spatial_shape[2]))
-            kernel_output = layer.kernel.Forward(kernel_lifted, current, output_shape)
-            local_output = layer.local_linear.Forward(local_linear_lifted, current)
-            summed = local_output + kernel_output
-            activated = Activated(self.activations, layer.activation, summed)
-            # a residual layer can only add its input back when the channel count survived
-            if layer.residual and activated.shape == current.shape:
-                activated = activated + current
-            outputs.append(activated)
-            current = activated
+
+            def One_Layer(
+                entering: Any,
+                layer: Layer[GridFunction] = layer,
+                kernel_lifted: dict[str, Any] = kernel_lifted,
+                local_linear_lifted: dict[str, Any] = local_linear_lifted,
+            ) -> Any:
+                """one activated kernel-plus-local sum on the grid it was handed, its residual added when shapes allow"""
+                spatial_shape = entering.shape[1:]
+                output_shape = (int(spatial_shape[0]), int(spatial_shape[1]), int(spatial_shape[2]))
+                kernel_output = layer.kernel.Forward(kernel_lifted, entering, output_shape)
+                local_output = layer.local_linear.Forward(local_linear_lifted, entering)
+                activated = Activated(self.activations, layer.activation, local_output + kernel_output)
+                # a residual layer can only add its input back when the channel count survived
+                if layer.residual and activated.shape == entering.shape:
+                    activated = activated + entering
+                return activated
+
+            current = Recomputed_In_Backward(One_Layer, current) if self.recompute_layers else One_Layer(current)
+            outputs.append(current)
         return outputs
 
 

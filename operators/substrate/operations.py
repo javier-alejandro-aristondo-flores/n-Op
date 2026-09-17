@@ -1,5 +1,7 @@
 """array mathematics that differs between engines, dispatched on the array's kind"""
 
+from collections.abc import Callable
+from importlib import import_module
 from typing import Any
 
 import numpy as np
@@ -163,3 +165,11 @@ def Peak_Accelerator_Bytes() -> int:
     if not Accelerator_Is_Available():
         return 0
     return int(Torch_Module().cuda.max_memory_allocated())
+
+
+def Recomputed_In_Backward(function: Callable[[Any], Any], value: Any) -> Any:
+    """the function's value with its intermediates dropped and rebuilt when the gradient is taken, plain on numpy"""
+    if not Is_Engine_Native(value):
+        return function(value)
+    # the non-reentrant form tracks weights the function closes over, so a layer's lifted slices need no threading
+    return import_module("torch.utils.checkpoint").checkpoint(function, value, use_reentrant=False)

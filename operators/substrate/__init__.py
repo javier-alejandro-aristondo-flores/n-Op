@@ -49,6 +49,7 @@ from operators.substrate.operations import (
     Contract_Channel_Axis,
     Detached,
     Peak_Accelerator_Bytes,
+    Recomputed_In_Backward,
     Reset_Peak_Accelerator_Bytes,
     Exponential,
     Gaussian_Error_Linear_Unit,

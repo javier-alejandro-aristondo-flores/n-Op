@@ -220,3 +220,30 @@ def Test_A_Handed_Activation_Runs_Through_Every_Composition() -> None:
     assert not np.allclose(handed_output, pointwise_output)
     tied = WeightTied(Small_Layer(2, 2, seed=61, activation="alias_free"), depth=2, activations=handed)
     assert np.asarray(tied.Apply(field).values, dtype=np.float64).shape == (2, 8, 8, 8)
+
+
+@pytest.mark.skipif(not Torch_Is_Available(), reason="torch is not installed yet")
+def Test_A_Stack_That_Recomputes_Its_Layers_Reaches_The_Same_Value_And_Gradients() -> None:
+    """dropping and rebuilding each layer's intermediates changes the memory held, never the numbers"""
+    layers = (Small_Layer(2, 2, seed=71), Small_Layer(2, 2, seed=73))
+    plain = ExplicitStack(layers)
+    recomputing = ExplicitStack(layers, recompute_layers=True)
+    values = np.asarray(Small_Field(2, (8, 8, 8), seed=75).values, dtype=np.float64)
+
+    def Loss_Through(stack: ExplicitStack) -> Callable[[dict[str, Any]], Any]:
+        def Loss(lifted: dict[str, Any]) -> Any:
+            return (stack.Forward(lifted, TorchEngine().Lift_Constant(values)) ** 2).mean()
+
+        return Loss
+
+    parameters = ParameterSet(values=plain.Parameter_Values())
+    plain_value, plain_gradients = TorchEngine().Value_And_Gradients(parameters, Loss_Through(plain))
+    value, gradients = TorchEngine().Value_And_Gradients(parameters, Loss_Through(recomputing))
+    assert abs(plain_value - value) < 1e-12
+    for name, gradient in plain_gradients.items():
+        assert np.allclose(gradient, gradients[name], atol=1e-12), name
+    # the reference engine takes the same branch as a plain call
+    assert np.allclose(
+        np.asarray(plain.Apply(Small_Field(2, (8, 8, 8), seed=75)).values),
+        np.asarray(recomputing.Apply(Small_Field(2, (8, 8, 8), seed=75)).values),
+    )

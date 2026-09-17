@@ -63,11 +63,13 @@ member  delta_r_squared  22     88    0.964537  0.001376       [0.963332, 0.9648
 
 ## Conformal band (IV.3)
 
-Level 0.9, unit `symmetry_orbit`, calibrated on 23 validation orbits, offset `0.012270`. Test-orbit coverage (every voxel of the whole field inside the band, medianed per orbit then averaged): `0.977` against a guarantee of `[0.900, 0.942]`.
+Level 0.9, unit `symmetry_orbit`, calibrated on 23 validation orbits, offset `0.012270`. Test-orbit coverage (every voxel of the whole field inside the band, medianed per orbit then averaged): `0.977` against a guarantee of `[0.900, 0.942]`; the band over-covers, sitting `0.036` above the guarantee's upper end -- the calibrated offset is conservative on this test split rather than tight.
 
 ## Standing
 
 Verdict: **pass** against the canon kill (`0.005565` relative L2, delta-R-squared >= 0.75), one seeded run (20260916). Per the sweep's own policy (seed sweeps deferred), no seed-spread is measured for this member, so a close result cannot be resolved further on this run alone; it is read at face value.
+
+Against the closed-form ridge from the cheap density's own basis coefficients (`0.000005` relative L2, itself within a few parts in a million of the rank-32 ceiling), the trained member's own error is `406` times larger -- on this interpolation-strength holdout the network adds nothing over linear regression, and the pass above is a pass against the pre-registered canon bar only, not against this closed-form floor.
 
 Caveats: one seed; the FiLM conditioning on campaign and exact-exchange fraction named in the canon entry is dropped here because the strain atlas is one campaign at one exact-exchange fraction, making it a no-op on this block (it is the canon's labeled ablation, not built here); the conditioned-model ablation itself is not run.
 

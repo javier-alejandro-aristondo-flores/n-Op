@@ -405,6 +405,17 @@ def Conformal_Lines(
     inspected = calibrator.Inspect()
     guarantee_low = float(np.asarray(inspected["coverage_guarantee_low"]))
     guarantee_high = float(np.asarray(inspected["coverage_guarantee_high"]))
+    if orbit_level_coverage > guarantee_high:
+        guarantee_reading = (
+            f"over-covers, sitting `{orbit_level_coverage - guarantee_high:.3f}` above the guarantee's upper end"
+            " -- the calibrated offset is conservative on this test split rather than tight"
+        )
+    elif orbit_level_coverage < guarantee_low:
+        guarantee_reading = (
+            f"under-covers, sitting `{guarantee_low - orbit_level_coverage:.3f}` below the guarantee's lower end"
+        )
+    else:
+        guarantee_reading = "sits inside the guaranteed interval"
     lines = [
         "## Conformal band (IV.3)",
         "",
@@ -412,7 +423,7 @@ def Conformal_Lines(
         f" {int(np.asarray(inspected['calibration_unit_count']))} validation orbits, offset"
         f" `{float(np.asarray(inspected['conformal_offset'])):.6f}`. Test-orbit coverage (every voxel of the"
         f" whole field inside the band, medianed per orbit then averaged): `{orbit_level_coverage:.3f}`"
-        f" against a guarantee of `[{guarantee_low:.3f}, {guarantee_high:.3f}]`.",
+        f" against a guarantee of `[{guarantee_low:.3f}, {guarantee_high:.3f}]`; the band {guarantee_reading}.",
         "",
     ]
     summary = MetricSummary(
@@ -509,6 +520,10 @@ def Main(argv: list[str] | None = None) -> int:
     floor_medians["identity"] = member_comparison.floor_median
     figure_count = Write_Figures(member, test, test_rebuilt, floor_medians, member_comparison.member_median)
 
+    comparisons_by_group = {comparison.group_name: comparison for comparison in floor_comparisons}
+    ridge_comparison = comparisons_by_group["ridge_cheap_coefficients"]
+    ridge_ratio = member_comparison.member_median / ridge_comparison.member_median
+
     stage_manifests = [cast(dict[str, object], training_manifest[f"stage_{stage_index}"]) for stage_index in range(3)]
     probe_rate = cast(float, training_manifest["probe_learning_rate"])
     stage_summary = ", ".join(
@@ -552,6 +567,12 @@ def Main(argv: list[str] | None = None) -> int:
         f" delta-R-squared >= 0.75), one seeded run (20260916). Per the sweep's own policy (seed sweeps"
         " deferred), no seed-spread is measured for this member, so a close result cannot be resolved"
         " further on this run alone; it is read at face value.",
+        "",
+        "Against the closed-form ridge from the cheap density's own basis coefficients"
+        f" (`{ridge_comparison.member_median:.6f}` relative L2, itself within a few parts in a million of the"
+        f" rank-32 ceiling), the trained member's own error is `{ridge_ratio:.0f}` times larger -- on this"
+        " interpolation-strength holdout the network adds nothing over linear regression, and the pass above"
+        " is a pass against the pre-registered canon bar only, not against this closed-form floor.",
         "",
         "Caveats: one seed; the FiLM conditioning on campaign and exact-exchange fraction named in the"
         " canon entry is dropped here because the strain atlas is one campaign at one exact-exchange"

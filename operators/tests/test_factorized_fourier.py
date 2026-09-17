@@ -46,6 +46,7 @@ from operators.factorized_fourier.report import (
     Localization_Loss,
     Nearest_Run_Rows,
     Probe_Curve_At,
+    Probe_Manifest_With_Curves,
     Probe_Passes,
     Shell_Filter_Rows,
     Write_Back_Parameters,
@@ -1048,6 +1049,35 @@ def Test_Probe_Curve_At_Reads_The_Nearest_Validation_Pass() -> None:
     assert abs(Probe_Curve_At(manifest, "cap_hit_fraction", 500) - 0.2) < 1e-12
     with pytest.raises(ValueError):
         Probe_Curve_At(manifest, "missing_curve", 400)
+
+
+def Test_Probe_Manifest_With_Curves_Widens_A_Real_Staged_Run_For_Probe_Curve_At(tmp_path: Path) -> None:
+    """a toy staged run's own stage-zero curves, read back off disk, land in the shape Probe_Curve_At reads"""
+
+    class Fixed_Value_Hook:
+        """emits one named diagnostic at a fixed value every validation pass, standing in for a rung's own health curve"""
+
+
+        def After_Step(self, progress: TrainingProgress) -> None:
+            return None
+
+
+        def After_Validation(self, progress: TrainingProgress) -> dict[str, float]:
+            return {"cap_hit_fraction": 0.5}
+
+    member = Toy_Member()
+    batches = TwoExampleBatches(Toy_Training_Batch(seed=21))
+    engine = TorchEngine(device_name="cpu")
+    parameters = ParameterSet(values={name: value.copy() for name, value in member.Parameter_Values().items()})
+    _, staged = Staged_Training(
+        engine, parameters, lambda: ParameterSet(values=member.Parameter_Values()), Batch_Loss(member), batches,
+        step_count=4, run_name="toy_probe", seed=5, artifact_directory=tmp_path, hook=Fixed_Value_Hook(),
+        stage_fractions=(1.0, 0.0, 0.0), validation_interval=2, probe_steps=2,
+    )
+    widened = Probe_Manifest_With_Curves(staged, tmp_path, "toy_probe")
+    validation_steps = cast(NDArray[np.float64], widened["stage_0_validation_steps"])
+    assert list(validation_steps) == [2.0, 4.0]
+    assert abs(Probe_Curve_At(widened, "cap_hit_fraction", 4) - 0.5) < 1e-12
 
 
 def Test_Fixed_Point_Health_Lines_Reports_Not_Yet_Run_Before_Any_Checkpoint_Exists() -> None:

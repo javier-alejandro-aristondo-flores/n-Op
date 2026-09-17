@@ -1384,6 +1384,21 @@ class HealthTrackingHook:
         return reported
 
 
+def Probe_Manifest_With_Curves(manifest: dict[str, object], artifact_directory: Path, run_name: str) -> dict[str, object]:
+    """a staged run's own manifest, widened with the stage-zero validation steps and auxiliary curves training wrote to disk"""
+    with np.load(artifact_directory / f"{run_name}_stage0_curves.npz") as archive:
+        validation_steps = np.asarray(archive["validation_steps"], dtype=np.float64)
+        auxiliary_curves = {
+            name.removesuffix("_curve"): np.asarray(archive[name], dtype=np.float64)
+            for name in archive.files
+            if name.endswith("_curve") and name not in ("loss_curve", "validation_curve")
+        }
+    widened_manifest = dict(manifest)
+    widened_manifest["stage_0_validation_steps"] = validation_steps
+    widened_manifest["stage_0_auxiliary_curves"] = auxiliary_curves
+    return widened_manifest
+
+
 def Probe_Fixed_Point_Rung(
     rung: Stabilization,
     run_name: str,
@@ -1391,10 +1406,11 @@ def Probe_Fixed_Point_Rung(
     jacobian_penalty: JacobianPenalty | None = None,
 ) -> dict[str, object]:
     """the five-hundred-step probe every rung is launched under before its six-hour run, one stage, no early stop"""
-    return Train_Flagship_Member(
+    manifest = Train_Flagship_Member(
         PROBE_STEP_COUNT, run_name, "fixed_point", stage_fractions=(1.0, 0.0, 0.0), stabilization=rung,
         contraction_budget=contraction_budget, jacobian_penalty=jacobian_penalty,
     )
+    return Probe_Manifest_With_Curves(manifest, TRAINING_ARTIFACT_PATH, run_name)
 
 
 def Probe_Curve_At(manifest: dict[str, object], curve_name: str, step: int) -> float:

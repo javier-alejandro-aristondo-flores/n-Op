@@ -131,12 +131,13 @@ def Unit_Scores(
     engine: Engine,
     parameters: ParameterSet,
     forward_loss: ForwardLoss,
-    held_units: tuple[tuple[str, LiftedArrays], ...],
+    held_units: tuple[tuple[str, TrainingBatch], ...],
 ) -> dict[str, float]:
     """each held-out unit's own loss, which is what a unit-mean score is taken over"""
+    # a unit is lifted only while it is scored, so a large validation set never sits on the accelerator at once
     return {
-        unit_key: engine.Evaluate(parameters, Loss_On(forward_loss, lifted_batch))
-        for unit_key, lifted_batch in held_units
+        unit_key: engine.Evaluate(parameters, Loss_On(forward_loss, Lifted_Batch(engine, batch)))
+        for unit_key, batch in held_units
     }
 
 
@@ -150,7 +151,7 @@ def Unit_Mean_Score(unit_scores: dict[str, float]) -> float:
 def Record_Validation_Pass(
     engine: Engine,
     forward_loss: ForwardLoss,
-    held_units: tuple[tuple[str, LiftedArrays], ...],
+    held_units: tuple[tuple[str, TrainingBatch], ...],
     progress: TrainingProgress,
 ) -> float:
     """one score over the held-out units, put on the curve and kept as the best when it is the best"""
@@ -261,9 +262,7 @@ def Train(
         raise ValueError(f"a validation pass every {validation_interval} steps is not a schedule")
     chosen_engine = Training_Engine(device, precision) if engine is None else engine
     generator = np.random.default_rng(seed)
-    held_units = tuple(
-        (unit_key, Lifted_Batch(chosen_engine, batch)) for unit_key, batch in batch_source.Validation_Batches()
-    )
+    held_units = tuple(batch_source.Validation_Batches())
     checkpoint_path: Path | None = None
     if artifact_directory is not None:
         artifact_directory.mkdir(parents=True, exist_ok=True)

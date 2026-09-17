@@ -38,7 +38,7 @@ from operators.framework import Coefficients, Domain, GridSpec, Spectral_Truncat
 from operators.inspection import Render_Error_Spread, Render_Floor_Comparison, Render_Inspection_Suite, Render_Table
 from operators.metrics import Relative_L2
 from operators.nonlinear_manifold_decoder import Manifold_Network, NonlinearManifoldDecoder
-from operators.substrate import ParameterSet
+from operators.substrate import ParameterSet, Peak_Accelerator_Bytes, Reset_Peak_Accelerator_Bytes
 from operators.tasks import Card_Named
 from operators.training import (
     Build_Field_Cache,
@@ -463,6 +463,7 @@ def Trained_Manifold_Member() -> tuple[NonlinearManifoldDecoder, NDArray[np.floa
     lifted_channel_deviation = engine.Lift_Constant(np.asarray(channel_deviation, dtype=np.float64))
     forward_loss = Point_Value_Loss(member, lifted_parameter_spreads, lifted_channel_mean, lifted_channel_deviation)
     parameters = ParameterSet(values=member.Parameter_Values())
+    Reset_Peak_Accelerator_Bytes()
     parameters, manifest = Staged_Training(
         engine,
         parameters,
@@ -478,6 +479,7 @@ def Trained_Manifold_Member() -> tuple[NonlinearManifoldDecoder, NDArray[np.floa
         validation_interval=VALIDATION_INTERVAL,
         final_stage_patience=FINAL_STAGE_PATIENCE,
     )
+    manifest["peak_accelerator_bytes"] = Peak_Accelerator_Bytes()
     for name, value in parameters.values.items():
         if name in member.branch.parameter_values:
             member.branch.parameter_values[name] = value

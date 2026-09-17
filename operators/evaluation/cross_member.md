@@ -33,8 +33,9 @@ residual_correction  projection_backbone  ridge_strain_components     relative_l
 
 ### lattice_to_charge
 
-member                configuration  group                     metric       units  median    verdicts
-galerkin_transformer  gate           nearest_angle_copy_floor  relative_l2  25     0.085278  -       
+member                configuration  group                         metric       units  median    verdicts                     
+galerkin_transformer  gate           member_vs_nearest_angle_copy  relative_l2  25     0.177966  nearest_angle_copy_floor:kill
+galerkin_transformer  gate           nearest_angle_copy_floor      relative_l2  25     0.085278  -                            
 
 ### strain_to_charge
 
@@ -54,8 +55,9 @@ deep_dft  minimal        superposed_atomic_density_floor_held_out_18  normalized
 
 #### perovskite_arms
 
-task               member                configuration  group                                metric       units  median    verdicts
-lattice_to_charge  galerkin_transformer  gate           linear_in_angle_interpolation_floor  relative_l2  27     0.026421  -       
+task               member                configuration  group                                    metric       units  median    verdicts                                
+lattice_to_charge  galerkin_transformer  gate           linear_in_angle_interpolation_floor      relative_l2  27     0.026421  -                                       
+lattice_to_charge  galerkin_transformer  gate           member_vs_linear_in_angle_interpolation  relative_l2  27     0.119110  linear_in_angle_interpolation_floor:kill
 
 #### strain_atlas_arms
 

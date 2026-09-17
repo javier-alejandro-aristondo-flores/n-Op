@@ -7,7 +7,7 @@ Verdicts use the canon's own bars; levels added before a member trained are labe
 
 | as of | trunk | tests | figures |
 |---|---|---|---|
-| 2026-09-17, 12:30 | `43715fb` | 610 + 9 card-only | 710 committed |
+| 2026-09-17, 14:30 | `99f5b1b` | 617 + 9 card-only | 784 committed |
 
 Words used throughout, defined once: the *electron localization function* is a field on [0, 1]
 saying how strongly electrons are pinned at a point; the *density of states* is the curve of how
@@ -35,7 +35,7 @@ yet read **pending**.
 | I.1 | `factorized_fourier` | explicit | judged (localization); potential and parametric floors measured, training queued | charge_to_localization / fold 0, cubic block | MAE 0.00217 vs kill ≤ 0.0488 | pass, 97.8% better |
 | I.2 | `alias_free_convolutional` | — | parts built, member not started | charge_to_localization (planned) | pending | pending |
 | I.3 | `factorized_fourier` | weight_tied_injected | four of five rungs trained and judged; the three stability rungs for the fixed point are built, probes queued | charge_to_localization / fold 0 | MAE 0.00271 (injected), 0.00297 (plain), copy margins 56% and 52% | pass; weight-tying yes at matched parameters, no at matched width; fixed_point pending |
-| I.4 | `galerkin_transformer` | — | not started; no package exists yet | charge_to_localization / charge_to_potential (planned) | pending | pending |
+| I.4 | `galerkin_transformer` | width 128, 4 heads, 4 layers | killed at its stage-1 gate, one seed | lattice_to_charge / perovskite angle stratum, fold 0 (25 runs) and 27 interior arm levels | 0.1780 vs bar ≤ 0.0426 (copy 0.0853); 0.1191 vs bar ≤ 0.0132 (interpolation 0.0264) | killed by its own pre-registration after three defects were fixed; tied with the training-mean field (0.1755); stage 2 not run |
 | II.1 | `deep_operator_network` | principal_component | finished | strain_to_charge / 40³ block, cheap functional | 0.000821 vs ridge kill ≤ 0.003105 (25% better) | pass, 14 of 14 |
 | II.2 | `multiple_input_operator_network` | — | not started | charge_and_potential_to_localization (planned) | pending | pending |
 | II.3 | `nonlinear_manifold_decoder` | canonical | killed, one seed | strain_to_charge / 423 interior arm levels (and the committed split, 22 units) | 0.002452 vs bar ≤ 0.000607 (bracketing interpolation 0.000911) | killed on the interpolation bar, as pre-registered and as the canon predicted; grid transfer a narrow miss (1.32× vs 1.3×) |
@@ -171,9 +171,44 @@ injection, queued after it; the injection-free weight-tied row above stays as an
 
 ## I.4 — Galerkin transformer with query-point decoding · charge density → electron localization / local potential
 
-**Status: not started; no package exists yet.** Linear attention over the grid with a
-cross-attention decoder at query points, layer-granular checkpointing. Scheduled in the same wave
-as I.2.
+**Status: killed at its stage-1 gate by its own pre-registration, one seed (20260916).** A new
+package, `operators/galerkin_transformer/`: softmax-free attention (queries times the key–value
+product over the token count, keys and values normalized over the token axis, verified against a
+token-by-token double loop with no token-by-token tensor ever formed), a cross-attention decoder at
+query points, width 128, four heads, four layers, 374,145 parameters. The canon stages this entry:
+first the perovskite lattice factors → charge density gate on the angle stratum (32³ tokens, 64³
+queries, the six factors as constant channels), two hours of wall-clock; only on a pass, the
+localization task on the cubic block.
+
+| population | row | median relative L2 |
+|---|---|---|
+| fold 0 of the angle stratum, 25 runs | nearest-angle copy, the floor | 0.0853 (bar ≤ 0.0426) |
+| | the training-mean field (context) | 0.1755 |
+| | **the member** | **0.1780 — killed** |
+| 27 interior levels of the angle arm | linear-in-angle interpolation, the floor | 0.0264 (bar ≤ 0.0132) |
+| | **the member** | **0.1191 — killed** |
+
+Run `perovskite_gate_v2_52283`: 52,283 steps in its two hours at 0.138 s per step, 1.5 GB on the
+card; validation flat at the mean field through every stage. For scale, the built branch–trunk
+member reaches 0.0183 on the same fold.
+
+**The kill is of a repaired member, not of a bug.** Its first gate run never trained, and three
+defects were found and fixed before this verdict: the decoder's queries carried coordinates only, so
+training drove the output blind to the lattice factors (outputs for two different structures 27%
+apart at initialization, 4e-8 apart after training; fixed by conditioning the queries on the
+factors, with a regression test); the electron-count renormalization sat inside the training loss
+(moved to inference only, the house pattern); and the raw density's core cusps owned the squared
+error (the top 5% of voxels carry 77% of it; fixed by per-voxel target standardization, the
+corpus's own recorded prescription). After the fixes the member reaches the mean field in a
+hundred steps, keeps its input dependence (14% between its two most separated evaluation runs),
+and learns nothing beyond the mean.
+
+*An untested hypothesis, recorded before the verdict:* on this task the network is handed no
+field, only six constants and order-four periodic coordinate features, so everything spatial must
+be synthesized from four modes per axis, while the lattice response is concentrated near the atomic
+cores of a 64³ grid; the branch–trunk member wins the same task because a proper-orthogonal basis
+hands it that structure. The canon names no rung after this gate, so it is not pursued. The
+localization stage and the potential cross-entry bar were not run.
 
 ---
 

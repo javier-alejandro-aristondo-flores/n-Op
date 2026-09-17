@@ -13,6 +13,7 @@ from operators.codomain_attention.report import (
     Loaded_Training_Population,
     PRETRAIN_HOUR_CAP,
     PRETRAIN_SEED,
+    PROBE_RESULT_PATH,
     STEP_COST_PROBE_STEPS,
     Step_Cost_Probe,
     Train_Completion_Member,
@@ -24,8 +25,6 @@ from operators.substrate import Peak_Accelerator_Bytes, Reset_Peak_Accelerator_B
 
 # the pretrain's own fixed run name, so the fine-tune and k3 drivers know which checkpoint to resume from
 PRETRAIN_RUN_NAME = "completion_fold0_pretrain_20260916"
-
-PROBE_RESULT_PATH = TRAINING_ARTIFACT_PATH / "probe_result.json"
 
 FINE_TUNE_HOUR_CAP = 1.0
 K3_HOUR_CAP = 4.0

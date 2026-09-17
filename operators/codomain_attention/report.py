@@ -1,5 +1,6 @@
 """the member measured against its pre-registered floors, and the staged training driver the card runs it through"""
 
+import json
 import re
 import time
 from pathlib import Path
@@ -41,6 +42,7 @@ FIGURES_PATH = Path(__file__).parent / "figures"
 ARRAY_CACHE_PATH = POOL_ROOT / STORE_NAME / "_figures" / "codomain_attention"
 # checkpoints are scratch, not a corpus artifact, but they still hold no volumetric data either way
 TRAINING_ARTIFACT_PATH = POOL_ROOT / STORE_NAME / "_training" / "codomain_attention"
+PROBE_RESULT_PATH = TRAINING_ARTIFACT_PATH / "probe_result.json"
 
 PRETRAIN_SEED = 20260916
 
@@ -329,7 +331,10 @@ def Write_Inspection_Suite(member: CodomainAttention, directory: Path) -> Render
 
 
 def Pre_Training_Report_Lines(
-    parameter_count: int, master_weight_megabytes: float, bars: dict[str, dict[str, float | str | None]]
+    parameter_count: int,
+    master_weight_megabytes: float,
+    bars: dict[str, dict[str, float | str | None]],
+    probe: dict[str, object] | None,
 ) -> list[str]:
     """the report's own pre-registration section: architecture, floors and every bar, before a step of training runs"""
     lines = [
@@ -361,10 +366,21 @@ def Pre_Training_Report_Lines(
         f"- channel vocabulary: {', '.join(CHANNEL_VOCABULARY)}",
         f"- parameters: {parameter_count:,} ({master_weight_megabytes:.1f} MB at double precision,"
         f" {master_weight_megabytes / 2.0:.1f} MB at the single-precision working width)",
-        f"- peak memory: not yet measured with recomputation on; pre-registered ceiling for the 300-step probe is"
-        f" {CARD_USABLE_MEMORY_GIGABYTES:.2f} GB (the card's own measured usable budget), the probe stopping",
-        f"  on exceedance -- for reference the flagship's explicit configuration held"
-        f" {FLAGSHIP_PEAK_MEMORY_GIGABYTES_AT_BATCH_ONE:.1f} GB at batch 1",
+    ]
+    if probe is None:
+        lines += [
+            f"- peak memory: not yet measured with recomputation on; pre-registered ceiling for the 300-step probe"
+            f" is {CARD_USABLE_MEMORY_GIGABYTES:.2f} GB (the card's own measured usable budget), the probe",
+            f"  stopping on exceedance -- for reference the flagship's explicit configuration held"
+            f" {FLAGSHIP_PEAK_MEMORY_GIGABYTES_AT_BATCH_ONE:.1f} GB at batch 1",
+        ]
+    else:
+        lines += [
+            f"- peak memory: measured at {probe['peak_accelerator_memory_gigabytes']:.4f} GB over the 300-step"
+            f" probe, recomputation on, against the {probe['ceiling_gigabytes']:.2f} GB ceiling -- see the"
+            f" Training probe section below",
+        ]
+    lines += [
         "",
         "## Floors and bars (fold 0 of the cubic block, freshly read through the promoted evaluation rows)",
         "",
@@ -379,6 +395,41 @@ def Pre_Training_Report_Lines(
             f" required improvement {bar['required_improvement']}, absolute bar **{bar_text}** -- {bar['reads']}"
         )
     lines.append("")
+    return lines
+
+
+def Loaded_Probe_Result() -> dict[str, object] | None:
+    """the 300-step cost probe's own written numbers, or nothing if the probe has not yet run"""
+    if not PROBE_RESULT_PATH.is_file():
+        return None
+    return cast(dict[str, object], json.loads(PROBE_RESULT_PATH.read_text()))
+
+
+def Training_Probe_Report_Lines(probe: dict[str, object] | None) -> list[str]:
+    """the probe's measured seconds per step and peak accelerator memory, or the pre-registered ceiling alone"""
+    lines = ["## Training probe (300 steps, exclusive card)", ""]
+    if probe is None:
+        lines += [
+            f"Not yet measured; pre-registered ceiling is {CARD_USABLE_MEMORY_GIGABYTES:.2f} GB (the card's own"
+            " measured usable budget).",
+            "",
+        ]
+        return lines
+    seconds_per_step = cast(float, probe["seconds_per_step"])
+    six_hour_steps = max(1, int(PRETRAIN_HOUR_CAP * 3600.0 / seconds_per_step))
+    within = "within" if probe["within_ceiling"] else "over"
+    lines += [
+        f"Measured on an exclusive card, `PYTORCH_CUDA_ALLOC_CONF=expandable_segments:True`:"
+        f" {seconds_per_step:.4f} seconds per step, {cast(float, probe['peak_accelerator_memory_gigabytes']):.4f} GB"
+        f" peak accelerator memory against the {cast(float, probe['ceiling_gigabytes']):.2f} GB ceiling"
+        f" ({within} it), over {int(cast(float, probe['step_count']))} steps in"
+        f" {cast(float, probe['elapsed_seconds']):.1f} s. The stack recomputes its layers"
+        " (`recompute_layers=True`) because the plain forward saves on the order of 7 GB against the card's"
+        f" {CARD_USABLE_MEMORY_GIGABYTES:.2f} GB budget; recomputation brought the measured peak down to"
+        f" {cast(float, probe['peak_accelerator_memory_gigabytes']):.2f} GB at roughly a third more wall-clock"
+        f" per step. At this rate the six-hour pretrain cap gives {six_hour_steps:,} steps.",
+        "",
+    ]
     return lines
 
 
@@ -444,7 +495,9 @@ def Main() -> int:
     sized_member = Placeholder_Sized_Member()
     parameter_count = sized_member.Parameter_Count()
     master_weight_megabytes = sum(value.nbytes for value in sized_member.Parameter_Values().values()) / 1e6
-    lines = Pre_Training_Report_Lines(parameter_count, master_weight_megabytes, bars)
+    probe = Loaded_Probe_Result()
+    lines = Pre_Training_Report_Lines(parameter_count, master_weight_megabytes, bars, probe)
+    lines += Training_Probe_Report_Lines(probe)
     lines += [
         "## Split counts (measured against the committed paired-fields fold map)",
         "",

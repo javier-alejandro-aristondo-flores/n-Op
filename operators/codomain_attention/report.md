@@ -24,8 +24,7 @@ dedicated potential run is queued ahead of this member's own card slot.
 - processing grid: (40, 40, 40)
 - channel vocabulary: charge_density, magnetization_density, electron_localization_up, electron_localization_down, local_potential_up, local_potential_down
 - parameters: 3,838,762 (30.7 MB at double precision, 15.4 MB at the single-precision working width)
-- peak memory: not yet measured with recomputation on; pre-registered ceiling for the 300-step probe is 5.61 GB (the card's own measured usable budget), the probe stopping
-  on exceedance -- for reference the flagship's explicit configuration held 3.6 GB at batch 1
+- peak memory: measured at 2.2072 GB over the 300-step probe, recomputation on, against the 5.61 GB ceiling -- see the Training probe section below
 
 ## Floors and bars (fold 0 of the cubic block, freshly read through the promoted evaluation rows)
 
@@ -34,6 +33,10 @@ dedicated potential run is queued ahead of this member's own card slot.
 - **k1_potential_zero_shot**: floor `factorized_fourier_dedicated_potential` = pending, metric `mean_removed_relative_l2`, required improvement -1.0, absolute bar **pending** -- pending: the dedicated potential run is queued on the card ahead of this member's
 - **k2_localization_semilocal_floor**: floor `semilocal_ridge_floor` = 0.097618, metric `mean_absolute_error`, required improvement 0.2, absolute bar **0.078094** -- the completion flagship deflates if zero-shot elf lands within twenty percent of this
 - **k2_potential_spectral_poisson_semilocal_xc**: floor `hartree_plus_semilocal_xc_ridge` = 0.479646, metric `mean_removed_relative_l2`, required improvement 0.3, absolute bar **0.335752** -- the v-read adds nothing over textbook physics if it does not clear this
+
+## Training probe (300 steps, exclusive card)
+
+Measured on an exclusive card, `PYTORCH_CUDA_ALLOC_CONF=expandable_segments:True`: 2.2917 seconds per step, 2.2072 GB peak accelerator memory against the 5.61 GB ceiling (within it), over 300 steps in 687.5 s. The stack recomputes its layers (`recompute_layers=True`) because the plain forward saves on the order of 7 GB against the card's 5.61 GB budget; recomputation brought the measured peak down to 2.21 GB at roughly a third more wall-clock per step. At this rate the six-hour pretrain cap gives 9,425 steps.
 
 ## Split counts (measured against the committed paired-fields fold map)
 

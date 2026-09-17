@@ -7,7 +7,7 @@ Verdicts use the canon's own bars; levels added before a member trained are labe
 
 | as of | trunk | tests | figures |
 |---|---|---|---|
-| 2026-09-12, 16:00 | `63ff0d4` | 424 | 536 committed |
+| 2026-09-17, 08:00 | `8a617ac` | 615 | 691 committed |
 
 Words used throughout, defined once: the *electron localization function* is a field on [0, 1]
 saying how strongly electrons are pinned at a point; the *density of states* is the curve of how
@@ -34,7 +34,7 @@ yet read **pending**.
 |---|---|---|---|---|---|---|
 | I.1 | `factorized_fourier` | explicit | judged (localization); potential and parametric floors measured, training queued | charge_to_localization / fold 0, cubic block | MAE 0.00217 vs kill ≤ 0.0488 | pass, 97.8% better |
 | I.2 | `alias_free_convolutional` | — | parts built, member not started | charge_to_localization (planned) | pending | pending |
-| I.3 | `factorized_fourier` | weight_tied | three of four rungs trained and judged; fixed point blocked on a build | charge_to_localization / fold 0 | MAE 0.00297, copy margin 52% | pass; fixed_point pending |
+| I.3 | `factorized_fourier` | weight_tied_injected | four of five rungs trained and judged; the three stability rungs for the fixed point are built, probes queued | charge_to_localization / fold 0 | MAE 0.00271 (injected), 0.00297 (plain), copy margins 56% and 52% | pass; weight-tying yes at matched parameters, no at matched width; fixed_point pending |
 | I.4 | `galerkin_transformer` | — | not started; no package exists yet | charge_to_localization / charge_to_potential (planned) | pending | pending |
 | II.1 | `deep_operator_network` | principal_component | finished | strain_to_charge / 40³ block, cheap functional | 0.000821 vs ridge kill ≤ 0.003105 (25% better) | pass, 14 of 14 |
 | II.2 | `multiple_input_operator_network` | — | not started | charge_and_potential_to_localization (planned) | pending | pending |
@@ -42,9 +42,9 @@ yet read **pending**.
 | II.4 | `factorized_fourier` | parametric | built with floors measured, training queued | strain_to_charge, parametric / interior levels | floor 0.091% vs kill ≤ 0.064% | pending, not yet trained |
 | III.1 | `deep_dft` | — | parts built, member not started | structure_to_charge_defects (planned) | pending | pending |
 | III.3 | `gaussian_plane_wave` | — | not started; no package exists yet | structure → charge (planned) | pending | pending |
-| IV.1 | `residual_correction` | — | not started; central assumption measured | cheap_to_accurate_charge (planned) | ceiling 0.024% vs identity 1.118% | pending |
+| IV.1 | `residual_correction` | projection_backbone | judged, one seed | cheap_to_accurate_charge / strain_atlas_holdout / test, 22 orbits | 0.002079 vs kill ≤ 0.005565 (identity 0.011131) | pass the canon kill; 406× worse than the closed-form ridge, so nothing gained over linear regression |
 | IV.2 | — | — | not started | cheap_to_accurate_states (planned) | pending | pending |
-| IV.3 | `wrappers` (`ConformalCalibrator`) | — | built, not yet applied to a member | any prediction → interval (planned) | pending | pending |
+| IV.3 | `wrappers` (`ConformalCalibrator`) | level 0.90, orbit unit | applied to IV.1 | cheap_to_accurate_charge / test orbits | coverage 0.977 vs guaranteed 0.900–0.942 | valid, over-covering (conservative) |
 | V.1 | `codomain_attention` | — | parts built, member not started | field_completion (planned) | pending | pending |
 | VI.1 | `deep_operator_network` | energy_trunk | finished | strain_to_states / 248 test runs, 30 orbits | curve L1 0.206 vs ridge 0.368 | pass, 44% better |
 
@@ -127,8 +127,9 @@ much under grid shift) is not built.
 
 ## I.3 — Deep-equilibrium Fourier operator, with the weight-tied ladder · charge density → electron localization, computed as a fixed point
 
-**Status: three of four rungs trained and judged; the fixed-point rung is blocked on a build (see
-below), not on a knob.** Lives in `operators/factorized_fourier/` as configurations of one factory, the
+**Status: four of five rungs trained and judged; the fixed-point rung's three canon stability rungs
+are built and tested (spectral clipping, a Jacobian penalty, a normalized parametrization), their
+probes queued on the card.** Lives in `operators/factorized_fourier/` as configurations of one factory, the
 canon's own design. The experiment is the decomposition curve explicit → weight-tied → fixed point,
 isolating what weight sharing buys from what implicit depth buys; "weight-tying yes, deep
 equilibrium no" is a legitimate verdict.
@@ -138,11 +139,14 @@ equilibrium no" is a legitimate verdict.
 | explicit, twelve layers | 11.55M | 24,404 | 3.94 h | 3.6 GB | 8.0e-5 | 0.00217 | all pass |
 | weight-tied, one layer applied twelve times (no input injection) | 0.96M | 23,804 | 2.69 h | 3.2 GB | 1.2e-4 | 0.00297 | all pass; copy margin 52% |
 | explicit, one layer — the exact matched-parameter comparator | 0.96M | 35,505 (full budget, still improving) | 0.52 h | 0.7 GB | 3.9e-4 | 0.01004 | canon levels pass; fails the copy and the stretch |
+| weight-tied with input injection — the fixed point's exact unrolled counterpart | 0.96M | 28,504 | resumed across two power losses | 3.5 GB | 1.0e-4 | 0.00271 | all pass; copy margin 56% |
 | fixed point (phantom gradient, depth 3) | 0.96M | — | — | — | — | — | pending |
 
 Reading so far: re-applying one layer twelve times beats applying it once by more than three to one
-at identical parameter count; the twelve-layer stack buys another factor of one and a half for
-twelve times the parameters.
+at identical parameter count; injecting the input at every application buys another 9% (0.00271
+against 0.00297; defects 0.00316, strains 0.00107); the twelve-layer stack is still a quarter better
+than the best tied rung for twelve times the parameters. So far: weight-tying yes at matched
+parameters, no at matched width. One seed per rung.
 
 Canon bars for the fixed-point rung: beat the explicit comparator at both matchings (same width and
 matched parameters) over three seeds, or be at least 3× faster to train; health floor ≥ 90% of
@@ -295,11 +299,28 @@ entry to land redundant, and building it is what makes that prediction worth som
 
 ## IV.1 — Residual correction · cheap-functional charge density → accurate-functional charge density
 
-**Status: not started; its central assumption is measured.** The correction field's basis decay on
-the 608 same-geometry training pairs: rank-32 representation ceiling 0.024% relative L2 against an
-identity floor of 1.118% and a kill of 0.559% (half the identity floor), so the whole error will
-live in the parameter map, not the representation. Unblocked: the wrappers are trainable and the
-`proper_orthogonal` backbone it names exists.
+**Status: judged, one seed (20260916).** `operators/residual_correction/`, configuration
+`projection_backbone`: the cheap density's rank-32 basis coefficients → a small network starting at
+the identity → the correction's rank-32 basis, zero-mean conserved; 24,865 parameters; 20,000 steps
+in about 34 minutes. Test block: 88 runs in 22 symmetry orbits of the strain atlas holdout, relative
+L2, orbit-aggregated medians.
+
+| row | median | against the identity floor |
+|---|---|---|
+| identity (return the cheap density) | 0.011131 | the floor |
+| global affine | 0.010466 | 6.0% better |
+| ridge from the strain components | 0.000049 | 99.6% better |
+| ridge from the cheap density's coefficients | 0.000005 | 100.0% better |
+| rank-32 representation ceiling | 0.000002 | — |
+| **the member** | **0.002079** | **81.3% better; canon kill ≤ 0.005565 passed; ΔR² 0.9645** |
+
+The pass is against the canon's pre-registered bar only. The closed-form ridge from the cheap
+density's own coefficients is 406 times better than the trained member: on this holdout, which
+removes symmetry orbits but leaves every held-out point a small interpolation step from a training
+point, the correction is almost exactly linear in those coefficients and the network adds nothing
+over linear regression. The canon's conditioning on campaign and exchange fraction is a no-op on
+this one-campaign block and was not built; the spectral backbone is the escalation for a miss and
+was not needed.
 
 ---
 
@@ -311,8 +332,10 @@ live in the parameter map, not the representation. Unblocked: the wrappers are t
 
 ## IV.3 — Conformal interval wrapper · any prediction → the same prediction with a guaranteed-coverage interval
 
-**Status: built (`ConformalCalibrator` in `operators/wrappers/`), not yet applied to a member's
-results.** A wrapper, never a member.
+**Status: applied to IV.1.** `ConformalCalibrator` in `operators/wrappers/`, a wrapper, never a
+member. Level 0.90, exchangeable unit the symmetry orbit, calibrated on 23 validation orbits and
+applied to the 22 test orbits of the correction member: coverage 0.977 against a guaranteed
+interval of 0.900 to 0.942. Valid and conservative: it over-covers by 0.036.
 
 ---
 

@@ -280,13 +280,30 @@ def Test_Agreeing_Artifacts_Render_One_Table_Per_Task() -> None:
     assert "alias_free_convolutional" in rendered
 
 
-def Test_A_Split_Mismatch_Refuses() -> None:
-    """a row whose split differs from its own task card's split is refused, never silently rendered"""
-    wrong_split = Synthetic_Cross_Member_Results(
-        "factorized_fourier", "charge_to_localization", "not_the_cards_split", "sig_a", 0.1
+def Test_A_Split_Mismatch_Is_Listed_Not_Pooled() -> None:
+    """a row whose split differs from its own task card's split lands in its own section, never the task's table"""
+    on_card = Synthetic_Cross_Member_Results(
+        "factorized_fourier", "charge_to_localization", "paired_fields_fivefold", "sig_a", 0.1
     )
-    with pytest.raises(ValueError):
-        Cross_Member_Table((wrong_split,))
+    off_card = Synthetic_Cross_Member_Results(
+        "alias_free_convolutional", "charge_to_localization", "not_the_cards_split", "sig_b", 0.2
+    )
+    rendered = Cross_Member_Table((on_card, off_card))
+    assert "Rows outside the card's split" in rendered
+    assert "not_the_cards_split" in rendered
+    task_section, outside_section = rendered.split("### Rows outside the card's split")
+    assert "alias_free_convolutional" not in task_section
+    assert "alias_free_convolutional" in outside_section
+    assert "factorized_fourier" in task_section
+
+
+def Test_An_Unknown_Task_Names_Its_Member() -> None:
+    """a task name no card carries refuses with the offending member named, not just the task"""
+    unknown = Synthetic_Cross_Member_Results(
+        "factorized_fourier", "not_a_real_task", "whatever_split", "sig_a", 0.1
+    )
+    with pytest.raises(ValueError, match="factorized_fourier"):
+        Cross_Member_Table((unknown,))
 
 
 def Test_A_Signature_Mismatch_Refuses() -> None:

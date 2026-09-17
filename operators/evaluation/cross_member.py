@@ -49,29 +49,37 @@ def Pooled_Verdicts(results: tuple[MemberResults, ...]) -> tuple[VerdictRow, ...
     return tuple(verdict for member_results in results for verdict in member_results.verdicts)
 
 
-def Split_Refusals(rows: tuple[ResultRow, ...]) -> list[str]:
-    """one message per row whose split does not match its own task card's split"""
-    refusals: list[str] = []
+def Card_Split_Of(row: ResultRow) -> str:
+    """the row's own task card's committed split, or a refusal naming the member and the unknown task"""
+    try:
+        return Card_Named(row.key.task).split
+    except KeyError:
+        raise ValueError(f"{row.key.member}: no task card named {row.key.task!r} (key {row.key})") from None
+
+
+def Card_Split_Partition(rows: tuple[ResultRow, ...]) -> tuple[tuple[ResultRow, ...], tuple[ResultRow, ...]]:
+    """every row measured on its own task card's committed split, and every other row, never pooled together"""
+    on_card: list[ResultRow] = []
+    outside: list[ResultRow] = []
     for row in rows:
-        card_split = Card_Named(row.key.task).split
-        if row.key.split != card_split:
-            refusals.append(
-                f"{row.key.member} {row.key.task} {row.key.configuration}:"
-                f" split {row.key.split!r} differs from the card's {card_split!r}"
-            )
-    return refusals
+        (on_card if row.key.split == Card_Split_Of(row) else outside).append(row)
+    return tuple(on_card), tuple(outside)
 
 
 def Signature_Refusals(rows: tuple[ResultRow, ...]) -> list[str]:
-    """one message per task whose rows disagree on which units they were scored over"""
-    signatures_by_task: dict[str, set[str]] = {}
+    """one message per task, split, block and group whose rows disagree on which units they were scored over"""
+    members_by_signature: dict[tuple[str, str, str, str], dict[str, set[str]]] = {}
     for row in rows:
-        signatures_by_task.setdefault(row.key.task, set()).add(row.block_signature)
-    return [
-        f"{task}: block signatures disagree across members {sorted(signatures)}"
-        for task, signatures in sorted(signatures_by_task.items())
-        if len(signatures) > 1
-    ]
+        measurement = (row.key.task, row.key.split, row.key.block, row.key.group)
+        members_by_signature.setdefault(measurement, {}).setdefault(row.block_signature, set()).add(row.key.member)
+    refusals: list[str] = []
+    for measurement, signatures in sorted(members_by_signature.items()):
+        if len(signatures) <= 1:
+            continue
+        task, split, block, group = measurement
+        named = {signature: sorted(members) for signature, members in sorted(signatures.items())}
+        refusals.append(f"{task} {split} {block} {group}: block signatures disagree across members {named}")
+    return refusals
 
 
 def Verdicts_For(verdicts: tuple[VerdictRow, ...], key: ResultKey) -> tuple[str, ...]:
@@ -101,19 +109,52 @@ def Task_Table(task: str, rows: tuple[ResultRow, ...], verdicts: tuple[VerdictRo
     )
 
 
+def Outside_Card_Split_Table(split: str, rows: tuple[ResultRow, ...], verdicts: tuple[VerdictRow, ...]) -> Table:
+    """one non-card split's own rows, sorted by task then member, each carrying the verdicts its key earned"""
+    split_rows = sorted(
+        (row for row in rows if row.key.split == split),
+        key=lambda row: (row.key.task, row.key.member, row.key.configuration, row.key.group, row.summary.metric_name),
+    )
+    return tuple(
+        {
+            "task": row.key.task,
+            "member": row.key.member,
+            "configuration": row.key.configuration,
+            "group": row.key.group,
+            "metric": row.summary.metric_name,
+            "units": row.summary.unit_count,
+            "median": f"{row.summary.median:.6f}",
+            "verdicts": ", ".join(Verdicts_For(verdicts, row.key)) or "-",
+        }
+        for row in split_rows
+    )
+
+
+def Outside_Card_Split_Section(rows: tuple[ResultRow, ...], verdicts: tuple[VerdictRow, ...]) -> str:
+    """every row whose split differs from its own task card's, one table per split, apart from the tables above"""
+    splits = sorted({row.key.split for row in rows})
+    tables = "\n\n".join(
+        f"#### {split}\n\n{Render_Table(Outside_Card_Split_Table(split, rows, verdicts))}" for split in splits
+    )
+    return f"### Rows outside the card's split\n\n{tables}"
+
+
 def Cross_Member_Table(results: tuple[MemberResults, ...]) -> str:
-    """every landed member's rows, one table per task, or a plain statement when no artifact exists"""
+    """every task's own rows on its card split, one table each, a further section for every other split, or nothing"""
     rows = Pooled_Rows(results)
     if not rows:
         return "no artifacts"
-    refusals = Split_Refusals(rows) + Signature_Refusals(rows)
+    on_card_rows, outside_rows = Card_Split_Partition(rows)
+    refusals = Signature_Refusals(rows)
     if refusals:
         raise ValueError("; ".join(refusals))
     verdicts = Pooled_Verdicts(results)
     sections = [
-        f"### {task}\n\n{Render_Table(Task_Table(task, rows, verdicts))}"
-        for task in sorted({row.key.task for row in rows})
+        f"### {task}\n\n{Render_Table(Task_Table(task, on_card_rows, verdicts))}"
+        for task in sorted({row.key.task for row in on_card_rows})
     ]
+    if outside_rows:
+        sections.append(Outside_Card_Split_Section(outside_rows, verdicts))
     return "\n\n".join(sections)
 
 

@@ -7,7 +7,7 @@ Verdicts use the canon's own bars; levels added before a member trained are labe
 
 | as of | trunk | tests | figures |
 |---|---|---|---|
-| 2026-09-17, 08:00 | `8a617ac` | 615 | 691 committed |
+| 2026-09-17, 12:30 | `43715fb` | 610 + 9 card-only | 710 committed |
 
 Words used throughout, defined once: the *electron localization function* is a field on [0, 1]
 saying how strongly electrons are pinned at a point; the *density of states* is the curve of how
@@ -38,7 +38,7 @@ yet read **pending**.
 | I.4 | `galerkin_transformer` | — | not started; no package exists yet | charge_to_localization / charge_to_potential (planned) | pending | pending |
 | II.1 | `deep_operator_network` | principal_component | finished | strain_to_charge / 40³ block, cheap functional | 0.000821 vs ridge kill ≤ 0.003105 (25% better) | pass, 14 of 14 |
 | II.2 | `multiple_input_operator_network` | — | not started | charge_and_potential_to_localization (planned) | pending | pending |
-| II.3 | `nonlinear_manifold_decoder` | — | parts built, member not started | strain/lattice → charge (planned) | pending | pending |
+| II.3 | `nonlinear_manifold_decoder` | canonical | killed, one seed | strain_to_charge / 423 interior arm levels (and the committed split, 22 units) | 0.002452 vs bar ≤ 0.000607 (bracketing interpolation 0.000911) | killed on the interpolation bar, as pre-registered and as the canon predicted; grid transfer a narrow miss (1.32× vs 1.3×) |
 | II.4 | `factorized_fourier` | parametric | built with floors measured, training queued | strain_to_charge, parametric / interior levels | floor 0.091% vs kill ≤ 0.064% | pending, not yet trained |
 | III.1 | `deep_dft` | — | parts built, member not started | structure_to_charge_defects (planned) | pending | pending |
 | III.3 | `gaussian_plane_wave` | — | not started; no package exists yet | structure → charge (planned) | pending | pending |
@@ -254,9 +254,28 @@ the layerless one the branch–trunk member uses, and the encoders and readouts 
 
 ## II.3 — Nonlinear manifold decoder · strain or lattice parameters → charge density, decoded point by point
 
-**Status: parts built, member not started.** `NonlinearDecoder` exists in `operators/readouts/`
-(the value at a point is a nonlinear function of latent and position, proven not expressible as a
-linear map of its latent: 0.097 against a basis expansion's 6.7e-16 on the linearity test).
+**Status: killed on its pre-registered interpolation bar, one seed (20260916).**
+`operators/nonlinear_manifold_decoder/`: the six strain components plus the functional → a sensor
+encoder → `NonlinearDecoder` (the value at a point is a nonlinear function of latent and position,
+proven not expressible as a linear map of its latent), point-sampled on every grid shape; 272,001
+parameters; about 10,200 steps in seven minutes on the card (≈0.7 GB sampled), the rest of its
+46 minutes host evaluation. Relative L2, medians:
+
+| population | row | median | reading |
+|---|---|---|---|
+| 423 interior levels of the strain arms (leave one level out) | bracketing linear interpolation, the floor | 0.000911 | bar: a third better, ≤ 0.000607 |
+| | Gaussian radial basis on the six strain components, the second floor | 0.000991 | bar ≤ 0.000661 |
+| | ridge to the strain tensor (context) | 0.004225 | — |
+| | nearest-run copy (context) | 0.019876 | — |
+| | **the member** | **0.002452** | **killed: 2.7× worse than interpolation** |
+| committed holdout split, 22 units | the member's headline | 0.002424 | context: the built branch–trunk canonical reads 0.0019–0.0024 on the same split |
+| every grid shape, 30 units | the member | 0.002795 | — |
+| grid transfer | error off the dominant 40³ shape against on it | 0.003188 against 0.002424 | inflation 1.32× against a bar of 1.3×: a narrow miss |
+
+The canon predicted this: on an interpolation split a linear interpolation between bracketing
+training levels is nearly exact, and a learned decoder cannot beat it by a third. The member is a
+working operator that answers on nine grid shapes at the branch–trunk member's accuracy; it is
+killed by its bar, not by a defect.
 
 ---
 

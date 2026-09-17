@@ -319,16 +319,72 @@ def Test_The_Decoder_Query_Condition_Makes_A_Fresh_Members_Output_Depend_On_The_
     parameters = member.Parameter_Values()
     vector_a = np.array([1.0, 1.0, 1.0, 0.8, 1.2, 1.2])
     vector_b = np.array([1.0, 1.0, 1.0, 1.1, 0.8, 0.8])
-    condition_vector = np.array([1.0])
-    output_a = member.Forward_From_Coarse_Input(
-        parameters, Parametric_Combined_Input(vector_a, processing_shape), query_features,
-        weight_each=1.0, condition_vector=condition_vector,
-    )
-    output_b = member.Forward_From_Coarse_Input(
-        parameters, Parametric_Combined_Input(vector_b, processing_shape), query_features,
-        weight_each=1.0, condition_vector=condition_vector,
-    )
+    output_a = member.Forward_From_Coarse_Input(parameters, Parametric_Combined_Input(vector_a, processing_shape), query_features)
+    output_b = member.Forward_From_Coarse_Input(parameters, Parametric_Combined_Input(vector_b, processing_shape), query_features)
     assert Relative_Difference(output_a, output_b) > 1e-3
+
+
+def Test_The_Decoder_Query_Condition_Survives_A_Handful_Of_Training_Steps() -> None:
+    """a few gradient steps on a toy two-lattice batch cannot train the un-normalized condition channel away"""
+    processing_shape = (3, 3, 3)
+    member = Parametric_Member(processing_shape, hidden_channels=8, layer_count=1, seed=31)
+    query_features = member.decoder.Coordinate_Features(Output_Points(GridSpec((4, 4, 4))))
+    generator = np.random.default_rng(32)
+    combined_a = Parametric_Combined_Input(np.array([1.0, 1.0, 1.0, 0.8, 1.2, 1.2]), processing_shape)
+    combined_b = Parametric_Combined_Input(np.array([1.0, 1.0, 1.0, 1.1, 0.8, 0.8]), processing_shape)
+    query_row_count = query_features.shape[0]
+    target_a = generator.normal(size=(query_row_count, 1))
+    target_b = generator.normal(size=(query_row_count, 1))
+
+    def Forward_Loss(lifted_parameters: dict[str, Any], lifted_batch: dict[str, Any]) -> Any:
+        predicted_a = member.Forward_From_Coarse_Input(lifted_parameters, lifted_batch["combined_a"], lifted_batch["query_features"])
+        predicted_b = member.Forward_From_Coarse_Input(lifted_parameters, lifted_batch["combined_b"], lifted_batch["query_features"])
+        residual_a = predicted_a - lifted_batch["target_a"]
+        residual_b = predicted_b - lifted_batch["target_b"]
+        return (residual_a * residual_a).mean() + (residual_b * residual_b).mean()
+
+    batch = TrainingBatch(
+        {
+            "combined_a": combined_a, "combined_b": combined_b, "query_features": query_features,
+            "target_a": target_a, "target_b": target_b,
+        }
+    )
+    result = Train(
+        engine=Training_Engine(device="host"), parameters=ParameterSet(values=member.Parameter_Values()),
+        forward_loss=Forward_Loss, batch_source=FixedBatches(batch), step_count=5, learning_rate=1e-3,
+        validation_interval=5,
+    )
+    trained_parameters = result.parameters.values
+    output_a = member.Forward_From_Coarse_Input(trained_parameters, combined_a, query_features)
+    output_b = member.Forward_From_Coarse_Input(trained_parameters, combined_b, query_features)
+    assert Relative_Difference(output_a, output_b) > 1e-3
+
+
+@pytest.mark.skipif(not Torch_Is_Available(), reason="torch is not installed yet")
+def Test_Gradient_Reaches_The_Decoder_Query_Condition_Channels_On_Both_Engines() -> None:
+    """the widened query_projection sees a nonzero, engine-agreeing gradient through the lattice-parameter columns"""
+    processing_shape = (3, 3, 3)
+    member = Parametric_Member(processing_shape, hidden_channels=8, layer_count=1, seed=33)
+    generator = np.random.default_rng(34)
+    combined = Parametric_Combined_Input(np.array([1.0, 1.02, 0.98, 0.9, 1.1, 1.0]), processing_shape)
+    query_points = Output_Points(GridSpec((4, 4, 4)))
+    query_features = member.decoder.Coordinate_Features(query_points)
+    target = generator.normal(size=(query_points.shape[0], 1))
+    parameters = ParameterSet(values={name: value.copy() for name, value in member.Parameter_Values().items()})
+    engine = TorchEngine()
+    lifted_combined = engine.Lift_Constant(combined)
+    lifted_query_features = engine.Lift_Constant(query_features)
+    lifted_target = engine.Lift_Constant(target)
+    gradients = Agreeing_Gradients(
+        parameters,
+        Member_Loss(member, lifted_combined, lifted_query_features, lifted_target),
+        Member_Loss(member, combined, query_features, target),
+    )
+    matching = [name for name in gradients if name.startswith("query.")]
+    assert matching
+    query_weight_gradient = gradients["query.lift_weights"]
+    condition_columns = query_weight_gradient[:, -galerkin_transformer.PEROVSKITE_LATTICE_FACTOR_COUNT :]
+    assert float(np.abs(condition_columns).max()) > 1e-8
 
 
 def Test_No_Token_By_Token_Tensor_With_The_Condition_Channels(monkeypatch: pytest.MonkeyPatch) -> None:

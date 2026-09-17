@@ -505,20 +505,24 @@ def Perovskite_Gate_Training_Examples() -> tuple[list[ParameterExample], list[Pa
     return train_examples, validation_examples
 
 
+def Perovskite_Density_Scale(examples: list[ParameterExample]) -> float:
+    """the training population's own pooled standard deviation of the raw charge density, cusp voxels included"""
+    values = [np.asarray(example.target_function.values, dtype=np.float64).ravel() for example in examples]
+    return float(np.std(np.concatenate(values)))
+
+
 @dataclasses.dataclass(frozen=True, slots=True)
 class PerovskiteGateExample:
-    """one angle-stratum run's own coarse parametric input, decoder target and conservation covariates"""
+    """one angle-stratum run's own coarse parametric input and density-scaled decoder target"""
 
     identifier: str
     unit_key: str
     combined_coarse_input: NDArray[np.float32]
     target_values: NDArray[np.float32]
-    weight_each: float
-    electron_count: float
 
 
-def Perovskite_Gate_Example(example: ParameterExample) -> PerovskiteGateExample:
-    """one loaded parameter example, turned into this driver's own cached, single-precision training unit"""
+def Perovskite_Gate_Example(example: ParameterExample, density_scale: float) -> PerovskiteGateExample:
+    """one loaded parameter example, turned into this driver's own cached, single-precision, scaled training unit"""
     parameter_vector = np.asarray(example.parameters.vector, dtype=np.float64)
     combined_coarse_input = np.concatenate(
         [
@@ -527,17 +531,13 @@ def Perovskite_Gate_Example(example: ParameterExample) -> PerovskiteGateExample:
         ],
         axis=0,
     )
-    target_values = np.asarray(example.target_function.values, dtype=np.float64).reshape(-1, 1)
-    quadrature = example.target_function.quadrature
-    weight_each = quadrature.cell_volume / quadrature.point_count
-    electron_count = float(target_values.sum() * weight_each)
+    raw_target_values = np.asarray(example.target_function.values, dtype=np.float64).reshape(-1, 1)
+    target_values = raw_target_values / density_scale
     return PerovskiteGateExample(
         identifier=example.identifier,
         unit_key=example.unit_key,
         combined_coarse_input=np.asarray(combined_coarse_input, dtype=np.float32),
         target_values=np.asarray(target_values, dtype=np.float32),
-        weight_each=weight_each,
-        electron_count=electron_count,
     )
 
 
@@ -559,12 +559,7 @@ class PerovskiteGateBatches(BatchSource):
         drawn = self.training_examples[int(generator.integers(0, len(self.training_examples)))]
         self.last_drawn_identifier = drawn.identifier
         return TrainingBatch(
-            {
-                "combined_coarse_input": drawn.combined_coarse_input[None],
-                "targets": drawn.target_values[None],
-                "weight_each": np.asarray([drawn.weight_each], dtype=np.float32),
-                "electron_count": np.asarray([drawn.electron_count], dtype=np.float32),
-            }
+            {"combined_coarse_input": drawn.combined_coarse_input[None], "targets": drawn.target_values[None]}
         )
 
 
@@ -580,12 +575,6 @@ class PerovskiteGateBatches(BatchSource):
                                 [example.combined_coarse_input for example in examples]
                             ),
                             "targets": np.stack([example.target_values for example in examples]),
-                            "weight_each": np.asarray(
-                                [example.weight_each for example in examples], dtype=np.float32
-                            ),
-                            "electron_count": np.asarray(
-                                [example.electron_count for example in examples], dtype=np.float32
-                            ),
                         }
                     ),
                 )
@@ -604,18 +593,14 @@ class PerovskiteGateBatches(BatchSource):
 
 
 def Perovskite_Gate_Loss(member: GalerkinTransformer, lifted_query_features: Any) -> ForwardLoss:
-    """mean squared error over every example a batch carries, each renormalized to its own electron count"""
+    """mean squared error over every example a batch carries, in the member's own density-scaled units"""
 
     def Loss(lifted: dict[str, Any], lifted_batch: dict[str, Any]) -> Any:
         example_count = lifted_batch["combined_coarse_input"].shape[0]
         total = 0.0
         for example_index in range(example_count):
             predicted = member.Forward_From_Coarse_Input(
-                lifted,
-                lifted_batch["combined_coarse_input"][example_index],
-                lifted_query_features,
-                weight_each=float(lifted_batch["weight_each"][example_index]),
-                condition_vector=lifted_batch["electron_count"][example_index : example_index + 1],
+                lifted, lifted_batch["combined_coarse_input"][example_index], lifted_query_features
             )
             residual = predicted - lifted_batch["targets"][example_index]
             total = total + (residual * residual).mean()
@@ -650,11 +635,14 @@ def Write_Back_Gate_Parameters(member: GalerkinTransformer, parameters: Paramete
 def Perovskite_Gate_Rig() -> tuple[GalerkinTransformer, Engine, ForwardLoss, PerovskiteGateBatches]:
     """a freshly seeded gate member beside the engine, loss and batches its staged training and cost probe both share"""
     raw_train_examples, raw_validation_examples = Perovskite_Gate_Training_Examples()
-    training_examples = [Perovskite_Gate_Example(example) for example in raw_train_examples]
-    validation_examples = [Perovskite_Gate_Example(example) for example in raw_validation_examples]
+    density_scale = Perovskite_Density_Scale(raw_train_examples)
+    training_examples = [Perovskite_Gate_Example(example, density_scale) for example in raw_train_examples]
+    validation_examples = [Perovskite_Gate_Example(example, density_scale) for example in raw_validation_examples]
     batches = PerovskiteGateBatches(training_examples, validation_examples)
 
-    member = Galerkin_Transformer_Network("parametric", processing_shape=GATE_PROCESSING_SHAPE, seed=GATE_SEED)
+    member = Galerkin_Transformer_Network(
+        "parametric", processing_shape=GATE_PROCESSING_SHAPE, density_scale=density_scale, seed=GATE_SEED
+    )
     engine = Training_Engine()
     query_points = Output_Points(GridSpec(PEROVSKITE_ANGLE_GRID_SHAPE))
     query_features = np.asarray(member.decoder.Coordinate_Features(query_points), dtype=np.float64)
@@ -711,7 +699,11 @@ def Cost_Probe(step_count: int = COST_PROBE_STEP_COUNT) -> dict[str, object]:
 
 def Loaded_Gate_Member(run_name: str) -> GalerkinTransformer:
     """a fresh gate-configuration member, its final training stage's best checkpoint folded back in"""
-    member = Galerkin_Transformer_Network("parametric", processing_shape=GATE_PROCESSING_SHAPE, seed=GATE_SEED)
+    raw_train_examples, _ = Perovskite_Gate_Training_Examples()
+    density_scale = Perovskite_Density_Scale(raw_train_examples)
+    member = Galerkin_Transformer_Network(
+        "parametric", processing_shape=GATE_PROCESSING_SHAPE, density_scale=density_scale, seed=GATE_SEED
+    )
     parameters = ParameterSet(values=member.Parameter_Values())
     final_stage_index = len(GATE_STAGE_FRACTIONS) - 1
     checkpoint_path = GATE_TRAINING_ARTIFACT_PATH / f"{run_name}_stage{final_stage_index}{GATE_CHECKPOINT_SUFFIX}"

@@ -91,12 +91,15 @@ Both tasks answer queries at any grid shape the caller requests (64³ for the pe
 for the cubic block, and whatever an invariance probe asks), independent of `processing_shape`,
 because the decoder is the operator claim.
 
-**Parameter count.** 373,377 (parametric task) / 373,762 (localization task) at width 128 / 4 heads /
+**Parameter count.** 374,145 (parametric task) / 373,762 (localization task) at width 128 / 4 heads /
 4 layers (`GalerkinTransformer.Parameter_Count()`), inside the 0.3-0.5M pre-registration band the
 integrator set before any card spend. The first build, at width 32 / 2 heads / 4 layers, reached only
 25,761 parameters -- short of the canon's own ≈1M full-scale estimate -- and is kept here as a note:
 the width was raised before pre-registration once that gap was seen, not discovered by a width search.
-Head count and layer count are unchanged from the first build; only the hidden width moved.
+Head count and layer count are unchanged from the first build; only the hidden width moved. The
+parametric task's own 768-parameter gap over the localization task's count is the decoder's lattice-
+parameter condition channels ("Defect found and fixed" section below), added post-registration while
+diagnosing why the gate was not learning.
 
 ## Compute
 
@@ -124,7 +127,7 @@ own. `{n}` ranges over the four attention-layer indices.
 | `composition.layer_{n}.local_linear.lift_biases` | `(128,)` | `Render_Bars` |
 | `composition.last_layer_norms` | `(4,)`, only once `Apply()` is called directly on the composition -- the member's own forward path never does | `Render_Bars` (reference line at 1) |
 | `readout.key_norm_scale` / `_bias`, `value_norm_scale` / `_bias` | `(128,)` | `Render_Bars` |
-| `readout.query.lift_weights` | `(128, 25)` | `Render_Matrix` |
+| `readout.query.lift_weights` | `(128, 25)` localization, `(128, 31)` parametric -- the last six columns are the lattice-parameter condition channels | `Render_Matrix` |
 | `readout.query.lift_biases` | `(128,)` | `Render_Bars` |
 | `readout.key.lift_weights` / `value.lift_weights` | `(128, 128)` | `Render_Matrix` |
 | `readout.key.lift_biases` / `value.lift_biases` | `(128,)` | `Render_Bars` |
@@ -180,4 +183,56 @@ Members_Output_Depend_On_The_Lattice_Parameters` (relative difference over 1e-3 
 `Test_No_Token_By_Token_Tensor_With_The_Condition_Channels` (the conditioning is a concatenation, not
 a contraction, so it introduces no `(N, N)`-shaped tensor). A second anomaly the conditioning fix
 does not touch -- the trained run scored *worse* than the trivial training-mean-field baseline -- is
-diagnosed and fixed separately; see the next section.
+investigated separately below; one contributing defect is fixed, the dominant cause is diagnosed but
+not yet fixed.
+
+## Second anomaly: the run scored worse than the trivial mean-field baseline
+
+An input-blind optimum is the training population's own pointwise mean field, MSE ≈ 0.109 on the
+angle-stratum validation set; `perovskite_gate_48840` sat at 1.7422 from the probe onward, fifteen
+times worse. Two things were checked, on the host, card hidden throughout.
+
+**Confirmed and fixed: `Conserving` was inside the training loss.** `Forward_From_Coarse_Input`
+called `self.conservation.Forward` on every example, using each example's own known electron count
+as the condition -- a whole-field, physical-units correction with no place inside a per-example loss
+(the canon's own §A.4: "any scale it applies at inference is pure model error ... it belongs only on
+the whole-field evaluation path"). Fixed: `Forward_From_Coarse_Input` no longer takes `weight_each`
+or `condition_vector` and never renormalizes; `GalerkinTransformer` gains `density_scale` (the
+training population's own pooled standard deviation of the raw density, `Perovskite_Density_Scale`
+in `report.py`, mirroring `factorized_fourier.Potential_Target_Scale`'s own pattern), and `__call__`
+un-scales the raw forward's output (`× density_scale`) before handing it to `Conserving`, which now
+runs only at inference. `PerovskiteGateExample`/`PerovskiteGateBatches`/`Perovskite_Gate_Loss` are
+correspondingly simplified: targets are divided by `density_scale` once, up front, and the loss is
+plain mean squared error, no conditioning on an electron count anywhere in the training path.
+
+**Host sanity run, both with the decoder-conditioning fix already in**, 300 steps, seed 20260917, the
+full angle-stratum population, staged learning rate 1e-3: the pre-fix loss shape (`Conserving` inside
+the loss, raw units, reproduced by hand since the member no longer supports it directly) reached
+3.586 → 1.663 → 1.664 → 1.664 at steps 0/100/200/300 against its own raw-units mean-field baseline of
+0.1089 (**15.3× worse at the plateau**); the fixed loss shape (scaled units) reached 1.379 → 0.743 →
+0.741 → 0.741 against its own scaled-units baseline of 0.0463 (**16.0× worse at the plateau**). Both
+runs improve quickly through step 100 and then go flat -- the same qualitative shape as the original
+bug, just rescaled. **The renormalization-in-the-loss hypothesis is not confirmed as the dominant
+cause**: removing it does not close the gap to the mean-field floor (if anything the ratio is
+marginally worse, well within one-seed noise). It is kept anyway, since it is independently required
+by the canon's own §A.4 and removes a real risk (a near-zero or sign-changing raw integral dividing
+the loss's gradient) that a longer or differently-seeded run could still hit.
+
+**The dominant cause, diagnosed but not yet fixed: cusp-voxel domination of the mean squared error.**
+Measured directly on the training population's own raw density (20,971,520 voxels): median 0.2566,
+MAD 0.1702, mean 0.7998, but max 15.61 (the canon's own §A.4 already names this: "dynamic range
+≈420× with peaks at 15.56 e/Å³, heavy-atom core cusps"). The top 5% of voxels by value carry **77%**
+of the total sum of squares; the top 1% carry **38%**; the top 0.1% carry **7%**. A `density_scale`
+built as one pooled *scalar* standard deviation cannot touch this: dividing every voxel by the same
+number leaves every voxel's *relative* contribution to the squared-error sum exactly where it was.
+Squared-error gradient signal is therefore still overwhelmingly owned by a small set of heavy-atom
+core cusps whose height is set mostly by nuclear charge and barely moves under the gate's own small
+angle perturbations -- consistent with both sanity runs' shape: a quick partial fit (the
+lattice-*independent* rough cusp-plus-bulk shape) followed by a stall (the fine, lattice-*dependent*
+structure the gate actually measures is a small perturbation the cusp-dominated gradient has little
+incentive to resolve). **Proposed, not implemented:** log-compress the parametric task's own target
+before the loss, mirroring `Log_Compressed_Input_Channels`'s existing `np.log1p` treatment of the
+localization task's own *input* density -- the same technique, applied to this task's *target*
+instead, already lives two functions away in this exact module. Awaiting approval before landing;
+the criterion the integrator set (loss under the mean-field baseline, input-dependence over 1e-3)
+is not yet met and the card has not been asked for.

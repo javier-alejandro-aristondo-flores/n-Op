@@ -393,6 +393,7 @@ class GalerkinTransformer(NeuralOperator[GridFunction, GridFunction, GridFunctio
         reference_density: float = 1.0,
         gram_mean: NDArray[np.float64] | None = None,
         gram_scale: NDArray[np.float64] | None = None,
+        density_scale: float = 1.0,
     ) -> None:
         super().__init__(encoder, composition, readout)
         self.lift = encoder
@@ -403,6 +404,10 @@ class GalerkinTransformer(NeuralOperator[GridFunction, GridFunction, GridFunctio
         self.reference_density = reference_density
         self.gram_mean = np.zeros(LATTICE_GRAM_CHANNEL_COUNT) if gram_mean is None else gram_mean
         self.gram_scale = np.ones(LATTICE_GRAM_CHANNEL_COUNT) if gram_scale is None else gram_scale
+        # the parametric task's own training population scale, fixed once and read only at inference: the
+        # lifted forward the training loss calls answers in this scaled space, never renormalized, so a
+        # near-zero or sign-changing raw integral early in training never divides the loss's own gradient
+        self.density_scale = density_scale
         self.channel_labels = PEROVSKITE_DENSITY_CHANNEL_LABELS if task == "parametric" else LOCALIZATION_CHANNEL_LABELS
         # the whole-field conservation law: the perovskite density's own electron count, the localization
         # task's bounded head carrying no conservation law of its own
@@ -425,28 +430,16 @@ class GalerkinTransformer(NeuralOperator[GridFunction, GridFunction, GridFunctio
         return sum(int(value.size) for value in self.Parameter_Values().values())
 
 
-    def Forward_From_Coarse_Input(
-        self,
-        lifted: dict[str, Any],
-        combined_coarse_input: Any,
-        query_features: Any,
-        weight_each: float | None = None,
-        condition_vector: Any | None = None,
-    ) -> Any:
+    def Forward_From_Coarse_Input(self, lifted: dict[str, Any], combined_coarse_input: Any, query_features: Any) -> Any:
         """the lifted path from the coarse token input, through the attention stack, to the query-point decoder"""
+        # never renormalized here: conservation is a whole-field, physical-units correction that belongs
+        # only on the inference path in __call__, never inside a training loss built directly on this call
         hidden = self.lift.Forward(lifted, combined_coarse_input)
         carried = self.attention_stack.Forward(lifted, hidden)
         condition_channels = (
             combined_coarse_input[:PEROVSKITE_LATTICE_FACTOR_COUNT, 0, 0, 0] if self.task == "parametric" else None
         )
-        produced = self.decoder.Forward(lifted, carried, query_features, condition_channels=condition_channels)
-        if self.task == "parametric":
-            if self.conservation is None or weight_each is None or condition_vector is None:
-                raise ValueError(
-                    "the parametric task needs its conservation wrapper, weight_each and an electron count"
-                )
-            produced = self.conservation.Forward(produced, weight_each, condition_vector)
-        return produced
+        return self.decoder.Forward(lifted, carried, query_features, condition_channels=condition_channels)
 
 
     def __call__(
@@ -476,14 +469,14 @@ class GalerkinTransformer(NeuralOperator[GridFunction, GridFunction, GridFunctio
                 axis=0,
             )
             weight_each = cell_volume / point_count
+            standardized = np.asarray(
+                self.Forward_From_Coarse_Input(self.Parameter_Values(), combined, query_features), dtype=np.float64
+            )
+            physical = standardized * self.density_scale
+            if self.conservation is None:
+                raise ValueError("the parametric task always carries its own conservation wrapper")
             produced = np.asarray(
-                self.Forward_From_Coarse_Input(
-                    self.Parameter_Values(),
-                    combined,
-                    query_features,
-                    weight_each=weight_each,
-                    condition_vector=np.asarray(condition.vector, dtype=np.float64),
-                ),
+                self.conservation.Forward(physical, weight_each, np.asarray(condition.vector, dtype=np.float64)),
                 dtype=np.float64,
             )
         else:
@@ -526,6 +519,8 @@ class GalerkinTransformer(NeuralOperator[GridFunction, GridFunction, GridFunctio
             state["reference_density"] = np.asarray(self.reference_density)
             state["gram_standardization_mean"] = self.gram_mean
             state["gram_standardization_scale"] = self.gram_scale
+        if self.task == "parametric":
+            state["density_scale"] = np.asarray(self.density_scale)
         if self.last_predicted_values is not None:
             state["last_predicted_values"] = self.last_predicted_values
         return state
@@ -554,6 +549,7 @@ def Galerkin_Transformer_Network(
     reference_density: float = 1.0,
     gram_mean: NDArray[np.float64] | None = None,
     gram_scale: NDArray[np.float64] | None = None,
+    density_scale: float = 1.0,
     seed: int = 0,
 ) -> GalerkinTransformer:
     """the gate configuration: coordinate-featured tokens, softmax-free attention layers, a query-point decoder"""
@@ -587,4 +583,5 @@ def Galerkin_Transformer_Network(
         reference_density=reference_density,
         gram_mean=gram_mean,
         gram_scale=gram_scale,
+        density_scale=density_scale,
     )

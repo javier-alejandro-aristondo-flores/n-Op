@@ -21,12 +21,19 @@
 ## Defect found and fixed before any gate verdict
 
 `perovskite_gate_48840` (stopped mid stage 1, validation flat at 1.7422 from the probe onward) was
-diagnosed as a real defect, not a dead end -- see `IMPLEMENTATION.md`'s own section for the numbers.
-First fix landed: the decoder's query now carries the lattice parameters directly (they were being
-washed out by the token-axis normalization on every path except this one, and training was driving
-that surviving path toward zero). A second, independent anomaly -- the run scored worse than the
-trivial training-mean-field baseline -- is diagnosed and fixed separately below. `perovskite_gate_48840`
-is void; the rerun will carry a new run name.
+diagnosed as a real defect, not a dead end -- see `IMPLEMENTATION.md`'s own two sections for the
+numbers. First fix landed: the decoder's query now carries the lattice parameters directly (they
+were being washed out by the token-axis normalization on every path except this one, and training
+was driving that surviving path toward zero). Second, the training loss no longer renormalizes to
+the electron count -- that belonged only on the inference path -- but a 300-step host sanity run
+with both fixes in shows this was not the dominant cause of the run's own second anomaly (scoring
+worse than the trivial training-mean-field baseline): both the pre-fix and fixed loss shapes plateau
+at roughly 15-16x worse than their own mean-field floor. The dominant cause is now diagnosed --
+squared-error domination by a handful of heavy-atom core cusp voxels (top 5% of voxels carry 77% of
+the total sum of squares) -- with a proposed log-compression fix for the target, not yet implemented
+or approved. **The gate has not been rerun; the criterion for asking for the card (loss under the
+mean-field baseline) is not yet met.** `perovskite_gate_48840` is void; the eventual rerun will carry
+a new run name.
 
 ## Stage-1 gate run
 
@@ -44,8 +51,10 @@ Not yet run under the fixed member. Pass a run name as this module's own command
 
 ## Parameter count and memory
 
-- stage 1 (32-cubed tokens): 373377 parameters, 2.849 MiB at float64 (parameters alone)
-- stage 2 (40-cubed tokens): 373762 parameters, 2.852 MiB at float64 (parameters alone)
+- stage 1 (32-cubed tokens): 374145 parameters, 2.855 MiB at float64 (parameters alone) -- +768 over the
+  original 373377 for the decoder's own lattice-parameter condition channels, added while diagnosing why
+  the gate was not learning (see "Defect found and fixed before any gate verdict" above)
+- stage 2 (40-cubed tokens): 373762 parameters, 2.852 MiB at float64 (parameters alone), unaffected
 
 ## The training driver
 

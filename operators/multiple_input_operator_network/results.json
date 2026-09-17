@@ -85,7 +85,678 @@
     "run_count": 152,
     "unit_count": 29
    }
+  },
+  {
+   "block_signature": "0bd87f3fe43d",
+   "key": {
+    "block": "fold_0",
+    "configuration": "rank32_latent128_trunk3x256",
+    "group": "member",
+    "member": "multiple_input_operator_network",
+    "split": "paired_fields_fivefold",
+    "task": "charge_and_potential_to_localization"
+   },
+   "summary": {
+    "confidence_high": 0.030779,
+    "confidence_low": 0.015667,
+    "group_name": "member",
+    "interquartile": 0.017463,
+    "median": 0.016454,
+    "metric_name": "mean_absolute_error",
+    "run_count": 152,
+    "unit_count": 29
+   }
+  },
+  {
+   "block_signature": "0bd87f3fe43d",
+   "key": {
+    "block": "fold_0",
+    "configuration": "rank32_latent128_trunk3x256",
+    "group": "member__defect_set",
+    "member": "multiple_input_operator_network",
+    "split": "paired_fields_fivefold",
+    "task": "charge_and_potential_to_localization"
+   },
+   "summary": {
+    "confidence_high": 0.037937,
+    "confidence_low": 0.019938,
+    "group_name": "member__defect_set",
+    "interquartile": 0.014253,
+    "median": 0.022939,
+    "metric_name": "mean_absolute_error",
+    "run_count": 84,
+    "unit_count": 21
+   }
+  },
+  {
+   "block_signature": "0bd87f3fe43d",
+   "key": {
+    "block": "fold_0",
+    "configuration": "rank32_latent128_trunk3x256",
+    "group": "member__supercell_strains",
+    "member": "multiple_input_operator_network",
+    "split": "paired_fields_fivefold",
+    "task": "charge_and_potential_to_localization"
+   },
+   "summary": {
+    "confidence_high": 0.0076,
+    "confidence_low": 0.006466,
+    "group_name": "member__supercell_strains",
+    "interquartile": 0.001289,
+    "median": 0.006552,
+    "metric_name": "mean_absolute_error",
+    "run_count": 68,
+    "unit_count": 8
+   }
+  },
+  {
+   "block_signature": "0bd87f3fe43d",
+   "key": {
+    "block": "fold_0",
+    "configuration": "rank32_latent128_trunk3x256",
+    "group": "member__functional_accurate",
+    "member": "multiple_input_operator_network",
+    "split": "paired_fields_fivefold",
+    "task": "charge_and_potential_to_localization"
+   },
+   "summary": {
+    "confidence_high": 0.039391,
+    "confidence_low": 0.020107,
+    "group_name": "member__functional_accurate",
+    "interquartile": 0.01849,
+    "median": 0.023374,
+    "metric_name": "mean_absolute_error",
+    "run_count": 44,
+    "unit_count": 22
+   }
+  },
+  {
+   "block_signature": "0bd87f3fe43d",
+   "key": {
+    "block": "fold_0",
+    "configuration": "rank32_latent128_trunk3x256",
+    "group": "member__functional_cheap",
+    "member": "multiple_input_operator_network",
+    "split": "paired_fields_fivefold",
+    "task": "charge_and_potential_to_localization"
+   },
+   "summary": {
+    "confidence_high": 0.029792,
+    "confidence_low": 0.015058,
+    "group_name": "member__functional_cheap",
+    "interquartile": 0.016386,
+    "median": 0.014839,
+    "metric_name": "mean_absolute_error",
+    "run_count": 108,
+    "unit_count": 29
+   }
+  },
+  {
+   "block_signature": "0bd87f3fe43d",
+   "key": {
+    "block": "fold_0",
+    "configuration": "rank32_latent128_trunk3x256",
+    "group": "member",
+    "member": "multiple_input_operator_network",
+    "split": "paired_fields_fivefold",
+    "task": "charge_and_potential_to_localization"
+   },
+   "summary": {
+    "confidence_high": 0.987866,
+    "confidence_low": 0.952594,
+    "group_name": "member",
+    "interquartile": 0.021461,
+    "median": 0.987451,
+    "metric_name": "structural_similarity_3d",
+    "run_count": 152,
+    "unit_count": 29
+   }
+  },
+  {
+   "block_signature": "0bd87f3fe43d",
+   "key": {
+    "block": "fold_0",
+    "configuration": "rank32_latent128_trunk3x256",
+    "group": "member__defect_set",
+    "member": "multiple_input_operator_network",
+    "split": "paired_fields_fivefold",
+    "task": "charge_and_potential_to_localization"
+   },
+   "summary": {
+    "confidence_high": 0.982524,
+    "confidence_low": 0.935617,
+    "group_name": "member__defect_set",
+    "interquartile": 0.019492,
+    "median": 0.979928,
+    "metric_name": "structural_similarity_3d",
+    "run_count": 84,
+    "unit_count": 21
+   }
+  },
+  {
+   "block_signature": "0bd87f3fe43d",
+   "key": {
+    "block": "fold_0",
+    "configuration": "rank32_latent128_trunk3x256",
+    "group": "member__supercell_strains",
+    "member": "multiple_input_operator_network",
+    "split": "paired_fields_fivefold",
+    "task": "charge_and_potential_to_localization"
+   },
+   "summary": {
+    "confidence_high": 0.999038,
+    "confidence_low": 0.998696,
+    "group_name": "member__supercell_strains",
+    "interquartile": 0.000377,
+    "median": 0.999023,
+    "metric_name": "structural_similarity_3d",
+    "run_count": 68,
+    "unit_count": 8
+   }
+  },
+  {
+   "block_signature": "0bd87f3fe43d",
+   "key": {
+    "block": "fold_0",
+    "configuration": "rank32_latent128_trunk3x256",
+    "group": "member__functional_accurate",
+    "member": "multiple_input_operator_network",
+    "split": "paired_fields_fivefold",
+    "task": "charge_and_potential_to_localization"
+   },
+   "summary": {
+    "confidence_high": 0.983195,
+    "confidence_low": 0.934167,
+    "group_name": "member__functional_accurate",
+    "interquartile": 0.026498,
+    "median": 0.9804,
+    "metric_name": "structural_similarity_3d",
+    "run_count": 44,
+    "unit_count": 22
+   }
+  },
+  {
+   "block_signature": "0bd87f3fe43d",
+   "key": {
+    "block": "fold_0",
+    "configuration": "rank32_latent128_trunk3x256",
+    "group": "member__functional_cheap",
+    "member": "multiple_input_operator_network",
+    "split": "paired_fields_fivefold",
+    "task": "charge_and_potential_to_localization"
+   },
+   "summary": {
+    "confidence_high": 0.98847,
+    "confidence_low": 0.954924,
+    "group_name": "member__functional_cheap",
+    "interquartile": 0.019963,
+    "median": 0.991594,
+    "metric_name": "structural_similarity_3d",
+    "run_count": 108,
+    "unit_count": 29
+   }
+  },
+  {
+   "block_signature": "0bd87f3fe43d",
+   "key": {
+    "block": "fold_0",
+    "configuration": "rank32_latent128_trunk3x256",
+    "group": "member",
+    "member": "multiple_input_operator_network",
+    "split": "paired_fields_fivefold",
+    "task": "charge_and_potential_to_localization"
+   },
+   "summary": {
+    "confidence_high": 0.137758,
+    "confidence_low": 0.069938,
+    "group_name": "member",
+    "interquartile": 0.094099,
+    "median": 0.069531,
+    "metric_name": "relative_l2",
+    "run_count": 152,
+    "unit_count": 29
+   }
+  },
+  {
+   "block_signature": "0bd87f3fe43d",
+   "key": {
+    "block": "fold_0",
+    "configuration": "rank32_latent128_trunk3x256",
+    "group": "member__defect_set",
+    "member": "multiple_input_operator_network",
+    "split": "paired_fields_fivefold",
+    "task": "charge_and_potential_to_localization"
+   },
+   "summary": {
+    "confidence_high": 0.173101,
+    "confidence_low": 0.093218,
+    "group_name": "member__defect_set",
+    "interquartile": 0.076755,
+    "median": 0.113505,
+    "metric_name": "relative_l2",
+    "run_count": 84,
+    "unit_count": 21
+   }
+  },
+  {
+   "block_signature": "0bd87f3fe43d",
+   "key": {
+    "block": "fold_0",
+    "configuration": "rank32_latent128_trunk3x256",
+    "group": "member__supercell_strains",
+    "member": "multiple_input_operator_network",
+    "split": "paired_fields_fivefold",
+    "task": "charge_and_potential_to_localization"
+   },
+   "summary": {
+    "confidence_high": 0.027286,
+    "confidence_low": 0.023587,
+    "group_name": "member__supercell_strains",
+    "interquartile": 0.004188,
+    "median": 0.023902,
+    "metric_name": "relative_l2",
+    "run_count": 68,
+    "unit_count": 8
+   }
+  },
+  {
+   "block_signature": "0bd87f3fe43d",
+   "key": {
+    "block": "fold_0",
+    "configuration": "rank32_latent128_trunk3x256",
+    "group": "member__functional_accurate",
+    "member": "multiple_input_operator_network",
+    "split": "paired_fields_fivefold",
+    "task": "charge_and_potential_to_localization"
+   },
+   "summary": {
+    "confidence_high": 0.174705,
+    "confidence_low": 0.091909,
+    "group_name": "member__functional_accurate",
+    "interquartile": 0.087219,
+    "median": 0.106398,
+    "metric_name": "relative_l2",
+    "run_count": 44,
+    "unit_count": 22
+   }
+  },
+  {
+   "block_signature": "0bd87f3fe43d",
+   "key": {
+    "block": "fold_0",
+    "configuration": "rank32_latent128_trunk3x256",
+    "group": "member__functional_cheap",
+    "member": "multiple_input_operator_network",
+    "split": "paired_fields_fivefold",
+    "task": "charge_and_potential_to_localization"
+   },
+   "summary": {
+    "confidence_high": 0.133132,
+    "confidence_low": 0.067738,
+    "group_name": "member__functional_cheap",
+    "interquartile": 0.087552,
+    "median": 0.066973,
+    "metric_name": "relative_l2",
+    "run_count": 108,
+    "unit_count": 29
+   }
+  },
+  {
+   "block_signature": "0bd87f3fe43d",
+   "key": {
+    "block": "fold_0",
+    "configuration": "rank32_latent128_trunk3x256",
+    "group": "twin",
+    "member": "multiple_input_operator_network",
+    "split": "paired_fields_fivefold",
+    "task": "charge_and_potential_to_localization"
+   },
+   "summary": {
+    "confidence_high": 0.03446,
+    "confidence_low": 0.018067,
+    "group_name": "twin",
+    "interquartile": 0.029947,
+    "median": 0.014553,
+    "metric_name": "mean_absolute_error",
+    "run_count": 152,
+    "unit_count": 29
+   }
+  },
+  {
+   "block_signature": "0bd87f3fe43d",
+   "key": {
+    "block": "fold_0",
+    "configuration": "rank32_latent128_trunk3x256",
+    "group": "twin__defect_set",
+    "member": "multiple_input_operator_network",
+    "split": "paired_fields_fivefold",
+    "task": "charge_and_potential_to_localization"
+   },
+   "summary": {
+    "confidence_high": 0.043786,
+    "confidence_low": 0.023968,
+    "group_name": "twin__defect_set",
+    "interquartile": 0.028702,
+    "median": 0.030213,
+    "metric_name": "mean_absolute_error",
+    "run_count": 84,
+    "unit_count": 21
+   }
+  },
+  {
+   "block_signature": "0bd87f3fe43d",
+   "key": {
+    "block": "fold_0",
+    "configuration": "rank32_latent128_trunk3x256",
+    "group": "twin__supercell_strains",
+    "member": "multiple_input_operator_network",
+    "split": "paired_fields_fivefold",
+    "task": "charge_and_potential_to_localization"
+   },
+   "summary": {
+    "confidence_high": 0.007217,
+    "confidence_low": 0.006055,
+    "group_name": "twin__supercell_strains",
+    "interquartile": 0.001322,
+    "median": 0.006238,
+    "metric_name": "mean_absolute_error",
+    "run_count": 68,
+    "unit_count": 8
+   }
+  },
+  {
+   "block_signature": "0bd87f3fe43d",
+   "key": {
+    "block": "fold_0",
+    "configuration": "rank32_latent128_trunk3x256",
+    "group": "twin__functional_accurate",
+    "member": "multiple_input_operator_network",
+    "split": "paired_fields_fivefold",
+    "task": "charge_and_potential_to_localization"
+   },
+   "summary": {
+    "confidence_high": 0.043556,
+    "confidence_low": 0.023872,
+    "group_name": "twin__functional_accurate",
+    "interquartile": 0.029197,
+    "median": 0.028957,
+    "metric_name": "mean_absolute_error",
+    "run_count": 44,
+    "unit_count": 22
+   }
+  },
+  {
+   "block_signature": "0bd87f3fe43d",
+   "key": {
+    "block": "fold_0",
+    "configuration": "rank32_latent128_trunk3x256",
+    "group": "twin__functional_cheap",
+    "member": "multiple_input_operator_network",
+    "split": "paired_fields_fivefold",
+    "task": "charge_and_potential_to_localization"
+   },
+   "summary": {
+    "confidence_high": 0.033816,
+    "confidence_low": 0.017486,
+    "group_name": "twin__functional_cheap",
+    "interquartile": 0.029611,
+    "median": 0.013713,
+    "metric_name": "mean_absolute_error",
+    "run_count": 108,
+    "unit_count": 29
+   }
+  },
+  {
+   "block_signature": "0bd87f3fe43d",
+   "key": {
+    "block": "fold_0",
+    "configuration": "rank32_latent128_trunk3x256",
+    "group": "twin",
+    "member": "multiple_input_operator_network",
+    "split": "paired_fields_fivefold",
+    "task": "charge_and_potential_to_localization"
+   },
+   "summary": {
+    "confidence_high": 0.987112,
+    "confidence_low": 0.952164,
+    "group_name": "twin",
+    "interquartile": 0.026765,
+    "median": 0.991394,
+    "metric_name": "structural_similarity_3d",
+    "run_count": 152,
+    "unit_count": 29
+   }
+  },
+  {
+   "block_signature": "0bd87f3fe43d",
+   "key": {
+    "block": "fold_0",
+    "configuration": "rank32_latent128_trunk3x256",
+    "group": "twin__defect_set",
+    "member": "multiple_input_operator_network",
+    "split": "paired_fields_fivefold",
+    "task": "charge_and_potential_to_localization"
+   },
+   "summary": {
+    "confidence_high": 0.980671,
+    "confidence_low": 0.934911,
+    "group_name": "twin__defect_set",
+    "interquartile": 0.029018,
+    "median": 0.973995,
+    "metric_name": "structural_similarity_3d",
+    "run_count": 84,
+    "unit_count": 21
+   }
+  },
+  {
+   "block_signature": "0bd87f3fe43d",
+   "key": {
+    "block": "fold_0",
+    "configuration": "rank32_latent128_trunk3x256",
+    "group": "twin__supercell_strains",
+    "member": "multiple_input_operator_network",
+    "split": "paired_fields_fivefold",
+    "task": "charge_and_potential_to_localization"
+   },
+   "summary": {
+    "confidence_high": 0.99918,
+    "confidence_low": 0.998854,
+    "group_name": "twin__supercell_strains",
+    "interquartile": 0.000365,
+    "median": 0.999145,
+    "metric_name": "structural_similarity_3d",
+    "run_count": 68,
+    "unit_count": 8
+   }
+  },
+  {
+   "block_signature": "0bd87f3fe43d",
+   "key": {
+    "block": "fold_0",
+    "configuration": "rank32_latent128_trunk3x256",
+    "group": "twin__functional_accurate",
+    "member": "multiple_input_operator_network",
+    "split": "paired_fields_fivefold",
+    "task": "charge_and_potential_to_localization"
+   },
+   "summary": {
+    "confidence_high": 0.981297,
+    "confidence_low": 0.933234,
+    "group_name": "twin__functional_accurate",
+    "interquartile": 0.029302,
+    "median": 0.973143,
+    "metric_name": "structural_similarity_3d",
+    "run_count": 44,
+    "unit_count": 22
+   }
+  },
+  {
+   "block_signature": "0bd87f3fe43d",
+   "key": {
+    "block": "fold_0",
+    "configuration": "rank32_latent128_trunk3x256",
+    "group": "twin__functional_cheap",
+    "member": "multiple_input_operator_network",
+    "split": "paired_fields_fivefold",
+    "task": "charge_and_potential_to_localization"
+   },
+   "summary": {
+    "confidence_high": 0.987691,
+    "confidence_low": 0.953916,
+    "group_name": "twin__functional_cheap",
+    "interquartile": 0.026585,
+    "median": 0.991517,
+    "metric_name": "structural_similarity_3d",
+    "run_count": 108,
+    "unit_count": 29
+   }
+  },
+  {
+   "block_signature": "0bd87f3fe43d",
+   "key": {
+    "block": "fold_0",
+    "configuration": "rank32_latent128_trunk3x256",
+    "group": "twin",
+    "member": "multiple_input_operator_network",
+    "split": "paired_fields_fivefold",
+    "task": "charge_and_potential_to_localization"
+   },
+   "summary": {
+    "confidence_high": 0.140723,
+    "confidence_low": 0.074994,
+    "group_name": "twin",
+    "interquartile": 0.119577,
+    "median": 0.070017,
+    "metric_name": "relative_l2",
+    "run_count": 152,
+    "unit_count": 29
+   }
+  },
+  {
+   "block_signature": "0bd87f3fe43d",
+   "key": {
+    "block": "fold_0",
+    "configuration": "rank32_latent128_trunk3x256",
+    "group": "twin__defect_set",
+    "member": "multiple_input_operator_network",
+    "split": "paired_fields_fivefold",
+    "task": "charge_and_potential_to_localization"
+   },
+   "summary": {
+    "confidence_high": 0.180101,
+    "confidence_low": 0.102352,
+    "group_name": "twin__defect_set",
+    "interquartile": 0.123451,
+    "median": 0.128723,
+    "metric_name": "relative_l2",
+    "run_count": 84,
+    "unit_count": 21
+   }
+  },
+  {
+   "block_signature": "0bd87f3fe43d",
+   "key": {
+    "block": "fold_0",
+    "configuration": "rank32_latent128_trunk3x256",
+    "group": "twin__supercell_strains",
+    "member": "multiple_input_operator_network",
+    "split": "paired_fields_fivefold",
+    "task": "charge_and_potential_to_localization"
+   },
+   "summary": {
+    "confidence_high": 0.025659,
+    "confidence_low": 0.021874,
+    "group_name": "twin__supercell_strains",
+    "interquartile": 0.004305,
+    "median": 0.022532,
+    "metric_name": "relative_l2",
+    "run_count": 68,
+    "unit_count": 8
+   }
+  },
+  {
+   "block_signature": "0bd87f3fe43d",
+   "key": {
+    "block": "fold_0",
+    "configuration": "rank32_latent128_trunk3x256",
+    "group": "twin__functional_accurate",
+    "member": "multiple_input_operator_network",
+    "split": "paired_fields_fivefold",
+    "task": "charge_and_potential_to_localization"
+   },
+   "summary": {
+    "confidence_high": 0.179399,
+    "confidence_low": 0.099765,
+    "group_name": "twin__functional_accurate",
+    "interquartile": 0.11653,
+    "median": 0.134699,
+    "metric_name": "relative_l2",
+    "run_count": 44,
+    "unit_count": 22
+   }
+  },
+  {
+   "block_signature": "0bd87f3fe43d",
+   "key": {
+    "block": "fold_0",
+    "configuration": "rank32_latent128_trunk3x256",
+    "group": "twin__functional_cheap",
+    "member": "multiple_input_operator_network",
+    "split": "paired_fields_fivefold",
+    "task": "charge_and_potential_to_localization"
+   },
+   "summary": {
+    "confidence_high": 0.137613,
+    "confidence_low": 0.07255,
+    "group_name": "twin__functional_cheap",
+    "interquartile": 0.116742,
+    "median": 0.071484,
+    "metric_name": "relative_l2",
+    "run_count": 108,
+    "unit_count": 29
+   }
   }
  ],
- "verdicts": []
+ "verdicts": [
+  {
+   "comparison": {
+    "floor_median": 0.097618,
+    "floor_name": "semilocal_ridge_floor",
+    "group_name": "pattern_rule_vs_semilocal_ridge",
+    "improvement": 0.831446,
+    "member_median": 0.016454,
+    "metric_name": "mean_absolute_error",
+    "required_improvement": 0.2,
+    "verdict": "pass"
+   },
+   "key": {
+    "block": "fold_0",
+    "configuration": "rank32_latent128_trunk3x256",
+    "group": "pattern_rule_vs_semilocal_ridge",
+    "member": "multiple_input_operator_network",
+    "split": "paired_fields_fivefold",
+    "task": "charge_and_potential_to_localization"
+   }
+  },
+  {
+   "comparison": {
+    "floor_median": 0.014553,
+    "floor_name": "density_alone_twin",
+    "group_name": "decisive_vs_twin",
+    "improvement": -0.130628,
+    "member_median": 0.016454,
+    "metric_name": "mean_absolute_error",
+    "required_improvement": 0.05,
+    "verdict": "kill"
+   },
+   "key": {
+    "block": "fold_0",
+    "configuration": "rank32_latent128_trunk3x256",
+    "group": "decisive_vs_twin",
+    "member": "multiple_input_operator_network",
+    "split": "paired_fields_fivefold",
+    "task": "charge_and_potential_to_localization"
+   }
+  }
+ ]
 }

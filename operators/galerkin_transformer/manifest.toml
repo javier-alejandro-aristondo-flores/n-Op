@@ -15,4 +15,5 @@ wrappers = "per task card"
 [depends_on]
 framework = true
 kernels = []
-shared_note = "attention lives on the coarse Nyquist grid; the 80-cubed native trunk is the canon's own super-later clause"
+packages = ["deep_operator_network"]
+shared_note = "attention lives on the coarse Nyquist grid; the 80-cubed native trunk is the canon's own super-later clause; the parametric task's target is standardized with Pointwise_Statistics, deep_operator_network's own per-voxel statistics helper, the same helper residual_correction already reuses"

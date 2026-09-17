@@ -393,7 +393,8 @@ class GalerkinTransformer(NeuralOperator[GridFunction, GridFunction, GridFunctio
         reference_density: float = 1.0,
         gram_mean: NDArray[np.float64] | None = None,
         gram_scale: NDArray[np.float64] | None = None,
-        density_scale: float = 1.0,
+        density_voxel_mean: NDArray[np.float64] | None = None,
+        density_voxel_scale: NDArray[np.float64] | None = None,
     ) -> None:
         super().__init__(encoder, composition, readout)
         self.lift = encoder
@@ -404,10 +405,14 @@ class GalerkinTransformer(NeuralOperator[GridFunction, GridFunction, GridFunctio
         self.reference_density = reference_density
         self.gram_mean = np.zeros(LATTICE_GRAM_CHANNEL_COUNT) if gram_mean is None else gram_mean
         self.gram_scale = np.ones(LATTICE_GRAM_CHANNEL_COUNT) if gram_scale is None else gram_scale
-        # the parametric task's own training population scale, fixed once and read only at inference: the
-        # lifted forward the training loss calls answers in this scaled space, never renormalized, so a
-        # near-zero or sign-changing raw integral early in training never divides the loss's own gradient
-        self.density_scale = density_scale
+        # the parametric task's own training population, per-voxel statistics of the raw density, in the
+        # decoder's own row-per-query-point layout (query_row_count, 1); fixed once and read only at
+        # inference -- the lifted forward the training loss calls answers in this standardized space, never
+        # renormalized, so predicting zero already is the training-mean field, and the cusp-dominated raw
+        # squared error no longer owns the gradient. None means the identity (no standardization), which is
+        # shape-agnostic; a set pair is grid-bound to the shape they were measured on (see Unstandardized_Target)
+        self.density_voxel_mean = density_voxel_mean
+        self.density_voxel_scale = density_voxel_scale
         self.channel_labels = PEROVSKITE_DENSITY_CHANNEL_LABELS if task == "parametric" else LOCALIZATION_CHANNEL_LABELS
         # the whole-field conservation law: the perovskite density's own electron count, the localization
         # task's bounded head carrying no conservation law of its own
@@ -442,6 +447,19 @@ class GalerkinTransformer(NeuralOperator[GridFunction, GridFunction, GridFunctio
         return self.decoder.Forward(lifted, carried, query_features, condition_channels=condition_channels)
 
 
+    def Unstandardized_Target(self, standardized: Any, query_row_count: int) -> Any:
+        """the raw forward's output brought back to physical density units, grid-bound to the training shape"""
+        if self.density_voxel_mean is None or self.density_voxel_scale is None:
+            return standardized
+        if self.density_voxel_mean.shape[0] != query_row_count:
+            raise ValueError(
+                f"the parametric task's per-voxel target statistics were measured on"
+                f" {self.density_voxel_mean.shape[0]} query rows, not the requested {query_row_count} --"
+                " un-standardization is grid-bound to the gate's own angle-stratum resolution"
+            )
+        return standardized * self.density_voxel_scale + self.density_voxel_mean
+
+
     def __call__(
         self,
         input_function: GridFunction,
@@ -472,7 +490,7 @@ class GalerkinTransformer(NeuralOperator[GridFunction, GridFunction, GridFunctio
             standardized = np.asarray(
                 self.Forward_From_Coarse_Input(self.Parameter_Values(), combined, query_features), dtype=np.float64
             )
-            physical = standardized * self.density_scale
+            physical = self.Unstandardized_Target(standardized, query_features.shape[0])
             if self.conservation is None:
                 raise ValueError("the parametric task always carries its own conservation wrapper")
             produced = np.asarray(
@@ -519,8 +537,9 @@ class GalerkinTransformer(NeuralOperator[GridFunction, GridFunction, GridFunctio
             state["reference_density"] = np.asarray(self.reference_density)
             state["gram_standardization_mean"] = self.gram_mean
             state["gram_standardization_scale"] = self.gram_scale
-        if self.task == "parametric":
-            state["density_scale"] = np.asarray(self.density_scale)
+        if self.task == "parametric" and self.density_voxel_mean is not None and self.density_voxel_scale is not None:
+            state["density_voxel_mean"] = self.density_voxel_mean
+            state["density_voxel_scale"] = self.density_voxel_scale
         if self.last_predicted_values is not None:
             state["last_predicted_values"] = self.last_predicted_values
         return state
@@ -549,7 +568,8 @@ def Galerkin_Transformer_Network(
     reference_density: float = 1.0,
     gram_mean: NDArray[np.float64] | None = None,
     gram_scale: NDArray[np.float64] | None = None,
-    density_scale: float = 1.0,
+    density_voxel_mean: NDArray[np.float64] | None = None,
+    density_voxel_scale: NDArray[np.float64] | None = None,
     seed: int = 0,
 ) -> GalerkinTransformer:
     """the gate configuration: coordinate-featured tokens, softmax-free attention layers, a query-point decoder"""
@@ -583,5 +603,6 @@ def Galerkin_Transformer_Network(
         reference_density=reference_density,
         gram_mean=gram_mean,
         gram_scale=gram_scale,
-        density_scale=density_scale,
+        density_voxel_mean=density_voxel_mean,
+        density_voxel_scale=density_voxel_scale,
     )

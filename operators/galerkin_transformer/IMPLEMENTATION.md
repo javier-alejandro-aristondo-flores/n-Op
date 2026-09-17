@@ -190,49 +190,73 @@ not yet fixed.
 
 An input-blind optimum is the training population's own pointwise mean field, MSE ≈ 0.109 on the
 angle-stratum validation set; `perovskite_gate_48840` sat at 1.7422 from the probe onward, fifteen
-times worse. Two things were checked, on the host, card hidden throughout.
+times worse. Three things were checked and two fixed, on the host, card hidden throughout.
 
 **Confirmed and fixed: `Conserving` was inside the training loss.** `Forward_From_Coarse_Input`
 called `self.conservation.Forward` on every example, using each example's own known electron count
 as the condition -- a whole-field, physical-units correction with no place inside a per-example loss
 (the canon's own §A.4: "any scale it applies at inference is pure model error ... it belongs only on
 the whole-field evaluation path"). Fixed: `Forward_From_Coarse_Input` no longer takes `weight_each`
-or `condition_vector` and never renormalizes; `GalerkinTransformer` gains `density_scale` (the
-training population's own pooled standard deviation of the raw density, `Perovskite_Density_Scale`
-in `report.py`, mirroring `factorized_fourier.Potential_Target_Scale`'s own pattern), and `__call__`
-un-scales the raw forward's output (`× density_scale`) before handing it to `Conserving`, which now
-runs only at inference. `PerovskiteGateExample`/`PerovskiteGateBatches`/`Perovskite_Gate_Loss` are
-correspondingly simplified: targets are divided by `density_scale` once, up front, and the loss is
-plain mean squared error, no conditioning on an electron count anywhere in the training path.
+or `condition_vector` and never renormalizes; `__call__` un-standardizes the raw forward's output
+before handing it to `Conserving`, which now runs only at inference (the exact un-standardization is
+the per-voxel one below). A 300-step host sanity run with a first attempt at un-standardization (one
+pooled *scalar* standard deviation) showed this alone was **not** the dominant cause: the pre-fix
+loss shape plateaued 15.3× worse than its own mean-field floor, the de-renormalized one 16.0× worse
+-- no improvement, within one-seed noise. Kept anyway (required by §A.4 independent of this anomaly,
+and it removes a real division-by-a-possibly-near-zero-or-sign-changing-integral risk), but the
+search continued.
 
-**Host sanity run, both with the decoder-conditioning fix already in**, 300 steps, seed 20260917, the
-full angle-stratum population, staged learning rate 1e-3: the pre-fix loss shape (`Conserving` inside
-the loss, raw units, reproduced by hand since the member no longer supports it directly) reached
-3.586 → 1.663 → 1.664 → 1.664 at steps 0/100/200/300 against its own raw-units mean-field baseline of
-0.1089 (**15.3× worse at the plateau**); the fixed loss shape (scaled units) reached 1.379 → 0.743 →
-0.741 → 0.741 against its own scaled-units baseline of 0.0463 (**16.0× worse at the plateau**). Both
-runs improve quickly through step 100 and then go flat -- the same qualitative shape as the original
-bug, just rescaled. **The renormalization-in-the-loss hypothesis is not confirmed as the dominant
-cause**: removing it does not close the gap to the mean-field floor (if anything the ratio is
-marginally worse, well within one-seed noise). It is kept anyway, since it is independently required
-by the canon's own §A.4 and removes a real risk (a near-zero or sign-changing raw integral dividing
-the loss's gradient) that a longer or differently-seeded run could still hit.
+**Diagnosed: cusp-voxel domination of the mean squared error.** Measured directly on the training
+population's own raw density (20,971,520 voxels): median 0.2566, MAD 0.1702, mean 0.7998, but max
+15.61 (the canon's own §A.4 already names this: "dynamic range ≈420× with peaks at 15.56 e/Å³,
+heavy-atom core cusps"). The top 5% of voxels by value carry **77%** of the total sum of squares; the
+top 1% carry **38%**; the top 0.1% carry **7%**. A single pooled *scalar* standard deviation cannot
+touch this: dividing every voxel by the same number leaves every voxel's *relative* contribution to
+the squared-error sum exactly where it was, so squared-error gradient signal stays owned by a small
+set of heavy-atom cusps whose height is set mostly by nuclear charge and barely moves under the
+gate's own small angle perturbations -- consistent with the quick-partial-fit-then-stall shape both
+sanity runs showed.
 
-**The dominant cause, diagnosed but not yet fixed: cusp-voxel domination of the mean squared error.**
-Measured directly on the training population's own raw density (20,971,520 voxels): median 0.2566,
-MAD 0.1702, mean 0.7998, but max 15.61 (the canon's own §A.4 already names this: "dynamic range
-≈420× with peaks at 15.56 e/Å³, heavy-atom core cusps"). The top 5% of voxels by value carry **77%**
-of the total sum of squares; the top 1% carry **38%**; the top 0.1% carry **7%**. A `density_scale`
-built as one pooled *scalar* standard deviation cannot touch this: dividing every voxel by the same
-number leaves every voxel's *relative* contribution to the squared-error sum exactly where it was.
-Squared-error gradient signal is therefore still overwhelmingly owned by a small set of heavy-atom
-core cusps whose height is set mostly by nuclear charge and barely moves under the gate's own small
-angle perturbations -- consistent with both sanity runs' shape: a quick partial fit (the
-lattice-*independent* rough cusp-plus-bulk shape) followed by a stall (the fine, lattice-*dependent*
-structure the gate actually measures is a small perturbation the cusp-dominated gradient has little
-incentive to resolve). **Proposed, not implemented:** log-compress the parametric task's own target
-before the loss, mirroring `Log_Compressed_Input_Channels`'s existing `np.log1p` treatment of the
-localization task's own *input* density -- the same technique, applied to this task's *target*
-instead, already lives two functions away in this exact module. Awaiting approval before landing;
-the criterion the integrator set (loss under the mean-field baseline, input-dependence over 1e-3)
-is not yet met and the card has not been asked for.
+**Fixed: per-voxel target standardization, the canon's own recorded answer for exactly this corpus.**
+§A.4 already prescribes it ("the perovskite target needs per-field standardization") and the built
+branch-trunk member (`operators.deep_operator_network`) already carries the reusable helper,
+`Pointwise_Statistics(training_fields) -> (voxel_mean, voxel_scale)` -- each voxel's own mean and
+spread across the training runs, spread guarded to 1.0 where it is exactly zero -- already reused by
+`residual_correction`. `GalerkinTransformer.density_voxel_mean`/`density_voxel_scale` replace the
+scalar `density_scale` entirely (arrays shaped `(query_row_count, 1)`, the decoder's own row-per-
+query-point layout, computed once by `report.py`'s `Perovskite_Voxel_Statistics` over the training
+runs only); the training loss standardizes each target the same way up front
+(`Perovskite_Gate_Example`); `GalerkinTransformer.Unstandardized_Target` inverts it at inference,
+before `Conserving`. This removes the lattice-independent cusp-plus-bulk shape from the loss
+entirely: predicting exactly zero in standardized space already *is* the training-mean field, so
+every unit of gradient that moves the prediction away from zero is now working on the lattice-
+dependent deviation the gate actually measures, not on reproducing a handful of cusp heights.
+**Cost, stated plainly:** the query-anywhere property still holds for the network's own output in
+standardized units, but `density_voxel_mean`/`density_voxel_scale` are grid-bound to the exact shape
+they were measured on (the gate's own 64³ angle-stratum grid) -- `Unstandardized_Target` raises if
+handed a different query row count, rather than silently applying statistics at the wrong resolution.
+
+**Host sanity run, per-voxel standardization plus the decoder-conditioning fix, reported in the
+gate's own metric** (median relative L2 on the raw density over the 20 held-out angle-stratum runs,
+the same metric and population the two pre-registered floors use), 600 steps, seed 20260917, the full
+population, `GATE_PEAK_LEARNING_RATE`:
+
+| step | median relative L2 |
+|---|---|
+| 0 (untrained) | 0.2093 |
+| 100 | 0.1787 |
+| 200 | 0.1770 |
+| 300 | 0.1779 |
+| 600 | 0.1772 |
+
+against the training-mean field's own median relative L2 on the same 20 runs, **0.1765**, and the two
+pre-registered floors, nearest-angle copy **0.0853** and linear-in-angle interpolation **0.0264**.
+Input-dependence at step 600 (relative difference between two validation runs' own predictions, full
+physical-unit inference path): **3.87e-2**, comfortably over the 1e-3 floor -- the conditioning fix
+holds through 600 steps of the fixed loss. The cusp-domination fix closed the gap from 15-16× worse
+than the mean field to **within 1% of it, oscillating just above rather than below** (100-600: 1.2%,
+0.3%, 0.8%, 0.4% worse) -- a qualitatively different, healthy shape (quick rise to the floor, then a
+narrow, stable band around it) from the original bug's persistent 15× gap, but the integrator's own
+criterion is "clearly below," which this does not yet satisfy on 600 stochastic single-example host
+steps against a 9,000-14,000-step card run. Not yet asked for; the call on whether this is close
+enough to schedule, or needs the criterion met first, is the integrator's.

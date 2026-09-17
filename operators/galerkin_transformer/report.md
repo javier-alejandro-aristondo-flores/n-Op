@@ -22,18 +22,28 @@
 
 `perovskite_gate_48840` (stopped mid stage 1, validation flat at 1.7422 from the probe onward) was
 diagnosed as a real defect, not a dead end -- see `IMPLEMENTATION.md`'s own two sections for the
-numbers. First fix landed: the decoder's query now carries the lattice parameters directly (they
-were being washed out by the token-axis normalization on every path except this one, and training
-was driving that surviving path toward zero). Second, the training loss no longer renormalizes to
-the electron count -- that belonged only on the inference path -- but a 300-step host sanity run
-with both fixes in shows this was not the dominant cause of the run's own second anomaly (scoring
-worse than the trivial training-mean-field baseline): both the pre-fix and fixed loss shapes plateau
-at roughly 15-16x worse than their own mean-field floor. The dominant cause is now diagnosed --
-squared-error domination by a handful of heavy-atom core cusp voxels (top 5% of voxels carry 77% of
-the total sum of squares) -- with a proposed log-compression fix for the target, not yet implemented
-or approved. **The gate has not been rerun; the criterion for asking for the card (loss under the
-mean-field baseline) is not yet met.** `perovskite_gate_48840` is void; the eventual rerun will carry
-a new run name.
+full numbers. Three fixes:
+
+1. The decoder's query now carries the lattice parameters directly (they were being washed out by
+   the token-axis normalization on every path except this one, and training was driving that
+   surviving path toward zero).
+2. The training loss no longer renormalizes to the electron count -- that belonged only on the
+   inference path. A 300-step sanity run showed this alone was not the dominant cause of the run's
+   second anomaly (scoring worse than the trivial training-mean field): both the pre-fix and de-
+   renormalized loss shapes plateaued 15-16x worse than their own mean-field floor.
+3. The training target is now standardized per voxel across the training runs (`Pointwise_Statistics`,
+   reused from `operators.deep_operator_network`, the canon's own §A.4-prescribed fix for this
+   corpus's cusp-dominated dynamic range), replacing a first attempt at one pooled scalar. A 600-step
+   sanity run, reported in the gate's own metric (median relative L2 on the raw density, the 20
+   held-out angle-stratum runs): 0.2093 → 0.1787 → 0.1770 → 0.1779 → 0.1772 at steps 0/100/200/300/600,
+   against the training-mean field's own 0.1765 on the same runs and the two floors (copy 0.0853,
+   interpolation 0.0264); input-dependence at step 600 is 3.87e-2. This closed the gap from 15-16x
+   worse to within 1% of the mean field, oscillating just above it rather than clearly below --
+   healthier (a stable band, not a persistent large gap) but not yet the integrator's own criterion.
+
+**The gate has not been rerun; the criterion for asking for the card (clearly below the mean-field
+baseline, input-dependence over 1e-3) is not conclusively met at 600 host steps.**
+`perovskite_gate_48840` is void; the eventual rerun will carry a new run name.
 
 ## Stage-1 gate run
 

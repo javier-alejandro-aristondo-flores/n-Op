@@ -31,6 +31,7 @@ from operators.galerkin_transformer import (
     Sliced_Lifted,
     Token_Axis_Normalized,
 )
+from operators.deep_operator_network import Pointwise_Statistics
 from operators.evaluation import Read_Member_Results, ScoredRun, Write_Member_Results
 from operators.factorized_fourier import Interior_Levels
 from operators.galerkin_transformer.report import (
@@ -282,6 +283,36 @@ def Test_The_Perovskite_Density_Renormalizes_To_The_Electron_Count() -> None:
     output = member(input_function, GridSpec((5, 5, 5)), condition)
     integral = float(np.sum(output.values)) * output.quadrature.cell_volume / output.quadrature.point_count
     assert abs(integral - 48.0) < 1e-6
+
+
+def Test_Voxel_Standardization_Round_Trips_A_Training_Field() -> None:
+    """standardizing then un-standardizing a training field returns it to 1e-10, and a flat voxel stays finite"""
+    generator = np.random.default_rng(50)
+    fields = generator.uniform(0.01, 5.0, size=(6, 4, 4, 4))
+    # a voxel with zero spread across every training run
+    fields[:, 0, 0, 0] = 3.0
+    stacked = fields.reshape(6, -1, 1)
+    voxel_mean, voxel_scale = Pointwise_Statistics(stacked)
+    standardized = (stacked - voxel_mean) / voxel_scale
+    recovered = standardized * voxel_scale + voxel_mean
+    assert np.all(np.isfinite(standardized))
+    assert np.allclose(recovered, stacked, atol=1e-10)
+
+
+def Test_The_Members_Own_Unstandardization_Round_Trips_And_Is_Grid_Bound() -> None:
+    """the member's own inverse of its stored statistics round-trips, and refuses a mismatched query count"""
+    generator = np.random.default_rng(51)
+    fields = generator.uniform(0.01, 5.0, size=(6, 27, 1))
+    voxel_mean, voxel_scale = Pointwise_Statistics(fields)
+    member = Galerkin_Transformer_Network(
+        "parametric", processing_shape=(3, 3, 3), hidden_channels=6, head_count=2, layer_count=1,
+        density_voxel_mean=voxel_mean, density_voxel_scale=voxel_scale, seed=26,
+    )
+    standardized = (fields[0] - voxel_mean) / voxel_scale
+    recovered = member.Unstandardized_Target(standardized, query_row_count=27)
+    assert np.allclose(recovered, fields[0], atol=1e-10)
+    with pytest.raises(ValueError):
+        member.Unstandardized_Target(standardized, query_row_count=64)
 
 
 def Parametric_Member(processing_shape: tuple[int, int, int], hidden_channels: int, layer_count: int, seed: int) -> GalerkinTransformer:

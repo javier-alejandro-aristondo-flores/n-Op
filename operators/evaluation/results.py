@@ -50,8 +50,9 @@ class MemberResults:
 
 
 def Block_Signature(unit_keys: Iterable[str]) -> str:
-    """the first twelve hex characters of the sha256 over the sorted, newline-joined unit keys"""
-    joined = "\n".join(sorted(unit_keys))
+    """the first twelve hex characters of the sha256 over the sorted, newline-joined distinct unit keys"""
+    # a block is its set of units, so a caller handing one key per run or per spin channel hashes the same block
+    joined = "\n".join(sorted(set(unit_keys)))
     return hashlib.sha256(joined.encode("utf-8")).hexdigest()[:12]
 
 

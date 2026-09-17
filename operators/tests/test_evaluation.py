@@ -389,3 +389,11 @@ def Test_The_Results_Page_Headlines_Match_The_Member_Artifacts() -> None:
             mismatches.append(f"{row['entry']}: {value:.{precision}f} not among {sorted(printed)}")
     assert mismatches == [], mismatches
     assert skipped, "no row was ever checked or skipped, so the parser likely found nothing"
+
+
+def Test_A_Block_Signature_Counts_Each_Unit_Once() -> None:
+    """one key per run, per spin channel, or per unit all name the same block"""
+    per_unit = Block_Signature(["alpha", "beta"])
+    per_run = Block_Signature(["beta", "alpha", "alpha", "beta", "beta"])
+    assert per_unit == per_run
+    assert Block_Signature(["alpha"]) != per_unit

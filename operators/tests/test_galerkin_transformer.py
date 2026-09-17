@@ -284,6 +284,85 @@ def Test_The_Perovskite_Density_Renormalizes_To_The_Electron_Count() -> None:
     assert abs(integral - 48.0) < 1e-6
 
 
+def Parametric_Member(processing_shape: tuple[int, int, int], hidden_channels: int, layer_count: int, seed: int) -> GalerkinTransformer:
+    """a small parametric-task member, for the decoder's lattice-conditioning tests"""
+    return Galerkin_Transformer_Network(
+        "parametric", processing_shape=processing_shape, hidden_channels=hidden_channels, head_count=2,
+        layer_count=layer_count, seed=seed,
+    )
+
+
+def Parametric_Combined_Input(vector: NDArray[np.float64], processing_shape: tuple[int, int, int]) -> NDArray[np.float64]:
+    """one lattice-parameter vector's own coarse input, constant channels beside the grid's coordinate features"""
+    return np.concatenate(
+        [
+            galerkin_transformer.Constant_Channel_Field(vector, processing_shape),
+            galerkin_transformer.Coordinate_Feature_Channels(processing_shape),
+        ],
+        axis=0,
+    )
+
+
+def Relative_Difference(first_array: Any, second_array: Any) -> float:
+    """the gap between two arrays against the larger of their own norms, engine-agnostic once both are hosted"""
+    first = np.asarray(first_array, dtype=np.float64).reshape(-1)
+    second = np.asarray(second_array, dtype=np.float64).reshape(-1)
+    denominator = max(float(np.linalg.norm(first)), float(np.linalg.norm(second)), 1e-30)
+    return float(np.linalg.norm(first - second) / denominator)
+
+
+def Test_The_Decoder_Query_Condition_Makes_A_Fresh_Members_Output_Depend_On_The_Lattice_Parameters() -> None:
+    """at a fresh initialization, two well-separated lattice vectors already answer with visibly different fields"""
+    processing_shape = (3, 3, 3)
+    member = Parametric_Member(processing_shape, hidden_channels=8, layer_count=1, seed=30)
+    query_features = member.decoder.Coordinate_Features(Output_Points(GridSpec((4, 4, 4))))
+    parameters = member.Parameter_Values()
+    vector_a = np.array([1.0, 1.0, 1.0, 0.8, 1.2, 1.2])
+    vector_b = np.array([1.0, 1.0, 1.0, 1.1, 0.8, 0.8])
+    condition_vector = np.array([1.0])
+    output_a = member.Forward_From_Coarse_Input(
+        parameters, Parametric_Combined_Input(vector_a, processing_shape), query_features,
+        weight_each=1.0, condition_vector=condition_vector,
+    )
+    output_b = member.Forward_From_Coarse_Input(
+        parameters, Parametric_Combined_Input(vector_b, processing_shape), query_features,
+        weight_each=1.0, condition_vector=condition_vector,
+    )
+    assert Relative_Difference(output_a, output_b) > 1e-3
+
+
+def Test_No_Token_By_Token_Tensor_With_The_Condition_Channels(monkeypatch: pytest.MonkeyPatch) -> None:
+    """the lattice-conditioned query branch still calls no Einstein summation shaped like a dense attention map"""
+    original = galerkin_transformer.Einstein_Summation
+    recorded_shapes: list[tuple[int, ...]] = []
+
+    def Recording_Einstein_Summation(subscripts: str, first: Any, second: Any) -> Any:
+        result = original(subscripts, first, second)
+        recorded_shapes.append(tuple(np.asarray(result).shape))
+        return result
+
+    monkeypatch.setattr(galerkin_transformer, "Einstein_Summation", Recording_Einstein_Summation)
+    grid_shape = (8, 8, 8)
+    token_count = grid_shape[0] * grid_shape[1] * grid_shape[2]
+    decoder = QueryPointDecoder(
+        hidden_channels=4, output_channels=1, channel_labels=("field",), head_count=2,
+        condition_channel_count=galerkin_transformer.PEROVSKITE_LATTICE_FACTOR_COUNT, seed=40,
+    )
+    generator = np.random.default_rng(41)
+    token_values = generator.normal(size=(4, *grid_shape))
+    query_points = Output_Points(GridSpec((5, 5, 5)))
+    query_count = query_points.shape[0]
+    condition_channels = np.array([1.0, 1.02, 0.98, 0.9, 1.1, 1.0])
+    decoder.Forward(
+        decoder.parameter_values, token_values, decoder.Coordinate_Features(query_points),
+        condition_channels=condition_channels,
+    )
+    assert recorded_shapes, "the conditioned decoder forward never called Einstein_Summation"
+    for shape in recorded_shapes:
+        assert not ({token_count, query_count} <= set(shape)), shape
+        assert sum(1 for extent in shape if extent == token_count) <= 1, shape
+
+
 def Test_Two_Step_Toy_Training_Is_Deterministic() -> None:
     """the same tiny configuration trained twice from the same seed reaches the same loss curve"""
 

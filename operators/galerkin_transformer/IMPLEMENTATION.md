@@ -149,3 +149,35 @@ own parts directly) and the `(head_width, head_width)` `key_value` block, neithe
 as a `last_*` array on the member's own forward path since it never leaves the lifted computation;
 a caller wanting it calls `GalerkinAttentionKernel.Forward` directly, the same way the mandatory
 dense-reference check in the test suite does.
+
+## Defect found and fixed before the gate's verdict: the decoder never saw the lattice parameters
+
+Diagnosed against the stopped, non-learning run `perovskite_gate_48840` (stage 0 complete at 14,652
+steps, validation flat at 1.7422). Two lattice vectors 25% apart in parameter space, held-out
+targets 48% apart, gave a fresh (untrained) member's output a 27.1% relative difference — the
+network could see its input at initialization. After the stage-0 checkpoint the same pair's output
+differed by 1.3e-6; after stage 1 (1,000 more steps), 4.4e-8. Training was driving the member
+*toward* input-blindness, not away from it. Stage-by-stage tracing pinned the collapse to one place:
+`QueryPointDecoder`'s query is built only from `query_features`, the output grid's own coordinate
+features, identical for every example by construction — it carries no lattice channel at all. The
+only path the token stream's own (still real, still nonzero) lattice-dependent signal had to reach
+the output was the `key_value` block contracted against that fixed query, and training drove that
+contraction toward numerical degeneracy: the encoder still disagreed by single-digit percent at the
+decoder's own key/value even after their token-axis normalization, but the cross-attention output
+built from them agreed to 1e-6–1e-8.
+
+**Fix.** `QueryPointDecoder` gains `condition_channel_count` (0 by default, `PEROVSKITE_LATTICE_FACTOR_COUNT`
+for the parametric task); `query_projection`'s own input width grows by that many columns, and
+`Forward` takes an optional `condition_channels` vector, concatenated onto every query row *before*
+`query_projection`, on the query branch alone -- the one branch `Token_Axis_Normalized` never
+touches, so no per-channel mean-and-variance standardization over the token axis can wash a constant
+per-example value back out regardless of what training does to the token pathway. `GalerkinTransformer.
+Forward_From_Coarse_Input` reads the six lattice parameters straight off `combined_coarse_input`'s
+own constant channels (they are already there, broadcast identically at every point) and hands them
+through; +768 parameters (`hidden_channels · 6`) against ~373k, negligible. Regression coverage in
+`operators/tests/test_galerkin_transformer.py`: `Test_The_Decoder_Query_Condition_Makes_A_Fresh_
+Members_Output_Depend_On_The_Lattice_Parameters` (relative difference over 1e-3 at a fresh init) and
+`Test_No_Token_By_Token_Tensor_With_The_Condition_Channels` (the conditioning is a concatenation, not
+a contraction, so it introduces no `(N, N)`-shaped tensor). A second anomaly the conditioning fix
+does not touch -- the trained run scored *worse* than the trivial training-mean-field baseline -- is
+diagnosed and fixed separately; see the next section.

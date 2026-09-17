@@ -18,9 +18,19 @@
 1. vs nearest-angle copy (50% improvement): **0.0426**
 2. vs linear-in-angle interpolation (50% improvement): **0.0132**
 
+## Defect found and fixed before any gate verdict
+
+`perovskite_gate_48840` (stopped mid stage 1, validation flat at 1.7422 from the probe onward) was
+diagnosed as a real defect, not a dead end -- see `IMPLEMENTATION.md`'s own section for the numbers.
+First fix landed: the decoder's query now carries the lattice parameters directly (they were being
+washed out by the token-axis normalization on every path except this one, and training was driving
+that surviving path toward zero). A second, independent anomaly -- the run scored worse than the
+trivial training-mean-field baseline -- is diagnosed and fixed separately below. `perovskite_gate_48840`
+is void; the rerun will carry a new run name.
+
 ## Stage-1 gate run
 
-Not yet run. Pass a run name as this module's own command-line argument (`python -m operators.galerkin_transformer.report <run_name>`) once the card has trained it, to fold its checkpoint back in and score both bars in one host command.
+Not yet run under the fixed member. Pass a run name as this module's own command-line argument (`python -m operators.galerkin_transformer.report <run_name>`) once the card has trained it, to fold its checkpoint back in and score both bars in one host command.
 
 ## Stage 2 — the cubic block, fold 0 (pre-registration, before training)
 

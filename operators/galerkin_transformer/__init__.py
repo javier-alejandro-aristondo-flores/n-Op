@@ -251,6 +251,7 @@ class QueryPointDecoder(Operator[GridFunction, GridFunction]):
         bounded: bool = False,
         fourier_orders: int = COORDINATE_FOURIER_ORDERS,
         query_chunk_size: int = DECODER_QUERY_CHUNK_SIZE,
+        condition_channel_count: int = 0,
         seed: int = 0,
     ) -> None:
         if hidden_channels % head_count != 0:
@@ -260,8 +261,13 @@ class QueryPointDecoder(Operator[GridFunction, GridFunction]):
         self.head_width = hidden_channels // head_count
         self.channel_labels = channel_labels
         self.query_chunk_size = query_chunk_size
+        # a channel width the token-axis normalization can never wash out, since it is added to the query
+        # branch alone and every query row carries the identical, un-normalized value
+        self.condition_channel_count = condition_channel_count
         self.coordinate_features = PeriodicCoordinateFeatures(fourier_orders=fourier_orders, axis_count=3)
-        self.query_projection = PointwiseLift(hidden_channels, self.coordinate_features.feature_count, seed=seed)
+        self.query_projection = PointwiseLift(
+            hidden_channels, self.coordinate_features.feature_count + condition_channel_count, seed=seed
+        )
         self.key_projection = PointwiseLift(hidden_channels, hidden_channels, seed=seed + 1)
         self.value_projection = PointwiseLift(hidden_channels, hidden_channels, seed=seed + 2)
         self.final_projection = PointwiseProjection(output_channels, hidden_channels, bounded=bounded, seed=seed + 3)
@@ -297,8 +303,13 @@ class QueryPointDecoder(Operator[GridFunction, GridFunction]):
         return self.coordinate_features(points)
 
 
-    def Forward(self, lifted: dict[str, Any], token_values: Any, query_features: Any) -> Any:
+    def Forward(
+        self, lifted: dict[str, Any], token_values: Any, query_features: Any, condition_channels: Any = None
+    ) -> Any:
         """cross-attention from the encoder's final tokens onto every query row, evaluated in chunks"""
+        # condition_channels, when given, is a flat per-example vector concatenated onto every query row
+        # before query_projection -- the query branch never passes through Token_Axis_Normalized, so this
+        # is the one channel a per-example condition can ride into the output on unwashed
         hidden_channels = token_values.shape[0]
         token_spatial_shape = token_values.shape[1:]
         token_count = int(token_spatial_shape[0]) * int(token_spatial_shape[1]) * int(token_spatial_shape[2])
@@ -316,6 +327,11 @@ class QueryPointDecoder(Operator[GridFunction, GridFunction]):
         for chunk_start in range(0, query_row_count, self.query_chunk_size):
             chunk_features = query_features[chunk_start : chunk_start + self.query_chunk_size].T
             chunk_count = chunk_features.shape[1]
+            if condition_channels is not None:
+                # a row of ones on the query branch's own engine, so the broadcast needs no engine dispatch
+                ones_row = chunk_features[:1] * 0.0 + 1.0
+                condition_block = condition_channels[:, None] * ones_row
+                chunk_features = Concatenate_Channels([chunk_features, condition_block])
             query_full = self.query_projection.Forward(Sliced_Lifted(lifted, "query."), chunk_features)
             query_heads = query_full.reshape(self.head_count, self.head_width, chunk_count)
             attended_heads = Einstein_Summation("hde,hdm->hem", key_value, query_heads) / float(token_count)
@@ -420,7 +436,10 @@ class GalerkinTransformer(NeuralOperator[GridFunction, GridFunction, GridFunctio
         """the lifted path from the coarse token input, through the attention stack, to the query-point decoder"""
         hidden = self.lift.Forward(lifted, combined_coarse_input)
         carried = self.attention_stack.Forward(lifted, hidden)
-        produced = self.decoder.Forward(lifted, carried, query_features)
+        condition_channels = (
+            combined_coarse_input[:PEROVSKITE_LATTICE_FACTOR_COUNT, 0, 0, 0] if self.task == "parametric" else None
+        )
+        produced = self.decoder.Forward(lifted, carried, query_features, condition_channels=condition_channels)
         if self.task == "parametric":
             if self.conservation is None or weight_each is None or condition_vector is None:
                 raise ValueError(
@@ -542,10 +561,12 @@ def Galerkin_Transformer_Network(
         input_channel_count = PEROVSKITE_LATTICE_FACTOR_COUNT + COORDINATE_FEATURES.feature_count
         channel_labels: tuple[str, ...] = PEROVSKITE_DENSITY_CHANNEL_LABELS
         bounded = False
+        condition_channel_count = PEROVSKITE_LATTICE_FACTOR_COUNT
     else:
         input_channel_count = LOCALIZATION_INPUT_FIELD_CHANNEL_COUNT + COORDINATE_FEATURES.feature_count
         channel_labels = LOCALIZATION_CHANNEL_LABELS
         bounded = True
+        condition_channel_count = 0
     lift = PointwiseLift(hidden_channels, input_channel_count, seed=seed)
     attention_stack = ExplicitStack(Galerkin_Attention_Layers(hidden_channels, head_count, layer_count, seed))
     decoder = QueryPointDecoder(
@@ -554,6 +575,7 @@ def Galerkin_Transformer_Network(
         channel_labels,
         head_count=head_count,
         bounded=bounded,
+        condition_channel_count=condition_channel_count,
         seed=seed + 4 * layer_count + 1,
     )
     return GalerkinTransformer(

@@ -45,7 +45,7 @@ Pre-registered ladder, absolute mean absolute error, once the member and its twi
 
 ## Result
 
-Not yet run. Training is scheduled by the integrator on the shared card: the density-alone twin first (one hour), then the two-branch member (one hour), both under the flagship's staged protocol on the member_train fold, validated on the validation fold, evaluated on the evaluation fold above.
+Not yet run. Training is scheduled by the integrator on the shared card: the density-alone twin then the two-branch member, both under the flagship's staged protocol on the member_train fold, validated on the validation fold, evaluated on the evaluation fold above. **The two runs share one step budget, matched by construction rather than each sized from its own cost probe.** The twin's cost probe measured 0.451 s/step (100 steps, mostly one-time accelerator and kernel-cache initialization); the member's, run second in a fresh process, measured 0.107 s/step against an already-warm kernel cache -- the two probes are not comparable, and sizing each run from its own probe would have handed the twin 7,976 steps against the member's 33,650, confounding the decisive twin-vs-member comparison with unequal training rather than isolating the potential branch's own contribution. Both runs instead take the member's warm-cache figure, 33,650 steps each (the twin, the smaller network, can only finish sooner, never later).
 
 ## Inspection
 

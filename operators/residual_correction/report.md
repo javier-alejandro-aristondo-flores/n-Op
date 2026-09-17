@@ -31,7 +31,43 @@ Both ridge floors already sit within a few parts in a million of the rank-32 cei
 
 For the record, unrelated to this member's own metric: the linear-scissor gap floor over 1340 eigenvalue pairs shifts by `1.2231 +/- 0.0572` eV with a `38.6` meV linear residual (r-squared `0.9980`). Any gap read-out is an auxiliary head, never this member, and must beat this scissor on orbit-held-out data.
 
+## Result (one seed, 20260916)
+
+Divergence probe at `1.00e-03`, staged schedule (stage 0 at 1.00e-03 for 6000 of 6000 steps, stage 1 at 3.33e-04 for 6000 of 6000 steps, stage 2 at 1.11e-04 for 8000 of 8000 steps), validated every 100 steps, final-stage patience 15. 27 figures under `figures/projection_backbone/`.
+
+```
+group   metric       units  runs  median    interquartile  mean_interval       
+member  relative_l2  22     88    0.002079  0.000094       [0.002051, 0.002137]
+```
+
+```
+group   floor     floor_median  member_median  improvement  required  verdict
+member  identity  0.011131      0.002079       81.3%        50.0%     pass   
+```
+
+```
+group              metric       units  runs  median    interquartile  mean_interval       
+biaxial            relative_l2  3      3     0.002023  0.000024       [0.001986, 0.002034]
+isotropic          relative_l2  5      5     0.002050  0.000008       [0.001988, 0.002067]
+one_angle_shear    relative_l2  2      9     0.002089  0.000014       [0.002075, 0.002102]
+three_angle_shear  relative_l2  2      8     0.002196  0.000099       [0.002097, 0.002296]
+triaxial           relative_l2  6      24    0.002133  0.000111       [0.002035, 0.002172]
+two_angle_shear    relative_l2  2      36    0.002082  0.000007       [0.002075, 0.002089]
+uniaxial           relative_l2  3      3     0.002123  0.000190       [0.001998, 0.002377]
+```
+
+```
+group   metric           units  runs  median    interquartile  mean_interval       
+member  delta_r_squared  22     88    0.964537  0.001376       [0.963332, 0.964882]
+```
+
+## Conformal band (IV.3)
+
+Level 0.9, unit `symmetry_orbit`, calibrated on 23 validation orbits, offset `0.012270`. Test-orbit coverage (every voxel of the whole field inside the band, medianed per orbit then averaged): `0.977` against a guarantee of `[0.900, 0.942]`.
+
 ## Standing
 
-Floors only. Training is scheduled by the team lead and has not run in this worktree yet.
+Verdict: **pass** against the canon kill (`0.005565` relative L2, delta-R-squared >= 0.75), one seeded run (20260916). Per the sweep's own policy (seed sweeps deferred), no seed-spread is measured for this member, so a close result cannot be resolved further on this run alone; it is read at face value.
+
+Caveats: one seed; the FiLM conditioning on campaign and exact-exchange fraction named in the canon entry is dropped here because the strain atlas is one campaign at one exact-exchange fraction, making it a no-op on this block (it is the canon's labeled ablation, not built here); the conditioned-model ablation itself is not run.
 

@@ -106,6 +106,69 @@
     "run_count": 88,
     "unit_count": 22
    }
+  },
+  {
+   "block_signature": "9b086b9ef5f1",
+   "key": {
+    "block": "test",
+    "configuration": "projection_backbone",
+    "group": "member",
+    "member": "residual_correction",
+    "split": "strain_atlas_holdout",
+    "task": "cheap_to_accurate_charge"
+   },
+   "summary": {
+    "confidence_high": 0.002137,
+    "confidence_low": 0.002051,
+    "group_name": "member",
+    "interquartile": 9.4e-05,
+    "median": 0.002079,
+    "metric_name": "relative_l2",
+    "run_count": 88,
+    "unit_count": 22
+   }
+  },
+  {
+   "block_signature": "9b086b9ef5f1",
+   "key": {
+    "block": "test",
+    "configuration": "projection_backbone",
+    "group": "member",
+    "member": "residual_correction",
+    "split": "strain_atlas_holdout",
+    "task": "cheap_to_accurate_charge"
+   },
+   "summary": {
+    "confidence_high": 0.964882,
+    "confidence_low": 0.963332,
+    "group_name": "member",
+    "interquartile": 0.001376,
+    "median": 0.964537,
+    "metric_name": "delta_r_squared",
+    "run_count": 88,
+    "unit_count": 22
+   }
+  },
+  {
+   "block_signature": "9b086b9ef5f1",
+   "key": {
+    "block": "test",
+    "configuration": "projection_backbone",
+    "group": "conformal_calibration_0.90",
+    "member": "residual_correction",
+    "split": "strain_atlas_holdout",
+    "task": "cheap_to_accurate_charge"
+   },
+   "summary": {
+    "confidence_high": 0.941667,
+    "confidence_low": 0.9,
+    "group_name": "conformal_calibration_0.90",
+    "interquartile": 0.0,
+    "median": 1.0,
+    "metric_name": "orbit_field_coverage",
+    "run_count": 88,
+    "unit_count": 22
+   }
   }
  ],
  "verdicts": [
@@ -184,6 +247,26 @@
     "block": "test",
     "configuration": "projection_backbone",
     "group": "rank_32_ceiling",
+    "member": "residual_correction",
+    "split": "strain_atlas_holdout",
+    "task": "cheap_to_accurate_charge"
+   }
+  },
+  {
+   "comparison": {
+    "floor_median": 0.011131,
+    "floor_name": "identity",
+    "group_name": "member",
+    "improvement": 0.813216,
+    "member_median": 0.002079,
+    "metric_name": "relative_l2",
+    "required_improvement": 0.5,
+    "verdict": "pass"
+   },
+   "key": {
+    "block": "test",
+    "configuration": "projection_backbone",
+    "group": "member",
     "member": "residual_correction",
     "split": "strain_atlas_holdout",
     "task": "cheap_to_accurate_charge"

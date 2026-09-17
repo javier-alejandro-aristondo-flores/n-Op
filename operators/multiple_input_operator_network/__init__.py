@@ -58,10 +58,19 @@ def Density_Channels(input_function: GridFunction, reference_density: float) -> 
 
 
 def Potential_Channels(input_function: GridFunction) -> NDArray[np.float64]:
-    """the two mean-removed spin-potential channels the potential branch reads"""
+    """the two mean-removed spin-potential channels the potential branch reads, still in raw physical units"""
     potential_up = Labeled_Channel(input_function, INPUT_POTENTIAL_LABELS[0])
     potential_down = Labeled_Channel(input_function, INPUT_POTENTIAL_LABELS[1])
     return np.stack([potential_up - potential_up.mean(), potential_down - potential_down.mean()])
+
+
+def Standardized_Potential_Coefficients(
+    raw_coefficients: NDArray[np.float64],
+    potential_coefficient_mean: NDArray[np.float64],
+    potential_coefficient_scale: NDArray[np.float64],
+) -> NDArray[np.float64]:
+    """the potential basis's own raw coefficients centered and scaled per coefficient by training-fold statistics"""
+    return (raw_coefficients - potential_coefficient_mean) / potential_coefficient_scale
 
 
 def As_Grid_Function(values: NDArray[np.float64], labels: tuple[str, ...], like: GridFunction) -> GridFunction:
@@ -115,7 +124,7 @@ class TwoBranchEncoder(Operator[GridFunction, Coefficients]):
         self,
         density_projection: BasisProjectionEncoder,
         density_branch: SensorEncoder,
-        potential: tuple[BasisProjectionEncoder, SensorEncoder] | None,
+        potential: tuple[BasisProjectionEncoder, SensorEncoder, NDArray[np.float64], NDArray[np.float64]] | None,
         reference_density: float,
         seed: int = 0,
     ) -> None:
@@ -129,7 +138,7 @@ class TwoBranchEncoder(Operator[GridFunction, Coefficients]):
         if potential is None:
             self.potential_rank = 0
         else:
-            _, potential_branch = potential
+            _, potential_branch, _, _ = potential
             if int(potential_branch.network.layer_widths[-1]) != self.latent_width:
                 raise ValueError("the two branches must share one latent width for their product to be defined")
             self.potential_rank = int(potential_branch.network.layer_widths[0])
@@ -151,7 +160,7 @@ class TwoBranchEncoder(Operator[GridFunction, Coefficients]):
         """every sub-part's own arrays, prefixed so the two branches' identically named layers never collide"""
         collected = {f"density_branch.{name}": value for name, value in self.density_branch.parameter_values.items()}
         if self.potential is not None:
-            _, potential_branch = self.potential
+            _, potential_branch, _, _ = self.potential
             collected.update(
                 {f"potential_branch.{name}": value for name, value in potential_branch.parameter_values.items()}
             )
@@ -176,14 +185,22 @@ class TwoBranchEncoder(Operator[GridFunction, Coefficients]):
         if self.potential is None:
             combined = density_vector
         else:
-            potential_projection, potential_branch = self.potential
+            potential_projection, potential_branch, potential_coefficient_mean, potential_coefficient_scale = (
+                self.potential
+            )
             potential_field = As_Grid_Function(
                 Potential_Channels(input_function), DERIVED_POTENTIAL_LABELS, input_function
             )
             self.last_potential_grid_shape = potential_field.values.shape[1:]
-            potential_coefficients = potential_projection(potential_field, output_discretization, condition)
+            raw_potential_coefficients = potential_projection(potential_field, output_discretization, condition)
+            standardized_vector = Standardized_Potential_Coefficients(
+                np.asarray(raw_potential_coefficients.vector, dtype=np.float64),
+                potential_coefficient_mean,
+                potential_coefficient_scale,
+            )
+            potential_coefficients = dataclasses.replace(raw_potential_coefficients, vector=standardized_vector)
             potential_latent = potential_branch(potential_coefficients, output_discretization, condition)
-            self.last_potential_coefficients = np.asarray(potential_coefficients.vector, dtype=np.float64)
+            self.last_potential_coefficients = standardized_vector
             combined = density_vector * np.asarray(potential_latent.vector, dtype=np.float64)
         self.last_combined_latent = combined
         split = self.parameter_values["channel_head_weights"] @ combined + self.parameter_values["channel_head_biases"]
@@ -197,7 +214,7 @@ class TwoBranchEncoder(Operator[GridFunction, Coefficients]):
         state: dict[str, Array] = {f"density_projection.{name}": value for name, value in density_inspected.items()}
         state.update({f"density_branch.{name}": value for name, value in self.density_branch.Inspect().items()})
         if self.potential is not None:
-            potential_projection, potential_branch = self.potential
+            potential_projection, potential_branch, _, _ = self.potential
             potential_inspected = Basis_Projection_Inspection(
                 potential_projection, DERIVED_POTENTIAL_LABELS, self.last_potential_grid_shape
             )
@@ -251,6 +268,7 @@ class MultipleInputOperatorNetwork(NeuralOperator[GridFunction, Coefficients, Re
 
     def Forward_Coefficients(self, lifted: dict[str, Any], parameter_vectors: Any) -> Any:
         """the two branches' own coefficient slices, combined multiplicatively and split into per-channel trunk rows"""
+        # the potential slice arrives already standardized, concatenated that way by the cache that built it
         encoder = self.branch_encoder
         density_vector = parameter_vectors[:, : encoder.density_rank]
         density_latent = encoder.density_branch.network.Forward(
@@ -259,7 +277,7 @@ class MultipleInputOperatorNetwork(NeuralOperator[GridFunction, Coefficients, Re
         if encoder.potential is None:
             combined = density_latent
         else:
-            _, potential_branch = encoder.potential
+            _, potential_branch, _, _ = encoder.potential
             potential_end = encoder.density_rank + encoder.potential_rank
             potential_vector = parameter_vectors[:, encoder.density_rank : potential_end]
             potential_latent = potential_branch.network.Forward(
@@ -282,6 +300,8 @@ def Two_Branch_Member(
     density_basis: PodBasis,
     potential_basis: PodBasis,
     reference_density: float,
+    potential_coefficient_mean: NDArray[np.float64],
+    potential_coefficient_scale: NDArray[np.float64],
     seed: int = 0,
 ) -> MultipleInputOperatorNetwork:
     """the built configuration: two fixed-basis branches combined multiplicatively, read against a shared trunk"""
@@ -293,7 +313,11 @@ def Two_Branch_Member(
     # the potential branch is seeded one past the density branch, so the two draws never share a stream
     potential_branch = SensorEncoder((potential_rank, BRANCH_HIDDEN_WIDTH, LATENT_WIDTH), seed=seed + 1)
     encoder = TwoBranchEncoder(
-        density_projection, density_branch, (potential_projection, potential_branch), reference_density, seed=seed + 2
+        density_projection,
+        density_branch,
+        (potential_projection, potential_branch, potential_coefficient_mean, potential_coefficient_scale),
+        reference_density,
+        seed=seed + 2,
     )
     # the trunk is seeded two past the branches, so no two draws share a stream
     readout = BasisExpansion(

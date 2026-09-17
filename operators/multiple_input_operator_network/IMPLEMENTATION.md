@@ -198,5 +198,40 @@ loss costs the running stage its steps since its last validation pass rather tha
 writes seconds per step and peak accelerator bytes — measured through `operators.substrate`'s own
 `Reset_Peak_Accelerator_Bytes`/`Peak_Accelerator_Bytes` facet, never by naming the foreign engine —
 to a small json beside the checkpoints, the figure the card holder sizes each one-hour run's
-`step_count` from. **Not yet run**: the twin's and the member's own training, and therefore the
-decisive gate and every bar that needs a trained model — scheduled on the card.
+`step_count` from.
+
+**A defect, found and fixed 2026-09-17, before any verdict was written.** The first matched-budget
+run (`elf_fold0_member_33650`, void, superseded) never had a working forward pass: its combined
+latent (density branch latent times potential branch latent, elementwise) reached a std of 2441.6
+against the twin's 1.98, driving the bounded head's pre-activation to the thousands and saturating
+`Bounded_Values` to exactly 0.0 everywhere from step one, with zero gradient reaching the loss
+through the saturated points — the recorded validation score (0.091299, unmoved to six digits
+across all three stages) is what an all-zero prediction scores against this target, not a trained
+member. Root cause: `Density_Channels` runs the flagship's `Log_Compressed_Channels`, dynamic-range
+compression to O(1); `Potential_Channels` only removed each channel's own spatial mean, leaving the
+potential basis's own coefficients in raw physical units — measured at roughly 48x the density
+branch's own coefficient scale, which a `SensorEncoder` built and initialized identically to the
+density branch (correctly, per this package's own shared-seed convention) carries straight through
+to a correspondingly larger latent. **Fix**: `Potential_Coefficient_Statistics` (`cache.py`) fits
+each of the potential basis's rank-32 coefficients' own mean and spread across the pooled
+floor-training block (the `Parameter_Spreads` zero-spread guard's own idiom, `spread[spread ==
+0.0] = 1.0`), and `Standardized_Potential_Coefficients` (`__init__.py`) centers and scales each
+coefficient by those training-fold statistics before the potential branch ever reads them — in
+`TwoBranchEncoder.__call__` for the numpy inference path and in `Localization_Cache` for the cached
+coefficients training reads, so the fix reaches both from the same one change. The density path is
+untouched by design, so the twin's already-trained checkpoint (`elf_fold0_twin_33650`) stands
+unmodified and the two networks still share an identical density branch. The statistics are
+constants fit once on the training folds and reproduced deterministically by `Fitted_Bases`,
+exactly like the POD basis itself — no separate persistence needed.
+`Test_A_Fresh_Init_Does_Not_Saturate_The_Bounded_Head_On_Real_Scale_Input`
+(`test_multiple_input_operator_network.py`, `pool`) pins it: on real-scale input at a fresh init,
+the bounded head lands strictly inside `(0, 1)`, the two branches' own latent scales stay within a
+couple of orders of magnitude of each other (density's log-compressed-but-not-z-scored input and
+potential's now-unit-variance-per-coefficient input are two different, both legitimate conventions,
+so they do not land at the identical scale — the bound instead rules out the measured bug, a 55x
+branch-latent gap that saturated the head), and gradient reaches both branches through
+`Training_Engine`. A host sanity check (300 steps, `learning_rate=1e-3`, card hidden) confirmed the
+fix trains: validation score 0.076946 at step 25, falling every checkpoint after (one wobble, step
+150 to 175) to 0.015901 at step 300 — below the all-zero baseline (0.0913) from the first checkpoint
+and still falling at the run's end, not a plateau. **Not yet run**: the member's own matched retrain
+under the fix (`elf_fold0_member_v2_33650`) and therefore the decisive gate — scheduled on the card.

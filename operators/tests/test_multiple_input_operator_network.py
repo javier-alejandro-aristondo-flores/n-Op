@@ -42,11 +42,11 @@ from operators.multiple_input_operator_network.cache import (
     MEMBER_TRAIN_FOLDS,
     VALIDATION_FOLDS,
 )
-from operators.multiple_input_operator_network.report import Floor_Summaries
+from operators.multiple_input_operator_network.report import Floor_Summaries, Point_Value_Loss
 from operators.readouts import BasisExpansion, PeriodicCoordinateFeatures
 from operators.substrate import Accelerator_Is_Available, Adam_Step, Fresh_Adam_State, NumpyEngine, ParameterSet
 from operators.tasks import Card_Named
-from operators.training import PointSampledBatches, Training_Engine
+from operators.training import CoordinateFeaturizedBatches, PointSampledBatches, Training_Engine
 
 CUBE = Domain(lattice=np.eye(3) * 3.57)
 
@@ -79,7 +79,12 @@ def Synthetic_Input_Field(seed: int, grid_shape: tuple[int, int, int] = GRID) ->
 
 
 def Small_Two_Branch_Member(
-    density_rank: int = 4, potential_rank: int = 3, latent_width: int = 5, seed: int = 0
+    density_rank: int = 4,
+    potential_rank: int = 3,
+    latent_width: int = 5,
+    seed: int = 0,
+    potential_coefficient_mean: NDArray[np.float64] | None = None,
+    potential_coefficient_scale: NDArray[np.float64] | None = None,
 ) -> MultipleInputOperatorNetwork:
     """a tiny two-branch member, enough to assemble and differentiate quickly"""
     density_basis = Small_Pod_Basis(GRID_FEATURE_COUNT, density_rank, seed=101)
@@ -89,7 +94,10 @@ def Small_Two_Branch_Member(
     potential_projection = BasisProjectionEncoder(potential_basis.modes, potential_basis.mean)
     # the potential branch is seeded one past the density branch, so the two draws never share a stream
     potential_branch = SensorEncoder((potential_rank, 6, latent_width), seed=seed + 1)
-    potential = (potential_projection, potential_branch)
+    # the identity standardization by default, so a test not exercising the standardization itself sees no change
+    mean = np.zeros(potential_rank) if potential_coefficient_mean is None else potential_coefficient_mean
+    scale = np.ones(potential_rank) if potential_coefficient_scale is None else potential_coefficient_scale
+    potential = (potential_projection, potential_branch, mean, scale)
     encoder = TwoBranchEncoder(density_projection, density_branch, potential, reference_density=1.0, seed=seed + 2)
     readout = BasisExpansion(
         latent_width, (6,), PeriodicCoordinateFeatures(fourier_orders=1), OUTPUT_CHANNEL_LABELS, seed=seed + 3
@@ -193,10 +201,9 @@ def Test_The_Encoder_Refuses_Two_Branches_With_Different_Latent_Widths() -> None
     density_branch = SensorEncoder((4, 6, 5), seed=0)
     potential_projection = BasisProjectionEncoder(potential_basis.modes, potential_basis.mean)
     potential_branch = SensorEncoder((4, 6, 7), seed=1)
+    potential = (potential_projection, potential_branch, np.zeros(4), np.ones(4))
     with pytest.raises(ValueError):
-        TwoBranchEncoder(
-            density_projection, density_branch, (potential_projection, potential_branch), reference_density=1.0
-        )
+        TwoBranchEncoder(density_projection, density_branch, potential, reference_density=1.0)
 
 
 def Test_The_Member_Collects_Every_Learned_Array_Under_One_Namespace() -> None:
@@ -252,7 +259,7 @@ def Test_The_Product_Latent_Reduces_To_The_Branch_Trunk_Form_When_The_Potential_
     twin = Small_Density_Alone_Twin(seed=11)
     encoder = member.branch_encoder
     assert encoder.potential is not None
-    _, potential_branch = encoder.potential
+    _, potential_branch, _, _ = encoder.potential
     last_layer_index = len(potential_branch.network.layer_widths) - 2
     potential_branch.parameter_values[f"sensor_encoder_layer_{last_layer_index}_weights"][...] = 0.0
     potential_branch.parameter_values[f"sensor_encoder_layer_{last_layer_index}_biases"][...] = 1.0
@@ -414,8 +421,17 @@ def Test_The_Cubic_Block_Fold_Counts_Match_The_Canon() -> None:
 @pytest.mark.pool
 def Test_The_Built_Configurations_Match_Their_Own_Parameter_Counts() -> None:
     """the member and its twin, built from bases fit on the live corpus, carry the exact counts IMPLEMENTATION.md records"""
-    density_basis, potential_basis, reference_density, _ = Fitted_Bases(limit=40)
-    member = Two_Branch_Member(density_basis, potential_basis, reference_density, seed=0)
+    density_basis, potential_basis, reference_density, potential_coefficient_mean, potential_coefficient_scale, _ = (
+        Fitted_Bases(limit=40)
+    )
+    member = Two_Branch_Member(
+        density_basis,
+        potential_basis,
+        reference_density,
+        potential_coefficient_mean,
+        potential_coefficient_scale,
+        seed=0,
+    )
     twin = Density_Alone_Twin(density_basis, reference_density, seed=0)
     member_parameter_count = sum(value.size for value in member.Parameter_Values().values())
     twin_parameter_count = sum(value.size for value in twin.Parameter_Values().values())
@@ -437,10 +453,20 @@ def Test_The_Reports_Own_Floors_Reproduce_The_Recorded_Ladder() -> None:
 @pytest.mark.pool
 def Test_Fitted_Bases_Reports_A_Decay_Curve_And_A_Gate_Verdict() -> None:
     """a small fit still returns a basis at the eighty-cube feature width and a well-formed decay report"""
-    density_basis, potential_basis, reference_density, decay = Fitted_Bases(limit=10)
+    (
+        density_basis,
+        potential_basis,
+        reference_density,
+        potential_coefficient_mean,
+        potential_coefficient_scale,
+        decay,
+    ) = Fitted_Bases(limit=10)
     assert density_basis.modes.shape[1] == 2 * 80 * 80 * 80
     assert potential_basis.modes.shape[1] == 2 * 80 * 80 * 80
     assert reference_density > 0.0
+    assert potential_coefficient_mean.shape == (potential_basis.modes.shape[0],)
+    assert potential_coefficient_scale.shape == (potential_basis.modes.shape[0],)
+    assert np.all(potential_coefficient_scale > 0.0)
     for report in decay.values():
         assert 0.0 <= report["gate_passed"] <= 1.0
         assert report["gate_reached_rank"] >= 1.0
@@ -449,12 +475,28 @@ def Test_Fitted_Bases_Reports_A_Decay_Curve_And_A_Gate_Verdict() -> None:
 @pytest.mark.pool
 def Test_The_Cache_Feeds_Point_Sampled_Batches_Of_The_Built_Members_Own_Shape() -> None:
     """the member-local cache is a drop-in FieldCache, and point-sampled batches come from it unmodified"""
-    density_basis, potential_basis, reference_density, _ = Fitted_Bases(limit=10)
+    density_basis, potential_basis, reference_density, potential_coefficient_mean, potential_coefficient_scale, _ = (
+        Fitted_Bases(limit=10)
+    )
     train_cache = Localization_Cache(
-        MEMBER_TRAIN_FOLDS, density_basis, potential_basis, reference_density, "training", limit=30
+        MEMBER_TRAIN_FOLDS,
+        density_basis,
+        potential_basis,
+        reference_density,
+        potential_coefficient_mean,
+        potential_coefficient_scale,
+        "training",
+        limit=30,
     )
     validation_cache = Localization_Cache(
-        VALIDATION_FOLDS, density_basis, potential_basis, reference_density, "validation", limit=30
+        VALIDATION_FOLDS,
+        density_basis,
+        potential_basis,
+        reference_density,
+        potential_coefficient_mean,
+        potential_coefficient_scale,
+        "validation",
+        limit=30,
     )
     assert train_cache.fields and validation_cache.fields
     batch_source = PointSampledBatches(train_cache, validation_cache, runs_per_batch=2, points_per_run=8)
@@ -465,3 +507,77 @@ def Test_The_Cache_Feeds_Point_Sampled_Batches_Of_The_Built_Members_Own_Shape() 
     assert batch.arrays["point_coordinates"].shape == (2, 8, 3)
     assert batch.arrays["target_values"].shape == (2, 8, 2)
     assert batch_source.Validation_Batches()
+
+
+@pytest.mark.pool
+def Test_A_Fresh_Init_Does_Not_Saturate_The_Bounded_Head_On_Real_Scale_Input() -> None:
+    """the saturation guard the missing standardization would have failed: real-scale branch latents stay within a couple of orders of magnitude of each other, the bounded head stays strictly inside its own range, and gradient reaches both branches"""
+    density_basis, potential_basis, reference_density, potential_coefficient_mean, potential_coefficient_scale, _ = (
+        Fitted_Bases(limit=40)
+    )
+    member = Two_Branch_Member(
+        density_basis,
+        potential_basis,
+        reference_density,
+        potential_coefficient_mean,
+        potential_coefficient_scale,
+        seed=0,
+    )
+    example = next(iter(Cubic_Block_Examples(VALIDATION_FOLDS, limit=40)))
+    target_shape = example.target_function.values.shape[1:]
+    output_grid = GridSpec((int(target_shape[0]), int(target_shape[1]), int(target_shape[2])))
+    produced = member(example.input_function, output_grid)
+    assert isinstance(produced, GridFunction)
+    values = np.asarray(produced.values)
+    assert np.all(values > 0.0) and np.all(values < 1.0)
+    density_latent = member.branch_encoder.density_branch.Inspect()["last_latent_vector"]
+    assert member.branch_encoder.potential is not None
+    _, potential_branch, _, _ = member.branch_encoder.potential
+    potential_latent = potential_branch.Inspect()["last_latent_vector"]
+    density_scale = float(np.std(density_latent))
+    potential_scale = float(np.std(potential_latent))
+    assert density_scale > 0.0 and potential_scale > 0.0
+    # density's own input is log-compressed but never z-scored, while potential's is now standardized to unit
+    # variance per coefficient, so the two conventions do not land at the identical scale -- this bound instead
+    # rules out the measured bug (potential 55x the density branch's own scale, saturating the head at 0.0 exactly)
+    assert 0.01 <= potential_scale / density_scale <= 100.0
+    train_cache = Localization_Cache(
+        MEMBER_TRAIN_FOLDS,
+        density_basis,
+        potential_basis,
+        reference_density,
+        potential_coefficient_mean,
+        potential_coefficient_scale,
+        "training",
+        limit=6,
+    )
+    validation_cache = Localization_Cache(
+        VALIDATION_FOLDS,
+        density_basis,
+        potential_basis,
+        reference_density,
+        potential_coefficient_mean,
+        potential_coefficient_scale,
+        "validation",
+        limit=6,
+    )
+    sampler = PointSampledBatches(train_cache, validation_cache, runs_per_batch=2, points_per_run=8)
+    batches = CoordinateFeaturizedBatches(sampler, member.trunk_readout.coordinate_features)
+    batch = batches.Next_Batch(np.random.default_rng(1))
+    forward_loss = Point_Value_Loss(member)
+    engine = Training_Engine(device="host")
+    lifted_batch = {
+        name: engine.Lift_Constant(np.asarray(array, dtype=np.float64)) for name, array in batch.arrays.items()
+    }
+    loss_value, gradients = engine.Value_And_Gradients(
+        ParameterSet(values=member.Parameter_Values()), lambda lifted: forward_loss(lifted, lifted_batch)
+    )
+    assert np.isfinite(loss_value)
+    density_gradient = max(
+        float(np.abs(gradients[name]).max()) for name in gradients if name.startswith("density_branch.")
+    )
+    potential_gradient = max(
+        float(np.abs(gradients[name]).max()) for name in gradients if name.startswith("potential_branch.")
+    )
+    assert density_gradient > 0.0
+    assert potential_gradient > 0.0

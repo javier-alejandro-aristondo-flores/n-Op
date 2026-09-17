@@ -86,8 +86,22 @@ def Block_Lines(block: CubicBlock) -> list[str]:
 
 def Architecture_Lines() -> tuple[list[str], int, int]:
     """the built configuration's own parameter counts, measured on bases fit at the report's own basis rank"""
-    density_basis, potential_basis, reference_density, decay = Fitted_Bases(limit=64)
-    member = Two_Branch_Member(density_basis, potential_basis, reference_density, seed=0)
+    (
+        density_basis,
+        potential_basis,
+        reference_density,
+        potential_coefficient_mean,
+        potential_coefficient_scale,
+        decay,
+    ) = Fitted_Bases(limit=64)
+    member = Two_Branch_Member(
+        density_basis,
+        potential_basis,
+        reference_density,
+        potential_coefficient_mean,
+        potential_coefficient_scale,
+        seed=0,
+    )
     twin = Density_Alone_Twin(density_basis, reference_density, seed=0)
     member_parameter_count = sum(value.size for value in member.Parameter_Values().values())
     twin_parameter_count = sum(value.size for value in twin.Parameter_Values().values())
@@ -218,13 +232,27 @@ def Batches_For(
     density_basis: Any,
     potential_basis: Any,
     reference_density: float,
+    potential_coefficient_mean: Any,
+    potential_coefficient_scale: Any,
 ) -> tuple[CoordinateFeaturizedBatches, int]:
     """the training and validation caches drawn point-sampled, their points already answered by the trunk's own map, beside the training run count -- one cache serves the member and its twin alike, since the twin simply ignores the potential columns"""
     training_cache = Localization_Cache(
-        MEMBER_TRAIN_FOLDS, density_basis, potential_basis, reference_density, "training"
+        MEMBER_TRAIN_FOLDS,
+        density_basis,
+        potential_basis,
+        reference_density,
+        potential_coefficient_mean,
+        potential_coefficient_scale,
+        "training",
     )
     validation_cache = Localization_Cache(
-        VALIDATION_FOLDS, density_basis, potential_basis, reference_density, "validation"
+        VALIDATION_FOLDS,
+        density_basis,
+        potential_basis,
+        reference_density,
+        potential_coefficient_mean,
+        potential_coefficient_scale,
+        "validation",
     )
     sampler = PointSampledBatches(training_cache, validation_cache, RUNS_PER_BATCH, POINTS_PER_RUN)
     batches = CoordinateFeaturizedBatches(sampler, member.trunk_readout.coordinate_features)
@@ -233,13 +261,34 @@ def Batches_For(
 
 def Train_Configuration(step_count: int, run_name: str, twin: bool) -> dict[str, object]:
     """the staged run for either configuration through operators.training.Staged_Training, one code path so the twin cannot drift from the member, every stage resuming its own checkpoint -- the card holder's own driver, not invoked by this module; the card is scheduled by the integrator and this function trains nothing until it is called"""
-    density_basis, potential_basis, reference_density, _ = Fitted_Bases()
+    (
+        density_basis,
+        potential_basis,
+        reference_density,
+        potential_coefficient_mean,
+        potential_coefficient_scale,
+        _,
+    ) = Fitted_Bases()
     member = (
         Density_Alone_Twin(density_basis, reference_density, seed=0)
         if twin
-        else Two_Branch_Member(density_basis, potential_basis, reference_density, seed=0)
+        else Two_Branch_Member(
+            density_basis,
+            potential_basis,
+            reference_density,
+            potential_coefficient_mean,
+            potential_coefficient_scale,
+            seed=0,
+        )
     )
-    batches, training_run_count = Batches_For(member, density_basis, potential_basis, reference_density)
+    batches, training_run_count = Batches_For(
+        member,
+        density_basis,
+        potential_basis,
+        reference_density,
+        potential_coefficient_mean,
+        potential_coefficient_scale,
+    )
     forward_loss = Point_Value_Loss(member)
     parameters = ParameterSet(values=member.Parameter_Values())
     engine = Training_Engine()
@@ -263,13 +312,34 @@ def Train_Configuration(step_count: int, run_name: str, twin: bool) -> dict[str,
 
 def Cost_Probe(twin: bool) -> dict[str, object]:
     """a hundred steps on the real batch source for either configuration, seconds per step and peak accelerator bytes through operators.substrate's own dispatched facet, written to a small json beside the checkpoints"""
-    density_basis, potential_basis, reference_density, _ = Fitted_Bases()
+    (
+        density_basis,
+        potential_basis,
+        reference_density,
+        potential_coefficient_mean,
+        potential_coefficient_scale,
+        _,
+    ) = Fitted_Bases()
     member = (
         Density_Alone_Twin(density_basis, reference_density, seed=0)
         if twin
-        else Two_Branch_Member(density_basis, potential_basis, reference_density, seed=0)
+        else Two_Branch_Member(
+            density_basis,
+            potential_basis,
+            reference_density,
+            potential_coefficient_mean,
+            potential_coefficient_scale,
+            seed=0,
+        )
     )
-    batches, training_run_count = Batches_For(member, density_basis, potential_basis, reference_density)
+    batches, training_run_count = Batches_For(
+        member,
+        density_basis,
+        potential_basis,
+        reference_density,
+        potential_coefficient_mean,
+        potential_coefficient_scale,
+    )
     forward_loss = Point_Value_Loss(member)
     parameters = ParameterSet(values=member.Parameter_Values())
     Reset_Peak_Accelerator_Bytes()
@@ -325,17 +395,31 @@ def Main() -> int:
         "",
         "## Result",
         "",
-        "Not yet run. Training is scheduled by the integrator on the shared card: the density-alone twin then"
-        " the two-branch member, both under the flagship's staged protocol on the member_train fold, validated"
-        " on the validation fold, evaluated on the evaluation fold above. **The two runs share one step"
-        " budget, matched by construction rather than each sized from its own cost probe.** The twin's cost"
-        " probe measured 0.451 s/step (100 steps, mostly one-time accelerator and kernel-cache"
-        " initialization); the member's, run second in a fresh process, measured 0.107 s/step against an"
-        " already-warm kernel cache -- the two probes are not comparable, and sizing each run from its own"
-        " probe would have handed the twin 7,976 steps against the member's 33,650, confounding the decisive"
-        " twin-vs-member comparison with unequal training rather than isolating the potential branch's own"
-        " contribution. Both runs instead take the member's warm-cache figure, 33,650 steps each (the twin,"
-        " the smaller network, can only finish sooner, never later).",
+        "The two runs share one step budget, matched by construction rather than each sized from its own cost"
+        " probe: the twin's cost probe measured 0.451 s/step (100 steps, mostly one-time accelerator and"
+        " kernel-cache initialization), the member's, run second in a fresh process, measured 0.107 s/step"
+        " against an already-warm kernel cache -- the two probes are not comparable, and sizing each run from"
+        " its own probe would have handed the twin 7,976 steps against the member's 33,650, confounding the"
+        " decisive twin-vs-member comparison with unequal training rather than isolating the potential"
+        " branch's own contribution. Both runs instead took the member's warm-cache figure, 33,650 steps each.",
+        "",
+        "**`elf_fold0_member_33650` is void.** It never had a working forward pass: the potential branch's own"
+        " rank-32 coefficients entered the product un-standardized, at roughly 48x the density branch's own"
+        " scale, which saturated the bounded head (`Bounded_Values`) to exactly 0.0 everywhere from step one --"
+        " the recorded validation score (0.091299, unmoved to six digits across all three stages) is what an"
+        " all-zero prediction scores against this target, not a trained member. See `IMPLEMENTATION.md`'s own"
+        " defect section for the full diagnosis. **Fix, landed**: `Potential_Coefficient_Statistics` and"
+        " `Standardized_Potential_Coefficients` center and scale each of the potential basis's rank-32"
+        " coefficients by its own training-fold mean and spread before the potential branch ever reads it,"
+        " leaving the density path -- and the twin's already-trained checkpoint (`elf_fold0_twin_33650`) --"
+        " untouched. A host sanity check (300 steps, `learning_rate=1e-3`, card hidden) confirmed the fix"
+        " trains: validation score 0.076946 at step 25, falling every checkpoint after (one wobble, step 150 to"
+        " 175) to 0.015901 at step 300 -- below the all-zero baseline (0.0913) from the first checkpoint and"
+        " still falling at the run's end.",
+        "",
+        "**Not yet run**: the member's own matched retrain under the fix (`elf_fold0_member_v2_33650`, 33,650"
+        " steps, the twin's already-trained checkpoint stands) and therefore the decisive gate and the pattern"
+        " rule -- scheduled on the card.",
         "",
         "## Inspection",
         "",
@@ -348,10 +432,12 @@ def Main() -> int:
         "Built and tested (`operators/tests/test_multiple_input_operator_network.py`): the assembly, the"
         " basis fitting and cache, the gate contract, the product-reduces-to-branch-trunk identity, two-path"
         " agreement and gradients on both engines, the twin's shared-name and constant-potential properties, a"
-        " deterministic toy training run, the full inspection surface, the exact cubic-block fold counts, and"
-        " the built configuration's own parameter counts against the live corpus. Floors are pre-registered"
-        " above, read live through the promoted `operators.evaluation` package. Not yet run: the twin's and the"
-        " member's own training, scheduled on the card.",
+        " deterministic toy training run, the full inspection surface, the exact cubic-block fold counts, the"
+        " built configuration's own parameter counts against the live corpus, and (added after the defect"
+        " above) the saturation guard confirming real-scale branch latents and a non-saturated bounded head at"
+        " a fresh init. Floors are pre-registered above, read live through the promoted"
+        " `operators.evaluation` package. The twin is trained (`elf_fold0_twin_33650`); the member's first"
+        " matched run is void (see Result) and its fixed retrain is not yet run, scheduled on the card.",
     ]
     REPORT_PATH.write_text("\n".join(lines) + "\n")
     results = MemberResults(

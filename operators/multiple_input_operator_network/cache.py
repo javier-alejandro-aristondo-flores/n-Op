@@ -17,7 +17,11 @@ from operators.data import (
     Reconstruction_Error_Curve,
 )
 from operators.factorized_fourier import Reference_Density
-from operators.multiple_input_operator_network import Density_Channels, Potential_Channels
+from operators.multiple_input_operator_network import (
+    Density_Channels,
+    Potential_Channels,
+    Standardized_Potential_Coefficients,
+)
 from operators.tasks import Card_Named
 from operators.training import CachedField, FieldCache, Paired_Field_Examples, TrainingExample
 
@@ -76,6 +80,20 @@ def Fitted_Reference_Density(examples: list[TrainingExample]) -> float:
     return Reference_Density(density_fields, magnetization_fields)
 
 
+def Potential_Coefficient_Statistics(
+    potential_basis: PodBasis, examples: list[TrainingExample]
+) -> tuple[NDArray[np.float64], NDArray[np.float64]]:
+    """each potential coefficient's own mean and spread across the training block, the branch's own standardization"""
+    raw_coefficients = np.stack(
+        [Project(potential_basis, Potential_Snapshot(example)[None, :])[0] for example in examples]
+    )
+    mean = raw_coefficients.mean(axis=0)
+    spread = raw_coefficients.std(axis=0)
+    # a coefficient that never varies across the whole training block would divide the branch input by zero
+    spread[spread == 0.0] = 1.0
+    return mean, spread
+
+
 def Basis_Decay_Report(snapshots: NDArray[np.float64]) -> dict[str, float]:
     """reconstruction error at ranks eight, sixteen and thirty-two, beside the canon's own decay gate verdict"""
     curve = Reconstruction_Error_Curve(snapshots)
@@ -90,8 +108,8 @@ def Basis_Decay_Report(snapshots: NDArray[np.float64]) -> dict[str, float]:
 
 def Fitted_Bases(
     pool_root: Path = POOL_ROOT, limit: int | None = None
-) -> tuple[PodBasis, PodBasis, float, dict[str, dict[str, float]]]:
-    """the density and potential bases fit on the pooled non-evaluation folds, beside the reference density and decay"""
+) -> tuple[PodBasis, PodBasis, float, NDArray[np.float64], NDArray[np.float64], dict[str, dict[str, float]]]:
+    """the two bases fit on the pooled training folds, the reference density, the potential standardization, decay"""
     examples = list(Cubic_Block_Examples(FLOOR_TRAIN_FOLDS, pool_root, limit))
     if not examples:
         raise ValueError("no cubic-block training examples were found to fit the bases on")
@@ -104,7 +122,17 @@ def Fitted_Bases(
     }
     density_basis = Gram_Pod(density_snapshots, rank=BASIS_RANK)
     potential_basis = Gram_Pod(potential_snapshots, rank=BASIS_RANK)
-    return density_basis, potential_basis, reference_density, decay
+    potential_coefficient_mean, potential_coefficient_scale = Potential_Coefficient_Statistics(
+        potential_basis, examples
+    )
+    return (
+        density_basis,
+        potential_basis,
+        reference_density,
+        potential_coefficient_mean,
+        potential_coefficient_scale,
+        decay,
+    )
 
 
 def Localization_Cache(
@@ -112,6 +140,8 @@ def Localization_Cache(
     density_basis: PodBasis,
     potential_basis: PodBasis,
     reference_density: float,
+    potential_coefficient_mean: NDArray[np.float64],
+    potential_coefficient_scale: NDArray[np.float64],
     role: str,
     pool_root: Path = POOL_ROOT,
     limit: int | None = None,
@@ -121,7 +151,10 @@ def Localization_Cache(
     cached_fields: list[CachedField] = []
     for example in Cubic_Block_Examples(role_folds, pool_root, limit):
         density_coefficients = Project(density_basis, Density_Snapshot(example, reference_density)[None, :])[0]
-        potential_coefficients = Project(potential_basis, Potential_Snapshot(example)[None, :])[0]
+        raw_potential_coefficients = Project(potential_basis, Potential_Snapshot(example)[None, :])[0]
+        potential_coefficients = Standardized_Potential_Coefficients(
+            raw_potential_coefficients, potential_coefficient_mean, potential_coefficient_scale
+        )
         parameters = np.concatenate([density_coefficients, potential_coefficients])
         target_values = np.ascontiguousarray(np.asarray(example.target_function.values), dtype=np.float32)
         cached_fields.append(

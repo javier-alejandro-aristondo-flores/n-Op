@@ -41,13 +41,24 @@ full numbers. Three fixes:
    worse to within 1% of the mean field, oscillating just above it rather than clearly below --
    healthier (a stable band, not a persistent large gap) but not yet the integrator's own criterion.
 
-**The gate has not been rerun; the criterion for asking for the card (clearly below the mean-field
-baseline, input-dependence over 1e-3) is not conclusively met at 600 host steps.**
-`perovskite_gate_48840` is void; the eventual rerun will carry a new run name.
+The integrator's own read: the defect is fixed (the network reaches the training-mean field within a
+hundred steps instead of sitting sixteen times above it, and input-dependence survives training), and
+600 single-example host steps are far too few to resolve the lattice-dependent deviation that is the
+whole gap between the mean field and the copy floor. The pre-registered gate now decides on its own
+terms: two hours, step count from a fresh `Cost_Probe`, both bars, a miss is a real kill.
+
+**`perovskite_gate_48840` is void and must never be evaluated as this member's result** -- it predates
+every fix above. The rerun is `perovskite_gate_v2_52283`.
 
 ## Stage-1 gate run
 
-Not yet run under the fixed member. Pass a run name as this module's own command-line argument (`python -m operators.galerkin_transformer.report <run_name>`) once the card has trained it, to fold its checkpoint back in and score both bars in one host command.
+Launched under the fixed member, card granted at 13:40. `Cost_Probe()` measured 0.137711 seconds per
+step and a peak of 1,520,456,704 bytes (100 steps, GPU), giving `step_count = floor(7200 / 0.137711) =
+52283` for the two-hour cap. Run name `perovskite_gate_v2_52283`, launched detached
+(`Train_Perovskite_Gate_Member(52283, "perovskite_gate_v2_52283")`), confirmed on the card by
+`nvidia-smi` (process on GPU 0, ~1.6 GiB, ~94% utilization). Pass this run name as this module's own
+command-line argument (`python -m operators.galerkin_transformer.report perovskite_gate_v2_52283`)
+once it completes, to fold its checkpoint back in and score both bars in one host command.
 
 ## Stage 2 — the cubic block, fold 0 (pre-registration, before training)
 

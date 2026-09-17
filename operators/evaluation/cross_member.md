@@ -2,11 +2,41 @@
 
 ### charge_and_potential_to_localization
 
-member                           configuration                group                        metric               units  median    verdicts
-multiple_input_operator_network  rank32_latent128_trunk3x256  nearest_run_copy_floor       mean_absolute_error  29     0.006164  -       
-multiple_input_operator_network  rank32_latent128_trunk3x256  per_shell_filter_floor       mean_absolute_error  29     0.083022  -       
-multiple_input_operator_network  rank32_latent128_trunk3x256  semilocal_ridge_floor        mean_absolute_error  29     0.097618  -       
-multiple_input_operator_network  rank32_latent128_trunk3x256  training_mean_trivial_floor  mean_absolute_error  29     0.015957  -       
+member                           configuration                group                        metric                    units  median    verdicts
+multiple_input_operator_network  rank32_latent128_trunk3x256  member                       mean_absolute_error       29     0.016454  -       
+multiple_input_operator_network  rank32_latent128_trunk3x256  member                       relative_l2               29     0.069531  -       
+multiple_input_operator_network  rank32_latent128_trunk3x256  member                       structural_similarity_3d  29     0.987451  -       
+multiple_input_operator_network  rank32_latent128_trunk3x256  member__defect_set           mean_absolute_error       21     0.022939  -       
+multiple_input_operator_network  rank32_latent128_trunk3x256  member__defect_set           relative_l2               21     0.113505  -       
+multiple_input_operator_network  rank32_latent128_trunk3x256  member__defect_set           structural_similarity_3d  21     0.979928  -       
+multiple_input_operator_network  rank32_latent128_trunk3x256  member__functional_accurate  mean_absolute_error       22     0.023374  -       
+multiple_input_operator_network  rank32_latent128_trunk3x256  member__functional_accurate  relative_l2               22     0.106398  -       
+multiple_input_operator_network  rank32_latent128_trunk3x256  member__functional_accurate  structural_similarity_3d  22     0.980400  -       
+multiple_input_operator_network  rank32_latent128_trunk3x256  member__functional_cheap     mean_absolute_error       29     0.014839  -       
+multiple_input_operator_network  rank32_latent128_trunk3x256  member__functional_cheap     relative_l2               29     0.066973  -       
+multiple_input_operator_network  rank32_latent128_trunk3x256  member__functional_cheap     structural_similarity_3d  29     0.991594  -       
+multiple_input_operator_network  rank32_latent128_trunk3x256  member__supercell_strains    mean_absolute_error       8      0.006552  -       
+multiple_input_operator_network  rank32_latent128_trunk3x256  member__supercell_strains    relative_l2               8      0.023902  -       
+multiple_input_operator_network  rank32_latent128_trunk3x256  member__supercell_strains    structural_similarity_3d  8      0.999023  -       
+multiple_input_operator_network  rank32_latent128_trunk3x256  nearest_run_copy_floor       mean_absolute_error       29     0.006164  -       
+multiple_input_operator_network  rank32_latent128_trunk3x256  per_shell_filter_floor       mean_absolute_error       29     0.083022  -       
+multiple_input_operator_network  rank32_latent128_trunk3x256  semilocal_ridge_floor        mean_absolute_error       29     0.097618  -       
+multiple_input_operator_network  rank32_latent128_trunk3x256  training_mean_trivial_floor  mean_absolute_error       29     0.015957  -       
+multiple_input_operator_network  rank32_latent128_trunk3x256  twin                         mean_absolute_error       29     0.014553  -       
+multiple_input_operator_network  rank32_latent128_trunk3x256  twin                         relative_l2               29     0.070017  -       
+multiple_input_operator_network  rank32_latent128_trunk3x256  twin                         structural_similarity_3d  29     0.991394  -       
+multiple_input_operator_network  rank32_latent128_trunk3x256  twin__defect_set             mean_absolute_error       21     0.030213  -       
+multiple_input_operator_network  rank32_latent128_trunk3x256  twin__defect_set             relative_l2               21     0.128723  -       
+multiple_input_operator_network  rank32_latent128_trunk3x256  twin__defect_set             structural_similarity_3d  21     0.973995  -       
+multiple_input_operator_network  rank32_latent128_trunk3x256  twin__functional_accurate    mean_absolute_error       22     0.028957  -       
+multiple_input_operator_network  rank32_latent128_trunk3x256  twin__functional_accurate    relative_l2               22     0.134699  -       
+multiple_input_operator_network  rank32_latent128_trunk3x256  twin__functional_accurate    structural_similarity_3d  22     0.973143  -       
+multiple_input_operator_network  rank32_latent128_trunk3x256  twin__functional_cheap       mean_absolute_error       29     0.013713  -       
+multiple_input_operator_network  rank32_latent128_trunk3x256  twin__functional_cheap       relative_l2               29     0.071484  -       
+multiple_input_operator_network  rank32_latent128_trunk3x256  twin__functional_cheap       structural_similarity_3d  29     0.991517  -       
+multiple_input_operator_network  rank32_latent128_trunk3x256  twin__supercell_strains      mean_absolute_error       8      0.006238  -       
+multiple_input_operator_network  rank32_latent128_trunk3x256  twin__supercell_strains      relative_l2               8      0.022532  -       
+multiple_input_operator_network  rank32_latent128_trunk3x256  twin__supercell_strains      structural_similarity_3d  8      0.999145  -       
 
 ### charge_to_localization
 

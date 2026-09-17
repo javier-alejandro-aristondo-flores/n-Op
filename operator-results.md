@@ -7,7 +7,7 @@ Verdicts use the canon's own bars; levels added before a member trained are labe
 
 | as of | trunk | tests | figures |
 |---|---|---|---|
-| 2026-09-17, 14:30 | `99f5b1b` | 617 + 9 card-only | 784 committed |
+| 2026-09-17, 15:45 | `a5cd89f` | 617 + 9 card-only | 822 committed |
 
 Words used throughout, defined once: the *electron localization function* is a field on [0, 1]
 saying how strongly electrons are pinned at a point; the *density of states* is the curve of how
@@ -37,7 +37,7 @@ yet read **pending**.
 | I.3 | `factorized_fourier` | weight_tied_injected | four of five rungs trained and judged; the three stability rungs for the fixed point are built, probes queued | charge_to_localization / fold 0 | MAE 0.00271 (injected), 0.00297 (plain), copy margins 56% and 52% | pass; weight-tying yes at matched parameters, no at matched width; fixed_point pending |
 | I.4 | `galerkin_transformer` | width 128, 4 heads, 4 layers | killed at its stage-1 gate, one seed | lattice_to_charge / perovskite angle stratum, fold 0 (25 runs) and 27 interior arm levels | 0.1780 vs bar ≤ 0.0426 (copy 0.0853); 0.1191 vs bar ≤ 0.0132 (interpolation 0.0264) | killed by its own pre-registration after three defects were fixed; tied with the training-mean field (0.1755); stage 2 not run |
 | II.1 | `deep_operator_network` | principal_component | finished | strain_to_charge / 40³ block, cheap functional | 0.000821 vs ridge kill ≤ 0.003105 (25% better) | pass, 14 of 14 |
-| II.2 | `multiple_input_operator_network` | — | not started | charge_and_potential_to_localization (planned) | pending | pending |
+| II.2 | `multiple_input_operator_network` | two_branch (and its density-alone twin) | killed on its decisive bar, one seed | charge_and_potential_to_localization / paired_fields_fivefold / fold 0, 29 units | MAE 0.016454 vs its twin's 0.014553 (needed 5% better, is 13.1% worse); pattern rule vs ridge 0.097618 passed | killed: the potential branch adds nothing at matched budget; a repaired member |
 | II.3 | `nonlinear_manifold_decoder` | canonical | killed, one seed | strain_to_charge / 423 interior arm levels (and the committed split, 22 units) | 0.002452 vs bar ≤ 0.000607 (bracketing interpolation 0.000911) | killed on the interpolation bar, as pre-registered and as the canon predicted; grid transfer a narrow miss (1.32× vs 1.3×) |
 | II.4 | `factorized_fourier` | parametric | built with floors measured, training queued | strain_to_charge, parametric / interior levels | floor 0.091% vs kill ≤ 0.064% | pending, not yet trained |
 | III.1 | `deep_dft` | — | parts built, member not started | structure_to_charge_defects (planned) | pending | pending |
@@ -281,9 +281,35 @@ the final table; the projection variants of the field-to-field tasks (II.1c) are
 
 ## II.2 — Multiple-input operator network · (charge density, local potential) → electron localization
 
-**Status: not started.** Its low-rank kernel has a lifted forward (a Nyström integral, not the
-multiplicative latent combination this member needs, which is member work), its composition is
-the layerless one the branch–trunk member uses, and the encoders and readouts it needs exist.
+**Status: killed on its decisive bar, one seed (20260916).**
+`operators/multiple_input_operator_network/`: two branches read rank-32 proper-orthogonal
+coefficients of the log-compressed density and of the mean-removed potential, their latents are
+multiplied elementwise, and a point-queried trunk with a bounded head answers the localization
+field; 245,632 parameters. Its twin is the same network with the potential branch held constant
+(224,896 parameters), trained on the identical schedule: 33,650 steps each, about half an hour each
+at 0.11 s per step, 0.8 GB. Fold 0 of the cubic block, both spins, 29 units, medians:
+
+| row | mean absolute error | structural similarity | relative L2 |
+|---|---|---|---|
+| semilocal ridge (the pattern-rule floor) | 0.097618 | — | — |
+| training-mean template | 0.015957 | — | — |
+| nearest-run copy | 0.006164 | — | — |
+| density-alone twin | 0.014553 | 0.9914 | 0.0700 |
+| **two-branch member** | **0.016454** | 0.9875 | 0.0695 |
+| the flagship on the same block, for scale | 0.002170 | 0.9998 | 0.0105 |
+
+Pattern rule against the ridge: passed (83.1% better, 20% required). **The decisive bar, the member
+against its own twin at 5% better: killed — it is 13.1% worse**, and worse on structural similarity
+too. Handing the network the potential as a second input buys nothing at matched budget. The member
+does not beat the training-mean template, the twin only just does, and both sit about seven times
+above the flagship: a coefficient-space network at rank 32 is not competitive on this field.
+
+The kill is of a repaired member. Its first run never trained: the potential branch was fed
+coefficients in raw physical units, 48 times the density's scale, the product latent reached a
+spread of 2,441, and the bounded head was exactly zero everywhere with no gradient from the first
+step (validation pinned at the all-zero score, 0.0913). Fixed by standardizing each potential
+coefficient with training-fold statistics, pinned by a saturation-guard test; the twin's run was
+unaffected and stands.
 
 ---
 

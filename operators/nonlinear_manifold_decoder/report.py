@@ -68,6 +68,9 @@ STRAIN_ATLAS_CAMPAIGN = "strain_atlas"
 COMMON_GRID_SHAPE = (40, 40, 40)
 COMMON_GRID_SHAPE_LABEL = "40x40x40"
 CHARGE_DENSITY_FIELD_NAME = "charge_density"
+# the arm leave-one-level-out population is built straight from the campaign's own brackets, not the
+# card's train/validation/test roles, so it earns its own plain-word split name rather than the card's
+STRAIN_ATLAS_ARMS_SPLIT = "strain_atlas_arms"
 
 # the branch's seventh feature, beside the six standardized strain components
 FUNCTIONAL_BRANCH_FEATURE = {"cheap": 0.0, "accurate": 1.0}
@@ -608,37 +611,41 @@ def Report_Lines() -> tuple[list[str], MemberResults]:
     headline_signature = Block_Signature(test_block.unit_keys)
     every_shape_signature = Block_Signature(run.unit_key for run in every_shape_runs)
 
-    def Result_Key(block: str, group: str) -> ResultKey:
-        """this report's own member, configuration, task and split, beside the block and group asked for"""
+    def Result_Key(split: str, block: str, group: str) -> ResultKey:
+        """this report's own member, configuration and task, beside the split, block and group asked for"""
         return ResultKey(
             member="nonlinear_manifold_decoder", configuration="canonical", task="strain_to_charge",
-            split="strain_atlas_holdout", block=block, group=group,
+            split=split, block=block, group=group,
         )
 
     rows = tuple(
         ResultRow(
-            key=Result_Key("arm_leave_one_level_out", summary.group_name), summary=summary,
+            key=Result_Key(STRAIN_ATLAS_ARMS_SPLIT, "arm_leave_one_level_out", summary.group_name), summary=summary,
             block_signature=arm_signature,
         )
         for summary in (*host_summaries, arm_member_summary)
     ) + (
         ResultRow(
-            key=Result_Key("committed_test_split", headline_summary.group_name), summary=headline_summary,
-            block_signature=headline_signature,
+            key=Result_Key(card.split, "committed_test_split", headline_summary.group_name),
+            summary=headline_summary, block_signature=headline_signature,
         ),
         ResultRow(
-            key=Result_Key("every_shape_test_split", every_shape_summary.group_name), summary=every_shape_summary,
-            block_signature=every_shape_signature,
+            key=Result_Key(card.split, "every_shape_test_split", every_shape_summary.group_name),
+            summary=every_shape_summary, block_signature=every_shape_signature,
         ),
     )
     verdicts = (
         VerdictRow(
-            key=Result_Key("arm_leave_one_level_out", "bracketing_interpolation"), comparison=interpolation_comparison
+            key=Result_Key(STRAIN_ATLAS_ARMS_SPLIT, "arm_leave_one_level_out", "bracketing_interpolation"),
+            comparison=interpolation_comparison,
         ),
         VerdictRow(
-            key=Result_Key("arm_leave_one_level_out", "gaussian_radial_basis"), comparison=radial_basis_comparison
+            key=Result_Key(STRAIN_ATLAS_ARMS_SPLIT, "arm_leave_one_level_out", "gaussian_radial_basis"),
+            comparison=radial_basis_comparison,
         ),
-        VerdictRow(key=Result_Key("every_shape_test_split", "own_40_cubed_error"), comparison=transfer_comparison),
+        VerdictRow(
+            key=Result_Key(card.split, "every_shape_test_split", "own_40_cubed_error"), comparison=transfer_comparison
+        ),
     )
     results = MemberResults(
         member="nonlinear_manifold_decoder", regenerate="python -m operators.nonlinear_manifold_decoder.report",

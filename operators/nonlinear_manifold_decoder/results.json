@@ -1,0 +1,803 @@
+{
+ "member": "nonlinear_manifold_decoder",
+ "regenerate": "python -m operators.nonlinear_manifold_decoder.report",
+ "rows": [
+  {
+   "block_signature": "79b16406e0ce",
+   "key": {
+    "block": "arm_leave_one_level_out",
+    "configuration": "canonical",
+    "group": "bracketing_interpolation_floor",
+    "member": "nonlinear_manifold_decoder",
+    "split": "strain_atlas_arms",
+    "task": "strain_to_charge"
+   },
+   "summary": {
+    "confidence_high": 0.000818,
+    "confidence_low": 0.000688,
+    "group_name": "bracketing_interpolation_floor",
+    "interquartile": 0.001348,
+    "median": 0.000911,
+    "metric_name": "relative_l2",
+    "run_count": 423,
+    "unit_count": 423
+   }
+  },
+  {
+   "block_signature": "79b16406e0ce",
+   "key": {
+    "block": "arm_leave_one_level_out",
+    "configuration": "canonical",
+    "group": "bracketing_interpolation_floor__biaxial",
+    "member": "nonlinear_manifold_decoder",
+    "split": "strain_atlas_arms",
+    "task": "strain_to_charge"
+   },
+   "summary": {
+    "confidence_high": 7.4e-05,
+    "confidence_low": 6.4e-05,
+    "group_name": "bracketing_interpolation_floor__biaxial",
+    "interquartile": 1.5e-05,
+    "median": 6.6e-05,
+    "metric_name": "relative_l2",
+    "run_count": 38,
+    "unit_count": 38
+   }
+  },
+  {
+   "block_signature": "79b16406e0ce",
+   "key": {
+    "block": "arm_leave_one_level_out",
+    "configuration": "canonical",
+    "group": "bracketing_interpolation_floor__isotropic",
+    "member": "nonlinear_manifold_decoder",
+    "split": "strain_atlas_arms",
+    "task": "strain_to_charge"
+   },
+   "summary": {
+    "confidence_high": 2.1e-05,
+    "confidence_low": 1.9e-05,
+    "group_name": "bracketing_interpolation_floor__isotropic",
+    "interquartile": 5e-06,
+    "median": 2e-05,
+    "metric_name": "relative_l2",
+    "run_count": 45,
+    "unit_count": 45
+   }
+  },
+  {
+   "block_signature": "79b16406e0ce",
+   "key": {
+    "block": "arm_leave_one_level_out",
+    "configuration": "canonical",
+    "group": "bracketing_interpolation_floor__one_angle_shear",
+    "member": "nonlinear_manifold_decoder",
+    "split": "strain_atlas_arms",
+    "task": "strain_to_charge"
+   },
+   "summary": {
+    "confidence_high": 6e-06,
+    "confidence_low": 5e-06,
+    "group_name": "bracketing_interpolation_floor__one_angle_shear",
+    "interquartile": 1e-06,
+    "median": 5e-06,
+    "metric_name": "relative_l2",
+    "run_count": 38,
+    "unit_count": 38
+   }
+  },
+  {
+   "block_signature": "79b16406e0ce",
+   "key": {
+    "block": "arm_leave_one_level_out",
+    "configuration": "canonical",
+    "group": "bracketing_interpolation_floor__three_angle_shear",
+    "member": "nonlinear_manifold_decoder",
+    "split": "strain_atlas_arms",
+    "task": "strain_to_charge"
+   },
+   "summary": {
+    "confidence_high": 0.000665,
+    "confidence_low": 0.000564,
+    "group_name": "bracketing_interpolation_floor__three_angle_shear",
+    "interquartile": 0.000194,
+    "median": 0.000649,
+    "metric_name": "relative_l2",
+    "run_count": 20,
+    "unit_count": 20
+   }
+  },
+  {
+   "block_signature": "79b16406e0ce",
+   "key": {
+    "block": "arm_leave_one_level_out",
+    "configuration": "canonical",
+    "group": "bracketing_interpolation_floor__triaxial",
+    "member": "nonlinear_manifold_decoder",
+    "split": "strain_atlas_arms",
+    "task": "strain_to_charge"
+   },
+   "summary": {
+    "confidence_high": 0.001409,
+    "confidence_low": 0.001333,
+    "group_name": "bracketing_interpolation_floor__triaxial",
+    "interquartile": 0.000523,
+    "median": 0.001374,
+    "metric_name": "relative_l2",
+    "run_count": 216,
+    "unit_count": 216
+   }
+  },
+  {
+   "block_signature": "79b16406e0ce",
+   "key": {
+    "block": "arm_leave_one_level_out",
+    "configuration": "canonical",
+    "group": "bracketing_interpolation_floor__two_angle_shear",
+    "member": "nonlinear_manifold_decoder",
+    "split": "strain_atlas_arms",
+    "task": "strain_to_charge"
+   },
+   "summary": {
+    "confidence_high": 0.000197,
+    "confidence_low": 0.000194,
+    "group_name": "bracketing_interpolation_floor__two_angle_shear",
+    "interquartile": 3e-06,
+    "median": 0.000194,
+    "metric_name": "relative_l2",
+    "run_count": 28,
+    "unit_count": 28
+   }
+  },
+  {
+   "block_signature": "79b16406e0ce",
+   "key": {
+    "block": "arm_leave_one_level_out",
+    "configuration": "canonical",
+    "group": "bracketing_interpolation_floor__uniaxial",
+    "member": "nonlinear_manifold_decoder",
+    "split": "strain_atlas_arms",
+    "task": "strain_to_charge"
+   },
+   "summary": {
+    "confidence_high": 2.8e-05,
+    "confidence_low": 2.4e-05,
+    "group_name": "bracketing_interpolation_floor__uniaxial",
+    "interquartile": 5e-06,
+    "median": 2.5e-05,
+    "metric_name": "relative_l2",
+    "run_count": 38,
+    "unit_count": 38
+   }
+  },
+  {
+   "block_signature": "79b16406e0ce",
+   "key": {
+    "block": "arm_leave_one_level_out",
+    "configuration": "canonical",
+    "group": "gaussian_radial_basis_floor",
+    "member": "nonlinear_manifold_decoder",
+    "split": "strain_atlas_arms",
+    "task": "strain_to_charge"
+   },
+   "summary": {
+    "confidence_high": 0.004115,
+    "confidence_low": 0.003048,
+    "group_name": "gaussian_radial_basis_floor",
+    "interquartile": 0.003138,
+    "median": 0.000991,
+    "metric_name": "relative_l2",
+    "run_count": 423,
+    "unit_count": 423
+   }
+  },
+  {
+   "block_signature": "79b16406e0ce",
+   "key": {
+    "block": "arm_leave_one_level_out",
+    "configuration": "canonical",
+    "group": "gaussian_radial_basis_floor__biaxial",
+    "member": "nonlinear_manifold_decoder",
+    "split": "strain_atlas_arms",
+    "task": "strain_to_charge"
+   },
+   "summary": {
+    "confidence_high": 0.000982,
+    "confidence_low": 0.000728,
+    "group_name": "gaussian_radial_basis_floor__biaxial",
+    "interquartile": 0.000713,
+    "median": 0.000903,
+    "metric_name": "relative_l2",
+    "run_count": 38,
+    "unit_count": 38
+   }
+  },
+  {
+   "block_signature": "79b16406e0ce",
+   "key": {
+    "block": "arm_leave_one_level_out",
+    "configuration": "canonical",
+    "group": "gaussian_radial_basis_floor__isotropic",
+    "member": "nonlinear_manifold_decoder",
+    "split": "strain_atlas_arms",
+    "task": "strain_to_charge"
+   },
+   "summary": {
+    "confidence_high": 0.004093,
+    "confidence_low": 0.003829,
+    "group_name": "gaussian_radial_basis_floor__isotropic",
+    "interquartile": 0.000762,
+    "median": 0.004046,
+    "metric_name": "relative_l2",
+    "run_count": 45,
+    "unit_count": 45
+   }
+  },
+  {
+   "block_signature": "79b16406e0ce",
+   "key": {
+    "block": "arm_leave_one_level_out",
+    "configuration": "canonical",
+    "group": "gaussian_radial_basis_floor__one_angle_shear",
+    "member": "nonlinear_manifold_decoder",
+    "split": "strain_atlas_arms",
+    "task": "strain_to_charge"
+   },
+   "summary": {
+    "confidence_high": 0.017162,
+    "confidence_low": 0.012455,
+    "group_name": "gaussian_radial_basis_floor__one_angle_shear",
+    "interquartile": 0.01406,
+    "median": 0.016164,
+    "metric_name": "relative_l2",
+    "run_count": 38,
+    "unit_count": 38
+   }
+  },
+  {
+   "block_signature": "79b16406e0ce",
+   "key": {
+    "block": "arm_leave_one_level_out",
+    "configuration": "canonical",
+    "group": "gaussian_radial_basis_floor__three_angle_shear",
+    "member": "nonlinear_manifold_decoder",
+    "split": "strain_atlas_arms",
+    "task": "strain_to_charge"
+   },
+   "summary": {
+    "confidence_high": 0.012233,
+    "confidence_low": 0.007694,
+    "group_name": "gaussian_radial_basis_floor__three_angle_shear",
+    "interquartile": 0.007047,
+    "median": 0.010882,
+    "metric_name": "relative_l2",
+    "run_count": 20,
+    "unit_count": 20
+   }
+  },
+  {
+   "block_signature": "79b16406e0ce",
+   "key": {
+    "block": "arm_leave_one_level_out",
+    "configuration": "canonical",
+    "group": "gaussian_radial_basis_floor__triaxial",
+    "member": "nonlinear_manifold_decoder",
+    "split": "strain_atlas_arms",
+    "task": "strain_to_charge"
+   },
+   "summary": {
+    "confidence_high": 0.000906,
+    "confidence_low": 0.000773,
+    "group_name": "gaussian_radial_basis_floor__triaxial",
+    "interquartile": 0.000613,
+    "median": 0.000712,
+    "metric_name": "relative_l2",
+    "run_count": 216,
+    "unit_count": 216
+   }
+  },
+  {
+   "block_signature": "79b16406e0ce",
+   "key": {
+    "block": "arm_leave_one_level_out",
+    "configuration": "canonical",
+    "group": "gaussian_radial_basis_floor__two_angle_shear",
+    "member": "nonlinear_manifold_decoder",
+    "split": "strain_atlas_arms",
+    "task": "strain_to_charge"
+   },
+   "summary": {
+    "confidence_high": 0.014738,
+    "confidence_low": 0.0096,
+    "group_name": "gaussian_radial_basis_floor__two_angle_shear",
+    "interquartile": 0.011363,
+    "median": 0.011515,
+    "metric_name": "relative_l2",
+    "run_count": 28,
+    "unit_count": 28
+   }
+  },
+  {
+   "block_signature": "79b16406e0ce",
+   "key": {
+    "block": "arm_leave_one_level_out",
+    "configuration": "canonical",
+    "group": "gaussian_radial_basis_floor__uniaxial",
+    "member": "nonlinear_manifold_decoder",
+    "split": "strain_atlas_arms",
+    "task": "strain_to_charge"
+   },
+   "summary": {
+    "confidence_high": 0.000583,
+    "confidence_low": 0.000427,
+    "group_name": "gaussian_radial_basis_floor__uniaxial",
+    "interquartile": 0.000451,
+    "median": 0.000532,
+    "metric_name": "relative_l2",
+    "run_count": 38,
+    "unit_count": 38
+   }
+  },
+  {
+   "block_signature": "79b16406e0ce",
+   "key": {
+    "block": "arm_leave_one_level_out",
+    "configuration": "canonical",
+    "group": "ridge_to_tensor_floor",
+    "member": "nonlinear_manifold_decoder",
+    "split": "strain_atlas_arms",
+    "task": "strain_to_charge"
+   },
+   "summary": {
+    "confidence_high": 0.008186,
+    "confidence_low": 0.006818,
+    "group_name": "ridge_to_tensor_floor",
+    "interquartile": 0.006619,
+    "median": 0.004225,
+    "metric_name": "relative_l2",
+    "run_count": 423,
+    "unit_count": 423
+   }
+  },
+  {
+   "block_signature": "79b16406e0ce",
+   "key": {
+    "block": "arm_leave_one_level_out",
+    "configuration": "canonical",
+    "group": "ridge_to_tensor_floor__biaxial",
+    "member": "nonlinear_manifold_decoder",
+    "split": "strain_atlas_arms",
+    "task": "strain_to_charge"
+   },
+   "summary": {
+    "confidence_high": 0.008272,
+    "confidence_low": 0.005221,
+    "group_name": "ridge_to_tensor_floor__biaxial",
+    "interquartile": 0.005108,
+    "median": 0.005077,
+    "metric_name": "relative_l2",
+    "run_count": 38,
+    "unit_count": 38
+   }
+  },
+  {
+   "block_signature": "79b16406e0ce",
+   "key": {
+    "block": "arm_leave_one_level_out",
+    "configuration": "canonical",
+    "group": "ridge_to_tensor_floor__isotropic",
+    "member": "nonlinear_manifold_decoder",
+    "split": "strain_atlas_arms",
+    "task": "strain_to_charge"
+   },
+   "summary": {
+    "confidence_high": 0.009086,
+    "confidence_low": 0.007981,
+    "group_name": "ridge_to_tensor_floor__isotropic",
+    "interquartile": 0.002726,
+    "median": 0.009097,
+    "metric_name": "relative_l2",
+    "run_count": 45,
+    "unit_count": 45
+   }
+  },
+  {
+   "block_signature": "79b16406e0ce",
+   "key": {
+    "block": "arm_leave_one_level_out",
+    "configuration": "canonical",
+    "group": "ridge_to_tensor_floor__one_angle_shear",
+    "member": "nonlinear_manifold_decoder",
+    "split": "strain_atlas_arms",
+    "task": "strain_to_charge"
+   },
+   "summary": {
+    "confidence_high": 0.024029,
+    "confidence_low": 0.017808,
+    "group_name": "ridge_to_tensor_floor__one_angle_shear",
+    "interquartile": 0.017725,
+    "median": 0.02043,
+    "metric_name": "relative_l2",
+    "run_count": 38,
+    "unit_count": 38
+   }
+  },
+  {
+   "block_signature": "79b16406e0ce",
+   "key": {
+    "block": "arm_leave_one_level_out",
+    "configuration": "canonical",
+    "group": "ridge_to_tensor_floor__three_angle_shear",
+    "member": "nonlinear_manifold_decoder",
+    "split": "strain_atlas_arms",
+    "task": "strain_to_charge"
+   },
+   "summary": {
+    "confidence_high": 0.012817,
+    "confidence_low": 0.011071,
+    "group_name": "ridge_to_tensor_floor__three_angle_shear",
+    "interquartile": 0.002519,
+    "median": 0.011866,
+    "metric_name": "relative_l2",
+    "run_count": 20,
+    "unit_count": 20
+   }
+  },
+  {
+   "block_signature": "79b16406e0ce",
+   "key": {
+    "block": "arm_leave_one_level_out",
+    "configuration": "canonical",
+    "group": "ridge_to_tensor_floor__triaxial",
+    "member": "nonlinear_manifold_decoder",
+    "split": "strain_atlas_arms",
+    "task": "strain_to_charge"
+   },
+   "summary": {
+    "confidence_high": 0.003955,
+    "confidence_low": 0.003411,
+    "group_name": "ridge_to_tensor_floor__triaxial",
+    "interquartile": 0.001252,
+    "median": 0.003353,
+    "metric_name": "relative_l2",
+    "run_count": 216,
+    "unit_count": 216
+   }
+  },
+  {
+   "block_signature": "79b16406e0ce",
+   "key": {
+    "block": "arm_leave_one_level_out",
+    "configuration": "canonical",
+    "group": "ridge_to_tensor_floor__two_angle_shear",
+    "member": "nonlinear_manifold_decoder",
+    "split": "strain_atlas_arms",
+    "task": "strain_to_charge"
+   },
+   "summary": {
+    "confidence_high": 0.023092,
+    "confidence_low": 0.016728,
+    "group_name": "ridge_to_tensor_floor__two_angle_shear",
+    "interquartile": 0.014941,
+    "median": 0.018543,
+    "metric_name": "relative_l2",
+    "run_count": 28,
+    "unit_count": 28
+   }
+  },
+  {
+   "block_signature": "79b16406e0ce",
+   "key": {
+    "block": "arm_leave_one_level_out",
+    "configuration": "canonical",
+    "group": "ridge_to_tensor_floor__uniaxial",
+    "member": "nonlinear_manifold_decoder",
+    "split": "strain_atlas_arms",
+    "task": "strain_to_charge"
+   },
+   "summary": {
+    "confidence_high": 0.004373,
+    "confidence_low": 0.003662,
+    "group_name": "ridge_to_tensor_floor__uniaxial",
+    "interquartile": 0.002098,
+    "median": 0.003994,
+    "metric_name": "relative_l2",
+    "run_count": 38,
+    "unit_count": 38
+   }
+  },
+  {
+   "block_signature": "79b16406e0ce",
+   "key": {
+    "block": "arm_leave_one_level_out",
+    "configuration": "canonical",
+    "group": "nearest_run_copy_floor",
+    "member": "nonlinear_manifold_decoder",
+    "split": "strain_atlas_arms",
+    "task": "strain_to_charge"
+   },
+   "summary": {
+    "confidence_high": 0.024712,
+    "confidence_low": 0.022205,
+    "group_name": "nearest_run_copy_floor",
+    "interquartile": 0.010944,
+    "median": 0.019876,
+    "metric_name": "relative_l2",
+    "run_count": 423,
+    "unit_count": 423
+   }
+  },
+  {
+   "block_signature": "79b16406e0ce",
+   "key": {
+    "block": "arm_leave_one_level_out",
+    "configuration": "canonical",
+    "group": "nearest_run_copy_floor__biaxial",
+    "member": "nonlinear_manifold_decoder",
+    "split": "strain_atlas_arms",
+    "task": "strain_to_charge"
+   },
+   "summary": {
+    "confidence_high": 0.03456,
+    "confidence_low": 0.023751,
+    "group_name": "nearest_run_copy_floor__biaxial",
+    "interquartile": 0.022644,
+    "median": 0.024364,
+    "metric_name": "relative_l2",
+    "run_count": 38,
+    "unit_count": 38
+   }
+  },
+  {
+   "block_signature": "79b16406e0ce",
+   "key": {
+    "block": "arm_leave_one_level_out",
+    "configuration": "canonical",
+    "group": "nearest_run_copy_floor__isotropic",
+    "member": "nonlinear_manifold_decoder",
+    "split": "strain_atlas_arms",
+    "task": "strain_to_charge"
+   },
+   "summary": {
+    "confidence_high": 0.034881,
+    "confidence_low": 0.025184,
+    "group_name": "nearest_run_copy_floor__isotropic",
+    "interquartile": 0.022191,
+    "median": 0.025752,
+    "metric_name": "relative_l2",
+    "run_count": 45,
+    "unit_count": 45
+   }
+  },
+  {
+   "block_signature": "79b16406e0ce",
+   "key": {
+    "block": "arm_leave_one_level_out",
+    "configuration": "canonical",
+    "group": "nearest_run_copy_floor__one_angle_shear",
+    "member": "nonlinear_manifold_decoder",
+    "split": "strain_atlas_arms",
+    "task": "strain_to_charge"
+   },
+   "summary": {
+    "confidence_high": 0.015981,
+    "confidence_low": 0.011017,
+    "group_name": "nearest_run_copy_floor__one_angle_shear",
+    "interquartile": 0.012087,
+    "median": 0.014143,
+    "metric_name": "relative_l2",
+    "run_count": 38,
+    "unit_count": 38
+   }
+  },
+  {
+   "block_signature": "79b16406e0ce",
+   "key": {
+    "block": "arm_leave_one_level_out",
+    "configuration": "canonical",
+    "group": "nearest_run_copy_floor__three_angle_shear",
+    "member": "nonlinear_manifold_decoder",
+    "split": "strain_atlas_arms",
+    "task": "strain_to_charge"
+   },
+   "summary": {
+    "confidence_high": 0.016955,
+    "confidence_low": 0.01689,
+    "group_name": "nearest_run_copy_floor__three_angle_shear",
+    "interquartile": 8e-05,
+    "median": 0.016914,
+    "metric_name": "relative_l2",
+    "run_count": 20,
+    "unit_count": 20
+   }
+  },
+  {
+   "block_signature": "79b16406e0ce",
+   "key": {
+    "block": "arm_leave_one_level_out",
+    "configuration": "canonical",
+    "group": "nearest_run_copy_floor__triaxial",
+    "member": "nonlinear_manifold_decoder",
+    "split": "strain_atlas_arms",
+    "task": "strain_to_charge"
+   },
+   "summary": {
+    "confidence_high": 0.024928,
+    "confidence_low": 0.022379,
+    "group_name": "nearest_run_copy_floor__triaxial",
+    "interquartile": 0.003366,
+    "median": 0.019984,
+    "metric_name": "relative_l2",
+    "run_count": 216,
+    "unit_count": 216
+   }
+  },
+  {
+   "block_signature": "79b16406e0ce",
+   "key": {
+    "block": "arm_leave_one_level_out",
+    "configuration": "canonical",
+    "group": "nearest_run_copy_floor__two_angle_shear",
+    "member": "nonlinear_manifold_decoder",
+    "split": "strain_atlas_arms",
+    "task": "strain_to_charge"
+   },
+   "summary": {
+    "confidence_high": 0.011595,
+    "confidence_low": 0.010466,
+    "group_name": "nearest_run_copy_floor__two_angle_shear",
+    "interquartile": 0.000602,
+    "median": 0.010395,
+    "metric_name": "relative_l2",
+    "run_count": 28,
+    "unit_count": 28
+   }
+  },
+  {
+   "block_signature": "79b16406e0ce",
+   "key": {
+    "block": "arm_leave_one_level_out",
+    "configuration": "canonical",
+    "group": "nearest_run_copy_floor__uniaxial",
+    "member": "nonlinear_manifold_decoder",
+    "split": "strain_atlas_arms",
+    "task": "strain_to_charge"
+   },
+   "summary": {
+    "confidence_high": 0.038317,
+    "confidence_low": 0.025519,
+    "group_name": "nearest_run_copy_floor__uniaxial",
+    "interquartile": 0.02952,
+    "median": 0.024575,
+    "metric_name": "relative_l2",
+    "run_count": 38,
+    "unit_count": 38
+   }
+  },
+  {
+   "block_signature": "79b16406e0ce",
+   "key": {
+    "block": "arm_leave_one_level_out",
+    "configuration": "canonical",
+    "group": "member_arm_population",
+    "member": "nonlinear_manifold_decoder",
+    "split": "strain_atlas_arms",
+    "task": "strain_to_charge"
+   },
+   "summary": {
+    "confidence_high": 0.006796,
+    "confidence_low": 0.005053,
+    "group_name": "member_arm_population",
+    "interquartile": 0.001879,
+    "median": 0.002452,
+    "metric_name": "relative_l2",
+    "run_count": 423,
+    "unit_count": 423
+   }
+  },
+  {
+   "block_signature": "0e5d02b41568",
+   "key": {
+    "block": "committed_test_split",
+    "configuration": "canonical",
+    "group": "member_headline_committed_split",
+    "member": "nonlinear_manifold_decoder",
+    "split": "strain_atlas_holdout",
+    "task": "strain_to_charge"
+   },
+   "summary": {
+    "confidence_high": 0.003277,
+    "confidence_low": 0.002564,
+    "group_name": "member_headline_committed_split",
+    "interquartile": 0.001684,
+    "median": 0.002424,
+    "metric_name": "relative_l2",
+    "run_count": 176,
+    "unit_count": 22
+   }
+  },
+  {
+   "block_signature": "5de938246821",
+   "key": {
+    "block": "every_shape_test_split",
+    "configuration": "canonical",
+    "group": "member_every_shape",
+    "member": "nonlinear_manifold_decoder",
+    "split": "strain_atlas_holdout",
+    "task": "strain_to_charge"
+   },
+   "summary": {
+    "confidence_high": 0.003335,
+    "confidence_low": 0.002721,
+    "group_name": "member_every_shape",
+    "interquartile": 0.001553,
+    "median": 0.002795,
+    "metric_name": "relative_l2",
+    "run_count": 248,
+    "unit_count": 30
+   }
+  }
+ ],
+ "verdicts": [
+  {
+   "comparison": {
+    "floor_median": 0.000911,
+    "floor_name": "bracketing_interpolation",
+    "group_name": "all",
+    "improvement": -1.692364,
+    "member_median": 0.002452,
+    "metric_name": "relative_l2",
+    "required_improvement": 0.333333,
+    "verdict": "kill"
+   },
+   "key": {
+    "block": "arm_leave_one_level_out",
+    "configuration": "canonical",
+    "group": "bracketing_interpolation",
+    "member": "nonlinear_manifold_decoder",
+    "split": "strain_atlas_arms",
+    "task": "strain_to_charge"
+   }
+  },
+  {
+   "comparison": {
+    "floor_median": 0.000991,
+    "floor_name": "gaussian_radial_basis",
+    "group_name": "all",
+    "improvement": -1.474291,
+    "member_median": 0.002452,
+    "metric_name": "relative_l2",
+    "required_improvement": 0.333333,
+    "verdict": "kill"
+   },
+   "key": {
+    "block": "arm_leave_one_level_out",
+    "configuration": "canonical",
+    "group": "gaussian_radial_basis",
+    "member": "nonlinear_manifold_decoder",
+    "split": "strain_atlas_arms",
+    "task": "strain_to_charge"
+   }
+  },
+  {
+   "comparison": {
+    "floor_median": 0.002424,
+    "floor_name": "own_40_cubed_error",
+    "group_name": "all",
+    "improvement": -0.315594,
+    "member_median": 0.003188,
+    "metric_name": "relative_l2",
+    "required_improvement": -0.3,
+    "verdict": "kill"
+   },
+   "key": {
+    "block": "every_shape_test_split",
+    "configuration": "canonical",
+    "group": "own_40_cubed_error",
+    "member": "nonlinear_manifold_decoder",
+    "split": "strain_atlas_holdout",
+    "task": "strain_to_charge"
+   }
+  }
+ ]
+}

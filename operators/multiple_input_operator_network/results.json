@@ -3,14 +3,14 @@
  "regenerate": "python -m operators.multiple_input_operator_network.report",
  "rows": [
   {
-   "block_signature": "55fd01d57fa5",
+   "block_signature": "0bd87f3fe43d",
    "key": {
-    "block": "55fd01d57fa5",
+    "block": "fold_0",
     "configuration": "rank32_latent128_trunk3x256",
     "group": "semilocal_ridge_floor",
     "member": "multiple_input_operator_network",
-    "split": "fold_0_evaluation",
-    "task": "localization"
+    "split": "paired_fields_fivefold",
+    "task": "charge_and_potential_to_localization"
    },
    "summary": {
     "confidence_high": 0.098625,
@@ -24,14 +24,14 @@
    }
   },
   {
-   "block_signature": "55fd01d57fa5",
+   "block_signature": "0bd87f3fe43d",
    "key": {
-    "block": "55fd01d57fa5",
+    "block": "fold_0",
     "configuration": "rank32_latent128_trunk3x256",
     "group": "per_shell_filter_floor",
     "member": "multiple_input_operator_network",
-    "split": "fold_0_evaluation",
-    "task": "localization"
+    "split": "paired_fields_fivefold",
+    "task": "charge_and_potential_to_localization"
    },
    "summary": {
     "confidence_high": 0.100953,
@@ -45,14 +45,14 @@
    }
   },
   {
-   "block_signature": "55fd01d57fa5",
+   "block_signature": "0bd87f3fe43d",
    "key": {
-    "block": "55fd01d57fa5",
+    "block": "fold_0",
     "configuration": "rank32_latent128_trunk3x256",
     "group": "training_mean_trivial_floor",
     "member": "multiple_input_operator_network",
-    "split": "fold_0_evaluation",
-    "task": "localization"
+    "split": "paired_fields_fivefold",
+    "task": "charge_and_potential_to_localization"
    },
    "summary": {
     "confidence_high": 0.024347,
@@ -66,14 +66,14 @@
    }
   },
   {
-   "block_signature": "55fd01d57fa5",
+   "block_signature": "0bd87f3fe43d",
    "key": {
-    "block": "55fd01d57fa5",
+    "block": "fold_0",
     "configuration": "rank32_latent128_trunk3x256",
     "group": "nearest_run_copy_floor",
     "member": "multiple_input_operator_network",
-    "split": "fold_0_evaluation",
-    "task": "localization"
+    "split": "paired_fields_fivefold",
+    "task": "charge_and_potential_to_localization"
    },
    "summary": {
     "confidence_high": 0.016482,

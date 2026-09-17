@@ -10,7 +10,7 @@
     "group": "superposed_atomic_density_floor_all_42",
     "member": "deep_dft",
     "split": "paired_fields_fivefold",
-    "task": "structure_to_density_and_magnetization"
+    "task": "structure_to_charge_defects"
    },
    "summary": {
     "confidence_high": 0.173254,
@@ -31,7 +31,7 @@
     "group": "superposed_atomic_density_floor_held_out_18",
     "member": "deep_dft",
     "split": "paired_fields_fivefold",
-    "task": "structure_to_density_and_magnetization"
+    "task": "structure_to_charge_defects"
    },
    "summary": {
     "confidence_high": 0.200479,
@@ -52,7 +52,7 @@
     "group": "reduced_salted_floor_all_42",
     "member": "deep_dft",
     "split": "paired_fields_fivefold",
-    "task": "structure_to_density_and_magnetization"
+    "task": "structure_to_charge_defects"
    },
    "summary": {
     "confidence_high": 7.337816,
@@ -73,7 +73,7 @@
     "group": "nearest_structure_copy_context_all_42",
     "member": "deep_dft",
     "split": "paired_fields_fivefold",
-    "task": "structure_to_density_and_magnetization"
+    "task": "structure_to_charge_defects"
    },
    "summary": {
     "confidence_high": 0.093563,

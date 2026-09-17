@@ -445,15 +445,15 @@ def Floor_Result_Rows(
     block: CubicBlock, elf_floor: MetricSummary, potential_floor: MetricSummary
 ) -> tuple[ResultRow, ResultRow]:
     """the two pre-registered floor summaries as result rows, keyed to the cubic block's own evaluation fold"""
-    block_signature = Block_Signature(block.unit_of[identifier] for identifier in block.evaluation)
+    block_signature = Block_Signature({block.unit_of[identifier] for identifier in block.evaluation})
     return (
         ResultRow(
             key=ResultKey(
                 member="codomain_attention",
                 configuration=CONFIGURATION_NAME,
-                task="localization",
-                split="fold_0_evaluation",
-                block=block_signature,
+                task="charge_to_localization",
+                split="paired_fields_fivefold",
+                block="fold_0",
                 group="semilocal_ridge_floor",
             ),
             summary=elf_floor,
@@ -463,9 +463,9 @@ def Floor_Result_Rows(
             key=ResultKey(
                 member="codomain_attention",
                 configuration=CONFIGURATION_NAME,
-                task="potential",
-                split="fold_0_evaluation",
-                block=block_signature,
+                task="charge_to_potential",
+                split="paired_fields_fivefold",
+                block="fold_0",
                 group="hartree_plus_semilocal_xc_ridge_floor",
             ),
             summary=potential_floor,

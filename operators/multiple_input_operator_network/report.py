@@ -180,15 +180,15 @@ def Floor_Lines(
 
 def Result_Rows(block: CubicBlock, floor_summaries: tuple[MetricSummary, ...]) -> tuple[ResultRow, ...]:
     """the four floor summaries as result rows, keyed to the cubic block's own evaluation fold"""
-    block_signature = Block_Signature(block.unit_of[identifier] for identifier in block.evaluation)
+    block_signature = Block_Signature({block.unit_of[identifier] for identifier in block.evaluation})
     return tuple(
         ResultRow(
             key=ResultKey(
                 member=MEMBER_NAME,
                 configuration=CONFIGURATION_NAME,
-                task="localization",
-                split="fold_0_evaluation",
-                block=block_signature,
+                task=TASK_NAME,
+                split="paired_fields_fivefold",
+                block="fold_0",
                 group=summary.group_name,
             ),
             summary=summary,

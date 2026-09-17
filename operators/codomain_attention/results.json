@@ -3,14 +3,14 @@
  "regenerate": "python -m operators.codomain_attention.report",
  "rows": [
   {
-   "block_signature": "55fd01d57fa5",
+   "block_signature": "0bd87f3fe43d",
    "key": {
-    "block": "55fd01d57fa5",
+    "block": "fold_0",
     "configuration": "hidden32_modes19_heads2_layers4",
     "group": "semilocal_ridge_floor",
     "member": "codomain_attention",
-    "split": "fold_0_evaluation",
-    "task": "localization"
+    "split": "paired_fields_fivefold",
+    "task": "charge_to_localization"
    },
    "summary": {
     "confidence_high": 0.098625,
@@ -24,14 +24,14 @@
    }
   },
   {
-   "block_signature": "55fd01d57fa5",
+   "block_signature": "0bd87f3fe43d",
    "key": {
-    "block": "55fd01d57fa5",
+    "block": "fold_0",
     "configuration": "hidden32_modes19_heads2_layers4",
     "group": "hartree_plus_semilocal_xc_ridge_floor",
     "member": "codomain_attention",
-    "split": "fold_0_evaluation",
-    "task": "potential"
+    "split": "paired_fields_fivefold",
+    "task": "charge_to_potential"
    },
    "summary": {
     "confidence_high": 0.669886,

@@ -482,7 +482,7 @@ def Main(argv: list[str] | None = None) -> int:
     train = CorrectionBlock("train")
     validation = CorrectionBlock("validation")
     test = CorrectionBlock("test")
-    block_signature = Block_Signature(test.unit_keys)
+    block_signature = Block_Signature(set(test.unit_keys))
 
     floor_lines, floor_comparisons, floor_summaries, correction_basis, cheap_basis, kill_bar = Floor_Lines(
         train, validation, test

@@ -53,7 +53,7 @@ MEMBER_NAME = "deep_dft"
 
 CONFIGURATION_NAME = "minimal"
 
-TASK_NAME = "structure_to_density_and_magnetization"
+TASK_NAME = "structure_to_charge_defects"
 
 SPLIT_NAME = "paired_fields_fivefold"
 

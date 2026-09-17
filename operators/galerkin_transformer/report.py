@@ -255,7 +255,7 @@ def Results_Artifact(data: FloorData, evaluation: GateEvaluation | None = None) 
                 group="nearest_angle_copy_floor",
             ),
             summary=copy_summary,
-            block_signature=Block_Signature(row.unit_key for row in data.copy_rows),
+            block_signature=Block_Signature({row.unit_key for row in data.copy_rows}),
         ),
         ResultRow(
             key=ResultKey(
@@ -267,7 +267,7 @@ def Results_Artifact(data: FloorData, evaluation: GateEvaluation | None = None) 
                 group="linear_in_angle_interpolation_floor",
             ),
             summary=interpolation_summary,
-            block_signature=Block_Signature(row.unit_key for row in data.interpolation_rows),
+            block_signature=Block_Signature({row.unit_key for row in data.interpolation_rows}),
         ),
         ResultRow(
             key=ResultKey(
@@ -279,7 +279,7 @@ def Results_Artifact(data: FloorData, evaluation: GateEvaluation | None = None) 
                 group="semilocal_ridge_floor",
             ),
             summary=ridge_summary,
-            block_signature=Block_Signature(row.unit_key for row in data.ridge_rows),
+            block_signature=Block_Signature({row.unit_key for row in data.ridge_rows}),
         ),
     ]
     verdicts: tuple[VerdictRow, ...] = ()
@@ -304,14 +304,14 @@ def Results_Artifact(data: FloorData, evaluation: GateEvaluation | None = None) 
             ResultRow(
                 key=copy_verdict_key,
                 summary=Summarize(evaluation.copy_comparison_rows, "relative_l2", "member"),
-                block_signature=Block_Signature(row.unit_key for row in evaluation.copy_comparison_rows),
+                block_signature=Block_Signature({row.unit_key for row in evaluation.copy_comparison_rows}),
             )
         )
         rows.append(
             ResultRow(
                 key=interpolation_verdict_key,
                 summary=Summarize(evaluation.interpolation_comparison_rows, "relative_l2", "member"),
-                block_signature=Block_Signature(row.unit_key for row in evaluation.interpolation_comparison_rows),
+                block_signature=Block_Signature({row.unit_key for row in evaluation.interpolation_comparison_rows}),
             )
         )
         verdicts = (

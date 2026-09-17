@@ -3,7 +3,7 @@
  "regenerate": "python -m operators.residual_correction.report",
  "rows": [
   {
-   "block_signature": "9b086b9ef5f1",
+   "block_signature": "0e5d02b41568",
    "key": {
     "block": "test",
     "configuration": "projection_backbone",
@@ -24,7 +24,7 @@
    }
   },
   {
-   "block_signature": "9b086b9ef5f1",
+   "block_signature": "0e5d02b41568",
    "key": {
     "block": "test",
     "configuration": "projection_backbone",
@@ -45,7 +45,7 @@
    }
   },
   {
-   "block_signature": "9b086b9ef5f1",
+   "block_signature": "0e5d02b41568",
    "key": {
     "block": "test",
     "configuration": "projection_backbone",
@@ -66,7 +66,7 @@
    }
   },
   {
-   "block_signature": "9b086b9ef5f1",
+   "block_signature": "0e5d02b41568",
    "key": {
     "block": "test",
     "configuration": "projection_backbone",
@@ -87,7 +87,7 @@
    }
   },
   {
-   "block_signature": "9b086b9ef5f1",
+   "block_signature": "0e5d02b41568",
    "key": {
     "block": "test",
     "configuration": "projection_backbone",
@@ -108,7 +108,7 @@
    }
   },
   {
-   "block_signature": "9b086b9ef5f1",
+   "block_signature": "0e5d02b41568",
    "key": {
     "block": "test",
     "configuration": "projection_backbone",
@@ -129,7 +129,7 @@
    }
   },
   {
-   "block_signature": "9b086b9ef5f1",
+   "block_signature": "0e5d02b41568",
    "key": {
     "block": "test",
     "configuration": "projection_backbone",
@@ -150,7 +150,7 @@
    }
   },
   {
-   "block_signature": "9b086b9ef5f1",
+   "block_signature": "0e5d02b41568",
    "key": {
     "block": "test",
     "configuration": "projection_backbone",

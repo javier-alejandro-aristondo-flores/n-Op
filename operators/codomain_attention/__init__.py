@@ -86,6 +86,7 @@ class CodomainAttention(NeuralOperator[GridFunction, GridFunction, GridFunction]
         seed: int = 0,
         mode_mixing: ModeMixing = MODE_MIXING,
         coarse_shape: tuple[int, int, int] = COARSE_SHAPE,
+        recompute_layers: bool = True,
     ) -> None:
         encoder = VariableEncoding(
             vocabulary=CHANNEL_VOCABULARY,
@@ -94,7 +95,8 @@ class CodomainAttention(NeuralOperator[GridFunction, GridFunction, GridFunction]
             seed=seed,
         )
         composition = ExplicitStack(
-            Completion_Layers(hidden_channels, kept_modes, head_count, layer_count, seed + 1, mode_mixing)
+            Completion_Layers(hidden_channels, kept_modes, head_count, layer_count, seed + 1, mode_mixing),
+            recompute_layers=recompute_layers,
         )
         readout = TokenSharedReadout(hidden_channels, seed=seed + 1000)
         super().__init__(encoder, composition, readout)
@@ -108,6 +110,7 @@ class CodomainAttention(NeuralOperator[GridFunction, GridFunction, GridFunction]
         self.layer_count = layer_count
         self.mode_mixing: ModeMixing = mode_mixing
         self.coarse_shape = coarse_shape
+        self.recompute_layers = recompute_layers
         self.statistics = statistics
         self.parameter_values: dict[str, NDArray[np.float64]] = {
             "mask_flag": np.asarray(MASK_FLAG_INITIAL_VALUE),

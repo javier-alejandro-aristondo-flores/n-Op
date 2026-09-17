@@ -13,10 +13,18 @@ dedicated potential run is queued ahead of this member's own card slot.
 - kept modes per axis: 19 (mode extent 39)
 - attention heads: 2
 - explicit-stack layers: 4
+- activation recomputation: on by default for this member (`recompute_layers=True`) -- an exclusive,
+  uncontended probe of the un-recomputed stack reached 5.1 GB allocated plus 383 MB reserved finishing
+  essentially one of the four layers, forward only, before the readout or backward ever ran; extrapolated
+  across all four layers the full forward pass needs on the order of 7 GB of saved tensors, against the
+  card's 5.61 GB ceiling -- so each layer now drops its intermediates and
+  rebuilds them when the gradient is taken (`operators.compositions.ExplicitStack`'s own
+  `recompute_layers` flag, backed by the substrate facet `Recomputed_In_Backward`), trading roughly a
+  third more wall-clock per step for the room rather than cutting the pre-registered architecture
 - processing grid: (40, 40, 40)
 - channel vocabulary: charge_density, magnetization_density, electron_localization_up, electron_localization_down, local_potential_up, local_potential_down
 - parameters: 3,838,762 (30.7 MB at double precision, 15.4 MB at the single-precision working width)
-- peak memory: not yet measured; pre-registered ceiling for the 300-step probe is 5.61 GB (the card's own measured usable budget), the probe stopping
+- peak memory: not yet measured with recomputation on; pre-registered ceiling for the 300-step probe is 5.61 GB (the card's own measured usable budget), the probe stopping
   on exceedance -- for reference the flagship's explicit configuration held 3.6 GB at batch 1
 
 ## Floors and bars (fold 0 of the cubic block, freshly read through the promoted evaluation rows)

@@ -188,11 +188,23 @@ touching `operators.data.splits`), covered by
   spectral blocks (query/key/value/output) inside each attention layer (≈958K parameters per layer,
   ≈3.84M across four), not the encoder (384) or the readout (33). Master weights: 30.7 MB at double
   precision, 15.4 MB at the single-precision working width the card trains at.
-- **Peak memory**: not yet measured. A forward-and-backward pass at this configuration needs the
-  full 40³ grid at 32 hidden channels across six tokens, which this build deferred rather than run
-  against a shared card already carrying other streams' live work at the time of this build (1.7-1.8
-  GB free of 6 GB) — the house rule reserves that measurement for when the card is this member's own,
-  alongside the 300-step cost probe the training section asks for.
+- **Peak memory**: measured on an exclusive card (2026-09-17), and too large as built. The first
+  probe attempts shared the card with an unrelated gate and are not trustworthy; the exclusive,
+  uncontended run reached 5.1 GB allocated plus 383 MB reserved-but-unallocated finishing
+  essentially one of the stack's four layers, forward only, before the readout or backward pass
+  ever ran — the traceback cannot say which layer, since `ExplicitStack.Layer_Outputs` loops, but
+  at that per-layer cost (each spectral kernel keeps three contiguous ~91 MB mode-mixing copies for
+  its separable factors, four kernels per layer, plus the pre-norm and the attention combine) it
+  reads as the third or fourth layer, not the first. Extrapolated across all four layers, the full
+  forward pass needs on the order of 7 GB of saved tensors against the card's 5.61 GB usable
+  budget. Rather than cut the pre-registered architecture (hidden channels, kept modes, head count
+  or layer count), the member now builds with `recompute_layers=True` by default — a new
+  `CodomainAttention.__init__` argument threaded onto `operators.compositions.ExplicitStack`'s own
+  `recompute_layers` flag (trunk `8ad562a`), which drops each layer's intermediates and rebuilds
+  them through `torch.utils.checkpoint` (the substrate facet `Recomputed_In_Backward`) when the
+  gradient is taken, values and gradients unchanged, at roughly a third more wall-clock per step —
+  the six-hour pretrain cap absorbs this in its step count rather than in wall-clock time. The
+  300-step cost probe under recomputation is the card's next measurement.
 
 ## Inspection
 

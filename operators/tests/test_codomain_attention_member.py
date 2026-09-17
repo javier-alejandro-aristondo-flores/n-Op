@@ -72,6 +72,16 @@ def Test_The_Default_Configuration_Constructs_And_Reports_A_Positive_Parameter_C
     assert "mask_flag" in member.Parameter_Values()
 
 
+def Test_The_Default_Configuration_Recomputes_Its_Layers() -> None:
+    """this member trades a second forward per layer for the room by default, the measured reason it must"""
+    member = CodomainAttention(Toy_Statistics())
+    assert member.recompute_layers is True
+    assert member.attention_stack.recompute_layers is True
+    built_off = CodomainAttention(Toy_Statistics(), recompute_layers=False)
+    assert built_off.recompute_layers is False
+    assert built_off.attention_stack.recompute_layers is False
+
+
 def Test_The_Member_Answers_A_Toy_Grid_With_Every_Channel_Present() -> None:
     """all six channels visible in, all six channels out, on the coarse grid the member was built for"""
     member = Toy_Member()

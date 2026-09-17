@@ -349,11 +349,19 @@ def Pre_Training_Report_Lines(
         f"- kept modes per axis: {KEPT_MODE} (mode extent {2 * KEPT_MODE + 1})",
         f"- attention heads: {HEAD_COUNT}",
         f"- explicit-stack layers: {LAYER_COUNT}",
+        "- activation recomputation: on by default for this member (`recompute_layers=True`) -- an exclusive,",
+        "  uncontended probe of the un-recomputed stack reached 5.1 GB allocated plus 383 MB reserved finishing",
+        "  essentially one of the four layers, forward only, before the readout or backward ever ran; extrapolated",
+        "  across all four layers the full forward pass needs on the order of 7 GB of saved tensors, against the",
+        f"  card's {CARD_USABLE_MEMORY_GIGABYTES:.2f} GB ceiling -- so each layer now drops its intermediates and",
+        "  rebuilds them when the gradient is taken (`operators.compositions.ExplicitStack`'s own",
+        "  `recompute_layers` flag, backed by the substrate facet `Recomputed_In_Backward`), trading roughly a",
+        "  third more wall-clock per step for the room rather than cutting the pre-registered architecture",
         f"- processing grid: {COARSE_SHAPE}",
         f"- channel vocabulary: {', '.join(CHANNEL_VOCABULARY)}",
         f"- parameters: {parameter_count:,} ({master_weight_megabytes:.1f} MB at double precision,"
         f" {master_weight_megabytes / 2.0:.1f} MB at the single-precision working width)",
-        f"- peak memory: not yet measured; pre-registered ceiling for the 300-step probe is"
+        f"- peak memory: not yet measured with recomputation on; pre-registered ceiling for the 300-step probe is"
         f" {CARD_USABLE_MEMORY_GIGABYTES:.2f} GB (the card's own measured usable budget), the probe stopping",
         f"  on exceedance -- for reference the flagship's explicit configuration held"
         f" {FLAGSHIP_PEAK_MEMORY_GIGABYTES_AT_BATCH_ONE:.1f} GB at batch 1",

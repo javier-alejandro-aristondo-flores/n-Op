@@ -327,6 +327,51 @@ def Results_Artifact(data: FloorData, evaluation: GateEvaluation | None = None) 
     )
 
 
+def Defects_And_Hypothesis_Lines() -> list[str]:
+    """three defects found and fixed before any verdict, and one dated, labeled, untested hypothesis"""
+    return [
+        "## Defects found and fixed before this verdict",
+        "",
+        "The first trained run of this gate, `perovskite_gate_48840`, sat flat at validation 1.7422 from"
+        " its own cost probe onward and was diagnosed as a real defect, not a dead end, before any verdict"
+        " was read from it. `perovskite_gate_48840` is void and must never be read as this member's result.",
+        "",
+        "1. **The decoder was blind to its own input.** `QueryPointDecoder`'s cross-attention query was"
+        " built only from output-grid coordinates, identical for every example; the only path a lattice-"
+        "dependent signal had to reach the output was the key/value contraction against that fixed query,"
+        " and training drove it toward numerical degeneracy (1.3e-6 relative difference between two well-"
+        "separated lattice vectors after stage 0, against 27.1% at a fresh initialization). Fixed by"
+        " concatenating the six lattice factors onto every query row before `query_projection`, on the one"
+        " branch the token-axis normalization never touches.",
+        "2. **`Conserving` sat inside the training loss.** The electron-count renormalization is a whole-"
+        "field, physical-units correction with no place inside a per-example loss. Fixed by moving it to"
+        " `__call__` alone; a host sanity run confirmed this was not the dominant cause of the second"
+        " anomaly below (removing it did not close the gap to the training-mean field) but it is kept, both"
+        " because the canon's own architecture note requires it and because it removes a real risk (a near-"
+        "zero or sign-changing raw integral dividing the loss's own gradient).",
+        "3. **The loss was cusp-dominated.** The raw density's top 5% of voxels by value carry 77% of the"
+        " total sum of squares (heavy-atom core cusps, ~420x dynamic range); a single pooled scalar"
+        " standardization cannot rebalance this, since a uniform rescale preserves every voxel's relative"
+        " contribution to the loss exactly. Fixed by standardizing the target per voxel across the training"
+        " runs (`Pointwise_Statistics`, reused from `operators.deep_operator_network`), which removed the"
+        " lattice-independent cusp-plus-bulk shape from the loss and let a 600-step host sanity run reach"
+        " the training-mean field within a hundred steps instead of sitting sixteen times above it.",
+        "",
+        "Full numbers for all three are in `IMPLEMENTATION.md`.",
+        "",
+        "## An untested hypothesis, recorded before the verdict (the integrator's own, 2026-09-17)",
+        "",
+        "On this task the network receives no field at all, only six constants and order-four periodic"
+        " coordinate features, so everything spatial in its prediction must be synthesized from four modes"
+        " per axis, while the lattice response the gate measures is concentrated near atomic cores on a 64"
+        "-cubed grid. The built branch-trunk member (`deep_operator_network`) wins the same task (0.0183)"
+        " because a proper-orthogonal basis hands it that spatial structure directly, rather than asking a"
+        " coordinate-feature attention stack to synthesize it from scratch. Not tested here; recorded"
+        " before reading the verdict below so it stands or falls on its own.",
+        "",
+    ]
+
+
 def Gate_Run_Lines(evaluation: GateEvaluation) -> list[str]:
     """one trained gate run's own numbers against both stage-1 bars, both verdicts stamped by Compare_To_Floor"""
     return [
@@ -343,6 +388,14 @@ def Gate_Run_Lines(evaluation: GateEvaluation) -> list[str]:
         f" {evaluation.interpolation_verdict.floor_median:.4f}, improvement"
         f" {100 * evaluation.interpolation_verdict.improvement:.1f}% (required"
         f" {100 * GATE_IMPROVEMENT_MARGIN:.0f}%) -- **{evaluation.interpolation_verdict.verdict}**",
+        "",
+        "**Context, not a bar**: the training-mean field itself (the input-blind optimum, no lattice"
+        f" parameters read at all) scores median relative L2 {evaluation.mean_field_relative_l2_median:.4f} on"
+        " the same 25 evaluation runs the copy verdict above uses -- the member beats this trivial answer only"
+        " if its own median above reads lower. Input-dependence: the trained member's own prediction differs by"
+        f" a relative {evaluation.input_dependence:.2e} between its two most lattice-separated evaluation runs"
+        f" (`{evaluation.input_dependence_unit_a}` vs `{evaluation.input_dependence_unit_b}`), confirming the"
+        " decoder-conditioning fix still holds after the full staged run.",
         "",
     ]
 
@@ -397,6 +450,7 @@ def Report_Lines(data: FloorData, evaluation: GateEvaluation | None = None) -> l
         f" **{gate_bars['gate_vs_linear_in_angle_interpolation']:.4f}**",
         "",
     ]
+    lines += Defects_And_Hypothesis_Lines()
     lines += Gate_Run_Lines(evaluation) if evaluation is not None else [
         "## Stage-1 gate run",
         "",
@@ -462,19 +516,36 @@ def Report_Lines(data: FloorData, evaluation: GateEvaluation | None = None) -> l
         "",
         "## Standing",
         "",
-        (
-            f"The stage-1 gate run `{evaluation.run_name}` is scored above against both bars"
-            if evaluation is not None
-            else "No training has run."
-        )
-        + " The gate class, the attention kernel, the query-point decoder and the member are"
-        " built and pass every test (`operators/tests/test_galerkin_transformer.py`). Both stage-1 floors and"
-        " the stage-2 semilocal-ridge floor are measured and pre-registered above; the training driver for the"
-        " stage-1 gate is written"
-        + (
-            " and has been run once." if evaluation is not None else " but not run. What remains: the card."
-        ),
     ]
+    if evaluation is None:
+        lines += [
+            "No training has run. The gate class, the attention kernel, the query-point decoder and the"
+            " member are built and pass every test (`operators/tests/test_galerkin_transformer.py`). Both"
+            " stage-1 floors and the stage-2 semilocal-ridge floor are measured and pre-registered above;"
+            " the training driver for the stage-1 gate is written but not run. What remains: the card.",
+        ]
+    else:
+        gate_passed = evaluation.copy_verdict.verdict == "pass" and evaluation.interpolation_verdict.verdict == "pass"
+        lines += [
+            (
+                "**The stage-1 gate passes both bars.** Stage 2 (the pattern rule against the semilocal-"
+                "ridge floor, measured and pre-registered above) is next."
+                if gate_passed
+                else "**The entry is killed at its own pre-registered stage-1 gate**, per §S.6b's canon"
+                " order: `perovskite_gate_v2_52283` misses the nearest-angle-copy bar"
+                f" ({evaluation.copy_verdict.verdict}) and the linear-in-angle-interpolation bar"
+                f" ({evaluation.interpolation_verdict.verdict}) both, by a wide margin on each. Stage 2 is"
+                " not run -- the pre-registration only spends the fine-grid budget once stage 1 clears."
+                " This is the kill of the repaired member, run after the three defects above were found"
+                " and fixed and the decoder-conditioning fix was confirmed still active at the end of"
+                " training (input-dependence above); it is not the kill of a bug."
+            ),
+            "",
+            "The gate class, the attention kernel, the query-point decoder and the member are built and pass"
+            " every test (`operators/tests/test_galerkin_transformer.py`). Both stage-1 floors and the"
+            " stage-2 semilocal-ridge floor are measured and pre-registered above; the training driver for"
+            " the stage-1 gate is written and has been run once, as `perovskite_gate_v2_52283`.",
+        ]
     return lines
 
 
@@ -776,29 +847,79 @@ def Member_Angle_Level_Rows(
     return scored
 
 
+def Training_Mean_Field(train_examples: list[ParameterExample]) -> NDArray[np.float64]:
+    """the angle stratum's own training population, averaged pointwise -- the input-blind optimum"""
+    stacked = np.stack(
+        [np.asarray(example.target_function.values, dtype=np.float64) for example in train_examples]
+    )
+    return stacked.mean(axis=0)
+
+
+def Mean_Field_Relative_L2_Median(
+    mean_field: NDArray[np.float64], evaluation_examples: list[ParameterExample]
+) -> float:
+    """the training-mean field's own median relative L2 on the copy floor's exact evaluation population"""
+    scores = [
+        Relative_L2(mean_field, np.asarray(example.target_function.values, dtype=np.float64))
+        for example in evaluation_examples
+    ]
+    return float(np.median(scores))
+
+
+def Member_Input_Dependence(
+    member: GalerkinTransformer, evaluation_examples: list[ParameterExample]
+) -> tuple[float, str, str]:
+    """the trained member's own relative difference between its two most lattice-separated predictions"""
+    parameter_vectors = [np.asarray(example.parameters.vector, dtype=np.float64) for example in evaluation_examples]
+    most_separated = max(
+        ((first, second) for first in range(len(evaluation_examples)) for second in range(first + 1, len(evaluation_examples))),
+        key=lambda pair: float(np.linalg.norm(parameter_vectors[pair[0]] - parameter_vectors[pair[1]])),
+    )
+    first_index, second_index = most_separated
+    example_a, example_b = evaluation_examples[first_index], evaluation_examples[second_index]
+    truth_a = np.asarray(example_a.target_function.values, dtype=np.float64)
+    truth_b = np.asarray(example_b.target_function.values, dtype=np.float64)
+    predicted_a = Member_Predicted_Field(member, example_a.parameters, truth_a, example_a.target_function.quadrature)
+    predicted_b = Member_Predicted_Field(member, example_b.parameters, truth_b, example_b.target_function.quadrature)
+    denominator = max(float(np.linalg.norm(predicted_a)), float(np.linalg.norm(predicted_b)), 1e-30)
+    relative_difference = float(np.linalg.norm(predicted_a - predicted_b) / denominator)
+    return relative_difference, example_a.unit_key, example_b.unit_key
+
+
 @dataclasses.dataclass(frozen=True, slots=True)
 class GateEvaluation:
-    """one trained gate run's own scored rows and its verdict against each stage-1 floor"""
+    """one trained gate run's own scored rows, its verdict against each stage-1 floor, and context numbers"""
 
     run_name: str
     copy_comparison_rows: list[ScoredRun]
     interpolation_comparison_rows: list[ScoredRun]
     copy_verdict: FloorComparison
     interpolation_verdict: FloorComparison
+    mean_field_relative_l2_median: float
+    input_dependence: float
+    input_dependence_unit_a: str
+    input_dependence_unit_b: str
 
 
 def Evaluated_Gate_Run(run_name: str, data: FloorData) -> GateEvaluation:
     """the trained member folded back from its own checkpoint, scored on the exact populations each floor used"""
     member = Loaded_Gate_Member(run_name)
-    copy_rows = Member_Angle_Stratum_Rows(member, Angle_Stratum_Examples("evaluation", 0))
+    evaluation_examples = Angle_Stratum_Examples("evaluation", 0)
+    copy_rows = Member_Angle_Stratum_Rows(member, evaluation_examples)
     arm = Angle_Arm()
     interpolation_rows = Member_Angle_Level_Rows(
         member, arm, Interior_Levels(arm), Angle_Stratum_Example_By_Run_Path()
     )
+    mean_field = Training_Mean_Field(Angle_Stratum_Examples("train", 0))
+    input_dependence, unit_a, unit_b = Member_Input_Dependence(member, evaluation_examples)
     return GateEvaluation(
         run_name=run_name,
         copy_comparison_rows=copy_rows,
         interpolation_comparison_rows=interpolation_rows,
+        mean_field_relative_l2_median=Mean_Field_Relative_L2_Median(mean_field, evaluation_examples),
+        input_dependence=input_dependence,
+        input_dependence_unit_a=unit_a,
+        input_dependence_unit_b=unit_b,
         copy_verdict=Compare_To_Floor(
             copy_rows, data.copy_rows, "relative_l2", "nearest_angle_copy_floor",
             GATE_IMPROVEMENT_MARGIN, "angle_stratum_fold_0",

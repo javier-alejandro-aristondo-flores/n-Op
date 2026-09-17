@@ -64,7 +64,90 @@
     "run_count": 152,
     "unit_count": 29
    }
+  },
+  {
+   "block_signature": "37c6af0a8392",
+   "key": {
+    "block": "fold_0",
+    "configuration": "gate",
+    "group": "member_vs_nearest_angle_copy",
+    "member": "galerkin_transformer",
+    "split": "perovskite_folds",
+    "task": "lattice_to_charge"
+   },
+   "summary": {
+    "confidence_high": 0.210591,
+    "confidence_low": 0.170367,
+    "group_name": "member",
+    "interquartile": 0.0468,
+    "median": 0.177966,
+    "metric_name": "relative_l2",
+    "run_count": 25,
+    "unit_count": 25
+   }
+  },
+  {
+   "block_signature": "41b450449c83",
+   "key": {
+    "block": "angle_arm_interior_levels",
+    "configuration": "gate",
+    "group": "member_vs_linear_in_angle_interpolation",
+    "member": "galerkin_transformer",
+    "split": "perovskite_arms",
+    "task": "lattice_to_charge"
+   },
+   "summary": {
+    "confidence_high": 0.124447,
+    "confidence_low": 0.110535,
+    "group_name": "member",
+    "interquartile": 0.019709,
+    "median": 0.11911,
+    "metric_name": "relative_l2",
+    "run_count": 27,
+    "unit_count": 27
+   }
   }
  ],
- "verdicts": []
+ "verdicts": [
+  {
+   "comparison": {
+    "floor_median": 0.085278,
+    "floor_name": "nearest_angle_copy_floor",
+    "group_name": "angle_stratum_fold_0",
+    "improvement": -1.0869,
+    "member_median": 0.177966,
+    "metric_name": "relative_l2",
+    "required_improvement": 0.5,
+    "verdict": "kill"
+   },
+   "key": {
+    "block": "fold_0",
+    "configuration": "gate",
+    "group": "member_vs_nearest_angle_copy",
+    "member": "galerkin_transformer",
+    "split": "perovskite_folds",
+    "task": "lattice_to_charge"
+   }
+  },
+  {
+   "comparison": {
+    "floor_median": 0.026421,
+    "floor_name": "linear_in_angle_interpolation_floor",
+    "group_name": "angle_arm_interior_levels",
+    "improvement": -3.508132,
+    "member_median": 0.11911,
+    "metric_name": "relative_l2",
+    "required_improvement": 0.5,
+    "verdict": "kill"
+   },
+   "key": {
+    "block": "angle_arm_interior_levels",
+    "configuration": "gate",
+    "group": "member_vs_linear_in_angle_interpolation",
+    "member": "galerkin_transformer",
+    "split": "perovskite_arms",
+    "task": "lattice_to_charge"
+   }
+  }
+ ]
 }

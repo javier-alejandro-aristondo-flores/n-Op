@@ -258,5 +258,18 @@ than the mean field to **within 1% of it, oscillating just above rather than bel
 0.3%, 0.8%, 0.4% worse) -- a qualitatively different, healthy shape (quick rise to the floor, then a
 narrow, stable band around it) from the original bug's persistent 15× gap, but the integrator's own
 criterion is "clearly below," which this does not yet satisfy on 600 stochastic single-example host
-steps against a 9,000-14,000-step card run. Not yet asked for; the call on whether this is close
-enough to schedule, or needs the criterion met first, is the integrator's.
+steps against a 9,000-14,000-step card run.
+
+**Outcome: the integrator judged the defect fixed and scheduled the pre-registered gate itself as the
+decider.** `perovskite_gate_v2_52283` (52,283 steps, the two-hour cap from a fresh `Cost_Probe`) was
+trained on the card and scored on the host: member median relative L2 0.1780 vs the nearest-angle-copy
+floor 0.0853 (**kill**, -108.7% against the required 50%) and 0.1191 vs the linear-in-angle-
+interpolation floor 0.0264 (**kill**, -350.8%). The training-mean field itself scores 0.1755 on the
+same 25 evaluation runs, so the full-length run landed in the same place the 600-step sanity run
+already showed: close to, not below, the trivial input-blind optimum. Input-dependence held (1.40e-1
+between the two most lattice-separated evaluation runs) -- the entry is killed on its own pre-
+registered stage-1 gate, not by a bug. See `report.md`'s own "Defects found and fixed before this
+verdict" and "An untested hypothesis" sections for the full standing and the integrator's own recorded
+guess at why: this task hands the member no field, only six constants and coordinate features, so it
+must synthesize spatial structure the built branch-trunk member's proper-orthogonal basis gets for
+free.

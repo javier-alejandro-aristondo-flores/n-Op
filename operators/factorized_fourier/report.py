@@ -1,6 +1,7 @@
 """the member measured against its floors, written as one committed markdown artifact"""
 
 import dataclasses
+import json
 import re
 from pathlib import Path
 from typing import Any, Literal, cast
@@ -1350,7 +1351,7 @@ EXPLICIT_MATCHED_RUN_NAME = "elf_fold0_explicit_matched_35505"
 # updated by hand once each rung's six-hour run is launched and its step count known, the same convention
 # the explicit run's own name already follows; a name with no checkpoint yet is exactly how "not yet run" is read
 FIXED_POINT_RUN_NAME_BY_RUNG: dict[Stabilization, str] = {
-    "spectral_clipping": "elf_fold0_fixed_point_spectral_clipping_pending",
+    "spectral_clipping": "elf_fold0_fixed_point_spectral_clipping_35219",
     "jacobian_penalty": "elf_fold0_fixed_point_jacobian_penalty_pending",
     "normalized": "elf_fold0_fixed_point_normalized_pending",
 }
@@ -1426,6 +1427,87 @@ def Probe_Curve_At(manifest: dict[str, object], curve_name: str, step: int) -> f
 def Probe_Passes(cap_hit_fraction_at_400: float, cap_hit_fraction_at_500: float) -> bool:
     """the launch rule: under one half at five hundred steps, and not still climbing from the pass at four hundred"""
     return cap_hit_fraction_at_500 < 0.5 and cap_hit_fraction_at_500 <= cap_hit_fraction_at_400
+
+
+def Probe_Manifest_From_Disk(run_name: str) -> dict[str, object]:
+    """a probe's own stage-zero manifest and curves, read back purely from what training already wrote to disk"""
+    manifest_path = TRAINING_ARTIFACT_PATH / f"{run_name}_stage0_manifest.json"
+    if not manifest_path.is_file():
+        raise FileNotFoundError(f"no stage-zero manifest found for {run_name!r} under {TRAINING_ARTIFACT_PATH}")
+    manifest: dict[str, object] = {"stage_0": json.loads(manifest_path.read_text())}
+    return Probe_Manifest_With_Curves(manifest, TRAINING_ARTIFACT_PATH, run_name)
+
+
+# a rung's own diagnostic curve, beyond the cap-hit fraction and mean iterations every fixed-point probe carries
+PROBE_DIAGNOSTIC_NAMES: dict[Stabilization, tuple[str, ...]] = {
+    "spectral_clipping": ("nominal_lipschitz", "clipped_fraction"),
+    "jacobian_penalty": (),
+    "normalized": (),
+}
+
+# updated by hand once a probe or its knob-turned repeat is launched; a name with no stage-zero manifest yet is
+# exactly how "not yet probed" is read, the same convention FIXED_POINT_RUN_NAME_BY_RUNG already follows
+PROBE_RUN_NAME_BY_RUNG: dict[Stabilization, tuple[str, str]] = {
+    "spectral_clipping": (
+        "elf_fold0_fixed_point_spectral_clipping_probe", "elf_fold0_fixed_point_spectral_clipping_probe_knob",
+    ),
+    "jacobian_penalty": (
+        "elf_fold0_fixed_point_jacobian_penalty_probe", "elf_fold0_fixed_point_jacobian_penalty_probe_knob",
+    ),
+    "normalized": ("elf_fold0_fixed_point_normalized_probe", "elf_fold0_fixed_point_normalized_probe_knob"),
+}
+
+
+def Probe_Table_Row(rung: Stabilization, run_name: str) -> tuple[str, bool] | None:
+    """one probe's own row and whether it passed the launch rule, or nothing while that probe has not run yet"""
+    try:
+        manifest = Probe_Manifest_From_Disk(run_name)
+    except FileNotFoundError:
+        return None
+    cap_hit_at_400 = Probe_Curve_At(manifest, "cap_hit_fraction", 400)
+    cap_hit_at_500 = Probe_Curve_At(manifest, "cap_hit_fraction", 500)
+    mean_iterations_at_500 = Probe_Curve_At(manifest, "mean_iterations", 500)
+    passed = Probe_Passes(cap_hit_at_400, cap_hit_at_500)
+    extra = ", ".join(
+        f"{name} {Probe_Curve_At(manifest, name, 500):.4f}" for name in PROBE_DIAGNOSTIC_NAMES.get(rung, ())
+    )
+    stage_zero = cast(dict[str, object], manifest["stage_0"])
+    line = (
+        f"`{run_name}`: cap-hit fraction {cap_hit_at_400:.3f} at step 400, {cap_hit_at_500:.3f} at step 500 --"
+        f" launch rule {'passes' if passed else 'fails'}; mean iterations {mean_iterations_at_500:.2f};"
+        f" best validation {cast(float, stage_zero['best_validation_score']):.6f}" + (f"; {extra}" if extra else "")
+    )
+    return line, passed
+
+
+def Deep_Equilibrium_Probe_Table_Lines() -> list[str]:
+    """every probe attempted so far, canon order, stopping the table at the first rung whose probe holds"""
+    lines = ["### the probe table (five-hundred-step probes, canon C.2's own protocol), in canon order", "", "```"]
+    stopped = False
+    for rung, (run_name, knob_run_name) in PROBE_RUN_NAME_BY_RUNG.items():
+        label = RUNG_LABELS.get(rung, rung)
+        if stopped:
+            lines.append(f"{label}: not probed (an earlier rung already held)")
+            continue
+        first = Probe_Table_Row(rung, run_name)
+        if first is None:
+            lines.append(f"{label}: not yet probed")
+            break
+        first_line, first_passed = first
+        lines.append(f"{label}: {first_line}")
+        if first_passed:
+            stopped = True
+            continue
+        second = Probe_Table_Row(rung, knob_run_name)
+        if second is None:
+            lines.append(f"{label} (knob turn): not yet probed")
+            break
+        second_line, second_passed = second
+        lines.append(f"{label} (knob turn): {second_line}")
+        if second_passed:
+            stopped = True
+    lines += ["```", ""]
+    return lines
 
 
 def Fixed_Point_Health_Verdict(convergence_rate: float) -> str:
@@ -1934,6 +2016,7 @@ def Main() -> int:
     floor_lines, bars = Floor_Block_Lines()
     evaluation_lines = Elf_Evaluation_Lines()
     deq_lines = Deep_Equilibrium_Ladder_Lines()
+    deq_probe_table_lines = Deep_Equilibrium_Probe_Table_Lines()
     deq_verdict_lines = Deep_Equilibrium_Verdict_Lines()
     potential_lines = Potential_Task_Lines()
     parametric_lines = Parametric_Task_Lines()
@@ -1951,8 +2034,8 @@ def Main() -> int:
     ]
     REPORT_PATH.write_text(
         "\n".join(
-            header + floor_lines + evaluation_lines + deq_lines + deq_verdict_lines + potential_lines
-            + parametric_lines
+            header + floor_lines + evaluation_lines + deq_lines + deq_probe_table_lines + deq_verdict_lines
+            + potential_lines + parametric_lines
         )
         + "\n"
     )

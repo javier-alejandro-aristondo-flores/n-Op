@@ -46,8 +46,10 @@ from operators.factorized_fourier.report import (
     Localization_Loss,
     Nearest_Run_Rows,
     Probe_Curve_At,
+    Probe_Manifest_From_Disk,
     Probe_Manifest_With_Curves,
     Probe_Passes,
+    Probe_Table_Row,
     Shell_Filter_Rows,
     Write_Back_Parameters,
 )
@@ -1084,6 +1086,17 @@ def Test_Fixed_Point_Health_Lines_Reports_Not_Yet_Run_Before_Any_Checkpoint_Exis
     """the health section degrades gracefully, matching the same pattern Elf_Evaluation_Lines already follows"""
     lines = Fixed_Point_Health_Lines("spectral_clipping", "a_run_name_no_checkpoint_could_ever_carry")
     assert any("Not yet run" in line for line in lines)
+
+
+def Test_Probe_Manifest_From_Disk_Raises_Before_Any_Checkpoint_Exists() -> None:
+    """the probe table's own disk reader is explicit about a run it cannot find, the same run name never colliding"""
+    with pytest.raises(FileNotFoundError):
+        Probe_Manifest_From_Disk("a_run_name_no_checkpoint_could_ever_carry")
+
+
+def Test_Probe_Table_Row_Reports_Nothing_Before_Any_Checkpoint_Exists() -> None:
+    """a probe row is silently absent, not an error, while its own run has not written a stage-zero manifest yet"""
+    assert Probe_Table_Row("spectral_clipping", "a_run_name_no_checkpoint_could_ever_carry") is None
 
 
 def Test_Deep_Equilibrium_Verdict_Lines_Reads_Outcome_A_Before_Any_Rung_Has_Trained() -> None:

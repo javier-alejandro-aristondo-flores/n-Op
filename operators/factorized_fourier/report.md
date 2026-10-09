@@ -97,6 +97,8 @@ member__functional_accurate  relative_l2               22     44    0.014733  0.
 member__functional_cheap     relative_l2               29     108   0.009677  0.013281       [0.009872, 0.022718]
 ```
 
+The strain run-channels are 34 runs counted twice: on the unpolarized strain runs the two spin fields are identical to round-off, so the pooled rows weight that campaign by 68 channels; the unit medians the ladder reads are unaffected, since each unit's channels fold into one median.
+
 ### the pre-registered claim ladder, measured
 
 ```

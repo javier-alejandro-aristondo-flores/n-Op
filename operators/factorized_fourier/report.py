@@ -1320,6 +1320,10 @@ def Elf_Evaluation_Lines(
         Render_Table(Summary_Table(tuple(summaries))),
         "```",
         "",
+        "The strain run-channels are 34 runs counted twice: on the unpolarized strain runs the two spin fields are"
+        " identical to round-off, so the pooled rows weight that campaign by 68 channels; the unit medians the ladder"
+        " reads are unaffected, since each unit's channels fold into one median.",
+        "",
         "### the pre-registered claim ladder, measured",
         "",
         "```",

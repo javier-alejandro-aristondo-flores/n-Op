@@ -1348,9 +1348,10 @@ def Elf_Evaluation_Lines(
         "",
         "### the alloy every-shape row",
         "",
-        "Not applicable: the `alloy_ensemble` fold-zero archives checked all carry `has_localization: False` and"
-        " non-cubic shapes (for example `(48, 96, 216)`); this campaign has no localization target for the member"
-        " to be scored against, on any shape.",
+        "Not scored: the `alloy_ensemble` archives do carry a localization target (164 under the spin-summed key"
+        " `electron_localization`, 18 under `_up` and `_down`), but the cubic block's loader reads only the per-spin"
+        " keys and the alloy grids are non-cubic (for example `(48, 96, 216)`); the every-shape row needs a loader"
+        " for the spin-summed key and is not applicable as this member is built.",
         "",
         f"Figures: {figures_written} files written under `{figures_directory}`, arrays cached at"
         f" `{cache_directory}`.",

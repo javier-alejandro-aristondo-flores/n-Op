@@ -384,7 +384,7 @@ def Test_The_Results_Page_Headlines_Match_The_Member_Artifacts() -> None:
         if member_match is None:
             continue
         results_path = Member_Results_Path(member_match.group(1))
-        if results_path is None or not results_path.is_file():
+        if not results_path.is_file():
             without_artifact.append(member_match.group(1))
             continue
         parsed = Headline_Value_And_Precision(row["headline vs bar"])

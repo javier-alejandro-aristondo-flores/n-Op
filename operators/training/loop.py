@@ -1,6 +1,7 @@
 """the training loop on the engine facet, scored over exchangeable units and resumable from its own archive"""
 
 import json
+import subprocess
 import time
 from abc import abstractmethod
 from collections.abc import Callable
@@ -240,6 +241,22 @@ def Read_Checkpoint(path: Path, parameters: ParameterSet) -> TrainingProgress:
     )
 
 
+def Repository_Commit() -> str:
+    """the commit the package was imported from, or unknown when no repository answers"""
+    package_root = Path(__file__).resolve().parent.parent
+    try:
+        answer = subprocess.run(
+            ["git", "-C", str(package_root), "rev-parse", "HEAD"],
+            capture_output=True,
+            text=True,
+            timeout=5.0,
+            check=False,
+        )
+    except (OSError, subprocess.SubprocessError):
+        return "unknown"
+    return answer.stdout.strip() if answer.returncode == 0 and answer.stdout.strip() else "unknown"
+
+
 def Train(
     engine: Engine | None,
     parameters: ParameterSet,
@@ -256,6 +273,7 @@ def Train(
     precision: Precision = "single",
     resume: bool = False,
     hook: TrainingHook | None = None,
+    provenance: dict[str, str] | None = None,
 ) -> TrainingResult:
     """the Adam loop over drawn batches, keeping the parameters that scored best over the held-out units"""
     if validation_interval < 1:
@@ -329,6 +347,8 @@ def Train(
         "parameter_names": sorted(progress.best_parameters.values),
         "wall_clock_seconds": wall_clock_seconds,
         "hook_present": hook is not None,
+        "commit": Repository_Commit(),
+        "provenance": dict(provenance or {}),
     }
     auxiliary_curves = {
         name: np.asarray(curve, dtype=np.float64) for name, curve in progress.auxiliary_curves.items()

@@ -407,6 +407,18 @@ def Test_A_Hook_Clips_Every_Step_And_The_Manifest_Records_Its_Presence() -> None
     assert result.manifest["hook_present"] is True
 
 
+def Test_The_Manifest_Records_The_Commit_And_The_Provenance_Handed_In() -> None:
+    """every run names the commit it ran from and carries whatever provenance its caller supplied"""
+    rows, parameters = Linear_Regression_Setup()
+    result = Train(
+        NumpyEngine(), parameters, Regression_Loss, FixedBatches(Rows_Batch(rows)), step_count=5, learning_rate=0.05,
+        provenance={"configuration_name": "toy"},
+    )
+    commit = cast(str, result.manifest["commit"])
+    assert commit == "unknown" or (len(commit) == 40 and all(character in "0123456789abcdef" for character in commit))
+    assert result.manifest["provenance"] == {"configuration_name": "toy"}
+
+
 def Test_A_Hook_With_No_Hook_Leaves_The_Manifest_Unflagged() -> None:
     """asserts the manifest's own flag answers false, not merely absent, when no hook was passed"""
     rows, parameters = Linear_Regression_Setup()

@@ -345,7 +345,10 @@ RESULTS_PAGE_PATH = Path(__file__).resolve().parent.parent.parent / "operator-re
 SUMMARY_TABLE_HEADING = "## Summary, one row per canon entry"
 HEADLINE_NUMBER = re.compile(r"\d+(?:\.\d+)?%?")
 MEMBER_CELL = re.compile(r"`([a-z_]+)`")
-MEMBERS_WITHOUT_RESULTS_ARTIFACT = frozenset({"factorized_fourier", "deep_operator_network"})
+# two members whose results live only in their reports, the stub package, and the wrapper row that is not a member
+MEMBERS_WITHOUT_RESULTS_ARTIFACT = frozenset(
+    {"factorized_fourier", "deep_operator_network", "gaussian_plane_wave", "wrappers"}
+)
 
 
 def Summary_Table_Rows(document_text: str) -> list[dict[str, str]]:
@@ -398,7 +401,7 @@ def Test_The_Results_Page_Headlines_Match_The_Member_Artifacts() -> None:
     assert checked, "no row with a results artifact was checked, so the parser likely found nothing"
     # a member with an artifact prints either a number this test can read or the word pending, never something else
     assert unparsable == [], unparsable
-    # only the two members that never wrote a results artifact may go unchecked for want of one
+    # only the members that never wrote a results artifact, the stub and the wrapper row may go unchecked for want of one
     assert set(without_artifact) <= MEMBERS_WITHOUT_RESULTS_ARTIFACT, sorted(set(without_artifact))
 
 

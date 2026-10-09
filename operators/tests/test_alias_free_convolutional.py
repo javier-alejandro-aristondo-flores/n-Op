@@ -451,11 +451,12 @@ def Test_The_Augmented_Batch_Source_And_Loss_Train_A_Toy_Member_And_Write_Back_C
             campaign="toy",
             log_density_values=(generator.normal(size=(2, 8, 8, 8)) * 0.1).astype(np.float32),
             gram_vector=(generator.normal(size=(6,)) * 0.1).astype(np.float32),
+            lattice=np.eye(3) * 7.0,
             target_values=generator.uniform(0.1, 0.9, size=(2, 4, 4, 4)).astype(np.float32),
         )
         for draw in range(3)
     ]
-    batches = AugmentedMemberBatches(training_examples, training_examples[:1])
+    batches = AugmentedMemberBatches(training_examples, training_examples[:1], np.zeros(6), np.ones(6))
     initial_parameters = ParameterSet(
         values={name: value.copy() for name, value in member.Parameter_Values().items()}
     )

@@ -114,7 +114,7 @@ def Superposed_Atomic_Density_Errors(
     campaign: str,
     pool_root: Path = POOL_ROOT,
 ) -> NDArray[np.float64]:
-    """per-run normalized error of the stored atomic superposition against the density"""
+    """per-run normalized error of the stored atomic superposition, written at the run's starting geometry, against the density"""
     errors: list[float] = []
     for identifier in identifiers:
         with np.load(Archive_Path(campaign, identifier, pool_root)) as archive:

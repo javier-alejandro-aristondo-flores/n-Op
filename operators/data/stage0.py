@@ -116,7 +116,13 @@ def Cross_Fidelity_Lines(functional_pairs: Sequence[FunctionalPair]) -> list[str
 
 def Superposition_Lines() -> list[str]:
     """the stored atomic-superposition floor, campaign by campaign"""
-    lines = ["## Superposed-atomic-density floor (normalized mean absolute error)", ""]
+    lines = [
+        "## Superposed-atomic-density floor (normalized mean absolute error)",
+        "",
+        "The stored superposition (AECCAR1) is written before the first ionic step, so on relaxed runs it sits on the"
+        " starting geometry rather than the final positions; the alloy block's number includes that mismatch.",
+        "",
+    ]
     for campaign in ("defect_set", "supercell_strains", "alloy_ensemble"):
         errors = Superposed_Atomic_Density_Errors(Campaign_Identifiers(campaign), campaign)
         if errors.size == 0:

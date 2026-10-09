@@ -175,6 +175,7 @@ def Extract_Run(census_row: CensusRow, pool_root: Path) -> tuple[dict[str, Store
         field = Read_Field_File(run_directory / "CHGCAR")
         geometry = field.geometry
         arrays.update(Charge_Entries(field, Cell_Volume(field.geometry.lattice)))
+    # vasp writes the core and atomic fields before the first ionic step, so on relaxed runs they sit on the starting geometry
     aeccar_names = {
         "AECCAR0": "all_electron_core_density",
         "AECCAR1": "superposed_atomic_density",

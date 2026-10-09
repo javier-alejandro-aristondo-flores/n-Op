@@ -13,6 +13,8 @@ Cubic-block folds: 261 train runs, 76 evaluation runs (fold 0).
 
 ## Superposed-atomic-density floor (normalized mean absolute error)
 
+The stored superposition (AECCAR1) is written before the first ionic step, so on relaxed runs it sits on the starting geometry rather than the final positions; the alloy block's number includes that mismatch.
+
 - defect_set: median 14.96%, interquartile 1.29%, runs 196
 - supercell_strains: median 14.94%, interquartile 0.01%, runs 169
 - alloy_ensemble: median 27.02%, interquartile 3.64%, runs 182

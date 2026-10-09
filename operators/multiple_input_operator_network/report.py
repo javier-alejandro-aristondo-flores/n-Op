@@ -776,7 +776,8 @@ def Main() -> int:
         " probe would have handed the twin 7,976 steps against the member's 33,650, confounding the decisive"
         " twin-vs-member comparison with unequal training rather than isolating the potential branch's own"
         " contribution. Both runs instead took the member's warm-cache figure, 33,650 steps each (the fixed"
-        " member's own retrain, `elf_fold0_member_v2_33650`).",
+        " member's own retrain, `elf_fold0_member_v2_33650`). Both stopped by patience in the last stage after"
+        " 21,890 stage steps (10,095 + 10,095 + 1,700; 22,090 with the 200-step probe), read from their manifests.",
         "",
         *evaluation_lines,
         "## Inspection",

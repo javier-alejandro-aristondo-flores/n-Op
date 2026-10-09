@@ -345,6 +345,7 @@ RESULTS_PAGE_PATH = Path(__file__).resolve().parent.parent.parent / "operator-re
 SUMMARY_TABLE_HEADING = "## Summary, one row per canon entry"
 HEADLINE_NUMBER = re.compile(r"\d+(?:\.\d+)?%?")
 MEMBER_CELL = re.compile(r"`([a-z_]+)`")
+MEMBERS_WITHOUT_RESULTS_ARTIFACT = frozenset({"factorized_fourier", "deep_operator_network"})
 
 
 def Summary_Table_Rows(document_text: str) -> list[dict[str, str]]:
@@ -370,25 +371,35 @@ def Test_The_Results_Page_Headlines_Match_The_Member_Artifacts() -> None:
     """every summary-table headline with a results.json source reproduces that artifact at the page's precision"""
     rows = Summary_Table_Rows(RESULTS_PAGE_PATH.read_text())
     assert rows, "the summary table parsed no rows at all"
-    skipped: list[str] = []
+    without_artifact: list[str] = []
+    pending: list[str] = []
+    unparsable: list[str] = []
+    checked: list[str] = []
     mismatches: list[str] = []
     for row in rows:
         member_match = MEMBER_CELL.search(row["member"])
-        results_path = Member_Results_Path(member_match.group(1)) if member_match else None
+        if member_match is None:
+            continue
+        results_path = Member_Results_Path(member_match.group(1))
         if results_path is None or not results_path.is_file():
-            skipped.append(row["entry"])
+            without_artifact.append(member_match.group(1))
             continue
         parsed = Headline_Value_And_Precision(row["headline vs bar"])
         if parsed is None:
-            skipped.append(row["entry"])
+            (pending if "pending" in row["headline vs bar"] else unparsable).append(row["entry"])
             continue
+        checked.append(row["entry"])
         value, precision = parsed
         artifact = Read_Member_Results(results_path)
         printed = {f"{result_row.summary.median:.{precision}f}" for result_row in artifact.rows}
         if f"{value:.{precision}f}" not in printed:
             mismatches.append(f"{row['entry']}: {value:.{precision}f} not among {sorted(printed)}")
     assert mismatches == [], mismatches
-    assert skipped, "no row was ever checked or skipped, so the parser likely found nothing"
+    assert checked, "no row with a results artifact was checked, so the parser likely found nothing"
+    # a member with an artifact prints either a number this test can read or the word pending, never something else
+    assert unparsable == [], unparsable
+    # only the two members that never wrote a results artifact may go unchecked for want of one
+    assert set(without_artifact) <= MEMBERS_WITHOUT_RESULTS_ARTIFACT, sorted(set(without_artifact))
 
 
 def Test_A_Block_Signature_Counts_Each_Unit_Once() -> None:

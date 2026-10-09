@@ -81,10 +81,13 @@ def Drawn_Grid_Operation(generator: np.random.Generator) -> tuple[NDArray[np.int
 
 
 def Augmented_Channels(
-    stacked_channels: NDArray[np.float64], matrix: NDArray[np.int64], translation: NDArray[np.float64]
+    stacked_channels: NDArray[np.float64],
+    matrix: NDArray[np.int64],
+    translation: NDArray[np.float64],
+    cells_per_axis: int = 1,
 ) -> NDArray[np.float64]:
     """a channel-stacked field under one exact grid operation, every channel moved by the same symmetry"""
-    return Apply_Grid_Operation(stacked_channels, matrix, translation)
+    return Apply_Grid_Operation(stacked_channels, matrix, translation, cells_per_axis)
 
 
 def Visible_Mask(present_labels: tuple[str, ...], visible_labels: tuple[str, ...]) -> NDArray[np.float32]:

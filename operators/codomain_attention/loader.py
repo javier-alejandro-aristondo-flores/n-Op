@@ -110,6 +110,10 @@ def Channel_Statistics_From_Examples(
     )
 
 
+# the cubic block's runs are two conventional diamond cells per axis, so a quarter-cell glide is an eighth of the grid
+SUPERCELL_CELLS_PER_AXIS = 2
+
+
 def Built_Completion_Step(
     example: CompletionExample,
     pattern: MaskPatternName,
@@ -120,10 +124,10 @@ def Built_Completion_Step(
     """one masked-reconstruction step's full transformed target stack, its visible mask and its functional covariate"""
     matrix, translation = Drawn_Grid_Operation(generator)
     fine_stack = np.stack([example.raw_channels[label] for label in FINE_GROUP_LABELS]).astype(np.float64)
-    augmented_fine = Augmented_Channels(fine_stack, matrix, translation)
+    augmented_fine = Augmented_Channels(fine_stack, matrix, translation, SUPERCELL_CELLS_PER_AXIS)
     truncated_fine = Spectral_Truncation_Resample(augmented_fine, coarse_shape)
     coarse_stack = np.stack([example.raw_channels[label] for label in ELF_GROUP]).astype(np.float64)
-    augmented_coarse = Augmented_Channels(coarse_stack, matrix, translation)
+    augmented_coarse = Augmented_Channels(coarse_stack, matrix, translation, SUPERCELL_CELLS_PER_AXIS)
 
     raw_by_label: dict[str, NDArray[np.float64]] = dict(zip(FINE_GROUP_LABELS, truncated_fine, strict=True))
     raw_by_label.update(zip(ELF_GROUP, augmented_coarse, strict=True))

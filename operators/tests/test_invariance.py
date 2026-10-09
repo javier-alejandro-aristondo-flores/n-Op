@@ -4,8 +4,10 @@ import re
 from pathlib import Path
 
 import numpy as np
+import pytest
 from numpy.typing import NDArray
 
+from operators.data import Archive_Path
 from operators.framework import (
     Apply_Grid_Operation,
     Array,
@@ -114,6 +116,30 @@ def Test_Grid_Operations_Compose_Exactly() -> None:
         moved = Apply_Grid_Operation(field, matrix, shift)
         assert moved.shape == field.shape
         assert np.allclose(np.sort(moved.ravel()), np.sort(field.ravel()))
+
+
+PRISTINE_SUPERCELL = ("supercell_strains", "78e29cde81149eca")
+
+# the corpus's cubic runs are two conventional diamond cells per axis, so a quarter cell is an eighth of the grid
+SUPERCELL_CELLS_PER_AXIS = 2
+
+
+@pytest.mark.pool
+def Test_Every_Diamond_Operation_Leaves_The_Pristine_Supercell_Density_Unchanged() -> None:
+    """on the two-by-two-by-two supercell the glide is an eighth of the grid, and then all 48 operations are crystal symmetries"""
+    with np.load(Archive_Path(*PRISTINE_SUPERCELL)) as archive:
+        density = np.asarray(archive["charge_density"], dtype=np.float64)[None]
+    scale = float(np.linalg.norm(density.ravel()))
+    with_supercell: list[float] = []
+    as_one_cell: list[float] = []
+    for matrix, translation in Diamond_Grid_Operations():
+        moved = Apply_Grid_Operation(density, matrix, translation, SUPERCELL_CELLS_PER_AXIS)
+        with_supercell.append(float(np.linalg.norm((moved - density).ravel()) / scale))
+        moved_as_one = Apply_Grid_Operation(density, matrix, translation)
+        as_one_cell.append(float(np.linalg.norm((moved_as_one - density).ravel()) / scale))
+    assert max(with_supercell) < 1e-6
+    # the control: read as one conventional cell, the 24 glide operations shift by a quarter and move the crystal
+    assert sum(1 for error in as_one_cell if error > 0.5) == 24
 
 
 def Test_An_Equivariant_Model_Scores_Zero() -> None:

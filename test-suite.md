@@ -543,7 +543,7 @@ means fp16 + loss scaler; there is no hardware bf16.) Alloy-grid full-resolution
 the ~50M Tucker-factorized config go SUPER-LATER.
 **Data-volume honesty and mitigations.** 547 multi-channel samples vs the paper's 8k/40k
 snapshots: exact grid-symmetry augmentation (all 48 diamond-group operations act exactly on even
-80³ grids — the non-symmorphic quarter-shifts are exact 20-point rolls; ISYM=0 so no
+80³ grids — the non-symmorphic quarter-cell shifts are exact 10-point rolls on the 64-atom cells' 80³ grids, a quarter of the conventional cell being an eighth of the supercell; ISYM=0 so no
 symmetrization bias), mask multiplicity, and **density-only inpainting samples imported from the
 Strain Atlas (2,680 @ 40³) and Perovskite Grid (250 @ 64³) — consumable only by a variable-channel
 model**, which no dedicated pairwise competitor can use. Augmented views are correlated, not new
@@ -715,7 +715,7 @@ aggregate.
 - **(c) Alloy transfer.** Zero-shot (query-anywhere members) or few-shot onto the held-out Alloy
   Ensemble; raw cross-chemistry errors are incomparable, so the score is skill vs the SAD floor.
 - **(d) Symmetry sanity.** All 48 diamond-group operations act exactly on the even 80³ grids
-  (quarter-shifts = exact 20-voxel rolls): report the median equivariance error
+  (quarter-cell shifts = exact 10-voxel rolls on the 64-atom cells' 80³ grids): report the median equivariance error
   ‖f(g·x) − g·f(x)‖/‖f‖ over operations × ~20 runs. Near-zero for built-in-equivariant members; a
   real diagnostic for the Fourier lineage. A symmetrized-inference ablation (group-averaged
   predictions) rides the same harness, reported as its own line — never silently enabled.

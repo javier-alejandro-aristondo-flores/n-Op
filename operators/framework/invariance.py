@@ -79,14 +79,19 @@ def Diamond_Grid_Operations() -> tuple[tuple[NDArray[np.int64], NDArray[np.float
 
 
 def Apply_Grid_Operation(
-    values: NDArray[np.float64], matrix: NDArray[np.int64], translation: NDArray[np.float64]
+    values: NDArray[np.float64],
+    matrix: NDArray[np.int64],
+    translation: NDArray[np.float64],
+    cells_per_axis: int = 1,
 ) -> NDArray[np.float64]:
-    """one exact symmetry operation on a compatible cubic grid"""
+    """one exact symmetry operation on a compatible cubic grid spanning the given conventional cells per axis"""
     stacked = np.asarray(values)
     extent = stacked.shape[1]
     grid = np.indices((extent, extent, extent)).reshape(3, -1)
-    # the half rounds the fractional translation to the nearest whole voxel
-    shifts = np.asarray(np.asarray(translation, dtype=np.float64) * extent + 0.5, dtype=np.int64).reshape(3, 1)
+    # the translation is a fraction of one conventional cell, and the half rounds it to the nearest whole voxel
+    shifts = np.asarray(
+        np.asarray(translation, dtype=np.float64) * extent / cells_per_axis + 0.5, dtype=np.int64
+    ).reshape(3, 1)
     # gathering asks where each target voxel came from, which is the inverse map
     inverse = np.asarray(matrix, dtype=np.int64).T
     source = np.mod(inverse @ (grid - shifts), extent)
@@ -98,6 +103,7 @@ def Equivariance_Errors(
     apply_model: Callable[[NDArray[np.float64]], NDArray[np.float64]],
     values: NDArray[np.float64],
     operations: tuple[tuple[NDArray[np.int64], NDArray[np.float64]], ...],
+    cells_per_axis: int = 1,
 ) -> NDArray[np.float64]:
     """relative equivariance error of a model under each operation"""
     base_output = np.asarray(apply_model(values), dtype=np.float64)
@@ -105,9 +111,9 @@ def Equivariance_Errors(
     errors: list[float] = []
     for matrix, translation in operations:
         # transform then apply, against apply then transform
-        transformed_input = Apply_Grid_Operation(values, matrix, translation)
+        transformed_input = Apply_Grid_Operation(values, matrix, translation, cells_per_axis)
         output_of_transformed = np.asarray(apply_model(transformed_input), dtype=np.float64)
-        transformed_output = Apply_Grid_Operation(base_output, matrix, translation)
+        transformed_output = Apply_Grid_Operation(base_output, matrix, translation, cells_per_axis)
         errors.append(float(np.linalg.norm((output_of_transformed - transformed_output).ravel()) / scale))
     return np.asarray(errors, dtype=np.float64)
 
@@ -192,10 +198,10 @@ def Grid_Application(
     return Apply_To_Values
 
 
-def Exactly_Operable_Grid(shape: tuple[int, int, int]) -> bool:
-    """whether the 48 operations land on whole voxels, which needs a quarter-divisible cube"""
-    # the glide translations are quarter cells, and a quarter cell is whole voxels only here
-    return len(set(shape)) == 1 and shape[0] % QUARTER_CELL_DIVISOR == 0
+def Exactly_Operable_Grid(shape: tuple[int, int, int], cells_per_axis: int = 1) -> bool:
+    """whether the 48 operations land on whole voxels, which needs a cube divisible by four per conventional cell"""
+    # the glide translations are quarter conventional cells, and a quarter cell is whole voxels only here
+    return len(set(shape)) == 1 and shape[0] % (QUARTER_CELL_DIVISOR * cells_per_axis) == 0
 
 
 def Skill_Against_Null(
@@ -228,7 +234,9 @@ def Resolution_Axis(
 
 
 def Symmetry_Axis(
-    operator: Operator[GridFunction, GridFunction], probes: Sequence[InvarianceProbe]
+    operator: Operator[GridFunction, GridFunction],
+    probes: Sequence[InvarianceProbe],
+    cells_per_axis: int = 1,
 ) -> NDArray[np.float64]:
     """every probe's equivariance error under each of the 48 diamond operations"""
     operations = Diamond_Grid_Operations()
@@ -238,6 +246,7 @@ def Symmetry_Axis(
                 Grid_Application(operator, probe.input_function),
                 np.asarray(probe.input_function.values, dtype=np.float64),
                 operations,
+                cells_per_axis,
             )
             for probe in probes
         ]
@@ -264,6 +273,7 @@ def Discretization_Invariance_Report(
     training_shape: tuple[int, int, int] = TRAINING_SHAPE,
     twins: Sequence[SupercellTwin] = (),
     irreducible_kpoint_counts: Sequence[int] = (),
+    cells_per_axis: int = 1,
 ) -> dict[str, Array]:
     """every invariance axis that applies to one operator on one task card"""
     measured: dict[str, Array] = {}
@@ -280,8 +290,8 @@ def Discretization_Invariance_Report(
         measured["resolution_truncation_null"] = null_errors
         measured["resolution_skill"] = Skill_Against_Null(model_errors, null_errors)
         reported.append("resolution")
-        if all(Exactly_Operable_Grid(Grid_Shape_Of(probe.input_function.values)) for probe in probes):
-            equivariance_errors = Symmetry_Axis(operator, probes)
+        if all(Exactly_Operable_Grid(Grid_Shape_Of(probe.input_function.values), cells_per_axis) for probe in probes):
+            equivariance_errors = Symmetry_Axis(operator, probes, cells_per_axis)
             measured["symmetry_equivariance_error"] = equivariance_errors
             measured["symmetry_median_equivariance_error"] = np.asarray(float(np.median(equivariance_errors)))
             reported.append("symmetry")

@@ -186,10 +186,13 @@ def Random_Diamond_Operation(generator: np.random.Generator) -> tuple[NDArray[np
 
 
 def Augmented_Training_Pair(
-    input_values: NDArray[np.float64], target_values: NDArray[np.float64], generator: np.random.Generator
+    input_values: NDArray[np.float64],
+    target_values: NDArray[np.float64],
+    generator: np.random.Generator,
+    cells_per_axis: int = 1,
 ) -> tuple[NDArray[np.float64], NDArray[np.float64]]:
     """one exact grid symmetry, drawn once and applied identically to the input and its own target"""
     matrix, translation = Random_Diamond_Operation(generator)
-    augmented_input = Apply_Grid_Operation(input_values, matrix, translation)
-    augmented_target = Apply_Grid_Operation(target_values, matrix, translation)
+    augmented_input = Apply_Grid_Operation(input_values, matrix, translation, cells_per_axis)
+    augmented_target = Apply_Grid_Operation(target_values, matrix, translation, cells_per_axis)
     return augmented_input, augmented_target

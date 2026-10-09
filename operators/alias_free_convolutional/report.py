@@ -93,6 +93,10 @@ def Input_Statistics(
     return reference_density, gram_mean, gram_scale
 
 
+# the cubic block's runs are two conventional diamond cells per axis, so a quarter-cell glide is an eighth of the grid
+SUPERCELL_CELLS_PER_AXIS = 2
+
+
 @dataclasses.dataclass(frozen=True, slots=True)
 class MemberExample:
     """one run's log-compressed spin channels and standardized Gram vector, cached beside its coarse target"""
@@ -155,6 +159,7 @@ class AugmentedMemberBatches(BatchSource):
             np.asarray(drawn.log_density_values, dtype=np.float64),
             np.asarray(drawn.target_values, dtype=np.float64),
             generator,
+            SUPERCELL_CELLS_PER_AXIS,
         )
         return TrainingBatch(
             {

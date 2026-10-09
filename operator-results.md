@@ -138,7 +138,7 @@ equilibrium no" is a legitimate verdict.
 
 | rung | parameters | steps | wall-clock | peak card memory | validation loss | mean absolute error | verdict on the five levels |
 |---|---|---|---|---|---|---|---|
-| explicit, twelve layers | 11.55M stored, 5.80M live | 24,404 | 3.94 h | 3.6 GB | 8.0e-5 | 0.00217 | all pass |
+| explicit, twelve layers | 11.55M stored, 5.80M live | 24,404 | 3.94 h | 3.6 GB | 8.1e-5 (stage 1 reached 8.0e-5, which the staged trainer did not return) | 0.00217 | all pass |
 | weight-tied, one layer applied twelve times (no input injection) | 0.96M stored, 0.48M live | 23,804 | 2.69 h | 3.2 GB | 1.2e-4 | 0.00297 | all pass; copy margin 52% |
 | explicit, one layer — the exact matched-parameter comparator | 0.96M stored, 0.48M live | 35,505 (full budget, still improving) | 0.52 h | 0.7 GB | 3.9e-4 | 0.01004 | canon levels pass; fails the copy and the stretch |
 | weight-tied with input injection — the fixed point's exact unrolled counterpart | 0.96M stored, 0.48M live | 28,504 | resumed across two power losses | 3.5 GB | 1.0e-4 | 0.00271 | all pass; copy margin 56% |

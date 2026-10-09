@@ -3,7 +3,7 @@
 import json
 from collections.abc import Callable
 from pathlib import Path
-from typing import Any
+from typing import Any, cast
 
 import numpy as np
 from numpy.typing import NDArray
@@ -54,6 +54,7 @@ def Staged_Training(
     probe_steps: int = DEFAULT_PROBE_STEPS,
     validation_interval: int = DEFAULT_VALIDATION_INTERVAL,
     final_stage_patience: int = DEFAULT_FINAL_STAGE_PATIENCE,
+    provenance: dict[str, str] | None = None,
 ) -> tuple[ParameterSet, dict[str, object]]:
     """the divergence probe then three stages at decaying rates, every piece resuming from its own checkpoint"""
     stage_step_counts = Staged_Step_Counts(step_count, stage_fractions)
@@ -71,7 +72,7 @@ def Staged_Training(
         probe_result = Train(
             engine, parameters, forward_loss, batches, step_count=probe_step_count, learning_rate=chosen_peak_rate,
             seed=seed, artifact_directory=artifact_directory, run_name=probe_name,
-            validation_interval=probe_step_count, patience=0, hook=hook,
+            validation_interval=probe_step_count, patience=0, hook=hook, provenance=provenance,
         )
         if not Sane_Loss_Curve(probe_result.loss_curve, probe_result.validation_curve):
             chosen_peak_rate = peak_learning_rate * 0.3
@@ -79,6 +80,7 @@ def Staged_Training(
                 engine, fresh_parameters(), forward_loss, batches, step_count=probe_step_count,
                 learning_rate=chosen_peak_rate, seed=seed, artifact_directory=artifact_directory,
                 run_name=probe_name, validation_interval=probe_step_count, patience=0, resume=False, hook=hook,
+                provenance=provenance,
             )
             if not Sane_Loss_Curve(probe_result.loss_curve, probe_result.validation_curve):
                 raise RuntimeError(
@@ -86,7 +88,14 @@ def Staged_Training(
                 )
         parameters = probe_result.parameters
     stage_rates = (chosen_peak_rate, chosen_peak_rate / 3.0, chosen_peak_rate / 9.0)
-    manifest: dict[str, object] = {"probe_learning_rate": chosen_peak_rate, "probe_steps": probe_step_count}
+    manifest: dict[str, object] = {
+        "probe_learning_rate": chosen_peak_rate,
+        "probe_steps": probe_step_count,
+        "provenance": dict(provenance or {}),
+    }
+    best_parameters = parameters
+    best_score = float("inf")
+    best_stage = -1
     for stage_index, (rate, stage_steps) in enumerate(zip(stage_rates, stage_step_counts, strict=True)):
         is_final_stage = stage_index == len(stage_step_counts) - 1
         # every stage resumes its own checkpoint, so a relaunch skips finished stages and continues a partial one
@@ -94,8 +103,15 @@ def Staged_Training(
             engine, parameters, forward_loss, batches, step_count=stage_steps, learning_rate=rate,
             seed=seed + stage_index, artifact_directory=artifact_directory,
             run_name=f"{run_name}_stage{stage_index}", validation_interval=validation_interval,
-            patience=final_stage_patience if is_final_stage else 0, resume=True, hook=hook,
+            patience=final_stage_patience if is_final_stage else 0, resume=True, hook=hook, provenance=provenance,
         )
         parameters = result.parameters
         manifest[f"stage_{stage_index}"] = result.manifest
-    return parameters, manifest
+        recorded_score = result.manifest.get("best_validation_score")
+        stage_score = float(cast(float, recorded_score)) if recorded_score is not None else float("inf")
+        # a later stage at a smaller rate can end worse than an earlier one, and the run keeps the best of all three
+        if stage_score < best_score:
+            best_parameters, best_score, best_stage = result.parameters, stage_score, stage_index
+    manifest["best_stage"] = best_stage
+    manifest["best_validation_score"] = best_score
+    return best_parameters, manifest

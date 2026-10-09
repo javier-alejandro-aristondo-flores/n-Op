@@ -1,6 +1,7 @@
 """the member measured against its floors, written as one committed markdown artifact"""
 
 import dataclasses
+import json
 import re
 from pathlib import Path
 from typing import Any, Literal, cast
@@ -1021,6 +1022,31 @@ def Fresh_Flagship_Member(
     return member, ParameterSet(values=member.Parameter_Values())
 
 
+def Stage_Best_Sentence(checkpoint_path: Path) -> str:
+    """which stage of the run scored best on validation, read from the sibling stage manifests, beside what was returned"""
+    stem_match = re.match(r"(.+)_stage(\d+)_checkpoint\.npz$", checkpoint_path.name)
+    if stem_match is None:
+        return ""
+    run_name, returned_stage = stem_match.group(1), int(stem_match.group(2))
+    scores: dict[int, tuple[float, int]] = {}
+    for manifest_path in sorted(checkpoint_path.parent.glob(f"{run_name}_stage*_manifest.json")):
+        stage_match = re.search(r"_stage(\d+)_manifest\.json$", manifest_path.name)
+        recorded = json.loads(manifest_path.read_text())
+        if stage_match is not None and recorded.get("best_validation_score") is not None:
+            scores[int(stage_match.group(1))] = (float(recorded["best_validation_score"]), int(recorded["best_step"]))
+    if not scores:
+        return ""
+    best_stage = min(scores, key=lambda stage: scores[stage][0])
+    best_score, best_step = scores[best_stage]
+    if best_stage == returned_stage:
+        return f" That is also the best validation score over all {len(scores)} stages."
+    return (
+        f" The best validation score over all {len(scores)} stages was {best_score:.6f}, in stage {best_stage} at its step"
+        f" {best_step}; the staged trainer returned the last stage's best rather than the best of all stages until the"
+        " fix of 9 October 2026, so this checkpoint is stage {returned_stage}'s."
+    )
+
+
 def Load_Trained_Member(
     checkpoint_path: Path,
     block: CubicBlock,
@@ -1292,7 +1318,8 @@ def Elf_Evaluation_Lines(
         f"## The member's own result (electron localization, fold 0, {configuration_label})",
         "",
         f"Loaded from `{checkpoint_path.name}`: {progress.completed_steps} completed steps, best validation score"
-        f" {progress.best_score:.6f} at step {progress.best_step}.",
+        f" {progress.best_score:.6f} at step {progress.best_step}."
+        + Stage_Best_Sentence(checkpoint_path),
         "",
         "### three caveats before trusting this number",
         "",

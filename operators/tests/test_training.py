@@ -24,6 +24,8 @@ from operators.substrate import (
 from operators.data import Strain_Tensor_Of
 from operators.tasks import Card_Named
 from operators.training import (
+    Staged_Training,
+    TrainingResult,
     AUXILIARY_PROBE_ROLE,
     Aligned_Energy_Grid,
     BatchSource,
@@ -417,6 +419,44 @@ def Test_The_Manifest_Records_The_Commit_And_The_Provenance_Handed_In() -> None:
     commit = cast(str, result.manifest["commit"])
     assert commit == "unknown" or (len(commit) == 40 and all(character in "0123456789abcdef" for character in commit))
     assert result.manifest["provenance"] == {"configuration_name": "toy"}
+
+
+def Test_The_Staged_Protocol_Returns_The_Best_Stage_And_Not_The_Last(
+    monkeypatch: pytest.MonkeyPatch, tmp_path: Path
+) -> None:
+    """when a later stage ends worse than an earlier one, the parameters handed back are the earlier stage's best"""
+    scores = iter((0.5, 0.3, 0.1, 0.2))
+    seen_provenance: list[dict[str, str] | None] = []
+
+    def Stub_Train(engine: Any, parameters: ParameterSet, *arguments: Any, **keywords: Any) -> TrainingResult:
+        score = next(scores)
+        seen_provenance.append(keywords.get("provenance"))
+        return TrainingResult(
+            parameters=ParameterSet(values={"weight": np.asarray([score])}),
+            loss_curve=np.asarray([1.0, 0.9]),
+            validation_curve=np.asarray([score]),
+            validation_steps=np.asarray([1.0]),
+            manifest={"best_validation_score": score, "run_name": keywords["run_name"]},
+        )
+
+    monkeypatch.setattr("operators.training.staged.Train", Stub_Train)
+    rows, _ = Linear_Regression_Setup()
+    parameters, manifest = Staged_Training(
+        NumpyEngine(),
+        ParameterSet(values={"weight": np.asarray([9.0])}),
+        lambda: ParameterSet(values={"weight": np.asarray([9.0])}),
+        Regression_Loss,
+        FixedBatches(Rows_Batch(rows)),
+        step_count=30,
+        run_name="staged_toy",
+        seed=1,
+        artifact_directory=tmp_path,
+        provenance={"configuration_name": "toy"},
+    )
+    assert float(parameters.values["weight"][0]) == 0.1
+    assert manifest["best_stage"] == 1
+    assert manifest["best_validation_score"] == 0.1
+    assert all(entry == {"configuration_name": "toy"} for entry in seen_provenance)
 
 
 def Test_A_Hook_With_No_Hook_Leaves_The_Manifest_Unflagged() -> None:

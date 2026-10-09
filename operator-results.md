@@ -46,7 +46,7 @@ yet read **pending**.
 | IV.2 | — | — | not started | cheap_to_accurate_states (planned) | pending | pending |
 | IV.3 | `wrappers` (`ConformalCalibrator`) | level 0.90, orbit unit | applied to IV.1 | cheap_to_accurate_charge / test orbits | coverage 0.977 vs guaranteed 0.900–0.942 | valid, over-covering (conservative) |
 | V.1 | `codomain_attention` | — | built with floors; the pretraining run stopped at stage 0 (2,800 of 2,828 steps) on 18 September, never judged | field_completion (planned) | pending | pending |
-| VI.1 | `deep_operator_network` | energy_trunk | finished | strain_to_states / 248 test runs, 30 orbits | curve L1 0.206 vs ridge 0.368 | pass, 44% better |
+| VI.1 | `deep_operator_network` | energy_trunk | finished | strain_to_states / 248 test runs, 30 orbits | curve L1 0.206 vs ridge 0.368 | pass (the canon sets no bar for VI.1), 44% better than the ridge |
 
 ---
 
@@ -190,8 +190,9 @@ localization task on the cubic block.
 | 27 interior levels of the angle arm | linear-in-angle interpolation, the floor | 0.0264 (bar ≤ 0.0132) |
 | | **the member** | **0.1191 — killed** |
 
-Run `perovskite_gate_v2_52283`: 52,283 steps in its two hours at 0.138 s per step, 1.5 GB on the
-card; validation flat at the mean field through every stage. For scale, the built branch–trunk
+Run `perovskite_gate_v2_52283`: 33,170 stage steps (15,685 + 15,685 + 1,800, the last stage stopped by
+patience) of its 52,283-step two-hour budget, plus the 200-step probe, in 1.3 hours at 0.14 s per step,
+1.5 GB on the card; validation flat at the mean field through every stage. For scale, the built branch–trunk
 member reaches 0.0183 on the same fold.
 
 **The kill is of a repaired member, not of a bug.** Its first gate run never trained, and three
@@ -288,7 +289,7 @@ the final table; the projection variants of the field-to-field tasks (II.1c) are
 coefficients of the log-compressed density and of the mean-removed potential, their latents are
 multiplied elementwise, and a point-queried trunk with a bounded head answers the localization
 field; 245,632 parameters. Its twin is the same network with the potential branch held constant
-(224,896 parameters), trained on the identical schedule: 33,650 steps each, about half an hour each
+(224,896 parameters), trained on the identical 33,650-step schedule, of which 21,890 stage steps ran for each (10,095 + 10,095 + 1,700; both last stages stopped by patience; 22,090 with the probe), about half an hour each
 at 0.11 s per step, 0.8 GB. Fold 0 of the cubic block, both spins, 29 units, medians:
 
 | row | mean absolute error | structural similarity | relative L2 |

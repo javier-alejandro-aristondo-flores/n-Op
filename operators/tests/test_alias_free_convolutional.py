@@ -12,7 +12,9 @@ from numpy.typing import NDArray
 from operators.alias_free_convolutional import (
     AliasFreeConvolutional,
     Alias_Free_Convolutional_Network,
+    Augmented_Training_Example,
     Augmented_Training_Pair,
+    Random_Diamond_Operation,
     StencilActivation,
 )
 from operators.alias_free_convolutional.activation import Alias_Free_Activation
@@ -327,6 +329,16 @@ def Test_Augmentation_Commutes_With_The_Lift_Over_Every_Diamond_Operation() -> N
         error = float(np.abs(np.asarray(transformed_then_lifted) - np.asarray(lifted_then_transformed)).max())
         worst_commutation_error = max(worst_commutation_error, error)
     assert worst_commutation_error < 1e-10
+
+
+def Test_The_Lattice_Turns_With_The_Grid_Under_Augmentation() -> None:
+    """the drawn signed permutation moves the lattice rows as it moves the grid, so a sheared cell's metric follows its field"""
+    lattice = np.array([[7.0, 0.3, 0.0], [0.0, 7.2, 0.1], [0.2, 0.0, 6.9]])
+    field = np.random.default_rng(66).normal(size=(2, 8, 8, 8))
+    _, _, turned = Augmented_Training_Example(field, field, lattice, np.random.default_rng(67))
+    matrix, _ = Random_Diamond_Operation(np.random.default_rng(67))
+    assert np.allclose(turned, matrix @ lattice)
+    assert np.allclose(turned @ turned.T, matrix @ (lattice @ lattice.T) @ matrix.T)
 
 
 def Test_Augmented_Training_Pair_Applies_The_Same_Operation_To_Input_And_Target() -> None:

@@ -11,7 +11,7 @@ from numpy.typing import NDArray
 from operators.alias_free_convolutional import (
     AliasFreeConvolutional,
     Alias_Free_Convolutional_Network,
-    Augmented_Training_Pair,
+    Augmented_Training_Example,
     StencilActivation,
 )
 from operators.data import Archive_Path, POOL_ROOT, STORE_NAME
@@ -106,6 +106,7 @@ class MemberExample:
     campaign: str
     log_density_values: NDArray[np.float32]
     gram_vector: NDArray[np.float32]
+    lattice: NDArray[np.float64]
     target_values: NDArray[np.float32]
 
 
@@ -134,6 +135,7 @@ def Member_Examples(
                 campaign=campaign,
                 log_density_values=np.asarray(log_density_values, dtype=np.float32),
                 gram_vector=np.asarray(gram_vector, dtype=np.float32),
+                lattice=np.asarray(lattice, dtype=np.float64),
                 target_values=np.asarray(target_values, dtype=np.float32),
             )
         )
@@ -144,8 +146,18 @@ class AugmentedMemberBatches(BatchSource):
     """one augmented training example drawn every step, every validation unit held fixed and unaugmented"""
 
 
-    def __init__(self, training_examples: list[MemberExample], validation_examples: list[MemberExample]) -> None:
+    def __init__(
+        self,
+        training_examples: list[MemberExample],
+        validation_examples: list[MemberExample],
+        gram_mean: NDArray[np.float64],
+        gram_scale: NDArray[np.float64],
+        cells_per_axis: int = SUPERCELL_CELLS_PER_AXIS,
+    ) -> None:
         self.training_examples = training_examples
+        self.gram_mean = gram_mean
+        self.gram_scale = gram_scale
+        self.cells_per_axis = cells_per_axis
         self.validation_by_unit: dict[str, list[MemberExample]] = {}
         for example in validation_examples:
             self.validation_by_unit.setdefault(example.unit_key, []).append(example)
@@ -155,16 +167,19 @@ class AugmentedMemberBatches(BatchSource):
     def Next_Batch(self, generator: np.random.Generator) -> TrainingBatch:
         drawn = self.training_examples[int(generator.integers(0, len(self.training_examples)))]
         self.last_drawn_identifier = drawn.identifier
-        augmented_density, augmented_target = Augmented_Training_Pair(
+        augmented_density, augmented_target, turned_lattice = Augmented_Training_Example(
             np.asarray(drawn.log_density_values, dtype=np.float64),
             np.asarray(drawn.target_values, dtype=np.float64),
+            drawn.lattice,
             generator,
-            SUPERCELL_CELLS_PER_AXIS,
+            self.cells_per_axis,
         )
+        # a strained cell's metric must turn with its field, or the augmented sample carries another cell's lattice
+        gram_vector = Standardized_Gram(Gram_Six(turned_lattice), self.gram_mean, self.gram_scale)
         return TrainingBatch(
             {
                 "log_density_values": np.asarray(augmented_density, dtype=np.float32)[None],
-                "gram_vector": drawn.gram_vector[None],
+                "gram_vector": np.asarray(gram_vector, dtype=np.float32)[None],
                 "targets": np.asarray(augmented_target, dtype=np.float32)[None],
             }
         )
@@ -275,7 +290,7 @@ def Train_Convolutional_Member(
     reference_density, gram_mean, gram_scale = Input_Statistics(block, training_identifiers)
     training_examples = Member_Examples(training_identifiers, block, reference_density, gram_mean, gram_scale)
     validation_examples = Member_Examples(validation_identifiers, block, reference_density, gram_mean, gram_scale)
-    batches = AugmentedMemberBatches(training_examples, validation_examples)
+    batches = AugmentedMemberBatches(training_examples, validation_examples, gram_mean, gram_scale)
 
     member = Alias_Free_Convolutional_Network(
         reference_density=reference_density,
@@ -341,7 +356,7 @@ def Cost_Probe(activation: StencilActivation, step_count: int = COST_PROBE_STEP_
     training_identifiers = block.member_train
     reference_density, gram_mean, gram_scale = Input_Statistics(block, training_identifiers)
     training_examples = Member_Examples(training_identifiers, block, reference_density, gram_mean, gram_scale)
-    batches = AugmentedMemberBatches(training_examples, training_examples[:1])
+    batches = AugmentedMemberBatches(training_examples, training_examples[:1], gram_mean, gram_scale)
 
     member = Alias_Free_Convolutional_Network(
         reference_density=reference_density,

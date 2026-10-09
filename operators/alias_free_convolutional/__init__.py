@@ -185,6 +185,22 @@ def Random_Diamond_Operation(generator: np.random.Generator) -> tuple[NDArray[np
     return operations[int(generator.integers(len(operations)))]
 
 
+def Augmented_Training_Example(
+    input_values: NDArray[np.float64],
+    target_values: NDArray[np.float64],
+    lattice: NDArray[np.float64],
+    generator: np.random.Generator,
+    cells_per_axis: int = 1,
+) -> tuple[NDArray[np.float64], NDArray[np.float64], NDArray[np.float64]]:
+    """one exact grid symmetry, drawn once and applied identically to the input, its own target and the lattice rows"""
+    matrix, translation = Random_Diamond_Operation(generator)
+    augmented_input = Apply_Grid_Operation(input_values, matrix, translation, cells_per_axis)
+    augmented_target = Apply_Grid_Operation(target_values, matrix, translation, cells_per_axis)
+    # the signed permutation that moves the grid moves the lattice rows the same way, so the metric turns with the field
+    turned_lattice = np.asarray(matrix, dtype=np.float64) @ np.asarray(lattice, dtype=np.float64)
+    return augmented_input, augmented_target, turned_lattice
+
+
 def Augmented_Training_Pair(
     input_values: NDArray[np.float64],
     target_values: NDArray[np.float64],
@@ -192,7 +208,7 @@ def Augmented_Training_Pair(
     cells_per_axis: int = 1,
 ) -> tuple[NDArray[np.float64], NDArray[np.float64]]:
     """one exact grid symmetry, drawn once and applied identically to the input and its own target"""
-    matrix, translation = Random_Diamond_Operation(generator)
-    augmented_input = Apply_Grid_Operation(input_values, matrix, translation, cells_per_axis)
-    augmented_target = Apply_Grid_Operation(target_values, matrix, translation, cells_per_axis)
+    augmented_input, augmented_target, _ = Augmented_Training_Example(
+        input_values, target_values, np.eye(3), generator, cells_per_axis
+    )
     return augmented_input, augmented_target

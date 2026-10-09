@@ -210,17 +210,38 @@ def Test_The_Separable_Form_Stores_Far_Fewer_Weights_Than_The_Full_One() -> None
 
 
 def Test_The_Separable_Kernel_Publishes_Every_Axis_As_Magnitude_And_Phase() -> None:
-    """each axis factor is one complex weight, and each is reachable as the pair it is stored as"""
+    """each axis factor is published as the conjugate-symmetric half the forward uses, as magnitude and phase and as its own pair"""
     kernel = SpectralKernel((2, 1, 1), output_channels=2, input_channels=3, seed=19, mode_mixing="separable")
     inspected = kernel.Inspect()
     for axis_name, extent in zip(("first_axis", "second_axis", "third_axis"), (5, 3, 3)):
         magnitudes = np.asarray(inspected[f"{axis_name}_mode_magnitudes"], dtype=np.float64)
         phases = np.asarray(inspected[f"{axis_name}_mode_phases"], dtype=np.float64)
-        real_part = np.asarray(inspected[f"{axis_name}_mode_weights_real"], dtype=np.float64)
-        imaginary_part = np.asarray(inspected[f"{axis_name}_mode_weights_imaginary"], dtype=np.float64)
+        effective_real = np.asarray(inspected[f"{axis_name}_effective_mode_weights_real"], dtype=np.float64)
+        effective_imaginary = np.asarray(inspected[f"{axis_name}_effective_mode_weights_imaginary"], dtype=np.float64)
+        effective = effective_real + 1j * effective_imaginary
         assert magnitudes.shape == (extent, 2, 3)
-        assert np.allclose(magnitudes * np.cos(phases), real_part)
-        assert np.allclose(magnitudes * np.sin(phases), imaginary_part)
+        assert np.allclose(magnitudes * np.cos(phases), effective_real)
+        assert np.allclose(magnitudes * np.sin(phases), effective_imaginary)
+        # the published factor is the conjugate-symmetric half, which is all the forward ever uses
+        assert np.allclose(effective, np.conj(effective[::-1]))
+        raw = np.asarray(inspected[f"{axis_name}_mode_weights_real"]) + 1j * np.asarray(
+            inspected[f"{axis_name}_mode_weights_imaginary"]
+        )
+        assert np.allclose(effective, (raw + np.conj(raw[::-1])) / 2.0)
+
+
+def Test_The_Anti_Hermitian_Half_Of_Every_Factor_Never_Reaches_The_Output() -> None:
+    """symmetrizing the stored factors changes the weights but not one output value, so that half is a null direction"""
+    kernel = SpectralKernel((2, 2, 2), output_channels=3, input_channels=2, seed=23, mode_mixing="separable")
+    generator = np.random.default_rng(29)
+    field = generator.normal(size=(2, 8, 8, 8))
+    before = np.asarray(kernel.Forward(kernel.parameter_values, field, (8, 8, 8)), dtype=np.float64)
+    raw = {name: np.array(value) for name, value in kernel.parameter_values.items()}
+    kernel.Hermitian_Symmetrize()
+    moved = max(float(np.abs(kernel.parameter_values[name] - value).max()) for name, value in raw.items())
+    assert moved > 1e-3
+    after = np.asarray(kernel.Forward(kernel.parameter_values, field, (8, 8, 8)), dtype=np.float64)
+    assert np.allclose(before, after, atol=1e-12)
 
 
 def Test_The_Assembled_Weights_Are_What_The_Factors_Add_Up_To() -> None:

@@ -345,13 +345,20 @@ class SpectralKernel(Kernel[GridFunction, GridFunction]):
 
     def Inspect(self) -> dict[str, Array]:
         state: dict[str, Array] = dict(self.parameter_values)
-        for stem in self.Weight_Shapes():
-            real_part = self.parameter_values[f"{stem}_real"]
-            imaginary_part = self.parameter_values[f"{stem}_imaginary"]
+        for stem, shape in self.Weight_Shapes().items():
             quantity = stem.removesuffix("_weights")
-            state[f"{quantity}_magnitudes"] = np.sqrt(real_part**2 + imaginary_part**2)
+            # the forward keeps only the conjugate-symmetric half of each factor, so that half is what the figures describe
+            mode_axes = tuple(range(len(shape) - 2))
+            effective = Hermitian_Mode_Part(self.Complex_Weight(self.parameter_values, stem), mode_axes)
+            effective_real = np.ascontiguousarray(np.real(effective))
+            effective_imaginary = np.ascontiguousarray(np.imag(effective))
+            axis_prefix = stem.removesuffix("mode_weights").rstrip("_")
+            effective_stem = f"{axis_prefix}_effective_mode_weights" if axis_prefix else "effective_mode_weights"
+            state[f"{effective_stem}_real"] = effective_real
+            state[f"{effective_stem}_imaginary"] = effective_imaginary
+            state[f"{quantity}_magnitudes"] = np.sqrt(effective_real**2 + effective_imaginary**2)
             # the pair is one complex weight, and its phase is half of what that weight means
-            state[f"{quantity}_phases"] = np.arctan2(imaginary_part, real_part)
+            state[f"{quantity}_phases"] = np.arctan2(effective_imaginary, effective_real)
         if self.last_output_values is not None:
             state["last_output_values"] = self.last_output_values
         if self.last_mode_gains is not None:

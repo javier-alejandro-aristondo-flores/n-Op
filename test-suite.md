@@ -636,7 +636,10 @@ load (baking them leaks test information into every twin/transfer axis). ELF sta
 potential stored raw with its spatial mean as a scalar. The core and superposed-atomic fields (AECCAR0,
 AECCAR1) are written by VASP before the first ionic step, so on relaxed runs they sit on the starting
 geometry while `positions` holds the final one; `superposed_atomic_density` is not the promolecule of
-the stored positions there, and the alloy block's SAD floor includes that mismatch.
+the stored positions there, and the alloy block's SAD floor includes that mismatch. The supercell-strain runs used ENCUT 460 eV and the
+defect campaigns 500 eV, so their fields come from different basis sets on the same grids; every ELFCAR was
+written with PREC = Normal on the coarse (wavefunction) grid, for which VASP's own ELFCAR page warns of
+wrap-around aliasing and recommends PREC = High, so the stored ELF carries that aliasing.
 **Size: ≈ 9.7 GB ≈ 8% of the 124 GB free** (core 7.9 GB + a deletable 1.5 GB floor cache). Not
 materialized: CHG, WAVECAR, PROCAR, augmentation text, alias-copy payloads, any Relaxation-Pool
 volumetrics (none exist), per-model prediction dumps (quota: metrics + ≤ 5 example fields,

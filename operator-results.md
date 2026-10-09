@@ -33,19 +33,19 @@ yet read **pending**.
 | entry | member | configuration | status | task / split / block | headline vs bar | verdict |
 |---|---|---|---|---|---|---|
 | I.1 | `factorized_fourier` | explicit | judged (localization); potential and parametric floors measured, training queued | charge_to_localization / fold 0, cubic block | MAE 0.00217 vs kill ≤ 0.0488 | pass, 97.8% better |
-| I.2 | `alias_free_convolutional` | — | parts built, member not started | charge_to_localization (planned) | pending | pending |
-| I.3 | `factorized_fourier` | weight_tied_injected | four of five rungs trained and judged; the three stability rungs for the fixed point are built, probes queued | charge_to_localization / fold 0 | MAE 0.00271 (injected), 0.00297 (plain), copy margins 56% and 52% | pass; weight-tying yes at matched parameters, no at matched width; fixed_point pending |
+| I.2 | `alias_free_convolutional` | — | built with floors and tests; twin and member not trained | charge_to_localization (planned) | pending | pending |
+| I.3 | `factorized_fourier` | weight_tied_injected | four of five rungs trained and judged; the three stability rungs for the fixed point are built, the spectral-clipping rung passed its probe and finished its six-hour run, evaluated in the ladder worktree and not yet landed | charge_to_localization / fold 0 | MAE 0.00271 (injected), 0.00297 (plain), copy margins 56% and 52% | pass; weight-tying yes at matched parameters, no at matched width; fixed_point pending |
 | I.4 | `galerkin_transformer` | width 128, 4 heads, 4 layers | killed at its stage-1 gate, one seed | lattice_to_charge / perovskite angle stratum, fold 0 (25 runs) and 27 interior arm levels | 0.1780 vs bar ≤ 0.0426 (copy 0.0853); 0.1191 vs bar ≤ 0.0132 (interpolation 0.0264) | killed by its own pre-registration after three defects were fixed; tied with the training-mean field (0.1755); stage 2 not run |
 | II.1 | `deep_operator_network` | principal_component | finished | strain_to_charge / 40³ block, cheap functional | 0.000821 vs ridge kill ≤ 0.003105 (25% better) | pass, 14 of 14 |
 | II.2 | `multiple_input_operator_network` | two_branch (and its density-alone twin) | killed on its decisive bar, one seed | charge_and_potential_to_localization / paired_fields_fivefold / fold 0, 29 units | MAE 0.016454 vs its twin's 0.014553 (needed 5% better, is 13.1% worse); pattern rule vs ridge 0.097618 passed | killed: the potential branch adds nothing at matched budget; a repaired member |
 | II.3 | `nonlinear_manifold_decoder` | canonical | killed, one seed | strain_to_charge / 423 interior arm levels (and the committed split, 22 units) | 0.002452 vs bar ≤ 0.000607 (bracketing interpolation 0.000911) | killed on the interpolation bar, as pre-registered and as the canon predicted; grid transfer a narrow miss (1.32× vs 1.3×) |
 | II.4 | `factorized_fourier` | parametric | built with floors measured, training queued | strain_to_charge, parametric / interior levels | floor 0.091% vs kill ≤ 0.064% | pending, not yet trained |
-| III.1 | `deep_dft` | — | parts built, member not started | structure_to_charge_defects (planned) | pending | pending |
-| III.3 | `gaussian_plane_wave` | — | not started; no package exists yet | structure → charge (planned) | pending | pending |
+| III.1 | `deep_dft` | — | built with floors (superposed-atomic-density, reduced-SALTED, nearest-structure copy); not trained | structure_to_charge_defects (planned) | pending | pending |
+| III.3 | `gaussian_plane_wave` | — | a stub package exists; not built | structure → charge (planned) | pending | pending |
 | IV.1 | `residual_correction` | projection_backbone | judged, one seed | cheap_to_accurate_charge / strain_atlas_holdout / test, 22 orbits | 0.002079 vs kill ≤ 0.005565 (identity 0.011131) | pass the canon kill; 406× worse than the closed-form ridge, so nothing gained over linear regression |
 | IV.2 | — | — | not started | cheap_to_accurate_states (planned) | pending | pending |
 | IV.3 | `wrappers` (`ConformalCalibrator`) | level 0.90, orbit unit | applied to IV.1 | cheap_to_accurate_charge / test orbits | coverage 0.977 vs guaranteed 0.900–0.942 | valid, over-covering (conservative) |
-| V.1 | `codomain_attention` | — | parts built, member not started | field_completion (planned) | pending | pending |
+| V.1 | `codomain_attention` | — | built with floors; the pretraining run stopped at stage 0 (2,800 of 2,828 steps) on 18 September, never judged | field_completion (planned) | pending | pending |
 | VI.1 | `deep_operator_network` | energy_trunk | finished | strain_to_states / 248 test runs, 30 orbits | curve L1 0.206 vs ridge 0.368 | pass, 44% better |
 
 ---
@@ -117,7 +117,7 @@ sweep behind every row, the five-fold protocol once for the final table.
 
 ## I.2 — Convolutional neural operator · charge density → electron localization (and → local potential)
 
-**Status: parts built, member not started.** The multi-scale composition with exact spectral
+**Status: built with floors and tests; twin and member not trained.** The multi-scale composition with exact spectral
 resampling exists (`operators/compositions/multi_scale.py`); the fused activation-resampling kernel
 with its own gradient rule — the entry's identity, mandatory because naive autodiff materializes
 the doubled grid and exhausts the card — does not. Floors: shares I.1's, already measured on the
@@ -129,8 +129,9 @@ much under grid shift) is not built.
 ## I.3 — Deep-equilibrium Fourier operator, with the weight-tied ladder · charge density → electron localization, computed as a fixed point
 
 **Status: four of five rungs trained and judged; the fixed-point rung's three canon stability rungs
-are built and tested (spectral clipping, a Jacobian penalty, a normalized parametrization), their
-probes queued on the card.** Lives in `operators/factorized_fourier/` as configurations of one factory, the
+are built and tested (spectral clipping, a Jacobian penalty, a normalized parametrization); the
+spectral-clipping rung passed its probe and finished its six-hour run, evaluated in the ladder worktree
+and not yet landed.** Lives in `operators/factorized_fourier/` as configurations of one factory, the
 canon's own design. The experiment is the decomposition curve explicit → weight-tied → fixed point,
 isolating what weight sharing buys from what implicit depth buys; "weight-tying yes, deep
 equilibrium no" is a legitimate verdict.
@@ -362,7 +363,7 @@ two three-dimensional sweeps) is report-local data until the variant survives.
 
 ## III.1 — DeepDFT · atomic structure → charge density (and magnetization), queryable anywhere
 
-**Status: parts built, member not started.** `AtomEmbedding` (keyed by element and
+**Status: built with floors; not trained.** `AtomEmbedding` (keyed by element and
 pseudopotential title, never element alone), the continuous displacement kernel, periodic radius
 graphs by cell height, and the superposed-atomic-density floor (Stage-0) exist. Kills: 10× the
 superposed-density floor; 3× the reduced isotropic kernel-ridge floor; moments within 5% with the
@@ -372,7 +373,7 @@ right sign on 90% of magnetic runs. Named schedule risk: scatter-add throughput.
 
 ## III.3 — Gaussian plane-wave neural operator · atomic structure → charge density
 
-**Status: not started; no package exists yet.** Its kill benchmark *is* III.1 at matched budget,
+**Status: a stub package exists; not built.** Its kill benchmark *is* III.1 at matched budget,
 so it cannot be judged before III.1 is measured; the canon records in advance that it expects this
 entry to land redundant, and building it is what makes that prediction worth something.
 
@@ -422,7 +423,7 @@ interval of 0.900 to 0.942. Valid and conservative: it over-covers by 0.036.
 
 ## V.1 — Codomain attention · any subset of the fields → the missing fields
 
-**Status: parts built, member not started.** The whole kernel package exists
+**Status: built with floors; the pretraining run stopped part-way and was never judged.** The whole kernel package exists
 (`operators/kernels/codomain_attention/`): attention over at most eight field tokens with
 token-shared spectral query, key, value and output blocks, function-space layer norm, a
 token-shared local term, a max-shifted softmax; parameter count independent of the token count.

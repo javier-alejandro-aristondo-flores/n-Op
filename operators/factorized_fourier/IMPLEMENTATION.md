@@ -61,9 +61,7 @@ and `gram_standardization_scale`) — built directly at the coarse resolution, n
 because a spatially constant channel is unchanged by spectral truncation to round-off.
 
 **Truncate-then-lift.** The two log-compressed channels are truncated from the fine grid to the
-processing grid by `Resampled_To_Shape`, a local twin of `operators.compositions.multi_scale.
-Spectral_Resampled` (not yet exported from that package's root — flagged to the integrator; every
-other production module in this package still imports only through package roots). A pointwise
+processing grid by `operators.compositions.Spectral_Resampled`, imported through the package root. A pointwise
 affine lift commutes exactly with spectral truncation — truncation acts on space, the lift on
 channels, and the lift's bias is the field's own zero mode, which truncation always keeps — so
 truncating the eight raw channels first and lifting after costs an eighth of lifting first and
@@ -151,10 +149,9 @@ written against negative axis indices and einsum ellipses), but the lift and the
 so a step loops over the one or two examples of a batch in the loss closure and averages, rather
 than carrying a batch axis through the member itself.
 
-**Floors, recomputed.** `report.py` replicates `operators.data.stage0`'s `Eighty_Cubed_Block`,
-`Elf_Ridge_Lines` and `Shell_Filter_Lines` recipes locally (two more names not exported from that
-package's root for a caller outside `operators.data`: `Apply_Per_Shell_Filter` and
-`Spectral_Gradient_Magnitude_And_Laplacian`), on the identical block (recounted at 261 train runs
+**Floors, recomputed.** `report.py` reads the block and the floor recipes from `operators.evaluation`
+(`CubicBlock`, `Elf_Ridge_Rows`, `Shell_Filter_Rows`, `Training_Mean_Rows`, `Nearest_Run_Rows`), promoted
+there from the stage-zero originals, on the identical block (recounted at 261 train runs
 across folds one through four, 76 evaluation runs in fold zero, matching stage zero exactly),
 scored on all three of the card's metrics and on both spin channels, aggregated to the exchangeable
 split unit before every median. Recomputed: ridge floor unit-median mean absolute error `0.0976`
@@ -193,7 +190,8 @@ configuration (twelve layers, each its own kernel and local linear map); `weight
 | `encoder.lift_weights` | `(64, 8)` | `Render_Matrix` |
 | `encoder.lift_biases` | `(64,)` | `Render_Bars` |
 | `composition.layer_{n}.kernel.{axis}_mode_weights_real` / `_imaginary` | `(39, 64, 64)` per named axis | `Render_Field_Slices` |
-| `composition.layer_{n}.kernel.{axis}_mode_magnitudes` / `_phases` | `(39, 64, 64)` per named axis | `Render_Field_Slices` |
+| `composition.layer_{n}.kernel.{axis}_effective_mode_weights_real` / `_imaginary` | `(39, 64, 64)` per named axis: the Hermitian-symmetric half of the factor, (W(k) + conj W(−k))/2, which is all the forward uses | `Render_Field_Slices` |
+| `composition.layer_{n}.kernel.{axis}_mode_magnitudes` / `_phases` | `(39, 64, 64)` per named axis, of the effective (Hermitian-symmetric) factor, not of the raw stored halves | `Render_Field_Slices` |
 | `composition.layer_{n}.kernel.gain_layer_0_weights` / `_biases` | `(8, 1)` / `(8,)`, metric-aware only (the potential task) | `Render_Matrix` / `Render_Bars` |
 | `composition.layer_{n}.kernel.gain_layer_1_weights` / `_biases` | `(64, 8)` / `(64,)`, metric-aware only | `Render_Matrix` / `Render_Bars` |
 | `composition.layer_{n}.kernel.last_output_values` | `(64, *output_shape)`, only once `Integrate()` is called directly on that kernel object -- the member's own forward path never does | `Render_Field_Sheet` |
@@ -208,7 +206,8 @@ configuration (twelve layers, each its own kernel and local linear map); `weight
 | `gram_standardization_mean` | `(6,)` | `Render_Bars` |
 | `gram_standardization_scale` | `(6,)` | `Render_Bars` |
 | `last_gram_vector` | `(6,)`, after a numpy call | `Render_Bars` |
-| `last_predicted_values` | `(2, *processing_shape)`, after a numpy call | `Render_Field_Sheet` |
+| `last_predicted_values` | `(2, *requested_grid)`, after a numpy call, on whatever grid the call asked for (the cached suite holds the 80³ super-resolution call's) | `Render_Field_Sheet` |
+| `initial_scale` | `()`, every configuration (1.0 unless the configuration scales its shared layer at construction) | scalar panel |
 | `target_scale` | `()`, potential task only | scalar panel |
 | `last_fixed_point_iterations_taken` | `()`, `fixed_point` configuration only, after a numpy call | scalar panel |
 | `last_fixed_point_final_residual` | `()`, `fixed_point` configuration only, after a numpy call | scalar panel |
@@ -223,10 +222,9 @@ Every key above is covered by the generic renderer dispatched on its rank alone
 checks the skipped list is empty on a toy member reached through its own forward path, which is why
 the direct-`Integrate()`-only and direct-`Apply()`-only keys above are not exercised by that
 particular test -- they share the same rank-dispatched renderers as the keys it does cover, since
-`Render_One_Array` dispatches on rank alone, blind to the name. The report's own figure suite
-additionally draws a per-layer mode-magnitude spectrum through `Render_Spectrum`, radius-ordered
-from the zero mode out to mode 19 — the last point on that plot is, by construction, the coarse
-grid's own Nyquist edge, which is where the truncation from the 80³ input stops.
+`Render_One_Array` dispatches on rank alone, blind to the name. No radial mode-magnitude spectrum is
+drawn; the per-axis magnitude and phase figures draw each factor's Hermitian-symmetric half, which
+is all the forward uses (the stored anti-Hermitian half never trains).
 
 **The stability rungs' own diagnostics live beside the member's, not inside it.**
 `ContractionProjection.Inspect()` (`"spectral_clipping"` only) exposes `local_bound`, `mode_bound`,

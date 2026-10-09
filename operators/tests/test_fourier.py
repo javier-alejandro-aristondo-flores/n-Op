@@ -201,10 +201,12 @@ def Test_The_Separable_Form_Stores_Far_Fewer_Weights_Than_The_Full_One() -> None
         kernel = SpectralKernel((3, 4, 5), output_channels=5, input_channels=4, mode_mixing=mode_mixing)
         assert kernel.Parameter_Count() == SpectralKernel.Parameter_Count_For((3, 4, 5), 5, 4, mode_mixing)
     # the full coarse Nyquist of a forty-cubed grid at sixty-four channels, which is the flagship's own budget
-    full = SpectralKernel.Parameter_Count_For((20, 20, 20), 64, 64, "full")
-    separable = SpectralKernel.Parameter_Count_For((20, 20, 20), 64, 64, "separable")
-    assert (full, separable) == (564_600_832, 1_007_616)
+    full = SpectralKernel.Parameter_Count_For((19, 19, 19), 64, 64, "full")
+    separable = SpectralKernel.Parameter_Count_For((19, 19, 19), 64, 64, "separable")
+    assert (full, separable) == (485_941_248, 958_464)
     assert full > 500 * separable
+    # the canon's original twenty-cubed estimate, one mode more than a forty-point axis can hold
+    assert SpectralKernel.Parameter_Count_For((20, 20, 20), 64, 64, "separable") == 1_007_616
 
 
 def Test_The_Separable_Kernel_Publishes_Every_Axis_As_Magnitude_And_Phase() -> None:

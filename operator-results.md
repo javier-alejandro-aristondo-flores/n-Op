@@ -59,8 +59,9 @@ floors measured, training queued (II.4).** Package `operators/factorized_fourier
 Assembly as built: per-spin log-compressed densities plus six lattice Gram-matrix channels on the
 fine 80³ grid → truncation to 40³ (exact, before the lift, since a pointwise linear lift commutes
 with spectral truncation) → twelve factorized spectral layers at the full coarse Nyquist (19 modes
-per axis; the canon's "20³" is one more than a 40-point axis can hold) at width 64, 11.55M
-parameters → bounded head 1/(1 + softplus²). Trained on folds 2–4 (196 runs), early-stopped on fold
+per axis; the canon's "20³" is one more than a 40-point axis can hold) at width 64, 11.55M stored
+parameters of which 5.80M are live (the anti-Hermitian half of each spectral factor never trains;
+see the member's report) → bounded head 1/(1 + softplus²). Trained on folds 2–4 (196 runs), early-stopped on fold
 1 (65 runs, 24 units), judged on fold 0 (76 runs, 29 units) of the cubic block, which no training or
 model selection touched. Batch 1, single precision on the card, one seed.
 
@@ -136,10 +137,10 @@ equilibrium no" is a legitimate verdict.
 
 | rung | parameters | steps | wall-clock | peak card memory | validation loss | mean absolute error | verdict on the five levels |
 |---|---|---|---|---|---|---|---|
-| explicit, twelve layers | 11.55M | 24,404 | 3.94 h | 3.6 GB | 8.0e-5 | 0.00217 | all pass |
-| weight-tied, one layer applied twelve times (no input injection) | 0.96M | 23,804 | 2.69 h | 3.2 GB | 1.2e-4 | 0.00297 | all pass; copy margin 52% |
-| explicit, one layer — the exact matched-parameter comparator | 0.96M | 35,505 (full budget, still improving) | 0.52 h | 0.7 GB | 3.9e-4 | 0.01004 | canon levels pass; fails the copy and the stretch |
-| weight-tied with input injection — the fixed point's exact unrolled counterpart | 0.96M | 28,504 | resumed across two power losses | 3.5 GB | 1.0e-4 | 0.00271 | all pass; copy margin 56% |
+| explicit, twelve layers | 11.55M stored, 5.80M live | 24,404 | 3.94 h | 3.6 GB | 8.0e-5 | 0.00217 | all pass |
+| weight-tied, one layer applied twelve times (no input injection) | 0.96M stored, 0.48M live | 23,804 | 2.69 h | 3.2 GB | 1.2e-4 | 0.00297 | all pass; copy margin 52% |
+| explicit, one layer — the exact matched-parameter comparator | 0.96M stored, 0.48M live | 35,505 (full budget, still improving) | 0.52 h | 0.7 GB | 3.9e-4 | 0.01004 | canon levels pass; fails the copy and the stretch |
+| weight-tied with input injection — the fixed point's exact unrolled counterpart | 0.96M stored, 0.48M live | 28,504 | resumed across two power losses | 3.5 GB | 1.0e-4 | 0.00271 | all pass; copy margin 56% |
 | fixed point (phantom gradient, depth 3) | 0.96M | — | — | — | — | — | pending |
 
 Reading so far: re-applying one layer twelve times beats applying it once by more than three to one

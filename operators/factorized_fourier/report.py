@@ -825,6 +825,25 @@ def Rung_Parameter_Count(configuration: FactorizedFourierConfiguration, layer_co
     return sum(value.size for value in member.Parameter_Values().values())
 
 
+def Live_Parameter_Count(configuration: FactorizedFourierConfiguration, layer_count: int) -> int:
+    """one rung's parameters that training can move: half of every spectral factor is a null direction of the forward"""
+    member = Factorized_Fourier_Network(
+        hidden_channels=HIDDEN_CHANNELS,
+        kept_modes=(KEPT_MODE, KEPT_MODE, KEPT_MODE),
+        layer_count=layer_count,
+        reference_density=1.0,
+        gram_mean=np.zeros(GRAM_CHANNEL_COUNT),
+        gram_scale=np.ones(GRAM_CHANNEL_COUNT),
+        processing_shape=COARSE_SHAPE,
+        configuration=configuration,
+    )
+    live = 0
+    for name, value in member.Parameter_Values().items():
+        # the forward keeps only the hermitian-symmetric half of each mode weight pair, so the other half never trains
+        live += value.size // 2 if "mode_weights" in name else value.size
+    return live
+
+
 def Deep_Equilibrium_Ladder_Lines() -> list[str]:
     """the I.3 ladder pre-registered: parameter counts of every rung, the matched-params comparator, both bars"""
     explicit_same_width = Rung_Parameter_Count("explicit", LAYER_COUNT)
@@ -833,6 +852,9 @@ def Deep_Equilibrium_Ladder_Lines() -> list[str]:
     matched_params_layer_count = 1
     explicit_matched_params = Rung_Parameter_Count("explicit", matched_params_layer_count)
     assert explicit_matched_params == tied_and_fixed_point
+    explicit_live = Live_Parameter_Count("explicit", LAYER_COUNT)
+    tied_live = Live_Parameter_Count("weight_tied", LAYER_COUNT)
+    matched_live = Live_Parameter_Count("explicit", matched_params_layer_count)
     return [
         "## The deep-equilibrium ladder (canon I.3), pre-registered before any rung is trained",
         "",
@@ -853,6 +875,16 @@ def Deep_Equilibrium_Ladder_Lines() -> list[str]:
         " (exact match to the tied block, not merely approximate: one explicit layer at this width has precisely"
         " the shared layer's own count)",
         "```",
+        "",
+        "**Live counts.** The spectral kernel stores both halves of each conjugate mode pair, and the forward keeps"
+        " only the Hermitian-symmetric half, (W(k) + conj W(−k))/2 (`Hermitian_Mode_Part`), so the anti-Hermitian"
+        " half of every factor, including the imaginary part at the zero mode, never receives a gradient and stays"
+        " at its initialization (measured on the trained explicit checkpoint on 9 October 2026: that half sits at"
+        " the initialization spread 3.70e-5 while the trained half sits at 0.06–0.08). Of the stored counts above,"
+        f" {explicit_live:,} (explicit), {tied_live:,} (weight_tied and fixed_point) and {matched_live:,} (explicit,"
+        " matched params) are live: half of each kernel's numbers plus every local, lift and readout weight. The"
+        " ratios between rungs are unchanged by the halving, and so is every prediction; the stored counts are what"
+        " the checkpoints hold.",
         "",
         "**Stability escalation.** The primitive (`operators.compositions.fixed_point.FixedPoint`) implements"
         " damping and Anderson acceleration (history depth, regularization, a condition-number ceiling that"

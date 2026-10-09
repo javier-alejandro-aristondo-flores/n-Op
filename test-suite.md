@@ -150,7 +150,9 @@ decades; dynamic range is the Gibbs driver); ELF head 1/(1+softplus²) matching 
 form; 6 Gram-matrix channels + per-mode |k_phys|² spectral features (non-orthogonal cells; for
 ρ→V the metric is mandatory: V_H(k) = 4πρ(k)/|k|²). Config: width 64, 12 layers, modes 19³ (the
 full Nyquist a 40-point axis holds: 2K+1 ≤ 40, the unpaired Nyquist bin excluded; 11.55M params as
-built). Vanilla-FNO comparator (w32, 4 layers, 12³ modes, 56.6M) kept as the
+built, 5.80M of them live: the kernel stores both halves of each conjugate mode pair and the forward uses
+only the Hermitian-symmetric half). Vanilla-FNO comparator (w32, 4 layers, 12³ modes, 56.6M stored, half
+live) kept as the
 capacity ablation. Two free exact constraints at inference: predicted densities renormalized to
 the run's electron count; the potential head's uniform (G=0) mode pinned to zero, matching the
 gauge convention (§9.4).

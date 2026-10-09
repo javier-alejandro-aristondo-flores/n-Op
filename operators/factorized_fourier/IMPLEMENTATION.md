@@ -81,7 +81,11 @@ before it was built: `958,464` real numbers per layer's kernel in the separable 
 `485,941,248` the same modes would cost in the full (non-factorized) form — roughly five hundred
 times more, the reason this member is named for the factorized kernel. With the local linear term
 (`4,160`), the lift (`576`) and the readout (`130`), the whole assembly totals **11,552,194**
-parameters (confirmed by construction, not only by the formula).
+parameters (confirmed by construction, not only by the formula). Of these, 5,750,784 — the
+anti-Hermitian half of every kernel factor, including the imaginary part at the zero mode — are exact
+null directions of the forward: `Hermitian_Mode_Part` keeps only (W(k) + conj W(−k))/2, so they never
+receive a gradient and stay at their initialization (measured on the trained checkpoint, 9 October
+2026). The live count is **5,801,410**; the stored count is what the checkpoints hold.
 
 **Readout.** `PointwiseProjection(output_channels=2, hidden_channels=64, bounded=True)`, the head
 `1 / (1 + softplus(x)²)` the readout package already implements.

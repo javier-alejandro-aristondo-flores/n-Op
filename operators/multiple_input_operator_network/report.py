@@ -148,7 +148,7 @@ def Architecture_Lines() -> tuple[list[str], int, int]:
         f" {twin_parameter_count} parameters** (the twin's density branch, channel head and trunk are seeded"
         " identically to the member's own; only the potential branch is absent).",
         "",
-        "Proper-orthogonal basis decay, fit on 64 of the pooled floor-training runs (a report-scale sample kept"
+        "Proper-orthogonal basis decay, fit on 242 of the pooled floor-training runs (a per-fold limit of 64 applied before the cubic-shape filter, so 58 + 63 + 60 + 61 runs; a report-scale sample kept"
         " small for this section's own timing; the parameter counts above depend only on the fixed rank, not"
         " on which runs the fit used):",
         "",

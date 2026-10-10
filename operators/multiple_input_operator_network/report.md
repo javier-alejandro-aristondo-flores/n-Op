@@ -15,7 +15,7 @@ counted directly from `operators.evaluation.CubicBlock`, the same promoted parti
 
 Two `SensorEncoder((32, 128, 128))` branches over rank-32 proper-orthogonal coefficients of the log-compressed spin densities and of the mean-removed spin potentials, combined by an elementwise product in the shared 128-wide latent, split into two 128-wide per-channel rows by one learned channel head, read out by a shared `BasisExpansion(128, (256, 256, 256))` trunk with a bounded zero-to-one head. **Two-branch member: 245632 parameters. Density-alone twin: 224896 parameters** (the twin's density branch, channel head and trunk are seeded identically to the member's own; only the potential branch is absent).
 
-Proper-orthogonal basis decay, fit on 64 of the pooled floor-training runs (a report-scale sample kept small for this section's own timing; the parameter counts above depend only on the fixed rank, not on which runs the fit used):
+Proper-orthogonal basis decay, fit on 242 of the pooled floor-training runs (a per-fold limit of 64 applied before the cubic-shape filter, so 58 + 63 + 60 + 61 runs; a report-scale sample kept small for this section's own timing; the parameter counts above depend only on the fixed rank, not on which runs the fit used):
 
 | branch | gate passed | gate rank | error at rank 8 | error at rank 16 | error at rank 32 |
 |---|---|---|---|---|---|

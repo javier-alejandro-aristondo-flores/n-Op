@@ -538,10 +538,12 @@ def Write_Evaluation_Figures(
         FIGURES_PATH / "fold_0" / "error_by_campaign.png",
         "electron localization fold 0 evaluation error by campaign (mean absolute error)",
     )
+    # the dashed level is the pre-registered pass level of each bar, not the floor itself
+    required = {"semilocal_ridge_floor": PATTERN_RULE_MARGIN, "density_alone_twin": DECISIVE_TWIN_MARGIN}
     Render_Floor_Comparison(
         floor_medians,
         member_median,
-        {name: 0.0 for name in floor_medians},
+        {name: required.get(name, 0.0) for name in floor_medians},
         FIGURES_PATH / "fold_0" / "floors.png",
         "electron localization fold 0 against its floors and the density-alone twin (mean absolute error)",
     )

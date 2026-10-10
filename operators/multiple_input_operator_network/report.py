@@ -581,6 +581,7 @@ def Training_Lines(run_name: str, label: str) -> list[str]:
 
 def Evaluation_Lines(
     block: CubicBlock,
+    floor_medians: dict[str, float],
 ) -> tuple[list[str], tuple[ResultRow, ...], tuple[VerdictRow, ...]]:
     """the trained member's and twin's own result on fold 0, the two verdicts, or a placeholder before either exists"""
     try:
@@ -615,10 +616,11 @@ def Evaluation_Lines(
         member_rows, twin_rows, "mean_absolute_error", "density_alone_twin", DECISIVE_TWIN_MARGIN, "decisive_vs_twin"
     )
     block_signature = Block_Signature({block.unit_of[identifier] for identifier in block.evaluation})
+    # every floor the report tabulates, plus the twin, so the figure shows what its title names
     figures_written = Write_Evaluation_Figures(
         member,
         member_rows,
-        {"semilocal_ridge_floor": pattern_rule.floor_median, "density_alone_twin": decisive.floor_median},
+        {**floor_medians, "semilocal_ridge_floor": pattern_rule.floor_median, "density_alone_twin": decisive.floor_median},
         decisive.member_median,
     )
     member_mae = next(
@@ -730,7 +732,13 @@ def Main() -> int:
     block = CubicBlock()
     architecture_lines, member_parameter_count, twin_parameter_count = Architecture_Lines()
     ridge_summary, filter_summary, mean_summary, copy_summary, bars = Floor_Summaries(block)
-    evaluation_lines, evaluation_rows, evaluation_verdicts = Evaluation_Lines(block)
+    floor_medians = {
+        "semilocal_ridge_floor": ridge_summary.median,
+        "per_shell_filter_floor": filter_summary.median,
+        "training_mean_trivial_floor": mean_summary.median,
+        "nearest_run_copy_floor": copy_summary.median,
+    }
+    evaluation_lines, evaluation_rows, evaluation_verdicts = Evaluation_Lines(block, floor_medians)
     member_mae_median = Metric_Median(evaluation_rows, "member", "mean_absolute_error")
     twin_mae_median = Metric_Median(evaluation_rows, "twin", "mean_absolute_error")
     standing_context_lines: list[str] = []

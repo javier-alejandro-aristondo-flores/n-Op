@@ -1319,7 +1319,7 @@ def Elf_Evaluation_Lines(
     return [
         f"## The member's own result (electron localization, fold 0, {configuration_label})",
         "",
-        f"Loaded from `{checkpoint_path.name}`: {progress.completed_steps} completed steps, best validation score"
+        f"Loaded from `{checkpoint_path.name}`: {progress.completed_steps} completed steps in this final stage, best validation score"
         f" {progress.best_score:.6f} at step {progress.best_step}."
         + Stage_Best_Sentence(checkpoint_path),
         "",
@@ -1548,7 +1548,7 @@ def Fixed_Point_Health_Lines(rung: Stabilization, run_name: str) -> list[str]:
     return [
         f"### {label}: health floor",
         "",
-        f"Loaded from `{checkpoint_path.name}`: {progress.completed_steps} completed steps, best validation score"
+        f"Loaded from `{checkpoint_path.name}`: {progress.completed_steps} completed steps in this final stage, best validation score"
         f" {progress.best_score:.6f} at step {progress.best_step}.",
         "",
         "```",

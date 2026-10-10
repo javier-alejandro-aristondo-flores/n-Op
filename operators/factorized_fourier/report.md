@@ -66,7 +66,7 @@ Every level is absolute mean absolute error; a lower number is stricter. The fir
 
 ## The member's own result (electron localization, fold 0, explicit stack)
 
-Loaded from `elf_fold0_explicit_35505_stage2_checkpoint.npz`: 3100 completed steps, best validation score 0.000081 at step 1600. The best validation score over all 3 stages was 0.000080, in stage 1 at its step 8400; the staged trainer returned the last stage's best rather than the best of all stages until the fix of 9 October 2026, so this checkpoint is stage 2's.
+Loaded from `elf_fold0_explicit_35505_stage2_checkpoint.npz`: 3100 completed steps in this final stage, best validation score 0.000081 at step 1600. The best validation score over all 3 stages was 0.000080, in stage 1 at its step 8400; the staged trainer returned the last stage's best rather than the best of all stages until the fix of 9 October 2026, so this checkpoint is stage 2's.
 
 ### three caveats before trusting this number
 

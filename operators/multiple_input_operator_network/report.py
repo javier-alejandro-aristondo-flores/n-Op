@@ -714,7 +714,8 @@ def Evaluation_Lines(
                 task=TASK_NAME,
                 split="paired_fields_fivefold",
                 block="fold_0",
-                group=comparison.group_name,
+                # a verdict is filed under the row it judges, so the cross-member table can attach it
+                group="member",
             ),
             comparison=comparison,
         )

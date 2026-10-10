@@ -732,7 +732,7 @@
    "key": {
     "block": "fold_0",
     "configuration": "rank32_latent128_trunk3x256",
-    "group": "pattern_rule_vs_semilocal_ridge",
+    "group": "member",
     "member": "multiple_input_operator_network",
     "split": "paired_fields_fivefold",
     "task": "charge_and_potential_to_localization"
@@ -752,7 +752,7 @@
    "key": {
     "block": "fold_0",
     "configuration": "rank32_latent128_trunk3x256",
-    "group": "decisive_vs_twin",
+    "group": "member",
     "member": "multiple_input_operator_network",
     "split": "paired_fields_fivefold",
     "task": "charge_and_potential_to_localization"

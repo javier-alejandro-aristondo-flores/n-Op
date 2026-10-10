@@ -1,0 +1,4 @@
+[    2.8s] cheap principal_component: 0.000821 on 22 units (reported 0.000821); 8 branch arrays from the cache; basis refit vs cached modes, largest gap up to sign 0.00e+00
+[    3.3s] cheap proper_orthogonal: 0.000819 on 22 units (reported 0.000819); 8 branch arrays from the cache; basis refit vs cached modes, largest gap up to sign 0.00e+00
+[    5.0s] accurate principal_component: 0.001092 on 22 units (reported 0.001092); 8 branch arrays from the cache; basis refit vs cached modes, largest gap up to sign 0.00e+00
+[    5.4s] accurate proper_orthogonal: 0.001122 on 22 units (reported 0.001122); 8 branch arrays from the cache; basis refit vs cached modes, largest gap up to sign 0.00e+00

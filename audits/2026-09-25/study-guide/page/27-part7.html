@@ -1,0 +1,55 @@
+<section class="part" id="part-7" aria-labelledby="h-part-7">
+<h2 id="h-part-7"><span class="partno" data-nofact>Part 7</span> What broke along the way</h2>
+<div class="prose">
+<p>Most models needed a fix that showed up only on their first real run on the card. Every fix below is recorded in the commit history.</p>
+</div>
+<div class="table-wrap">
+<table>
+<thead><tr><th>Where</th><th>What went wrong</th><th>The fix</th></tr></thead>
+<tbody>
+<tr><td>the shared fixed-point code</td><td>It asked numpy to read a tensor living on the card, which numpy cannot do.</td><td>Values come to the processor only where a decision is made there.</td></tr>
+<tr><td>the shared fixed-point code</td><td>Its acceleration copied the whole state to the processor at every iteration, so the card sat mostly idle.</td><td>The state stays on the card; only small scalars cross.</td></tr>
+<tr><td>the shared fixed-point code</td><td>It never fed the input back in, so every input reached the same fixed point and the model could only output a constant.</td><td>The input is injected at every iteration.</td></tr>
+<tr><td>the shared fixed-point code</td><td>Its stopping tolerance was absolute, so on a large state it demanded parts-per-million agreement and never stopped early.</td><td>The tolerance is relative to the state's size.</td></tr>
+<tr><td>the shared fixed-point code</td><td>The shared layer did not contract at its default initialization, so the solve never converged.</td><td>Three stability rungs were built; spectral clipping held.</td></tr>
+<tr><td>the trainer</td><td>It loaded every validation batch onto the card at once and ran out of memory on a model with many validation units.</td><td>Validation units stay on the processor and move to the card one at a time.</td></tr>
+<tr><td>codomain attention</td><td>Its stack's saved intermediates needed more memory than the card has.</td><td>Each layer rebuilds its intermediates during the backward pass.</td></tr>
+<tr><td>the Galerkin transformer</td><td>Its decoder's queries carried only coordinates, so it learned to ignore the lattice factors.</td><td>The queries are conditioned on the factors.</td></tr>
+<tr><td>the Galerkin transformer</td><td>The electron-count correction sat inside the training loss.</td><td>The correction runs at prediction time only.</td></tr>
+<tr><td>the Galerkin transformer</td><td>The density's spikes at the atomic cores owned the squared error.</td><td>The target is standardized voxel by voxel.</td></tr>
+<tr><td>the two-input network</td><td>Raw potential coefficients, about 48 times the density's scale, pinned the bounded head at zero with no gradient.</td><td>Each coefficient is standardized with training-fold statistics.</td></tr>
+<tr><td>the two-input network</td><td>Its cost probe ran on a cold cache for the twin and a warm one for the member, so their budgets came out unequal.</td><td>Both train for the same 33,650-step budget.</td></tr>
+<tr><td>the branch–trunk network, perovskite</td><td>One configuration projected standardized fields onto a basis fit on raw ones.</td><td>Each configuration builds its own basis; a regression test pins it.</td></tr>
+</tbody>
+</table>
+</div>
+<div class="prose">
+<p>The lesson the project drew: every model's first act on the card became a short sanity check that its validation score moves and beats its own trivial baseline, before any long run.</p>
+<h3>How the work ran</h3>
+<ul>
+<li>Models were written in parallel by separate agents, each in its own copy of the repository, and landed one at a time through a single integrator that ran the full test suite on every landing.</li>
+<li>The card ran one job at a time; evaluation ran on the processor beside it.</li>
+<li>The laptop lost power more than once during runs, so every stage checkpoints and resumes. A guard paused card jobs whenever the laptop went onto battery.</li>
+</ul>
+</div>
+<check part="7">
+<q>Why did the first fixed-point runs output a constant?</q>
+<a>The solver never fed the input back in, so every input converged to the same fixed point, which depended only on the weights.</a>
+<src>commit 7d359b9</src>
+</check>
+<check part="7">
+<q>Why did the two-input network's first run never train?</q>
+<a>The potential's coefficients entered in raw units, about 48 times the density's scale. That saturated the bounded head at exactly zero, so no gradient flowed from the first step.</a>
+<src>commit 20ef323; operator-results.md, section II.2</src>
+</check>
+<check part="7">
+<q>Name the Galerkin transformer's three defects.</q>
+<a>Decoder queries blind to the lattice factors; the electron-count correction inside the training loss; and a loss dominated by spikes at the atomic cores.</a>
+<src>commits b814821, c7bf891, 19ca291</src>
+</check>
+<check part="7">
+<q>What sanity check became every model's first act on the card?</q>
+<a>A short run confirming that the validation score moves and beats the model's own trivial baseline.</a>
+<src>The sweep log, 17 September</src>
+</check>
+</section>

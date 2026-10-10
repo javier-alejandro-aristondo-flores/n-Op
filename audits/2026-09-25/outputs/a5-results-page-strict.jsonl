@@ -1,0 +1,250 @@
+{"line": 19, "member": null, "number": "35%", "traced": false, "context": "member measured a seed spread of 14\u201335% of the median on its own task, so no few-percent"}
+{"line": 35, "member": "factorized_fourier", "number": "0.00217", "traced": true, "context": "| I.1 | `factorized_fourier` | explicit | judged (localization); potential and parametric floors measured, training queu"}
+{"line": 35, "member": "factorized_fourier", "number": "0.0488", "traced": true, "context": "| I.1 | `factorized_fourier` | explicit | judged (localization); potential and parametric floors measured, training queu"}
+{"line": 35, "member": "factorized_fourier", "number": "97.8%", "traced": true, "context": "| I.1 | `factorized_fourier` | explicit | judged (localization); potential and parametric floors measured, training queu"}
+{"line": 37, "member": "factorized_fourier", "number": "0.00271", "traced": false, "context": "| I.3 | `factorized_fourier` | weight_tied_injected | four of five rungs trained and judged; the three stability rungs f"}
+{"line": 37, "member": "factorized_fourier", "number": "0.00297", "traced": false, "context": "| I.3 | `factorized_fourier` | weight_tied_injected | four of five rungs trained and judged; the three stability rungs f"}
+{"line": 37, "member": "factorized_fourier", "number": "56%", "traced": true, "context": "| I.3 | `factorized_fourier` | weight_tied_injected | four of five rungs trained and judged; the three stability rungs f"}
+{"line": 37, "member": "factorized_fourier", "number": "52%", "traced": true, "context": "| I.3 | `factorized_fourier` | weight_tied_injected | four of five rungs trained and judged; the three stability rungs f"}
+{"line": 38, "member": "galerkin_transformer", "number": "0.1780", "traced": true, "context": "| I.4 | `galerkin_transformer` | width 128, 4 heads, 4 layers | killed at its stage-1 gate, one seed | lattice_to_charge"}
+{"line": 38, "member": "galerkin_transformer", "number": "0.0426", "traced": true, "context": "| I.4 | `galerkin_transformer` | width 128, 4 heads, 4 layers | killed at its stage-1 gate, one seed | lattice_to_charge"}
+{"line": 38, "member": "galerkin_transformer", "number": "0.0853", "traced": true, "context": "| I.4 | `galerkin_transformer` | width 128, 4 heads, 4 layers | killed at its stage-1 gate, one seed | lattice_to_charge"}
+{"line": 38, "member": "galerkin_transformer", "number": "0.1191", "traced": true, "context": "| I.4 | `galerkin_transformer` | width 128, 4 heads, 4 layers | killed at its stage-1 gate, one seed | lattice_to_charge"}
+{"line": 38, "member": "galerkin_transformer", "number": "0.0132", "traced": true, "context": "| I.4 | `galerkin_transformer` | width 128, 4 heads, 4 layers | killed at its stage-1 gate, one seed | lattice_to_charge"}
+{"line": 38, "member": "galerkin_transformer", "number": "0.0264", "traced": true, "context": "| I.4 | `galerkin_transformer` | width 128, 4 heads, 4 layers | killed at its stage-1 gate, one seed | lattice_to_charge"}
+{"line": 38, "member": "galerkin_transformer", "number": "0.1755", "traced": true, "context": "| I.4 | `galerkin_transformer` | width 128, 4 heads, 4 layers | killed at its stage-1 gate, one seed | lattice_to_charge"}
+{"line": 39, "member": "deep_operator_network", "number": "0.000821", "traced": true, "context": "| II.1 | `deep_operator_network` | principal_component | finished | strain_to_charge / 40\u00b3 block, cheap functional | 0.0"}
+{"line": 39, "member": "deep_operator_network", "number": "0.003105", "traced": false, "context": "| II.1 | `deep_operator_network` | principal_component | finished | strain_to_charge / 40\u00b3 block, cheap functional | 0.0"}
+{"line": 39, "member": "deep_operator_network", "number": "25%", "traced": true, "context": "| II.1 | `deep_operator_network` | principal_component | finished | strain_to_charge / 40\u00b3 block, cheap functional | 0.0"}
+{"line": 40, "member": "multiple_input_operator_network", "number": "0.016454", "traced": true, "context": "| II.2 | `multiple_input_operator_network` | two_branch (and its density-alone twin) | killed on its decisive bar, one s"}
+{"line": 40, "member": "multiple_input_operator_network", "number": "0.014553", "traced": true, "context": "| II.2 | `multiple_input_operator_network` | two_branch (and its density-alone twin) | killed on its decisive bar, one s"}
+{"line": 40, "member": "multiple_input_operator_network", "number": "5%", "traced": true, "context": "| II.2 | `multiple_input_operator_network` | two_branch (and its density-alone twin) | killed on its decisive bar, one s"}
+{"line": 40, "member": "multiple_input_operator_network", "number": "13.1%", "traced": false, "context": "| II.2 | `multiple_input_operator_network` | two_branch (and its density-alone twin) | killed on its decisive bar, one s"}
+{"line": 40, "member": "multiple_input_operator_network", "number": "0.097618", "traced": true, "context": "| II.2 | `multiple_input_operator_network` | two_branch (and its density-alone twin) | killed on its decisive bar, one s"}
+{"line": 41, "member": "nonlinear_manifold_decoder", "number": "0.002452", "traced": true, "context": "| II.3 | `nonlinear_manifold_decoder` | canonical | killed, one seed | strain_to_charge / 423 interior arm levels (and t"}
+{"line": 41, "member": "nonlinear_manifold_decoder", "number": "0.000607", "traced": false, "context": "| II.3 | `nonlinear_manifold_decoder` | canonical | killed, one seed | strain_to_charge / 423 interior arm levels (and t"}
+{"line": 41, "member": "nonlinear_manifold_decoder", "number": "0.000911", "traced": true, "context": "| II.3 | `nonlinear_manifold_decoder` | canonical | killed, one seed | strain_to_charge / 423 interior arm levels (and t"}
+{"line": 41, "member": "nonlinear_manifold_decoder", "number": "1.32", "traced": false, "context": "| II.3 | `nonlinear_manifold_decoder` | canonical | killed, one seed | strain_to_charge / 423 interior arm levels (and t"}
+{"line": 41, "member": "nonlinear_manifold_decoder", "number": "1.3", "traced": true, "context": "| II.3 | `nonlinear_manifold_decoder` | canonical | killed, one seed | strain_to_charge / 423 interior arm levels (and t"}
+{"line": 42, "member": "factorized_fourier", "number": "0.091%", "traced": true, "context": "| II.4 | `factorized_fourier` | parametric | built with floors measured, training queued | strain_to_charge, parametric "}
+{"line": 42, "member": "factorized_fourier", "number": "0.064%", "traced": true, "context": "| II.4 | `factorized_fourier` | parametric | built with floors measured, training queued | strain_to_charge, parametric "}
+{"line": 45, "member": "residual_correction", "number": "0.002079", "traced": true, "context": "| IV.1 | `residual_correction` | projection_backbone | judged, one seed | cheap_to_accurate_charge / strain_atlas_holdou"}
+{"line": 45, "member": "residual_correction", "number": "0.005565", "traced": true, "context": "| IV.1 | `residual_correction` | projection_backbone | judged, one seed | cheap_to_accurate_charge / strain_atlas_holdou"}
+{"line": 45, "member": "residual_correction", "number": "0.011131", "traced": true, "context": "| IV.1 | `residual_correction` | projection_backbone | judged, one seed | cheap_to_accurate_charge / strain_atlas_holdou"}
+{"line": 47, "member": "residual_correction", "number": "0.90", "traced": true, "context": "| IV.3 | `wrappers` (`ConformalCalibrator`) | level 0.90, orbit unit | applied to IV.1 | cheap_to_accurate_charge / test"}
+{"line": 47, "member": "residual_correction", "number": "0.977", "traced": true, "context": "| IV.3 | `wrappers` (`ConformalCalibrator`) | level 0.90, orbit unit | applied to IV.1 | cheap_to_accurate_charge / test"}
+{"line": 47, "member": "residual_correction", "number": "0.900", "traced": true, "context": "| IV.3 | `wrappers` (`ConformalCalibrator`) | level 0.90, orbit unit | applied to IV.1 | cheap_to_accurate_charge / test"}
+{"line": 47, "member": "residual_correction", "number": "0.942", "traced": true, "context": "| IV.3 | `wrappers` (`ConformalCalibrator`) | level 0.90, orbit unit | applied to IV.1 | cheap_to_accurate_charge / test"}
+{"line": 49, "member": "deep_operator_network", "number": "0.206", "traced": true, "context": "| VI.1 | `deep_operator_network` | energy_trunk | finished | strain_to_states / 248 test runs, 30 orbits | curve L1 0.20"}
+{"line": 49, "member": "deep_operator_network", "number": "0.368", "traced": true, "context": "| VI.1 | `deep_operator_network` | energy_trunk | finished | strain_to_states / 248 test runs, 30 orbits | curve L1 0.20"}
+{"line": 49, "member": "deep_operator_network", "number": "44%", "traced": true, "context": "| VI.1 | `deep_operator_network` | energy_trunk | finished | strain_to_states / 248 test runs, 30 orbits | curve L1 0.20"}
+{"line": 62, "member": "factorized_fourier", "number": "11.55", "traced": false, "context": "per axis; the canon's \"20\u00b3\" is one more than a 40-point axis can hold) at width 64, 11.55M"}
+{"line": 71, "member": "factorized_fourier", "number": "0.0976", "traced": true, "context": "| semilocal pointwise ridge (density, gradient, Laplacian) \u2014 the canon's kill anchor | 0.0976 | \u2014 | \u2014 |"}
+{"line": 72, "member": "factorized_fourier", "number": "0.0830", "traced": true, "context": "| per-shell linear filter (a one-layer linear Fourier operator) | 0.0830 | \u2014 | \u2014 |"}
+{"line": 73, "member": "factorized_fourier", "number": "0.0160", "traced": true, "context": "| training-mean template (added) | 0.0160 | \u2014 | \u2014 |"}
+{"line": 74, "member": "factorized_fourier", "number": "0.0062", "traced": true, "context": "| nearest-training-run copy, by input distance (added, the memorization null) | 0.0062 | 0.0082 | 0.0014 |"}
+{"line": 74, "member": "factorized_fourier", "number": "0.0082", "traced": true, "context": "| nearest-training-run copy, by input distance (added, the memorization null) | 0.0062 | 0.0082 | 0.0014 |"}
+{"line": 74, "member": "factorized_fourier", "number": "0.0014", "traced": true, "context": "| nearest-training-run copy, by input distance (added, the memorization null) | 0.0062 | 0.0082 | 0.0014 |"}
+{"line": 80, "member": "factorized_fourier", "number": "3.94", "traced": false, "context": "**Result, explicit stack (24,404 steps, 3.94 h):**"}
+{"line": 84, "member": "factorized_fourier", "number": "0.00217", "traced": true, "context": "| pooled, 29 units | **0.00217** | 1.05% | 0.9998 |"}
+{"line": 84, "member": "factorized_fourier", "number": "1.05%", "traced": true, "context": "| pooled, 29 units | **0.00217** | 1.05% | 0.9998 |"}
+{"line": 84, "member": "factorized_fourier", "number": "0.9998", "traced": true, "context": "| pooled, 29 units | **0.00217** | 1.05% | 0.9998 |"}
+{"line": 85, "member": "factorized_fourier", "number": "0.00233", "traced": true, "context": "| defect set | 0.00233 | 1.35% | 0.9995 |"}
+{"line": 85, "member": "factorized_fourier", "number": "1.35%", "traced": true, "context": "| defect set | 0.00233 | 1.35% | 0.9995 |"}
+{"line": 85, "member": "factorized_fourier", "number": "0.9995", "traced": true, "context": "| defect set | 0.00233 | 1.35% | 0.9995 |"}
+{"line": 86, "member": "factorized_fourier", "number": "0.00070", "traced": true, "context": "| strains | 0.00070 | 0.26% | 0.99999 |"}
+{"line": 86, "member": "factorized_fourier", "number": "0.26%", "traced": true, "context": "| strains | 0.00070 | 0.26% | 0.99999 |"}
+{"line": 86, "member": "factorized_fourier", "number": "0.99999", "traced": true, "context": "| strains | 0.00070 | 0.26% | 0.99999 |"}
+{"line": 90, "member": "factorized_fourier", "number": "0.0488", "traced": true, "context": "| canon kill: half the semilocal ridge | \u2264 0.0488 | pass, 97.8% better than the ridge |"}
+{"line": 90, "member": "factorized_fourier", "number": "97.8%", "traced": true, "context": "| canon kill: half the semilocal ridge | \u2264 0.0488 | pass, 97.8% better than the ridge |"}
+{"line": 91, "member": "factorized_fourier", "number": "20%", "traced": true, "context": "| canon pattern rule: 20% better than the ridge | \u2264 0.0781 | pass |"}
+{"line": 91, "member": "factorized_fourier", "number": "0.0781", "traced": true, "context": "| canon pattern rule: 20% better than the ridge | \u2264 0.0781 | pass |"}
+{"line": 92, "member": "factorized_fourier", "number": "0.0160", "traced": true, "context": "| added: beat the template | < 0.0160 | pass, 86% better |"}
+{"line": 92, "member": "factorized_fourier", "number": "86%", "traced": true, "context": "| added: beat the template | < 0.0160 | pass, 86% better |"}
+{"line": 93, "member": "factorized_fourier", "number": "0.0062", "traced": true, "context": "| added: beat the nearest-run copy | < 0.0062 | pass, 65% better |"}
+{"line": 93, "member": "factorized_fourier", "number": "65%", "traced": true, "context": "| added: beat the nearest-run copy | < 0.0062 | pass, 65% better |"}
+{"line": 94, "member": "factorized_fourier", "number": "0.0080", "traced": true, "context": "| added stretch: half the template | \u2264 0.0080 | pass |"}
+{"line": 97, "member": "factorized_fourier", "number": "0.62%", "traced": true, "context": "sit within 0.62% relative L2 of the direct coarse answer. The alloy campaign carries no localization"}
+{"line": 99, "member": "factorized_fourier", "number": "3.3", "traced": true, "context": "read 3.3\u00d7 better than the defect rows because strain barely moves this field, so the defect rows"}
+{"line": 101, "member": "factorized_fourier", "number": "0.019", "traced": true, "context": "number (a 2026 hydrogen-only localization network at 0.019) is an easier problem, not a competitor."}
+{"line": 104, "member": "factorized_fourier", "number": "2.13%", "traced": true, "context": "target lives on the fine grid; the coarse trunk's own truncation ceiling is 2.13% mean-removed"}
+{"line": 107, "member": "factorized_fourier", "number": "154%", "traced": true, "context": "term alone 154%; positional climatology 60.3%; Hartree + climatology 40.3%; Hartree + semilocal"}
+{"line": 107, "member": "factorized_fourier", "number": "60.3%", "traced": true, "context": "term alone 154%; positional climatology 60.3%; Hartree + climatology 40.3%; Hartree + semilocal"}
+{"line": 107, "member": "factorized_fourier", "number": "40.3%", "traced": true, "context": "term alone 154%; positional climatology 60.3%; Hartree + climatology 40.3%; Hartree + semilocal"}
+{"line": 108, "member": "factorized_fourier", "number": "47.96%", "traced": true, "context": "exchange-correlation ridge 47.96% \u2014 the canon's anchor, so the **bar is 23.98%** (twice as good),"}
+{"line": 108, "member": "factorized_fourier", "number": "23.98%", "traced": true, "context": "exchange-correlation ridge 47.96% \u2014 the canon's anchor, so the **bar is 23.98%** (twice as good),"}
+{"line": 139, "member": "factorized_fourier", "number": "11.55", "traced": false, "context": "| explicit, twelve layers | 11.55M | 24,404 | 3.94 h | 3.6 GB | 8.0e-5 | 0.00217 | all pass |"}
+{"line": 139, "member": "factorized_fourier", "number": "3.94", "traced": false, "context": "| explicit, twelve layers | 11.55M | 24,404 | 3.94 h | 3.6 GB | 8.0e-5 | 0.00217 | all pass |"}
+{"line": 139, "member": "factorized_fourier", "number": "3.6", "traced": true, "context": "| explicit, twelve layers | 11.55M | 24,404 | 3.94 h | 3.6 GB | 8.0e-5 | 0.00217 | all pass |"}
+{"line": 139, "member": "factorized_fourier", "number": "8.0e-5", "traced": true, "context": "| explicit, twelve layers | 11.55M | 24,404 | 3.94 h | 3.6 GB | 8.0e-5 | 0.00217 | all pass |"}
+{"line": 139, "member": "factorized_fourier", "number": "0.00217", "traced": true, "context": "| explicit, twelve layers | 11.55M | 24,404 | 3.94 h | 3.6 GB | 8.0e-5 | 0.00217 | all pass |"}
+{"line": 140, "member": "factorized_fourier", "number": "0.96", "traced": true, "context": "| weight-tied, one layer applied twelve times (no input injection) | 0.96M | 23,804 | 2.69 h | 3.2 GB | 1.2e-4 | 0.00297"}
+{"line": 140, "member": "factorized_fourier", "number": "2.69", "traced": false, "context": "| weight-tied, one layer applied twelve times (no input injection) | 0.96M | 23,804 | 2.69 h | 3.2 GB | 1.2e-4 | 0.00297"}
+{"line": 140, "member": "factorized_fourier", "number": "3.2", "traced": true, "context": "| weight-tied, one layer applied twelve times (no input injection) | 0.96M | 23,804 | 2.69 h | 3.2 GB | 1.2e-4 | 0.00297"}
+{"line": 140, "member": "factorized_fourier", "number": "1.2e-4", "traced": true, "context": "| weight-tied, one layer applied twelve times (no input injection) | 0.96M | 23,804 | 2.69 h | 3.2 GB | 1.2e-4 | 0.00297"}
+{"line": 140, "member": "factorized_fourier", "number": "0.00297", "traced": false, "context": "| weight-tied, one layer applied twelve times (no input injection) | 0.96M | 23,804 | 2.69 h | 3.2 GB | 1.2e-4 | 0.00297"}
+{"line": 140, "member": "factorized_fourier", "number": "52%", "traced": true, "context": "| weight-tied, one layer applied twelve times (no input injection) | 0.96M | 23,804 | 2.69 h | 3.2 GB | 1.2e-4 | 0.00297"}
+{"line": 141, "member": "factorized_fourier", "number": "0.96", "traced": true, "context": "| explicit, one layer \u2014 the exact matched-parameter comparator | 0.96M | 35,505 (full budget, still improving) | 0.52 h "}
+{"line": 141, "member": "factorized_fourier", "number": "0.52", "traced": true, "context": "| explicit, one layer \u2014 the exact matched-parameter comparator | 0.96M | 35,505 (full budget, still improving) | 0.52 h "}
+{"line": 141, "member": "factorized_fourier", "number": "0.7", "traced": true, "context": "| explicit, one layer \u2014 the exact matched-parameter comparator | 0.96M | 35,505 (full budget, still improving) | 0.52 h "}
+{"line": 141, "member": "factorized_fourier", "number": "3.9e-4", "traced": false, "context": "| explicit, one layer \u2014 the exact matched-parameter comparator | 0.96M | 35,505 (full budget, still improving) | 0.52 h "}
+{"line": 141, "member": "factorized_fourier", "number": "0.01004", "traced": false, "context": "| explicit, one layer \u2014 the exact matched-parameter comparator | 0.96M | 35,505 (full budget, still improving) | 0.52 h "}
+{"line": 142, "member": "factorized_fourier", "number": "0.96", "traced": true, "context": "| weight-tied with input injection \u2014 the fixed point's exact unrolled counterpart | 0.96M | 28,504 | resumed across two "}
+{"line": 142, "member": "factorized_fourier", "number": "3.5", "traced": true, "context": "| weight-tied with input injection \u2014 the fixed point's exact unrolled counterpart | 0.96M | 28,504 | resumed across two "}
+{"line": 142, "member": "factorized_fourier", "number": "1.0e-4", "traced": true, "context": "| weight-tied with input injection \u2014 the fixed point's exact unrolled counterpart | 0.96M | 28,504 | resumed across two "}
+{"line": 142, "member": "factorized_fourier", "number": "0.00271", "traced": false, "context": "| weight-tied with input injection \u2014 the fixed point's exact unrolled counterpart | 0.96M | 28,504 | resumed across two "}
+{"line": 142, "member": "factorized_fourier", "number": "56%", "traced": true, "context": "| weight-tied with input injection \u2014 the fixed point's exact unrolled counterpart | 0.96M | 28,504 | resumed across two "}
+{"line": 143, "member": "factorized_fourier", "number": "0.96", "traced": true, "context": "| fixed point (phantom gradient, depth 3) | 0.96M | \u2014 | \u2014 | \u2014 | \u2014 | \u2014 | pending |"}
+{"line": 146, "member": "factorized_fourier", "number": "9%", "traced": true, "context": "at identical parameter count; injecting the input at every application buys another 9% (0.00271"}
+{"line": 146, "member": "factorized_fourier", "number": "0.00271", "traced": false, "context": "at identical parameter count; injecting the input at every application buys another 9% (0.00271"}
+{"line": 147, "member": "factorized_fourier", "number": "0.00297", "traced": false, "context": "against 0.00297; defects 0.00316, strains 0.00107); the twelve-layer stack is still a quarter better"}
+{"line": 147, "member": "factorized_fourier", "number": "0.00316", "traced": true, "context": "against 0.00297; defects 0.00316, strains 0.00107); the twelve-layer stack is still a quarter better"}
+{"line": 147, "member": "factorized_fourier", "number": "0.00107", "traced": false, "context": "against 0.00297; defects 0.00316, strains 0.00107); the twelve-layer stack is still a quarter better"}
+{"line": 152, "member": "factorized_fourier", "number": "90%", "traced": true, "context": "matched parameters) over three seeds, or be at least 3\u00d7 faster to train; health floor \u2265 90% of"}
+{"line": 153, "member": "factorized_fourier", "number": "1e-3", "traced": true, "context": "validation inputs converging to a relative residual of 1e-3 within 32 iterations (kill under 80%)."}
+{"line": 153, "member": "factorized_fourier", "number": "80%", "traced": true, "context": "validation inputs converging to a relative residual of 1e-3 within 32 iterations (kill under 80%)."}
+{"line": 161, "member": "factorized_fourier", "number": "0.1", "traced": true, "context": "the start \u2014 with the shared layer's weights scaled by 0.1 or 0.03 the solves converge at step 100"}
+{"line": 161, "member": "factorized_fourier", "number": "0.03", "traced": true, "context": "the start \u2014 with the shared layer's weights scaled by 0.1 or 0.03 the solves converge at step 100"}
+{"line": 162, "member": "factorized_fourier", "number": "0.34", "traced": true, "context": "(cap-hit 0.34, mean 22 iterations) and training drives the map back out of contractivity by step"}
+{"line": 163, "member": "factorized_fourier", "number": "0.98", "traced": true, "context": "200\u2013300 (cap-hit 0.98 \u2192 1.00) at both scales. The next rungs the canon names are builds: per-mode"}
+{"line": 163, "member": "factorized_fourier", "number": "1.00", "traced": true, "context": "200\u2013300 (cap-hit 0.98 \u2192 1.00) at both scales. The next rungs the canon names are builds: per-mode"}
+{"line": 165, "member": "factorized_fourier", "number": "3.4e-3", "traced": true, "context": "rung trains. Even at the cap the injected model learns (validation loss 3.4e-3 at step 200, better"}
+{"line": 185, "member": "galerkin_transformer", "number": "0.0853", "traced": true, "context": "| fold 0 of the angle stratum, 25 runs | nearest-angle copy, the floor | 0.0853 (bar \u2264 0.0426) |"}
+{"line": 185, "member": "galerkin_transformer", "number": "0.0426", "traced": true, "context": "| fold 0 of the angle stratum, 25 runs | nearest-angle copy, the floor | 0.0853 (bar \u2264 0.0426) |"}
+{"line": 186, "member": "galerkin_transformer", "number": "0.1755", "traced": true, "context": "| | the training-mean field (context) | 0.1755 |"}
+{"line": 187, "member": "galerkin_transformer", "number": "0.1780", "traced": true, "context": "| | **the member** | **0.1780 \u2014 killed** |"}
+{"line": 188, "member": "galerkin_transformer", "number": "0.0264", "traced": true, "context": "| 27 interior levels of the angle arm | linear-in-angle interpolation, the floor | 0.0264 (bar \u2264 0.0132) |"}
+{"line": 188, "member": "galerkin_transformer", "number": "0.0132", "traced": true, "context": "| 27 interior levels of the angle arm | linear-in-angle interpolation, the floor | 0.0264 (bar \u2264 0.0132) |"}
+{"line": 189, "member": "galerkin_transformer", "number": "0.1191", "traced": true, "context": "| | **the member** | **0.1191 \u2014 killed** |"}
+{"line": 191, "member": "galerkin_transformer", "number": "0.138", "traced": false, "context": "Run `perovskite_gate_v2_52283`: 52,283 steps in its two hours at 0.138 s per step, 1.5 GB on the"}
+{"line": 191, "member": "galerkin_transformer", "number": "1.5", "traced": false, "context": "Run `perovskite_gate_v2_52283`: 52,283 steps in its two hours at 0.138 s per step, 1.5 GB on the"}
+{"line": 193, "member": "galerkin_transformer", "number": "0.0183", "traced": true, "context": "member reaches 0.0183 on the same fold."}
+{"line": 197, "member": "galerkin_transformer", "number": "27%", "traced": true, "context": "training drove the output blind to the lattice factors (outputs for two different structures 27%"}
+{"line": 198, "member": "galerkin_transformer", "number": "4e-8", "traced": false, "context": "apart at initialization, 4e-8 apart after training; fixed by conditioning the queries on the"}
+{"line": 201, "member": "galerkin_transformer", "number": "5%", "traced": true, "context": "error (the top 5% of voxels carry 77% of it; fixed by per-voxel target standardization, the"}
+{"line": 201, "member": "galerkin_transformer", "number": "77%", "traced": true, "context": "error (the top 5% of voxels carry 77% of it; fixed by per-voxel target standardization, the"}
+{"line": 203, "member": "galerkin_transformer", "number": "14%", "traced": true, "context": "hundred steps, keeps its input dependence (14% between its two most separated evaluation runs),"}
+{"line": 231, "member": "deep_operator_network", "number": "25%", "traced": true, "context": "| ridge floor (parameters \u2192 mode coefficients); kill: beat by 25% | 0.00414 | 0.00411 |"}
+{"line": 231, "member": "deep_operator_network", "number": "0.00414", "traced": true, "context": "| ridge floor (parameters \u2192 mode coefficients); kill: beat by 25% | 0.00414 | 0.00411 |"}
+{"line": 231, "member": "deep_operator_network", "number": "0.00411", "traced": true, "context": "| ridge floor (parameters \u2192 mode coefficients); kill: beat by 25% | 0.00414 | 0.00411 |"}
+{"line": 232, "member": "deep_operator_network", "number": "0.00896", "traced": true, "context": "| nearest-neighbor field copy; kill: beat by 2\u00d7 | 0.00896 | 0.00896 |"}
+{"line": 232, "member": "deep_operator_network", "number": "0.00896", "traced": true, "context": "| nearest-neighbor field copy; kill: beat by 2\u00d7 | 0.00896 | 0.00896 |"}
+{"line": 233, "member": "deep_operator_network", "number": "0.000017", "traced": true, "context": "| rank-32 projection ceiling | 0.000017 | 0.000017 |"}
+{"line": 233, "member": "deep_operator_network", "number": "0.000017", "traced": true, "context": "| rank-32 projection ceiling | 0.000017 | 0.000017 |"}
+{"line": 234, "member": "deep_operator_network", "number": "0.000821", "traced": true, "context": "| `principal_component` | **0.000821** | **0.001092** |"}
+{"line": 234, "member": "deep_operator_network", "number": "0.001092", "traced": true, "context": "| `principal_component` | **0.000821** | **0.001092** |"}
+{"line": 235, "member": "deep_operator_network", "number": "0.000819", "traced": true, "context": "| `proper_orthogonal` | **0.000819** | **0.001122** |"}
+{"line": 235, "member": "deep_operator_network", "number": "0.001122", "traced": true, "context": "| `proper_orthogonal` | **0.000819** | **0.001122** |"}
+{"line": 236, "member": "deep_operator_network", "number": "0.001896", "traced": true, "context": "| `canonical`, scored on the same 40\u00b3 block | 0.001896 | 0.002413 |"}
+{"line": 236, "member": "deep_operator_network", "number": "0.002413", "traced": true, "context": "| `canonical`, scored on the same 40\u00b3 block | 0.001896 | 0.002413 |"}
+{"line": 237, "member": "deep_operator_network", "number": "0.0094", "traced": true, "context": "| `canonical`, all 124 test runs across nine grid shapes (copy floor 0.0094) | 0.002339 | 0.002766 |"}
+{"line": 237, "member": "deep_operator_network", "number": "0.002339", "traced": true, "context": "| `canonical`, all 124 test runs across nine grid shapes (copy floor 0.0094) | 0.002339 | 0.002766 |"}
+{"line": 237, "member": "deep_operator_network", "number": "0.002766", "traced": true, "context": "| `canonical`, all 124 test runs across nine grid shapes (copy floor 0.0094) | 0.002339 | 0.002766 |"}
+{"line": 240, "member": "deep_operator_network", "number": "0.5%", "traced": true, "context": "indistinguishable: a twelve-run seed sweep put their paired difference at 0.5% and 1.8% against"}
+{"line": 240, "member": "deep_operator_network", "number": "1.8%", "traced": true, "context": "indistinguishable: a twelve-run seed sweep put their paired difference at 0.5% and 1.8% against"}
+{"line": 241, "member": "deep_operator_network", "number": "35%", "traced": true, "context": "within-configuration spreads of 14\u201335%, and the published explicit bias term is a structural zero"}
+{"line": 242, "member": "deep_operator_network", "number": "1.6e-18", "traced": false, "context": "(+1.6e-18 on the training block). The learned trunk is the only configuration that reads every grid"}
+{"line": 243, "member": "deep_operator_network", "number": "2.3", "traced": false, "context": "shape; it costs about 2.3\u00d7 the fixed basis on the shared grid, the division of labor predicted."}
+{"line": 250, "member": "deep_operator_network", "number": "0.392", "traced": true, "context": "| training-mean floor | 0.392 | 0.757 |"}
+{"line": 250, "member": "deep_operator_network", "number": "0.757", "traced": true, "context": "| training-mean floor | 0.392 | 0.757 |"}
+{"line": 251, "member": "deep_operator_network", "number": "0.368", "traced": true, "context": "| ridge floor | 0.368 | 0.518 |"}
+{"line": 251, "member": "deep_operator_network", "number": "0.518", "traced": true, "context": "| ridge floor | 0.368 | 0.518 |"}
+{"line": 252, "member": "deep_operator_network", "number": "0.206", "traced": true, "context": "| **member, the card's own loss** | **0.206** (44% better than the ridge) | **0.265** (49%) |"}
+{"line": 252, "member": "deep_operator_network", "number": "44%", "traced": true, "context": "| **member, the card's own loss** | **0.206** (44% better than the ridge) | **0.265** (49%) |"}
+{"line": 252, "member": "deep_operator_network", "number": "0.265", "traced": true, "context": "| **member, the card's own loss** | **0.206** (44% better than the ridge) | **0.265** (49%) |"}
+{"line": 252, "member": "deep_operator_network", "number": "49%", "traced": true, "context": "| **member, the card's own loss** | **0.206** (44% better than the ridge) | **0.265** (49%) |"}
+{"line": 253, "member": "deep_operator_network", "number": "0.208", "traced": true, "context": "| ablation, band edges weighted 5\u00d7 | 0.208 | 0.193 |"}
+{"line": 253, "member": "deep_operator_network", "number": "0.193", "traced": true, "context": "| ablation, band edges weighted 5\u00d7 | 0.208 | 0.193 |"}
+{"line": 255, "member": "deep_operator_network", "number": "0.195", "traced": true, "context": "Per functional, whole window: cheap 0.195, accurate 0.215. The canon sets no numeric kill for this"}
+{"line": 255, "member": "deep_operator_network", "number": "0.215", "traced": true, "context": "Per functional, whole window: cheap 0.195, accurate 0.215. The canon sets no numeric kill for this"}
+{"line": 259, "member": "deep_operator_network", "number": "0.020", "traced": true, "context": "+0.020 eV with zero spread), so the floors' zero there is inherited, not earned."}
+{"line": 267, "member": "deep_operator_network", "number": "0.0423", "traced": true, "context": "| fold 0 (interpolation) | 0.0423 | 0.0853 | **0.0183** pass/pass | **0.0189** pass/pass | **0.0235** pass/pass | 0.0248"}
+{"line": 267, "member": "deep_operator_network", "number": "0.0853", "traced": true, "context": "| fold 0 (interpolation) | 0.0423 | 0.0853 | **0.0183** pass/pass | **0.0189** pass/pass | **0.0235** pass/pass | 0.0248"}
+{"line": 267, "member": "deep_operator_network", "number": "0.0183", "traced": true, "context": "| fold 0 (interpolation) | 0.0423 | 0.0853 | **0.0183** pass/pass | **0.0189** pass/pass | **0.0235** pass/pass | 0.0248"}
+{"line": 267, "member": "deep_operator_network", "number": "0.0189", "traced": true, "context": "| fold 0 (interpolation) | 0.0423 | 0.0853 | **0.0183** pass/pass | **0.0189** pass/pass | **0.0235** pass/pass | 0.0248"}
+{"line": 267, "member": "deep_operator_network", "number": "0.0235", "traced": true, "context": "| fold 0 (interpolation) | 0.0423 | 0.0853 | **0.0183** pass/pass | **0.0189** pass/pass | **0.0235** pass/pass | 0.0248"}
+{"line": 267, "member": "deep_operator_network", "number": "0.0248", "traced": true, "context": "| fold 0 (interpolation) | 0.0423 | 0.0853 | **0.0183** pass/pass | **0.0189** pass/pass | **0.0235** pass/pass | 0.0248"}
+{"line": 268, "member": "deep_operator_network", "number": "0.8", "traced": true, "context": "| factor-0.8 holdout (extrapolation) | 0.0755 | 0.0877 | 0.0937 | 0.1264 | **0.0434** | 0.0443 (122 runs, 62 shapes) |"}
+{"line": 268, "member": "deep_operator_network", "number": "0.0755", "traced": true, "context": "| factor-0.8 holdout (extrapolation) | 0.0755 | 0.0877 | 0.0937 | 0.1264 | **0.0434** | 0.0443 (122 runs, 62 shapes) |"}
+{"line": 268, "member": "deep_operator_network", "number": "0.0877", "traced": true, "context": "| factor-0.8 holdout (extrapolation) | 0.0755 | 0.0877 | 0.0937 | 0.1264 | **0.0434** | 0.0443 (122 runs, 62 shapes) |"}
+{"line": 268, "member": "deep_operator_network", "number": "0.0937", "traced": true, "context": "| factor-0.8 holdout (extrapolation) | 0.0755 | 0.0877 | 0.0937 | 0.1264 | **0.0434** | 0.0443 (122 runs, 62 shapes) |"}
+{"line": 268, "member": "deep_operator_network", "number": "0.1264", "traced": true, "context": "| factor-0.8 holdout (extrapolation) | 0.0755 | 0.0877 | 0.0937 | 0.1264 | **0.0434** | 0.0443 (122 runs, 62 shapes) |"}
+{"line": 268, "member": "deep_operator_network", "number": "0.0434", "traced": true, "context": "| factor-0.8 holdout (extrapolation) | 0.0755 | 0.0877 | 0.0937 | 0.1264 | **0.0434** | 0.0443 (122 runs, 62 shapes) |"}
+{"line": 268, "member": "deep_operator_network", "number": "0.0443", "traced": true, "context": "| factor-0.8 holdout (extrapolation) | 0.0755 | 0.0877 | 0.0937 | 0.1264 | **0.0434** | 0.0443 (122 runs, 62 shapes) |"}
+{"line": 269, "member": "deep_operator_network", "number": "1.2", "traced": true, "context": "| factor-1.2 holdout (extrapolation) | 0.0766 | 0.0877 | 0.0584 | 0.0606 | **0.0499** | 0.0461 |"}
+{"line": 269, "member": "deep_operator_network", "number": "0.0766", "traced": true, "context": "| factor-1.2 holdout (extrapolation) | 0.0766 | 0.0877 | 0.0584 | 0.0606 | **0.0499** | 0.0461 |"}
+{"line": 269, "member": "deep_operator_network", "number": "0.0877", "traced": true, "context": "| factor-1.2 holdout (extrapolation) | 0.0766 | 0.0877 | 0.0584 | 0.0606 | **0.0499** | 0.0461 |"}
+{"line": 269, "member": "deep_operator_network", "number": "0.0584", "traced": true, "context": "| factor-1.2 holdout (extrapolation) | 0.0766 | 0.0877 | 0.0584 | 0.0606 | **0.0499** | 0.0461 |"}
+{"line": 269, "member": "deep_operator_network", "number": "0.0606", "traced": true, "context": "| factor-1.2 holdout (extrapolation) | 0.0766 | 0.0877 | 0.0584 | 0.0606 | **0.0499** | 0.0461 |"}
+{"line": 269, "member": "deep_operator_network", "number": "0.0499", "traced": true, "context": "| factor-1.2 holdout (extrapolation) | 0.0766 | 0.0877 | 0.0584 | 0.0606 | **0.0499** | 0.0461 |"}
+{"line": 269, "member": "deep_operator_network", "number": "0.0461", "traced": true, "context": "| factor-1.2 holdout (extrapolation) | 0.0766 | 0.0877 | 0.0584 | 0.0606 | **0.0499** | 0.0461 |"}
+{"line": 272, "member": "deep_operator_network", "number": "0.8", "traced": true, "context": "best; it is the only configuration clearing a holdout (both bars on 0.8, and 43% against a 50% copy"}
+{"line": 272, "member": "deep_operator_network", "number": "43%", "traced": true, "context": "best; it is the only configuration clearing a holdout (both bars on 0.8, and 43% against a 50% copy"}
+{"line": 272, "member": "deep_operator_network", "number": "50%", "traced": true, "context": "best; it is the only configuration clearing a holdout (both bars on 0.8, and 43% against a 50% copy"}
+{"line": 273, "member": "deep_operator_network", "number": "1.2", "traced": true, "context": "bar on 1.2, where its run was still improving at its budget). The learned trunk reads the length"}
+{"line": 290, "member": "multiple_input_operator_network", "number": "0.11", "traced": true, "context": "at 0.11 s per step, 0.8 GB. Fold 0 of the cubic block, both spins, 29 units, medians:"}
+{"line": 290, "member": "multiple_input_operator_network", "number": "0.8", "traced": true, "context": "at 0.11 s per step, 0.8 GB. Fold 0 of the cubic block, both spins, 29 units, medians:"}
+{"line": 294, "member": "multiple_input_operator_network", "number": "0.097618", "traced": true, "context": "| semilocal ridge (the pattern-rule floor) | 0.097618 | \u2014 | \u2014 |"}
+{"line": 295, "member": "multiple_input_operator_network", "number": "0.015957", "traced": true, "context": "| training-mean template | 0.015957 | \u2014 | \u2014 |"}
+{"line": 296, "member": "multiple_input_operator_network", "number": "0.006164", "traced": true, "context": "| nearest-run copy | 0.006164 | \u2014 | \u2014 |"}
+{"line": 297, "member": "multiple_input_operator_network", "number": "0.014553", "traced": true, "context": "| density-alone twin | 0.014553 | 0.9914 | 0.0700 |"}
+{"line": 297, "member": "multiple_input_operator_network", "number": "0.9914", "traced": true, "context": "| density-alone twin | 0.014553 | 0.9914 | 0.0700 |"}
+{"line": 297, "member": "multiple_input_operator_network", "number": "0.0700", "traced": true, "context": "| density-alone twin | 0.014553 | 0.9914 | 0.0700 |"}
+{"line": 298, "member": "multiple_input_operator_network", "number": "0.016454", "traced": true, "context": "| **two-branch member** | **0.016454** | 0.9875 | 0.0695 |"}
+{"line": 298, "member": "multiple_input_operator_network", "number": "0.9875", "traced": true, "context": "| **two-branch member** | **0.016454** | 0.9875 | 0.0695 |"}
+{"line": 298, "member": "multiple_input_operator_network", "number": "0.0695", "traced": true, "context": "| **two-branch member** | **0.016454** | 0.9875 | 0.0695 |"}
+{"line": 299, "member": "multiple_input_operator_network", "number": "0.002170", "traced": true, "context": "| the flagship on the same block, for scale | 0.002170 | 0.9998 | 0.0105 |"}
+{"line": 299, "member": "multiple_input_operator_network", "number": "0.9998", "traced": false, "context": "| the flagship on the same block, for scale | 0.002170 | 0.9998 | 0.0105 |"}
+{"line": 299, "member": "multiple_input_operator_network", "number": "0.0105", "traced": true, "context": "| the flagship on the same block, for scale | 0.002170 | 0.9998 | 0.0105 |"}
+{"line": 301, "member": "multiple_input_operator_network", "number": "83.1%", "traced": true, "context": "Pattern rule against the ridge: passed (83.1% better, 20% required). **The decisive bar, the member"}
+{"line": 301, "member": "multiple_input_operator_network", "number": "20%", "traced": true, "context": "Pattern rule against the ridge: passed (83.1% better, 20% required). **The decisive bar, the member"}
+{"line": 302, "member": "multiple_input_operator_network", "number": "5%", "traced": true, "context": "against its own twin at 5% better: killed \u2014 it is 13.1% worse**, and worse on structural similarity"}
+{"line": 302, "member": "multiple_input_operator_network", "number": "13.1%", "traced": false, "context": "against its own twin at 5% better: killed \u2014 it is 13.1% worse**, and worse on structural similarity"}
+{"line": 310, "member": "multiple_input_operator_network", "number": "0.0913", "traced": true, "context": "step (validation pinned at the all-zero score, 0.0913). Fixed by standardizing each potential"}
+{"line": 322, "member": "nonlinear_manifold_decoder", "number": "0.7", "traced": false, "context": "parameters; about 10,200 steps in seven minutes on the card (\u22480.7 GB sampled), the rest of its"}
+{"line": 327, "member": "nonlinear_manifold_decoder", "number": "0.000911", "traced": true, "context": "| 423 interior levels of the strain arms (leave one level out) | bracketing linear interpolation, the floor | 0.000911 |"}
+{"line": 327, "member": "nonlinear_manifold_decoder", "number": "0.000607", "traced": false, "context": "| 423 interior levels of the strain arms (leave one level out) | bracketing linear interpolation, the floor | 0.000911 |"}
+{"line": 328, "member": "nonlinear_manifold_decoder", "number": "0.000991", "traced": true, "context": "| | Gaussian radial basis on the six strain components, the second floor | 0.000991 | bar \u2264 0.000661 |"}
+{"line": 328, "member": "nonlinear_manifold_decoder", "number": "0.000661", "traced": false, "context": "| | Gaussian radial basis on the six strain components, the second floor | 0.000991 | bar \u2264 0.000661 |"}
+{"line": 329, "member": "nonlinear_manifold_decoder", "number": "0.004225", "traced": true, "context": "| | ridge to the strain tensor (context) | 0.004225 | \u2014 |"}
+{"line": 330, "member": "nonlinear_manifold_decoder", "number": "0.019876", "traced": true, "context": "| | nearest-run copy (context) | 0.019876 | \u2014 |"}
+{"line": 331, "member": "nonlinear_manifold_decoder", "number": "0.002452", "traced": true, "context": "| | **the member** | **0.002452** | **killed: 2.7\u00d7 worse than interpolation** |"}
+{"line": 331, "member": "nonlinear_manifold_decoder", "number": "2.7", "traced": false, "context": "| | **the member** | **0.002452** | **killed: 2.7\u00d7 worse than interpolation** |"}
+{"line": 332, "member": "nonlinear_manifold_decoder", "number": "0.002424", "traced": true, "context": "| committed holdout split, 22 units | the member's headline | 0.002424 | context: the built branch\u2013trunk canonical reads"}
+{"line": 332, "member": "nonlinear_manifold_decoder", "number": "0.0019", "traced": true, "context": "| committed holdout split, 22 units | the member's headline | 0.002424 | context: the built branch\u2013trunk canonical reads"}
+{"line": 332, "member": "nonlinear_manifold_decoder", "number": "0.0024", "traced": true, "context": "| committed holdout split, 22 units | the member's headline | 0.002424 | context: the built branch\u2013trunk canonical reads"}
+{"line": 333, "member": "nonlinear_manifold_decoder", "number": "0.002795", "traced": true, "context": "| every grid shape, 30 units | the member | 0.002795 | \u2014 |"}
+{"line": 334, "member": "nonlinear_manifold_decoder", "number": "0.003188", "traced": true, "context": "| grid transfer | error off the dominant 40\u00b3 shape against on it | 0.003188 against 0.002424 | inflation 1.32\u00d7 against a"}
+{"line": 334, "member": "nonlinear_manifold_decoder", "number": "0.002424", "traced": true, "context": "| grid transfer | error off the dominant 40\u00b3 shape against on it | 0.003188 against 0.002424 | inflation 1.32\u00d7 against a"}
+{"line": 334, "member": "nonlinear_manifold_decoder", "number": "1.32", "traced": false, "context": "| grid transfer | error off the dominant 40\u00b3 shape against on it | 0.003188 against 0.002424 | inflation 1.32\u00d7 against a"}
+{"line": 334, "member": "nonlinear_manifold_decoder", "number": "1.3", "traced": true, "context": "| grid transfer | error off the dominant 40\u00b3 shape against on it | 0.003188 against 0.002424 | inflation 1.32\u00d7 against a"}
+{"line": 352, "member": "factorized_fourier", "number": "5e-6", "traced": true, "context": "levels, seven families), relative L2 medians per family: one-angle shear 5e-6, isotropic 2e-5,"}
+{"line": 352, "member": "factorized_fourier", "number": "2e-5", "traced": true, "context": "levels, seven families), relative L2 medians per family: one-angle shear 5e-6, isotropic 2e-5,"}
+{"line": 353, "member": "factorized_fourier", "number": "2.5e-5", "traced": true, "context": "uniaxial 2.5e-5, biaxial 6.6e-5, two-angle shear 1.9e-4, three-angle shear 6.5e-4, triaxial 1.4e-3;"}
+{"line": 353, "member": "factorized_fourier", "number": "6.6e-5", "traced": true, "context": "uniaxial 2.5e-5, biaxial 6.6e-5, two-angle shear 1.9e-4, three-angle shear 6.5e-4, triaxial 1.4e-3;"}
+{"line": 353, "member": "factorized_fourier", "number": "1.9e-4", "traced": true, "context": "uniaxial 2.5e-5, biaxial 6.6e-5, two-angle shear 1.9e-4, three-angle shear 6.5e-4, triaxial 1.4e-3;"}
+{"line": 353, "member": "factorized_fourier", "number": "6.5e-4", "traced": true, "context": "uniaxial 2.5e-5, biaxial 6.6e-5, two-angle shear 1.9e-4, three-angle shear 6.5e-4, triaxial 1.4e-3;"}
+{"line": 353, "member": "factorized_fourier", "number": "1.4e-3", "traced": true, "context": "uniaxial 2.5e-5, biaxial 6.6e-5, two-angle shear 1.9e-4, three-angle shear 6.5e-4, triaxial 1.4e-3;"}
+{"line": 354, "member": "factorized_fourier", "number": "0.091%", "traced": true, "context": "pooled **0.091%**. Beside it on the same leave-one-level-out block: the ridge to rank-32 modes, the"}
+{"line": 355, "member": "factorized_fourier", "number": "0.7", "traced": true, "context": "nearest-run copy in parameter space, the training mean. **Canon kill: under 0.7\u00d7 the best floor,"}
+{"line": 356, "member": "factorized_fourier", "number": "0.064%", "traced": true, "context": "i.e. 0.064% relative L2**, on interpolation splits; the canon itself predicts the interpolation floor"}
+{"line": 367, "member": "deep_dft", "number": "5%", "traced": true, "context": "superposed-density floor; 3\u00d7 the reduced isotropic kernel-ridge floor; moments within 5% with the"}
+{"line": 368, "member": "deep_dft", "number": "90%", "traced": true, "context": "right sign on 90% of magnetic runs. Named schedule risk: scatter-add throughput."}
+{"line": 390, "member": "residual_correction", "number": "0.011131", "traced": true, "context": "| identity (return the cheap density) | 0.011131 | the floor |"}
+{"line": 391, "member": "residual_correction", "number": "0.010466", "traced": true, "context": "| global affine | 0.010466 | 6.0% better |"}
+{"line": 391, "member": "residual_correction", "number": "6.0%", "traced": true, "context": "| global affine | 0.010466 | 6.0% better |"}
+{"line": 392, "member": "residual_correction", "number": "0.000049", "traced": true, "context": "| ridge from the strain components | 0.000049 | 99.6% better |"}
+{"line": 392, "member": "residual_correction", "number": "99.6%", "traced": true, "context": "| ridge from the strain components | 0.000049 | 99.6% better |"}
+{"line": 393, "member": "residual_correction", "number": "0.000005", "traced": true, "context": "| ridge from the cheap density's coefficients | 0.000005 | 100.0% better |"}
+{"line": 393, "member": "residual_correction", "number": "100.0%", "traced": true, "context": "| ridge from the cheap density's coefficients | 0.000005 | 100.0% better |"}
+{"line": 394, "member": "residual_correction", "number": "0.000002", "traced": true, "context": "| rank-32 representation ceiling | 0.000002 | \u2014 |"}
+{"line": 395, "member": "residual_correction", "number": "0.002079", "traced": true, "context": "| **the member** | **0.002079** | **81.3% better; canon kill \u2264 0.005565 passed; \u0394R\u00b2 0.9645** |"}
+{"line": 395, "member": "residual_correction", "number": "81.3%", "traced": true, "context": "| **the member** | **0.002079** | **81.3% better; canon kill \u2264 0.005565 passed; \u0394R\u00b2 0.9645** |"}
+{"line": 395, "member": "residual_correction", "number": "0.005565", "traced": true, "context": "| **the member** | **0.002079** | **81.3% better; canon kill \u2264 0.005565 passed; \u0394R\u00b2 0.9645** |"}
+{"line": 395, "member": "residual_correction", "number": "0.9645", "traced": true, "context": "| **the member** | **0.002079** | **81.3% better; canon kill \u2264 0.005565 passed; \u0394R\u00b2 0.9645** |"}
+{"line": 416, "member": "residual_correction", "number": "0.90", "traced": true, "context": "member. Level 0.90, exchangeable unit the symmetry orbit, calibrated on 23 validation orbits and"}
+{"line": 417, "member": "residual_correction", "number": "0.977", "traced": true, "context": "applied to the 22 test orbits of the correction member: coverage 0.977 against a guaranteed"}
+{"line": 418, "member": "residual_correction", "number": "0.900", "traced": true, "context": "interval of 0.900 to 0.942. Valid and conservative: it over-covers by 0.036."}
+{"line": 418, "member": "residual_correction", "number": "0.942", "traced": true, "context": "interval of 0.900 to 0.942. Valid and conservative: it over-covers by 0.036."}
+{"line": 418, "member": "residual_correction", "number": "0.036", "traced": true, "context": "interval of 0.900 to 0.942. Valid and conservative: it over-covers by 0.036."}
+{"line": 430, "member": "codomain_attention", "number": "30%", "traced": true, "context": "potential read must beat the spectral-Poisson + semilocal floor by 30%."}

@@ -1,0 +1,9 @@
+0000000000000000000000000000000000000000 b401bced2a3f5732a541b1cea8aad3a14a3b9256 Javier Flores <eus11@txstate.edu> 1787902087 -0500	branch: Created from HEAD
+b401bced2a3f5732a541b1cea8aad3a14a3b9256 89fce42548be807d5b05bab7b72631435482e7af Javier Flores <eus11@txstate.edu> 1787902296 -0500	commit: The np alias comes back: aliasing was never the thing being banned
+89fce42548be807d5b05bab7b72631435482e7af 2287a6fdadabcd57e5bf5eeaf3d404867e3545a9 Javier Flores <eus11@txstate.edu> 1787902420 -0500	commit: Counters name what they index, or stop existing
+2287a6fdadabcd57e5bf5eeaf3d404867e3545a9 2f69d0e3924870b54e18731cc389539d75944394 Javier Flores <eus11@txstate.edu> 1787903556 -0500	commit: The comments arrive, and the docstrings stop being sentences
+2f69d0e3924870b54e18731cc389539d75944394 d1b77481d6b18264c9a48f4e4468428acce10804 Javier Flores <eus11@txstate.edu> 1787903626 -0500	commit: The rules of record follow the code
+d1b77481d6b18264c9a48f4e4468428acce10804 85dbb5d3d24512c60128f2366bd93246d482a695 Javier Flores <eus11@txstate.edu> 1787906338 -0500	commit: The roots grow the surface the parts were being raided for
+85dbb5d3d24512c60128f2366bd93246d482a695 69f4209fa7b22885e39926b4895eb4b82ebcd75c Javier Flores <eus11@txstate.edu> 1787906635 -0500	commit: Cross-package imports enter through the root
+69f4209fa7b22885e39926b4895eb4b82ebcd75c 3f887b184359521511b158768f291a76832b0b7d Javier Flores <eus11@txstate.edu> 1787907064 -0500	commit: The cleanliness sweep: one pool guard, no duplicate helpers, straight imports
+3f887b184359521511b158768f291a76832b0b7d 54f06243d33bf6e0900dfeca6ffce7d14523ddc0 Javier Flores <eus11@txstate.edu> 1787907124 -0500	commit: The rules of record: the root is the API, and the import shape is written down

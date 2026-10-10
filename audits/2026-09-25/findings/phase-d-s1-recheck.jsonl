@@ -1,0 +1,26 @@
+{"id": "D1-raw-data-001", "recheck": "confirmed", "note": "AECCAR0/1 written at the start of the run; verified in September and again 9 October (researcher header check: 83 of 196 defect runs drift > 0.01 A)", "date": "2026-10-09"}
+{"id": "D1-raw-data-002", "recheck": "confirmed", "note": "alloy SAD floor includes relaxation displacement: 171 of 182 alloy runs drift > 0.01 A (9 October header check)", "date": "2026-10-09"}
+{"id": "D1-raw-data-003", "recheck": "confirmed in mechanism", "note": "disp_counts.py rerun: 68 of 196 defect runs shift > 0.1 A; the substitution experiment (IQR 1.29% -> 0.53%) is the auditor's, not rerun", "date": "2026-10-09"}
+{"id": "M10-structure-to-density-001", "recheck": "confirmed", "note": "salted_fit_eval.py rerun: the 12 seen-element units score 0.09-0.11 normalized MAE, the 9 held-out-chemistry units 11.41-12.01 with a near-uniform +8.7 offset (max |correction| 8.7 against a cell-mean density 0.70); the reported interquartile 11.58 is this construction defect, not a spread", "date": "2026-10-09"}
+{"id": "M10-structure-to-density-003", "recheck": "confirmed", "note": "K01, the silicon runs labeled H; confirmed 25 September (A3 species check)", "date": "2026-10-09"}
+{"id": "M2-flagship-ladder-potential-parametric-001", "recheck": "confirmed", "note": "the 66 shear-arm levels averaging three planes; confirmed 25 September", "date": "2026-10-09"}
+{"id": "M3-branch-trunk-parameters-to-charge-001", "recheck": "confirmed", "note": "perovskite symmetry copies: 57 of 61 holdout runs have their crystal in training; confirmed 2 October", "date": "2026-10-09"}
+{"id": "M4-branch-trunk-energy-trunk-001", "recheck": "confirmed", "note": "VI.1 has no bar; confirmed 2 October; the page's pass is marked as barless by fix F13, the verdict word is review item R2", "date": "2026-10-09"}
+{"id": "M5-correction-001", "recheck": "confirmed", "note": "the conformal row stores 1.0 where the report says 0.977; reproduced 25 September (results.json row read again 9 October)", "date": "2026-10-09"}
+{"id": "M6-two-input-001", "recheck": "confirmed", "note": "report.py:544 passes 0.0 for every required improvement to Render_Floor_Comparison, whose target is floor*(1-required)", "date": "2026-10-09"}
+{"id": "M6-two-input-002", "recheck": "confirmed", "note": "count_limit64.py rerun: Fitted_Bases(limit=64) reads 58+63+60+61 = 242 runs; cache.py applies the limit per fold before the cubic filter", "date": "2026-10-09"}
+{"id": "M6-two-input-003", "recheck": "confirmed", "note": "Verdicts_For finds no row group for either verdict; cross_member.md shows '-' on all 34 rows", "date": "2026-10-09"}
+{"id": "M7-manifold-decoder-001", "recheck": "confirmed", "note": "337 of 423 arm levels in training (PA-06, 25 September)", "date": "2026-10-09"}
+{"id": "M7-manifold-decoder-004", "recheck": "confirmed", "note": "rerun: 423 level-units are 201 orbits; orbit-unit bracketing median 0.000053 against the level-unit 0.000911", "date": "2026-10-09"}
+{"id": "M7-manifold-decoder-005", "recheck": "confirmed", "note": "the 66 three-plane levels (25 September)", "date": "2026-10-09"}
+{"id": "M9-codomain-member-001", "recheck": "confirmed", "note": "Functional_Label keys on path spelling: 146 strain runs and 4 defect runs labeled 'other' though PBE (lhfcalc F, aexx 0)", "date": "2026-10-09"}
+{"id": "N4-encoders-readouts-wrappers-001", "recheck": "confirmed", "note": "results.json conformal row: median 1.0, confidence_low 0.9, confidence_high 0.941667 = the guarantee band; report.py:436-437", "date": "2026-10-09"}
+{"id": "O2-overlap-001", "recheck": "confirmed", "note": "Reference_Axis_Length reads reference_2_atoms (a = 2.52718) while every named family is referenced to 2.52225 (volumes 11.3462 x factors); ratio 1.00195", "date": "2026-10-09"}
+{"id": "P-pictures-001", "recheck": "confirmed", "note": "K02, the residual-correction floors figure collapsing five floors (deep dive)", "date": "2026-10-09"}
+{"id": "R-results-page-001", "recheck": "confirmed", "note": "manifests: 15,685 + 15,685 + 1,800 stage steps; fixed as F13", "date": "2026-10-09"}
+{"id": "R-results-page-002", "recheck": "confirmed", "note": "manifests: 10,095 + 10,095 + 1,700 per run; fixed as F13", "date": "2026-10-09"}
+{"id": "S1-metrics-intervals-pooling-001", "recheck": "confirmed", "note": "frequency-split metric anisotropy, confirmed by mechanism 2 October; review item R3", "date": "2026-10-09"}
+{"id": "S1-metrics-intervals-pooling-002", "recheck": "confirmed", "note": "perovskite units: 125 angle runs are 14 crystals (2 October)", "date": "2026-10-09"}
+{"id": "S2-floors-and-verdicts-001", "recheck": "confirmed", "note": "same defect as M6-two-input-003, seen from the cross-member side", "date": "2026-10-09"}
+{"id": "S2-floors-and-verdicts-002", "recheck": "confirmed", "note": "same defect as M7-manifold-decoder-005", "date": "2026-10-09"}
+{"id": "T-training-001", "recheck": "confirmed", "note": "stage manifests: stage 1 best 8.02e-5, stage 2 best 8.08e-5 returned; fixed as F11", "date": "2026-10-09"}

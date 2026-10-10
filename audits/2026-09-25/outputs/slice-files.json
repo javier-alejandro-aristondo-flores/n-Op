@@ -1,0 +1,369 @@
+{
+ "D1-raw-data": {
+  "files": [
+   "o/data/__init__.py",
+   "o/data/parsers.py",
+   "o/data/spectra.py",
+   "o/data/stage0.py",
+   "o/data/store.py",
+   "o/stage0-report.md",
+   "o/tests/test_parsers.py",
+   "o/tests/test_store.py"
+  ],
+  "figure_folders": []
+ },
+ "D2-grouping-and-splits": {
+  "files": [
+   "o/data/__init__.py",
+   "o/data/exclusions.py",
+   "o/data/orbits.py",
+   "o/data/pod.py",
+   "o/data/splits.py",
+   "o/data/splits/paired_fields_fivefold.json",
+   "o/data/splits/perovskite_folds.json",
+   "o/data/splits/strain_atlas_holdout.json",
+   "o/data/splits/twin_shear_map.json",
+   "o/tests/test_exclusions.py",
+   "o/tests/test_orbits.py",
+   "o/tests/test_splits.py"
+  ],
+  "figure_folders": []
+ },
+ "T-training": {
+  "files": [
+   "o/tests/test_sampling.py",
+   "o/tests/test_training.py",
+   "o/training/__init__.py",
+   "o/training/cache.py",
+   "o/training/hardware.py",
+   "o/training/loader.py",
+   "o/training/loop.py",
+   "o/training/sampling.py",
+   "o/training/staged.py"
+  ],
+  "figure_folders": []
+ },
+ "S1-metrics-intervals-pooling": {
+  "files": [
+   "o/evaluation/__init__.py",
+   "o/evaluation/scoring.py",
+   "o/metrics/__init__.py",
+   "o/tests/test_evaluation.py",
+   "o/tests/test_metrics.py"
+  ],
+  "figure_folders": []
+ },
+ "S2-floors-and-verdicts": {
+  "files": [
+   "o/data/floors.py",
+   "o/evaluation/__init__.py",
+   "o/evaluation/cross_member.md",
+   "o/evaluation/cross_member.py",
+   "o/evaluation/every_shape.py",
+   "o/evaluation/localization_block.py",
+   "o/evaluation/perovskite_block.py",
+   "o/evaluation/results.py",
+   "o/tasks/__init__.py",
+   "o/tests/test_evaluation.py",
+   "o/tests/test_floors.py"
+  ],
+  "figure_folders": []
+ },
+ "P-pictures": {
+  "files": [
+   "o/inspection/__init__.py",
+   "o/inspection/catalog.py",
+   "o/inspection/plots/__init__.py",
+   "o/inspection/plots/backend.py",
+   "o/inspection/plots/renderers.py",
+   "o/inspection/plots/results.py",
+   "o/inspection/plots/suite.py",
+   "o/inspection/tables.py",
+   "o/tests/test_inspection.py"
+  ],
+  "figure_folders": []
+ },
+ "N1-substrate-and-framework": {
+  "files": [
+   "o/framework/__init__.py",
+   "o/framework/composition.py",
+   "o/framework/domain.py",
+   "o/framework/inspectable.py",
+   "o/framework/integral.py",
+   "o/framework/invariance.py",
+   "o/framework/kernel.py",
+   "o/framework/layer.py",
+   "o/framework/operator.py",
+   "o/framework/representation.py",
+   "o/substrate/__init__.py",
+   "o/substrate/arrays.py",
+   "o/substrate/custom_gradient.py",
+   "o/substrate/devices.py",
+   "o/substrate/engine.py",
+   "o/substrate/fourier.py",
+   "o/substrate/linear_algebra.py",
+   "o/substrate/network.py",
+   "o/substrate/operations.py",
+   "o/substrate/optimize.py",
+   "o/substrate/torch_engine.py",
+   "o/tests/test_fourier.py",
+   "o/tests/test_integral.py",
+   "o/tests/test_invariance.py",
+   "o/tests/test_substrate.py"
+  ],
+  "figure_folders": []
+ },
+ "N2-kernels": {
+  "files": [
+   "o/kernels/__init__.py",
+   "o/kernels/codomain_attention/__init__.py",
+   "o/kernels/codomain_attention/attention.py",
+   "o/kernels/codomain_attention/layer_norm.py",
+   "o/kernels/codomain_attention/local_linear.py",
+   "o/kernels/codomain_attention/tokens.py",
+   "o/kernels/compact_support/__init__.py",
+   "o/kernels/compact_support/continuous.py",
+   "o/kernels/compact_support/geometry.py",
+   "o/kernels/compact_support/tabulated.py",
+   "o/kernels/low_rank/__init__.py",
+   "o/kernels/spectral/__init__.py",
+   "o/tests/test_codomain_attention.py",
+   "o/tests/test_kernels.py",
+   "o/tests/test_spectral_metric.py"
+  ],
+  "figure_folders": []
+ },
+ "N3-compositions": {
+  "files": [
+   "o/compositions/__init__.py",
+   "o/compositions/activation.py",
+   "o/compositions/contraction.py",
+   "o/compositions/fixed_point.py",
+   "o/compositions/multi_scale.py",
+   "o/tests/test_contraction.py",
+   "o/tests/test_fixed_point.py",
+   "o/tests/test_multi_scale.py"
+  ],
+  "figure_folders": []
+ },
+ "N4-encoders-readouts-wrappers": {
+  "files": [
+   "o/encoders/__init__.py",
+   "o/readouts/__init__.py",
+   "o/tests/test_parts.py",
+   "o/wrappers/__init__.py"
+  ],
+  "figure_folders": []
+ },
+ "M1-flagship-localization": {
+  "files": [
+   "o/factorized_fourier/IMPLEMENTATION.md",
+   "o/factorized_fourier/__init__.py",
+   "o/factorized_fourier/manifest.toml",
+   "o/factorized_fourier/report.md",
+   "o/factorized_fourier/report.py",
+   "o/tests/test_factorized_fourier.py"
+  ],
+  "figure_folders": [
+   "o/factorized_fourier/figures/fold_0/explicit"
+  ]
+ },
+ "M2-flagship-ladder-potential-parametric": {
+  "files": [
+   "o/factorized_fourier/IMPLEMENTATION.md",
+   "o/factorized_fourier/__init__.py",
+   "o/factorized_fourier/manifest.toml",
+   "o/factorized_fourier/parametric.py",
+   "o/factorized_fourier/report.md",
+   "o/factorized_fourier/report.py",
+   "o/tests/test_factorized_fourier.py",
+   "o/tests/test_factorized_fourier_parametric.py"
+  ],
+  "figure_folders": [
+   "o/factorized_fourier/figures/fold_0/explicit",
+   "o/factorized_fourier/figures/fold_0/explicit_matched",
+   "o/factorized_fourier/figures/fold_0/weight_tied",
+   "o/factorized_fourier/figures/fold_0/weight_tied_injected"
+  ]
+ },
+ "M3-branch-trunk-parameters-to-charge": {
+  "files": [
+   "o/deep_operator_network/IMPLEMENTATION.md",
+   "o/deep_operator_network/__init__.py",
+   "o/deep_operator_network/configs/canonical.toml",
+   "o/deep_operator_network/configs/principal_component.toml",
+   "o/deep_operator_network/configs/proper_orthogonal.toml",
+   "o/deep_operator_network/manifest.toml",
+   "o/deep_operator_network/report.md",
+   "o/deep_operator_network/report.py",
+   "o/tests/test_deep_operator_network.py"
+  ],
+  "figure_folders": [
+   "o/deep_operator_network/figures/accurate/canonical",
+   "o/deep_operator_network/figures/accurate/principal_component",
+   "o/deep_operator_network/figures/accurate/proper_orthogonal",
+   "o/deep_operator_network/figures/cheap/canonical",
+   "o/deep_operator_network/figures/cheap/principal_component",
+   "o/deep_operator_network/figures/cheap/proper_orthogonal",
+   "o/deep_operator_network/figures/perovskite/fold_0",
+   "o/deep_operator_network/figures/perovskite/holdout_factor_0p8",
+   "o/deep_operator_network/figures/perovskite/holdout_factor_1p2",
+   "o/deep_operator_network/figures/pooled/energy_trunk"
+  ]
+ },
+ "M4-branch-trunk-energy-trunk": {
+  "files": [
+   "o/deep_operator_network/IMPLEMENTATION.md",
+   "o/deep_operator_network/__init__.py",
+   "o/deep_operator_network/configs/energy_trunk.toml",
+   "o/deep_operator_network/manifest.toml",
+   "o/deep_operator_network/report.md",
+   "o/deep_operator_network/report.py",
+   "o/tests/test_deep_operator_network.py"
+  ],
+  "figure_folders": [
+   "o/deep_operator_network/figures/pooled/energy_trunk"
+  ]
+ },
+ "M5-correction": {
+  "files": [
+   "o/residual_correction/IMPLEMENTATION.md",
+   "o/residual_correction/__init__.py",
+   "o/residual_correction/configs/projection_backbone.toml",
+   "o/residual_correction/configs/spectral_backbone.toml",
+   "o/residual_correction/manifest.toml",
+   "o/residual_correction/report.md",
+   "o/residual_correction/report.py",
+   "o/residual_correction/results.json",
+   "o/tests/test_residual_correction.py"
+  ],
+  "figure_folders": [
+   "o/residual_correction/figures/projection_backbone",
+   "o/residual_correction/figures/projection_backbone/components"
+  ]
+ },
+ "M6-two-input": {
+  "files": [
+   "o/multiple_input_operator_network/IMPLEMENTATION.md",
+   "o/multiple_input_operator_network/__init__.py",
+   "o/multiple_input_operator_network/cache.py",
+   "o/multiple_input_operator_network/manifest.toml",
+   "o/multiple_input_operator_network/report.md",
+   "o/multiple_input_operator_network/report.py",
+   "o/multiple_input_operator_network/results.json",
+   "o/tests/test_multiple_input_operator_network.py"
+  ],
+  "figure_folders": [
+   "o/multiple_input_operator_network/figures/fold_0",
+   "o/multiple_input_operator_network/figures/fold_0/components"
+  ]
+ },
+ "M7-manifold-decoder": {
+  "files": [
+   "o/nonlinear_manifold_decoder/IMPLEMENTATION.md",
+   "o/nonlinear_manifold_decoder/__init__.py",
+   "o/nonlinear_manifold_decoder/manifest.toml",
+   "o/nonlinear_manifold_decoder/report.md",
+   "o/nonlinear_manifold_decoder/report.py",
+   "o/nonlinear_manifold_decoder/results.json",
+   "o/tests/test_nonlinear_manifold_decoder.py"
+  ],
+  "figure_folders": [
+   "o/nonlinear_manifold_decoder/figures/pooled",
+   "o/nonlinear_manifold_decoder/figures/pooled/components"
+  ]
+ },
+ "M8-galerkin": {
+  "files": [
+   "o/galerkin_transformer/IMPLEMENTATION.md",
+   "o/galerkin_transformer/__init__.py",
+   "o/galerkin_transformer/manifest.toml",
+   "o/galerkin_transformer/report.md",
+   "o/galerkin_transformer/report.py",
+   "o/galerkin_transformer/results.json",
+   "o/tests/test_galerkin_transformer.py"
+  ],
+  "figure_folders": [
+   "o/galerkin_transformer/figures/perovskite_gate_v2_52283"
+  ]
+ },
+ "M9-codomain-member": {
+  "files": [
+   "o/codomain_attention/IMPLEMENTATION.md",
+   "o/codomain_attention/__init__.py",
+   "o/codomain_attention/channels.py",
+   "o/codomain_attention/drivers.py",
+   "o/codomain_attention/loader.py",
+   "o/codomain_attention/manifest.toml",
+   "o/codomain_attention/masking.py",
+   "o/codomain_attention/readout.py",
+   "o/codomain_attention/report.md",
+   "o/codomain_attention/report.py",
+   "o/codomain_attention/results.json",
+   "o/codomain_attention/splits.py",
+   "o/tests/test_codomain_attention_member.py"
+  ],
+  "figure_folders": []
+ },
+ "M10-structure-to-density": {
+  "files": [
+   "o/deep_dft/IMPLEMENTATION.md",
+   "o/deep_dft/__init__.py",
+   "o/deep_dft/floors.py",
+   "o/deep_dft/manifest.toml",
+   "o/deep_dft/message_passing.py",
+   "o/deep_dft/readout.py",
+   "o/deep_dft/report.md",
+   "o/deep_dft/report.py",
+   "o/deep_dft/results.json",
+   "o/deep_dft/sampling.py",
+   "o/deep_dft/species.py",
+   "o/tests/test_deep_dft.py"
+  ],
+  "figure_folders": [
+   "o/deep_dft/figures"
+  ]
+ },
+ "M11-convolutional-and-plane-wave": {
+  "files": [
+   "o/alias_free_convolutional/IMPLEMENTATION.md",
+   "o/alias_free_convolutional/__init__.py",
+   "o/alias_free_convolutional/activation.py",
+   "o/alias_free_convolutional/manifest.toml",
+   "o/alias_free_convolutional/report.md",
+   "o/alias_free_convolutional/report.py",
+   "o/alias_free_convolutional/results.json",
+   "o/gaussian_plane_wave/IMPLEMENTATION.md",
+   "o/gaussian_plane_wave/__init__.py",
+   "o/gaussian_plane_wave/manifest.toml",
+   "o/tests/test_alias_free_convolutional.py"
+  ],
+  "figure_folders": [
+   "o/alias_free_convolutional/figures/fold_0/alias_free"
+  ]
+ },
+ "R-results-page": {
+  "files": [
+   "operator-results.md"
+  ],
+  "figure_folders": []
+ },
+ "G-gates-and-package": {
+  "files": [
+   ".gitattributes",
+   ".gitignore",
+   "o/README.md",
+   "o/__init__.py",
+   "o/pyproject.toml",
+   "o/tests/conftest.py",
+   "o/tests/test_imports.py"
+  ],
+  "figure_folders": []
+ },
+ "L-ledger": {
+  "files": [
+   "test-suite.md"
+  ],
+  "figure_folders": []
+ }
+}

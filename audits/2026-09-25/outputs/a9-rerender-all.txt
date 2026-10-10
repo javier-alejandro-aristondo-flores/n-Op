@@ -1,0 +1,27 @@
+26 caches
+alias_free_convolutional/fold_0/alias_free/untrained: committed 26, rendered 26, compared 26, identical 26, differing [], only committed []
+deep_dft/a241daf388f71072: no committed figure folder matches
+deep_operator_network/accurate/canonical: committed 19, rendered 19, compared 19, identical 19, differing [], only committed []
+deep_operator_network/accurate: no committed figure folder matches
+deep_operator_network/accurate/principal_component: committed 14, rendered 14, compared 14, identical 14, differing [], only committed []
+deep_operator_network/accurate/proper_orthogonal: committed 17, rendered 17, compared 17, identical 17, differing [], only committed []
+deep_operator_network/cheap/canonical: committed 19, rendered 19, compared 19, identical 19, differing [], only committed []
+deep_operator_network/cheap: no committed figure folder matches
+deep_operator_network/cheap/principal_component: committed 14, rendered 14, compared 14, identical 14, differing [], only committed []
+deep_operator_network/cheap/proper_orthogonal: committed 17, rendered 17, compared 17, identical 17, differing [], only committed []
+deep_operator_network/perovskite/fold_0/canonical: committed 19, rendered 19, compared 19, identical 19, differing [], only committed []
+deep_operator_network/perovskite/fold_0/principal_component: committed 14, rendered 14, compared 14, identical 14, differing [], only committed []
+deep_operator_network/perovskite/fold_0/proper_orthogonal: committed 17, rendered 17, compared 17, identical 17, differing [], only committed []
+deep_operator_network/perovskite/holdout_factor_0p8/canonical: committed 19, rendered 19, compared 19, identical 19, differing [], only committed []
+deep_operator_network/perovskite/holdout_factor_0p8/principal_component: committed 14, rendered 14, compared 14, identical 14, differing [], only committed []
+deep_operator_network/perovskite/holdout_factor_0p8/proper_orthogonal: committed 17, rendered 17, compared 17, identical 17, differing [], only committed []
+deep_operator_network/perovskite/holdout_factor_1p2/canonical: committed 19, rendered 19, compared 19, identical 19, differing [], only committed []
+deep_operator_network/perovskite/holdout_factor_1p2/principal_component: committed 14, rendered 14, compared 14, identical 14, differing [], only committed []
+deep_operator_network/perovskite/holdout_factor_1p2/proper_orthogonal: committed 17, rendered 17, compared 17, identical 17, differing [], only committed []
+deep_operator_network/pooled/energy_trunk: committed 18, rendered 18, compared 18, identical 18, differing [], only committed []
+factorized_fourier/fold_0/explicit: committed 176, rendered 176, compared 176, identical 176, differing [], only committed []
+factorized_fourier/fold_0/explicit_matched: committed 22, rendered 22, compared 22, identical 22, differing [], only committed []
+factorized_fourier/fold_0/weight_tied: committed 22, rendered 22, compared 22, identical 22, differing [], only committed []
+factorized_fourier/fold_0/weight_tied_injected: committed 22, rendered 22, compared 22, identical 22, differing [], only committed []
+nonlinear_manifold_decoder/pooled: committed 17, rendered 17, compared 17, identical 17, differing [], only committed []
+residual_correction: no committed figure folder matches

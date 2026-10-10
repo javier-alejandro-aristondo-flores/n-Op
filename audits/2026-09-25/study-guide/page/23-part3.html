@@ -1,0 +1,89 @@
+<section class="part" id="part-3" aria-labelledby="h-part-3">
+<h2 id="h-part-3"><span class="partno" data-nofact>Part 3</span> Splitting the data without cheating</h2>
+<div class="prose">
+<p>A test score means something only if the model never saw the test examples, or near-copies of them. This corpus is full of near-copies: strains that are the same crystal turned around, two functionals computed at one geometry, folders that are byte copies of each other. So runs are grouped into <strong>units</strong> that always travel together, and every split assigns units, never single runs.</p>
+<h3>Orbits</h3>
+<p>The strain atlas strains a cubic crystal. Swapping two axes, or flipping an axis's sign, maps a strain onto an equivalent one: the same crystal, turned. The code reduces each run's six strain components to a canonical form under the 48 signed axis permutations, and every run sharing that form, under both functionals, belongs to one <strong>orbit</strong>. The 2,680 strain-atlas runs form 296 orbits. A random split would put one copy of a crystal in training and its turned twin in the test, and the test would measure memory.</p>
+<h3>The co-split rules</h3>
+<ul>
+<li>Byte-identical copies count once.</li>
+<li>The cheap and accurate runs of one geometry always land in the same split.</li>
+<li>The strain atlas and the supercell campaign share one fold map for the 120 shear values they have in common.</li>
+<li>The alloy splits by configuration, each configuration taking its satellite runs along.</li>
+<li>Every reported number is labeled <em>interpolation</em> (a held-out point between training points) or <em>extrapolation</em> (outside them).</li>
+</ul>
+<h3>The four split files</h3>
+<p>The splits are committed files, and the code regenerates them byte for byte.</p>
+</div>
+<div class="table-wrap">
+<table>
+<thead><tr><th>File</th><th>What it splits</th><th>Contents</th></tr></thead>
+<tbody>
+<tr><td><code>strain_atlas_holdout</code></td><td>the strain atlas, by orbit</td><td>296 orbits: 236 for training (2,112 runs), 30 for validation (288 runs), 30 for test (280 runs)</td></tr>
+<tr><td><code>paired_fields_fivefold</code></td><td>the paired fields, in five folds</td><td>207 units, 540 runs</td></tr>
+<tr><td><code>perovskite_folds</code></td><td>the perovskite grid, in five folds</td><td>249 units of one run each (125 angle, 124 length), plus tags for the two extrapolation holdouts</td></tr>
+<tr><td><code>twin_shear_map</code></td><td>shears shared by two campaigns</td><td>20 shear orbits linking strain-atlas runs to supercell runs</td></tr>
+</tbody>
+</table>
+</div>
+<figure>
+<div class="diagram wide">
+<!--FOLDS-->
+</div>
+<figcaption>Fold roles on the cubic block. A model trains on folds 2–4, uses fold 1 only to decide when to stop, and is judged on fold 0. The floors have no stopping decision to make, so they fit on folds 1–4. No training run and no model choice ever touches fold 0.</figcaption>
+</figure>
+<div class="prose">
+<h3>Interpolation and extrapolation</h3>
+<p>Along a sweep, neighboring runs are nearly identical. Holding out a level that sits between two training levels tests interpolation, which a straight line between the neighbors often does almost perfectly. Holding out everything beyond the training range tests extrapolation. The perovskite split adds two extrapolation holdouts: every run with a lattice factor of 0.8, and separately every run with a factor of 1.2.</p>
+</div>
+<div class="confirmed">
+<p><span class="tag found">Found</span> <strong>The perovskite split misses a symmetry</strong></p>
+<p>The perovskite split makes every run its own unit. But the cell's five atoms sit at the corner, the body center and the three edge midpoints, positions that swapping or reversing the cell's axes leaves unchanged. Reversing one cell edge turns the two angles touching it into their supplements, and 0.8 × 90° = 72° is the supplement of 1.2 × 90° = 108°. Many runs are therefore the same crystal written in a different cell.</p>
+<p>Checked on <time datetime="2026-10-02">2 October</time> with my own script. The 125 angle runs are only 14 distinct crystals. Every one of the 25 fold-0 angle runs has a same-crystal run in folds 1–4, and in each "extrapolation" holdout, 57 of the 61 runs are crystals that also sit among the runs not held out. On the fields themselves, pairs predicted to match do, to 2–6e-7 after the axis change (as stored they differ by 0.11–0.30). A genuinely different crystal stays at 8.2e-2 under all 48 axis changes.</p>
+</div>
+<figure>
+<div class="diagram">
+<!--CELLS-->
+</div>
+<figcaption>One lattice, two cells, drawn in two dimensions. Reversing the second edge turns a 72° cell into a 108° cell around the same points, so a "factor 0.8" run and a "factor 1.2" run can be one crystal.</figcaption>
+</figure>
+<div class="prose">
+<p>Three smaller in-sample problems surfaced in the same checks. None flips a verdict, because each affected model lost even with the advantage.</p>
+<ul>
+<li>The manifold decoder is compared with leave-one-level-out floors on 423 levels, but 337 of those levels are its own training data.</li>
+<li>The Galerkin transformer's interpolation comparison scores it in-sample on 24 of 27 levels.</li>
+<li>The two-input network's fixed bases are fit on folds 1–4, so the validation fold sits inside its own components. Its verdict against its twin is unaffected.</li>
+</ul>
+</div>
+
+<check part="3">
+<q>Why is a random split invalid on the strain atlas?</q>
+<a>Symmetric strains are the same crystal turned. A random split puts copies on both sides, so the test measures memory, not prediction.</a>
+<src>test-suite.md, section 9.2</src>
+</check>
+<check part="3">
+<q>What is an orbit, and how many are in the strain atlas?</q>
+<a>The set of runs whose six strain components reduce to the same canonical form under the 48 signed axis permutations, both functionals included. The 2,680 runs form 296 orbits.</a>
+<src>operators/data/orbits.py; strain_atlas_holdout.json</src>
+</check>
+<check part="3">
+<q>On the cubic block, which fold judges, which decides when training stops, which train the model, and which fit the floors?</q>
+<a>Fold 0 judges. Fold 1 decides when to stop. Folds 2–4 train the model. Folds 1–4 fit the floors.</a>
+<src>operators/evaluation/localization_block.py; operator-results.md, section I.1</src>
+</check>
+<check part="3">
+<q>Why may the floors use fold 1 when the model may not train on it?</q>
+<a>The model uses fold 1 to choose when to stop. Training on it would make that choice look better than it is. A floor is fit in one step with no choice to make, so it can use every fold but the one being judged.</a>
+<src>The fold roles in operators/evaluation/localization_block.py; this reasoning is the guide's</src>
+</check>
+<check part="3">
+<q>Why does the factor-0.8 perovskite holdout not measure extrapolation?</q>
+<a>Reversing one cell edge turns a 72° angle into 108°, so a factor-0.8 angle crystal is the same crystal as a factor-1.2 one, which sits in training. 57 of the holdout's 61 runs have their crystal among the runs not held out.</a>
+<src>The 2 October check (computations.txt)</src>
+</check>
+<check part="3">
+<q>How many distinct crystals hide in the 125-run perovskite angle sweep?</q>
+<a>14.</a>
+<src>The 2 October check (computations.txt)</src>
+</check>
+</section>

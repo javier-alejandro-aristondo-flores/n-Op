@@ -1,0 +1,3 @@
+[    2.6s] block: 76 evaluation runs in 29 units
+[    5.9s] explicit_matched: elf_fold0_explicit_matched_35505_stage2_checkpoint.npz, best step 13900, best validation 3.8584e-04, parameter names match the manifest: True
+[  245.0s]   explicit_matched: MAE 0.010043 (reported 0.01004), relative L2 0.046987, 29 units, 152 rows

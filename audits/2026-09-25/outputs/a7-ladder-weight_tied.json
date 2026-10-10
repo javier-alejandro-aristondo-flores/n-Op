@@ -1,0 +1,13 @@
+{
+ "weight_tied": {
+  "run": "elf_fold0_weight_tied_35505",
+  "checkpoint": "elf_fold0_weight_tied_35505_stage2_checkpoint.npz",
+  "best_step": 1000,
+  "best_validation": 0.00012075576033273212,
+  "mae": 0.002965686599251608,
+  "relative_l2": 0.015876181313320893,
+  "units": 29,
+  "rows": 152,
+  "reported_mae": 0.002966
+ }
+}

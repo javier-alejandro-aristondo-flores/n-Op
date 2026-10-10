@@ -1,0 +1,24 @@
+{
+ "twin": {
+  "run": "elf_fold0_twin_33650",
+  "mae": 0.014552857708588949,
+  "relative_l2": 0.0700173062419712,
+  "units": 29,
+  "rows": 152,
+  "reported": {
+   "mae": 0.014553,
+   "relative_l2": 0.070017
+  }
+ },
+ "member": {
+  "run": "elf_fold0_member_v2_33650",
+  "mae": 0.016453861398162857,
+  "relative_l2": 0.06953110249891686,
+  "units": 29,
+  "rows": 152,
+  "reported": {
+   "mae": 0.016454,
+   "relative_l2": 0.069531
+  }
+ }
+}

@@ -1,0 +1,3 @@
+[    4.8s] block: 76 evaluation runs in 29 units
+[    7.9s] weight_tied_injected: elf_fold0_weight_tied_injected_35505_stage2_checkpoint.npz, best step 5700, best validation 1.0181e-04, parameter names match the manifest: True
+[ 3023.6s]   weight_tied_injected: MAE 0.002706 (reported 0.002706), relative L2 0.014478, 29 units, 152 rows

@@ -1,0 +1,48 @@
+worktree /home/javier/Projects/Physics/Programs/n-Op
+HEAD 485a7d9b6d5a72aabe1c9521b4ee7b45f6deb83b
+branch refs/heads/neural-operator-suite
+
+worktree /home/javier/Projects/Physics/Programs/n-Op-audit-baseline
+HEAD 485a7d9b6d5a72aabe1c9521b4ee7b45f6deb83b
+detached
+
+worktree /home/javier/Projects/Physics/Programs/n-Op-streams/audit-fixes
+HEAD 485a7d9b6d5a72aabe1c9521b4ee7b45f6deb83b
+branch refs/heads/audit-fixes
+
+worktree /home/javier/Projects/Physics/Programs/n-Op-streams/codomain
+HEAD 20ef323af6c3081ec2ffc420a1c90b97aedb1afd
+branch refs/heads/stream-codomain
+
+worktree /home/javier/Projects/Physics/Programs/n-Op-streams/convolutional
+HEAD 20ef323af6c3081ec2ffc420a1c90b97aedb1afd
+branch refs/heads/stream-convolutional
+
+worktree /home/javier/Projects/Physics/Programs/n-Op-streams/deep-dft
+HEAD 20ef323af6c3081ec2ffc420a1c90b97aedb1afd
+branch refs/heads/stream-deep-dft
+
+worktree /home/javier/Projects/Physics/Programs/n-Op-streams/galerkin
+HEAD 99f5b1b441a179182f291bd00d97e7dc7c46aca9
+branch refs/heads/stream-galerkin
+
+worktree /home/javier/Projects/Physics/Programs/n-Op-streams/ladder
+HEAD 4682fd03b48c125432469d13e4e8adad890f1b43
+branch refs/heads/stream-ladder
+
+worktree /home/javier/Projects/Physics/Programs/n-Op-streams/manifold
+HEAD 43715fbc47fd4c60981df5ffe158af601178f548
+branch refs/heads/stream-manifold
+
+worktree /home/javier/Projects/Physics/Programs/n-Op-streams/mionet
+HEAD a5cd89fc4f4e0f71173c96202c8a2332ffa7a4ea
+branch refs/heads/stream-mionet
+
+worktree /home/javier/Projects/Physics/Programs/n-Op-streams/prep-evaluation
+HEAD 0a0a23998eb6c970b9e81972c10ec97988fb332f
+branch refs/heads/stream-prep-evaluation
+
+worktree /home/javier/Projects/Physics/Programs/n-Op-streams/residual
+HEAD 0a0a23998eb6c970b9e81972c10ec97988fb332f
+branch refs/heads/stream-residual
+

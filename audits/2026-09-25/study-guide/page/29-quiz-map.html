@@ -1,0 +1,22 @@
+<section class="part" id="quiz" aria-labelledby="h-quiz">
+<h2 id="h-quiz"><span class="partno" data-nofact>Part 9</span> Final quiz</h2>
+<p class="note">One answer per question. Press <em>Check my answers</em> when done; each question then shows why. The score feeds the knowledge map below.</p>
+<form class="quiz" id="quiz-form" novalidate>
+<div id="quiz-items"></div>
+<div class="row reset-row">
+<button type="submit" class="primary" id="quiz-submit">Check my answers</button>
+<span id="quiz-score" aria-live="polite" data-nofact></span>
+</div>
+</form>
+</section>
+
+<section class="part" id="map" aria-labelledby="h-map">
+<h2 id="h-map">Knowledge map</h2>
+<p class="note">For each part: your own ratings of its checks, and your quiz answers on that part. A part is marked to reread when under <span data-nofact>70%</span> of your ratings say <em>Knew it</em>, or you missed more than one of its quiz questions.</p>
+<div class="legend" data-nofact><span><i style="background: var(--pass)"></i>Knew it</span><span><i style="background: var(--hold)"></i>Partly</span><span><i style="background: var(--kill)"></i>Didn't know</span></div>
+<div class="map" id="map-rows" data-nofact></div>
+<div class="reset-row">
+<button type="button" id="reset-start">Clear my answers and ratings</button>
+<span id="reset-confirm" hidden>This clears every rating, typed answer and quiz answer in this browser. <button type="button" id="reset-yes">Clear everything</button> <button type="button" id="reset-no">Keep them</button></span>
+</div>
+</section>

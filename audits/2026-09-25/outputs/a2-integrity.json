@@ -1,0 +1,27 @@
+{
+ "census_rows": 5085,
+ "splits_regenerate": true,
+ "split_directory_checked": "/home/javier/Projects/Physics/Programs/n-Op-audit-baseline/operators/data/splits",
+ "store": {
+  "fresh": 5085,
+  "stale": 0,
+  "missing": 0,
+  "orphaned": 0
+ },
+ "run_folders_on_disk": 5085,
+ "on_disk_not_in_census": [],
+ "in_census_not_on_disk": [],
+ "census_path_form_example": "alloy/0-Alumium-position-teste/0-Alumium-position-teste/x_000.0_Al_Al0Ga8O12_POSCAR_x000.0_cfg001_AlSites_none",
+ "exclusion_path_counts": {
+  "E1": 6,
+  "E2": 1,
+  "E3": 1,
+  "E4": 1,
+  "E5": 1,
+  "E6": 73,
+  "E7": 4,
+  "E8": 128,
+  "E9": 12,
+  "E10": 1
+ }
+}

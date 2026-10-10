@@ -1,0 +1,5 @@
+[    2.2s] checkpoint manifold_stage2_checkpoint.npz: best step 3800, best validation 2.7410e-05
+[ 1094.8s] arm levels: member 0.002452 on 423 levels (reported 0.002452); bracketing floor 0.000911 (reported 0.000911)
+[ 1094.8s] without the shear arms: member 0.002384 vs floor 0.001057 on 357 levels, improvement -125.4% (bar 33.3%); shear arms alone: member 0.022956 vs floor 0.000006 on 66 levels
+[ 1094.8s] levels holding no training run: member 0.002381 vs floor 0.000626 on 86 levels, improvement -280.2%
+[ 1581.5s] headline 0.002424 on 22 units (reported 0.002424); every shape 0.002795 on 30 units (reported 0.002795); transfer 0.003188 vs 0.002424 = 1.316x (reported 1.316x), kill

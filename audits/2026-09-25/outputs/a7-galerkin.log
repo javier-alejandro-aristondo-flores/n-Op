@@ -1,0 +1,2 @@
+[    2.4s] floors: nearest-angle copy 0.0853 (reported 0.0853), interpolation 0.0264 (reported 0.0264)
+[  150.6s] member: 0.1780 on 25 copy units (reported 0.1780), 0.1191 on 27 levels (reported 0.1191); mean field 0.1755 (reported 0.1755); input dependence 0.14 (reported 1.4e-1); verdicts kill and kill

@@ -1,0 +1,94 @@
+<section class="part" id="part-2" aria-labelledby="h-part-2">
+<h2 id="h-part-2"><span class="partno" data-nofact>Part 2</span> The raw material: VASP runs</h2>
+<div class="prose">
+<p>VASP is the program that solved density functional theory for every crystal in this project. Each run is a folder of its output files on <code>/Pool</code>, a separate disk outside the repository. The pool holds 5,085 runs, and the repository never stores any of them.</p>
+<h3>What one run produces</h3>
+</div>
+<div class="table-wrap">
+<table>
+<thead><tr><th>File</th><th>What it holds</th><th>What to remember</th></tr></thead>
+<tbody>
+<tr><td><code>CHGCAR</code></td><td>The charge density; in a spin-polarized run, the magnetization follows as a second block.</td><td>It stores density times the cell's volume. The store divides the volume out, giving electrons per cubic ångström.</td></tr>
+<tr><td><code>ELFCAR</code></td><td>The electron localization field, from 0 to 1.</td><td>Written on half the density's grid per axis, so 80³ becomes 40³. No fine-grid localization truth exists anywhere.</td></tr>
+<tr><td><code>LOCPOT</code></td><td>The total local potential, in electronvolts.</td><td>A periodic cell has no absolute zero of potential, so it is compared after each field loses its own mean.</td></tr>
+<tr><td><code>AECCAR0</code>, <code>AECCAR2</code></td><td>The all-electron core and valence densities.</td><td>Stay summed over spin.</td></tr>
+<tr><td><code>AECCAR1</code></td><td>Free-atom densities simply added up: no bonding at all.</td><td>Serves as a floor: a structure model must beat it.</td></tr>
+<tr><td><code>EIGENVAL</code></td><td>The electron energies at each sampled point in momentum space.</td><td>The density of states is rebuilt from these with a stated smearing, never read from VASP's own density-of-states file.</td></tr>
+<tr><td><code>OUTCAR</code>, <code>OSZICAR</code></td><td>The log: electron count, magnetic moment, the element record.</td><td>Element identity comes from here, never from opening a pseudopotential.</td></tr>
+<tr><td><code>POTCAR</code></td><td>The licensed pseudopotential.</td><td>Never opened, quoted or copied. The repository is public.</td></tr>
+</tbody>
+</table>
+</div>
+<div class="prose">
+<p>Two laws hold across the field files. The <strong>half-grid law</strong>: the localization field is always on exactly half the density's grid per axis. The <strong>spin-block law</strong>: in a spin-polarized run every field file doubles, so <code>CHGCAR</code> holds density and magnetization, while <code>ELFCAR</code> and <code>LOCPOT</code> each hold a spin-up and a spin-down field.</p>
+<h3>Cheap and accurate</h3>
+<p>Many geometries were computed twice: once with the cheap functional (PBE, or PBEsol for the alloy) and once with the accurate hybrid (HSE), which costs 10–100 times more and places band gaps much closer to experiment. The hybrid mixes in a fraction of exact exchange, and that fraction differs by campaign: 0.27 for the strain atlas, 0.25 for the defect set, 0.325 for the alloy. "Accurate" is therefore a different target in each campaign, and the plan forbids pooling them.</p>
+<h3>The campaigns</h3>
+</div>
+<div class="table-wrap">
+<table>
+<thead><tr><th>Store name</th><th>What it is</th><th>Runs</th><th>Fields</th></tr></thead>
+<tbody>
+<tr><td><code>strain_atlas</code></td><td>A 2-atom diamond cell under strain on one to six axes; cheap and accurate at every point</td><td class="n">2,680</td><td>charge density only, grids near 40³</td></tr>
+<tr><td><code>supercell_strains</code></td><td>A 64-atom diamond cell under strain, cheap functional</td><td class="n">200</td><td>full field set on 169 runs</td></tr>
+<tr><td><code>defect_set</code></td><td>64-atom diamond with substituted dopants: singles, pairs, triads; both functionals; spin-polarized</td><td class="n">196</td><td>full field set, 80³</td></tr>
+<tr><td><code>perovskite_grid</code></td><td>The AgNbO₃ 5-atom cell, its lattice lengths and angles swept on two factorial grids, cheap functional</td><td class="n">250</td><td>charge density only; the angle sweep on 64³</td></tr>
+<tr><td><code>alloy_ensemble</code></td><td>β-(Al,Ga)₂O₃, 20 atoms: disorder configurations, a volume series, a composition pipeline</td><td class="n">182</td><td>full field set, large grids</td></tr>
+<tr><td><code>relaxation_pool</code></td><td>Materials Project semiconductors and element references</td><td class="n">1,576</td><td>none: its volumetric files are empty by design</td></tr>
+<tr><td><code>uncatalogued</code></td><td>One stray test run</td><td class="n">1</td><td>—</td></tr>
+</tbody>
+</table>
+</div>
+<div class="prose">
+<p>Two names recur. The <strong>paired fields</strong> are the 547 runs carrying the whole field set (182 alloy, 169 supercell, 196 defect); the field-to-field models learn from them. The <strong>cubic block</strong> is its runs on the exact 80³ grid, from the supercell and defect campaigns; the localization models train and are judged there.</p>
+<h3>The census and the store</h3>
+<p>The census, <code>_census/runs.jsonl</code>, has one row per run, derived by parsing the files themselves, never directory names. The store, <code>_derived/</code>, holds one archive per run (5,085 in all) plus a small sidecar recording the census row's hash and the extractor's version. Fields are single precision; scalars and curves are double. Densities are divided by the cell volume. Nothing is standardized in the archives: means and spreads are computed from training folds only, when data is loaded, because statistics baked into the archives would carry test information into every model.</p>
+<p>A freshness guard compares every archive with the census before any metric is reported. On <time datetime="2026-09-25">25 September</time> the audit found all 5,085 archives fresh, every charge integral within 2.7e-7 of its electron count, and raw files matching the store to 3–6e-8.</p>
+<h3>Exclusions</h3>
+<p>Ten rules, E1 to E10, remove or flag runs before any split. E1 drops a defect triad branch that is a byte copy of another (6 runs). E2 drops a zirconium "accurate" run that is the cheap run's bytes. E6 drops 73 dead relaxation runs. E8 flags 128 perovskite runs with fractional occupancy, for gap labels only; their fields stay usable. The audit re-resolved all ten against the files.</p>
+<h3>The licensing rule</h3>
+<p>Nothing volumetric and nothing derived from a pseudopotential leaves <code>/Pool</code>; only metric tables and plots do. That is why the data lives on its own disk and why no model output is ever committed as an array.</p>
+</div>
+<div class="confirmed">
+<p><span class="tag found">Found</span> <strong>Defects in the data, confirmed since the models were built</strong></p>
+<p>Two silicon-dopant runs name the dopant "H" in every file header, while the log and electron count say silicon. They are the only 2 of 5,085 archives whose labels disagree, and the store inherits the wrong label. It matters for a model keyed by element (the structure-to-density network), not for the flagship.</p>
+<p><code>AECCAR0</code> and <code>AECCAR1</code> are written on the starting geometry; the other fields on the relaxed one. The store keeps one geometry per run, so in relaxed runs the core and free-atom densities do not sit on the stored structure. This mixes two geometries into the superposed-atom floor. <span class="tag open">Pending</span> How far that moves the floor's published numbers is still being verified.</p>
+<p>82 of 196 defect runs hold a point where the magnetization exceeds the density, because the stored density can go negative near heavy atoms. The flagship clips this at its input.</p>
+</div>
+
+<check part="2">
+<q>Which file holds the localization field, and on what grid compared with the charge density?</q>
+<a><code>ELFCAR</code>, on exactly half the density's grid per axis: 80³ becomes 40³. No fine-grid localization truth exists, so a model that answers at 80³ can only be checked for self-consistency there.</a>
+<src>test-suite.md, section 1 (the half-grid law)</src>
+</check>
+<check part="2">
+<q>In a spin-polarized run, what does <code>CHGCAR</code> hold, and what does the store change about it?</q>
+<a>The density times the cell volume, followed by the magnetization. The store divides out the volume, so densities are in electrons per cubic ångström.</a>
+<src>test-suite.md, sections 1 and 9.1</src>
+</check>
+<check part="2">
+<q>How many runs does the store hold, and which campaign carries no fields at all?</q>
+<a>5,085 archives. The relaxation pool (1,576 runs) has its volumetric files deliberately emptied.</a>
+<src>/Pool/VASP_DATA/read-me-first.md; the store's own folders</src>
+</check>
+<check part="2">
+<q>Why may "accurate" results never be pooled across campaigns?</q>
+<a>Each campaign's hybrid uses a different exact-exchange fraction (0.27, 0.25, 0.325), so "accurate" names a different target in each.</a>
+<src>test-suite.md, section 0 (the never-pool rule)</src>
+</check>
+<check part="2">
+<q>Why are normalization statistics not stored inside the archives?</q>
+<a>They are computed from training folds only, when data is loaded. Statistics baked into the archives would carry test information into every model and every transfer test.</a>
+<src>test-suite.md, section 9.1</src>
+</check>
+<check part="2">
+<q>Where does a run's density of states come from?</q>
+<a>It is rebuilt from the electron energies in <code>EIGENVAL</code> with a stated smearing, never read from VASP's own density-of-states file.</a>
+<src>test-suite.md, section 9.4; the corpus read-me</src>
+</check>
+<check part="2">
+<q>What is wrong with <code>AECCAR0</code> and <code>AECCAR1</code> in a relaxed run?</q>
+<a>They sit on the starting geometry while the other fields sit on the relaxed one, and the store records only one geometry. A floor built from them mixes two geometries.</a>
+<src>The audit's raw-file check (nine sampled runs), 25 September</src>
+</check>
+</section>

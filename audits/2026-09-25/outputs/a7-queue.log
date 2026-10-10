@@ -1,0 +1,10 @@
+10:29:18 starting two_input
+10:34:34 finished two_input with exit 0
+10:34:34 starting galerkin
+10:37:05 finished galerkin with exit 0
+10:37:05 starting correction
+10:37:12 finished correction with exit 0
+10:37:12 starting manifold
+11:03:34 finished manifold with exit 0
+11:04:01 starting branch_trunk
+11:05:08 finished branch_trunk with exit 0

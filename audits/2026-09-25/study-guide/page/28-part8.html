@@ -1,0 +1,75 @@
+<section class="part" id="part-8" aria-labelledby="h-part-8">
+<h2 id="h-part-8"><span class="partno" data-nofact>Part 8</span> After the models</h2>
+<div class="prose">
+<h3>The deck</h3>
+<p>On <time datetime="2026-09-18">18 September</time> a talk deck covered which models failed and why, and proposed a next idea: a learned step placed inside the DFT solver's own loop, checked before it is accepted. That idea is a design only; nothing was built.</p>
+<h3>The pause</h3>
+<p>On <time datetime="2026-09-25">25 September</time> the PI stopped all training and model development until what exists is verified.</p>
+<h3>The grading deep dive</h3>
+<p>The same day, every grade of the passing models was re-derived from the raw VASP files with separately written readers and scoring code. Every headline, floor and bar of the flagship reproduced to six digits from its checkpoint; the branch–trunk and correction floors reproduced exactly. It found:</p>
+<ul>
+<li>the silicon dopant labeled "H";</li>
+<li>the flagship's fold 0 holding three different tests;</li>
+<li>a run of figure defects:
+<ul>
+<li>the correction floors figure collapsing five floors into one;</li>
+<li>error-spread titles counting run-and-spin rows as units;</li>
+<li>the "mean interval" column bootstrapping the mean, not the median;</li>
+<li>the flagship's floors figure drawn in relative L2 while its verdicts are in mean absolute error.</li>
+</ul></li>
+</ul>
+<h3>The audit</h3>
+<p>The audit asks three questions of everything in the suite. Is the output right? Are the statements about the output right? Does what was written before the code match what was built?</p>
+<ul>
+<li><strong>A frozen copy.</strong> Auditors read a write-protected copy of the repository at commit <code data-nofact>485a7d9</code>. The store and census on <code>/Pool</code> were made read-only, and the pseudopotential files unreadable. These permission locks are still on.</li>
+<li><strong>Blind auditors.</strong> 26 auditors each own a slice of the repository and see nothing of what is already known. Each finding is a contradiction pair: a verbatim quote from the repository beside what contradicts it (a second quote, a command's output, or a physics reference).</li>
+<li><strong>Severities.</strong> S1 wrong result, S2 wrong statement, S3 silent deviation from a pre-code document, S4 latent bug, S5 cosmetic.</li>
+<li><strong>The ledger.</strong> Every checkable promise in the documents written before the code becomes a row, checked against what was built.</li>
+<li><strong>Re-scoring.</strong> Every saved model was scored again from its checkpoint, with no training. Every reported number reproduced at its printed precision.</li>
+<li><strong>Verification.</strong> Each claim is then checked blind, and every wrong result or wrong statement again by me before anything is fixed. Fixes go on a separate branch, and nothing is pushed without Javier's word.</li>
+</ul>
+<p>Where it stands on <time datetime="2026-10-02">2 October</time>:</p>
+<ul>
+<li>19 auditors returned 552 findings (S1 22, S2 300, S3 73, S4 87, S5 70), and three more saved 91 before the account's session limit stopped them: 643 claims awaiting verification.</li>
+<li>Four auditors and most of the ledger have still to run.</li>
+<li>The audit is paused while this guide is written.</li>
+</ul>
+</div>
+<div class="table-wrap">
+<table>
+<thead><tr><th>Confirmed so far</th><th>What it changes</th></tr></thead>
+<tbody>
+<tr><td>Perovskite runs that are the same crystal in different cells, scattered across folds and holdouts</td><td>The lattice task's interpolation and extrapolation rows don't test what they claim; a symmetry-aware copy beats every model there</td></tr>
+<tr><td>The energy trunk has no bar, and a curve copy beats it</td><td>"pass, 44% better" doesn't stand</td></tr>
+<tr><td>The frequency-split metric counts some modes twice</td><td>Every secondary frequency-split row is mis-weighted</td></tr>
+<tr><td>The conformal row in <code>results.json</code> stores 1.0 and the guarantee band</td><td>The machine record disagrees with the report's 0.977</td></tr>
+<tr><td>The schedule returns the last stage's best</td><td>"8.0e-5" should be 8.1e-5; two rungs were evaluated on worse parameters than they had kept</td></tr>
+<tr><td>Budgets reported as steps run</td><td>The Galerkin gate ran 33,170 steps, not 52,283; the two-input runs 22,090, not 33,650</td></tr>
+<tr><td>Core and free-atom densities on the starting geometry</td><td>The superposed-atom floors mix two geometries in relaxed runs; size still being measured</td></tr>
+<tr><td>In-sample comparisons (manifold decoder, Galerkin, two-input bases)</td><td>Not like-for-like, though each kill or verdict stands</td></tr>
+<tr><td>Stale statuses on the results page</td><td>Four entries described as less built than they are</td></tr>
+<tr><td>Two silicon runs labeled "H"</td><td>Wrong species label in the store</td></tr>
+</tbody>
+</table>
+</div>
+<check part="8">
+<q>What did the grading deep dive do, and name two things it found.</q>
+<a>It re-derived the passing models' grades from the raw files with separately written code; every flagship number reproduced to six digits. Among its findings: the silicon runs labeled "H", the flagship's fold 0 holding three different tests, and several figure defects.</a>
+<src>The deep dive record, 25 September</src>
+</check>
+<check part="8">
+<q>What is a contradiction pair?</q>
+<a>The audit's unit of evidence: a verbatim quote from the repository beside what contradicts it, which is a second quote, a command's output, or a physics reference. A claim without one is only a design note.</a>
+<src>The audit plan</src>
+</check>
+<check part="8">
+<q>What did re-scoring the saved models show?</q>
+<a>Every reported number reproduced at its printed precision. The problems are in how numbers were set up, labeled and compared, not in the scoring arithmetic.</a>
+<src>The audit's re-scoring logs (a7-*.log)</src>
+</check>
+<check part="8">
+<q>Which confirmed findings change how a verdict should read?</q>
+<a>The perovskite lattice task, whose holdouts are not the tests they are labeled as, and the energy trunk, which has no bar and loses to a simple copy.</a>
+<src>The 2 October checks</src>
+</check>
+</section>

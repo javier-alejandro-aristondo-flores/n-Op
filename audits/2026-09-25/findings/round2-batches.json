@@ -1,0 +1,1276 @@
+[
+ {
+  "id": "v-001",
+  "tier": "single",
+  "slices": [
+   "M7-manifold-decoder",
+   "M8-galerkin"
+  ],
+  "count": 8,
+  "ids": [
+   "M7-manifold-decoder-017",
+   "M7-manifold-decoder-019",
+   "M7-manifold-decoder-023",
+   "M7-manifold-decoder-024",
+   "M8-galerkin-001",
+   "M8-galerkin-002",
+   "M8-galerkin-003",
+   "M8-galerkin-005"
+  ]
+ },
+ {
+  "id": "v-002",
+  "tier": "defended",
+  "slices": [
+   "D1-raw-data",
+   "D2-grouping-and-splits"
+  ],
+  "count": 8,
+  "ids": [
+   "D1-raw-data-010",
+   "D1-raw-data-011",
+   "D1-raw-data-012",
+   "D2-grouping-and-splits-001",
+   "D2-grouping-and-splits-012",
+   "D2-grouping-and-splits-013",
+   "D2-grouping-and-splits-014",
+   "D2-grouping-and-splits-015"
+  ]
+ },
+ {
+  "id": "v-003",
+  "tier": "defended",
+  "slices": [
+   "D2-grouping-and-splits",
+   "M1-flagship-localization"
+  ],
+  "count": 8,
+  "ids": [
+   "D2-grouping-and-splits-016",
+   "M1-flagship-localization-022",
+   "M1-flagship-localization-023",
+   "M1-flagship-localization-024",
+   "M1-flagship-localization-025",
+   "M1-flagship-localization-026",
+   "M1-flagship-localization-027",
+   "M1-flagship-localization-028"
+  ]
+ },
+ {
+  "id": "v-004",
+  "tier": "single",
+  "slices": [
+   "M8-galerkin"
+  ],
+  "count": 8,
+  "ids": [
+   "M8-galerkin-006",
+   "M8-galerkin-007",
+   "M8-galerkin-008",
+   "M8-galerkin-009",
+   "M8-galerkin-010",
+   "M8-galerkin-011",
+   "M8-galerkin-012",
+   "M8-galerkin-013"
+  ]
+ },
+ {
+  "id": "v-005",
+  "tier": "full",
+  "slices": [
+   "R-results-page",
+   "S1-metrics-intervals-pooling",
+   "S2-floors-and-verdicts"
+  ],
+  "count": 4,
+  "ids": [
+   "R-results-page-002",
+   "S1-metrics-intervals-pooling-001",
+   "S1-metrics-intervals-pooling-002",
+   "S2-floors-and-verdicts-001"
+  ]
+ },
+ {
+  "id": "v-006",
+  "tier": "full",
+  "slices": [
+   "N4-encoders-readouts-wrappers",
+   "O2-overlap",
+   "P-pictures",
+   "R-results-page"
+  ],
+  "count": 4,
+  "ids": [
+   "N4-encoders-readouts-wrappers-001",
+   "O2-overlap-001",
+   "P-pictures-001",
+   "R-results-page-001"
+  ]
+ },
+ {
+  "id": "v-007",
+  "tier": "single",
+  "slices": [
+   "M1-flagship-localization"
+  ],
+  "count": 8,
+  "ids": [
+   "M1-flagship-localization-009",
+   "M1-flagship-localization-010",
+   "M1-flagship-localization-011",
+   "M1-flagship-localization-012",
+   "M1-flagship-localization-013",
+   "M1-flagship-localization-014",
+   "M1-flagship-localization-015",
+   "M1-flagship-localization-016"
+  ]
+ },
+ {
+  "id": "v-008",
+  "tier": "defended",
+  "slices": [
+   "M1-flagship-localization",
+   "M10-structure-to-density"
+  ],
+  "count": 8,
+  "ids": [
+   "M1-flagship-localization-029",
+   "M1-flagship-localization-030",
+   "M10-structure-to-density-015",
+   "M10-structure-to-density-016",
+   "M10-structure-to-density-017",
+   "M10-structure-to-density-018",
+   "M10-structure-to-density-019",
+   "M10-structure-to-density-021"
+  ]
+ },
+ {
+  "id": "v-009",
+  "tier": "full",
+  "slices": [
+   "D1-raw-data",
+   "M10-structure-to-density"
+  ],
+  "count": 4,
+  "ids": [
+   "D1-raw-data-001",
+   "D1-raw-data-002",
+   "D1-raw-data-003",
+   "M10-structure-to-density-001"
+  ]
+ },
+ {
+  "id": "v-010",
+  "tier": "single",
+  "slices": [
+   "R-results-page",
+   "S1-metrics-intervals-pooling"
+  ],
+  "count": 8,
+  "ids": [
+   "R-results-page-008",
+   "R-results-page-009",
+   "R-results-page-010",
+   "R-results-page-013",
+   "R-results-page-016",
+   "R-results-page-018",
+   "R-results-page-021",
+   "S1-metrics-intervals-pooling-003"
+  ]
+ },
+ {
+  "id": "v-011",
+  "tier": "single",
+  "slices": [
+   "O3-overlap",
+   "P-pictures"
+  ],
+  "count": 8,
+  "ids": [
+   "O3-overlap-004",
+   "O3-overlap-005",
+   "O3-overlap-009",
+   "O3-overlap-010",
+   "P-pictures-003",
+   "P-pictures-004",
+   "P-pictures-005",
+   "P-pictures-007"
+  ]
+ },
+ {
+  "id": "v-012",
+  "tier": "full",
+  "slices": [
+   "M10-structure-to-density",
+   "M2-flagship-ladder-potential-parametric",
+   "M3-branch-trunk-parameters-to-charge",
+   "M4-branch-trunk-energy-trunk"
+  ],
+  "count": 4,
+  "ids": [
+   "M10-structure-to-density-003",
+   "M2-flagship-ladder-potential-parametric-001",
+   "M3-branch-trunk-parameters-to-charge-001",
+   "M4-branch-trunk-energy-trunk-001"
+  ]
+ },
+ {
+  "id": "v-013",
+  "tier": "single",
+  "slices": [
+   "M8-galerkin"
+  ],
+  "count": 8,
+  "ids": [
+   "M8-galerkin-014",
+   "M8-galerkin-015",
+   "M8-galerkin-016",
+   "M8-galerkin-017",
+   "M8-galerkin-018",
+   "M8-galerkin-019",
+   "M8-galerkin-020",
+   "M8-galerkin-021"
+  ]
+ },
+ {
+  "id": "v-014",
+  "tier": "single",
+  "slices": [
+   "D2-grouping-and-splits",
+   "G-gates-and-package"
+  ],
+  "count": 8,
+  "ids": [
+   "D2-grouping-and-splits-019",
+   "G-gates-and-package-001",
+   "G-gates-and-package-002",
+   "G-gates-and-package-003",
+   "G-gates-and-package-004",
+   "G-gates-and-package-005",
+   "G-gates-and-package-014",
+   "G-gates-and-package-015"
+  ]
+ },
+ {
+  "id": "v-015",
+  "tier": "single",
+  "slices": [
+   "P-pictures",
+   "R-results-page"
+  ],
+  "count": 8,
+  "ids": [
+   "P-pictures-008",
+   "P-pictures-010",
+   "P-pictures-012",
+   "P-pictures-013",
+   "P-pictures-022",
+   "R-results-page-005",
+   "R-results-page-006",
+   "R-results-page-007"
+  ]
+ },
+ {
+  "id": "v-016",
+  "tier": "full",
+  "slices": [
+   "M7-manifold-decoder",
+   "M9-codomain-member"
+  ],
+  "count": 4,
+  "ids": [
+   "M7-manifold-decoder-001",
+   "M7-manifold-decoder-004",
+   "M7-manifold-decoder-005",
+   "M9-codomain-member-001"
+  ]
+ },
+ {
+  "id": "v-017",
+  "tier": "single",
+  "slices": [
+   "M4-branch-trunk-energy-trunk",
+   "M5-correction"
+  ],
+  "count": 8,
+  "ids": [
+   "M4-branch-trunk-energy-trunk-020",
+   "M4-branch-trunk-energy-trunk-021",
+   "M4-branch-trunk-energy-trunk-022",
+   "M4-branch-trunk-energy-trunk-023",
+   "M4-branch-trunk-energy-trunk-026",
+   "M5-correction-002",
+   "M5-correction-003",
+   "M5-correction-004"
+  ]
+ },
+ {
+  "id": "v-018",
+  "tier": "single",
+  "slices": [
+   "M3-branch-trunk-parameters-to-charge",
+   "M4-branch-trunk-energy-trunk"
+  ],
+  "count": 8,
+  "ids": [
+   "M3-branch-trunk-parameters-to-charge-044",
+   "M3-branch-trunk-parameters-to-charge-045",
+   "M3-branch-trunk-parameters-to-charge-046",
+   "M3-branch-trunk-parameters-to-charge-049",
+   "M4-branch-trunk-energy-trunk-004",
+   "M4-branch-trunk-energy-trunk-005",
+   "M4-branch-trunk-energy-trunk-006",
+   "M4-branch-trunk-energy-trunk-007"
+  ]
+ },
+ {
+  "id": "v-019",
+  "tier": "single",
+  "slices": [
+   "M5-correction"
+  ],
+  "count": 8,
+  "ids": [
+   "M5-correction-005",
+   "M5-correction-006",
+   "M5-correction-007",
+   "M5-correction-008",
+   "M5-correction-009",
+   "M5-correction-010",
+   "M5-correction-011",
+   "M5-correction-012"
+  ]
+ },
+ {
+  "id": "v-020",
+  "tier": "defended",
+  "slices": [
+   "M11-convolutional-and-plane-wave",
+   "M2-flagship-ladder-potential-parametric",
+   "M3-branch-trunk-parameters-to-charge"
+  ],
+  "count": 8,
+  "ids": [
+   "M11-convolutional-and-plane-wave-024",
+   "M2-flagship-ladder-potential-parametric-021",
+   "M2-flagship-ladder-potential-parametric-022",
+   "M3-branch-trunk-parameters-to-charge-002",
+   "M3-branch-trunk-parameters-to-charge-031",
+   "M3-branch-trunk-parameters-to-charge-032",
+   "M3-branch-trunk-parameters-to-charge-033",
+   "M3-branch-trunk-parameters-to-charge-034"
+  ]
+ },
+ {
+  "id": "v-021",
+  "tier": "single",
+  "slices": [
+   "D1-raw-data",
+   "D2-grouping-and-splits"
+  ],
+  "count": 8,
+  "ids": [
+   "D1-raw-data-015",
+   "D1-raw-data-016",
+   "D1-raw-data-017",
+   "D1-raw-data-018",
+   "D2-grouping-and-splits-002",
+   "D2-grouping-and-splits-003",
+   "D2-grouping-and-splits-004",
+   "D2-grouping-and-splits-005"
+  ]
+ },
+ {
+  "id": "v-022",
+  "tier": "single",
+  "slices": [
+   "M9-codomain-member"
+  ],
+  "count": 8,
+  "ids": [
+   "M9-codomain-member-002",
+   "M9-codomain-member-003",
+   "M9-codomain-member-004",
+   "M9-codomain-member-005",
+   "M9-codomain-member-006",
+   "M9-codomain-member-007",
+   "M9-codomain-member-008",
+   "M9-codomain-member-009"
+  ]
+ },
+ {
+  "id": "v-023",
+  "tier": "single",
+  "slices": [
+   "M5-correction"
+  ],
+  "count": 8,
+  "ids": [
+   "M5-correction-013",
+   "M5-correction-015",
+   "M5-correction-016",
+   "M5-correction-017",
+   "M5-correction-018",
+   "M5-correction-019",
+   "M5-correction-020",
+   "M5-correction-021"
+  ]
+ },
+ {
+  "id": "v-024",
+  "tier": "single",
+  "slices": [
+   "M3-branch-trunk-parameters-to-charge"
+  ],
+  "count": 8,
+  "ids": [
+   "M3-branch-trunk-parameters-to-charge-010",
+   "M3-branch-trunk-parameters-to-charge-011",
+   "M3-branch-trunk-parameters-to-charge-012",
+   "M3-branch-trunk-parameters-to-charge-013",
+   "M3-branch-trunk-parameters-to-charge-014",
+   "M3-branch-trunk-parameters-to-charge-015",
+   "M3-branch-trunk-parameters-to-charge-016",
+   "M3-branch-trunk-parameters-to-charge-017"
+  ]
+ },
+ {
+  "id": "v-025",
+  "tier": "single",
+  "slices": [
+   "M2-flagship-ladder-potential-parametric",
+   "M3-branch-trunk-parameters-to-charge"
+  ],
+  "count": 8,
+  "ids": [
+   "M2-flagship-ladder-potential-parametric-027",
+   "M2-flagship-ladder-potential-parametric-028",
+   "M3-branch-trunk-parameters-to-charge-003",
+   "M3-branch-trunk-parameters-to-charge-005",
+   "M3-branch-trunk-parameters-to-charge-006",
+   "M3-branch-trunk-parameters-to-charge-007",
+   "M3-branch-trunk-parameters-to-charge-008",
+   "M3-branch-trunk-parameters-to-charge-009"
+  ]
+ },
+ {
+  "id": "v-026",
+  "tier": "single",
+  "slices": [
+   "M7-manifold-decoder"
+  ],
+  "count": 8,
+  "ids": [
+   "M7-manifold-decoder-008",
+   "M7-manifold-decoder-009",
+   "M7-manifold-decoder-010",
+   "M7-manifold-decoder-011",
+   "M7-manifold-decoder-012",
+   "M7-manifold-decoder-014",
+   "M7-manifold-decoder-015",
+   "M7-manifold-decoder-016"
+  ]
+ },
+ {
+  "id": "v-027",
+  "tier": "single",
+  "slices": [
+   "M11-convolutional-and-plane-wave"
+  ],
+  "count": 8,
+  "ids": [
+   "M11-convolutional-and-plane-wave-006",
+   "M11-convolutional-and-plane-wave-007",
+   "M11-convolutional-and-plane-wave-008",
+   "M11-convolutional-and-plane-wave-009",
+   "M11-convolutional-and-plane-wave-010",
+   "M11-convolutional-and-plane-wave-011",
+   "M11-convolutional-and-plane-wave-012",
+   "M11-convolutional-and-plane-wave-013"
+  ]
+ },
+ {
+  "id": "v-028",
+  "tier": "defended",
+  "slices": [
+   "M5-correction",
+   "M6-two-input",
+   "M7-manifold-decoder",
+   "M9-codomain-member"
+  ],
+  "count": 8,
+  "ids": [
+   "M5-correction-025",
+   "M5-correction-026",
+   "M5-correction-027",
+   "M6-two-input-025",
+   "M7-manifold-decoder-013",
+   "M7-manifold-decoder-018",
+   "M9-codomain-member-015",
+   "M9-codomain-member-016"
+  ]
+ },
+ {
+  "id": "v-029",
+  "tier": "defended",
+  "slices": [
+   "N1-substrate-and-framework",
+   "N2-kernels",
+   "N3-compositions",
+   "N4-encoders-readouts-wrappers",
+   "P-pictures",
+   "R-results-page",
+   "S1-metrics-intervals-pooling"
+  ],
+  "count": 8,
+  "ids": [
+   "N1-substrate-and-framework-009",
+   "N2-kernels-014",
+   "N3-compositions-015",
+   "N4-encoders-readouts-wrappers-010",
+   "P-pictures-006",
+   "R-results-page-023",
+   "S1-metrics-intervals-pooling-026",
+   "S1-metrics-intervals-pooling-027"
+  ]
+ },
+ {
+  "id": "v-030",
+  "tier": "single",
+  "slices": [
+   "N3-compositions",
+   "N4-encoders-readouts-wrappers"
+  ],
+  "count": 8,
+  "ids": [
+   "N3-compositions-020",
+   "N4-encoders-readouts-wrappers-002",
+   "N4-encoders-readouts-wrappers-003",
+   "N4-encoders-readouts-wrappers-005",
+   "N4-encoders-readouts-wrappers-006",
+   "N4-encoders-readouts-wrappers-007",
+   "N4-encoders-readouts-wrappers-008",
+   "N4-encoders-readouts-wrappers-009"
+  ]
+ },
+ {
+  "id": "v-031",
+  "tier": "single",
+  "slices": [
+   "S1-metrics-intervals-pooling"
+  ],
+  "count": 8,
+  "ids": [
+   "S1-metrics-intervals-pooling-022",
+   "S1-metrics-intervals-pooling-023",
+   "S1-metrics-intervals-pooling-028",
+   "S1-metrics-intervals-pooling-029",
+   "S1-metrics-intervals-pooling-031",
+   "S1-metrics-intervals-pooling-032",
+   "S1-metrics-intervals-pooling-033",
+   "S1-metrics-intervals-pooling-034"
+  ]
+ },
+ {
+  "id": "v-032",
+  "tier": "single",
+  "slices": [
+   "M1-flagship-localization",
+   "M10-structure-to-density"
+  ],
+  "count": 8,
+  "ids": [
+   "M1-flagship-localization-017",
+   "M1-flagship-localization-018",
+   "M1-flagship-localization-019",
+   "M1-flagship-localization-020",
+   "M1-flagship-localization-021",
+   "M1-flagship-localization-031",
+   "M10-structure-to-density-002",
+   "M10-structure-to-density-004"
+  ]
+ },
+ {
+  "id": "v-033",
+  "tier": "single",
+  "slices": [
+   "N1-substrate-and-framework",
+   "N2-kernels"
+  ],
+  "count": 8,
+  "ids": [
+   "N1-substrate-and-framework-019",
+   "N1-substrate-and-framework-020",
+   "N1-substrate-and-framework-024",
+   "N2-kernels-001",
+   "N2-kernels-003",
+   "N2-kernels-004",
+   "N2-kernels-005",
+   "N2-kernels-006"
+  ]
+ },
+ {
+  "id": "v-034",
+  "tier": "single",
+  "slices": [
+   "M9-codomain-member"
+  ],
+  "count": 8,
+  "ids": [
+   "M9-codomain-member-022",
+   "M9-codomain-member-023",
+   "M9-codomain-member-024",
+   "M9-codomain-member-025",
+   "M9-codomain-member-030",
+   "M9-codomain-member-031",
+   "M9-codomain-member-037",
+   "M9-codomain-member-038"
+  ]
+ },
+ {
+  "id": "v-035",
+  "tier": "single",
+  "slices": [
+   "S2-floors-and-verdicts",
+   "T-training"
+  ],
+  "count": 8,
+  "ids": [
+   "S2-floors-and-verdicts-027",
+   "S2-floors-and-verdicts-028",
+   "S2-floors-and-verdicts-030",
+   "T-training-002",
+   "T-training-003",
+   "T-training-004",
+   "T-training-005",
+   "T-training-006"
+  ]
+ },
+ {
+  "id": "v-036",
+  "tier": "single",
+  "slices": [
+   "N3-compositions"
+  ],
+  "count": 8,
+  "ids": [
+   "N3-compositions-001",
+   "N3-compositions-002",
+   "N3-compositions-003",
+   "N3-compositions-004",
+   "N3-compositions-005",
+   "N3-compositions-006",
+   "N3-compositions-007",
+   "N3-compositions-008"
+  ]
+ },
+ {
+  "id": "v-037",
+  "tier": "single",
+  "slices": [
+   "M4-branch-trunk-energy-trunk"
+  ],
+  "count": 8,
+  "ids": [
+   "M4-branch-trunk-energy-trunk-008",
+   "M4-branch-trunk-energy-trunk-009",
+   "M4-branch-trunk-energy-trunk-010",
+   "M4-branch-trunk-energy-trunk-012",
+   "M4-branch-trunk-energy-trunk-015",
+   "M4-branch-trunk-energy-trunk-016",
+   "M4-branch-trunk-energy-trunk-018",
+   "M4-branch-trunk-energy-trunk-019"
+  ]
+ },
+ {
+  "id": "v-038",
+  "tier": "single",
+  "slices": [
+   "M5-correction",
+   "M6-two-input"
+  ],
+  "count": 8,
+  "ids": [
+   "M5-correction-022",
+   "M5-correction-023",
+   "M5-correction-024",
+   "M5-correction-028",
+   "M5-correction-030",
+   "M6-two-input-004",
+   "M6-two-input-005",
+   "M6-two-input-006"
+  ]
+ },
+ {
+  "id": "v-039",
+  "tier": "single",
+  "slices": [
+   "M11-convolutional-and-plane-wave"
+  ],
+  "count": 8,
+  "ids": [
+   "M11-convolutional-and-plane-wave-014",
+   "M11-convolutional-and-plane-wave-015",
+   "M11-convolutional-and-plane-wave-016",
+   "M11-convolutional-and-plane-wave-017",
+   "M11-convolutional-and-plane-wave-025",
+   "M11-convolutional-and-plane-wave-026",
+   "M11-convolutional-and-plane-wave-027",
+   "M11-convolutional-and-plane-wave-028"
+  ]
+ },
+ {
+  "id": "v-040",
+  "tier": "single",
+  "slices": [
+   "M11-convolutional-and-plane-wave",
+   "M2-flagship-ladder-potential-parametric"
+  ],
+  "count": 8,
+  "ids": [
+   "M11-convolutional-and-plane-wave-029",
+   "M2-flagship-ladder-potential-parametric-002",
+   "M2-flagship-ladder-potential-parametric-003",
+   "M2-flagship-ladder-potential-parametric-004",
+   "M2-flagship-ladder-potential-parametric-005",
+   "M2-flagship-ladder-potential-parametric-006",
+   "M2-flagship-ladder-potential-parametric-007",
+   "M2-flagship-ladder-potential-parametric-008"
+  ]
+ },
+ {
+  "id": "v-041",
+  "tier": "defended",
+  "slices": [
+   "M3-branch-trunk-parameters-to-charge",
+   "M4-branch-trunk-energy-trunk"
+  ],
+  "count": 8,
+  "ids": [
+   "M3-branch-trunk-parameters-to-charge-035",
+   "M3-branch-trunk-parameters-to-charge-036",
+   "M3-branch-trunk-parameters-to-charge-037",
+   "M4-branch-trunk-energy-trunk-002",
+   "M4-branch-trunk-energy-trunk-003",
+   "M4-branch-trunk-energy-trunk-011",
+   "M4-branch-trunk-energy-trunk-013",
+   "M4-branch-trunk-energy-trunk-025"
+  ]
+ },
+ {
+  "id": "v-042",
+  "tier": "single",
+  "slices": [
+   "T-training"
+  ],
+  "count": 1,
+  "ids": [
+   "T-training-017"
+  ]
+ },
+ {
+  "id": "v-043",
+  "tier": "single",
+  "slices": [
+   "N3-compositions"
+  ],
+  "count": 8,
+  "ids": [
+   "N3-compositions-009",
+   "N3-compositions-010",
+   "N3-compositions-011",
+   "N3-compositions-013",
+   "N3-compositions-014",
+   "N3-compositions-016",
+   "N3-compositions-017",
+   "N3-compositions-018"
+  ]
+ },
+ {
+  "id": "v-044",
+  "tier": "single",
+  "slices": [
+   "M3-branch-trunk-parameters-to-charge"
+  ],
+  "count": 8,
+  "ids": [
+   "M3-branch-trunk-parameters-to-charge-018",
+   "M3-branch-trunk-parameters-to-charge-019",
+   "M3-branch-trunk-parameters-to-charge-020",
+   "M3-branch-trunk-parameters-to-charge-021",
+   "M3-branch-trunk-parameters-to-charge-022",
+   "M3-branch-trunk-parameters-to-charge-026",
+   "M3-branch-trunk-parameters-to-charge-027",
+   "M3-branch-trunk-parameters-to-charge-028"
+  ]
+ },
+ {
+  "id": "v-045",
+  "tier": "full",
+  "slices": [
+   "M5-correction",
+   "M6-two-input"
+  ],
+  "count": 4,
+  "ids": [
+   "M5-correction-001",
+   "M6-two-input-001",
+   "M6-two-input-002",
+   "M6-two-input-003"
+  ]
+ },
+ {
+  "id": "v-046",
+  "tier": "single",
+  "slices": [
+   "M6-two-input"
+  ],
+  "count": 8,
+  "ids": [
+   "M6-two-input-007",
+   "M6-two-input-008",
+   "M6-two-input-009",
+   "M6-two-input-010",
+   "M6-two-input-011",
+   "M6-two-input-012",
+   "M6-two-input-013",
+   "M6-two-input-014"
+  ]
+ },
+ {
+  "id": "v-047",
+  "tier": "single",
+  "slices": [
+   "M2-flagship-ladder-potential-parametric"
+  ],
+  "count": 8,
+  "ids": [
+   "M2-flagship-ladder-potential-parametric-017",
+   "M2-flagship-ladder-potential-parametric-018",
+   "M2-flagship-ladder-potential-parametric-019",
+   "M2-flagship-ladder-potential-parametric-020",
+   "M2-flagship-ladder-potential-parametric-023",
+   "M2-flagship-ladder-potential-parametric-024",
+   "M2-flagship-ladder-potential-parametric-025",
+   "M2-flagship-ladder-potential-parametric-026"
+  ]
+ },
+ {
+  "id": "v-048",
+  "tier": "single",
+  "slices": [
+   "M8-galerkin"
+  ],
+  "count": 8,
+  "ids": [
+   "M8-galerkin-022",
+   "M8-galerkin-023",
+   "M8-galerkin-024",
+   "M8-galerkin-026",
+   "M8-galerkin-027",
+   "M8-galerkin-028",
+   "M8-galerkin-029",
+   "M8-galerkin-030"
+  ]
+ },
+ {
+  "id": "v-049",
+  "tier": "single",
+  "slices": [
+   "S1-metrics-intervals-pooling"
+  ],
+  "count": 8,
+  "ids": [
+   "S1-metrics-intervals-pooling-005",
+   "S1-metrics-intervals-pooling-006",
+   "S1-metrics-intervals-pooling-009",
+   "S1-metrics-intervals-pooling-010",
+   "S1-metrics-intervals-pooling-014",
+   "S1-metrics-intervals-pooling-015",
+   "S1-metrics-intervals-pooling-016",
+   "S1-metrics-intervals-pooling-017"
+  ]
+ },
+ {
+  "id": "v-050",
+  "tier": "single",
+  "slices": [
+   "M3-branch-trunk-parameters-to-charge"
+  ],
+  "count": 8,
+  "ids": [
+   "M3-branch-trunk-parameters-to-charge-029",
+   "M3-branch-trunk-parameters-to-charge-030",
+   "M3-branch-trunk-parameters-to-charge-038",
+   "M3-branch-trunk-parameters-to-charge-039",
+   "M3-branch-trunk-parameters-to-charge-040",
+   "M3-branch-trunk-parameters-to-charge-041",
+   "M3-branch-trunk-parameters-to-charge-042",
+   "M3-branch-trunk-parameters-to-charge-043"
+  ]
+ },
+ {
+  "id": "v-051",
+  "tier": "single",
+  "slices": [
+   "D2-grouping-and-splits"
+  ],
+  "count": 8,
+  "ids": [
+   "D2-grouping-and-splits-006",
+   "D2-grouping-and-splits-007",
+   "D2-grouping-and-splits-008",
+   "D2-grouping-and-splits-009",
+   "D2-grouping-and-splits-010",
+   "D2-grouping-and-splits-011",
+   "D2-grouping-and-splits-017",
+   "D2-grouping-and-splits-018"
+  ]
+ },
+ {
+  "id": "v-052",
+  "tier": "single",
+  "slices": [
+   "M1-flagship-localization"
+  ],
+  "count": 8,
+  "ids": [
+   "M1-flagship-localization-001",
+   "M1-flagship-localization-002",
+   "M1-flagship-localization-003",
+   "M1-flagship-localization-004",
+   "M1-flagship-localization-005",
+   "M1-flagship-localization-006",
+   "M1-flagship-localization-007",
+   "M1-flagship-localization-008"
+  ]
+ },
+ {
+  "id": "v-053",
+  "tier": "single",
+  "slices": [
+   "N1-substrate-and-framework"
+  ],
+  "count": 8,
+  "ids": [
+   "N1-substrate-and-framework-011",
+   "N1-substrate-and-framework-012",
+   "N1-substrate-and-framework-013",
+   "N1-substrate-and-framework-014",
+   "N1-substrate-and-framework-015",
+   "N1-substrate-and-framework-016",
+   "N1-substrate-and-framework-017",
+   "N1-substrate-and-framework-018"
+  ]
+ },
+ {
+  "id": "v-054",
+  "tier": "defended",
+  "slices": [
+   "S2-floors-and-verdicts",
+   "T-training"
+  ],
+  "count": 8,
+  "ids": [
+   "S2-floors-and-verdicts-012",
+   "S2-floors-and-verdicts-013",
+   "S2-floors-and-verdicts-014",
+   "S2-floors-and-verdicts-018",
+   "S2-floors-and-verdicts-020",
+   "S2-floors-and-verdicts-021",
+   "S2-floors-and-verdicts-022",
+   "T-training-008"
+  ]
+ },
+ {
+  "id": "v-055",
+  "tier": "single",
+  "slices": [
+   "S1-metrics-intervals-pooling",
+   "S2-floors-and-verdicts"
+  ],
+  "count": 8,
+  "ids": [
+   "S1-metrics-intervals-pooling-035",
+   "S1-metrics-intervals-pooling-036",
+   "S2-floors-and-verdicts-004",
+   "S2-floors-and-verdicts-006",
+   "S2-floors-and-verdicts-010",
+   "S2-floors-and-verdicts-023",
+   "S2-floors-and-verdicts-024",
+   "S2-floors-and-verdicts-025"
+  ]
+ },
+ {
+  "id": "v-056",
+  "tier": "single",
+  "slices": [
+   "O1-overlap",
+   "O2-overlap"
+  ],
+  "count": 8,
+  "ids": [
+   "O1-overlap-012",
+   "O1-overlap-013",
+   "O1-overlap-015",
+   "O1-overlap-018",
+   "O1-overlap-019",
+   "O2-overlap-006",
+   "O2-overlap-007",
+   "O2-overlap-010"
+  ]
+ },
+ {
+  "id": "v-057",
+  "tier": "single",
+  "slices": [
+   "M6-two-input",
+   "M7-manifold-decoder"
+  ],
+  "count": 8,
+  "ids": [
+   "M6-two-input-023",
+   "M6-two-input-024",
+   "M6-two-input-026",
+   "M6-two-input-027",
+   "M6-two-input-028",
+   "M7-manifold-decoder-002",
+   "M7-manifold-decoder-003",
+   "M7-manifold-decoder-007"
+  ]
+ },
+ {
+  "id": "v-058",
+  "tier": "single",
+  "slices": [
+   "M2-flagship-ladder-potential-parametric"
+  ],
+  "count": 8,
+  "ids": [
+   "M2-flagship-ladder-potential-parametric-009",
+   "M2-flagship-ladder-potential-parametric-010",
+   "M2-flagship-ladder-potential-parametric-011",
+   "M2-flagship-ladder-potential-parametric-012",
+   "M2-flagship-ladder-potential-parametric-013",
+   "M2-flagship-ladder-potential-parametric-014",
+   "M2-flagship-ladder-potential-parametric-015",
+   "M2-flagship-ladder-potential-parametric-016"
+  ]
+ },
+ {
+  "id": "v-059",
+  "tier": "full",
+  "slices": [
+   "S2-floors-and-verdicts",
+   "T-training"
+  ],
+  "count": 2,
+  "ids": [
+   "S2-floors-and-verdicts-002",
+   "T-training-001"
+  ]
+ },
+ {
+  "id": "v-060",
+  "tier": "defended",
+  "slices": [
+   "M9-codomain-member",
+   "N1-substrate-and-framework"
+  ],
+  "count": 8,
+  "ids": [
+   "M9-codomain-member-019",
+   "M9-codomain-member-026",
+   "M9-codomain-member-027",
+   "M9-codomain-member-028",
+   "M9-codomain-member-029",
+   "N1-substrate-and-framework-003",
+   "N1-substrate-and-framework-005",
+   "N1-substrate-and-framework-006"
+  ]
+ },
+ {
+  "id": "v-061",
+  "tier": "single",
+  "slices": [
+   "M9-codomain-member"
+  ],
+  "count": 8,
+  "ids": [
+   "M9-codomain-member-010",
+   "M9-codomain-member-011",
+   "M9-codomain-member-012",
+   "M9-codomain-member-014",
+   "M9-codomain-member-017",
+   "M9-codomain-member-018",
+   "M9-codomain-member-020",
+   "M9-codomain-member-021"
+  ]
+ },
+ {
+  "id": "v-062",
+  "tier": "single",
+  "slices": [
+   "N2-kernels"
+  ],
+  "count": 8,
+  "ids": [
+   "N2-kernels-007",
+   "N2-kernels-008",
+   "N2-kernels-010",
+   "N2-kernels-011",
+   "N2-kernels-012",
+   "N2-kernels-013",
+   "N2-kernels-015",
+   "N2-kernels-016"
+  ]
+ },
+ {
+  "id": "v-063",
+  "tier": "single",
+  "slices": [
+   "M9-codomain-member",
+   "N1-substrate-and-framework"
+  ],
+  "count": 8,
+  "ids": [
+   "M9-codomain-member-039",
+   "M9-codomain-member-040",
+   "M9-codomain-member-041",
+   "N1-substrate-and-framework-001",
+   "N1-substrate-and-framework-002",
+   "N1-substrate-and-framework-004",
+   "N1-substrate-and-framework-008",
+   "N1-substrate-and-framework-010"
+  ]
+ },
+ {
+  "id": "v-064",
+  "tier": "single",
+  "slices": [
+   "T-training"
+  ],
+  "count": 8,
+  "ids": [
+   "T-training-009",
+   "T-training-010",
+   "T-training-011",
+   "T-training-012",
+   "T-training-013",
+   "T-training-014",
+   "T-training-015",
+   "T-training-016"
+  ]
+ },
+ {
+  "id": "v-065",
+  "tier": "single",
+  "slices": [
+   "M10-structure-to-density"
+  ],
+  "count": 8,
+  "ids": [
+   "M10-structure-to-density-005",
+   "M10-structure-to-density-006",
+   "M10-structure-to-density-007",
+   "M10-structure-to-density-008",
+   "M10-structure-to-density-009",
+   "M10-structure-to-density-011",
+   "M10-structure-to-density-013",
+   "M10-structure-to-density-014"
+  ]
+ },
+ {
+  "id": "v-066",
+  "tier": "defended",
+  "slices": [
+   "M10-structure-to-density",
+   "M11-convolutional-and-plane-wave"
+  ],
+  "count": 8,
+  "ids": [
+   "M10-structure-to-density-022",
+   "M10-structure-to-density-023",
+   "M11-convolutional-and-plane-wave-018",
+   "M11-convolutional-and-plane-wave-019",
+   "M11-convolutional-and-plane-wave-020",
+   "M11-convolutional-and-plane-wave-021",
+   "M11-convolutional-and-plane-wave-022",
+   "M11-convolutional-and-plane-wave-023"
+  ]
+ },
+ {
+  "id": "v-067",
+  "tier": "single",
+  "slices": [
+   "M6-two-input"
+  ],
+  "count": 8,
+  "ids": [
+   "M6-two-input-015",
+   "M6-two-input-016",
+   "M6-two-input-017",
+   "M6-two-input-018",
+   "M6-two-input-019",
+   "M6-two-input-020",
+   "M6-two-input-021",
+   "M6-two-input-022"
+  ]
+ },
+ {
+  "id": "v-068",
+  "tier": "single",
+  "slices": [
+   "D1-raw-data"
+  ],
+  "count": 8,
+  "ids": [
+   "D1-raw-data-004",
+   "D1-raw-data-005",
+   "D1-raw-data-006",
+   "D1-raw-data-007",
+   "D1-raw-data-008",
+   "D1-raw-data-009",
+   "D1-raw-data-013",
+   "D1-raw-data-014"
+  ]
+ },
+ {
+  "id": "v-069",
+  "tier": "single",
+  "slices": [
+   "N4-encoders-readouts-wrappers",
+   "O1-overlap"
+  ],
+  "count": 8,
+  "ids": [
+   "N4-encoders-readouts-wrappers-011",
+   "N4-encoders-readouts-wrappers-012",
+   "N4-encoders-readouts-wrappers-013",
+   "N4-encoders-readouts-wrappers-014",
+   "N4-encoders-readouts-wrappers-015",
+   "O1-overlap-003",
+   "O1-overlap-006",
+   "O1-overlap-010"
+  ]
+ },
+ {
+  "id": "v-070",
+  "tier": "single",
+  "slices": [
+   "M10-structure-to-density",
+   "M11-convolutional-and-plane-wave"
+  ],
+  "count": 8,
+  "ids": [
+   "M10-structure-to-density-024",
+   "M10-structure-to-density-025",
+   "M10-structure-to-density-026",
+   "M10-structure-to-density-027",
+   "M11-convolutional-and-plane-wave-001",
+   "M11-convolutional-and-plane-wave-002",
+   "M11-convolutional-and-plane-wave-003",
+   "M11-convolutional-and-plane-wave-004"
+  ]
+ }
+]

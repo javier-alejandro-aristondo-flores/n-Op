@@ -1,0 +1,245 @@
+{
+ "S2-floors-and-verdicts": {
+  "whole": [],
+  "part": [
+   "operators/evaluation/localization_block.py",
+   "operators/tests/test_evaluation.py",
+   "operators/tests/test_floors.py"
+  ],
+  "shell": [
+   "operators/data/floors.py",
+   "operators/evaluation/__init__.py",
+   "operators/evaluation/cross_member.md",
+   "operators/evaluation/cross_member.py",
+   "operators/evaluation/every_shape.py",
+   "operators/evaluation/perovskite_block.py",
+   "operators/evaluation/results.py",
+   "operators/tasks/__init__.py"
+  ],
+  "never": []
+ },
+ "D2-grouping-and-splits": {
+  "whole": [
+   "operators/data/__init__.py",
+   "operators/data/exclusions.py",
+   "operators/data/orbits.py",
+   "operators/data/pod.py",
+   "operators/data/splits.py",
+   "operators/tests/test_exclusions.py",
+   "operators/tests/test_orbits.py",
+   "operators/tests/test_splits.py"
+  ],
+  "part": [],
+  "shell": [],
+  "never": []
+ },
+ "N2-kernels": {
+  "whole": [
+   "operators/kernels/__init__.py",
+   "operators/kernels/codomain_attention/__init__.py",
+   "operators/kernels/codomain_attention/attention.py",
+   "operators/kernels/codomain_attention/layer_norm.py",
+   "operators/kernels/codomain_attention/local_linear.py",
+   "operators/kernels/codomain_attention/tokens.py",
+   "operators/kernels/compact_support/__init__.py",
+   "operators/kernels/compact_support/continuous.py",
+   "operators/kernels/compact_support/geometry.py",
+   "operators/kernels/compact_support/tabulated.py",
+   "operators/kernels/low_rank/__init__.py",
+   "operators/kernels/spectral/__init__.py",
+   "operators/tests/test_codomain_attention.py",
+   "operators/tests/test_kernels.py",
+   "operators/tests/test_spectral_metric.py"
+  ],
+  "part": [],
+  "shell": [],
+  "never": []
+ },
+ "S1-metrics-intervals-pooling": {
+  "whole": [],
+  "part": [
+   "operators/evaluation/__init__.py",
+   "operators/evaluation/scoring.py",
+   "operators/metrics/__init__.py",
+   "operators/tests/test_evaluation.py",
+   "operators/tests/test_metrics.py"
+  ],
+  "shell": [],
+  "never": []
+ },
+ "T-training": {
+  "whole": [
+   "operators/tests/test_sampling.py",
+   "operators/tests/test_training.py",
+   "operators/training/__init__.py",
+   "operators/training/cache.py",
+   "operators/training/hardware.py",
+   "operators/training/loader.py",
+   "operators/training/loop.py",
+   "operators/training/sampling.py",
+   "operators/training/staged.py"
+  ],
+  "part": [],
+  "shell": [],
+  "never": []
+ },
+ "P-pictures": {
+  "whole": [],
+  "part": [
+   "operators/inspection/plots/renderers.py",
+   "operators/inspection/plots/results.py",
+   "operators/inspection/plots/suite.py"
+  ],
+  "shell": [
+   "operators/inspection/__init__.py",
+   "operators/inspection/catalog.py",
+   "operators/inspection/plots/__init__.py",
+   "operators/inspection/plots/backend.py",
+   "operators/inspection/tables.py",
+   "operators/tests/test_inspection.py"
+  ],
+  "never": []
+ },
+ "M3-branch-trunk-parameters-to-charge": {
+  "whole": [
+   "operators/deep_operator_network/IMPLEMENTATION.md",
+   "operators/deep_operator_network/manifest.toml"
+  ],
+  "part": [
+   "operators/deep_operator_network/report.md",
+   "operators/deep_operator_network/report.py",
+   "operators/tests/test_deep_operator_network.py"
+  ],
+  "shell": [
+   "operators/deep_operator_network/__init__.py",
+   "operators/deep_operator_network/configs/canonical.toml"
+  ],
+  "never": [
+   "operators/deep_operator_network/configs/principal_component.toml",
+   "operators/deep_operator_network/configs/proper_orthogonal.toml"
+  ]
+ },
+ "M1-flagship-localization": {
+  "whole": [
+   "operators/factorized_fourier/IMPLEMENTATION.md",
+   "operators/factorized_fourier/__init__.py",
+   "operators/factorized_fourier/manifest.toml",
+   "operators/factorized_fourier/report.py",
+   "operators/tests/test_factorized_fourier.py"
+  ],
+  "part": [
+   "operators/factorized_fourier/report.md"
+  ],
+  "shell": [],
+  "never": []
+ },
+ "N1-substrate-and-framework": {
+  "whole": [
+   "operators/framework/operator.py"
+  ],
+  "part": [
+   "operators/substrate/linear_algebra.py",
+   "operators/substrate/network.py",
+   "operators/tests/test_fourier.py",
+   "operators/tests/test_integral.py",
+   "operators/tests/test_invariance.py",
+   "operators/tests/test_substrate.py"
+  ],
+  "shell": [
+   "operators/framework/__init__.py",
+   "operators/framework/composition.py",
+   "operators/framework/domain.py",
+   "operators/framework/inspectable.py",
+   "operators/framework/integral.py",
+   "operators/framework/invariance.py",
+   "operators/framework/kernel.py",
+   "operators/framework/layer.py",
+   "operators/framework/representation.py",
+   "operators/substrate/__init__.py",
+   "operators/substrate/arrays.py",
+   "operators/substrate/custom_gradient.py",
+   "operators/substrate/devices.py",
+   "operators/substrate/engine.py",
+   "operators/substrate/fourier.py",
+   "operators/substrate/operations.py",
+   "operators/substrate/optimize.py",
+   "operators/substrate/torch_engine.py"
+  ],
+  "never": []
+ },
+ "N4-encoders-readouts-wrappers": {
+  "whole": [
+   "operators/encoders/__init__.py",
+   "operators/readouts/__init__.py",
+   "operators/wrappers/__init__.py"
+  ],
+  "part": [
+   "operators/tests/test_parts.py"
+  ],
+  "shell": [],
+  "never": []
+ },
+ "M4-branch-trunk-energy-trunk": {
+  "whole": [
+   "operators/deep_operator_network/IMPLEMENTATION.md",
+   "operators/deep_operator_network/__init__.py",
+   "operators/deep_operator_network/configs/energy_trunk.toml",
+   "operators/deep_operator_network/manifest.toml"
+  ],
+  "part": [
+   "operators/deep_operator_network/report.md",
+   "operators/deep_operator_network/report.py",
+   "operators/tests/test_deep_operator_network.py"
+  ],
+  "shell": [],
+  "never": []
+ },
+ "D1-raw-data": {
+  "whole": [
+   "operators/stage0-report.md"
+  ],
+  "part": [],
+  "shell": [
+   "operators/data/__init__.py",
+   "operators/data/parsers.py",
+   "operators/data/spectra.py",
+   "operators/data/stage0.py",
+   "operators/data/store.py",
+   "operators/tests/test_parsers.py",
+   "operators/tests/test_store.py"
+  ],
+  "never": []
+ },
+ "N3-compositions": {
+  "whole": [
+   "operators/compositions/__init__.py",
+   "operators/compositions/activation.py",
+   "operators/compositions/contraction.py",
+   "operators/compositions/fixed_point.py",
+   "operators/compositions/multi_scale.py",
+   "operators/tests/test_contraction.py",
+   "operators/tests/test_fixed_point.py",
+   "operators/tests/test_multi_scale.py"
+  ],
+  "part": [],
+  "shell": [],
+  "never": []
+ },
+ "M2-flagship-ladder-potential-parametric": {
+  "whole": [
+   "operators/factorized_fourier/IMPLEMENTATION.md",
+   "operators/factorized_fourier/manifest.toml"
+  ],
+  "part": [
+   "operators/factorized_fourier/__init__.py",
+   "operators/factorized_fourier/report.md",
+   "operators/factorized_fourier/report.py",
+   "operators/tests/test_factorized_fourier.py",
+   "operators/tests/test_factorized_fourier_parametric.py"
+  ],
+  "shell": [
+   "operators/factorized_fourier/parametric.py"
+  ],
+  "never": []
+ }
+}

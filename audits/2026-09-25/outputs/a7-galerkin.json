@@ -1,0 +1,10 @@
+{
+ "member_on_copy_population": 0.17796632259220055,
+ "copy_units": 25,
+ "member_on_interpolation_levels": 0.11911045680481774,
+ "interpolation_units": 27,
+ "mean_field": 0.17552893916198975,
+ "input_dependence": 0.14016389782830993,
+ "copy_verdict": "kill",
+ "interpolation_verdict": "kill"
+}

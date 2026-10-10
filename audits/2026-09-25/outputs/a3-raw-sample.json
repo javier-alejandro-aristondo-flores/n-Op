@@ -1,0 +1,294 @@
+{
+ "raw_vs_store": {
+  "strain_atlas: diamond/2_atoms_4-10-2026/new-data/5_angular-distortion-3angles-HSE06/shear_3D_g1_0.09_g2_-0.09_g3_-0.09/1-GGA-PBE": {
+   "run": "diamond/2_atoms_4-10-2026/new-data/5_angular-distortion-3angles-HSE06/shear_3D_g1_0.09_g2_-0.09_g3_-0.09/1-GGA-PBE",
+   "CHGCAR block 1 / volume vs charge_density": 5.502689747710514e-08,
+   "CONTROL CHGCAR read z fastest": null,
+   "lattice max gap": 0.0,
+   "positions max fractional gap": 0.0,
+   "OUTCAR NELECT minus stored electron_count": 0.0,
+   "EIGENVAL electrons, kpoints, bands": [
+    8,
+    172,
+    8
+   ],
+   "stored energies shape": [
+    1,
+    172,
+    8
+   ],
+   "EIGENVAL first energy minus stored": 0.0
+  },
+  "strain_atlas: diamond/2_atoms_4-10-2026/new-data/5_angular-distortion-3angles-HSE06/shear_3D_g1_0.03_g2_-0.09_g3_0.09/1-GGA-PBE": {
+   "run": "diamond/2_atoms_4-10-2026/new-data/5_angular-distortion-3angles-HSE06/shear_3D_g1_0.03_g2_-0.09_g3_0.09/1-GGA-PBE",
+   "CHGCAR block 1 / volume vs charge_density": 5.563442913528497e-08,
+   "CONTROL CHGCAR read z fastest": null,
+   "lattice max gap": 0.0,
+   "positions max fractional gap": 0.0,
+   "OUTCAR NELECT minus stored electron_count": 0.0,
+   "EIGENVAL electrons, kpoints, bands": [
+    8,
+    172,
+    8
+   ],
+   "stored energies shape": [
+    1,
+    172,
+    8
+   ],
+   "EIGENVAL first energy minus stored": 0.0
+  },
+  "supercell_strains: diamond/Pure/New_files/angular-distortion-new/shear_xz_g0.095": {
+   "run": "diamond/Pure/New_files/angular-distortion-new/shear_xz_g0.095",
+   "CHGCAR block 1 / volume vs charge_density": 3.016291550308764e-08,
+   "CONTROL CHGCAR read z fastest": 0.0029977549625721206,
+   "CHGCAR block 2 / volume vs magnetization_density": 4.164341240585999e-08,
+   "lattice max gap": 0.0,
+   "positions max fractional gap": 0.0,
+   "AECCAR0 block 1 vs all_electron_core_density": 1.0858393546119882e-08,
+   "AECCAR1 block 1 vs superposed_atomic_density": 3.414716109434494e-08,
+   "AECCAR2 block 1 vs all_electron_valence_density": 3.444256493563249e-08,
+   "ELFCAR block 1 vs electron_localization_up": 3.466283316514451e-08,
+   "ELFCAR block 2 vs electron_localization_down": 3.466283316514451e-08,
+   "LOCPOT block 1 vs local_potential_up": 3.242236754587809e-08,
+   "LOCPOT block 2 vs local_potential_down": 3.2422301115205875e-08,
+   "OUTCAR NELECT minus stored electron_count": 0.0,
+   "EIGENVAL electrons, kpoints, bands": [
+    256,
+    8,
+    288
+   ],
+   "stored energies shape": [
+    2,
+    8,
+    288
+   ],
+   "EIGENVAL first energy minus stored": 0.0
+  },
+  "supercell_strains: diamond/Pure/New_files/volume-isotropic-new/Vol_387": {
+   "run": "diamond/Pure/New_files/volume-isotropic-new/Vol_387",
+   "CHGCAR block 1 / volume vs charge_density": 3.275415452069572e-08,
+   "CONTROL CHGCAR read z fastest": 1.184348610897981e-07,
+   "CHGCAR block 2 / volume vs magnetization_density": 3.044069159499998e-08,
+   "lattice max gap": 0.0,
+   "positions max fractional gap": 0.0,
+   "OUTCAR NELECT minus stored electron_count": 0.0,
+   "EIGENVAL electrons, kpoints, bands": [
+    256,
+    8,
+    288
+   ],
+   "stored energies shape": [
+    2,
+    8,
+    288
+   ],
+   "EIGENVAL first energy minus stored": 0.0
+  },
+  "defect_set: diamond/single_defect/VIA-element-single-impurity/Te/HSE06": {
+   "run": "diamond/single_defect/VIA-element-single-impurity/Te/HSE06",
+   "CHGCAR block 1 / volume vs charge_density": 3.018240239342283e-08,
+   "CONTROL CHGCAR read z fastest": 0.0001589551184073757,
+   "CHGCAR block 2 / volume vs magnetization_density": 4.5117322398114164e-08,
+   "lattice max gap": 0.0,
+   "positions max fractional gap": 0.0,
+   "AECCAR0 block 1 vs all_electron_core_density": 2.290010800179536e-08,
+   "AECCAR1 block 1 vs superposed_atomic_density": 4.46564091657051e-08,
+   "AECCAR2 block 1 vs all_electron_valence_density": 3.1562172306953573e-08,
+   "ELFCAR block 1 vs electron_localization_up": 3.3845053833862806e-08,
+   "ELFCAR block 2 vs electron_localization_down": 3.389356770446457e-08,
+   "LOCPOT block 1 vs local_potential_up": 3.4028728911165424e-08,
+   "LOCPOT block 2 vs local_potential_down": 3.4018560219724284e-08,
+   "OUTCAR NELECT minus stored electron_count": 0.0,
+   "EIGENVAL electrons, kpoints, bands": [
+    258,
+    8,
+    200
+   ],
+   "stored energies shape": [
+    2,
+    8,
+    200
+   ],
+   "EIGENVAL first energy minus stored": 0.0
+  },
+  "defect_set: diamond/triads_defects/H-B-Si/C8-C55-C1-were_replaced/config3/GGA-PBE": {
+   "run": "diamond/triads_defects/H-B-Si/C8-C55-C1-were_replaced/config3/GGA-PBE",
+   "CHGCAR block 1 / volume vs charge_density": 5.526054131480877e-08,
+   "CONTROL CHGCAR read z fastest": 0.8065784305803569,
+   "CHGCAR block 2 / volume vs magnetization_density": 4.766479640407854e-08,
+   "lattice max gap": 0.0,
+   "positions max fractional gap": 0.0,
+   "AECCAR0 block 1 vs all_electron_core_density": 3.0755461393917355e-08,
+   "AECCAR1 block 1 vs superposed_atomic_density": 4.6325318921980065e-08,
+   "AECCAR2 block 1 vs all_electron_valence_density": 3.475542159279139e-08,
+   "ELFCAR block 1 vs electron_localization_up": 3.2820836125266426e-08,
+   "ELFCAR block 2 vs electron_localization_down": 3.028337656523999e-08,
+   "LOCPOT block 1 vs local_potential_up": 3.023531764329898e-08,
+   "LOCPOT block 2 vs local_potential_down": 3.0211895491721064e-08,
+   "OUTCAR NELECT minus stored electron_count": 0.0,
+   "EIGENVAL electrons, kpoints, bands": [
+    252,
+    8,
+    192
+   ],
+   "stored energies shape": [
+    2,
+    8,
+    192
+   ],
+   "EIGENVAL first energy minus stored": 0.0
+  },
+  "perovskite_grid: ggapbe/length_distortions/a_0p9_b_0p9_c_0p9_alpha_1_beta_1_gamma_1": {
+   "run": "ggapbe/length_distortions/a_0p9_b_0p9_c_0p9_alpha_1_beta_1_gamma_1",
+   "CHGCAR block 1 / volume vs charge_density": 3.051723828935594e-08,
+   "CONTROL CHGCAR read z fastest": 7.430529549428929e-08,
+   "lattice max gap": 0.0,
+   "positions max fractional gap": 0.0,
+   "OUTCAR NELECT minus stored electron_count": 0.0,
+   "EIGENVAL electrons, kpoints, bands": [
+    48,
+    260,
+    32
+   ],
+   "stored energies shape": [
+    1,
+    260,
+    32
+   ],
+   "EIGENVAL first energy minus stored": 0.0
+  },
+  "perovskite_grid: ggapbe/angle_distortions/a_1_b_1_c_1_alpha_1p2_beta_0p8_gamma_1": {
+   "run": "ggapbe/angle_distortions/a_1_b_1_c_1_alpha_1p2_beta_0p8_gamma_1",
+   "CHGCAR block 1 / volume vs charge_density": 3.0666044191211096e-08,
+   "CONTROL CHGCAR read z fastest": 0.24176497824213525,
+   "lattice max gap": 0.0,
+   "positions max fractional gap": 0.0,
+   "OUTCAR NELECT minus stored electron_count": 0.0,
+   "EIGENVAL electrons, kpoints, bands": [
+    48,
+    260,
+    32
+   ],
+   "stored energies shape": [
+    1,
+    260,
+    32
+   ],
+   "EIGENVAL first energy minus stored": 0.0
+  },
+  "alloy_ensemble: alloy/0-Alumium-position-teste/0-Alumium-position-teste/x_037.5_Al_Al3Ga5O12_POSCAR_x037.5_cfg008_AlSites_1-3-8": {
+   "run": "alloy/0-Alumium-position-teste/0-Alumium-position-teste/x_037.5_Al_Al3Ga5O12_POSCAR_x037.5_cfg008_AlSites_1-3-8",
+   "CHGCAR block 1 / volume vs charge_density": 5.700351173906152e-08,
+   "CONTROL CHGCAR read z fastest": null,
+   "lattice max gap": 0.0,
+   "positions max fractional gap": 0.0,
+   "AECCAR0 block 1 vs all_electron_core_density": 1.621543522045249e-08,
+   "AECCAR1 block 1 vs superposed_atomic_density": 4.1678974601609575e-08,
+   "AECCAR2 block 1 vs all_electron_valence_density": 3.661205094119193e-08,
+   "ELFCAR block 1 vs electron_localization": 3.386313360974447e-08,
+   "LOCPOT block 1 vs local_potential": 5.50994938675987e-08,
+   "OUTCAR NELECT minus stored electron_count": 0.0,
+   "EIGENVAL electrons, kpoints, bands": [
+    146,
+    36,
+    88
+   ],
+   "stored energies shape": [
+    1,
+    36,
+    88
+   ],
+   "EIGENVAL first energy minus stored": 0.0
+  },
+  "alloy_ensemble: alloy/0-Alumium-position-teste/0-Alumium-position-teste/x_062.5_Al_Al5Ga3O12_POSCAR_x062.5_cfg011_AlSites_1-3-4-5-8": {
+   "run": "alloy/0-Alumium-position-teste/0-Alumium-position-teste/x_062.5_Al_Al5Ga3O12_POSCAR_x062.5_cfg011_AlSites_1-3-4-5-8",
+   "CHGCAR block 1 / volume vs charge_density": 5.513374441781845e-08,
+   "CONTROL CHGCAR read z fastest": null,
+   "lattice max gap": 0.0,
+   "positions max fractional gap": 0.0,
+   "AECCAR0 block 1 vs all_electron_core_density": 1.6168093942384557e-08,
+   "AECCAR1 block 1 vs superposed_atomic_density": 4.1715656354419963e-08,
+   "AECCAR2 block 1 vs all_electron_valence_density": 3.38067422538741e-08,
+   "ELFCAR block 1 vs electron_localization": 3.4254817950303524e-08,
+   "LOCPOT block 1 vs local_potential": 5.486337446623513e-08,
+   "OUTCAR NELECT minus stored electron_count": 0.0,
+   "EIGENVAL electrons, kpoints, bands": [
+    126,
+    36,
+    80
+   ],
+   "stored energies shape": [
+    1,
+    36,
+    80
+   ],
+   "EIGENVAL first energy minus stored": 0.0
+  },
+  "relaxation_pool: j-dataset/semi-conductors1-1500/000993_mp-1208880_Sm2SiO5": {
+   "run": "j-dataset/semi-conductors1-1500/000993_mp-1208880_Sm2SiO5",
+   "OUTCAR NELECT minus stored electron_count": 0.0,
+   "EIGENVAL electrons, kpoints, bands": [
+    224,
+    21,
+    144
+   ],
+   "stored energies shape": [
+    2,
+    21,
+    144
+   ],
+   "EIGENVAL first energy minus stored": 0.0
+  },
+  "relaxation_pool: j-dataset/00_element_references_PBEsol_clean/Lu_mp-973571_Lu": {
+   "run": "j-dataset/00_element_references_PBEsol_clean/Lu_mp-973571_Lu",
+   "OUTCAR NELECT minus stored electron_count": 0.0,
+   "EIGENVAL electrons, kpoints, bands": [
+    27,
+    85,
+    24
+   ],
+   "stored energies shape": [
+    2,
+    85,
+    24
+   ],
+   "EIGENVAL first energy minus stored": 0.0
+  }
+ },
+ "orientation": {
+  "alloy/0-Alumium-position-teste/0-Alumium-position-teste/x_050.0_Al_Al4Ga4O12_POSCAR_x050.0_cfg007_AlSites_1-2-5-7": {
+   "grid": [
+    48,
+    96,
+    216
+   ],
+   "atoms": 20,
+   "atoms on a top-1% voxel, stored order": 1.0,
+   "CONTROL atoms on a top-1% voxel, axes reversed": 0.5,
+   "median distance to the local maximum (voxels)": 1.4142135623730951
+  },
+  "alloy/1-Alloy/1-Alloy/1-Volume-relaxation/8-x-87.5/volume_series/scale_0.900": {
+   "grid": [
+    48,
+    84,
+    192
+   ],
+   "atoms": 20,
+   "atoms on a top-1% voxel, stored order": 0.85,
+   "CONTROL atoms on a top-1% voxel, axes reversed": 0.45,
+   "median distance to the local maximum (voxels)": 1.2071067811865475
+  },
+  "alloy/1-Alloy/1-Alloy/1-Volume-relaxation/6-x-62.5/volume_series/scale_0.95": {
+   "grid": [
+    48,
+    96,
+    192
+   ],
+   "atoms": 20,
+   "atoms on a top-1% voxel, stored order": 1.0,
+   "CONTROL atoms on a top-1% voxel, axes reversed": 0.5,
+   "median distance to the local maximum (voxels)": 1.0
+  }
+ }
+}

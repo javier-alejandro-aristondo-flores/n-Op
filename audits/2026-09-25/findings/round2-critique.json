@@ -1,0 +1,308 @@
+{
+ "assignments": [
+  {
+   "name": "R3-01 substrate and framework read whole",
+   "files": [
+    "operators/substrate/__init__.py",
+    "operators/substrate/arrays.py",
+    "operators/substrate/custom_gradient.py",
+    "operators/substrate/devices.py",
+    "operators/substrate/engine.py",
+    "operators/substrate/fourier.py",
+    "operators/substrate/operations.py",
+    "operators/substrate/optimize.py",
+    "operators/substrate/torch_engine.py",
+    "operators/substrate/linear_algebra.py",
+    "operators/substrate/network.py",
+    "operators/framework/__init__.py",
+    "operators/framework/composition.py",
+    "operators/framework/domain.py",
+    "operators/framework/inspectable.py",
+    "operators/framework/integral.py",
+    "operators/framework/invariance.py",
+    "operators/framework/kernel.py",
+    "operators/framework/layer.py",
+    "operators/framework/representation.py",
+    "operators/tests/test_substrate.py",
+    "operators/tests/test_fourier.py",
+    "operators/tests/test_integral.py",
+    "operators/tests/test_invariance.py"
+   ],
+   "rows": [
+    "L6-006",
+    "L6-008",
+    "L6-009",
+    "L6-030"
+   ],
+   "brief": "18 of N1's 25 files were seen only through shell commands. Read each whole. Check the real-FFT normalization and the Hermitian half-spectrum handling in fourier.py, that custom_gradient's backward matches a finite-difference check, that the engine seam really keeps torch behind torch_engine.py, the integral's quadrature weights and cell-volume factor, the invariance checks (are they actually tested or only declared?), and that inspectable.py enforces the Inspect() contract. Resolve rows L6-006/008/009/030 (shared batched real FFT with AD through complex tensors, the vendor-versus-in-house decision and when it was taken) as kept, superseded, or broken, citing the commit that decided it."
+  },
+  {
+   "name": "R3-02 evaluation verdict machinery",
+   "files": [
+    "operators/evaluation/__init__.py",
+    "operators/evaluation/cross_member.py",
+    "operators/evaluation/cross_member.md",
+    "operators/evaluation/every_shape.py",
+    "operators/evaluation/perovskite_block.py",
+    "operators/evaluation/results.py",
+    "operators/evaluation/localization_block.py",
+    "operators/tasks/__init__.py"
+   ],
+   "rows": [],
+   "brief": "S2 read none of its files whole, and 8 of 11 only through the shell. Read them whole. Check the sign and the denominator of every percent-improvement gate (for example the perovskite -108.7% and -350.8% numbers, and the two-branch -13.1%), that pass/kill thresholds match each entry's pre-registration, that the perovskite nearest-angle-copy and linear-in-angle floors use training angles only, that cross_member.md agrees with cross_member.py, and that the task definitions in tasks/__init__.py match how the blocks consume them."
+  },
+  {
+   "name": "R3-03 floors and metrics",
+   "files": [
+    "operators/data/floors.py",
+    "operators/tests/test_floors.py",
+    "operators/metrics/__init__.py",
+    "operators/evaluation/scoring.py",
+    "operators/tests/test_metrics.py",
+    "operators/tests/test_evaluation.py"
+   ],
+   "rows": [
+    "L6-019",
+    "L6-020",
+    "L6-023",
+    "L6-024",
+    "L6-054",
+    "L6-060"
+   ],
+   "brief": "floors.py was seen only through the shell, and S1 read none of its five files whole. Read them whole. Check that every floor is fitted on training folds only, the formulas for the metrics (mean absolute error, the structural-similarity window and constants, relative L2), how intervals and pooling are built (per-run versus per-voxel, how the median is taken), and that tests assert numbers rather than shapes. Resolve L6-019/020 (conformal calibration and FiLM conditioning as shared primitives: are they present?), L6-023/024 (floors computed before training and reproducing the Stage-0 numbers, with the spectral-Poisson floor used as the units test), L6-054 (the superposition-of-atomic-densities floor read from AECCAR1 for the 547 paired runs) and L6-060 (Bader per-atom charges as a secondary metric)."
+  },
+  {
+   "name": "R3-04 codomain attention member code",
+   "files": [
+    "operators/codomain_attention/__init__.py",
+    "operators/codomain_attention/channels.py",
+    "operators/codomain_attention/drivers.py",
+    "operators/codomain_attention/loader.py",
+    "operators/codomain_attention/masking.py",
+    "operators/codomain_attention/readout.py",
+    "operators/codomain_attention/report.py",
+    "operators/codomain_attention/splits.py",
+    "operators/tests/test_codomain_attention_member.py"
+   ],
+   "rows": [],
+   "brief": "M9 read only its documents. All nine code and test files were seen only through the shell. Read them whole. Check for leaks between the pretrain and fine-tune folds in splits.py and loader.py, that masking hides the target channel at evaluation, the channel layout (including spin blocks), how the stopped pretrain checkpoint is chosen in drivers.py, and that report.py's verdict reads written rows rather than constants."
+  },
+  {
+   "name": "R3-05 manifold decoder and structure-to-density code",
+   "files": [
+    "operators/nonlinear_manifold_decoder/__init__.py",
+    "operators/nonlinear_manifold_decoder/report.py",
+    "operators/nonlinear_manifold_decoder/report.md",
+    "operators/tests/test_nonlinear_manifold_decoder.py",
+    "operators/deep_dft/__init__.py",
+    "operators/deep_dft/message_passing.py",
+    "operators/deep_dft/species.py",
+    "operators/deep_dft/report.py",
+    "operators/deep_dft/floors.py",
+    "operators/deep_dft/readout.py",
+    "operators/deep_dft/sampling.py",
+    "operators/tests/test_deep_dft.py"
+   ],
+   "rows": [],
+   "brief": "M7 read none of its code whole, and M10 saw its message-passing, species, model and report code only through the shell. Read them whole. In deep_dft check periodic-image handling and the cutoff in message_passing.py, the species encoding, that probe-point sampling and the member's own floors use training runs only, and that report.py's numbers come from written rows. In the manifold decoder check the report.py verdict path against report.md, and that the tests exercise the decoder rather than only its shapes."
+  },
+  {
+   "name": "R3-06 flagship parametric and report remainder",
+   "files": [
+    "operators/factorized_fourier/parametric.py",
+    "operators/factorized_fourier/report.py",
+    "operators/factorized_fourier/report.md",
+    "operators/factorized_fourier/__init__.py",
+    "operators/tests/test_factorized_fourier_parametric.py"
+   ],
+   "rows": [],
+   "brief": "M2's own subject, parametric.py, was seen only through the shell, and report.py (1,949 lines) and report.md were read only in part by both flagship auditors. Read parametric.py and its test whole, and the parts of report.py and report.md that cover the ladder, the potential and the parametric entries. Check how parameters are conditioned, whether the matched-budget comparison is honest, and that each report number traces to results.json."
+  },
+  {
+   "name": "R3-07 branch-trunk report read whole",
+   "files": [
+    "operators/deep_operator_network/report.py",
+    "operators/deep_operator_network/report.md",
+    "operators/deep_operator_network/__init__.py",
+    "operators/tests/test_deep_operator_network.py",
+    "operators/deep_operator_network/configs/canonical.toml",
+    "operators/deep_operator_network/configs/proper_orthogonal.toml"
+   ],
+   "rows": [],
+   "brief": "M3 and M4 both read report.py (1,835 lines) and the 670-line test only in part, and proper_orthogonal.toml was seen only through the shell. Read them whole between the two of you. Check that the proper-orthogonal and principal-component bases are fitted on training folds only, that the config values match what the report claims was run, and that every verdict in report.md matches report.py's arithmetic."
+  },
+  {
+   "name": "R3-08 alias-free convolutional and two-input report",
+   "files": [
+    "operators/alias_free_convolutional/__init__.py",
+    "operators/alias_free_convolutional/activation.py",
+    "operators/alias_free_convolutional/report.py",
+    "operators/tests/test_alias_free_convolutional.py",
+    "operators/multiple_input_operator_network/report.py"
+   ],
+   "rows": [],
+   "brief": "The alias-free model and its activation (the part that carries the anti-aliasing claim) were seen only through the shell, and its report and test were read only in part. Read them whole. Check that the activation upsamples, applies the nonlinearity and filters down at the claimed rates. Then read multiple_input_operator_network/report.py whole: it produced the killed -13.1% verdict, so check that the twin comparison uses the identical fold, schedule and metrics."
+  },
+  {
+   "name": "R3-09 raw data, parsers and store",
+   "files": [
+    "operators/data/parsers.py",
+    "operators/data/spectra.py",
+    "operators/data/store.py",
+    "operators/data/stage0.py",
+    "operators/data/__init__.py",
+    "operators/tests/test_store.py",
+    "operators/tests/test_parsers.py"
+   ],
+   "rows": [
+    "L6-003",
+    "L6-051",
+    "L6-052",
+    "L6-053",
+    "L6-055"
+   ],
+   "brief": "D1 saw parsers.py, spectra.py and test_store.py only through the shell, and read store.py and stage0.py only in part. Read them whole. Check grid ordering (Fortran x-fastest), the division by cell volume for CHGCAR, the handling of the second spin block in CHGCAR, ELFCAR and LOCPOT, and that the augmentation-occupancy text is skipped. Resolve L6-003/051/052/053/055 (the spin-block law, its single-block control run, and whether every member's channel layout accounts for doubled blocks) against the parsers and one spin-polarized sidecar from _derived."
+  },
+  {
+   "name": "R3-10 results page and pictures",
+   "files": [
+    "operator-results.md",
+    "operators/inspection/__init__.py",
+    "operators/inspection/catalog.py",
+    "operators/inspection/tables.py",
+    "operators/inspection/plots/__init__.py",
+    "operators/inspection/plots/backend.py",
+    "operators/inspection/plots/renderers.py",
+    "operators/inspection/plots/results.py",
+    "operators/inspection/plots/suite.py",
+    "operators/tests/test_inspection.py"
+   ],
+   "rows": [],
+   "brief": "R's only file, operator-results.md, was never opened, only searched through the shell, and P read none of its files whole. Read the results page whole and trace every number and verdict on it to the member's report.md and results.json at 485a7d9, including that killed and void runs (perovskite_gate_48840) are labeled as such. Read the inspection package whole and check that renderers consume only the inspection API (the inspectability rule) and that the figure captions match what is plotted."
+  },
+  {
+   "name": "R3-11 ledger data-count rows against the census",
+   "files": [],
+   "rows": [
+    "L6-040",
+    "L6-041",
+    "L6-042",
+    "L6-043",
+    "L6-044",
+    "L6-045",
+    "L6-046",
+    "L6-047",
+    "L6-048",
+    "L6-049",
+    "L6-050",
+    "L6-056",
+    "L6-064",
+    "L6-065",
+    "L6-066",
+    "L6-067"
+   ],
+   "brief": "No resolver classified these rows from the test-suite.md honesty and verification appendices (sections 11 and 12). Check each count against /Pool/VASP_DATA/_census (runs.jsonl, ANSWERS.md) and operators/data/exclusions.py, without opening any pseudopotential file: the Alloy stage-2/stage-3 k-mesh story (seven interior pairs with 36 k-points, the x=0 and x=100 endpoints on KSPACING with 30 points, and whether that confound is actually registered), the Strain Atlas count of 1,340 and its 0.00 meV degeneracy, the missing files of shear_xy_g0.015 and g0.010, 106 of 125 Perovskite runs flagged for fractional occupancy, the 547/548 ELF/LOCPOT/paired counts and the 182/169/196 split by tree. Mark each row kept, broken or stale."
+  },
+  {
+   "name": "R3-12 package gates and build-order ledger rows",
+   "files": [
+    ".gitignore",
+    ".gitattributes",
+    "operators/pyproject.toml",
+    "operators/__init__.py",
+    "operators/tests/conftest.py",
+    "operators/tests/test_imports.py"
+   ],
+   "rows": [
+    "L6-001",
+    "L6-002",
+    "L6-004",
+    "L6-005",
+    "L6-021",
+    "L6-022",
+    "L6-025",
+    "L6-039",
+    "L6-061"
+   ],
+   "brief": "G never opened .gitignore or .gitattributes, saw pyproject.toml only through the shell, and read conftest.py and test_imports.py only in part. Read them whole. Check that the pyright-strict gate and the Python version are really enforced, that POTCAR files and derived data cannot be committed, and that the import test covers every package. Resolve the build-order rows from test-suite.md section 10: L6-001/002 (ordering of the primitive union, and whether the AD core, matrix-multiply/network/optimizer kernels, parsers, store and split engine are shared by every member), L6-004/005 (whether the split engine consumes the duplicate registry, the orbit map and the twin/satellite co-split rules; check operators/data/splits.py), L6-021/022/025 (wave order and Wave 0 contents, checked against git history reachable from 485a7d9), L6-039 (Alloy full-resolution and full-width attention deferred to the supercomputer) and L6-061 (transfer axes f and g: are they implemented or recorded as deferred?)."
+  }
+ ],
+ "files_never_read": [
+  ".gitattributes",
+  ".gitignore",
+  "operator-results.md",
+  "operators/__init__.py",
+  "operators/alias_free_convolutional/__init__.py",
+  "operators/alias_free_convolutional/activation.py",
+  "operators/codomain_attention/__init__.py",
+  "operators/codomain_attention/channels.py",
+  "operators/codomain_attention/drivers.py",
+  "operators/codomain_attention/loader.py",
+  "operators/codomain_attention/masking.py",
+  "operators/codomain_attention/readout.py",
+  "operators/codomain_attention/report.py",
+  "operators/codomain_attention/splits.py",
+  "operators/data/floors.py",
+  "operators/data/parsers.py",
+  "operators/data/spectra.py",
+  "operators/deep_dft/__init__.py",
+  "operators/deep_dft/message_passing.py",
+  "operators/deep_dft/report.py",
+  "operators/deep_dft/species.py",
+  "operators/deep_operator_network/configs/proper_orthogonal.toml",
+  "operators/evaluation/cross_member.md",
+  "operators/evaluation/cross_member.py",
+  "operators/evaluation/every_shape.py",
+  "operators/evaluation/perovskite_block.py",
+  "operators/evaluation/results.py",
+  "operators/factorized_fourier/parametric.py",
+  "operators/framework/__init__.py",
+  "operators/framework/composition.py",
+  "operators/framework/domain.py",
+  "operators/framework/inspectable.py",
+  "operators/framework/integral.py",
+  "operators/framework/invariance.py",
+  "operators/framework/kernel.py",
+  "operators/framework/layer.py",
+  "operators/framework/representation.py",
+  "operators/inspection/__init__.py",
+  "operators/inspection/catalog.py",
+  "operators/inspection/plots/__init__.py",
+  "operators/inspection/plots/backend.py",
+  "operators/inspection/tables.py",
+  "operators/nonlinear_manifold_decoder/__init__.py",
+  "operators/nonlinear_manifold_decoder/report.py",
+  "operators/pyproject.toml",
+  "operators/substrate/__init__.py",
+  "operators/substrate/arrays.py",
+  "operators/substrate/custom_gradient.py",
+  "operators/substrate/devices.py",
+  "operators/substrate/engine.py",
+  "operators/substrate/fourier.py",
+  "operators/substrate/operations.py",
+  "operators/substrate/optimize.py",
+  "operators/substrate/torch_engine.py",
+  "operators/tasks/__init__.py",
+  "operators/tests/test_codomain_attention_member.py",
+  "operators/tests/test_inspection.py",
+  "operators/tests/test_nonlinear_manifold_decoder.py",
+  "operators/tests/test_store.py"
+ ],
+ "auditors_thin": [
+  "R-results-page: its one owned file (operator-results.md, 450 lines) was never opened, only touched through the shell",
+  "S2-floors-and-verdicts: no file read whole; 8 of 11, including floors.py and every verdict module except localization_block.py, seen only through the shell",
+  "S1-metrics-intervals-pooling: none of its 5 files read whole; metrics and scoring were read only in part",
+  "P-pictures: no file read whole; 6 of 9 seen only through the shell",
+  "N1-substrate-and-framework: 1 of 25 files read whole, 18 seen only through the shell (the whole engine, fourier and every framework module except operator.py)",
+  "M9-codomain-member: read only its 3 documents; all 9 code and test files seen only through the shell",
+  "M7-manifold-decoder: report.py, __init__.py and the test seen only through the shell; read only the docs plus part of report.md",
+  "M10-structure-to-density: message_passing, species, __init__ and report.py (635 lines) seen only through the shell",
+  "M2-flagship-ladder-potential-parametric: its own subject, parametric.py, seen only through the shell; the 1,949-line report.py read only in part",
+  "D1-raw-data: parsers.py, spectra.py and test_store.py seen only through the shell; store.py and stage0.py read only in part",
+  "G-gates-and-package: never opened .gitignore or .gitattributes; pyproject.toml seen only through the shell",
+  "M3-branch-trunk-parameters-to-charge: 5 of 9 files read only in part (report.py 1,835 lines, the 670-line test), proper_orthogonal.toml seen only through the shell",
+  "M11-convolutional-and-plane-wave: the alias-free model __init__.py and activation.py seen only through the shell; report.py and the test read only in part",
+  "O1-overlap, O2-overlap, O3-overlap: coverage records no owned files at all, so their reading cannot be measured; confirm whether they owned nothing by design"
+ ],
+ "verdict": "A third round is needed: 59 of 185 owned files were never read whole or in part, 13 auditors read thinly against their file lists (and 3 overlap auditors left nothing measurable), and all 40 unresolved ledger rows, every one from test-suite.md sections 10 to 12 under the general entry, still need a resolver."
+}

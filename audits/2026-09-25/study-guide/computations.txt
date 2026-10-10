@@ -1,0 +1,15 @@
+== frequency-split metric ==
+low band, error along x 0.030861, along z 0.021822, ratio 1.4142
+whole field as the low band 0.296828, plain relative L2 0.298005
+== perovskite symmetry copies ==
+supplement pair (alpha 0.8 against alpha 1.2): as stored 3.02e-01, best over 48 transforms 6.31e-07
+swap pair (alpha 0.8 beta 0.9 against alpha 0.9 beta 0.8): as stored 1.11e-01, best over 48 transforms 3.38e-07
+control, different crystals (alpha 0.8 against alpha 0.9): as stored 8.21e-02, best over 48 transforms 8.21e-02
+angle-stratum runs 125, distinct crystals 14
+fold-0 angle runs 25, with a same-crystal run in folds 1-4: 25, distinct fold-0 crystals 10
+holdout_factor_0p8: angle runs held out 61, whose crystal also sits among runs not held out 57
+holdout_factor_1p2: angle runs held out 61, whose crystal also sits among runs not held out 57
+symmetry-aware copy floor on fold 0 (each run's same-crystal training run, best transform): median 1.7e-07, worst 6.9e-07 over 25 runs
+== energy trunk copy floor ==
+control, ridge floor: whole window 0.368, band edges 0.518
+nearest-neighbor curve copy: whole window 0.149, band edges 0.171, 30 units, 1856 training runs

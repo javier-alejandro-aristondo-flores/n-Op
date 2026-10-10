@@ -1,0 +1,3 @@
+[    5.6s] blocks: train 608, validation 83, test 88 entries; kill bar 0.005565269097917695
+[    5.8s] checkpoint correction_projection_stage2_checkpoint.npz: best step 8000, best validation 3.3006e-06
+[    5.9s] member 0.002079 (reported 0.002079), identity 0.011131 (reported 0.011131), improvement 81.3% (reported 81.3%), ratio to the coefficient ridge 406x (reported 406x), 22 units

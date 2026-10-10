@@ -1,0 +1,70 @@
+{
+ "image_seed": 20260925,
+ "image_sample": [
+  "operators/alias_free_convolutional/figures/fold_0/alias_free/untrained/gram_standardization_mean.png",
+  "operators/deep_dft/figures/readout__last_predicted_values.png",
+  "operators/deep_operator_network/figures/perovskite/holdout_factor_0p8/canonical/floors.png",
+  "operators/factorized_fourier/figures/fold_0/explicit_matched/components/scalars.png",
+  "operators/galerkin_transformer/figures/perovskite_gate_v2_52283/last_predicted_values.png",
+  "operators/multiple_input_operator_network/figures/fold_0/floors.png",
+  "operators/nonlinear_manifold_decoder/figures/pooled/components/readout__decoder_layer_2_biases.png",
+  "operators/residual_correction/figures/projection_backbone/components/backbone__encoder__basis_modes.png",
+  "operators/alias_free_convolutional/figures/fold_0/alias_free/untrained/encoder__lift_biases.png",
+  "operators/alias_free_convolutional/figures/fold_0/alias_free/untrained/readout__projection_biases.png",
+  "operators/factorized_fourier/figures/fold_0/weight_tied/components/readout__projection_weights.png",
+  "operators/galerkin_transformer/figures/perovskite_gate_v2_52283/processing_shape.png",
+  "operators/residual_correction/figures/projection_backbone/components/cheap_basis_singular_values.png",
+  "operators/deep_operator_network/figures/perovskite/holdout_factor_1p2/proper_orthogonal/components/composition__last_carried_vector.png",
+  "operators/galerkin_transformer/figures/perovskite_gate_v2_52283/encoder__lift_weights.png",
+  "operators/residual_correction/figures/projection_backbone/components/correction_basis_singular_values.png",
+  "operators/multiple_input_operator_network/figures/fold_0/components/readout__trunk_layer_1_weights.png",
+  "operators/deep_operator_network/figures/accurate/principal_component/components/readout__basis_mean.png",
+  "operators/deep_dft/figures/last_renormalized_grid.png",
+  "operators/deep_operator_network/figures/perovskite/fold_0/principal_component/prediction_worst.png",
+  "operators/residual_correction/figures/projection_backbone/error_by_family.png",
+  "operators/deep_dft/figures/encoder__atom_embedding_table.png",
+  "operators/deep_operator_network/figures/pooled/energy_trunk/prediction_best.png",
+  "operators/residual_correction/figures/projection_backbone/prediction_median.png",
+  "operators/deep_operator_network/figures/perovskite/fold_0/proper_orthogonal/components/encoder__sensor_encoder_layer_3_weights.png",
+  "operators/deep_operator_network/figures/pooled/energy_trunk/error_by_functional.png",
+  "operators/factorized_fourier/figures/fold_0/explicit_matched/error_by_campaign.png",
+  "operators/deep_dft/figures/composition__atom_probe_layer_2__kernel__radial_weights.png",
+  "operators/factorized_fourier/figures/fold_0/explicit_matched/floors.png",
+  "operators/alias_free_convolutional/figures/fold_0/alias_free/untrained/scalars.png",
+  "operators/galerkin_transformer/figures/perovskite_gate_v2_52283/composition__layer_3__kernel__output__lift_weights.png",
+  "operators/deep_dft/figures/scalars.png",
+  "operators/factorized_fourier/figures/fold_0/explicit/components/gram_standardization_scale.png",
+  "operators/alias_free_convolutional/figures/fold_0/alias_free/untrained/gram_standardization_scale.png",
+  "operators/nonlinear_manifold_decoder/figures/pooled/components/composition__last_carried_vector.png",
+  "operators/residual_correction/figures/projection_backbone/floors.png",
+  "operators/factorized_fourier/figures/fold_0/explicit/prediction_best.png",
+  "operators/residual_correction/figures/projection_backbone/prediction_best.png",
+  "operators/factorized_fourier/figures/fold_0/explicit_matched/components/gram_standardization_mean.png",
+  "operators/factorized_fourier/figures/fold_0/weight_tied_injected/components/last_predicted_values.png"
+ ],
+ "overlap_seed": 925,
+ "overlap": {
+  "O1-overlap": [
+   "operator-results.md",
+   "operators/codomain_attention/splits.py",
+   "operators/deep_operator_network/__init__.py",
+   "operators/kernels/compact_support/continuous.py",
+   "operators/tests/test_deep_operator_network.py",
+   "operators/tests/test_orbits.py"
+  ],
+  "O2-overlap": [
+   "operators/codomain_attention/drivers.py",
+   "operators/data/orbits.py",
+   "operators/galerkin_transformer/__init__.py",
+   "operators/multiple_input_operator_network/report.md",
+   "operators/tests/test_fourier.py"
+  ],
+  "O3-overlap": [
+   "operators/codomain_attention/report.py",
+   "operators/data/spectra.py",
+   "operators/galerkin_transformer/report.py",
+   "operators/tasks/__init__.py",
+   "operators/tests/test_metrics.py"
+  ]
+ }
+}

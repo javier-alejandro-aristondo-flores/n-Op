@@ -1,0 +1,13 @@
+{
+ "explicit_matched": {
+  "run": "elf_fold0_explicit_matched_35505",
+  "checkpoint": "elf_fold0_explicit_matched_35505_stage2_checkpoint.npz",
+  "best_step": 13900,
+  "best_validation": 0.0003858426137715772,
+  "mae": 0.010042935521250795,
+  "relative_l2": 0.04698701984831573,
+  "units": 29,
+  "rows": 152,
+  "reported_mae": 0.01004
+ }
+}

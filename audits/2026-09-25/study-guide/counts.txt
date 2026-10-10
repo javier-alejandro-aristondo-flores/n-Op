@@ -1,0 +1,14 @@
+strain_atlas_holdout: 296 orbits; train 236 orbits (2112 runs), validation 30 orbits (288 runs), test 30 orbits (280 runs)
+paired_fields_fivefold: 207 units, 540 runs, five folds
+perovskite_folds: 249 units, one run each; angle 125, length 124
+twin_shear_map: 20 shear orbits
+store strain_atlas: 2680 archives
+store supercell_strains: 200 archives
+store defect_set: 196 archives
+store perovskite_grid: 250 archives
+store alloy_ensemble: 182 archives
+store relaxation_pool: 1576 archives
+store uncatalogued: 1 archives
+audit round 1: 19 auditors returned 552 findings: S1 22, S2 300, S3 73, S4 87, S5 70
+audit round 1: salvaged files {'M10-structure-to-density': 30, 'M11-convolutional-and-plane-wave': 32, 'R-results-page': 29}, 91 findings; total awaiting verification 643
+audit ledger: 402 rows extracted from chunks L1-L3

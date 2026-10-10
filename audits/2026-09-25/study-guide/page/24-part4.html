@@ -1,0 +1,83 @@
+<section class="part" id="part-4" aria-labelledby="h-part-4">
+<h2 id="h-part-4"><span class="partno" data-nofact>Part 4</span> Judging a model</h2>
+<div class="prose">
+<h3>The floors, in plain words</h3>
+</div>
+<div class="table-wrap">
+<table>
+<thead><tr><th>Floor</th><th>What it does</th><th>Where it is used</th></tr></thead>
+<tbody>
+<tr><td>training mean (template)</td><td>Predicts the average training field everywhere.</td><td>the localization models; context for the Galerkin gate</td></tr>
+<tr><td>ridge</td><td>A linear fit with a small penalty, solved in one step. The semilocal ridge predicts each point's localization from the density, its gradient and its curvature there. Other ridges map run parameters to basis coefficients.</td><td>nearly every task; the plan's kill anchor for localization</td></tr>
+<tr><td>nearest-run copy</td><td>Copies the training run closest in its input. Called the memorization null.</td><td>most tasks</td></tr>
+<tr><td>bracketing interpolation</td><td>Along a sweep, blends the two training levels on either side of the held-out level.</td><td>the manifold decoder, the parametric flagship, the Galerkin gate</td></tr>
+<tr><td>radial-basis interpolation</td><td>A smooth interpolant over the six strain components.</td><td>the manifold decoder</td></tr>
+<tr><td>identity</td><td>Returns the cheap density as the accurate one.</td><td>the correction network</td></tr>
+<tr><td>per-shell linear filter</td><td>One gain per ring of Fourier modes: roughly a one-layer linear Fourier operator.</td><td>the localization models</td></tr>
+<tr><td>superposed atoms</td><td>Free-atom densities added up, with no bonding (<code>AECCAR1</code>).</td><td>the structure-to-density network</td></tr>
+<tr><td>Hartree plus a remainder</td><td>Exact electrostatics from the density, plus a fitted remainder for everything else.</td><td>the potential task</td></tr>
+</tbody>
+</table>
+</div>
+<div class="prose">
+<h3>The metrics</h3>
+</div>
+<div class="table-wrap">
+<table>
+<thead><tr><th>Quantity</th><th>Primary metric</th><th>Why that one</th></tr></thead>
+<tbody>
+<tr><td>densities</td><td>relative L2, per run</td><td>the standard in the literature</td></tr>
+<tr><td>localization field</td><td>mean absolute error, with a three-dimensional structural similarity beside it</td><td>A deliberate deviation: relative L2's denominator changes with each cell's low-localization volume, so the same local accuracy would score differently in different campaigns.</td></tr>
+<tr><td>local potential</td><td>relative L2 after removing each field's mean</td><td>a periodic cell has no absolute zero of potential</td></tr>
+<tr><td>density of states</td><td>curve L1: the integrated absolute difference over the truth's own integral; the one-dimensional Wasserstein distance beside it</td><td>compares curves, not points</td></tr>
+</tbody>
+</table>
+</div>
+<div class="prose">
+<p>A secondary metric splits the error into low and high Fourier bands.</p>
+<p><span class="tag found">Found</span> It is not a true per-band relative error. On a test field the same error scores √2 differently when it lies along z instead of x (0.030861 against 0.021822). Over a band covering the whole field it returns 0.296828 where plain relative L2 gives 0.298005.</p>
+<h3>From runs to one number</h3>
+<p>Each run gets its error; each unit gets the median of its runs; the result is the median over units. Symmetry copies inside one orbit therefore count once. Weighting by runs would let crowded, easy orbits outvote sparse, hard ones; on the branch–trunk task, aggregating to orbits moved the ridge floor from 0.251% to 0.414%. The interval printed beside a median is a bootstrap over units, but of the mean, not the median, a mislabel the grading deep dive found.</p>
+<h3>The pass rule</h3>
+<p>One line of code decides every verdict: <em>improvement = 1 − member ÷ floor</em>. The model passes if its improvement meets the required margin and is killed otherwise. A negative improvement means the floor did better.</p>
+<p>Worked example from the perovskite lattice task: a member at 0.0183 against a ridge floor at 0.0423 with a 25% bar has improvement 1 − 0.0183 ÷ 0.0423 = 56.7%, so it passes. The manifold decoder at 0.002452 against bracketing interpolation at 0.000911 has improvement −169.2% against a required 33.3%, so it is killed.</p>
+<h3>Where the verdicts live</h3>
+<ul>
+<li><strong>Each model's <code>report.md</code></strong>, written by its <code>report.py</code>: the source of truth.</li>
+<li><strong><code>results.json</code></strong>: the same rows and verdicts in machine form. Seven models write one; the flagship and the branch–trunk network do not.</li>
+<li><strong><code>cross_member.md</code></strong>: one table built from the <code>results.json</code> files, so the flagship has no row on its own task.</li>
+<li><strong><code>operator-results.md</code></strong>: the one-page index, kept by hand. Its own words say every number is copied from a report. Its test checks only four rows and passes even when it checks none.</li>
+</ul>
+</div>
+
+<check part="4">
+<q>A member scores 0.0183 against a ridge floor of 0.0423, with a 25% bar. Pass or kill, and by how much?</q>
+<a>1 − 0.0183 ÷ 0.0423 = 56.7%, which clears 25%: pass.</a>
+<src>operator-results.md, II.1 perovskite table; the pass rule in operators/evaluation/scoring.py</src>
+</check>
+<check part="4">
+<q>The manifold decoder scored 0.002452 against bracketing interpolation at 0.000911, needing a third better. What is its improvement?</q>
+<a>1 − 0.002452 ÷ 0.000911 = −169.2%: the floor's error is under half the model's. Killed.</a>
+<src>The manifold decoder's report, as recorded in commit 43715fb</src>
+</check>
+<check part="4">
+<q>Why take the median inside each unit before the median across units?</q>
+<a>So symmetry copies inside one orbit count once. Otherwise crowded, easy orbits outvote sparse, hard ones; on the branch–trunk task the ridge floor moved from 0.251% to 0.414% when aggregated properly.</a>
+<src>operators/evaluation/scoring.py (Unit_Medians); the plan's measurement record</src>
+</check>
+<check part="4">
+<q>Why is the localization field scored by mean absolute error and not relative L2?</q>
+<a>Relative L2 divides by the field's own size, and that varies with each cell's low-localization volume, so identical local accuracy would score differently across campaigns.</a>
+<src>test-suite.md, section 9.4</src>
+</check>
+<check part="4">
+<q>Which file is the source of truth for a model's verdict, and which is only an index?</q>
+<a>The model's own <code>report.md</code> is the source of truth. <code>operator-results.md</code> is the hand-kept index; <code>results.json</code> and <code>cross_member.md</code> are machine copies.</a>
+<src>operator-results.md, opening paragraph</src>
+</check>
+<check part="4">
+<q>What is wrong with the frequency-split metric?</q>
+<a>It counts some Fourier modes twice, so the same error scores differently depending on its direction (by √2 between x and z), and a whole-field band does not equal plain relative L2.</a>
+<src>The 2 October check (computations.txt)</src>
+</check>
+</section>

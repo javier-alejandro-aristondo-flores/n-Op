@@ -1,0 +1,799 @@
+{
+ "defined_tests": 604,
+ "flagged": [
+  {
+   "file": "test_alias_free_convolutional.py",
+   "test": "Test_The_Assembly_Runs_From_Sixteen_Cubed_To_Eight_Cubed_With_Gradients_On_Every_Parameter",
+   "line": 214,
+   "reasons": [
+    "a sweeping name beside a short literal collection"
+   ]
+  },
+  {
+   "file": "test_alias_free_convolutional.py",
+   "test": "Test_The_Alias_Free_Assembly_Runs_From_Sixteen_Cubed_To_Eight_Cubed_With_Gradients_On_Every_Parameter",
+   "line": 246,
+   "reasons": [
+    "a sweeping name beside a short literal collection"
+   ]
+  },
+  {
+   "file": "test_alias_free_convolutional.py",
+   "test": "Test_The_Bounded_Head_Never_Leaves_Zero_To_One",
+   "line": 309,
+   "reasons": [
+    "a sweeping name beside a short literal collection"
+   ]
+  },
+  {
+   "file": "test_alias_free_convolutional.py",
+   "test": "Test_Augmentation_Commutes_With_The_Lift_Over_Every_Diamond_Operation",
+   "line": 318,
+   "reasons": [
+    "a sweeping name beside a short literal collection"
+   ]
+  },
+  {
+   "file": "test_alias_free_convolutional.py",
+   "test": "Test_The_Four_Floors_Land_Near_The_Flagships_Recorded_Numbers",
+   "line": 379,
+   "reasons": [
+    "assertions only under a branch, loop or try"
+   ]
+  },
+  {
+   "file": "test_codomain_attention.py",
+   "test": "Test_Gradient_Reaches_Every_Parameter_Of_The_Attention_Kernel",
+   "line": 221,
+   "reasons": [
+    "a sweeping name beside a short literal collection"
+   ]
+  },
+  {
+   "file": "test_codomain_attention.py",
+   "test": "Test_Resolution_Change_Matches_The_Spectral_Kernels_Own_Resampling",
+   "line": 242,
+   "reasons": [
+    "assertions only under a branch, loop or try"
+   ]
+  },
+  {
+   "file": "test_codomain_attention.py",
+   "test": "Test_Inspect_Exposes_Attention_Scores_And_The_Renderer_Draws_Every_Key",
+   "line": 404,
+   "reasons": [
+    "a sweeping name beside a short literal collection"
+   ]
+  },
+  {
+   "file": "test_codomain_attention_member.py",
+   "test": "Test_Per_Token_Heads_Touch_Only_Their_Own_Token",
+   "line": 145,
+   "reasons": [
+    "assertions only under a branch, loop or try"
+   ]
+  },
+  {
+   "file": "test_codomain_attention_member.py",
+   "test": "Test_Truncation_Commutes_With_Exact_Grid_Augmentation",
+   "line": 212,
+   "reasons": [
+    "assertions only under a branch, loop or try"
+   ]
+  },
+  {
+   "file": "test_codomain_attention_member.py",
+   "test": "Test_Gradient_Reaches_Every_Parameter_On_Both_Engines",
+   "line": 274,
+   "reasons": [
+    "a sweeping name beside a short literal collection"
+   ]
+  },
+  {
+   "file": "test_contraction.py",
+   "test": "Test_The_Projection_Is_Idempotent",
+   "line": 134,
+   "reasons": [
+    "assertions only under a branch, loop or try"
+   ]
+  },
+  {
+   "file": "test_deep_dft.py",
+   "test": "Test_Probes_Never_Send",
+   "line": 136,
+   "reasons": [
+    "a sweeping name beside a short literal collection"
+   ]
+  },
+  {
+   "file": "test_deep_dft.py",
+   "test": "Test_Probes_Never_Influence_Atom_Features",
+   "line": 151,
+   "reasons": [
+    "a sweeping name beside a short literal collection"
+   ]
+  },
+  {
+   "file": "test_deep_dft.py",
+   "test": "Test_Two_Path_Agreement_And_A_Gradient_On_Every_Parameter",
+   "line": 215,
+   "reasons": [
+    "a sweeping name beside a short literal collection"
+   ]
+  },
+  {
+   "file": "test_deep_dft.py",
+   "test": "Test_Every_Inspect_Key_Renders",
+   "line": 320,
+   "reasons": [
+    "a sweeping name beside a short literal collection"
+   ]
+  },
+  {
+   "file": "test_deep_operator_network.py",
+   "test": "Test_The_Member_Collects_Every_Learned_Array_Under_One_Namespace",
+   "line": 81,
+   "reasons": [
+    "a sweeping name beside a short literal collection"
+   ]
+  },
+  {
+   "file": "test_deep_operator_network.py",
+   "test": "Test_Gradients_Reach_Every_Branch_Array_Through_The_Engine",
+   "line": 118,
+   "reasons": [
+    "a sweeping name beside a short literal collection"
+   ]
+  },
+  {
+   "file": "test_deep_operator_network.py",
+   "test": "Test_Exact_Coefficients_Rebuild_The_Field_They_Came_From",
+   "line": 140,
+   "reasons": [
+    "assertions only under a branch, loop or try"
+   ]
+  },
+  {
+   "file": "test_deep_operator_network.py",
+   "test": "Test_Forward_Point_Values_Keeps_Each_Runs_Points_And_Coefficients_Together",
+   "line": 361,
+   "reasons": [
+    "a sweeping name beside a short literal collection"
+   ]
+  },
+  {
+   "file": "test_deep_operator_network.py",
+   "test": "Test_Gradients_Reach_Every_Canonical_Array_Through_The_Point_Sampled_Forward",
+   "line": 378,
+   "reasons": [
+    "a sweeping name beside a short literal collection"
+   ]
+  },
+  {
+   "file": "test_deep_operator_network.py",
+   "test": "Test_Gradients_Reach_Every_Energy_Trunk_Array_Through_The_Point_Sampled_Forward",
+   "line": 504,
+   "reasons": [
+    "a sweeping name beside a short literal collection"
+   ]
+  },
+  {
+   "file": "test_evaluation.py",
+   "test": "Test_Summaries_Split_By_Any_Label",
+   "line": 82,
+   "reasons": [
+    "a sweeping name beside a short literal collection"
+   ]
+  },
+  {
+   "file": "test_evaluation.py",
+   "test": "Test_The_Tables_Render_Without_Losing_A_Column",
+   "line": 124,
+   "reasons": [
+    "assertions only under a branch, loop or try"
+   ]
+  },
+  {
+   "file": "test_evaluation.py",
+   "test": "Test_The_Host_Harness_Resample_Agrees_With_The_Lifted_Resample",
+   "line": 334,
+   "reasons": [
+    "assertions only under a branch, loop or try"
+   ]
+  },
+  {
+   "file": "test_evaluation.py",
+   "test": "Test_A_Block_Signature_Counts_Each_Unit_Once",
+   "line": 394,
+   "reasons": [
+    "a sweeping name beside a short literal collection"
+   ]
+  },
+  {
+   "file": "test_exclusions.py",
+   "test": "Test_The_Exclusion_Counts_Match_The_Registry",
+   "line": 9,
+   "reasons": [
+    "assertions only under a branch, loop or try"
+   ]
+  },
+  {
+   "file": "test_factorized_fourier.py",
+   "test": "Test_Every_Parameter_Receives_A_Gradient_On_Both_Engines",
+   "line": 122,
+   "reasons": [
+    "a sweeping name beside a short literal collection"
+   ]
+  },
+  {
+   "file": "test_factorized_fourier.py",
+   "test": "Test_The_Potential_Output_Has_Zero_Mean_Per_Channel_To_Round_Off",
+   "line": 500,
+   "reasons": [
+    "assertions only under a branch, loop or try"
+   ]
+  },
+  {
+   "file": "test_factorized_fourier.py",
+   "test": "Test_The_Mode_Wavevector_Feature_Reaches_Every_Layer",
+   "line": 522,
+   "reasons": [
+    "assertions only under a branch, loop or try",
+    "a sweeping name beside a short literal collection"
+   ]
+  },
+  {
+   "file": "test_factorized_fourier.py",
+   "test": "Test_A_Toy_Training_Run_Is_Deterministic_From_One_Seed",
+   "line": 683,
+   "reasons": [
+    "assertions only under a branch, loop or try"
+   ]
+  },
+  {
+   "file": "test_factorized_fourier.py",
+   "test": "Test_The_Evaluation_Rows_Score_Every_Kill_Block_Run_On_Real_Archives",
+   "line": 906,
+   "reasons": [
+    "a sweeping name beside a short literal collection"
+   ]
+  },
+  {
+   "file": "test_factorized_fourier.py",
+   "test": "Test_A_Staged_Run_Resumes_Every_Stage_From_Its_Own_Checkpoint",
+   "line": 1065,
+   "reasons": [
+    "a sweeping name beside a short literal collection"
+   ]
+  },
+  {
+   "file": "test_factorized_fourier_parametric.py",
+   "test": "Test_Coordinate_Features_Break_The_Constant_Output_Degeneracy_And_Answer_Any_Grid",
+   "line": 181,
+   "reasons": [
+    "a sweeping name beside a short literal collection"
+   ]
+  },
+  {
+   "file": "test_factorized_fourier_parametric.py",
+   "test": "Test_The_Bracketing_Floor_Scores_Every_Interior_Level_Against_Its_Own_Corners",
+   "line": 217,
+   "reasons": [
+    "a sweeping name beside a short literal collection"
+   ]
+  },
+  {
+   "file": "test_fixed_point.py",
+   "test": "Test_Gradients_Reach_Both_Weight_Groups_Through_Every_Application_Of_Weight_Tied",
+   "line": 141,
+   "reasons": [
+    "a sweeping name beside a short literal collection"
+   ]
+  },
+  {
+   "file": "test_fixed_point.py",
+   "test": "Test_Every_Backward_Rule_Solves_And_Differentiates_With_The_Iterate_On_The_Accelerator",
+   "line": 313,
+   "reasons": [
+    "a sweeping name beside a short literal collection"
+   ]
+  },
+  {
+   "file": "test_fixed_point.py",
+   "test": "Test_The_Audits_Two_Ground_Truths_Agree_With_Each_Other",
+   "line": 504,
+   "reasons": [
+    "a sweeping name beside a short literal collection"
+   ]
+  },
+  {
+   "file": "test_fixed_point.py",
+   "test": "Test_Phantom_Gradient_Bias_Shrinks_As_Its_Depth_Grows",
+   "line": 515,
+   "reasons": [
+    "assertions only under a branch, loop or try"
+   ]
+  },
+  {
+   "file": "test_fourier.py",
+   "test": "Test_The_Real_Transform_Round_Trips_On_Every_Engine",
+   "line": 39,
+   "reasons": [
+    "assertions only under a branch, loop or try",
+    "a sweeping name beside a short literal collection"
+   ]
+  },
+  {
+   "file": "test_fourier.py",
+   "test": "Test_The_Transform_Never_Widens_What_An_Engine_Narrowed",
+   "line": 63,
+   "reasons": [
+    "a sweeping name beside a short literal collection"
+   ]
+  },
+  {
+   "file": "test_fourier.py",
+   "test": "Test_The_Separable_Kernel_Publishes_Every_Axis_As_Magnitude_And_Phase",
+   "line": 210,
+   "reasons": [
+    "assertions only under a branch, loop or try",
+    "a sweeping name beside a short literal collection"
+   ]
+  },
+  {
+   "file": "test_galerkin_transformer.py",
+   "test": "Test_Gradient_Reaches_Every_Parameter_On_Both_Engines",
+   "line": 220,
+   "reasons": [
+    "assertions only under a branch, loop or try",
+    "a sweeping name beside a short literal collection"
+   ]
+  },
+  {
+   "file": "test_galerkin_transformer.py",
+   "test": "Test_Every_Inspect_Key_Is_Drawn_By_The_Generic_Renderer",
+   "line": 492,
+   "reasons": [
+    "a sweeping name beside a short literal collection"
+   ]
+  },
+  {
+   "file": "test_imports.py",
+   "test": "Test_Every_Package_Imports",
+   "line": 62,
+   "reasons": [
+    "no assertion at all"
+   ]
+  },
+  {
+   "file": "test_imports.py",
+   "test": "Test_The_Behavioral_Classes_Are_Protocols",
+   "line": 68,
+   "reasons": [
+    "assertions only under a branch, loop or try"
+   ]
+  },
+  {
+   "file": "test_imports.py",
+   "test": "Test_Representation_Has_Exactly_Three_Forms",
+   "line": 80,
+   "reasons": [
+    "assertions only under a branch, loop or try"
+   ]
+  },
+  {
+   "file": "test_imports.py",
+   "test": "Test_Each_Operator_Package_Exposes_One_Assembly",
+   "line": 88,
+   "reasons": [
+    "assertions only under a branch, loop or try"
+   ]
+  },
+  {
+   "file": "test_imports.py",
+   "test": "Test_Every_Assembly_Carries_The_Inspection_Contract",
+   "line": 98,
+   "reasons": [
+    "assertions only under a branch, loop or try"
+   ]
+  },
+  {
+   "file": "test_imports.py",
+   "test": "Test_Every_Built_Assembly_Specifies_Its_Inspection_Surface",
+   "line": 120,
+   "reasons": [
+    "a broad exception handler"
+   ]
+  },
+  {
+   "file": "test_inspection.py",
+   "test": "Test_The_Rendering_Seam_Holds",
+   "line": 33,
+   "reasons": [
+    "assertions only under a branch, loop or try"
+   ]
+  },
+  {
+   "file": "test_inspection.py",
+   "test": "Test_The_Suite_Draws_Every_Rank_The_Package_Produces",
+   "line": 108,
+   "reasons": [
+    "a sweeping name beside a short literal collection"
+   ]
+  },
+  {
+   "file": "test_inspection.py",
+   "test": "Test_The_Result_Figures_Draw_From_Scored_Numbers",
+   "line": 185,
+   "reasons": [
+    "assertions only under a branch, loop or try"
+   ]
+  },
+  {
+   "file": "test_invariance.py",
+   "test": "Test_Grid_Operations_Compose_Exactly",
+   "line": 110,
+   "reasons": [
+    "assertions only under a branch, loop or try"
+   ]
+  },
+  {
+   "file": "test_invariance.py",
+   "test": "Test_A_Resampler_Is_Equivariant_Under_Every_Diamond_Operation",
+   "line": 190,
+   "reasons": [
+    "a sweeping name beside a short literal collection"
+   ]
+  },
+  {
+   "file": "test_kernels.py",
+   "test": "Test_Probe_Points_Receive_And_Never_Send",
+   "line": 302,
+   "reasons": [
+    "a sweeping name beside a short literal collection"
+   ]
+  },
+  {
+   "file": "test_multi_scale.py",
+   "test": "Test_Every_Scale_Halves_Exactly_And_The_Output_Leaves_At_Its_Designated_Shape",
+   "line": 65,
+   "reasons": [
+    "a sweeping name beside a short literal collection"
+   ]
+  },
+  {
+   "file": "test_multi_scale.py",
+   "test": "Test_Gradients_Reach_Every_Layers_Kernel_And_Local_Linear_Weights",
+   "line": 160,
+   "reasons": [
+    "a sweeping name beside a short literal collection"
+   ]
+  },
+  {
+   "file": "test_multi_scale.py",
+   "test": "Test_An_Activation_Name_The_Composition_Was_Never_Handed_Raises",
+   "line": 183,
+   "reasons": [
+    "a sweeping name beside a short literal collection"
+   ]
+  },
+  {
+   "file": "test_multi_scale.py",
+   "test": "Test_A_Handed_Activation_Runs_Through_Every_Composition",
+   "line": 199,
+   "reasons": [
+    "a sweeping name beside a short literal collection"
+   ]
+  },
+  {
+   "file": "test_multiple_input_operator_network.py",
+   "test": "Test_The_Bounded_Head_Never_Touches_Either_End_Of_Zero_To_One",
+   "line": 152,
+   "reasons": [
+    "a sweeping name beside a short literal collection"
+   ]
+  },
+  {
+   "file": "test_multiple_input_operator_network.py",
+   "test": "Test_Every_Inspect_Key_Renders",
+   "line": 234,
+   "reasons": [
+    "a sweeping name beside a short literal collection"
+   ]
+  },
+  {
+   "file": "test_multiple_input_operator_network.py",
+   "test": "Test_Pod_Projections_Round_Trip_At_The_Gates_Rank",
+   "line": 274,
+   "reasons": [
+    "assertions only under a branch, loop or try"
+   ]
+  },
+  {
+   "file": "test_nonlinear_manifold_decoder.py",
+   "test": "Test_Forward_Point_Values_Keeps_Each_Runs_Points_And_Coefficients_Together",
+   "line": 128,
+   "reasons": [
+    "a sweeping name beside a short literal collection"
+   ]
+  },
+  {
+   "file": "test_nonlinear_manifold_decoder.py",
+   "test": "Test_Gradients_Reach_Every_Array_Through_The_Point_Sampled_Forward",
+   "line": 145,
+   "reasons": [
+    "a sweeping name beside a short literal collection"
+   ]
+  },
+  {
+   "file": "test_nonlinear_manifold_decoder.py",
+   "test": "Test_Every_Inspection_Key_Has_A_Renderer",
+   "line": 279,
+   "reasons": [
+    "a sweeping name beside a short literal collection"
+   ]
+  },
+  {
+   "file": "test_parsers.py",
+   "test": "Test_Charge_Mean_Equals_The_Electron_Count",
+   "line": 108,
+   "reasons": [
+    "assertions only under a branch, loop or try"
+   ]
+  },
+  {
+   "file": "test_parsers.py",
+   "test": "Test_The_Half_Grid_Law_Holds",
+   "line": 117,
+   "reasons": [
+    "assertions only under a branch, loop or try"
+   ]
+  },
+  {
+   "file": "test_parts.py",
+   "test": "Test_The_Atom_Embedding_Looks_Up_Each_Atom_By_Its_Pair",
+   "line": 97,
+   "reasons": [
+    "a sweeping name beside a short literal collection"
+   ]
+  },
+  {
+   "file": "test_parts.py",
+   "test": "Test_The_Variable_Encoding_Widens_Each_Present_Channel",
+   "line": 136,
+   "reasons": [
+    "a sweeping name beside a short literal collection"
+   ]
+  },
+  {
+   "file": "test_parts.py",
+   "test": "Test_The_Stack_Collects_Every_Layer_Under_A_Distinct_Prefix",
+   "line": 270,
+   "reasons": [
+    "a sweeping name beside a short literal collection"
+   ]
+  },
+  {
+   "file": "test_parts.py",
+   "test": "Test_Gradients_Reach_Every_Layers_Kernel_And_Local_Linear_Weights",
+   "line": 312,
+   "reasons": [
+    "a sweeping name beside a short literal collection"
+   ]
+  },
+  {
+   "file": "test_parts.py",
+   "test": "Test_The_Fixed_Mode_Expansion_Inverts_The_Projection",
+   "line": 398,
+   "reasons": [
+    "assertions only under a branch, loop or try"
+   ]
+  },
+  {
+   "file": "test_parts.py",
+   "test": "Test_The_Feature_Counts_Match_What_The_Trunk_Was_Built_For",
+   "line": 495,
+   "reasons": [
+    "assertions only under a branch, loop or try"
+   ]
+  },
+  {
+   "file": "test_parts.py",
+   "test": "Test_Each_Channel_Matches_The_Trunk_Run_On_Its_Own",
+   "line": 524,
+   "reasons": [
+    "a sweeping name beside a short literal collection"
+   ]
+  },
+  {
+   "file": "test_parts.py",
+   "test": "Test_The_Residual_Wrapper_Carries_Gradients_To_The_Operator_Inside_It",
+   "line": 716,
+   "reasons": [
+    "assertions only under a branch, loop or try"
+   ]
+  },
+  {
+   "file": "test_parts.py",
+   "test": "Test_Each_Conservation_Law_Carries_Gradients_To_The_Operator_Inside_It",
+   "line": 736,
+   "reasons": [
+    "a sweeping name beside a short literal collection"
+   ]
+  },
+  {
+   "file": "test_parts.py",
+   "test": "Test_The_Variable_Encoding_Trains_Without_A_Covariate",
+   "line": 861,
+   "reasons": [
+    "assertions only under a branch, loop or try"
+   ]
+  },
+  {
+   "file": "test_parts.py",
+   "test": "Test_Gradients_Reach_Every_Nonlinear_Decoder_Array_Through_Forward",
+   "line": 1187,
+   "reasons": [
+    "assertions only under a branch, loop or try",
+    "a sweeping name beside a short literal collection"
+   ]
+  },
+  {
+   "file": "test_residual_correction.py",
+   "test": "Test_Two_Adam_Steps_Move_Every_Parameter",
+   "line": 219,
+   "reasons": [
+    "assertions only under a branch, loop or try"
+   ]
+  },
+  {
+   "file": "test_residual_correction.py",
+   "test": "Test_Guarded_Spread_Never_Divides_By_A_Silent_Zero",
+   "line": 294,
+   "reasons": [
+    "a sweeping name beside a short literal collection"
+   ]
+  },
+  {
+   "file": "test_sampling.py",
+   "test": "Test_A_Fixed_Spread_Covers_A_Field_And_Never_Repeats",
+   "line": 189,
+   "reasons": [
+    "a sweeping name beside a short literal collection"
+   ]
+  },
+  {
+   "file": "test_sampling.py",
+   "test": "Test_Every_Part_Of_The_Stream_Reports_Named_Arrays",
+   "line": 247,
+   "reasons": [
+    "a sweeping name beside a short literal collection"
+   ]
+  },
+  {
+   "file": "test_spectral_metric.py",
+   "test": "Test_Inspect_Exposes_The_Gain_And_The_Renderer_Draws_Every_Key",
+   "line": 210,
+   "reasons": [
+    "a sweeping name beside a short literal collection"
+   ]
+  },
+  {
+   "file": "test_store.py",
+   "test": "Test_The_Sidecar_Keeps_The_Names_The_Store_On_Disk_Was_Written_With",
+   "line": 162,
+   "reasons": [
+    "assertions only under a branch, loop or try"
+   ]
+  },
+  {
+   "file": "test_substrate.py",
+   "test": "Test_A_Parameter_The_Loss_Never_Touches_Gets_A_Zero_Gradient",
+   "line": 56,
+   "reasons": [
+    "a sweeping name beside a short literal collection"
+   ]
+  },
+  {
+   "file": "test_substrate.py",
+   "test": "Test_The_Reference_Engine_Never_Reaches_The_Declared_Backward",
+   "line": 154,
+   "reasons": [
+    "a sweeping name beside a short literal collection"
+   ]
+  },
+  {
+   "file": "test_substrate.py",
+   "test": "Test_A_Single_Precision_Engine_Never_Promotes_To_Double",
+   "line": 197,
+   "reasons": [
+    "a sweeping name beside a short literal collection"
+   ]
+  },
+  {
+   "file": "test_substrate.py",
+   "test": "Test_The_Torch_Seam_Holds",
+   "line": 521,
+   "reasons": [
+    "assertions only under a branch, loop or try"
+   ]
+  }
+ ],
+ "skip_sites": {
+  "test_alias_free_convolutional.py": [
+   "pytest.mark.skipif(not Accelerator_Is_Available(), reason='no accelerator card on this machine')",
+   "pytest.mark.skipif(not Torch_Is_Available(), reason='torch is not installed yet')",
+   "pytest.skip('under a gigabyte free on the shared card, leaving room for a live training run')"
+  ],
+  "test_codomain_attention.py": [
+   "pytest.mark.skipif(not Torch_Is_Available(), reason='torch is not installed yet')"
+  ],
+  "test_codomain_attention_member.py": [
+   "pytest.mark.skipif(not Torch_Is_Available(), reason='torch is not installed yet')"
+  ],
+  "test_contraction.py": [],
+  "test_deep_dft.py": [
+   "pytest.mark.skipif(not Torch_Is_Available(), reason='torch is not installed yet')"
+  ],
+  "test_deep_operator_network.py": [
+   "pytest.mark.skipif(not Accelerator_Is_Available(), reason='no card on this machine answers a lift')"
+  ],
+  "test_evaluation.py": [],
+  "test_exclusions.py": [],
+  "test_factorized_fourier.py": [],
+  "test_factorized_fourier_parametric.py": [],
+  "test_fixed_point.py": [
+   "pytest.mark.skipif(not Accelerator_Is_Available(), reason='no accelerator to hold the iterate on')",
+   "pytest.mark.skipif(not Torch_Is_Available(), reason='the foreign engine is not installed yet')"
+  ],
+  "test_floors.py": [],
+  "test_fourier.py": [
+   "pytest.mark.skipif(not Torch_Is_Available(), reason='torch is not installed yet')",
+   "pytest.param(TorchEngine(), id='torch', marks=pytest.mark.skipif(not Torch_Is_Available(), reason='torch is not installed yet'))"
+  ],
+  "test_galerkin_transformer.py": [
+   "pytest.mark.skipif(not Torch_Is_Available(), reason='torch is not installed yet')"
+  ],
+  "test_imports.py": [],
+  "test_inspection.py": [],
+  "test_integral.py": [],
+  "test_invariance.py": [],
+  "test_kernels.py": [
+   "pytest.mark.skipif(not Torch_Is_Available(), reason='torch is not installed yet')"
+  ],
+  "test_metrics.py": [],
+  "test_multi_scale.py": [
+   "pytest.mark.skipif(not Torch_Is_Available(), reason='torch is not installed yet')"
+  ],
+  "test_multiple_input_operator_network.py": [
+   "pytest.mark.skipif(not Accelerator_Is_Available(), reason='no card on this machine answers a lift')"
+  ],
+  "test_nonlinear_manifold_decoder.py": [
+   "pytest.mark.skipif(not Torch_Is_Available(), reason='torch is not installed yet')"
+  ],
+  "test_orbits.py": [],
+  "test_parsers.py": [],
+  "test_parts.py": [
+   "pytest.mark.skipif(not Torch_Is_Available(), reason='torch is not installed yet')"
+  ],
+  "test_residual_correction.py": [
+   "pytest.mark.skipif(not Torch_Is_Available(), reason='torch is not installed yet')"
+  ],
+  "test_sampling.py": [],
+  "test_spectral_metric.py": [
+   "pytest.mark.skipif(not Torch_Is_Available(), reason='torch is not installed yet')"
+  ],
+  "test_splits.py": [],
+  "test_store.py": [],
+  "test_substrate.py": [
+   "pytest.mark.skipif(not Accelerator_Is_Available(), reason='this machine reports no accelerator')",
+   "pytest.mark.skipif(not Torch_Is_Available(), reason='torch is not installed yet')",
+   "pytest.param(TorchEngine(), id='torch', marks=pytest.mark.skipif(not Torch_Is_Available(), reason='torch is not installed yet'))"
+  ],
+  "test_training.py": [
+   "pytest.mark.skipif(not Accelerator_Is_Available(), reason='no card on this machine answers a lift')",
+   "pytest.mark.skipif(not Torch_Is_Available(), reason='torch is not installed yet')",
+   "pytest.param(TorchEngine(), id='torch', marks=pytest.mark.skipif(not Torch_Is_Available(), reason='torch is not installed yet'))"
+  ]
+ }
+}

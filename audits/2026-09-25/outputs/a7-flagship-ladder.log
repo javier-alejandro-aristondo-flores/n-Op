@@ -1,0 +1,2 @@
+[    1.4s] block: 76 evaluation runs in 29 units
+[    3.0s] explicit: elf_fold0_explicit_35505_stage2_checkpoint.npz, best step 1600, best validation 8.0810e-05, parameter names match the manifest: True

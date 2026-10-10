@@ -1,0 +1,70 @@
+{
+ "canonical_cheap": {
+  "best_step": 2700,
+  "common_grid": 0.0018957406898941704,
+  "common_units": 22,
+  "every_shape": 0.0023385146253094174,
+  "every_shape_units": 30,
+  "every_shape_runs": 124,
+  "reported": [
+   0.001896,
+   0.002339
+  ]
+ },
+ "canonical_accurate": {
+  "best_step": 800,
+  "common_grid": 0.0024129476767810448,
+  "common_units": 22,
+  "every_shape": 0.0027663025552070635,
+  "every_shape_units": 30,
+  "every_shape_runs": 124,
+  "reported": [
+   0.002413,
+   0.002766
+  ]
+ },
+ "energy_training_mean": {
+  "curve_l1_whole": 0.39216112913479517,
+  "curve_l1_band_edge": 0.7569563998104605
+ },
+ "energy_ridge": {
+  "curve_l1_whole": 0.36810534182389154,
+  "curve_l1_band_edge": 0.5177231896047529
+ },
+ "energy_trunk_primary": {
+  "curve_l1_whole": [
+   0.20603181031932838,
+   30
+  ],
+  "curve_l1_band_edge": [
+   0.2647631608727139,
+   30
+  ],
+  "wasserstein_1d": [
+   0.15658224557172026,
+   30
+  ],
+  "gap_edge_error": [
+   1.9124999999999983,
+   30
+  ]
+ },
+ "energy_trunk_bandedge_ablation": {
+  "curve_l1_whole": [
+   0.2083929994475614,
+   30
+  ],
+  "curve_l1_band_edge": [
+   0.19348510209101527,
+   30
+  ],
+  "wasserstein_1d": [
+   0.15851989836089825,
+   30
+  ],
+  "gap_edge_error": [
+   0.0,
+   30
+  ]
+ }
+}

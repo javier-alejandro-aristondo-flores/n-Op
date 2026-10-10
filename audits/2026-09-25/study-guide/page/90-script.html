@@ -1,0 +1,221 @@
+</main>
+</div>
+<script>
+(function () {
+  "use strict";
+  var KEY = "operator-suite-study-guide-v1";
+  var PARTS = { 1: "What the suite asks", 2: "The raw material", 3: "Splitting the data", 4: "Judging a model",
+    5: "Training a model", 6: "The models", 7: "What broke", 8: "After the models" };
+  var QUIZ = [
+    { part: 1, q: "Which of these could not be a member of the suite?", options: ["A model mapping the charge density to the localization field on any grid", "A network mapping a fixed list of strain numbers to one band gap", "A layer applied repeatedly until it reaches a fixed point in a function space", "A trunk network that answers the field at any queried point"], answer: 1, why: "Fixed-vector predictors are excluded. Band gaps enter only as read-outs of a predicted function." },
+    { part: 1, q: "When were a model's floors computed?", options: ["After training, to see how much it learned", "Before training, on exactly the runs it is judged on", "On the validation fold only", "Only for models that were later killed"], answer: 1, why: "Floors and bars come first, so no threshold can move after a result is seen." },
+    { part: 2, q: "Compared with the charge density, the localization field is stored on", options: ["the same grid", "half the grid per axis", "twice the grid per axis", "a grid that varies run to run"], answer: 1, why: "The half-grid law: 80³ becomes 40³. No fine-grid localization truth exists." },
+    { part: 2, q: "What does CHGCAR store?", options: ["the density itself", "the density times the cell's volume", "the density divided by the cell's volume", "the local potential"], answer: 1, why: "The store divides the volume out." },
+    { part: 2, q: "Which campaign has no volumetric fields?", options: ["the strain atlas", "the defect set", "the relaxation pool", "the perovskite grid"], answer: 2, why: "Its volumetric files are empty by design." },
+    { part: 2, q: "Why may accurate-functional results never be pooled across campaigns?", options: ["The grids differ in size", "Each campaign's hybrid uses a different exact-exchange fraction", "Some campaigns lack magnetization", "The pseudopotentials are licensed"], answer: 1, why: "0.27, 0.25 and 0.325: a different target in each campaign." },
+    { part: 3, q: "How many orbits do the 2,680 strain-atlas runs form?", options: ["1,340", "296", "236", "48"], answer: 1, why: "296 orbits; 236 of them train. 48 is the number of signed axis permutations." },
+    { part: 3, q: "On the cubic block, what is fold 1 for?", options: ["Training the model", "Judging the model", "Deciding when the model stops training", "Nothing; it is held back"], answer: 2, why: "Fold 1 validates; folds 2–4 train; fold 0 judges; floors fit on folds 1–4." },
+    { part: 3, q: "Why does the perovskite factor-0.8 holdout not test extrapolation?", options: ["It holds out too few runs", "Reversing one cell edge turns 72° into 108°, so most held-out crystals also sit in training", "The perovskite runs use the cheap functional", "Its grids are 64³, not 80³"], answer: 1, why: "57 of its 61 runs are crystals present among the runs not held out." },
+    { part: 4, q: "A model scores 0.0183 against a floor of 0.0423, and the bar is 25%. The verdict?", options: ["Pass: improvement 56.7%", "Pass: improvement 43.3%", "Kill: improvement −131%", "Kill: the bar needs 50%"], answer: 0, why: "1 − 0.0183 ÷ 0.0423 = 56.7%, which clears 25%." },
+    { part: 4, q: "Why is the localization field scored by mean absolute error?", options: ["It is cheaper to compute", "Relative L2's denominator varies with each cell's low-localization volume", "The literature always uses it", "The field is not between 0 and 1"], answer: 1, why: "A deliberate, recorded deviation from the literature's default." },
+    { part: 4, q: "Why take each unit's median before the median across units?", options: ["To make the numbers smaller", "So symmetry copies inside one orbit count once", "Because the bootstrap needs it", "To give crowded orbits more weight"], answer: 1, why: "Otherwise crowded, easy orbits outvote sparse, hard ones." },
+    { part: 5, q: "The shared schedule's three stages run at", options: ["one rate throughout", "the peak rate, a third of it, then a ninth of it", "a rate that grows each stage", "rates chosen from the validation score"], answer: 1, why: "Over 30%, 30% and 40% of the budget, after a probe of up to 200 steps." },
+    { part: 5, q: "What does the shared schedule return?", options: ["The best parameters across all stages", "The last stage's best parameters", "The final step's parameters", "The probe's parameters"], answer: 1, why: "So an earlier, better stage can be discarded, as happened to two rungs." },
+    { part: 5, q: "Why does only one job train on the card at a time?", options: ["The card has too little memory for two", "Two concurrent trainings ran 2.56 times slower than queued", "The licensing forbids it", "The test suite requires it"], answer: 1, why: "Small models are limited by launch overhead, and the card switches between jobs." },
+    { part: 6, q: "The flagship's hardest bar was", options: ["the semilocal ridge", "the per-shell filter", "the training-mean template", "the nearest-run copy"], answer: 3, why: "The copy scores 0.0062; the flagship's 0.00217 beat it by 65%." },
+    { part: 6, q: "What killed the two-input network?", options: ["It failed the pattern rule against the ridge", "It was 13.1% worse than its own density-only twin", "It never converged", "Its budget ran out"], answer: 1, why: "The decisive bar asked for 5% better than the twin at a matched budget." },
+    { part: 6, q: "Why was the manifold decoder expected to lose?", options: ["It had too few parameters", "Linear interpolation between neighboring training levels is nearly exact on an interpolation split", "It trained for only seven minutes", "It could not read every grid shape"], answer: 1, why: "Interpolation scored 0.000911 against its 0.002452." },
+    { part: 6, q: "The correction network passed its bar. What undercuts the pass?", options: ["It over-covers its interval", "Plain linear regression on the same inputs is 406 times better", "It trained on the test fold", "Its floors were measured after training"], answer: 1, why: "The correction is almost exactly linear on this holdout." },
+    { part: 6, q: "After its three fixes, the Galerkin transformer learned", options: ["the lattice response well enough to pass", "essentially the mean field", "nothing, outputting zeros", "the localization field"], answer: 1, why: "0.1780 against the mean field's 0.1755." },
+    { part: 6, q: "What did the fixed-point rung show?", options: ["It never converged", "It converged on every run but was less accurate than every comparator", "It beat the twelve-layer stack", "It was never trained"], answer: 1, why: "100% converged in 11 iterations; 0.015242 against 0.01004 for one plain layer." },
+    { part: 6, q: "What beats the energy trunk?", options: ["The ridge floor", "The training-mean curve", "A nearest-neighbor copy of a training curve", "Nothing; it passes its bar"], answer: 2, why: "The copy scores 0.149 against the model's 0.206, and the plan sets no bar." },
+    { part: 7, q: "Why did the first fixed-point runs output a constant?", options: ["The learning rate was too high", "The input was never fed back in, so every input reached the same fixed point", "The card ran out of memory", "The tolerance was too loose"], answer: 1, why: "The fix injects the input at every iteration." },
+    { part: 8, q: "What did re-scoring every saved model show?", options: ["Several numbers were mis-computed", "Every reported number reproduced at its printed precision", "Most checkpoints were missing", "The flagship's error was twice what was reported"], answer: 1, why: "The problems lie in setup, labels and comparisons, not the scoring arithmetic." }
+  ];
+
+  var state = { ratings: {}, answers: {}, quiz: {}, quizChecked: false };
+  try {
+    var stored = window.localStorage.getItem(KEY);
+    if (stored) {
+      var parsed = JSON.parse(stored);
+      if (parsed && typeof parsed === "object") {
+        state.ratings = parsed.ratings || {};
+        state.answers = parsed.answers || {};
+        state.quiz = parsed.quiz || {};
+        state.quizChecked = Boolean(parsed.quizChecked);
+      }
+    }
+  } catch (error) { /* storage unavailable: the page works without it */ }
+  function Save() {
+    try { window.localStorage.setItem(KEY, JSON.stringify(state)); } catch (error) { /* ignore */ }
+  }
+
+  var checks = Array.prototype.slice.call(document.querySelectorAll(".check"));
+  var counters = {};
+  checks.forEach(function (check) {
+    var part = check.getAttribute("data-part");
+    counters[part] = (counters[part] || 0) + 1;
+    var id = part + "." + counters[part];
+    var slug = part + "-" + counters[part];
+    check.setAttribute("data-id", id);
+    check.querySelector(".check-label").textContent = "Check " + id;
+    var area = check.querySelector("textarea");
+    area.id = "answer-" + slug;
+    if (state.answers[id]) { area.value = state.answers[id]; }
+    area.addEventListener("input", function () { state.answers[id] = area.value; Save(); });
+    var reveal = check.querySelector(".reveal");
+    var answer = check.querySelector(".answer");
+    answer.id = "reveal-" + slug;
+    reveal.setAttribute("aria-controls", answer.id);
+    reveal.addEventListener("click", function () {
+      var opening = answer.hidden;
+      answer.hidden = !opening;
+      reveal.setAttribute("aria-expanded", String(opening));
+      reveal.textContent = opening ? "Hide answer" : "Show answer";
+    });
+    Array.prototype.forEach.call(check.querySelectorAll("[data-rate]"), function (button) {
+      button.addEventListener("click", function () {
+        state.ratings[id] = Number(button.getAttribute("data-rate"));
+        Save();
+        Paint();
+      });
+    });
+  });
+
+  var quizItems = document.getElementById("quiz-items");
+  QUIZ.forEach(function (item, number) {
+    var fieldset = document.createElement("fieldset");
+    var legend = document.createElement("legend");
+    legend.textContent = (number + 1) + ". " + item.q;
+    fieldset.appendChild(legend);
+    item.options.forEach(function (option, choice) {
+      var label = document.createElement("label");
+      var input = document.createElement("input");
+      input.type = "radio";
+      input.name = "quiz-" + number;
+      input.id = "quiz-" + number + "-" + choice;
+      input.value = String(choice);
+      if (state.quiz[number] === choice) { input.checked = true; }
+      input.addEventListener("change", function () { state.quiz[number] = choice; Save(); });
+      label.appendChild(input);
+      label.appendChild(document.createTextNode(option));
+      fieldset.appendChild(label);
+    });
+    var feedback = document.createElement("p");
+    feedback.className = "feedback";
+    feedback.id = "quiz-feedback-" + number;
+    feedback.hidden = true;
+    fieldset.appendChild(feedback);
+    quizItems.appendChild(fieldset);
+  });
+  document.getElementById("quiz-form").addEventListener("submit", function (event) {
+    event.preventDefault();
+    state.quizChecked = true;
+    Save();
+    Paint();
+    document.getElementById("quiz-score").scrollIntoView({ block: "nearest" });
+  });
+
+  function Quiz_Result() {
+    var right = 0;
+    var byPart = {};
+    QUIZ.forEach(function (item, number) {
+      var tally = byPart[item.part] || (byPart[item.part] = { right: 0, total: 0 });
+      tally.total += 1;
+      if (state.quiz[number] === item.answer) { right += 1; tally.right += 1; }
+    });
+    return { right: right, byPart: byPart };
+  }
+
+  function Paint() {
+    checks.forEach(function (check) {
+      var id = check.getAttribute("data-id");
+      Array.prototype.forEach.call(check.querySelectorAll("[data-rate]"), function (button) {
+        button.setAttribute("aria-pressed", String(state.ratings[id] === Number(button.getAttribute("data-rate"))));
+      });
+    });
+    var ratedTotal = checks.filter(function (check) { return state.ratings[check.getAttribute("data-id")] !== undefined; }).length;
+    document.getElementById("progress-rated").textContent = String(ratedTotal);
+    document.getElementById("progress-total").textContent = String(checks.length);
+    var result = Quiz_Result();
+    document.getElementById("progress-quiz").textContent = state.quizChecked ? (result.right + " of " + QUIZ.length) : "not taken";
+    var scoreLine = document.getElementById("quiz-score");
+    scoreLine.textContent = state.quizChecked ? ("Score: " + result.right + " of " + QUIZ.length + ".") : "";
+    QUIZ.forEach(function (item, number) {
+      var feedback = document.getElementById("quiz-feedback-" + number);
+      if (!state.quizChecked) { feedback.hidden = true; return; }
+      var correct = state.quiz[number] === item.answer;
+      feedback.hidden = false;
+      feedback.className = "feedback " + (correct ? "right" : "wrong");
+      feedback.textContent = (correct ? "Right. " : "Not quite: the answer is “" + item.options[item.answer] + "”. ") + item.why;
+    });
+    var rows = document.getElementById("map-rows");
+    rows.textContent = "";
+    Object.keys(PARTS).forEach(function (part) {
+      var partChecks = checks.filter(function (check) { return check.getAttribute("data-part") === part; });
+      var counts = [0, 0, 0];
+      partChecks.forEach(function (check) {
+        var rating = state.ratings[check.getAttribute("data-id")];
+        if (rating !== undefined) { counts[rating] += 1; }
+      });
+      var rated = counts[0] + counts[1] + counts[2];
+      var quizTally = result.byPart[part];
+      var missed = quizTally && state.quizChecked ? quizTally.total - quizTally.right : 0;
+      var call = "open";
+      var callText = "Not started";
+      if (rated > 0 || state.quizChecked) {
+        var weak = (rated > 0 && counts[2] / rated < 0.7) || missed > 1;
+        call = weak ? "reread" : "solid";
+        callText = weak ? "Reread this part" : "Solid";
+      }
+      var row = document.createElement("div");
+      row.className = "map-row";
+      var name = document.createElement("div");
+      name.className = "name";
+      var link = document.createElement("a");
+      link.href = "#part-" + part;
+      link.textContent = part + " · " + PARTS[part];
+      name.appendChild(link);
+      var bar = document.createElement("div");
+      bar.className = "bar";
+      bar.setAttribute("role", "img");
+      bar.setAttribute("aria-label", counts[2] + " knew it, " + counts[1] + " partly, " + counts[0] + " didn't know, of " + partChecks.length + " checks");
+      [["b-knew", counts[2]], ["b-partly", counts[1]], ["b-didnt", counts[0]]].forEach(function (piece) {
+        var span = document.createElement("span");
+        span.className = piece[0];
+        span.style.width = (partChecks.length ? (100 * piece[1] / partChecks.length) : 0) + "%";
+        bar.appendChild(span);
+      });
+      var figures = document.createElement("div");
+      figures.className = "fig";
+      figures.textContent = "rated " + rated + "/" + partChecks.length + (quizTally ? " · quiz " + (state.quizChecked ? quizTally.right : "–") + "/" + quizTally.total : "");
+      var verdict = document.createElement("div");
+      verdict.className = "call " + call;
+      verdict.textContent = callText;
+      row.appendChild(name);
+      row.appendChild(bar);
+      row.appendChild(figures);
+      row.appendChild(verdict);
+      rows.appendChild(row);
+      var tally = document.querySelector('[data-tally="' + part + '"]');
+      if (tally) { tally.textContent = rated + "/" + partChecks.length; }
+    });
+  }
+
+  var resetStart = document.getElementById("reset-start");
+  var resetConfirm = document.getElementById("reset-confirm");
+  resetStart.addEventListener("click", function () { resetConfirm.hidden = false; resetStart.hidden = true; });
+  document.getElementById("reset-no").addEventListener("click", function () { resetConfirm.hidden = true; resetStart.hidden = false; });
+  document.getElementById("reset-yes").addEventListener("click", function () {
+    state = { ratings: {}, answers: {}, quiz: {}, quizChecked: false };
+    try { window.localStorage.removeItem(KEY); } catch (error) { /* ignore */ }
+    Array.prototype.forEach.call(document.querySelectorAll(".check textarea"), function (area) { area.value = ""; });
+    Array.prototype.forEach.call(document.querySelectorAll("#quiz-items input"), function (input) { input.checked = false; });
+    resetConfirm.hidden = true;
+    resetStart.hidden = false;
+    Paint();
+  });
+
+  Paint();
+})();
+</script>

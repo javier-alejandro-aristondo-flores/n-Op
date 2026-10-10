@@ -1,0 +1,286 @@
+<section class="part" id="part-6" aria-labelledby="h-part-6">
+<h2 id="h-part-6"><span class="partno" data-nofact>Part 6</span> The models, one by one</h2>
+<div class="prose">
+<p>One sheet per model, in the plan's order. Each one says what goes in and out, how it is fed and built, how it trained, what it was judged against, what it scored, what broke, and what the audit has confirmed. First, the whole field at a glance.</p>
+</div>
+<figure>
+<div class="diagram wide">
+<!--SCOREBOARD-->
+</div>
+<figcaption>Each judged model's error divided by a floor's error, on a log scale; left of 1, the model wins. The open circle uses the floor the plan judged it against. The filled circle uses the strongest simple method known today, which for three rows is a floor found after the verdict. The numbers behind every point are in the table below.</figcaption>
+</figure>
+<div class="table-wrap">
+<table>
+<thead><tr><th>Model</th><th>Metric</th><th>Model's error</th><th>Plan's floor</th><th>Strongest simple method</th></tr></thead>
+<tbody>
+<tr><td>Flagship, explicit stack</td><td>MAE</td><td class="n">0.00217</td><td class="n">ridge 0.0976</td><td class="n">copy 0.0062</td></tr>
+<tr><td>Ladder: weight-tied, input injected</td><td>MAE</td><td class="n">0.00271</td><td class="n">ridge 0.0976</td><td class="n">copy 0.0062</td></tr>
+<tr><td>Ladder: one explicit layer</td><td>MAE</td><td class="n">0.01004</td><td class="n">ridge 0.0976</td><td class="n">copy 0.0062</td></tr>
+<tr><td>Branch–trunk, strain (fixed basis, cheap functional)</td><td>relative L2</td><td class="n">0.000821</td><td class="n">ridge 0.00414</td><td class="n">ridge 0.00414</td></tr>
+<tr><td>Branch–trunk, perovskite fold 0 (fixed basis)</td><td>relative L2</td><td class="n">0.0183</td><td class="n">ridge 0.0423</td><td class="n">symmetry-aware copy 1.7e-07</td></tr>
+<tr><td>Energy trunk</td><td>curve L1</td><td class="n">0.206</td><td class="n">ridge 0.368</td><td class="n">curve copy 0.149</td></tr>
+<tr><td>Two-input network</td><td>MAE</td><td class="n">0.016454</td><td class="n">ridge 0.097618</td><td class="n">copy 0.006164</td></tr>
+<tr><td>Manifold decoder</td><td>relative L2</td><td class="n">0.002452</td><td class="n">interpolation 0.000911</td><td class="n">interpolation 0.000911</td></tr>
+<tr><td>Galerkin transformer</td><td>relative L2</td><td class="n">0.1780</td><td class="n">copy 0.0853</td><td class="n">symmetry-aware copy 1.7e-07</td></tr>
+<tr><td>Correction network</td><td>relative L2</td><td class="n">0.002079</td><td class="n">identity 0.011131</td><td class="n">ridge, 406 times better than the model</td></tr>
+</tbody>
+</table>
+</div>
+<p class="note">The symmetry-aware copy and the energy trunk's curve copy were computed on <time datetime="2026-10-02">2 October</time>, read-only, from the same data and code. The two-input network's decisive comparison was against its own twin, not a floor; its card covers it.</p>
+
+<div class="cards">
+
+<article class="card" id="card-flagship">
+<div class="card-head"><h3><span class="entry" data-nofact>I.1</span>Factorized Fourier operator, the flagship</h3><span class="verdict pass">pass</span><p class="mapping">charge density → electron localization field</p></div>
+<dl class="spec">
+<dt>Fed</dt><dd>Each run's two spin densities, log-compressed, plus six channels describing the cell's shape (its lattice Gram matrix), on the 80³ grid. These are cut to 40³ by dropping high Fourier modes before the first layer, which is exact because that layer acts point by point.</dd>
+<dt>Built</dt><dd>A point-by-point lift to 64 channels, then twelve factorized spectral layers keeping 19 Fourier modes per axis (the plan's "20³" is one more than a 40-point axis can hold), then a head that keeps every output between 0 and 1. 11.55M parameters.</dd>
+<dt>Data</dt><dd>The cubic block. Trained on folds 2–4 (196 runs), stopped by fold 1 (65 runs, 24 units), judged on fold 0 (76 runs, 29 units). One run per step, single precision, one seed.</dd>
+<dt>Trained</dt><dd>24,404 steps in 3.94 hours, 3.6 GB on the card. The last stage stopped early, at 3,100 of its 14,201 steps.</dd>
+<dt>Floors</dt><dd>Mean absolute error, measured before training: semilocal ridge 0.0976 (the plan's kill anchor), per-shell filter 0.0830, training-mean template 0.0160, nearest-run copy 0.0062.</dd>
+<dt>Bars</dt><dd>Kill at half the ridge, at most 0.0488. Pattern rule: 20% better than the ridge, at most 0.0781. Added before training: beat the template, beat the copy, and a stretch level at half the template, at most 0.0080.</dd>
+<dt>Result</dt><dd>Mean absolute error 0.00217 (relative L2 1.05%, structural similarity 0.9998). Defect set 0.00233, strains 0.00070.</dd>
+<dt>Verdict</dt><dd>All five levels pass: 97.8% better than the ridge, 65% better than the copy.</dd>
+<dt>After</dt><dd>The grading deep dive reproduced every number to six digits from the checkpoint with independently written code. It also showed that fold 0 holds three different tests: plain strained diamond, defects of familiar elements, and nine dopant elements never seen in training. The audit re-scored 0.002170 exactly. The "8.0e-5" beside it should read 8.1e-5 (Part 5).</dd>
+<dt>Same model, other tasks</dt><dd><strong>Local potential:</strong> floors measured, never trained. The anchor floor, Hartree plus a semilocal ridge, scores 47.96%, so the bar is 23.98%. <strong>Parametric form (II.4):</strong> strain → density; bracketing interpolation scores 0.091% pooled, so the kill bar is 0.064%. Never trained; the plan predicts the floor wins.</dd>
+</dl>
+<figure class="plate">
+<!--IMG:flagship_best-->
+<figcaption>The flagship's best fold-0 run: one slice of the spin-up localization field on its 40³ grid. Left to right: truth, prediction, prediction minus truth. The difference panel's color scale is a few thousandths wide.</figcaption>
+</figure>
+<figure class="plate">
+<!--IMG:flagship_worst-->
+<figcaption>Its worst fold-0 run. The truth has a bright localization feature at a dopant site that the prediction misses entirely. A one-shot prediction has no step that would notice and correct this, which is the weakness the 18 September deck built its proposal around.</figcaption>
+</figure>
+</article>
+
+<article class="card" id="card-ladder">
+<div class="card-head"><h3><span class="entry" data-nofact>I.3</span>The weight-sharing ladder</h3><span class="verdict pass">four rungs judged</span><p class="mapping">charge density → electron localization field, as I.1</p></div>
+<dl class="spec">
+<dt>The question</dt><dd>Does applying one layer twelve times (weight-tying) do as well as twelve separate layers? Does solving for the layer's fixed point, the state it maps to itself, add anything beyond that?</dd>
+<dt>The rungs</dt><dd>
+<div class="table-wrap"><table>
+<thead><tr><th>Rung</th><th>Parameters</th><th>Steps</th><th>Time</th><th>Validation loss</th><th>MAE</th></tr></thead>
+<tbody>
+<tr><td>explicit, twelve layers</td><td class="n">11.55M</td><td class="n">24,404</td><td class="n">3.94 h</td><td class="n">8.1e-5</td><td class="n">0.00217</td></tr>
+<tr><td>weight-tied, input not injected</td><td class="n">0.96M</td><td class="n">23,804</td><td class="n">2.69 h</td><td class="n">1.2e-4</td><td class="n">0.00297</td></tr>
+<tr><td>weight-tied, input injected</td><td class="n">0.96M</td><td class="n">28,504</td><td>resumed across power losses</td><td class="n">1.0e-4</td><td class="n">0.00271</td></tr>
+<tr><td>one explicit layer, matched parameters</td><td class="n">0.96M</td><td class="n">35,505</td><td class="n">0.52 h</td><td class="n">3.9e-4</td><td class="n">0.01004</td></tr>
+<tr><td>fixed point, spectral clipping</td><td class="n">0.96M</td><td class="n">26,332</td><td class="n">5.5 h</td><td class="n">7.9e-4</td><td class="n">0.015242</td></tr>
+</tbody></table></div>
+</dd>
+<dt>Reading</dt><dd>Weight-tying wins at matched parameters: the tied rungs beat the single layer 3.4–3.7 times over. It loses at matched width: the twelve-layer stack is still better. Injecting the input at every application buys about 9%. The fixed point converges (100% of runs, in 11 iterations, on both folds) but is less accurate than every comparator. So: weight-tying yes, implicit depth no.</dd>
+<dt>Verdict</dt><dd>The four unrolled rungs pass all five levels except the single layer, which fails the copy and the stretch levels. The fixed-point result exists only in the ladder's own working copy, uncommitted.</dd>
+<dt>What broke</dt><dd>The shared fixed-point code had four defects that surfaced only on its first runs on the card:
+<ul>
+<li>it asked numpy to read a tensor that lived on the card;</li>
+<li>its acceleration step ran on the processor;</li>
+<li>it never fed the input back in, so every input reached the same fixed point and the model could only output a constant;</li>
+<li>its stopping tolerance was absolute, which on a four-million-entry state meant parts per million.</li>
+</ul>
+Then the layer turned out not to contract at its default initialization, so three stability rungs were built. The first, spectral clipping (capping each mode's gain so the map contracts), passed its probe and was trained.</dd>
+<dt>Audit</dt><dd>Re-scored 0.002966, 0.002706 and 0.010043 exactly. <span class="tag found">Found</span> The fixed-point report's verdict line says "unconverged" while its own health check says 100% converged. <span class="tag found">Found</span> The weight-tied rung returned a stage 2.0% worse on validation than one it had already kept.</dd>
+</dl>
+</article>
+
+<article class="card" id="card-convolutional">
+<div class="card-head"><h3><span class="entry" data-nofact>I.2</span>Convolutional operator</h3><span class="verdict none">never trained</span><p class="mapping">charge density → electron localization field, at 80³</p></div>
+<dl class="spec">
+<dt>Built</dt><dd>A U-shaped stack over three scales (80³ → 40³ → 20³), with an alias-free activation: upsample, apply the nonlinearity, downsample, with its own gradient rule so the doubled grid never sits in memory.</dd>
+<dt>Floors</dt><dd>The flagship's four, re-measured on the same block (ridge 0.097618, filter 0.083022, template 0.015957, copy 0.006164), with the same five-level ladder.</dd>
+<dt>Its own check</dt><dd>Fixed before training: match or beat a plain point-by-point twin, and lose at most half as much as that twin on 21 stretched grids.</dd>
+<dt>Status</dt><dd>Built and floors measured, never trained. The results page still says "member not started", which is stale.</dd>
+</dl>
+</article>
+
+<article class="card" id="card-galerkin">
+<div class="card-head"><h3><span class="entry" data-nofact>I.4</span>Galerkin transformer</h3><span class="verdict kill">killed</span><p class="mapping">its first gate: six perovskite lattice factors → charge density at query points</p></div>
+<dl class="spec">
+<dt>Fed</dt><dd>The six lattice factors as constant channels plus periodic coordinate features on 32³ tokens, answering 64³ query points. The target is standardized voxel by voxel.</dd>
+<dt>Built</dt><dd>Attention without a softmax (queries times the product of keys and values, normalized over tokens), then a cross-attention decoder at the query points. Width 128, four heads, four layers, 374,145 parameters.</dd>
+<dt>Data</dt><dd>The perovskite angle sweep. Judged on its 25 fold-0 runs and on 27 interior levels of the angle arm.</dd>
+<dt>Trained</dt><dd>A two-hour cap, budgeted at 52,283 steps from a measured 0.138 seconds per step, 1.5 GB. It stopped early after 33,170 steps plus the probe, about 78 minutes. Validation sat at the mean field the whole time.</dd>
+<dt>Floors and bars</dt><dd>Nearest-angle copy 0.0853, bar at most 0.0426. Linear-in-angle interpolation 0.0264, bar at most 0.0132. The training-mean field, 0.1755, as context.</dd>
+<dt>Result</dt><dd>0.1780 and 0.1191: no better than the mean field.</dd>
+<dt>Verdict</dt><dd>Killed at its first gate by its own pre-registration. Its second stage, the localization task, never ran.</dd>
+<dt>What broke</dt><dd>Three defects were found and fixed before the verdict:
+<ul>
+<li>the decoder's queries carried only coordinates, so training made the output blind to the lattice factors (outputs for two structures 27% apart at initialization, 4e-8 apart after training);</li>
+<li>the electron-count correction sat inside the training loss;</li>
+<li>the density's spikes at the atomic cores dominated the squared error (the top 5% of voxels carried 77% of it), fixed by standardizing voxel by voxel.</li>
+</ul>
+The first gate run is void.</dd>
+<dt>Hypothesis</dt><dd>Recorded before the verdict, never tested: six numbers and four Fourier modes per axis cannot build structure concentrated at atomic cores. The branch–trunk network solves the same task because its basis hands it that structure.</dd>
+<dt>Audit</dt><dd>Re-scored exactly. The interpolation comparison is in-sample on 24 of 27 levels, and the copy floor misses the symmetry copies; the kill stands either way.</dd>
+</dl>
+</article>
+
+<article class="card" id="card-branch-trunk">
+<div class="card-head"><h3><span class="entry" data-nofact>II.1</span>Branch–trunk network</h3><span class="verdict pass">pass on strain</span><p class="mapping">strain or lattice factors → charge density</p></div>
+<dl class="spec">
+<dt>How it works</dt><dd>A branch network reads the run's parameters into a vector; a trunk turns a query point into features; their product is the field at that point.</dd>
+<dt>Configurations</dt><dd>
+<ul>
+<li><code>principal_component</code>: a fixed basis of the top 32 components; its linear version is exactly the ridge floor.</li>
+<li><code>proper_orthogonal</code>: the same, fit on fields standardized voxel by voxel.</li>
+<li><code>canonical</code>: a learned trunk over coordinates, answerable on any grid.</li>
+<li><code>energy_trunk</code>: the density-of-states task, on its own sheet below.</li>
+</ul></dd>
+<dt>Strain task</dt><dd>The 40³ block, per functional. Judged on 88 test runs over 22 orbits. The fixed-basis configurations trained on 608 runs per functional for 32,000 steps; the learned trunk trained on 928 runs across every grid shape.</dd>
+<dt>Floors and bars</dt><dd>Ridge 0.00414 (cheap) and 0.00411 (accurate), to beat by 25%. Nearest-neighbor copy 0.00896, to beat by 2×. The basis alone limits error to 0.000017.</dd>
+<dt>Result</dt><dd>Relative L2, cheap / accurate:
+<ul>
+<li><code>principal_component</code>: 0.000821 / 0.001092;</li>
+<li><code>proper_orthogonal</code>: 0.000819 / 0.001122;</li>
+<li><code>canonical</code>: 0.001896 / 0.002413 on the 40³ block, and 0.002339 / 0.002766 on all 124 test runs across nine grid shapes.</li>
+</ul>
+Fourteen of fourteen comparisons pass. A seed sweep found the two fixed-basis configurations indistinguishable: a paired difference of 0.5% and 1.8%, against spreads of 14–35%.</dd>
+<dt>Perovskite task</dt><dd>Fold 0: ridge 0.0423, copy 0.0853; the three configurations 0.0183, 0.0189 and 0.0235, all passing. The holdouts labeled extrapolation read 0.0937, 0.1264 and 0.0434 for factor 0.8, and 0.0584, 0.0606 and 0.0499 for factor 1.2.</dd>
+<dt>What broke</dt><dd>The first perovskite <code>proper_orthogonal</code> rows projected standardized fields onto a basis fit on raw ones, which showed up as an 18-fold blowup in the high-frequency band on every split. It was caught before it shipped and pinned by a regression test.</dd>
+<dt>Audit</dt><dd>Every strain number reproduced; the fixed-basis rows were rebuilt from the weights kept in the figure caches, since those runs saved no checkpoint. <span class="tag found">Found</span> The perovskite rows are compromised: every fold-0 run has a same-crystal copy in training, and a copy that knows the cell's symmetry scores 1.7e-7, roughly <span data-nofact>100,000</span> times better than the best configuration. The perovskite passes measure nothing the labels claim.</dd>
+</dl>
+</article>
+
+<article class="card" id="card-energy">
+<div class="card-head"><h3><span class="entry" data-nofact>VI.1</span>Energy trunk, a branch–trunk configuration</h3><span class="verdict hold">no bar</span><p class="mapping">strain → density of states over energy</p></div>
+<dl class="spec">
+<dt>Fed</dt><dd>The six strain components plus the functional as a seventh input. The target is each run's curve rebuilt from its eigenvalues with 0.175 eV smearing, on a window from −28 to +8 eV around the top of the valence band: 601 points, 0.06 eV apart.</dd>
+<dt>Data</dt><dd>1,856 training runs; judged on 248 test runs over 30 orbits, both functionals pooled.</dd>
+<dt>Floors</dt><dd>Training mean 0.392 (whole window) and 0.757 (band edges); ridge 0.368 and 0.518.</dd>
+<dt>Result</dt><dd>Curve L1 0.206 over the whole window, 0.265 at the band edges. A variant weighting the band edges five times scores 0.208 and 0.193.</dd>
+<dt>Verdict</dt><dd>The results page says "pass, 44% better", but the plan sets no bar for this task.</dd>
+<dt>Audit</dt><dd><span class="tag found">Found</span> A nearest-neighbor copy of a training curve scores 0.149 and 0.171, better than the model on both windows (computed <time datetime="2026-10-02">2 October</time>). The gap-edge read-out is an artifact of the smearing: every true curve crosses its threshold at +0.020 eV.</dd>
+<dt>Why whole-window looks weak</dt><dd>467 of the 601 bins are valence states that strain barely moves, so they dilute the score. The signal lives at the band edges.</dd>
+</dl>
+</article>
+
+<article class="card" id="card-two-input">
+<div class="card-head"><h3><span class="entry" data-nofact>II.2</span>Two-input network</h3><span class="verdict kill">killed</span><p class="mapping">charge density and local potential → electron localization field</p></div>
+<dl class="spec">
+<dt>Fed</dt><dd>The top 32 components of the log-compressed density and of the local potential with its mean removed.</dd>
+<dt>Built</dt><dd>Two branches whose outputs multiply entry by entry, a trunk queried at points, and a head bounded between 0 and 1: 245,632 parameters. Its twin is the same network with the potential branch held constant: 224,896.</dd>
+<dt>Data</dt><dd>The cubic block; judged on fold 0, 29 units.</dd>
+<dt>Trained</dt><dd>Budgets of 33,650 steps each, matched on purpose; both stopped early at 22,090. About half an hour each, at about 0.11 seconds per step, 0.8 GB.</dd>
+<dt>Floors and bars</dt><dd>Semilocal ridge 0.097618, to beat by 20% (the pattern rule). Template 0.015957; copy 0.006164. Decisive: beat its own twin, 0.014553, by 5%.</dd>
+<dt>Result</dt><dd>0.016454: 13.1% worse than its twin.</dd>
+<dt>Verdict</dt><dd>Killed on its decisive bar. It passes the pattern rule, 83.1% better than the ridge, but does not beat the training-mean template. The potential added nothing at a matched budget.</dd>
+<dt>What broke</dt><dd>
+<ul>
+<li>Its first run never trained. The potential's coefficients entered in raw units, about 48 times the density's scale, so the bounded head sat at exactly zero with no gradient. Fixed by standardizing them.</li>
+<li>Twin and member were first given different budgets: a warm-cache cost probe measured 0.107 seconds per step against 0.451. They were then matched at 33,650.</li>
+</ul></dd>
+<dt>Audit</dt><dd>Re-scored exactly. Its fixed bases are fit on folds 1–4, so the validation fold sits inside its own components; the verdict against the twin is unaffected. <span class="tag open">Pending</span> Its floors figure draws the pass lines at a zero margin, and the cross-member table shows no verdict for it.</dd>
+</dl>
+</article>
+
+<article class="card" id="card-manifold">
+<div class="card-head"><h3><span class="entry" data-nofact>II.3</span>Manifold decoder</h3><span class="verdict kill">killed</span><p class="mapping">strain → charge density, decoded point by point</p></div>
+<dl class="spec">
+<dt>Fed</dt><dd>The six strain components plus the functional, sampled at points on every grid shape.</dd>
+<dt>Built</dt><dd>An encoder into a 128-number vector, then a decoder in which the value at a point is a nonlinear function of that vector and the point's coordinates, proven not reducible to a linear map of the vector. 272,001 parameters.</dd>
+<dt>Trained</dt><dd>About 10,200 steps in seven minutes on the card.</dd>
+<dt>Judged on</dt><dd>423 interior levels of the strain sweeps (leave one level out), plus the committed test split (22 units) and every grid shape (30 units).</dd>
+<dt>Floors and bars</dt><dd>Bracketing interpolation 0.000911, bar at most 0.000607. Radial basis 0.000991, bar at most 0.000661. Ridge 0.004225 and copy 0.019876 as context.</dd>
+<dt>Result</dt><dd>0.002452, 2.7 times worse than interpolation. Grid transfer 1.32 times against a bar of 1.3: a narrow miss.</dd>
+<dt>Verdict</dt><dd>Killed, as the plan predicted: on an interpolation split, a straight line between neighboring levels is nearly exact.</dd>
+<dt>Audit</dt><dd>Re-scored exactly. 337 of the 423 levels are its own training data, and 66 levels average three differently oriented shear fields. The kill stands on the 86 levels holding no training run (−280.2%) and without the shear arms (−125.4%).</dd>
+</dl>
+</article>
+
+<article class="card" id="card-correction">
+<div class="card-head"><h3><span class="entry" data-nofact>IV.1</span>Correction network</h3><span class="verdict pass">pass, hollow</span><p class="mapping">cheap-functional density → accurate-functional density</p></div>
+<dl class="spec">
+<dt>Fed</dt><dd>The cheap density's top 32 components.</dd>
+<dt>Built</dt><dd>A small network that starts as the identity and predicts the correction's top 32 components, held at zero mean. 24,865 parameters.</dd>
+<dt>Data</dt><dd>The strain atlas's 40³ block: 608 training, 83 validation and 88 test runs (22 orbits).</dd>
+<dt>Trained</dt><dd>20,000 steps on the shared schedule.</dd>
+<dt>Floors</dt><dd>Identity 0.011131, so the kill bar is half of it, at most 0.005565. Global affine 0.010466. Ridge from the strain 0.000049. Ridge from the cheap density's components 0.000005. The basis's own limit 0.000002.</dd>
+<dt>Result</dt><dd>0.002079: 81.3% better than identity.</dd>
+<dt>Verdict</dt><dd>Passes the plan's bar. But plain linear regression on the same inputs is 406 times better: on this holdout every test point is a small step from a training point, the correction is almost exactly linear, and the network adds nothing.</dd>
+<dt>Audit</dt><dd>Re-scored exactly. <span class="tag found">Found</span> Its floors figure keeps only one of five floors, because every comparison was filed under the same name. The picture shows the network beating the only floor drawn.</dd>
+</dl>
+</article>
+
+<article class="card" id="card-conformal">
+<div class="card-head"><h3><span class="entry" data-nofact>IV.3</span>Conformal wrapper</h3><span class="verdict pass">valid</span><p class="mapping">a prediction → the same prediction with an interval guaranteed to cover</p></div>
+<dl class="spec">
+<dt>How</dt><dd>Calibrated at level 0.90 with the orbit as unit, on 23 validation orbits, then applied to the correction network's 22 test orbits.</dd>
+<dt>Result</dt><dd>Coverage 0.977 against a guaranteed 0.900–0.942: valid, and conservative.</dd>
+<dt>Audit</dt><dd><span class="tag found">Found</span> <code>results.json</code> records the coverage as 1.0, which is a median of per-orbit hit-or-miss values and reads 1.0 for any coverage above one half. It also stores the guarantee band where the confidence interval belongs. The 0.977 appears nowhere in the file.</dd>
+</dl>
+</article>
+
+<article class="card" id="card-codomain">
+<div class="card-head"><h3><span class="entry" data-nofact>V.1</span>Codomain attention</h3><span class="verdict none">never judged</span><p class="mapping">any subset of six fields → the missing ones</p></div>
+<dl class="spec">
+<dt>Fed</dt><dd>Six fields as tokens at 40³: density, magnetization, localization up and down, potential up and down. Training hides some and asks for them back.</dd>
+<dt>Built</dt><dd>One encoding per field name, then four layers of attention across the field tokens: 3,838,762 parameters. Each layer rebuilds its intermediates during the backward pass so the stack fits on the card: 2.2072 GB peak, 2.2917 seconds per step.</dd>
+<dt>Data</dt><dd>Fold 0, 76 runs; fold 1, 65; folds 2–4, 196 for pretraining. The alloy campaign, 182 runs, is held out for zero-shot transfer.</dd>
+<dt>Bars</dt><dd>Zero-shot localization at most 0.004340, twice the flagship's error; after fine-tuning, at most 0.002713.</dd>
+<dt>Status</dt><dd>The pretraining run stopped cleanly after a checkpoint, 2,800 steps into its first stage of 2,828, with its best validation score of 0.2638 at step 1,000. It was never judged, and its report still says training has not started.</dd>
+<dt>Audit</dt><dd><span class="tag open">Pending</span> An auditor reports its functional label is wrong for many runs.</dd>
+</dl>
+</article>
+
+<article class="card" id="card-structure">
+<div class="card-head"><h3><span class="entry" data-nofact>III.1</span>Structure-to-density network</h3><span class="verdict none">never trained</span><p class="mapping">atoms → charge density and magnetization at any point</p></div>
+<dl class="spec">
+<dt>Built</dt><dd>Atoms embedded by element and pseudopotential, then three atom-to-atom and three atom-to-probe message-passing layers within 4.0 ångströms. 523,970 parameters.</dd>
+<dt>Data</dt><dd>The defect campaign; judged on fold 0, 42 runs in 21 units. 18 of those runs carry an element absent from every training fold.</dd>
+<dt>Floors</dt><dd>Superposed atoms 0.154149 (0.161438 on the unseen elements). A reduced density-fitting ridge, 0.111713, whose spread runs about a hundred times its median: a badly conditioned fit. Nearest-structure copy 0.067496.</dd>
+<dt>Bars</dt><dd>Ten times better than superposed atoms, at most 0.015415. Three times better than the ridge, at most 0.037238. Magnetic moments within 5% with the right sign on 90% of the 25 magnetic runs.</dd>
+<dt>Status</dt><dd>Never trained. The silicon runs labeled "H" (Part 2) matter here, because this model keys atoms by element.</dd>
+</dl>
+</article>
+
+<article class="card" id="card-rest">
+<div class="card-head"><h3><span class="entry" data-nofact>III.3 · IV.2</span>The two empty entries</h3><span class="verdict none">stub · not started</span><p class="mapping">atoms → density through plane waves; cheap → accurate density of states</p></div>
+<dl class="spec">
+<dt>Plane-wave network</dt><dd>A package exists whose constructor raises an error; the results page's "no package exists yet" is stale. It is judged against III.1 at a matched budget, so it cannot be judged first.</dd>
+<dt>Spectral correction</dt><dd>Not started.</dd>
+</dl>
+</article>
+
+</div>
+
+<check part="6">
+<q>What goes into the flagship, and which floor was its hardest bar?</q>
+<a>Two log-compressed spin densities plus six cell-shape channels at 80³, cut to 40³. Its hardest bar was the nearest-run copy (0.0062): it scored 0.00217, 65% better.</a>
+<src>operator-results.md, section I.1</src>
+</check>
+<check part="6">
+<q>What does the weight-sharing ladder conclude?</q>
+<a>Weight-tying yes at matched parameters (3.4–3.7 times better than one layer), no at matched width. Implicit depth no: the fixed point converges but is less accurate than every comparator.</a>
+<src>operator-results.md, section I.3; the ladder's uncommitted report</src>
+</check>
+<check part="6">
+<q>What decided the two-input network's fate, and why is it a fair test?</q>
+<a>It had to beat its own density-only twin by 5% at a matched budget; it was 13.1% worse. The twin differs only in having the potential branch held constant, so the comparison isolates what the potential adds.</a>
+<src>operator-results.md, section II.2</src>
+</check>
+<check part="6">
+<q>Why did the plan expect the manifold decoder to lose?</q>
+<a>On an interpolation split, linear interpolation between the bracketing training levels is nearly exact (0.000911). A learned decoder cannot beat it by a third.</a>
+<src>operator-results.md, section II.3</src>
+</check>
+<check part="6">
+<q>The correction network passed. Why is the pass hollow?</q>
+<a>Plain linear regression from the same 32 cheap-density components is 406 times better. The correction is almost exactly linear on this holdout, so the network adds nothing.</a>
+<src>operator-results.md, section IV.1</src>
+</check>
+<check part="6">
+<q>What did the Galerkin transformer learn after its three fixes?</q>
+<a>The mean field: 0.1780 against the mean field's 0.1755, flat through every stage. It kept some input dependence but learned nothing beyond the average.</a>
+<src>operator-results.md, section I.4</src>
+</check>
+<check part="6">
+<q>Why should the energy trunk's "pass, 44% better" not stand?</q>
+<a>The plan sets no bar for that task, and a nearest-neighbor copy of a training curve scores 0.149 against the model's 0.206.</a>
+<src>operator-results.md, sections II.1 and VI.1; the 2 October check</src>
+</check>
+<check part="6">
+<q>What makes the branch–trunk network's perovskite results unreliable?</q>
+<a>Every fold-0 test crystal also appears in training under a different cell. A copy that knows the symmetry scores 1.7e-7, so neither the fold-0 "interpolation" rows nor the "extrapolation" holdouts test what they claim.</a>
+<src>The 2 October check (computations.txt)</src>
+</check>
+</section>

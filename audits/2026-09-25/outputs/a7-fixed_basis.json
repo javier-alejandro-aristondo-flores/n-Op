@@ -1,0 +1,30 @@
+{
+ "cheap_principal_component": {
+  "median": 0.0008209345974060686,
+  "units": 22,
+  "reported": 0.000821,
+  "branch_arrays_loaded": 8,
+  "basis_modes_gap_up_to_sign": 0.0
+ },
+ "cheap_proper_orthogonal": {
+  "median": 0.0008191644641884982,
+  "units": 22,
+  "reported": 0.000819,
+  "branch_arrays_loaded": 8,
+  "basis_modes_gap_up_to_sign": 0.0
+ },
+ "accurate_principal_component": {
+  "median": 0.001092286943471628,
+  "units": 22,
+  "reported": 0.001092,
+  "branch_arrays_loaded": 8,
+  "basis_modes_gap_up_to_sign": 0.0
+ },
+ "accurate_proper_orthogonal": {
+  "median": 0.001121943051705658,
+  "units": 22,
+  "reported": 0.001122,
+  "branch_arrays_loaded": 8,
+  "basis_modes_gap_up_to_sign": 0.0
+ }
+}

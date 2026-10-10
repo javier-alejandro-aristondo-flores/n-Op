@@ -1,0 +1,14 @@
+{
+ "member": 0.0020790031456648485,
+ "units": 22,
+ "identity": 0.01113053819583539,
+ "improvement": 0.8132162965450557,
+ "ridge_cheap_coefficients": 5.119625908627971e-06,
+ "floor_medians": {
+  "global_affine": 0.010466108718586453,
+  "ridge_cheap_coefficients": 5.119625908627971e-06,
+  "ridge_strain_components": 4.856500659833339e-05,
+  "rank_32_ceiling": 1.682237081084679e-06
+ },
+ "ratio_to_ridge": 406.0849723729148
+}

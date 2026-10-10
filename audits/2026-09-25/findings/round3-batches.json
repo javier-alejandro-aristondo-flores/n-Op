@@ -1,0 +1,258 @@
+[
+ {
+  "id": "v3-001",
+  "tier": "full",
+  "slices": [
+   "R3-M10-deep-dft",
+   "R3-M2-parametric",
+   "R3-M7-manifold"
+  ],
+  "count": 4,
+  "ids": [
+   "R3-M10-deep-dft-001",
+   "R3-M2-parametric-001",
+   "R3-M7-manifold-001",
+   "R3-M7-manifold-003"
+  ]
+ },
+ {
+  "id": "v3-002",
+  "tier": "full",
+  "slices": [
+   "R3-S2-floors"
+  ],
+  "count": 1,
+  "ids": [
+   "R3-S2-floors-002"
+  ]
+ },
+ {
+  "id": "v3-003",
+  "tier": "defended",
+  "slices": [
+   "R3-M10-deep-dft",
+   "R3-M2-parametric",
+   "R3-M7-manifold",
+   "R3-M9-codomain"
+  ],
+  "count": 8,
+  "ids": [
+   "R3-M10-deep-dft-004",
+   "R3-M2-parametric-004",
+   "R3-M2-parametric-007",
+   "R3-M2-parametric-020",
+   "R3-M7-manifold-014",
+   "R3-M9-codomain-016",
+   "R3-M9-codomain-017",
+   "R3-M9-codomain-018"
+  ]
+ },
+ {
+  "id": "v3-004",
+  "tier": "defended",
+  "slices": [
+   "R3-M9-codomain",
+   "R3-S2-floors"
+  ],
+  "count": 7,
+  "ids": [
+   "R3-M9-codomain-021",
+   "R3-M9-codomain-024",
+   "R3-M9-codomain-029",
+   "R3-M9-codomain-030",
+   "R3-S2-floors-010",
+   "R3-S2-floors-011",
+   "R3-S2-floors-014"
+  ]
+ },
+ {
+  "id": "v3-005",
+  "tier": "single",
+  "slices": [
+   "R3-D1-data",
+   "R3-M10-deep-dft",
+   "R3-M2-parametric"
+  ],
+  "count": 8,
+  "ids": [
+   "R3-D1-data-008",
+   "R3-M10-deep-dft-005",
+   "R3-M10-deep-dft-007",
+   "R3-M10-deep-dft-011",
+   "R3-M10-deep-dft-015",
+   "R3-M2-parametric-003",
+   "R3-M2-parametric-008",
+   "R3-M2-parametric-009"
+  ]
+ },
+ {
+  "id": "v3-006",
+  "tier": "single",
+  "slices": [
+   "R3-M2-parametric",
+   "R3-M7-manifold"
+  ],
+  "count": 8,
+  "ids": [
+   "R3-M2-parametric-011",
+   "R3-M2-parametric-015",
+   "R3-M2-parametric-017",
+   "R3-M2-parametric-018",
+   "R3-M2-parametric-019",
+   "R3-M7-manifold-004",
+   "R3-M7-manifold-005",
+   "R3-M7-manifold-008"
+  ]
+ },
+ {
+  "id": "v3-007",
+  "tier": "single",
+  "slices": [
+   "R3-M7-manifold",
+   "R3-M9-codomain",
+   "R3-N1a-substrate"
+  ],
+  "count": 8,
+  "ids": [
+   "R3-M7-manifold-009",
+   "R3-M7-manifold-017",
+   "R3-M9-codomain-002",
+   "R3-M9-codomain-011",
+   "R3-M9-codomain-014",
+   "R3-N1a-substrate-003",
+   "R3-N1a-substrate-004",
+   "R3-N1a-substrate-010"
+  ]
+ },
+ {
+  "id": "v3-008",
+  "tier": "single",
+  "slices": [
+   "R3-N1a-substrate",
+   "R3-N1b-framework",
+   "R3-P-inspection",
+   "R3-S2-floors"
+  ],
+  "count": 8,
+  "ids": [
+   "R3-N1a-substrate-018",
+   "R3-N1b-framework-001",
+   "R3-N1b-framework-002",
+   "R3-N1b-framework-009",
+   "R3-P-inspection-013",
+   "R3-P-inspection-014",
+   "R3-P-inspection-015",
+   "R3-S2-floors-009"
+  ]
+ },
+ {
+  "id": "v3-009",
+  "tier": "single",
+  "slices": [
+   "R3-S2-floors",
+   "R3-singles"
+  ],
+  "count": 8,
+  "ids": [
+   "R3-S2-floors-013",
+   "R3-singles-002",
+   "R3-singles-005",
+   "R3-singles-006",
+   "R3-singles-007",
+   "R3-singles-008",
+   "R3-singles-010",
+   "R3-singles-013"
+  ]
+ },
+ {
+  "id": "v3-010",
+  "tier": "single",
+  "slices": [
+   "R3-singles"
+  ],
+  "count": 2,
+  "ids": [
+   "R3-singles-014",
+   "R3-singles-001"
+  ]
+ },
+ {
+  "id": "v3-011",
+  "tier": "single",
+  "slices": [
+   "R3-D1-data",
+   "R3-M10-deep-dft",
+   "R3-M2-parametric"
+  ],
+  "count": 8,
+  "ids": [
+   "R3-D1-data-005",
+   "R3-D1-data-006",
+   "R3-D1-data-009",
+   "R3-M10-deep-dft-006",
+   "R3-M10-deep-dft-013",
+   "R3-M10-deep-dft-021",
+   "R3-M2-parametric-002",
+   "R3-M2-parametric-013"
+  ]
+ },
+ {
+  "id": "v3-012",
+  "tier": "single",
+  "slices": [
+   "R3-M2-parametric",
+   "R3-M7-manifold",
+   "R3-M9-codomain"
+  ],
+  "count": 8,
+  "ids": [
+   "R3-M2-parametric-014",
+   "R3-M2-parametric-016",
+   "R3-M7-manifold-011",
+   "R3-M7-manifold-018",
+   "R3-M7-manifold-019",
+   "R3-M9-codomain-006",
+   "R3-M9-codomain-007",
+   "R3-M9-codomain-022"
+  ]
+ },
+ {
+  "id": "v3-013",
+  "tier": "single",
+  "slices": [
+   "R3-M9-codomain",
+   "R3-N1a-substrate"
+  ],
+  "count": 8,
+  "ids": [
+   "R3-M9-codomain-026",
+   "R3-N1a-substrate-002",
+   "R3-N1a-substrate-006",
+   "R3-N1a-substrate-007",
+   "R3-N1a-substrate-008",
+   "R3-N1a-substrate-009",
+   "R3-N1a-substrate-013",
+   "R3-N1a-substrate-014"
+  ]
+ },
+ {
+  "id": "v3-014",
+  "tier": "single",
+  "slices": [
+   "R3-N1a-substrate",
+   "R3-N1b-framework",
+   "R3-P-inspection"
+  ],
+  "count": 8,
+  "ids": [
+   "R3-N1a-substrate-015",
+   "R3-N1b-framework-003",
+   "R3-N1b-framework-012",
+   "R3-P-inspection-006",
+   "R3-P-inspection-008",
+   "R3-P-inspection-009",
+   "R3-P-inspection-010",
+   "R3-P-inspection-011"
+  ]
+ }
+]

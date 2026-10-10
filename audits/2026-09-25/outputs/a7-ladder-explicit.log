@@ -1,0 +1,4 @@
+[    5.1s] block: 76 evaluation runs in 29 units
+[    8.6s] explicit: elf_fold0_explicit_35505_stage2_checkpoint.npz, best step 1600, best validation 8.0810e-05, parameter names match the manifest: True
+[  368.1s]   determinism on three runs: max difference 0.000e+00
+[ 3193.9s]   explicit: MAE 0.002170 (reported 0.00217), relative L2 0.010538, 29 units, 152 rows

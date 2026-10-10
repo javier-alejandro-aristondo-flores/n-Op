@@ -1,0 +1,966 @@
+{
+ "key": [
+  {
+   "id": "K01",
+   "files": "store `species` for the silicon single-impurity runs; raw file headers",
+   "defect": "both silicon single-impurity runs name the dopant \"H\" in every file header; OUTCAR and the electron count say silicon; the store inherits the wrong label",
+   "source": "deep dive",
+   "status": "memory-file (index line neutralized before launch)"
+  },
+  {
+   "id": "K02",
+   "files": "`residual_correction/report.py`, its floors figure",
+   "defect": "the floors figure collapses five floors under one name, drawing one bar",
+   "source": "deep dive",
+   "status": "memory-file"
+  },
+  {
+   "id": "K03",
+   "files": "`inspection/plots/results.py` `Render_Error_Spread`",
+   "defect": "the title counts run-by-spin rows as \"units\"",
+   "source": "deep dive",
+   "status": "memory-file"
+  },
+  {
+   "id": "K04",
+   "files": "`evaluation/scoring.py`, reports with a `mean_interval` column",
+   "defect": "the interval bootstraps the mean but sits beside medians (deep_dft's reduced ridge median falls outside its own interval)",
+   "source": "deep dive",
+   "status": "memory-file"
+  },
+  {
+   "id": "K05",
+   "files": "`factorized_fourier/figures/.../floors.png`, `report.py`",
+   "defect": "the floors figure plots relative L2 while the verdicts are on mean absolute error",
+   "source": "deep dive",
+   "status": "memory-file"
+  },
+  {
+   "id": "K06",
+   "files": "`operator-results.md` (VI.1), `deep_operator_network/report.md`",
+   "defect": "the energy trunk is called \"pass\" though the test plan sets it no bar",
+   "source": "planning",
+   "status": "blind"
+  },
+  {
+   "id": "K07",
+   "files": "`factorized_fourier` `Spin_Channels` comment",
+   "defect": "\"about a quarter\" of defect runs carry magnetization above density; the true count is off by about half",
+   "source": "planning",
+   "status": "blind"
+  },
+  {
+   "id": "K08",
+   "files": "`test-suite.md` I.1, `factorized_fourier`",
+   "defect": "the flagship is split and judged differently from the split the test plan names for I.1, without a recorded reason",
+   "source": "planning",
+   "status": "blind"
+  },
+  {
+   "id": "K09",
+   "files": "`tasks/__init__.py` localization card, flagship",
+   "defect": "the card's metrics and conservation law are not what the member computes or applies",
+   "source": "planning",
+   "status": "blind"
+  },
+  {
+   "id": "K10",
+   "files": "a budget or selection step",
+   "defect": "a per-run median where the unit median is the rule",
+   "source": "planning",
+   "status": "blind"
+  },
+  {
+   "id": "K11",
+   "files": "`evaluation/perovskite_block.py` or its callers",
+   "defect": "member predictions and floors are renormalized differently on the perovskite block",
+   "source": "planning",
+   "status": "blind"
+  },
+  {
+   "id": "K12",
+   "files": "`data/exclusions.py`",
+   "defect": "exclusion rules E5\u2013E9 are declared but `Excluded_Paths_For_Scope` has no callers",
+   "source": "planning",
+   "status": "blind"
+  },
+  {
+   "id": "K13",
+   "files": "`data/store.py`",
+   "defect": "a docstring calls the archive name a content identifier; it is a hash of the path",
+   "source": "planning",
+   "status": "blind"
+  },
+  {
+   "id": "K14",
+   "files": "an occupancy comment (spectra or loader)",
+   "defect": "\"one to two\" is wrong for the occupancy it describes",
+   "source": "planning",
+   "status": "blind"
+  },
+  {
+   "id": "K15",
+   "files": "`operator-results.md`",
+   "defect": "stale status words: I.2, III.1, V.1 \"member not started\"; I.3 \"pending\"; III.3 \"no package exists\"; cross-member \"not yet\"",
+   "source": "planning, outputs map",
+   "status": "hinted"
+  },
+  {
+   "id": "K16",
+   "files": "`evaluation/cross_member.md`",
+   "defect": "the conformal coverage median reads 1.000000 where the correction report says 0.977",
+   "source": "planning",
+   "status": "blind"
+  },
+  {
+   "id": "K17",
+   "files": "`factorized_fourier/report.md`",
+   "defect": "the floors are said to reproduce stage zero's \"exactly\"; 0.0964 is a run-channel median, 0.097618 a unit median",
+   "source": "planning",
+   "status": "blind"
+  },
+  {
+   "id": "K18",
+   "files": "`deep_operator_network/report.md`, results page",
+   "defect": "\"14 of 14\" and \"25 of 35\" count comparisons over different scopes",
+   "source": "planning",
+   "status": "blind"
+  },
+  {
+   "id": "K19",
+   "files": "`residual_correction` spec and build",
+   "defect": "the specified quantile (pinball-loss) head was not built; the band is plain split conformal",
+   "source": "planning",
+   "status": "blind"
+  },
+  {
+   "id": "K20",
+   "files": "the affine floor (`Identity_And_Affine_Floors` or the correction report)",
+   "defect": "the affine floor is fitted per pair, not as the specified global map",
+   "source": "planning",
+   "status": "blind"
+  },
+  {
+   "id": "K21",
+   "files": "member `manifest.toml` files",
+   "defect": "stale manifests: \"declared, not built\" for built configurations, a listed FiLM conditioning, stale ranks",
+   "source": "planning",
+   "status": "blind"
+  },
+  {
+   "id": "K22",
+   "files": "`test-suite.md`",
+   "defect": "cost and size estimates contradicted by measurement and never edited",
+   "source": "planning",
+   "status": "blind"
+  },
+  {
+   "id": "K23",
+   "files": "an orbit count per strain family",
+   "defect": "orbits counted twice across families",
+   "source": "planning",
+   "status": "blind"
+  },
+  {
+   "id": "K24",
+   "files": "`deep_operator_network/report.md` perovskite",
+   "defect": "the \"every shape\" verdict rests on floors from the angle stratum only",
+   "source": "planning",
+   "status": "blind"
+  },
+  {
+   "id": "K25",
+   "files": "results page or flagship documents",
+   "defect": "the explicit rung's best validation loss quoted as 8.0e-5 in one place and 8.1e-5 in another",
+   "source": "planning",
+   "status": "blind"
+  },
+  {
+   "id": "K26",
+   "files": "`evaluation/cross_member.py`, `cross_member.md`",
+   "defect": "the flagship and the branch\u2013trunk network are absent, silently, for want of a `results.json`",
+   "source": "outputs map, confirmed",
+   "status": "blind"
+  },
+  {
+   "id": "K27",
+   "files": "`operator-results.md` I.4",
+   "defect": "\"52,283 steps in its two hours\"; the manifests show 33,170 steps in about 78 minutes",
+   "source": "outputs map, confirmed",
+   "status": "blind"
+  },
+  {
+   "id": "K28",
+   "files": "`tests/test_evaluation.py` results-page test",
+   "defect": "inverted closing guard, any-row matching, the two members without `results.json` skipped",
+   "source": "tests map, confirmed",
+   "status": "blind"
+  },
+  {
+   "id": "K29",
+   "files": "commit `a5cd89f` message",
+   "defect": "\"worse on every one of the three card metrics\"; on relative L2 the member is better (0.069531 vs 0.070017)",
+   "source": "planning, confirmed",
+   "status": "blind"
+  },
+  {
+   "id": "K30",
+   "files": "`training/loop.py` `Train`",
+   "defect": "a zero-step resume rewrites the manifest, curves and plots; resuming an early-stopped run trains on and overwrites the checkpoint",
+   "source": "outputs map, confirmed",
+   "status": "blind"
+  },
+  {
+   "id": "K31",
+   "files": "`deep_dft/IMPLEMENTATION.md`, `tests/test_deep_dft.py`, `tests/test_parts.py`",
+   "defect": "real pseudopotential titles from the corpus on the public remote",
+   "source": "my check, confirmed",
+   "status": "blind"
+  },
+  {
+   "id": "K32",
+   "files": "`galerkin_transformer/results.json`",
+   "defect": "the regeneration line omits the run argument, so a rerun drops both verdicts",
+   "source": "outputs map",
+   "status": "blind"
+  },
+  {
+   "id": "K33",
+   "files": "`alias_free_convolutional/results.json`",
+   "defect": "zero rows although the report states measured floors",
+   "source": "outputs map",
+   "status": "blind"
+  },
+  {
+   "id": "K34",
+   "files": "`deep_operator_network/report.md`",
+   "defect": "assembled across four commits; no single run produced it",
+   "source": "outputs map",
+   "status": "blind"
+  },
+  {
+   "id": "K35",
+   "files": "`factorized_fourier/report.py` ladder table, other reports",
+   "defect": "numbers with nothing on disk: hard-coded wall clock and peak memory, early cap-hit fractions, the seed-sweep spread, manifold and correction timings",
+   "source": "outputs map",
+   "status": "blind"
+  },
+  {
+   "id": "K36",
+   "files": "`nonlinear_manifold_decoder/report.py`",
+   "defect": "a docstring promises a \"fresh training run\"; it is a zero-step resume",
+   "source": "outputs map",
+   "status": "blind"
+  },
+  {
+   "id": "K37",
+   "files": "residual and manifold manifests on `/Pool`",
+   "defect": "rewritten with 0 s and cpu; the original timings survive only as checkpoint dates",
+   "source": "outputs map",
+   "status": "blind"
+  },
+  {
+   "id": "K38",
+   "files": "`factorized_fourier/report.md` vs `report.py`",
+   "defect": "the report predates seven generator commits; the hard-coded ladder table lacks the injected row and shows the fixed point as \"--\"",
+   "source": "outputs map",
+   "status": "blind"
+  },
+  {
+   "id": "K39",
+   "files": "`galerkin_transformer/figures/`",
+   "defect": "74 committed figures with no generating function in the repo",
+   "source": "outputs map",
+   "status": "blind"
+  },
+  {
+   "id": "K40",
+   "files": "results page, codomain documents",
+   "defect": "the partial codomain pretrain (2,800 of about 2,828 steps, no manifest) is recorded nowhere",
+   "source": "outputs map",
+   "status": "hinted"
+  },
+  {
+   "id": "K41",
+   "files": "`deep_operator_network/configs/energy_trunk.toml`",
+   "defect": "a comment calls its own, already corrected, value wrong",
+   "source": "critique",
+   "status": "blind"
+  },
+  {
+   "id": "K42",
+   "files": "`test-suite.md` via `475a282`",
+   "defect": "I.1's configuration line rewritten to \"as built\" with no note in the document",
+   "source": "critique",
+   "status": "blind"
+  },
+  {
+   "id": "K43",
+   "files": "`nonlinear_manifold_decoder/report.md`",
+   "defect": "first committed after the earliest surviving training checkpoint",
+   "source": "critique",
+   "status": "blind"
+  },
+  {
+   "id": "K44",
+   "files": "`multiple_input_operator_network` loader",
+   "defect": "the void run loads without error under the same parameter names; nothing guards against it",
+   "source": "outputs map",
+   "status": "blind"
+  },
+  {
+   "id": "K45",
+   "files": "training manifests",
+   "defect": "no commit, configuration or data hash recorded",
+   "source": "critique",
+   "status": "blind"
+  },
+  {
+   "id": "K46",
+   "files": "`data/splits.py` `Regenerated_Artifacts_Match` and its test",
+   "defect": "proves determinism only, while read as proving the splits correct",
+   "source": "critique",
+   "status": "blind"
+  },
+  {
+   "id": "K47",
+   "files": "`evaluation/scoring.py` `Compare_To_Floor`",
+   "defect": "never checks that the member rows and floor rows cover the same units",
+   "source": "planning",
+   "status": "blind"
+  },
+  {
+   "id": "K48",
+   "files": "the license scanner",
+   "defect": "no scanner covers `operators/`; the archived one resolves to `1-archive/`",
+   "source": "tests map",
+   "status": "blind"
+  },
+  {
+   "id": "K49",
+   "files": "`evaluation/cross_member.md`",
+   "defect": "verdicts dropped for the two-input network and the manifold decoder",
+   "source": "planning",
+   "status": "blind"
+  },
+  {
+   "id": "K50",
+   "files": "tests across the package",
+   "defect": "about twenty tests whose names promise more than they check",
+   "source": "tests map",
+   "status": "blind"
+  },
+  {
+   "id": "K51",
+   "files": "`factorized_fourier/report.md`",
+   "defect": "1.35% where the median 0.013450 rounds to 1.34% or 1.35% depending on the pass (a rounding flip)",
+   "source": "outputs map",
+   "status": "blind"
+  },
+  {
+   "id": "K52",
+   "files": "flagship committed figures vs `/Pool` cache",
+   "defect": "the committed figures can no longer be reproduced from the cache, which the ladder run rewrote after trunk",
+   "source": "outputs map",
+   "status": "blind"
+  }
+ ],
+ "candidates": {
+  "K01": [],
+  "K02": [
+   [
+    3,
+    "P-pictures-001",
+    "The residual-correction floors figure silently drops four of its five floors. The dictionary is keyed by floor_name, whi"
+   ]
+  ],
+  "K03": [
+   [
+    5,
+    "P-pictures-005",
+    "The error-spread title's count is the number of plotted values (unit_count = sum(group.shape[0] for group in errors_by_g"
+   ],
+   [
+    4,
+    "P-pictures-017",
+    "Render_Error_Spread (4.8 inches at its three-group minimum) and Render_Floor_Comparison (6.8 inches for two floors) size"
+   ],
+   [
+    3,
+    "P-pictures-018",
+    "Render_Field_Slices repeats the full key in each of its three panel titles, so any key longer than about 30 characters p"
+   ]
+  ],
+  "K04": [
+   [
+    4,
+    "S1-metrics-intervals-pooling-029",
+    "When the floor median is 0 (or negative), improvement is set to 0.0 whatever the member scores, so a zero-margin compari"
+   ],
+   [
+    4,
+    "S1-metrics-intervals-pooling-028",
+    "The test asserts that the median lies inside [confidence_low, confidence_high]. The bounds are a bootstrap interval for "
+   ],
+   [
+    4,
+    "S1-metrics-intervals-pooling-022",
+    "Summary_Table never converts anything to a percentage. Every median, interquartile and interval is printed as a plain si"
+   ]
+  ],
+  "K05": [
+   [
+    7,
+    "P-pictures-006",
+    "The pre-registered metric table makes MAE the electron-localization metric and puts relative L2 in the appendix, as a fl"
+   ],
+   [
+    7,
+    "P-pictures-004",
+    "The MIONet error-by-campaign call fills each group with row.errors[\"mean_absolute_error\"] but omits vertical_label, so t"
+   ],
+   [
+    7,
+    "M6-two-input-013",
+    "error_by_campaign.png plots per-row mean absolute error, but report.py passes no vertical_label, so the committed figure"
+   ]
+  ],
+  "K06": [
+   [
+    5,
+    "M3-branch-trunk-parameters-to-charge-036",
+    "IMPLEMENTATION.md presents the density-to-localization projection variant as part of the member, and test-suite.md II.1 "
+   ],
+   [
+    4,
+    "M4-branch-trunk-energy-trunk-023",
+    "For the energy trunk the validation 'unit' is the single whole batch (FixedBatches offers one held unit), so the printed"
+   ],
+   [
+    4,
+    "M4-branch-trunk-energy-trunk-002",
+    "The member's spec (this paragraph, unchanged apart from spelling since the spec was first written at 9f0b34a, where it a"
+   ]
+  ],
+  "K07": [
+   [
+    8,
+    "M1-flagship-localization-011",
+    "The comment misstates both the frequency (about two in five defect runs, not a quarter) and the cause (the stored densit"
+   ],
+   [
+    4,
+    "M1-flagship-localization-023",
+    "The chemistry of the kill block is not held out: a quarter of the fold-zero defect units have the same element combinati"
+   ],
+   [
+    4,
+    "M1-flagship-localization-019",
+    "rho0 is the mean over the first 80 (sorted by identifier) of the 196 member-training runs, not over the training block: "
+   ]
+  ],
+  "K08": [
+   [
+    7,
+    "T-training-008",
+    "MIONet fits its reference density, both rank-32 POD bases and the potential-coefficient mean and spread on FLOOR_TRAIN_F"
+   ],
+   [
+    6,
+    "M3-branch-trunk-parameters-to-charge-037",
+    "The plan's secondary density metric (Bader-basin per-atom charges) is computed for no block of this member, and no reaso"
+   ],
+   [
+    6,
+    "M3-branch-trunk-parameters-to-charge-002",
+    "The fold-0 'interpolation' block that report.md judges and operator-results.md calls the canon's block (pass/pass for al"
+   ]
+  ],
+  "K09": [],
+  "K10": [],
+  "K11": [],
+  "K12": [
+   [
+    3,
+    "D2-grouping-and-splits-007",
+    "The exclusion's stated reason misdescribes its criterion: the runs are OUTCAR-incomplete relaxations that never reached "
+   ]
+  ],
+  "K13": [
+   [
+    4,
+    "D1-raw-data-014",
+    "An identifier that is in neither the census nor the store falls through all three unusable conditions, so the guard stay"
+   ],
+   [
+    3,
+    "D1-raw-data-001",
+    "VASP writes AECCAR0 and AECCAR1 on the starting (POSCAR) geometry and CHGCAR, AECCAR2, ELFCAR and LOCPOT on the final on"
+   ]
+  ],
+  "K14": [],
+  "K15": [
+   [
+    7,
+    "M9-codomain-member-039",
+    "By the page's own status words V.1 is at least 'floors measured': the member exists (operators/codomain_attention/, buil"
+   ],
+   [
+    7,
+    "M11-convolutional-and-plane-wave-007",
+    "The III.3 section and its summary row say no package exists; a stub package with spec, manifest and import-gate entry ha"
+   ],
+   [
+    6,
+    "R-results-page-007",
+    "The summary row and the III.3 section ('**Status: not started; no package exists yet.**') both say no package exists; a "
+   ]
+  ],
+  "K16": [],
+  "K17": [
+   [
+    8,
+    "M1-flagship-localization-009",
+    "The floor numbers printed in this report (ridge 0.097618, per-shell filter 0.083022) do not equal stage zero's (0.0964, "
+   ],
+   [
+    7,
+    "S1-metrics-intervals-pooling-026",
+    "Stage zero pools flat over runs or run-channels: Median_And_Interquartile runs on per-run errors, never on unit medians."
+   ],
+   [
+    5,
+    "S1-metrics-intervals-pooling-014",
+    "Stage zero fits its climatology and its ridge on the first 80 defect-campaign training runs and takes a flat np.median o"
+   ]
+  ],
+  "K18": [
+   [
+    5,
+    "M3-branch-trunk-parameters-to-charge-003",
+    "The report's opening says every number is aggregated over symmetry orbits. For the whole lattice_to_charge section (21 o"
+   ],
+   [
+    4,
+    "M3-branch-trunk-parameters-to-charge-033",
+    "The sentence lists electron-count conservation as a difference of the lattice card, but strain_to_charge mandates the id"
+   ],
+   [
+    4,
+    "M3-branch-trunk-parameters-to-charge-012",
+    "The caveat applies a one-block strain measurement and a 'seventy' margin to a Standing that now covers 21 perovskite com"
+   ]
+  ],
+  "K19": [
+   [
+    4,
+    "N4-encoders-readouts-wrappers-002",
+    "The spec says a test orbit counts as covered only if every one of its runs is inside the band. report.py:402 does someth"
+   ],
+   [
+    4,
+    "M5-correction-001",
+    "The committed results artifact, and the cross-member table built from it, give the conformal band's coverage as 1.0, whi"
+   ],
+   [
+    3,
+    "S2-floors-and-verdicts-021",
+    "The cheap_to_accurate_charge card (written 2026-08-28, before the member) names delta_mean_squared_error, the error over"
+   ]
+  ],
+  "K20": [
+   [
+    4,
+    "S2-floors-and-verdicts-010",
+    "The row labeled global_affine (results.json, cross_member.md, results page 'global affine | 0.010466') is a per-pair fit"
+   ],
+   [
+    3,
+    "P-pictures-001",
+    "The residual-correction floors figure silently drops four of its five floors. The dictionary is keyed by floor_name, whi"
+   ]
+  ],
+  "K21": [
+   [
+    5,
+    "M3-branch-trunk-parameters-to-charge-026",
+    "The manifest's 'assembled' field says only principal_component is built and measured; all four configurations are built "
+   ],
+   [
+    4,
+    "M5-correction-017",
+    "The manifest lists Conditioned among the member's wrappers. The built member wraps only Conserving and Residual, and the"
+   ],
+   [
+    3,
+    "M8-galerkin-014",
+    "The manifest declares the report's deep_operator_network dependency but leaves out its factorized_fourier dependency, wh"
+   ]
+  ],
+  "K22": [
+   [
+    3,
+    "N1-substrate-and-framework-005",
+    "The test plan (bad2288, 2026-08-20, before any code) says a symmetrized-inference ablation, with group-averaged predicti"
+   ],
+   [
+    3,
+    "M10-structure-to-density-021",
+    "The floors are reported only in normalized MAE; the canon's primary density metric (relative L2), also on the member's o"
+   ],
+   [
+    3,
+    "D1-raw-data-011",
+    "The projection-family gate the plan defines per Paired-Fields campaign was measured on a two-campaign pooled block inste"
+   ]
+  ],
+  "K23": [],
+  "K24": [
+   [
+    6,
+    "M3-branch-trunk-parameters-to-charge-014",
+    "The row labeled every_shape compares only the 25 angle-stratum runs, because no length run has a same-shape copy. Its me"
+   ],
+   [
+    5,
+    "M3-branch-trunk-parameters-to-charge-007",
+    "In the three perovskite canonical sections, 'the table above' shows a member trained on both strata (160 runs in fold 0;"
+   ],
+   [
+    3,
+    "S1-metrics-intervals-pooling-005",
+    "The interpolation verdict (member 0.1191 against floor 0.0264, -350.8%) is not measured on 'this same angle-stratum eval"
+   ]
+  ],
+  "K25": [
+   [
+    7,
+    "T-training-001",
+    "The member whose MAE (0.00217) this row reports is the final stage's best checkpoint, with validation score 8.081e-05 (8"
+   ],
+   [
+    3,
+    "O1-overlap-018",
+    "The page says the injected fixed-point model reaches validation loss 3.4e-3 at step 200; every fixed-point run and probe"
+   ]
+  ],
+  "K26": [
+   [
+    7,
+    "S2-floors-and-verdicts-024",
+    "Every_Member_Results skips a canon member without a results.json silently, so the committed cross-member table omits the"
+   ],
+   [
+    4,
+    "S2-floors-and-verdicts-001",
+    "The cross-member table's verdict column silently drops every verdict whose ResultKey matches no row key: Verdicts_For jo"
+   ],
+   [
+    3,
+    "S2-floors-and-verdicts-025",
+    "Rounding to six decimal places, not significant figures, leaves the smallest floors in results.json with one significant"
+   ]
+  ],
+  "K27": [
+   [
+    10,
+    "R-results-page-001",
+    "The I.4 section says the gate run took 52,283 steps in its two hours; it actually stopped early by patience after 33,170"
+   ],
+   [
+    4,
+    "R-results-page-002",
+    "The II.2 section says each network was trained 33,650 steps; 33,650 is the schedule's budget, and both runs stopped earl"
+   ],
+   [
+    4,
+    "M8-galerkin-005",
+    "The spec says the gate run was trained for 52,283 steps. That was its budget. It ran 33,370 steps and was scored at a 2,"
+   ]
+  ],
+  "K28": [
+   [
+    4,
+    "S1-metrics-intervals-pooling-034",
+    "The test cannot detect a wrong bar, a wrong second number, or a headline number matched to the wrong metric or group, so"
+   ],
+   [
+    3,
+    "S2-floors-and-verdicts-027",
+    "Compare_To_Floor applies `improvement >= required_improvement` to every bar, and the test pins that sitting on the margi"
+   ],
+   [
+    3,
+    "S1-metrics-intervals-pooling-040",
+    "The crowded orbit in this test holds nine copies, not four."
+   ]
+  ],
+  "K29": [
+   [
+    11,
+    "O1-overlap-010",
+    "The commit message says the two-branch member is worse than its twin on every one of the three card metrics, but on rela"
+   ],
+   [
+    10,
+    "M6-two-input-006",
+    "The commit message says the member is worse than the twin on all three card metrics; on relative L2 it is better. (The s"
+   ],
+   [
+    6,
+    "M1-flagship-localization-010",
+    "Stage zero published only mean absolute error for these two floors (no structural similarity, no relative L2), and its f"
+   ]
+  ],
+  "K30": [
+   [
+    9,
+    "T-training-012",
+    "An early-stopped final stage has finished, but a relaunch does not skip it. Train resumes from the checkpoint's live par"
+   ],
+   [
+    7,
+    "T-training-013",
+    "Train times only the current call's loop and rewrites `<run>_manifest.json` on every resume. A relaunch that resumes an "
+   ],
+   [
+    4,
+    "T-training-009",
+    "The resumed path trusts any probe manifest it finds. Nothing records whether the probe passed, so a relaunch after a fai"
+   ]
+  ],
+  "K31": [
+   [
+    4,
+    "M10-structure-to-density-023",
+    "The tests and the spec embed literal POTCAR title strings (the header line of the licensed POTCAR file) in a repository "
+   ],
+   [
+    3,
+    "M10-structure-to-density-025",
+    "The embedding vocabulary is built from folds 1-4 while the training driver takes gradient steps on folds 2-4 only, so te"
+   ],
+   [
+    3,
+    "M10-structure-to-density-003",
+    "The lone dopant atom of both IVA-element-single-impurity/Si runs (fold zero) is a silicon atom in the calculation, but t"
+   ]
+  ],
+  "K32": [
+   [
+    3,
+    "O3-overlap-013",
+    "The potential floor row's key names the group hartree_plus_semilocal_xc_ridge_floor while its own summary names it hartr"
+   ],
+   [
+    3,
+    "M8-galerkin-024",
+    "The artifact's own rebuild command would regenerate a different artifact: no member rows, no verdicts, and a report sayi"
+   ],
+   [
+    3,
+    "M8-galerkin-019",
+    "The '95% interval' in both report.md tables (and confidence_low/high in results.json) is an interval for the mean. It si"
+   ]
+  ],
+  "K33": [
+   [
+    3,
+    "M11-convolutional-and-plane-wave-012",
+    "results.json carries none of the numbers its report prints, contrary to the results-artifact contract, so the cross-memb"
+   ]
+  ],
+  "K34": [
+   [
+    3,
+    "M3-branch-trunk-parameters-to-charge-026",
+    "The manifest's 'assembled' field says only principal_component is built and measured; all four configurations are built "
+   ],
+   [
+    3,
+    "M3-branch-trunk-parameters-to-charge-012",
+    "The caveat applies a one-block strain measurement and a 'seventy' margin to a Standing that now covers 21 perovskite com"
+   ],
+   [
+    3,
+    "M3-branch-trunk-parameters-to-charge-005",
+    "In all four fixed-basis per-family tables, the 'two_angle_shear' row (2 units, 36 runs) is half made of a single-shear o"
+   ]
+  ],
+  "K35": [
+   [
+    5,
+    "P-pictures-006",
+    "The pre-registered metric table makes MAE the electron-localization metric and puts relative L2 in the appendix, as a fl"
+   ],
+   [
+    4,
+    "M2-flagship-ladder-potential-parametric-029",
+    "The table's weight-tied peak memory (~3185 MiB) is not rounded to the nearest hundred MiB the note says every peak is re"
+   ],
+   [
+    4,
+    "M2-flagship-ladder-potential-parametric-008",
+    "The canon kills the fixed point only when it is not better AND costs at least 3x the wall-clock (its own Compute line ex"
+   ]
+  ],
+  "K36": [
+   [
+    6,
+    "M7-manifold-decoder-014",
+    "Main does not retrain from scratch when checkpoints exist; the committed report was produced by a zero-step resume."
+   ],
+   [
+    3,
+    "M6-two-input-021",
+    "The module docstring says the report is produced before any training; the module loads the trained member and twin check"
+   ]
+  ],
+  "K37": [],
+  "K38": [
+   [
+    4,
+    "M2-flagship-ladder-potential-parametric-018",
+    "The Inspection table names a fixed_point key that does not exist and omits the four composition keys the fixed point act"
+   ],
+   [
+    3,
+    "P-pictures-006",
+    "The pre-registered metric table makes MAE the electron-localization metric and puts relative L2 in the appendix, as a fl"
+   ],
+   [
+    3,
+    "O3-overlap-015",
+    "Three of the five bars listed under that header (both K1 localization bars and the pending K1 potential bar) derive from"
+   ]
+  ],
+  "K39": [],
+  "K40": [
+   [
+    5,
+    "M9-codomain-member-025",
+    "The 9,425-step budget, derived from a probe that amortizes one validation over 300 steps and ignores the 200 probe steps"
+   ]
+  ],
+  "K41": [
+   [
+    7,
+    "M4-branch-trunk-energy-trunk-016",
+    "The comment says the value below is wrong, but the value below is the measured window the comment itself names. The comm"
+   ],
+   [
+    4,
+    "M3-branch-trunk-parameters-to-charge-029",
+    "test-suite.md II.1 records no widths, depths, latent size or Fourier order, so it is not the source of the numbers this "
+   ],
+   [
+    3,
+    "M5-correction-022",
+    "The configuration calls the measured identity floor 1.11-1.19%. The measured floor has median 1.117% and interquartile r"
+   ]
+  ],
+  "K42": [
+   [
+    5,
+    "N2-kernels-014",
+    "The canon specifies filter-generating perceptrons for the III.1 kernel. The built continuous displacement kernel turns t"
+   ],
+   [
+    5,
+    "N1-substrate-and-framework-005",
+    "The test plan (bad2288, 2026-08-20, before any code) says a symmetrized-inference ablation, with group-averaged predicti"
+   ],
+   [
+    4,
+    "M9-codomain-member-026",
+    "V.1 (as first written and now) reparametrizes spin pairs as sum/difference and demotes the near-zero differences, with m"
+   ]
+  ],
+  "K43": [
+   [
+    3,
+    "M7-manifold-decoder-014",
+    "Main does not retrain from scratch when checkpoints exist; the committed report was produced by a zero-step resume."
+   ]
+  ],
+  "K44": [
+   [
+    3,
+    "T-training-015",
+    "The fold-map loaders send every role except the literal 'evaluation' to the training folds and never refuse an unknown r"
+   ],
+   [
+    3,
+    "M6-two-input-021",
+    "The module docstring says the report is produced before any training; the module loads the trained member and twin check"
+   ],
+   [
+    3,
+    "M6-two-input-015",
+    "The figure is titled as the member against 'its floors' (and report.md says 'the member against its floors and the twin'"
+   ]
+  ],
+  "K45": [
+   [
+    3,
+    "T-training-013",
+    "Train times only the current call's loop and rewrites `<run>_manifest.json` on every resume. A relaunch that resumes an "
+   ]
+  ],
+  "K46": [],
+  "K47": [
+   [
+    4,
+    "S1-metrics-intervals-pooling-022",
+    "Summary_Table never converts anything to a percentage. Every median, interquartile and interval is printed as a plain si"
+   ],
+   [
+    3,
+    "S2-floors-and-verdicts-023",
+    "Signature_Refusals only compares rows whose (task, split, block, group) all coincide, and Task_Table prints no block col"
+   ],
+   [
+    3,
+    "S1-metrics-intervals-pooling-037",
+    "run_count is the number of ScoredRun rows, which for every per-spin task counts run-channels. MIONet's 'runs' column pri"
+   ]
+  ],
+  "K48": [],
+  "K49": [
+   [
+    5,
+    "S2-floors-and-verdicts-001",
+    "The cross-member table's verdict column silently drops every verdict whose ResultKey matches no row key: Verdicts_For jo"
+   ],
+   [
+    3,
+    "S1-metrics-intervals-pooling-010",
+    "The cross-member table silently drops five recorded verdicts, four of them kills. MIONet's member row shows '-' even tho"
+   ],
+   [
+    3,
+    "S1-metrics-intervals-pooling-009",
+    "The committed cross-member table prints 'identity:pass' beside residual_correction's delta_r_squared row, but no verdict"
+   ]
+  ],
+  "K50": [],
+  "K51": [
+   [
+    3,
+    "S1-metrics-intervals-pooling-017",
+    "Per run, relative L2 at most 0.5 times identity is the same as delta-R-squared at least 0.75. After the unit-median pool"
+   ],
+   [
+    3,
+    "P-pictures-006",
+    "The pre-registered metric table makes MAE the electron-localization metric and puts relative L2 in the appendix, as a fl"
+   ],
+   [
+    3,
+    "M2-flagship-ladder-potential-parametric-005",
+    "0.0911% is not under 0.09%: report.py prints f'under {100 * best_floor_median:.2f}%', so rounding the pooled median down"
+   ]
+  ],
+  "K52": []
+ }
+}

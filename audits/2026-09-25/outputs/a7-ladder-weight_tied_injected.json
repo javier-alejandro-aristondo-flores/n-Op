@@ -1,0 +1,13 @@
+{
+ "weight_tied_injected": {
+  "run": "elf_fold0_weight_tied_injected_35505",
+  "checkpoint": "elf_fold0_weight_tied_injected_35505_stage2_checkpoint.npz",
+  "best_step": 5700,
+  "best_validation": 0.00010181067389207026,
+  "mae": 0.002705507370505525,
+  "relative_l2": 0.014478000484901703,
+  "units": 29,
+  "rows": 152,
+  "reported_mae": 0.002706
+ }
+}

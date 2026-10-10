@@ -1,0 +1,12 @@
+{
+ "arm": 0.00245165505597403,
+ "arm_units": 423,
+ "bracketing": 0.0009105955967622228,
+ "headline": 0.002423505532560669,
+ "headline_units": 22,
+ "every_shape": 0.0027949959537573073,
+ "every_shape_units": 30,
+ "transfer_off": 0.0031883481956050935,
+ "transfer_on": 0.002423505532560669,
+ "transfer_verdict": "kill"
+}

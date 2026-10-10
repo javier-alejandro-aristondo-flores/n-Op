@@ -1,0 +1,99 @@
+<section class="part" id="part-1" aria-labelledby="h-part-1">
+<h2 id="h-part-1"><span class="partno" data-nofact>Part 1</span> What the suite asks</h2>
+<div class="prose">
+<p>The suite is a set of neural operators, each trained on density functional theory (DFT) calculations of crystals, and each judged against simple methods fixed before it trained. Its plan, <code>test-suite.md</code>, was built on <time datetime="2026-08-19">19 August 2026</time>, before any model code existed. For every entry it names the task, the data, how the data is split, the simple methods to beat, and by how much.</p>
+<h3>What counts as a model here</h3>
+<p>An operator maps a whole function to a whole function: a field goes in, a field comes out, and the output can be asked for at any point or on any grid. An ordinary neural network maps a fixed list of numbers to a fixed list of numbers. The plan admits only operators. Fixed-vector predictors are excluded whatever their pedigree, and single numbers such as band gaps enter only as read-outs of a predicted function, never as training targets.</p>
+<p>The flagship is the example to keep in mind: it takes the charge density on a three-dimensional grid and returns the electron localization field on a grid.</p>
+<h3>Floors and bars</h3>
+<p>A <strong>floor</strong> is a simple method every model must beat: copy the closest training example, fit a straight line, predict the average. Each floor is computed on exactly the runs the model is judged on, before the model trains. A <strong>bar</strong> is the margin required over a floor, written down in advance, such as "25% better than the ridge floor". Missing a <strong>kill</strong> bar removes the entry, or that task, and the miss is recorded as a dead end with its evidence.</p>
+<p>Because floors and bars exist before training, no threshold can be moved after a result is seen. The audit checked the dates: every judged model's bars were committed before its first training run.</p>
+<h3>One seed</h3>
+<p>Each configuration was trained once, from one random seed. On the branch–trunk network's task, a twelve-run seed sweep measured the spread from run to run at 14–35% of the median. A difference of a few percent between two single runs is therefore noise, and the results page says so beside its numbers.</p>
+<h3>The rules for finishing, and the pause</h3>
+<p>On <time datetime="2026-09-16">16 September</time> Javier and the PI set the rules: failures are acceptable and are marked as dead ends rather than ground on; one seeded run per configuration; every escalation the plan names is tried once before an entry is called dead; and the two entries without a package each get a minimal build. On <time datetime="2026-09-25">25 September</time> the PI paused all training and model development until what exists is verified. The last training run stopped at <time datetime="2026-09-18T00:18">00:18 on 18 September</time>.</p>
+</div>
+
+<figure>
+<div class="diagram wide">
+<!--PIPELINE-->
+</div>
+<figcaption>The path every result takes. The floors and bars are fixed before training starts, and the verdict is read only from the scored evaluation runs.</figcaption>
+</figure>
+
+<h3>Every entry, where it stands</h3>
+<div class="table-wrap">
+<table>
+<thead><tr><th data-nofact>Entry</th><th>Model</th><th>In → out</th><th>Where it stands</th></tr></thead>
+<tbody>
+<tr><td data-nofact>I.1</td><td>Factorized Fourier operator (the flagship)</td><td>charge density → localization field</td><td><span class="verdict pass">pass</span></td></tr>
+<tr><td data-nofact>I.1</td><td>the same model, second task</td><td>charge density → local potential</td><td>floors measured, never trained</td></tr>
+<tr><td data-nofact>I.2</td><td>Convolutional operator</td><td>charge density → localization field</td><td>built, floors measured, never trained</td></tr>
+<tr><td data-nofact>I.3</td><td>The flagship's weight-sharing ladder</td><td>as I.1</td><td>four rungs judged; the fixed-point rung evaluated but not committed</td></tr>
+<tr><td data-nofact>I.4</td><td>Galerkin transformer</td><td>perovskite lattice factors → charge density (its first gate)</td><td><span class="verdict kill">killed</span></td></tr>
+<tr><td data-nofact>II.1</td><td>Branch–trunk network</td><td>strain or lattice factors → charge density</td><td><span class="verdict pass">pass</span> on strain; the perovskite rows are compromised (Part 3)</td></tr>
+<tr><td data-nofact>II.2</td><td>Two-input network</td><td>charge density and local potential → localization field</td><td><span class="verdict kill">killed</span></td></tr>
+<tr><td data-nofact>II.3</td><td>Manifold decoder</td><td>strain → charge density</td><td><span class="verdict kill">killed</span></td></tr>
+<tr><td data-nofact>II.4</td><td>The flagship, parametric form</td><td>strain → charge density</td><td>floors measured, never trained</td></tr>
+<tr><td data-nofact>III.1</td><td>Structure-to-density network</td><td>atoms → charge density and magnetization</td><td>built, floors measured, never trained</td></tr>
+<tr><td data-nofact>III.3</td><td>Plane-wave network</td><td>atoms → charge density</td><td>a stub</td></tr>
+<tr><td data-nofact>IV.1</td><td>Correction network</td><td>cheap-functional density → accurate-functional density</td><td><span class="verdict pass">pass</span>, though linear regression does far better (Part 6)</td></tr>
+<tr><td data-nofact>IV.2</td><td>Spectral correction</td><td>cheap density of states → accurate</td><td>not started</td></tr>
+<tr><td data-nofact>IV.3</td><td>Conformal wrapper</td><td>a prediction → the same prediction with a guaranteed interval</td><td>applied to IV.1</td></tr>
+<tr><td data-nofact>V.1</td><td>Codomain attention</td><td>any subset of six fields → the missing ones</td><td>built; pretraining stopped part-way; never judged</td></tr>
+<tr><td data-nofact>VI.1</td><td>Energy trunk (a branch–trunk configuration)</td><td>strain → density of states</td><td><span class="verdict hold">"pass" without a bar</span>; a simple copy beats it</td></tr>
+</tbody>
+</table>
+</div>
+
+<h3>Words used throughout</h3>
+<div class="table-wrap">
+<table>
+<thead><tr><th>Word</th><th>Meaning here</th></tr></thead>
+<tbody>
+<tr><td>run</td><td>One VASP calculation: a folder of output files for one crystal geometry and one functional.</td></tr>
+<tr><td>field</td><td>A number at every point of a three-dimensional grid over the crystal's repeating cell.</td></tr>
+<tr><td>charge density</td><td>How much electron charge sits at each point. The primary output of a DFT calculation.</td></tr>
+<tr><td>localization field</td><td>The electron localization function: a number from 0 to 1 at each point, high where electrons are pinned (bonds, lone pairs), low where they roam.</td></tr>
+<tr><td>local potential</td><td>The potential an electron feels at each point, in electronvolts.</td></tr>
+<tr><td>magnetization</td><td>Spin-up minus spin-down density; zero except in magnetic runs.</td></tr>
+<tr><td>density of states</td><td>A curve over energy counting the electron states at each energy. The gap in it is the band gap.</td></tr>
+<tr><td>functional</td><td>The approximation DFT uses. The cheap one (PBE) underestimates band gaps; the accurate hybrid (HSE) costs 10–100 times more.</td></tr>
+<tr><td>pseudopotential</td><td>The licensed file (POTCAR) describing each element's inner electrons. Never copied off <code>/Pool</code>.</td></tr>
+<tr><td>unit</td><td>A group of runs that must stay together in one split (Part 3). Every score is a median over units.</td></tr>
+<tr><td>fold</td><td>One of five slices of the data. Fold 0 is the one models are judged on.</td></tr>
+<tr><td>relative L2</td><td>The size of the error divided by the size of the truth.</td></tr>
+<tr><td>mean absolute error</td><td>The average absolute difference between prediction and truth, abbreviated MAE.</td></tr>
+<tr><td>ridge</td><td>Linear regression with a small penalty on the coefficients, solved in one step.</td></tr>
+<tr><td>POD basis</td><td>Proper-orthogonal decomposition: the principal components of a set of fields. A rank-32 basis keeps the top 32.</td></tr>
+<tr><td>checkpoint</td><td>Saved weights, optimizer state and curves, written during training so a run can resume.</td></tr>
+</tbody>
+</table>
+</div>
+
+<check part="1">
+<q>What does an operator take in and give out, and how does that differ from an ordinary neural network?</q>
+<a>A whole field in and a whole field out, answerable at any point or on any grid. An ordinary network maps a fixed list of numbers to a fixed list. The suite admits only operators; single numbers such as band gaps are read off a predicted function, never trained on directly.</a>
+<src>test-suite.md, section 0 (Charter)</src>
+</check>
+<check part="1">
+<q>When, and on which runs, is a floor computed? Why does that order matter?</q>
+<a>Before the model's first training step, on exactly the runs the model is judged on. The order makes moving a bar after seeing a result impossible. The audit confirmed every judged model's bars predate its first training run.</a>
+<src>The model reports; the audit's date check (plan execution log, 25 September)</src>
+</check>
+<check part="1">
+<q>Two configurations differ by 4%, one training run each. What can you conclude?</q>
+<a>Nothing. The seed sweep on the branch–trunk task measured a spread of 14–35% of the median between runs that differ only in their seed.</a>
+<src>operator-results.md, opening section</src>
+</check>
+<check part="1">
+<q>Name the three entries that were killed.</q>
+<a>The Galerkin transformer (I.4), the two-input network (II.2) and the manifold decoder (II.3).</a>
+<src>operator-results.md, summary table</src>
+</check>
+<check part="1">
+<q>What did the PI decide on 25 September, and what has trained since?</q>
+<a>All training and model development paused until what exists is verified. Nothing has trained since: the last run stopped on 18 September.</a>
+<src>The audit plan's context; the sweep log</src>
+</check>
+</section>

@@ -1,0 +1,82 @@
+<section class="part" id="part-5" aria-labelledby="h-part-5">
+<h2 id="h-part-5"><span class="partno" data-nofact>Part 5</span> Training a model</h2>
+<div class="prose">
+<h3>The engine seam</h3>
+<p>Every model is written in the project's own code against a small engine interface. A reference engine computes gradients by finite differences and serves as the correctness check; the training engine wraps an existing automatic-differentiation library behind the same interface. Only the <code>operators/substrate</code> package may import that library, and a test fails the build if any other file names it. The plan is to replace the borrowed parts with in-house ones later, behind the same interface, without touching any model.</p>
+<h3>The card</h3>
+<p>Training runs on one <span data-nofact>RTX 2060</span> graphics card with 6 GB of memory, 5.61 GB of it usable, in single precision. Only one job runs on it at a time: two concurrent trainings measured 2.56 times slower than the same two run one after the other. Evaluation runs on the processor, lowered in priority and pinned to a few cores so it never slows a training run.</p>
+<h3>How data is fed</h3>
+<ul>
+<li><strong>Whole fields.</strong> The flagship takes one run per step: its 80³ density, cut to 40³ before the first layer.</li>
+<li><strong>Point samples.</strong> Models with a coordinate trunk draw a few runs and random points in them at each step, so memory depends on the batch, not the grid, and runs on different grids can mix.</li>
+<li><strong>Basis coefficients.</strong> Models with a fixed basis work on each field's top 32 components.</li>
+</ul>
+<p>Inputs and targets are standardized with statistics from the training folds only. Examples: the flagship log-compresses each spin's density; the Galerkin transformer standardizes its target voxel by voxel; the two-input network standardizes its potential coefficients, a fix described in Part 7.</p>
+<h3>The training loop</h3>
+<ul>
+<li>The loss is mean squared error on standardized targets for fields, and curve L1 for the density of states.</li>
+<li>The optimizer is the project's own implementation of Adam.</li>
+<li>Every 100 steps the loop scores each validation unit, averages over units, keeps the best parameters so far, and writes a checkpoint holding parameters, optimizer state, curves and the random state.</li>
+<li>In the last stage, training stops after 15 validation passes in a row without improvement (patience).</li>
+<li>A relaunch resumes from the last checkpoint. That mattered: the laptop lost power during runs, and every run now resumes per stage.</li>
+</ul>
+</div>
+<figure>
+<div class="diagram wide">
+<!--SCHEDULE-->
+</div>
+<figcaption>The shared schedule in <code>operators/training/staged.py</code>. Each stage starts from the previous stage's best parameters, but the function returns only the last stage's best.</figcaption>
+</figure>
+<div class="prose">
+<h3>The staged schedule</h3>
+<p>A probe of up to 200 steps at the peak learning rate of 1e-3 checks that the loss stays finite and does not blow up; if it does, the probe reruns at 0.3 times the rate. Then come three stages at the peak rate, one third of it and one ninth of it, over 30%, 30% and 40% of the step budget. Only the last stage stops early.</p>
+</div>
+<div class="confirmed">
+<p><span class="tag found">Found</span> <strong>The schedule returns the last stage's best, not the best overall</strong></p>
+<p>For the explicit flagship, stage 1 reached a validation score of 8.02e-5 and stage 2 only 8.08e-5. The model evaluated and reported is stage 2's, yet the results page prints 8.0e-5 beside it, which is stage 1's number; the evaluated model's is 8.1e-5. The weight-tied rung lost the same way, by 2.0%.</p>
+</div>
+<div class="prose">
+<h3>Budgets against steps actually run</h3>
+<p>A step budget is fixed in advance, often from a measured cost per step, and early stopping can end a run well before it. The Galerkin transformer's budget was 7,200 seconds ÷ 0.137711 seconds per step = 52,283 steps; it stopped after 33,170 steps plus its probe, in about 78 minutes.</p>
+<p><span class="tag found">Found</span> The results page reports that budget as the steps it ran in its two hours. Likewise, the two-input network and its twin had budgets of 33,650 steps, and both completed 22,090.</p>
+<h3>Two older schedules</h3>
+<p>The branch–trunk network's learned-trunk and energy-trunk runs predate the shared schedule and used their own three stages:</p>
+<ul>
+<li>the learned trunk ran 6,000, 6,000 and 8,000 steps at 3e-3, 1e-3 and 3e-4;</li>
+<li>the energy trunk ran 800, 1,200 and 5,000 steps at 2e-3, 7e-4 and 2e-4.</li>
+</ul>
+<h3>Inspection and figures</h3>
+<p>A standing rule says everything a model computes, learns or stores must be reachable as named arrays through its <code>Inspect()</code> method, and figures may be drawn only from that interface. Figures render from cached arrays, reproducibly byte for byte, and are committed: 822 of them at the audited commit. The audit re-rendered every component figure from its cache. All matched except one flagship plot, where later code had added a scalar.</p>
+</div>
+
+<check part="5">
+<q>Describe the shared training schedule in one or two sentences.</q>
+<a>A probe of up to 200 steps at 1e-3, rerun at 0.3 times the rate if unstable. Then three stages at the peak rate, ÷3 and ÷9, over 30%, 30% and 40% of the budget, with early stopping only in the last.</a>
+<src>operators/training/staged.py</src>
+</check>
+<check part="5">
+<q>What does the schedule return, and why did that matter?</q>
+<a>The last stage's best parameters. An earlier stage can be better: for the explicit flagship, stage 1 scored 8.02e-5 against stage 2's 8.08e-5. So the page's 8.0e-5 belongs to a model that was never evaluated; the evaluated one is 8.1e-5.</a>
+<src>The training manifests (a10-manifests.tsv); the audit's finding on the staged return</src>
+</check>
+<check part="5">
+<q>Why does only one training job run on the card at a time?</q>
+<a>Two concurrent trainings were measured at 2.56 times slower than queueing them. Small models are limited by launch overhead, and the card switches between jobs.</a>
+<src>The plan's measurement record</src>
+</check>
+<check part="5">
+<q>What is point sampling, and why do coordinate-trunk models use it?</q>
+<a>Each step draws a few runs and random points inside them. Memory then depends on the batch, not the grid size, and runs on different grids can share one batch.</a>
+<src>operators/training/sampling.py; the branch–trunk specification</src>
+</check>
+<check part="5">
+<q>How many steps did the Galerkin gate actually run, against what budget?</q>
+<a>33,170 steps plus a 200-step probe, in about 78 minutes, against a budget of 52,283. The results page reports the budget as the steps run.</a>
+<src>The training manifests; the audit's finding on the gate's steps</src>
+</check>
+<check part="5">
+<q>What happens if the laptop loses power in the middle of a run?</q>
+<a>Every stage writes a checkpoint at each validation pass. A relaunch skips finished stages, resumes the unfinished one from its last checkpoint, and skips the probe if it already ran.</a>
+<src>operators/training/staged.py; operators/training/loop.py</src>
+</check>
+</section>

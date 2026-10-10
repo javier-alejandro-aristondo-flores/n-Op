@@ -1,0 +1,5 @@
+[   45.4s] twin: loaded elf_fold0_twin_33650
+[  174.7s]   twin: MAE 0.014553 (reported 0.014553), relative L2 0.070017 (reported 0.070017), 29 units, 152 rows
+[  209.7s] member: loaded elf_fold0_member_v2_33650
+[  314.7s]   member: MAE 0.016454 (reported 0.016454), relative L2 0.069531 (reported 0.069531), 29 units, 152 rows
+[  314.7s] member against twin on MAE: -13.1% (reported -13.1%); on relative L2: 0.69%

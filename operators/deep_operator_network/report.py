@@ -1822,8 +1822,10 @@ def Main() -> int:
         lines += [
             f"Caveat: {len(at_the_ceiling)} of {len(chosen_step_counts)} fixed-basis blocks chose the largest"
             f" budget offered ({max(CANDIDATE_STEP_COUNTS)} steps), so the search did not settle"
-            " inside its range. Quadrupling the budget moved the member by three to seven percent"
-            " against a margin it clears by seventy, so the boundary is recorded rather than chased.",
+            " inside its range. On the strain principal-component block where this was measured (6 September 2026)"
+            " quadrupling the budget moved the member by three to seven percent against a margin it cleared by about"
+            " seventy points; the perovskite fold-0 margins are about thirty points and the holdout margins negative,"
+            " so the boundary is recorded rather than chased.",
             "",
         ]
     REPORT_PATH.write_text("\n".join(lines) + "\n")

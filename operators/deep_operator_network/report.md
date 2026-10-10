@@ -603,5 +603,5 @@ block for it appears in this section.
 - the ridge floor is the binding one; the nearest-neighbor copy is roughly threefold weaker, against the suite's expectation that a factorial sweep would make copying brutal
 - the basis reconstructs the same fields to a thousandth of the floor, so the error measured here is the parameter map's and none of it the representation's
 
-Caveat: 4 of 4 fixed-basis blocks chose the largest budget offered (32000 steps), so the search did not settle inside its range. Quadrupling the budget moved the member by three to seven percent against a margin it clears by seventy, so the boundary is recorded rather than chased.
+Caveat: 4 of 4 fixed-basis blocks chose the largest budget offered (32000 steps), so the search did not settle inside its range. On the strain principal-component block where this was measured (6 September 2026) quadrupling the budget moved the member by three to seven percent against a margin it cleared by about seventy points; the perovskite fold-0 margins are about thirty points and the holdout margins negative, so the boundary is recorded rather than chased.
 

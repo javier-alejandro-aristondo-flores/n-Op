@@ -161,7 +161,7 @@ rather than inventing a fake integral to satisfy the template.
 | Directory | Contents |
 |---|---|
 | `framework/` | the four contracts, the `NeuralOperator` template, `Layer`, the dense reference integral, and the discretization-invariance harness |
-| `kernels/spectral/` | translation-invariant kernels: full and factorized per-axis mode weights, mode truncation, physical-wavevector features from the reciprocal lattice, spectral resampling (truncation and zero-padding), and the per-mode mixings — full and separable — that reach the transform through the substrate facet rather than owning it |
+| `kernels/spectral/` | translation-invariant kernels: full and factorized per-axis mode weights, mode truncation, physical-wavevector features from the reciprocal lattice, and the per-mode mixings — full and separable — that reach the transform through the substrate facet rather than owning it |
 | `kernels/compact_support/` | small-support kernels in two parametrizations — tabulated at integer offsets on a grid (convolution) and continuous in the displacement (message passing) — plus periodic neighbor finding and the alias-free activation machinery |
 | `kernels/low_rank/` | separable kernels φ(x)·ψ(y) evaluated as inner products, and the dense kernel over a finite index set |
 | `kernels/codomain_attention/` | attention over the channel index, with weights shared across channel tokens |

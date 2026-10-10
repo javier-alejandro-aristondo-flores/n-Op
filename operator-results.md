@@ -146,8 +146,9 @@ equilibrium no" is a legitimate verdict.
 
 Reading so far: re-applying one layer twelve times beats applying it once by more than three to one
 at identical parameter count; injecting the input at every application buys another 9% (0.00271
-against 0.00297; defects 0.00316, strains 0.00107); the twelve-layer stack is still a quarter better
-than the best tied rung for twelve times the parameters. So far: weight-tying yes at matched
+against 0.00297; defects 0.00316, strains 0.00107); the twelve-layer stack is still a fifth better
+(19.9%, on the same convention as every other margin on this page) than the best tied rung for twelve
+times the parameters. So far: weight-tying yes at matched
 parameters, no at matched width. One seed per rung.
 
 Canon bars for the fixed-point rung: beat the explicit comparator at both matchings (same width and

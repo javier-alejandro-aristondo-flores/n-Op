@@ -6,7 +6,7 @@ The block, all four floors and the pre-registered claim ladder below were measur
 
 ## The block
 
-Cubic block (`supercell_strains` and `defect_set`, 80³ charge density, full localization and potential): 261 runs across folds one through four train the floors, 76 runs in fold zero are the evaluation (kill) block. The member additionally holds out fold one (65 runs) for its own early stopping and trains on folds two through four (196 runs); the floors keep stage zero's own folds one through four as their training role, so their numbers reproduce stage zero's exactly.
+Cubic block (`supercell_strains` and `defect_set`, 80³ charge density, full localization and potential): 261 runs across folds one through four train the floors, 76 runs in fold zero are the evaluation (kill) block. The member additionally holds out fold one (65 runs) for its own early stopping and trains on folds two through four (196 runs); the floors keep stage zero's own folds one through four as their training role, so their per-run errors reproduce stage zero's; stage zero published flat run-channel medians (0.0964 for the ridge, 0.0816 for the filter on the up channel), while the table below aggregates to unit medians first, as the card requires, so the printed medians differ.
 
 ## Floors, measured before training, on this exact block, in the card's own metrics
 

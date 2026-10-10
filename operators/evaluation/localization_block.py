@@ -36,7 +36,7 @@ FINE_SHAPE = (80, 80, 80)
 LOCALIZATION_CHANNELS = ("electron_localization_up", "electron_localization_down")
 POTENTIAL_CHANNELS = ("local_potential_up", "local_potential_down")
 
-# stage zero's own choices, kept here so the recomputed numbers reproduce them
+# stage zero's own choices, kept here so the recomputed per-run errors reproduce them (the printed medians aggregate to units first)
 RIDGE_TRAIN_RUN_COUNT = 80
 FILTER_TRAIN_RUN_COUNT = 120
 RIDGE_VOXELS_PER_RUN = 2000
